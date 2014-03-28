@@ -8,12 +8,22 @@ import requests
 
 from apikey import key
 
-URL = 'https://misp.circl.lu/events'
-URL_TMPL = URL + '/{}'
-URL_XML_DOWNLOAD = URL + '/xml/download'
-URL_XML_DOWNLOAD_TMPL = URL_XML_DOWNLOAD + '/{}'
-
+URL=None
+URL_TMPL = None
+URL_XML_DOWNLOAD = None
+URL_XML_DOWNLOAD_TMPL = None
 OUTPUT_TYPE = 'json'
+
+def init_server(url, key):
+    global URL
+    global URL_TMPL
+    global URL_XML_DOWNLOAD
+    global URL_XML_DOWNLOAD_TMPL
+    URL = 'https://misp.circl.lu/events'
+    URL_TMPL = URL + '/{}'
+    URL_XML_DOWNLOAD = URL + '/xml/download'
+    URL_XML_DOWNLOAD_TMPL = URL_XML_DOWNLOAD + '/{}'
+
 
 def __prepare_session(output_type=OUTPUT_TYPE):
     """
@@ -67,23 +77,23 @@ def delete_event(event_id):
 
 ##########################################
 
-############### XML Export ###############
+############### Export ###############
 
-# Only XML,
+# XML and Json
 
 
 def download_all():
     """
         Download all event from the instance
     """
-    session = __prepare_session('xml')
+    session = __prepare_session()
     return session.get(URL_XML_DOWNLOAD, verify=False)
 
 def download(event_id):
     """
         Download one event in XML
     """
-    session = __prepare_session('xml')
+    session = __prepare_session()
     return session.get(URL_XML_DOWNLOAD_TMPL.format(event_id), verify=False)
 
 ######### REST Search #########
@@ -128,14 +138,15 @@ def search(values=None, not_values=None, type_attribute=None,
     if org is None:
         org = 'null'
 
-    session = __prepare_session('xml')
+    session = __prepare_session()
     return session.get(URL_SEARCH_TMPL.format(v, type_attribute,
         category, org, t), verify=False)
 
 ##########################################
 
 if __name__ == '__main__':
-    r = search(values='77.67.80.31', tags='OSINT')
-    print unicode(r.text)
+    r = search(tags='OSINT')
+    print unicode(r.json())
+
     #r = get_index()
     #print r.text
