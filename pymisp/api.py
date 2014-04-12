@@ -9,7 +9,7 @@ import requests
 class PyMISP(object):
 
     def __init__(self, url, key, out_type = 'json'):
-        self.url = url
+        self.url = url + '/events'
         self.key = key
         self.out_type = out_type
         self.rest = self.url + '/{}'
@@ -25,7 +25,8 @@ class PyMISP(object):
             out = self.out_type
         session = requests.Session()
         session.headers.update({'Authorization': self.key,
-            'Accept': 'application/' + out})
+            'Accept': 'application/' + out,
+            'content-type': 'text/' + out})
         return session
 
 
@@ -38,7 +39,7 @@ class PyMISP(object):
             Warning, there's a limit on the number of results
         """
         session = self.__prepare_session()
-        return session.get(self.url, verify=False)
+        return session.get(self.rest, verify=False)
 
     def get_event(self, event_id):
         """
