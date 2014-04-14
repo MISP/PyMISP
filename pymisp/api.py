@@ -99,7 +99,7 @@ class PyMISP(object):
         """
             Search via the Rest API
         """
-        search = self.url + '/events/restSearch/download/{}/{}/{}/{}/{}'
+        search = self.url + '/restSearch/download/{}/{}/{}/{}/{}'
         val = self.__prepare_rest_search(values, not_values).replace('/', '|')
         tag = self.__prepare_rest_search(tags, not_tags).replace(':', ';')
         if len(val) == 0:
