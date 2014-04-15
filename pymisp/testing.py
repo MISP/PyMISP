@@ -43,8 +43,14 @@ def list_copy(filename):
     with open(filename, 'r') as f:
         for l in f:
             l = int(l.strip())
+            print l
             copy_event(l)
+
+
+def export_our_org():
+    circl = source.search(org='CIRCL')
+    return _to_utf8(circl)
 
 if __name__ == '__main__':
     init()
-    list_copy('list')
+    list_copy('all_ours')
