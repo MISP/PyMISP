@@ -1,12 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from api import PyMISP
+
+from pymisp import PyMISP
 
 from keys import src, dest
 
 url_source = 'https://misp.circl.lu'
 url_dest = 'https://misppriv.circl.lu'
+cert_source = 'misp.circl.lu.crt'
+cert_dest = 'misppriv.circl.lu.crt'
 source = None
 destination = None
 
@@ -14,8 +17,8 @@ destination = None
 def init():
     global source
     global destination
-    source = PyMISP(url_source, src, 'xml')
-    destination = PyMISP(url_dest, dest, 'xml')
+    source = PyMISP(url_source, src, cert_source, 'xml')
+    destination = PyMISP(url_dest, dest, cert_dest, 'xml')
 
 
 def _to_utf8(request):
@@ -33,12 +36,6 @@ def copy_event(event_id):
     return destination.add_event(to_send)
 
 
-def export_osint():
-    # Warning: does not exports the samples/attachements
-    osint = source.search(tags='OSINT')
-    return _to_utf8(osint)
-
-
 def list_copy(filename):
     with open(filename, 'r') as f:
         for l in f:
@@ -52,5 +49,11 @@ def export_our_org():
     return _to_utf8(circl)
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='Copy the events from one MISP instance to an other.')
+    parser.add_argument('-f', '--filename', type=str, required=True,
+                        help='File containing a list of event id.')
+    args = parser.parse_args()
     init()
-    list_copy('all_ours')
+    list_copy(args.filename)
