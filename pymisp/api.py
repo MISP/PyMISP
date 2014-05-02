@@ -83,8 +83,7 @@ class PyMISP(object):
             :param event: Elements to add
         """
         session = self.__prepare_session()
-        return session.post(self.rest.format(event_id), data=event,
-                            verify=self.ssl)
+        return session.post(self.rest.format(event_id), data=event)
 
     def delete_event(self, event_id):
         """
