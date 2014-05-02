@@ -42,6 +42,12 @@ def copy_event(event_id):
     return destination.add_event(to_send)
 
 
+def update_event(event_id, event_to_update):
+    r_src = source.get_event(event_id)
+    to_send = _to_utf8(r_src)
+    return destination.update_event(event_to_update, to_send)
+
+
 def list_copy(filename):
     with open(filename, 'r') as f:
         for l in f:
@@ -62,7 +68,16 @@ def copy(eventid):
     eventid = int(eventid)
     print eventid, 'copying...'
     r = copy_event(eventid)
-    print r.text
+    if r.status_code >= 400:
+        loc = r.headers['location']
+        if loc is not None:
+            event_to_update = loc.split('/')[-1]
+            print'updating', event_to_update
+            r = update_event(eventid, event_to_update)
+            if r.status_code >= 400:
+                print r.status_code, r.headers
+        else:
+            print r.status_code, r.headers
     print eventid, 'done.'
 
 
