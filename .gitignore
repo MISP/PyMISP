@@ -1,2 +1,6 @@
 *.pyc
 examples/keys.py
+examples/cudeso.py
+build/*
+dist/*
+pymisp.egg-info/*
