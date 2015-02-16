@@ -3,6 +3,8 @@
 
 """ Python API using the REST interface of MISP """
 
+import json
+import datetime
 import requests
 
 
@@ -45,6 +47,15 @@ class PyMISP(object):
              'Accept': 'application/' + out,
              'content-type': 'text/' + out})
         return session
+
+    def __query(self, session, path, query):
+        if query.get('error') is not None:
+            return query
+        url = self.rest.format(path)
+        query = {'request': query}
+        print json.dumps(query)
+        r = session.post(url, data=json.dumps(query))
+        return r.json()
 
     # ############### REST API ################
 
@@ -121,7 +132,8 @@ class PyMISP(object):
         return to_return
 
     def search(self, values=None, not_values=None, type_attribute=None,
-               category=None, org=None, tags=None, not_tags=None):
+               category=None, org=None, tags=None, not_tags=None, date_from=None,
+               date_to=None):
         """
             Search via the Rest API
 
@@ -132,25 +144,36 @@ class PyMISP(object):
             :param org: Org reporting the event
             :param tags: Tags to search for
             :param not_tags: Tags *not* to search for
+            :param date_from: First date
+            :param date_to: Last date
 
         """
-        search = self.url + '/restSearch/download/{}/{}/{}/{}/{}'
         val = self.__prepare_rest_search(values, not_values).replace('/', '|')
         tag = self.__prepare_rest_search(tags, not_tags).replace(':', ';')
-        if len(val) == 0:
-            val = 'null'
-        if len(tag) == 0:
-            tag = 'null'
-        if type_attribute is None:
-            type_attribute = 'null'
-        if category is None:
-            category = 'null'
-        if org is None:
-            org = 'null'
+        query = {}
+        if len(val) != 0:
+            query['value'] = val
+        if len(tag) != 0:
+            query['tags'] = tag
+        if type_attribute is not None:
+            query['type'] = type_attribute
+        if category is not None:
+            query['category'] = category
+        if org is not None:
+            query['org'] = org
+        if date_from is not None:
+            if isinstance(date_from, datetime.date) or isinstance(date_to, datetime.datetime):
+                query['from'] = date_from.strftime('%Y-%m-%d')
+            else:
+                query['from'] = date_from
+        if date_to is not None:
+            if isinstance(date_to, datetime.date) or isinstance(date_to, datetime.datetime):
+                query['to'] = date_to.strftime('%Y-%m-%d')
+            else:
+                query['to'] = date_to
 
         session = self.__prepare_session()
-        return session.get(search.format(val, type_attribute,
-                                         category, org, tag))
+        return self.__query(session, 'restSearch/download', query)
 
     def get_attachement(self, event_id):
         """
