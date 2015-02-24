@@ -8,36 +8,32 @@
 
     Feed it a list of event_id's (1 id per line) with the option "-f".
     Use --no-comment to get a flat list of entries without event id and title information
-    
-"""    
 
-import sys
-import json
+"""
+
 from pymisp import PyMISP
 
 from cudeso import misp_key
 from cudeso import misp_url
 from cudeso import misp_verifycert
 
+source = None
 
-"""
-    Initialize PyMISP
 
-        Get configuration settings from config file
-
-"""
 def init():
-    global source    
+    """
+    Initialize PyMISP
+    Get configuration settings from config file
+    """
+    global source
     source = PyMISP(misp_url, misp_key, misp_verifycert, 'json')
 
 
-"""
-    Get details of an event and add it to the result arrays
-
-        :event_id   the id of the event
-
-"""
 def get_event(event_id):
+    """
+    Get details of an event and add it to the result arrays
+    :event_id   the id of the event
+    """
     global network_ip_src, network_ip_dst, network_hostname, network_domain
     global app_hostname, app_domain, app_ip_src, app_ip_dst, app_ids_only
 
@@ -52,71 +48,69 @@ def get_event(event_id):
                 return False
 
             event_core = event_json["Event"]
-            event_threatlevel_id = event_core["threat_level_id"] 
+            # event_threatlevel_id = event_core["threat_level_id"]
 
-            attribute_count = event_core["attribute_count"]
+            # attribute_count = event_core["attribute_count"]
             attribute = event_core["Attribute"]
 
             for attribute in event_core["Attribute"]:
-                if app_ids_only == True and attribute["to_ids"] == False:
+                if app_ids_only and not attribute["to_ids"]:
                     continue
-                
+
                 value = attribute["value"]
                 title = event_core["info"]
-                if attribute["type"] == "ip-src" and app_ip_src == True:
-                    network_ip_src.append( [ build_entry(value, event_id, title, "ip-src") ])
-                elif attribute["type"] == "ip-dst" and app_ip_dst == True:
-                    network_ip_dst.append( [ build_entry(value, event_id, title, "ip-dst") ])
-                elif attribute["type"] == "domain" and app_domain == True:
-                    network_domain.append( [ build_entry(value, event_id, title, "domain") ])
-                elif attribute["type"] == "hostname" and app_hostname == True:
-                    network_hostname.append( [ build_entry( value, event_id, title, "hostname") ])
+                if attribute["type"] == "ip-src" and app_ip_src:
+                    network_ip_src.append([build_entry(value, event_id, title, "ip-src")])
+                elif attribute["type"] == "ip-dst" and app_ip_dst:
+                    network_ip_dst.append([build_entry(value, event_id, title, "ip-dst")])
+                elif attribute["type"] == "domain" and app_domain:
+                    network_domain.append([build_entry(value, event_id, title, "domain")])
+                elif attribute["type"] == "hostname" and app_hostname:
+                    network_hostname.append([build_entry(value, event_id, title, "hostname")])
                 else:
                     continue
     else:
         print "Not a valid ID"
-        return        
+        return
 
 
-"""
+def build_entry(value, event_id, title, source):
+    """
     Build the line containing the entry
 
         :value      the datavalue of the entry
-        :event_id   id of the event 
-        :title      name of the event 
+        :event_id   id of the event
+        :title      name of the event
         :source     from which set was the entry retrieved
-
-"""        
-def build_entry( value, event_id , title, source ):
+    """
     global app_printcomment
 
-    if app_printcomment == True:
-        if app_printtitle == True:
-            return "%s # Event: %s / %s (from %s) " % ( value, event_id , title, source )
+    if app_printcomment:
+        if app_printtitle:
+            return "%s # Event: %s / %s (from %s) " % (value, event_id, title, source)
         else:
-            return "%s # Event: %s (from %s) " % ( value, event_id , source )
+            return "%s # Event: %s (from %s) " % (value, event_id, source)
     else:
         return value
 
 
-"""
-    Print the events from the result arrays
-
-"""    
 def print_events():
+    """
+    Print the events from the result arrays
+    """
     global network_ip_src, network_ip_dst, network_domain, network_hostname
     global app_hostname, app_domain, app_ip_src, app_ip_dst, app_ids_only, app_printcomment, app_printtitle
 
-    if app_ip_src == True:
+    if app_ip_src:
         for ip in network_ip_src:
             print ip[0]
-    if app_ip_dst == True:
+    if app_ip_dst:
         for ip in network_ip_dst:
             print ip[0]
-    if app_domain == True:
+    if app_domain:
         for ip in network_domain:
             print ip[0]
-    if app_hostname == True:
+    if app_hostname:
         for ip in network_hostname:
             print ip[0]
 
@@ -130,7 +124,7 @@ if __name__ == '__main__':
     network_hostname = []
 
     parser = argparse.ArgumentParser(
-                        description='Download network activity information from MISP.')
+        description='Download network activity information from MISP.')
     parser.add_argument('-f', '--filename', type=str,
                         help='File containing a list of event id.')
     parser.add_argument('--hostname', action='store_true', default=False,
@@ -146,9 +140,9 @@ if __name__ == '__main__':
     parser.add_argument('--no-ids-only', action='store_true', default=False,
                         help='Include IDS and non-IDS attribures.')
     parser.add_argument('--no-titles', action='store_true', default=False,
-                        help='Do not include titles')    
+                        help='Do not include titles')
     args = parser.parse_args()
-    
+
     if args.filename is not None:
         init()
         app_printcomment = args.no_comment
@@ -161,8 +155,7 @@ if __name__ == '__main__':
         # print "app_printcomment %s app_hostname %s app_domain %s app_ip_src %s app_ip_dst %s app_ids_only %s app_printtitle %s" % (app_printcomment,app_hostname, app_domain, app_ip_src, app_ip_dst, app_ids_only, app_printtitle)
         with open(args.filename, 'r') as line:
             for event_id in line:
-                get_event( event_id.strip() )
+                get_event(event_id.strip())
         print_events()
     else:
         print "No filename given, stopping."
-
