@@ -53,7 +53,7 @@ class PyMISP(object):
             return query
         url = self.rest.format(path)
         query = {'request': query}
-        print json.dumps(query)
+        print(json.dumps(query))
         r = session.post(url, data=json.dumps(query))
         return r.json()
 

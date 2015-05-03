@@ -74,7 +74,7 @@ def get_event(event_id):
                 else:
                     continue
     else:
-        print "Not a valid ID"
+        print("Not a valid ID")
         return        
 
 
@@ -109,16 +109,16 @@ def print_events():
 
     if app_ip_src == True:
         for ip in network_ip_src:
-            print ip[0]
+            print(ip[0])
     if app_ip_dst == True:
         for ip in network_ip_dst:
-            print ip[0]
+            print(ip[0])
     if app_domain == True:
         for ip in network_domain:
-            print ip[0]
+            print(ip[0])
     if app_hostname == True:
         for ip in network_hostname:
-            print ip[0]
+            print(ip[0])
 
 
 if __name__ == '__main__':
@@ -164,5 +164,5 @@ if __name__ == '__main__':
                 get_event( event_id.strip() )
         print_events()
     else:
-        print "No filename given, stopping."
+        print("No filename given, stopping.")
 
