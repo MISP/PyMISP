@@ -1,1 +1,1 @@
-from api import PyMISP
+from .api import PyMISP

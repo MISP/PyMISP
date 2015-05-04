@@ -18,7 +18,7 @@ destination = None
 def init(cert_to_priv=True):
     global source
     global destination
-    print cert_to_priv
+    print(cert_to_priv)
     if cert_to_priv:
         source = PyMISP(url_cert, cert, cert_cert, 'xml')
         destination = PyMISP(url_priv, priv, cert_priv, 'xml')
@@ -63,22 +63,22 @@ def loop_copy():
 def copy(eventid):
     eventid = eventid.strip()
     if len(eventid) == 0 or not eventid.isdigit():
-        print 'empty line or NaN.'
+        print('empty line or NaN.')
         return
     eventid = int(eventid)
-    print eventid, 'copying...'
+    print(eventid, 'copying...')
     r = copy_event(eventid)
     if r.status_code >= 400:
         loc = r.headers['location']
         if loc is not None:
             event_to_update = loc.split('/')[-1]
-            print'updating', event_to_update
+            print('updating', event_to_update)
             r = update_event(eventid, event_to_update)
             if r.status_code >= 400:
-                print r.status_code, r.headers
+                print(r.status_code, r.headers)
         else:
-            print r.status_code, r.headers
-    print eventid, 'done.'
+            print(r.status_code, r.headers)
+    print(eventid, 'done.')
 
 
 def export_our_org():
