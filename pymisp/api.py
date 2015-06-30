@@ -45,7 +45,7 @@ class PyMISP(object):
         session.headers.update(
             {'Authorization': self.key,
              'Accept': 'application/' + out,
-             'content-type': 'text/' + out})
+             'content-type': 'application/' + out})
         return session
 
     def __query(self, session, path, query):
@@ -84,7 +84,7 @@ class PyMISP(object):
             :param event: Event object to add
         """
         session = self.__prepare_session()
-        return session.post(self.url, data=event)
+        return session.post(self.url, data=json.dumps(event))
 
     def update_event(self, event_id, event):
         """
@@ -94,7 +94,7 @@ class PyMISP(object):
             :param event: Elements to add
         """
         session = self.__prepare_session()
-        return session.post(self.rest.format(event_id), data=event)
+        return session.post(self.rest.format(event_id), data=json.dumps(event))
 
     def delete_event(self, event_id):
         """
