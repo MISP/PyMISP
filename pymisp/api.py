@@ -196,6 +196,24 @@ class PyMISP(object):
         session = self.__prepare_session('xml')
         return session.get(xml)
 
+    def download_all_suricata(self):
+        """
+            Download all suricata rules events.
+        """
+        suricata_rules = self.url + '/nids/suricata/download'
+        session = self.__prepare_session('rules')
+        return session.get(suricata_rules)
+
+    def download_suricata_rule_event(self, event_id):
+        """
+            Download one suricata rule event.
+
+            :param event_id: ID of the event to download (same as get)
+        """
+        template = self.url + '/nids/suricata/download/{}'
+        session = self.__prepare_session('rules')
+        return session.get(template.format(event_id))
+
     def download(self, event_id, with_attachement=False):
         """
             Download one event in XML
