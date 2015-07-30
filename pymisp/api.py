@@ -84,7 +84,7 @@ class PyMISP(object):
             :param event: Event object to add
         """
         session = self.__prepare_session()
-        return session.post(self.url, data=json.dumps(event))
+        return session.post(self.url, data=event)
 
     def update_event(self, event_id, event):
         """
@@ -94,7 +94,7 @@ class PyMISP(object):
             :param event: Elements to add
         """
         session = self.__prepare_session()
-        return session.post(self.rest.format(event_id), data=json.dumps(event))
+        return session.post(self.rest.format(event_id), data=event)
 
     def delete_event(self, event_id):
         """
