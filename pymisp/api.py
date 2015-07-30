@@ -81,20 +81,32 @@ class PyMISP(object):
         """
             Add a new event
 
-            :param event: Event object to add
+            :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
-        return session.post(self.url, data=event)
+        if self.out_type == 'json':
+            if isinstance(event, basestring):
+                return session.post(self.url, data=event)
+            else:
+                return session.post(self.url, data=json.dumps(event))
+        else:
+            return session.post(self.url, data=event)
 
     def update_event(self, event_id, event):
         """
             Update an event
 
             :param event_id: Event id to update
-            :param event: Elements to add
+            :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
-        return session.post(self.rest.format(event_id), data=event)
+        if self.out_type == 'json':
+            if isinstance(event, basestring):
+                return session.post(self.rest.format(event_id), data=event)
+            else:
+                return session.post(self.rest.format(event_id), data=json.dumps(event))
+        else:
+            return session.post(self.rest.format(event_id), data=event)
 
     def delete_event(self, event_id):
         """

@@ -4,7 +4,6 @@
 import sys
 
 from pymisp import PyMISP
-import json
 
 from keys import cert, priv
 
@@ -31,7 +30,7 @@ def init(cert_to_priv=True):
 def _to_utf8(request):
     to_return = None
     if 'json' in request.headers['content-type']:
-        to_return = json.dumps(request.json())
+        to_return = request.json()
     else:
         to_return = request.text.encode('utf-8')
     return to_return
