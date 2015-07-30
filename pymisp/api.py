@@ -66,7 +66,7 @@ class PyMISP(object):
             Warning, there's a limit on the number of results
         """
         session = self.__prepare_session()
-        return session.get(self.rest)
+        return session.get(self.url)
 
     def get_event(self, event_id):
         """
