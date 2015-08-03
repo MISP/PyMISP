@@ -45,7 +45,7 @@ class PyMISP(object):
         session.headers.update(
             {'Authorization': self.key,
              'Accept': 'application/' + out,
-             'content-type': 'text/' + out})
+             'content-type': 'application/' + out})
         return session
 
     def __query(self, session, path, query):
@@ -53,7 +53,7 @@ class PyMISP(object):
             return query
         url = self.rest.format(path)
         query = {'request': query}
-        print json.dumps(query)
+        print(json.dumps(query))
         r = session.post(url, data=json.dumps(query))
         return r.json()
 
@@ -66,7 +66,7 @@ class PyMISP(object):
             Warning, there's a limit on the number of results
         """
         session = self.__prepare_session()
-        return session.get(self.rest)
+        return session.get(self.url)
 
     def get_event(self, event_id):
         """
@@ -81,20 +81,32 @@ class PyMISP(object):
         """
             Add a new event
 
-            :param event: Event object to add
+            :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
-        return session.post(self.url, data=event)
+        if self.out_type == 'json':
+            if isinstance(event, basestring):
+                return session.post(self.url, data=event)
+            else:
+                return session.post(self.url, data=json.dumps(event))
+        else:
+            return session.post(self.url, data=event)
 
     def update_event(self, event_id, event):
         """
             Update an event
 
             :param event_id: Event id to update
-            :param event: Elements to add
+            :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
-        return session.post(self.rest.format(event_id), data=event)
+        if self.out_type == 'json':
+            if isinstance(event, basestring):
+                return session.post(self.rest.format(event_id), data=event)
+            else:
+                return session.post(self.rest.format(event_id), data=json.dumps(event))
+        else:
+            return session.post(self.rest.format(event_id), data=event)
 
     def delete_event(self, event_id):
         """
@@ -195,6 +207,24 @@ class PyMISP(object):
         xml = self.url + '/xml/download'
         session = self.__prepare_session('xml')
         return session.get(xml)
+
+    def download_all_suricata(self):
+        """
+            Download all suricata rules events.
+        """
+        suricata_rules = self.url + '/nids/suricata/download'
+        session = self.__prepare_session('rules')
+        return session.get(suricata_rules)
+
+    def download_suricata_rule_event(self, event_id):
+        """
+            Download one suricata rule event.
+
+            :param event_id: ID of the event to download (same as get)
+        """
+        template = self.url + '/nids/suricata/download/{}'
+        session = self.__prepare_session('rules')
+        return session.get(template.format(event_id))
 
     def download(self, event_id, with_attachement=False):
         """
