@@ -6,7 +6,8 @@
 import json
 import datetime
 import requests
-
+import os
+import base64
 
 class PyMISP(object):
     """
@@ -116,6 +117,56 @@ class PyMISP(object):
         """
         session = self.__prepare_session()
         return session.delete(self.rest.format(event_id))
+
+    # ######### Create/update events through the API #########
+
+    def _create_event(self, distribution, threat_level_id, analysis, info):
+        # Setup details of a new event
+        if distribution not in [0, 1, 2, 3]:
+            return False
+        if threat_level_id not in [0, 1, 2, 3]:
+            return False
+        if analysis not in [0, 1, 2]:
+            return False
+        return {'distribution': int(distribution), 'info': info,
+                'threat_level_id': int(threat_level_id), 'analysis': analysis}
+
+    def upload_sample(self, event_id, filepaths, distribution, to_ids, category,
+                      info, analysis, threat_level_id):
+        to_post = {'request': {'files': []}}
+        if not isinstance(event_id, int):
+            # New event
+            postcontent = self._create_event(distribution, threat_level_id,
+                                             analysis, info)
+            if postcontent:
+                to_post['request'].update(postcontent)
+            else:
+                # invalid new event
+                return False
+        else:
+            to_post['request'].update({'event_id': int(event_id)})
+
+        if to_ids not in [True, False]:
+            return False
+        to_post['request'].update({'to_ids': to_ids})
+
+        if category not in ['Payload delivery', 'Artifacts dropped',
+                            'Payload Installation', 'External Analysis']:
+            return False
+        to_post['request'].update({'category': category})
+
+        files = []
+        for path in filepaths:
+            if not os.path.isfile(path):
+                continue
+            with open(path, 'rb') as f:
+                files.append({'filename': os.path.basename(path),
+                              'data': base64.b64encode(f.read())})
+
+        to_post['request']['files'] = files
+
+        session = self.__prepare_session()
+        return session.post(self.rest.format('upload_sample'), data=json.dumps(to_post))
 
     # ######## REST Search #########
 
