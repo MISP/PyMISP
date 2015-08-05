@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import priv
+from keys import url_priv, key_priv
+# from keys import url_cert, key_cert
 import argparse
 import os
 import glob
-
-url = 'https://misppriv.circl.lu'
 
 
 def init(url, key):
@@ -16,7 +15,10 @@ def init(url, key):
 
 def upload_files(m, eid, paths, distrib, ids, categ, info, analysis, threat):
     out = m.upload_sample(eid, paths, distrib, ids, categ, info, analysis, threat)
-    print out, out.text
+    if out.status_code == 200:
+        print("Files uploaded sucessfully")
+    else:
+        print("Something failed: {}".format(out.text))
 
 
 if __name__ == '__main__':
@@ -31,7 +33,8 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--threat", type=int, help="The threat level ID of the newly created event, if applicatble. [0-3]")
     args = parser.parse_args()
 
-    misp = init(url, priv)
+    misp = init(url_priv, key_priv)
+    # misp = init(url_cert, key_cert)
 
     files = []
     if os.path.isfile(args.upload):

@@ -9,6 +9,21 @@ import requests
 import os
 import base64
 
+
+class PyMISPError(Exception):
+    def __init__(self, message):
+        super(PyMISPError, self).__init__(message)
+        self.message = message
+
+
+class NewEventError(PyMISPError):
+    pass
+
+
+class NewAttributeError(PyMISPError):
+    pass
+
+
 class PyMISP(object):
     """
         Python API for MISP
@@ -123,11 +138,11 @@ class PyMISP(object):
     def _create_event(self, distribution, threat_level_id, analysis, info):
         # Setup details of a new event
         if distribution not in [0, 1, 2, 3]:
-            return False
+            raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(distribution))
         if threat_level_id not in [0, 1, 2, 3]:
-            return False
+            raise NewEventError('{} is invalid, the threat_level_id has to be in 0, 1, 2, 3'.format(threat_level_id))
         if analysis not in [0, 1, 2]:
-            return False
+            raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(analysis))
         return {'distribution': int(distribution), 'info': info,
                 'threat_level_id': int(threat_level_id), 'analysis': analysis}
 
@@ -138,21 +153,17 @@ class PyMISP(object):
             # New event
             postcontent = self._create_event(distribution, threat_level_id,
                                              analysis, info)
-            if postcontent:
-                to_post['request'].update(postcontent)
-            else:
-                # invalid new event
-                return False
+            to_post['request'].update(postcontent)
         else:
             to_post['request'].update({'event_id': int(event_id)})
 
         if to_ids not in [True, False]:
-            return False
+            raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(analysis))
         to_post['request'].update({'to_ids': to_ids})
 
         if category not in ['Payload delivery', 'Artifacts dropped',
                             'Payload Installation', 'External Analysis']:
-            return False
+            raise NewAttributeError('{} is invalid, category has to be in {}'.format(analysis, (', '.join(['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis']))))
         to_post['request'].update({'category': category})
 
         files = []
