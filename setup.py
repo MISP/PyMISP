@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='pymisp',
-    version='1.0.1',
+    version='1.1',
     author='Raphaël Vinot',
     author_email='raphael.vinot@circl.lu',
     maintainer='Raphaël Vinot',
@@ -21,6 +21,6 @@ setup(
         'Programming Language :: Python',
         'Topic :: Security',
         'Topic :: Internet',
-        ],
+    ],
     install_requires=['requests'],
-    )
+)
