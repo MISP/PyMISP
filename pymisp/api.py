@@ -145,8 +145,8 @@ class PyMISP(object):
         return {'distribution': int(distribution), 'info': info,
                 'threat_level_id': int(threat_level_id), 'analysis': analysis}
 
-    def upload_sample(self, event_id, filepaths, distribution, to_ids, category,
-                      info, analysis, threat_level_id):
+    def prepare_attribute(self, event_id, distribution, to_ids, category, info,
+                          analysis, threat_level_id):
         to_post = {'request': {'files': []}}
         if not isinstance(event_id, int):
             # New event
@@ -165,16 +165,37 @@ class PyMISP(object):
             raise NewAttributeError('{} is invalid, category has to be in {}'.format(analysis, (', '.join(['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis']))))
         to_post['request'].update({'category': category})
 
+        return to_post
+
+    def prepare_sample(self, filename, filepath):
+        with open(filepath, 'rb') as f:
+            return {'files': [{'filename': filename, 'data': base64.b64encode(f.read())}]}
+
+    def prepare_samplelist(self, filepaths):
         files = []
         for path in filepaths:
             if not os.path.isfile(path):
                 continue
-            with open(path, 'rb') as f:
-                files.append({'filename': os.path.basename(path),
-                              'data': base64.b64encode(f.read())})
+            files.append({'filename': os.path.basename(path), 'data': path})
+        return {'files': files}
 
-        to_post['request']['files'] = files
+    def upload_sample(self, filename, filepath, event_id, distribution, to_ids,
+                      category, info, analysis, threat_level_id):
+        to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
+                                         info, analysis, threat_level_id)
+        to_post['request'].update(self.prepare_sample(filename, filepath))
 
+        return self._upload_sample(to_post)
+
+    def upload_samplelist(self, filepaths, event_id, distribution, to_ids, category,
+                          info, analysis, threat_level_id):
+        to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
+                                         info, analysis, threat_level_id)
+        to_post['request'].update(self.prepare_samplelist(filepaths))
+
+        return self._upload_sample(to_post)
+
+    def _upload_sample(self, to_post):
         session = self.__prepare_session()
         return session.post(self.rest.format('upload_sample'), data=json.dumps(to_post))
 
