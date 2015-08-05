@@ -69,7 +69,6 @@ class PyMISP(object):
             return query
         url = self.rest.format(path)
         query = {'request': query}
-        print(json.dumps(query))
         r = session.post(url, data=json.dumps(query))
         return r.json()
 
@@ -207,7 +206,7 @@ class PyMISP(object):
 
     def search(self, values=None, not_values=None, type_attribute=None,
                category=None, org=None, tags=None, not_tags=None, date_from=None,
-               date_to=None):
+               date_to=None, last=None):
         """
             Search via the Rest API
 
@@ -220,6 +219,7 @@ class PyMISP(object):
             :param not_tags: Tags *not* to search for
             :param date_from: First date
             :param date_to: Last date
+            :param last: Last updated events (for example 5d or 12h or 30m)
 
         """
         val = self.__prepare_rest_search(values, not_values).replace('/', '|')
@@ -245,6 +245,8 @@ class PyMISP(object):
                 query['to'] = date_to.strftime('%Y-%m-%d')
             else:
                 query['to'] = date_to
+        if last is not None:
+            query['last'] = last
 
         session = self.__prepare_session()
         return self.__query(session, 'restSearch/download', query)
@@ -259,6 +261,14 @@ class PyMISP(object):
         attach = self.url + '/attributes/downloadAttachment/download/{}'
         session = self.__prepare_session()
         return session.get(attach.format(event_id))
+
+    def download_last(self, last):
+        """
+            Download the last updated events.
+
+            :param last: can be defined in days, hours, minutes (for example 5d or 12h or 30m)
+        """
+        return self.search(last=last)
 
     # ############## Export ###############
 
