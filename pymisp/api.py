@@ -200,6 +200,11 @@ class PyMISP(object):
 
     # ######## REST Search #########
 
+    def search_all(self, value):
+        query = {'value': value, 'searchall': 1}
+        session = self.__prepare_session()
+        return self.__query(session, 'restSearch/download', query)
+
     def __prepare_rest_search(self, values, not_values):
         """
             Prepare a search, generate the chain processed by the server
