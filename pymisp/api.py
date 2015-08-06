@@ -147,12 +147,11 @@ class PyMISP(object):
 
     def prepare_attribute(self, event_id, distribution, to_ids, category, info,
                           analysis, threat_level_id):
-        to_post = {'request': {'files': []}}
+        to_post = {'request': {}}
         if not isinstance(event_id, int):
             # New event
-            postcontent = self._create_event(distribution, threat_level_id,
-                                             analysis, info)
-            to_post['request'].update(postcontent)
+            to_post['request'].update(self._create_event(distribution, threat_level_id,
+                                                         analysis, info))
         else:
             to_post['request'].update({'event_id': int(event_id)})
 

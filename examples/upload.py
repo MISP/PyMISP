@@ -14,7 +14,7 @@ def init(url, key):
 
 
 def upload_files(m, eid, paths, distrib, ids, categ, info, analysis, threat):
-    out = m.upload_sample(eid, paths, distrib, ids, categ, info, analysis, threat)
+    out = m.upload_samplelist(paths, eid, distrib, ids, categ, info, analysis, threat)
     if out.status_code == 200:
         print("Files uploaded sucessfully")
     else:
@@ -41,5 +41,8 @@ if __name__ == '__main__':
         files = [args.upload]
     elif os.path.isdir(args.upload):
         files = [f for f in glob.iglob(os.path.join(args.upload + '*'))]
+    else:
+        print('invalid file')
+        exit(0)
 
     upload_files(misp, args.event, files, args.distrib, args.ids, args.categ, args.info, args.analysis, args.threat)
