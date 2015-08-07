@@ -8,6 +8,9 @@ import datetime
 import requests
 import os
 import base64
+from urlparse import urljoin
+import StringIO
+import zipfile
 
 
 class PyMISPError(Exception):
@@ -38,11 +41,12 @@ class PyMISP(object):
     """
 
     def __init__(self, url, key, ssl=True, out_type='json'):
-        self.url = url + '/events'
+        self.root_url = url
+        self.url = urljoin(self.root_url, 'events')
         self.key = key
         self.ssl = ssl
         self.out_type = out_type
-        self.rest = self.url + '/{}'
+        self.rest = urljoin(self.url, '{}')
 
     def __prepare_session(self, force_out=None):
         """
@@ -283,9 +287,26 @@ class PyMISP(object):
             :param event_id: Event id from where the attachements will
                              be fetched
         """
-        attach = self.url + '/attributes/downloadAttachment/download/{}'
+        attach = urljoin(self.url, 'attributes/downloadAttachment/download/{}')
         session = self.__prepare_session()
         return session.get(attach.format(event_id))
+
+    def download_samples(self, sample_hash=None, event_id=None, all_samples=False):
+        to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
+        session = self.__prepare_session()
+        response = session.post(urljoin(self.root_url, 'attributes/downloadSample'), data=json.dumps(to_post))
+        result = response.json()
+        if response.status_code != 200:
+            return False, result.get('message')
+        if not result.get('result') and result.get('message'):
+            return False, result.get('message')
+        details = []
+        for f in result['result']:
+            zipped = StringIO.StringIO(base64.b64decode(f['base64']))
+            archive = zipfile.ZipFile(zipped)
+            unzipped = StringIO.StringIO(archive.open(f['md5'], pwd='infected').read())
+            details.append([f['event_id'], f['filename'], unzipped])
+        return True, details
 
     def download_last(self, last):
         """
@@ -301,7 +322,7 @@ class PyMISP(object):
         """
             Download all event from the instance
         """
-        xml = self.url + '/xml/download'
+        xml = urljoin(self.url, 'xml/download')
         session = self.__prepare_session('xml')
         return session.get(xml)
 
@@ -309,7 +330,7 @@ class PyMISP(object):
         """
             Download all suricata rules events.
         """
-        suricata_rules = self.url + '/nids/suricata/download'
+        suricata_rules = urljoin(self.url, 'nids/suricata/download')
         session = self.__prepare_session('rules')
         return session.get(suricata_rules)
 
@@ -319,7 +340,7 @@ class PyMISP(object):
 
             :param event_id: ID of the event to download (same as get)
         """
-        template = self.url + '/nids/suricata/download/{}'
+        template = urljoin(self.url, 'nids/suricata/download/{}')
         session = self.__prepare_session('rules')
         return session.get(template.format(event_id))
 
@@ -329,7 +350,7 @@ class PyMISP(object):
 
             :param event_id: Event id of the event to download (same as get)
         """
-        template = self.url + '/events/xml/download/{}/{}'
+        template = urljoin(self.url, 'events/xml/download/{}/{}')
         if with_attachement:
             attach = 'true'
         else:
