@@ -42,11 +42,9 @@ class PyMISP(object):
 
     def __init__(self, url, key, ssl=True, out_type='json'):
         self.root_url = url
-        self.url = urljoin(self.root_url, 'events')
         self.key = key
         self.ssl = ssl
         self.out_type = out_type
-        self.rest = urljoin(self.url, '{}')
 
     def __prepare_session(self, force_out=None):
         """
@@ -71,7 +69,7 @@ class PyMISP(object):
     def __query(self, session, path, query):
         if query.get('error') is not None:
             return query
-        url = self.rest.format(path)
+        url = urljoin(self.root_url, 'events/{}'.format(path.lstrip('/')))
         query = {'request': query}
         r = session.post(url, data=json.dumps(query))
         return r.json()
@@ -85,7 +83,8 @@ class PyMISP(object):
             Warning, there's a limit on the number of results
         """
         session = self.__prepare_session()
-        return session.get(self.url)
+        url = urljoin(self.root_url, 'events')
+        return session.get(url)
 
     def get_event(self, event_id):
         """
@@ -94,7 +93,8 @@ class PyMISP(object):
             :param event_id: Event id to get
         """
         session = self.__prepare_session()
-        return session.get(self.rest.format(event_id))
+        url = urljoin(self.root_url, 'events/{}'.format(event_id.lstrip('/')))
+        return session.get(url)
 
     def add_event(self, event):
         """
@@ -103,13 +103,14 @@ class PyMISP(object):
             :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
+        url = urljoin(self.root_url, 'events')
         if self.out_type == 'json':
             if isinstance(event, basestring):
-                return session.post(self.url, data=event)
+                return session.post(url, data=event)
             else:
-                return session.post(self.url, data=json.dumps(event))
+                return session.post(url, data=json.dumps(event))
         else:
-            return session.post(self.url, data=event)
+            return session.post(url, data=event)
 
     def update_event(self, event_id, event):
         """
@@ -119,13 +120,14 @@ class PyMISP(object):
             :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
+        url = urljoin(self.root_url, 'events/{}'.format(event_id.lstrip('/')))
         if self.out_type == 'json':
             if isinstance(event, basestring):
-                return session.post(self.rest.format(event_id), data=event)
+                return session.post(url, data=event)
             else:
-                return session.post(self.rest.format(event_id), data=json.dumps(event))
+                return session.post(url, data=json.dumps(event))
         else:
-            return session.post(self.rest.format(event_id), data=event)
+            return session.post(url, data=event)
 
     def delete_event(self, event_id):
         """
@@ -134,7 +136,8 @@ class PyMISP(object):
             :param event_id: Event id to delete
         """
         session = self.__prepare_session()
-        return session.delete(self.rest.format(event_id))
+        url = urljoin(self.root_url, 'events/{}'.format(event_id.lstrip('/')))
+        return session.delete(url)
 
     # ######### Create/update events through the API #########
 
@@ -200,7 +203,8 @@ class PyMISP(object):
 
     def _upload_sample(self, to_post):
         session = self.__prepare_session()
-        return session.post(self.rest.format('upload_sample'), data=json.dumps(to_post))
+        url = urljoin(self.root_url, 'events/upload_sample')
+        return session.post(url, data=json.dumps(to_post))
 
     # ######## REST Search #########
 
@@ -287,9 +291,9 @@ class PyMISP(object):
             :param event_id: Event id from where the attachements will
                              be fetched
         """
-        attach = urljoin(self.url, 'attributes/downloadAttachment/download/{}')
+        attach = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(event_id.lstrip('/')))
         session = self.__prepare_session()
-        return session.get(attach.format(event_id))
+        return session.get(attach)
 
     def download_samples(self, sample_hash=None, event_id=None, all_samples=False):
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
@@ -322,7 +326,7 @@ class PyMISP(object):
         """
             Download all event from the instance
         """
-        xml = urljoin(self.url, 'xml/download')
+        xml = urljoin(self.root_url, 'events/xml/download')
         session = self.__prepare_session('xml')
         return session.get(xml)
 
@@ -330,7 +334,7 @@ class PyMISP(object):
         """
             Download all suricata rules events.
         """
-        suricata_rules = urljoin(self.url, 'nids/suricata/download')
+        suricata_rules = urljoin(self.root_url, 'events/nids/suricata/download')
         session = self.__prepare_session('rules')
         return session.get(suricata_rules)
 
@@ -340,9 +344,9 @@ class PyMISP(object):
 
             :param event_id: ID of the event to download (same as get)
         """
-        template = urljoin(self.url, 'nids/suricata/download/{}')
+        template = urljoin(self.root_url, 'events/nids/suricata/download/{}'.format(event_id.lstrip('/')))
         session = self.__prepare_session('rules')
-        return session.get(template.format(event_id))
+        return session.get(template)
 
     def download(self, event_id, with_attachement=False):
         """
@@ -350,12 +354,12 @@ class PyMISP(object):
 
             :param event_id: Event id of the event to download (same as get)
         """
-        template = urljoin(self.url, 'events/xml/download/{}/{}')
         if with_attachement:
             attach = 'true'
         else:
             attach = 'false'
+        template = urljoin(self.root_url, 'events/xml/download/{}/{}'.format(event_id.lstrip('/'), attach))
         session = self.__prepare_session('xml')
-        return session.get(template.format(event_id, attach))
+        return session.get(template)
 
     ##########################################
