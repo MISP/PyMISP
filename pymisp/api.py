@@ -93,7 +93,7 @@ class PyMISP(object):
             :param event_id: Event id to get
         """
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'events/{}'.format(event_id.lstrip('/')))
+        url = urljoin(self.root_url, 'events/{}'.format(event_id))
         return session.get(url)
 
     def add_event(self, event):
@@ -120,7 +120,7 @@ class PyMISP(object):
             :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'events/{}'.format(event_id.lstrip('/')))
+        url = urljoin(self.root_url, 'events/{}'.format(event_id))
         if self.out_type == 'json':
             if isinstance(event, basestring):
                 return session.post(url, data=event)
@@ -136,7 +136,7 @@ class PyMISP(object):
             :param event_id: Event id to delete
         """
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'events/{}'.format(event_id.lstrip('/')))
+        url = urljoin(self.root_url, 'events/{}'.format(event_id))
         return session.delete(url)
 
     # ######### Create/update events through the API #########
@@ -291,7 +291,7 @@ class PyMISP(object):
             :param event_id: Event id from where the attachements will
                              be fetched
         """
-        attach = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(event_id.lstrip('/')))
+        attach = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(event_id))
         session = self.__prepare_session()
         return session.get(attach)
 
@@ -344,7 +344,7 @@ class PyMISP(object):
 
             :param event_id: ID of the event to download (same as get)
         """
-        template = urljoin(self.root_url, 'events/nids/suricata/download/{}'.format(event_id.lstrip('/')))
+        template = urljoin(self.root_url, 'events/nids/suricata/download/{}'.format(event_id))
         session = self.__prepare_session('rules')
         return session.get(template)
 
@@ -358,7 +358,7 @@ class PyMISP(object):
             attach = 'true'
         else:
             attach = 'false'
-        template = urljoin(self.root_url, 'events/xml/download/{}/{}'.format(event_id.lstrip('/'), attach))
+        template = urljoin(self.root_url, 'events/xml/download/{}/{}'.format(event_id, attach))
         session = self.__prepare_session('xml')
         return session.get(template)
 
