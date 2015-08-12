@@ -20,10 +20,10 @@ def get_event(m, event, out=None):
     result = m.get_event(event)
     r = result.json()
     if out is None:
-        print(json.dumps(r['Event']) + '\n')
+        print(json.dumps(r) + '\n')
     else:
         with open(out, 'w') as f:
-            f.write(json.dumps(r['Event']) + '\n')
+            f.write(json.dumps(r) + '\n')
 
 
 if __name__ == '__main__':
