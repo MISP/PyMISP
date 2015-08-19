@@ -295,6 +295,18 @@ class PyMISP(object):
         session = self.__prepare_session()
         return session.get(attach)
 
+    def get_yara(self, event_id):
+        to_post = {'request': {'eventid': event_id, 'type': 'yara'}}
+        session = self.__prepare_session()
+        response = session.post(urljoin(self.root_url, 'attributes/restSearch'), data=json.dumps(to_post))
+        result = response.json()
+        if response.status_code != 200:
+            return False, result.get('message')
+        if not result.get('response') and result.get('message'):
+            return False, result.get('message')
+        rules = '\n\n'.join([a['value'] for a in result['response']['Attribute']])
+        return True, rules
+
     def download_samples(self, sample_hash=None, event_id=None, all_samples=False):
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
         session = self.__prepare_session()
