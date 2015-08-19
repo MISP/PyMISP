@@ -12,7 +12,7 @@ setup(
     description='Python API for MISP.',
     packages=['pymisp'],
     classifiers=[
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: OSI Approved :: BSD License',
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Science/Research',
