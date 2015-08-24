@@ -320,7 +320,12 @@ class PyMISP(object):
         for f in result['result']:
             zipped = StringIO.StringIO(base64.b64decode(f['base64']))
             archive = zipfile.ZipFile(zipped)
-            unzipped = StringIO.StringIO(archive.open(f['md5'], pwd='infected').read())
+            try:
+                # New format
+                unzipped = StringIO.StringIO(archive.open(f['filename'], pwd='infected').read())
+            except KeyError:
+                # Old format
+                unzipped = StringIO.StringIO(archive.open(f['md5'], pwd='infected').read())
             details.append([f['event_id'], f['filename'], unzipped])
         return True, details
 
