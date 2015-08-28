@@ -11,6 +11,8 @@ import base64
 from urlparse import urljoin
 import StringIO
 import zipfile
+import warnings
+import functools
 
 
 class PyMISPError(Exception):
@@ -25,6 +27,23 @@ class NewEventError(PyMISPError):
 
 class NewAttributeError(PyMISPError):
     pass
+
+
+def deprecated(func):
+    '''This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used.'''
+
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.warn_explicit(
+            "Call to deprecated function {}.".format(func.__name__),
+            category=DeprecationWarning,
+            filename=func.func_code.co_filename,
+            lineno=func.func_code.co_firstlineno + 1
+        )
+        return func(*args, **kwargs)
+    return new_func
 
 
 class PyMISP(object):
@@ -139,6 +158,11 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
         return session.delete(url)
 
+    def delete_attribute(self, attribute_id):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
+        return session.delete(url)
+
     # ######### Create/update events through the API #########
 
     def _create_event(self, distribution, threat_level_id, analysis, info):
@@ -173,32 +197,29 @@ class PyMISP(object):
 
         return to_post
 
-    def prepare_sample(self, filename, filepath):
-        with open(filepath, 'rb') as f:
-            return {'files': [{'filename': filename, 'data': base64.b64encode(f.read())}]}
+    # ############ Samples ############
 
-    def prepare_samplelist(self, filepaths):
-        files = []
-        for path in filepaths:
-            if not os.path.isfile(path):
-                continue
-            files.append({'filename': os.path.basename(path), 'data': path})
-        return {'files': files}
+    def _encode_file_to_upload(self, path):
+        with open(path, 'rb') as f:
+            return base64.b64encode(f.read())
 
     def upload_sample(self, filename, filepath, event_id, distribution, to_ids,
                       category, info, analysis, threat_level_id):
         to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
                                          info, analysis, threat_level_id)
-        to_post['request'].update(self.prepare_sample(filename, filepath))
-
+        to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
         return self._upload_sample(to_post)
 
     def upload_samplelist(self, filepaths, event_id, distribution, to_ids, category,
                           info, analysis, threat_level_id):
         to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
                                          info, analysis, threat_level_id)
-        to_post['request'].update(self.prepare_samplelist(filepaths))
-
+        files = []
+        for path in filepaths:
+            if not os.path.isfile(path):
+                continue
+            files.append({'filename': os.path.basename(path), 'data': self._encode_file_to_upload(path)})
+        to_post['request']['files'] = files
         return self._upload_sample(to_post)
 
     def _upload_sample(self, to_post):
@@ -322,10 +343,10 @@ class PyMISP(object):
             archive = zipfile.ZipFile(zipped)
             try:
                 # New format
-                unzipped = StringIO.StringIO(archive.open(f['filename'], pwd='infected').read())
+                unzipped = StringIO.StringIO(archive.open(f['md5'], pwd='infected').read())
             except KeyError:
                 # Old format
-                unzipped = StringIO.StringIO(archive.open(f['md5'], pwd='infected').read())
+                unzipped = StringIO.StringIO(archive.open(f['filename'], pwd='infected').read())
             details.append([f['event_id'], f['filename'], unzipped])
         return True, details
 
@@ -337,15 +358,7 @@ class PyMISP(object):
         """
         return self.search(last=last)
 
-    # ############## Export ###############
-
-    def download_all(self):
-        """
-            Download all event from the instance
-        """
-        xml = urljoin(self.root_url, 'events/xml/download')
-        session = self.__prepare_session('xml')
-        return session.get(xml)
+    # ############## Suricata ###############
 
     def download_all_suricata(self):
         """
@@ -365,6 +378,18 @@ class PyMISP(object):
         session = self.__prepare_session('rules')
         return session.get(template)
 
+    # ############## Deprecated (Pure XML API should not be used) ##################
+
+    @deprecated
+    def download_all(self):
+        """
+            Download all event from the instance
+        """
+        xml = urljoin(self.root_url, 'events/xml/download')
+        session = self.__prepare_session('xml')
+        return session.get(xml)
+
+    @deprecated
     def download(self, event_id, with_attachement=False):
         """
             Download one event in XML
