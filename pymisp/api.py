@@ -93,7 +93,9 @@ class PyMISP(object):
         r = session.post(url, data=json.dumps(query))
         return r.json()
 
-    # ############### REST API ################
+    # ################################################
+    # ############### Simple REST API ################
+    # ################################################
 
     def get_index(self):
         """
@@ -163,7 +165,9 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
         return session.delete(url)
 
-    # ######### Create/update events through the API #########
+    # ##################################################
+    # ######### Upload samples through the API #########
+    # ##################################################
 
     def _create_event(self, distribution, threat_level_id, analysis, info):
         # Setup details of a new event
@@ -197,8 +201,6 @@ class PyMISP(object):
 
         return to_post
 
-    # ############ Samples ############
-
     def _encode_file_to_upload(self, path):
         with open(path, 'rb') as f:
             return base64.b64encode(f.read())
@@ -227,7 +229,9 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'events/upload_sample')
         return session.post(url, data=json.dumps(to_post))
 
+    # ##############################
     # ######## REST Search #########
+    # ##############################
 
     def search_all(self, value):
         query = {'value': value, 'searchall': 1}
@@ -403,5 +407,3 @@ class PyMISP(object):
         template = urljoin(self.root_url, 'events/xml/download/{}/{}'.format(event_id, attach))
         session = self.__prepare_session('xml')
         return session.get(template)
-
-    ##########################################
