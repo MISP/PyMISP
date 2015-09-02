@@ -9,11 +9,23 @@ import time
 import requests
 import os
 import base64
-from urlparse import urljoin
-import StringIO
+try:
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin
+try:
+    from io import StringIO
+except ImportError:
+    from StringIO import StringIO
 import zipfile
 import warnings
 import functools
+
+# Least dirty way to support python 2 and 3
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 class PyMISPError(Exception):
@@ -40,8 +52,8 @@ def deprecated(func):
         warnings.warn_explicit(
             "Call to deprecated function {}.".format(func.__name__),
             category=DeprecationWarning,
-            filename=func.func_code.co_filename,
-            lineno=func.func_code.co_firstlineno + 1
+            filename=func.__code__.co_filename,
+            lineno=func.__code__.co_firstlineno + 1
         )
         return func(*args, **kwargs)
     return new_func
@@ -537,14 +549,14 @@ class PyMISP(object):
             return False, result.get('message')
         details = []
         for f in result['result']:
-            zipped = StringIO.StringIO(base64.b64decode(f['base64']))
+            zipped = StringIO(base64.b64decode(f['base64']))
             archive = zipfile.ZipFile(zipped)
             try:
                 # New format
-                unzipped = StringIO.StringIO(archive.open(f['md5'], pwd='infected').read())
+                unzipped = StringIO(archive.open(f['md5'], pwd='infected').read())
             except KeyError:
                 # Old format
-                unzipped = StringIO.StringIO(archive.open(f['filename'], pwd='infected').read())
+                unzipped = StringIO(archive.open(f['filename'], pwd='infected').read())
             details.append([f['event_id'], f['filename'], unzipped])
         return True, details
 
