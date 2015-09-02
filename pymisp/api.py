@@ -251,14 +251,21 @@ class PyMISP(object):
         response = self.add_event(data)
         return response.json()
 
+    # ##### File attributes #####
+
+    def _send_attributes(self, event, attributes):
+        event = self._prepare_update(event)
+        for a in attributes:
+            if a.get('distribution') is None:
+                a['distribution'] = event['Event']['distribution']
+        event['Event']['Attribute'] = attributes
+        response = self.update_event(event['Event']['id'], event)
+        return response.json()
+
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, comment=None, to_ids=True, distribution=None):
         categories = ['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis']
         if category not in categories:
             raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(categories))))
-
-        to_post = self._prepare_update(event)
-        if distribution is None:
-            distribution = to_post['Event']['distribution']
 
         attributes = []
         type_value = '{}'
@@ -275,16 +282,10 @@ class PyMISP(object):
         if sha256:
             attributes.append(self._prepare_full_attribute(category, type_value.format('sha256'), value.format(sha256),
                                                            to_ids, comment, distribution))
-        to_post['Event']['Attribute'] = attributes
-        print json.dumps(to_post, indent=2)
-        response = self.update_event(to_post['Event']['id'], to_post)
-        return response.json()
 
-    def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=False, comment=None, distribution=None):
-        to_post = self._prepare_update(event)
-        if distribution is None:
-            distribution = to_post['Event']['distribution']
+        return self._send_attributes(event, attributes)
 
+    def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None):
         type_value = '{}'
         value = '{}'
         if rvalue:
@@ -296,51 +297,67 @@ class PyMISP(object):
 
         attributes = []
         attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
-        to_post['Event']['Attribute'] = attributes
-        print json.dumps(to_post, indent=2)
-        response = self.update_event(to_post['Event']['id'], to_post)
-        return response.json()
+        return self._send_attributes(event, attributes)
 
-    def add_pattern(self, event, pattern, in_file=True, in_memory=False, category='Artifacts dropped', to_ids=False, comment=None, distribution=None):
-        to_post = self._prepare_update(event)
-        if distribution is None:
-            distribution = to_post['Event']['distribution']
-
+    def add_pattern(self, event, pattern, in_file=True, in_memory=False, category='Artifacts dropped', to_ids=True, comment=None, distribution=None):
         attributes = []
         if in_file:
             attributes.append(self._prepare_full_attribute(category, 'pattern-in-file', pattern, to_ids, comment, distribution))
         if in_memory:
             attributes.append(self._prepare_full_attribute(category, 'pattern-in-memory', pattern, to_ids, comment, distribution))
 
-        to_post['Event']['Attribute'] = attributes
-        response = self.update_event(to_post['Event']['id'], to_post)
-        return response.json()
+        return self._send_attributes(event, attributes)
 
-    def add_pipe(self, event, named_pipe, category='Artifacts dropped', to_ids=False, comment=None, distribution=None):
-        to_post = self._prepare_update(event)
-        if distribution is None:
-            distribution = to_post['Event']['distribution']
-
+    def add_pipe(self, event, named_pipe, category='Artifacts dropped', to_ids=True, comment=None, distribution=None):
         attributes = []
         if not named_pipe.startswith('\\.\\pipe\\'):
             named_pipe = '\\.\\pipe\\{}'.format(named_pipe)
         attributes.append(self._prepare_full_attribute(category, 'named pipe', named_pipe, to_ids, comment, distribution))
-        to_post['Event']['Attribute'] = attributes
-        response = self.update_event(to_post['Event']['id'], to_post)
-        return response.json()
+        return self._send_attributes(event, attributes)
 
-    def add_mutex(self, event, mutex, category='Artifacts dropped', to_ids=False, comment=None, distribution=None):
-        to_post = self._prepare_update(event)
-        if distribution is None:
-            distribution = to_post['Event']['distribution']
-
+    def add_mutex(self, event, mutex, category='Artifacts dropped', to_ids=True, comment=None, distribution=None):
         attributes = []
         if not mutex.startswith('\\BaseNamedObjects\\'):
             mutex = '\\BaseNamedObjects\\{}'.format(mutex)
         attributes.append(self._prepare_full_attribute(category, 'mutex', mutex, to_ids, comment, distribution))
-        to_post['Event']['Attribute'] = attributes
-        response = self.update_event(to_post['Event']['id'], to_post)
-        return response.json()
+        return self._send_attributes(event, attributes)
+
+    # ##### Network attributes #####
+
+    def add_ipdst(self, event, ipdst, category='Network activity', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'ip-dst', ipdst, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_hostname(self, event, hostname, category='Network activity', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'hostname', hostname, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_domain(self, event, domain, category='Network activity', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'domain', domain, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_url(self, event, url, category='Network activity', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'url', url, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_useragent(self, event, useragent, category='Network activity', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'user-agent', useragent, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_traffic_pattern(self, event, pattern, category='Network activity', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'pattern-in-traffic', pattern, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_snort(self, event, snort, category='Network activity', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'snort', snort, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
 
     # ##################################################
     # ######### Upload samples through the API #########
