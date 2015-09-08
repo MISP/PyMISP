@@ -5,7 +5,6 @@
 
 import json
 import datetime
-import time
 import requests
 import os
 import base64
@@ -249,10 +248,7 @@ class PyMISP(object):
         event['Event'].pop('proposal_email_lock', None)
         event['Event'].pop('publish_timestamp', None)
         event['Event'].pop('published', None)
-        new_timestamp = int(time.time())
-        if int(event['Event']['timestamp']) == new_timestamp:
-            new_timestamp += 1
-        event['Event']['timestamp'] = new_timestamp
+        event['Event'].pop('timestamp', None)
         event['Event']['id'] = int(event['Event']['id'])
         return event
 
