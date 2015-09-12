@@ -384,6 +384,11 @@ class PyMISP(object):
         to_post = {'request': {}}
         authorized_categs = ['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis']
 
+        if event_id is not None:
+            try:
+                event_id = int(event_id)
+            except:
+                pass
         if not isinstance(event_id, int):
             # New event
             to_post['request'] = self._create_event(distribution, threat_level_id, analysis, info)
@@ -543,8 +548,6 @@ class PyMISP(object):
         details = []
         for f in result['result']:
             decoded = base64.b64decode(f['base64'])
-            #if not isinstance(decoded, unicode):
-            #    decoded = decoded.encode('utf-8')
             zipped = BytesIO(decoded)
             archive = zipfile.ZipFile(zipped)
             try:
