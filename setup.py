@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='pymisp',
-    version='1.8',
+    version='1.8.1',
     author='Raphaël Vinot',
     author_email='raphael.vinot@circl.lu',
     maintainer='Raphaël Vinot',

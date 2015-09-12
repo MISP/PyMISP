@@ -12,10 +12,7 @@ try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
-try:
-    from io import StringIO
-except ImportError:
-    from StringIO import StringIO
+from io import BytesIO
 import zipfile
 import warnings
 import functools
@@ -545,14 +542,17 @@ class PyMISP(object):
             return False, result.get('message')
         details = []
         for f in result['result']:
-            zipped = StringIO(base64.b64decode(f['base64']))
+            decoded = base64.b64decode(f['base64'])
+            #if not isinstance(decoded, unicode):
+            #    decoded = decoded.encode('utf-8')
+            zipped = BytesIO(decoded)
             archive = zipfile.ZipFile(zipped)
             try:
                 # New format
-                unzipped = StringIO(archive.open(f['md5'], pwd='infected').read())
+                unzipped = BytesIO(archive.open(f['md5'], pwd='infected').read())
             except KeyError:
                 # Old format
-                unzipped = StringIO(archive.open(f['filename'], pwd='infected').read())
+                unzipped = BytesIO(archive.open(f['filename'], pwd='infected').read())
             details.append([f['event_id'], f['filename'], unzipped])
         return True, details
 
