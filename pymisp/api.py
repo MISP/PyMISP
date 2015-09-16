@@ -256,6 +256,14 @@ class PyMISP(object):
         response = self.add_event(data)
         return response.json()
 
+    def publish(self, event):
+        if event['Event']['published']:
+            return {'message': 'Already published'}
+        event = self._prepare_update(event)
+        event['Event']['published'] = True
+        response = self.update_event(event['Event']['id'], event)
+        return response.json()
+
     # ##### File attributes #####
 
     def _send_attributes(self, event, attributes):
