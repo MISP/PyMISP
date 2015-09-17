@@ -595,6 +595,27 @@ class PyMISP(object):
         session = self.__prepare_session('rules')
         return session.get(template)
 
+    # ########## Version ##########
+
+    def get_version(self):
+        """
+            Returns the version of the instance.
+        """
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'servers/getVersion')
+        return session.get(url).json()
+
+    def get_version_master(self):
+        """
+            Get the most recent version from github
+        """
+        r = requests.get('https://raw.githubusercontent.com/MISP/MISP/master/VERSION.json')
+        if r.status_code == 200:
+            master_version = json.loads(r.text)
+            return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
+        else:
+            return {'message': 'Impossible to retrieve the version of the master branch.'}
+
     # ############## Deprecated (Pure XML API should not be used) ##################
 
     @deprecated
