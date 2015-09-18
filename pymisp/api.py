@@ -51,6 +51,14 @@ class MissingDependency(PyMISPError):
     pass
 
 
+class NoURL(PyMISPError):
+    pass
+
+
+class NoKey(PyMISPError):
+    pass
+
+
 def deprecated(func):
     '''This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
@@ -82,6 +90,11 @@ class PyMISP(object):
     """
 
     def __init__(self, url, key, ssl=True, out_type='json'):
+        if not url:
+            raise NoURL('Please provide the URL of your MISP instance.')
+        if not key:
+            raise NoKey('Please provide your authorization key.')
+
         self.root_url = url
         self.key = key
         self.ssl = ssl
