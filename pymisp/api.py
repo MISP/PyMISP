@@ -5,9 +5,10 @@
 
 import json
 import datetime
-import requests
 import os
 import base64
+import re
+
 try:
     from urllib.parse import urljoin
 except ImportError:
@@ -16,6 +17,14 @@ from io import BytesIO
 import zipfile
 import warnings
 import functools
+
+try:
+    import requests
+    HAVE_REQUESTS = True
+except ImportError:
+    HAVE_REQUESTS = False
+
+from . import __version__
 
 # Least dirty way to support python 2 and 3
 try:
@@ -35,6 +44,10 @@ class NewEventError(PyMISPError):
 
 
 class NewAttributeError(PyMISPError):
+    pass
+
+
+class MissingDependency(PyMISPError):
     pass
 
 
@@ -92,6 +105,8 @@ class PyMISP(object):
                               (overwrite the constructor)
 
         """
+        if not HAVE_REQUESTS:
+            raise MissingDependency('Missing dependency, install requests (`pip install requests`)')
         if force_out is not None:
             out = force_out
         else:
@@ -596,6 +611,23 @@ class PyMISP(object):
         return session.get(template)
 
     # ########## Version ##########
+
+    def get_api_version(self):
+        """
+            Returns the current version of PyMISP installed on the system
+        """
+        return {'version': __version__}
+
+    def get_api_version_master(self):
+        """
+            Get the most recent version of PyMISP from github
+        """
+        r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/master/pymisp/__init__.py')
+        if r.status_code == 200:
+            version = re.findall("__version__ = '(.*)'", r.text)
+            return {'version': version[0]}
+        else:
+            return {'message': 'Impossible to retrieve the version of the master branch.'}
 
     def get_version(self):
         """

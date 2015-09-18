@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from setuptools import setup
+import pymisp
+
 
 setup(
     name='pymisp',
-    version='1.10',
+    version=pymisp.__version__,
     author='Raphaël Vinot',
     author_email='raphael.vinot@circl.lu',
     maintainer='Raphaël Vinot',
