@@ -572,14 +572,19 @@ class PyMISP(object):
         for f in result['result']:
             decoded = base64.b64decode(f['base64'])
             zipped = BytesIO(decoded)
-            archive = zipfile.ZipFile(zipped)
             try:
-                # New format
-                unzipped = BytesIO(archive.open(f['md5'], pwd='infected').read())
-            except KeyError:
-                # Old format
-                unzipped = BytesIO(archive.open(f['filename'], pwd='infected').read())
-            details.append([f['event_id'], f['filename'], unzipped])
+                archive = zipfile.ZipFile(zipped)
+                try:
+                    # New format
+                    unzipped = BytesIO(archive.open(f['md5'], pwd='infected').read())
+                except KeyError:
+                    # Old format
+                    unzipped = BytesIO(archive.open(f['filename'], pwd='infected').read())
+                details.append([f['event_id'], f['filename'], unzipped])
+            except zipfile.BadZipfile:
+                # In case the sample isn't zipped
+                details.append([f['event_id'], f['filename'], zipped])
+
         return True, details
 
     def download_last(self, last):

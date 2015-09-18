@@ -1,3 +1,3 @@
-__version__ = '1.10'
+__version__ = '1.11'
 
 from .api import PyMISP
