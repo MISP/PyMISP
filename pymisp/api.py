@@ -110,6 +110,12 @@ class PyMISP(object):
                       'pattern-in-file', 'pattern-in-traffic', 'pattern-in-memory', 'named pipe', 'mutex',
                       'vulnerability', 'attachment', 'malware-sample', 'link', 'comment', 'text', 'other']
 
+        try:
+            # Make sure the MISP instance is working and the URL is valid
+            self.get_version()
+        except Exception as e:
+            raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
+
     def __prepare_session(self, force_out=None):
         """
             Prepare the headers of the session
@@ -459,7 +465,7 @@ class PyMISP(object):
     def _upload_sample(self, to_post):
         session = self.__prepare_session('json')
         url = urljoin(self.root_url, 'events/upload_sample')
-        return session.post(url, data=json.dumps(to_post))
+        return session.post(url, data=json.dumps(to_post)).json()
 
     # ##############################
     # ######## REST Search #########
