@@ -302,7 +302,7 @@ class PyMISP(object):
         return response.json()
 
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, comment=None, to_ids=True, distribution=None):
-        categories = ['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis']
+        categories = ['Payload delivery', 'Artifacts dropped', 'Payload installation', 'External analysis']
         if category not in categories:
             raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(categories))))
 
