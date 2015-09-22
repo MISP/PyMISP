@@ -23,5 +23,6 @@ setup(
         'Topic :: Security',
         'Topic :: Internet',
     ],
+    test_suite="tests",
     install_requires=['requests'],
 )
