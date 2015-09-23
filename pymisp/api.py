@@ -138,6 +138,15 @@ class PyMISP(object):
              'content-type': 'application/' + out})
         return session
 
+    def _check_response(self, response):
+        if response.status_code >= 500:
+            response.raise_for_status()
+        to_return = response.json()
+        if 400 <= response.status_code < 500:
+            if to_return.get('error') is None:
+                to_return['error'] = to_return.get('message')
+        return to_return
+
     # ################################################
     # ############### Simple REST API ################
     # ################################################
@@ -277,18 +286,27 @@ class PyMISP(object):
 
     # ########## Helpers ##########
 
+    def get(self, eid):
+        response = self.get_event(int(eid), 'json')
+        return self._check_response(response)
+
+    def update(self, event):
+        eid = event['Event']['id']
+        response = self.update_event(eid, event, 'json')
+        return self._check_response(response)
+
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
         data = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
         response = self.add_event(data, 'json')
-        return response.json()
+        return self._check_response(response)
 
     def publish(self, event):
         if event['Event']['published']:
-            return {'message': 'Already published'}
+            return {'error': 'Already published'}
         event = self._prepare_update(event)
         event['Event']['published'] = True
         response = self.update_event(event['Event']['id'], event, 'json')
-        return response.json()
+        return self._check_response(response)
 
     # ##### File attributes #####
 
@@ -299,7 +317,7 @@ class PyMISP(object):
                 a['distribution'] = event['Event']['distribution']
         event['Event']['Attribute'] = attributes
         response = self.update_event(event['Event']['id'], event, 'json')
-        return response.json()
+        return self._check_response(response)
 
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, comment=None, to_ids=True, distribution=None):
         categories = ['Payload delivery', 'Artifacts dropped', 'Payload installation', 'External analysis']
@@ -465,7 +483,8 @@ class PyMISP(object):
     def _upload_sample(self, to_post):
         session = self.__prepare_session('json')
         url = urljoin(self.root_url, 'events/upload_sample')
-        return session.post(url, data=json.dumps(to_post)).json()
+        response = session.post(url, data=json.dumps(to_post))
+        return self._check_response(response)
 
     # ##############################
     # ######## REST Search #########
@@ -476,8 +495,8 @@ class PyMISP(object):
             return query
         url = urljoin(self.root_url, 'events/{}'.format(path.lstrip('/')))
         query = {'request': query}
-        r = session.post(url, data=json.dumps(query))
-        return r.json()
+        response = session.post(url, data=json.dumps(query))
+        return self._check_response(response)
 
     def search_all(self, value):
         query = {'value': value, 'searchall': 1}
@@ -570,10 +589,10 @@ class PyMISP(object):
         to_post = {'request': {'eventid': event_id, 'type': 'yara'}}
         session = self.__prepare_session('json')
         response = session.post(urljoin(self.root_url, 'attributes/restSearch'), data=json.dumps(to_post))
-        result = response.json()
-        if response.status_code != 200:
-            return False, result.get('message')
-        if not result.get('response') and result.get('message'):
+        result = self._check_response(response)
+        if result.get('error') is not None:
+            return False, result.get('error')
+        if not result.get('response'):
             return False, result.get('message')
         rules = '\n\n'.join([a['value'] for a in result['response']['Attribute']])
         return True, rules
@@ -582,10 +601,10 @@ class PyMISP(object):
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
         session = self.__prepare_session('json')
         response = session.post(urljoin(self.root_url, 'attributes/downloadSample'), data=json.dumps(to_post))
-        result = response.json()
-        if response.status_code != 200:
-            return False, result.get('message')
-        if not result.get('result') and result.get('message'):
+        result = self._check_response(response)
+        if result.get('error') is not None:
+            return False, result.get('error')
+        if not result.get('result'):
             return False, result.get('message')
         details = []
         for f in result['result']:
@@ -651,7 +670,7 @@ class PyMISP(object):
             version = re.findall("__version__ = '(.*)'", r.text)
             return {'version': version[0]}
         else:
-            return {'message': 'Impossible to retrieve the version of the master branch.'}
+            return {'error': 'Impossible to retrieve the version of the master branch.'}
 
     def get_version(self):
         """
@@ -659,7 +678,8 @@ class PyMISP(object):
         """
         session = self.__prepare_session('json')
         url = urljoin(self.root_url, 'servers/getVersion')
-        return session.get(url).json()
+        response = session.get(url)
+        return self._check_response(response)
 
     def get_version_master(self):
         """
@@ -670,7 +690,7 @@ class PyMISP(object):
             master_version = json.loads(r.text)
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
         else:
-            return {'message': 'Impossible to retrieve the version of the master branch.'}
+            return {'error': 'Impossible to retrieve the version of the master branch.'}
 
     # ############## Deprecated (Pure XML API should not be used) ##################
 
