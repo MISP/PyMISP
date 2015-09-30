@@ -111,7 +111,7 @@ class PyMISP(object):
                       'mutex', 'vulnerability', 'attachment', 'malware-sample', 'link', 'comment', 
                       'text', 'email-src', 'email-dst', 'email-subject', 'email-attachment', 
                       'yara', 'target-user', 'target-email', 'target-machine', 'target-org', 
-                      'target-location', 'target-external',	'other']
+                      'target-location', 'target-external', 'other']
 
         try:
             # Make sure the MISP instance is working and the URL is valid
