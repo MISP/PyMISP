@@ -108,10 +108,10 @@ class PyMISP(object):
                       'filename|sha256', 'ip-src', 'ip-dst', 'hostname', 'domain', 'url',
                       'user-agent', 'http-method', 'regkey', 'regkey|value', 'AS', 'snort',
                       'pattern-in-file', 'pattern-in-traffic', 'pattern-in-memory', 'named pipe', 
-					  'mutex', 'vulnerability', 'attachment', 'malware-sample', 'link', 'comment', 
-					  'text', 'email-src', 'email-dst', 'email-subject', 'email-attachment', 
-					  'yara', 'target-user', 'target-email', 'target-machine', 'target-org', 
-					  'target-location', 'target-external',	'other']
+                      'mutex', 'vulnerability', 'attachment', 'malware-sample', 'link', 'comment', 
+                      'text', 'email-src', 'email-dst', 'email-subject', 'email-attachment', 
+                      'yara', 'target-user', 'target-email', 'target-machine', 'target-org', 
+                      'target-location', 'target-external',	'other']
 
         try:
             # Make sure the MISP instance is working and the URL is valid
