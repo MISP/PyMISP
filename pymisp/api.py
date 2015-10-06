@@ -381,7 +381,7 @@ class PyMISP(object):
             mutex = '\\BaseNamedObjects\\{}'.format(mutex)
         attributes.append(self._prepare_full_attribute(category, 'mutex', mutex, to_ids, comment, distribution))
         return self._send_attributes(event, attributes)
-    
+
     # ##### Network attributes #####
 
     def add_ipdst(self, event, ipdst, category='Network activity', to_ids=True, comment=None, distribution=None):
