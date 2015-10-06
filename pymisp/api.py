@@ -381,7 +381,7 @@ class PyMISP(object):
             mutex = '\\BaseNamedObjects\\{}'.format(mutex)
         attributes.append(self._prepare_full_attribute(category, 'mutex', mutex, to_ids, comment, distribution))
         return self._send_attributes(event, attributes)
-
+    
     # ##### Network attributes #####
 
     def add_ipdst(self, event, ipdst, category='Network activity', to_ids=True, comment=None, distribution=None):
@@ -419,6 +419,63 @@ class PyMISP(object):
         attributes.append(self._prepare_full_attribute(category, 'snort', snort, to_ids, comment, distribution))
         return self._send_attributes(event, attributes)
 
+    # ##### Email attributes #####
+    
+    def add_email_src(self, event, email, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Payload delivery', 'email-src', email, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_email_dst(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None):
+        categories = ['Payload delivery', 'Network activity']
+        if category not in categories:
+            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(categories))))
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'email-dst', email, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_email_subject(self, event, email, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Payload delivery', 'email-subject', email, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_email_attachment(self, event, email, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Payload delivery', 'email-attachment', email, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+    
+    # ##### Target attributes #####
+    
+    def add_target_email(self, event, target, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Targeting data', 'target-email', target, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+    
+    def add_target_user(self, event, target, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Targeting data', 'target-user', target, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+    
+    def add_target_machine(self, event, target, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Targeting data', 'target-machine', target, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+    
+    def add_target_org(self, event, target, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Targeting data', 'target-org', target, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+    
+    def add_target_location(self, event, target, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Targeting data', 'target-location', target, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+    
+    def add_target_external(self, event, target, to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Targeting data', 'target-external', target, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+    
     # ##################################################
     # ######### Upload samples through the API #########
     # ##################################################
