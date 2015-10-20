@@ -424,19 +424,19 @@ class PyMISP(object):
         attributes.append(self._prepare_full_attribute(category, 'email-src', emailsrc, to_ids, comment, distribution))
         return self._send_attributes(event, attributes)
 
-    def add_emaildst(self, event, emailsrc, category='Payload delivery', to_ids=True, comment=None, distribution=None):
+    def add_emaildst(self, event, emaildst, category='Payload delivery', to_ids=True, comment=None, distribution=None):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'email-dst', emailsrc, to_ids, comment, distribution))
+        attributes.append(self._prepare_full_attribute(category, 'email-dst', emaildst, to_ids, comment, distribution))
         return self._send_attributes(event, attributes)
 
-    def add_emailsubject(self, event, emailsrc, category='Payload delivery', to_ids=True, comment=None, distribution=None):
+    def add_emailsubject(self, event, emailsubject, category='Payload delivery', to_ids=True, comment=None, distribution=None):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'email-subject', emailsrc, to_ids, comment, distribution))
+        attributes.append(self._prepare_full_attribute(category, 'email-subject', emailsubject, to_ids, comment, distribution))
         return self._send_attributes(event, attributes)
 
-    def add_emailattachment(self, event, emailsrc, category='Payload delivery', to_ids=True, comment=None, distribution=None):
+    def add_emailattachment(self, event, emailattachment, category='Payload delivery', to_ids=True, comment=None, distribution=None):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'email-attachment', emailsrc, to_ids, comment, distribution))
+        attributes.append(self._prepare_full_attribute(category, 'email-attachment', emailattachment, to_ids, comment, distribution))
         return self._send_attributes(event, attributes)
 
     # ##################################################
