@@ -108,7 +108,8 @@ class PyMISP(object):
                       'filename|sha256', 'ip-src', 'ip-dst', 'hostname', 'domain', 'url',
                       'user-agent', 'http-method', 'regkey', 'regkey|value', 'AS', 'snort',
                       'pattern-in-file', 'pattern-in-traffic', 'pattern-in-memory', 'named pipe', 'mutex',
-                      'vulnerability', 'attachment', 'malware-sample', 'link', 'comment', 'text', 'other']
+                      'vulnerability', 'attachment', 'malware-sample', 'link', 'comment', 'text', 'other',
+                      'email-src', 'email-dst', 'email-subject', 'email-attachment']
 
         try:
             # Make sure the MISP instance is working and the URL is valid
@@ -414,6 +415,28 @@ class PyMISP(object):
     def add_snort(self, event, snort, category='Network activity', to_ids=True, comment=None, distribution=None):
         attributes = []
         attributes.append(self._prepare_full_attribute(category, 'snort', snort, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    # ##### Email attributes #####
+
+    def add_emailsrc(self, event, emailsrc, category='Payload delivery', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'email-src', emailsrc, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_emaildst(self, event, emailsrc, category='Payload delivery', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'email-dst', emailsrc, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_emailsubject(self, event, emailsrc, category='Payload delivery', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'email-subject', emailsrc, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes)
+
+    def add_emailattachment(self, event, emailsrc, category='Payload delivery', to_ids=True, comment=None, distribution=None):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'email-attachment', emailsrc, to_ids, comment, distribution))
         return self._send_attributes(event, attributes)
 
     # ##################################################
