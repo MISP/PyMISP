@@ -392,6 +392,11 @@ class PyMISP(object):
         attributes.append(self._prepare_full_attribute(category, 'ip-dst', ipdst, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
+    def add_ipsrc(self, event, ipsrc, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'ip-src', ipsrc, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
     def add_hostname(self, event, hostname, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
         attributes.append(self._prepare_full_attribute(category, 'hostname', hostname, to_ids, comment, distribution))
