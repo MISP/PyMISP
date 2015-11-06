@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import url_priv, key_priv
-# from keys import url_cert, key_cert
+from keys import misp_url, misp_key
 import argparse
 import os
 import glob
@@ -15,11 +14,7 @@ def init(url, key):
 
 def upload_files(m, eid, paths, distrib, ids, categ, info, analysis, threat):
     out = m.upload_samplelist(paths, eid, distrib, ids, categ, info, analysis, threat)
-    if out.status_code == 200:
-        print("Files uploaded sucessfully")
-    else:
-        print("Something failed: {}".format(out.text))
-
+    print(out)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Send malware sample to MISP.')
@@ -33,8 +28,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--threat", type=int, help="The threat level ID of the newly created event, if applicatble. [0-3]")
     args = parser.parse_args()
 
-    misp = init(url_priv, key_priv)
-    # misp = init(url_cert, key_cert)
+    misp = init(misp_url, misp_key)
 
     files = []
     if os.path.isfile(args.upload):
