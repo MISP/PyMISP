@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import url_priv, key_priv
-# from keys import url_cert, key_cert
+from keys import misp_url, misp_key
 import argparse
 
 # For python2 & 3 compat, a bit dirty, but it seems to be the least bad one
@@ -24,8 +23,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--threat", type=int, help="The threat level ID of the newly created event, if applicatble. [0-3]")
     args = parser.parse_args()
 
-    misp = init(url_priv, key_priv)
-    # misp = init(url_cert, key_cert)
+    misp = init(misp_url, misp_key)
 
     event = misp.new_event(args.distrib, args.threat, args.analysis, args.info)
     print event

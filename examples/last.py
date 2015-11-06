@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import url_priv, key_priv
-# from keys import url_cert, key_cert
+from keys import misp_url, misp_key
 import argparse
 import os
 import json
@@ -38,7 +37,6 @@ if __name__ == '__main__':
         print('Output file already exists, abord.')
         exit(0)
 
-    misp = init(url_priv, key_priv)
-    # misp = init(url_cert, key_cert)
+    misp = init(misp_url, misp_key)
 
     download_last(misp, args.last, args.output)
