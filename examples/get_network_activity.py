@@ -13,18 +13,18 @@
         ./get_network_activity.py --netflow --event 8
             get netflow filter for event 8
 
-        ./get_network_activity.py -f get_network_activity.event_id --netflow 
+        ./get_network_activity.py -f get_network_activity.event_id --netflow
             get netflow filter for events in id file
 
         ./get_network_activity.py -f get_network_activity.event_id
-            get output with comments    
+            get output with comments
 """
 
 from pymisp import PyMISP
 
-from cudeso import misp_key
-from cudeso import misp_url
-from cudeso import misp_verifycert
+from keys import misp_key
+from keys import misp_url
+from keys import misp_verifycert
 
 source = None
 
@@ -71,7 +71,7 @@ def get_event(event_id):
                 if app_netflow:
                     app_printcomment = False
                     if attribute["type"] == "ip-dst" and app_ip_dst:
-                        network_ip_dst.append([build_entry(value, event_id, title, "ip-dst")])                    
+                        network_ip_dst.append([build_entry(value, event_id, title, "ip-dst")])
                 else:
                     if attribute["type"] == "ip-src" and app_ip_src:
                         network_ip_src.append([build_entry(value, event_id, title, "ip-src")])
@@ -121,7 +121,7 @@ def print_events():
             if firsthost:
                 firsthost = False
             else:
-                print " or "            
+                print " or "
             print "host %s" % ip[0]
     else:
         if app_ip_src:
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     app_event = args.event
 
     if app_event > 0:
-        get_event(app_event)        
+        get_event(app_event)
         print_events()
     elif args.filename is not None:
         # print "app_printcomment %s app_hostname %s app_domain %s app_ip_src %s app_ip_dst %s app_ids_only %s app_printtitle %s" % (app_printcomment,app_hostname, app_domain, app_ip_src, app_ip_dst, app_ids_only, app_printtitle)
