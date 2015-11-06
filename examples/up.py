@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import url_priv, key_priv
-# from keys import url_cert, key_cert
+from keys import misp_url, misp_key
 import argparse
 
 
@@ -26,7 +25,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    misp = init(url_priv, key_priv)
-    # misp = init(url_cert, key_cert)
+    misp = init(misp_url, misp_key)
 
     up_event(misp, args.event, args.input)
