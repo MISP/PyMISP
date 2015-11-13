@@ -7,7 +7,6 @@ import time
 
 import unittest
 
-
 class TestBasic(unittest.TestCase):
 
     def setUp(self):
@@ -34,10 +33,10 @@ class TestBasic(unittest.TestCase):
         event = self.misp.new_event(0, 1, 0, "This is a test")
         event_id = self._clean_event(event)
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
-                               u'attribute_count': u'0', u'analysis': u'0',
+                               u'attribute_count': None, u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False,
                                u'distribution': u'0', u'Attribute': [], u'proposal_email_lock': False,
-                               u'threat_level_id': u'1'}},
+                               u'threat_level_id': u'1'}}
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
         return int(event_id)
 
