@@ -37,7 +37,7 @@ class TestBasic(unittest.TestCase):
                                u'attribute_count': u'0', u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False,
                                u'distribution': u'0', u'Attribute': [], u'proposal_email_lock': False,
-                               u'threat_level_id': u'1'}},
+                               u'threat_level_id': u'1'}}
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
         return int(event_id)
 
