@@ -18,8 +18,12 @@ def init(url, key):
 def download_last(m, last, out=None):
     result = m.download_last(last)
     if out is None:
-        for e in result['response']:
-            print(json.dumps(e) + '\n')
+        if 'response' in result:
+            for e in result['response']:
+                print(json.dumps(e) + '\n')
+        else:
+            print('No results for that time period')
+            exit(0)
     else:
         with open(out, 'w') as f:
             for e in result['response']:
