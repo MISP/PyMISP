@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--categ", help="The category that will be assigned to the uploaded samples. Valid options are: Payload delivery, Artifacts dropped, Payload Installation, External Analysis.")
     parser.add_argument("-i", "--info", help="Used to populate the event info field if no event ID supplied.")
     parser.add_argument("-a", "--analysis", type=int, help="The analysis level of the newly created event, if applicatble. [0-2]")
-    parser.add_argument("-t", "--threat", type=int, help="The threat level ID of the newly created event, if applicatble. [0-3]")
+    parser.add_argument("-t", "--threat", type=int, help="The threat level ID of the newly created event, if applicatble. [1-4]")
     args = parser.parse_args()
 
     misp = init(misp_url, misp_key)
