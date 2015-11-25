@@ -89,7 +89,7 @@ class PyMISP(object):
         :param out_type: Type of object (json or xml)
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json'):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=False):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -99,6 +99,7 @@ class PyMISP(object):
         self.key = key
         self.ssl = ssl
         self.out_type = out_type
+        self.debug = debug
 
         self.categories = ['Internal reference', 'Targeting data', 'Antivirus detection',
                            'Payload delivery', 'Payload installation', 'Artifacts dropped',
@@ -144,10 +145,17 @@ class PyMISP(object):
     def _check_response(self, response):
         if response.status_code >= 500:
             response.raise_for_status()
-        to_return = response.json()
+        try:
+            to_return = response.json()
+        except:
+            if self.debug:
+                print(response.text)
+            raise PyMISPError('Unknown error: {}'.format(response.text))
         if 400 <= response.status_code < 500:
             if to_return.get('error') is None:
                 to_return['error'] = to_return.get('message')
+        if self.debug:
+            print(json.dumps(to_return, indent=4))
         return to_return
 
     # ################################################

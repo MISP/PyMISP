@@ -7,11 +7,12 @@ import time
 
 import unittest
 
+
 class TestBasic(unittest.TestCase):
 
     def setUp(self):
         self.maxDiff = None
-        self.misp = PyMISP(url, key, True, 'json')
+        self.misp = PyMISP(url, key, True, 'json', True)
 
     def _clean_event(self, event):
         event['Event'].pop('uuid', None)
