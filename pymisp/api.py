@@ -142,6 +142,23 @@ class PyMISP(object):
              'content-type': 'application/' + out})
         return session
 
+    def flatten_error_messages(self, response):
+        messages = []
+        if response.get('error'):
+            if isinstance(response['error'], list):
+                for e in response['errors']:
+                    messages.append(e['error']['value'][0])
+            else:
+                messages.append(['error'])
+        elif response.get('errors'):
+            if isinstance(response['errors'], dict):
+                for where, errors in response['errors'].items():
+                    for e in errors:
+                        for type_e, msgs in e.items():
+                            for m in msgs:
+                                messages.append('Error in {}: {}'.format(where, m))
+        return messages
+
     def _check_response(self, response):
         if response.status_code >= 500:
             response.raise_for_status()
@@ -151,9 +168,22 @@ class PyMISP(object):
             if self.debug:
                 print(response.text)
             raise PyMISPError('Unknown error: {}'.format(response.text))
+
+        errors = []
+        if to_return.get('error'):
+            if not isinstance(to_return['error'], list):
+                errors.append(to_return['error'])
+            else:
+                errors += to_return['error']
+
         if 400 <= response.status_code < 500:
-            if to_return.get('error') is None:
-                to_return['error'] = to_return.get('message')
+            if to_return.get('error') is None and to_return.get('message'):
+                errors.append(to_return['message'])
+            else:
+                errors.append(basestring(response.status_code))
+        errors += self.flatten_error_messages(to_return)
+        if errors:
+            to_return['errors'] = errors
         if self.debug:
             print(json.dumps(to_return, indent=4))
         return to_return
