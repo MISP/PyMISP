@@ -804,6 +804,21 @@ class PyMISP(object):
         session = self.__prepare_session('rules')
         return session.get(template)
 
+    # ########## Tags ##########
+
+    def get_all_tags(self, quiet=False):
+        session = self.__prepare_session('json')
+        url = urljoin(self.root_url, 'tags')
+        response = session.get(url)
+        r = self._check_response(response)
+        if not quiet or r.get('errors'):
+            return r
+        else:
+            to_return = []
+            for tag in r['Tag']:
+                to_return.append(tag['name'])
+            return to_return
+
     # ########## Version ##########
 
     def get_api_version(self):
