@@ -15,11 +15,12 @@ class TestBasic(unittest.TestCase):
         self.misp = PyMISP(url, key, True, 'json', True)
 
     def _clean_event(self, event):
+        event['Event'].pop('orgc_id', None)
         event['Event'].pop('uuid', None)
+        event['Event'].pop('sharing_group_id', None)
         event['Event'].pop('timestamp', None)
+        event['Event'].pop('org_id', None)
         event['Event'].pop('date', None)
-        event['Event'].pop('org', None)
-        event['Event'].pop('orgc', None)
         event['Event'].pop('RelatedEvent', None)
         event['Event'].pop('publish_timestamp', None)
         if event['Event'].get('Attribute'):
@@ -28,15 +29,23 @@ class TestBasic(unittest.TestCase):
                 a.pop('event_id', None)
                 a.pop('id', None)
                 a.pop('timestamp', None)
+        if event['Event'].get('Orgc'):
+            event['Event']['Orgc'].pop('uuid', None)
+            event['Event']['Orgc'].pop('id', None)
+        if event['Event'].get('Org'):
+            event['Event']['Org'].pop('uuid', None)
+            event['Event']['Org'].pop('id', None)
         return event['Event'].pop('id', None)
 
     def new_event(self):
         event = self.misp.new_event(0, 1, 0, "This is a test")
         event_id = self._clean_event(event)
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
-                               u'attribute_count': u'0', u'analysis': u'0',
+                               u'attribute_count': None, u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False,
                                u'distribution': u'0', u'Attribute': [], u'proposal_email_lock': False,
+                               u'Org': {u'name': u'ORGNAME'},
+                               u'Orgc': {u'name': u'ORGNAME'},
                                u'threat_level_id': u'1'}}
         print event
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
@@ -50,6 +59,8 @@ class TestBasic(unittest.TestCase):
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': u'3', u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False, u'distribution': u'0',
+                               u'Org': {u'name': u'ORGNAME'},
+                               u'Orgc': {u'name': u'ORGNAME'},
                                u'Attribute': [
                                    {u'category': u'Payload installation', u'comment': u'Fanny modules',
                                     u'to_ids': False, u'value': u'dll_installer.dll|0a209ac0de4ac033f31d6ba9191a8f7a',
@@ -71,6 +82,8 @@ class TestBasic(unittest.TestCase):
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': u'3', u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': True, u'distribution': u'0',
+                               u'Org': {u'name': u'ORGNAME'},
+                               u'Orgc': {u'name': u'ORGNAME'},
                                u'Attribute': [
                                    {u'category': u'Payload installation', u'comment': u'Fanny modules',
                                     u'to_ids': False, u'value': u'dll_installer.dll|0a209ac0de4ac033f31d6ba9191a8f7a',
