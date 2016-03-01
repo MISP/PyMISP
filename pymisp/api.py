@@ -192,15 +192,20 @@ class PyMISP(object):
     # ############### Simple REST API ################
     # ################################################
 
-    def get_index(self, force_out=None):
+    def get_index(self, force_out=None, filters=None):
         """
             Return the index.
 
             Warning, there's a limit on the number of results
         """
         session = self.__prepare_session(force_out)
-        url = urljoin(self.root_url, 'events')
-        return session.get(url)
+        url = urljoin(self.root_url, 'events', 'index')
+        if filters is not None:
+            filters = json.dumps(filters)
+            print filters
+            return session.post(url, data=filters)
+        else:
+            return session.get(url)
 
     def get_event(self, event_id, force_out=None):
         """
