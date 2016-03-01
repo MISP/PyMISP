@@ -199,7 +199,7 @@ class PyMISP(object):
             Warning, there's a limit on the number of results
         """
         session = self.__prepare_session(force_out)
-        url = urljoin(self.root_url, 'events', 'index')
+        url = urljoin(self.root_url, 'events/index')
         if filters is not None:
             filters = json.dumps(filters)
             print filters
