@@ -202,7 +202,7 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'events/index')
         if filters is not None:
             filters = json.dumps(filters)
-            print filters
+            print(filters)
             return session.post(url, data=filters)
         else:
             return session.get(url)
@@ -862,9 +862,15 @@ class PyMISP(object):
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
         else:
             return {'error': 'Impossible to retrieve the version of the master branch.'}
+    # ############## Export Attributes in text ####################################
 
+    def get_all_attributes_txt(self, type_attr):
+
+        session = self.__prepare_session('txt')
+        url = urljoin(self.root_url,'attributes/text/download/%s' % type_attr)
+        response = session.get(url)
+        return response
     # ############## Deprecated (Pure XML API should not be used) ##################
-
     @deprecated
     def download_all(self):
         """
