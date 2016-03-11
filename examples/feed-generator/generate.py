@@ -64,14 +64,15 @@ def __cleanupEventFields(event, temp):
 def __cleanupEventObjects(event, temp):
     for objectType in objectsToSave.keys():
         if objectsToSave[objectType]['multiple'] is True:
-            for objectInstance in temp['Event'][objectType]:
-                tempObject = {}
-                for field in objectsToSave[objectType]['fields']:
-                    if field in objectInstance.keys():
-                        tempObject[field] = objectInstance[field]
-                if objectType not in event['Event']:
-                    event['Event'][objectType] = []
-                event['Event'][objectType].append(tempObject)
+            if objectType in temp['Event']:
+                for objectInstance in temp['Event'][objectType]:
+                    tempObject = {}
+                    for field in objectsToSave[objectType]['fields']:
+                        if field in objectInstance.keys():
+                            tempObject[field] = objectInstance[field]
+                    if objectType not in event['Event']:
+                        event['Event'][objectType] = []
+                    event['Event'][objectType].append(tempObject)
         else:
             tempObject = {}
             for field in objectsToSave[objectType]['fields']:
