@@ -233,6 +233,7 @@ class PyMISP(object):
         else:
             return session.post(url, data=event)
 
+
     def update_event(self, event_id, event, force_out=None):
         """
             Update an event
@@ -264,6 +265,7 @@ class PyMISP(object):
         session = self.__prepare_session(force_out)
         url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
         return session.delete(url)
+
 
     # ##############################################
     # ######### Event handling (Json only) #########
@@ -303,7 +305,7 @@ class PyMISP(object):
         if distribution is not None:
             distribution = int(distribution)
         # If None: take the default value of the event
-        if distribution not in [None, 0, 1, 2, 3]:
+        if distribution not in [None, 0, 1, 2, 3,5]:
             raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3 or None'.format(distribution))
         if distribution is not None:
             to_return['distribution'] = distribution
@@ -352,6 +354,13 @@ class PyMISP(object):
         event = self._prepare_update(event)
         event['Event']['published'] = True
         response = self.update_event(event['Event']['id'], event, 'json')
+        return self._check_response(response)
+
+    def add_tag(self,event, tag):
+        session = self.__prepare_session('json')
+        to_post = {'request': {'Event':{'id': event['Event']['id'], 'tag': tag}}}
+        response = session.post(urljoin(self.root_url, 'events/addTag'), data=json.dumps(to_post))
+
         return self._check_response(response)
 
     # ##### File attributes #####
