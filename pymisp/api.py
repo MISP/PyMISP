@@ -112,7 +112,7 @@ class PyMISP(object):
                       'mutex', 'vulnerability', 'attachment', 'malware-sample', 'link', 'comment',
                       'text', 'email-src', 'email-dst', 'email-subject', 'email-attachment',
                       'yara', 'target-user', 'target-email', 'target-machine', 'target-org',
-                      'target-location', 'target-external', 'other']
+                      'target-location', 'target-external', 'other', 'threat-actor']
 
         try:
             # Make sure the MISP instance is working and the URL is valid
@@ -536,6 +536,13 @@ class PyMISP(object):
         attributes.append(self._prepare_full_attribute('Targeting data', 'target-external', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
+    # ##### Attribution attributes #####
+
+    def add_threat_actor(self, event, target, to_ids=True, comment=None, distribution=None, proposal=False):
+        attributes = []
+        attributes.append(self._prepare_full_attribute('Attribution', 'threat-actor', target, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
     # ##################################################
     # ######### Upload samples through the API #########
     # ##################################################
@@ -832,6 +839,13 @@ class PyMISP(object):
             for tag in r['Tag']:
                 to_return.append(tag['name'])
             return to_return
+
+    def new_tag(self,name=None, colour="#00ace6", exportable=False):
+        to_post = {'Tag': {'name':name,'colour':colour, 'exportable':exportable}}
+        session = self.__prepare_session('json')
+        url = urljoin(self.root_url, 'tags/add')
+        response = session.post(url, data=json.dumps(to_post))
+        return self._check_response(response)
 
     # ########## Version ##########
 
