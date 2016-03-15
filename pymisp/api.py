@@ -363,6 +363,13 @@ class PyMISP(object):
 
         return self._check_response(response)
 
+    def change_threat_level(self, event, threat_level_id):
+        event['Event']['threat_level_id'] = threat_level_id
+        self._prepare_update(event)
+        response = self.update_event(event['Event']['id'], event)
+
+        return self._check_response(response)
+
     # ##### File attributes #####
 
     def _send_attributes(self, event, attributes, proposal=False):
