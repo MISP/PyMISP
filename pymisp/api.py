@@ -8,6 +8,7 @@ import datetime
 import os
 import base64
 import re
+import urllib
 
 try:
     from urllib.parse import urljoin
@@ -170,6 +171,8 @@ class PyMISP(object):
             raise PyMISPError('Unknown error: {}'.format(response.text))
 
         errors = []
+        if type(to_return) is list:
+            to_return = {'response':to_return}
         if to_return.get('error'):
             if not isinstance(to_return['error'], list):
                 errors.append(to_return['error'])
@@ -675,6 +678,13 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'events/{}'.format(path.lstrip('/')))
         query = {'request': query}
         response = session.post(url, data=json.dumps(query))
+        return self._check_response(response)
+
+    def search_index(self, value):
+        value = urllib.quote(value)
+        session = self.__prepare_session('json')
+        url = urljoin(self.root_url, 'events/index/searchall:%s' % value)
+        response = session.get(url)
         return self._check_response(response)
 
     def search_all(self, value):
