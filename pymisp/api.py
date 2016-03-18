@@ -8,11 +8,12 @@ import datetime
 import os
 import base64
 import re
-import urllib
 
 try:
     from urllib.parse import urljoin
+    from urllib.parse import quote
 except ImportError:
+    from urllib import quote
     from urlparse import urljoin
 from io import BytesIO
 import zipfile
@@ -681,7 +682,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def search_index(self, value):
-        value = urllib.quote(value)
+        value = quote(value)
         session = self.__prepare_session('json')
         url = urljoin(self.root_url, 'events/index/searchall:%s' % value)
         response = session.get(url)
