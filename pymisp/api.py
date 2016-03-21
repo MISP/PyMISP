@@ -233,7 +233,6 @@ class PyMISP(object):
         else:
             return session.post(url, data=event)
 
-
     def update_event(self, event_id, event, force_out=None):
         """
             Update an event
@@ -265,7 +264,6 @@ class PyMISP(object):
         session = self.__prepare_session(force_out)
         url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
         return session.delete(url)
-
 
     # ##############################################
     # ######### Event handling (Json only) #########
@@ -305,8 +303,8 @@ class PyMISP(object):
         if distribution is not None:
             distribution = int(distribution)
         # If None: take the default value of the event
-        if distribution not in [None, 0, 1, 2, 3,5]:
-            raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3 or None'.format(distribution))
+        if distribution not in [None, 0, 1, 2, 3, 5]:
+            raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 5 or None'.format(distribution))
         if distribution is not None:
             to_return['distribution'] = distribution
 
@@ -356,9 +354,9 @@ class PyMISP(object):
         response = self.update_event(event['Event']['id'], event, 'json')
         return self._check_response(response)
 
-    def add_tag(self,event, tag):
+    def add_tag(self, event, tag):
         session = self.__prepare_session('json')
-        to_post = {'request': {'Event':{'id': event['Event']['id'], 'tag': tag}}}
+        to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
         response = session.post(urljoin(self.root_url, 'events/addTag'), data=json.dumps(to_post))
 
         return self._check_response(response)
@@ -847,8 +845,8 @@ class PyMISP(object):
                 to_return.append(tag['name'])
             return to_return
 
-    def new_tag(self,name=None, colour="#00ace6", exportable=False):
-        to_post = {'Tag': {'name':name,'colour':colour, 'exportable':exportable}}
+    def new_tag(self, name=None, colour="#00ace6", exportable=False):
+        to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable}}
         session = self.__prepare_session('json')
         url = urljoin(self.root_url, 'tags/add')
         response = session.post(url, data=json.dumps(to_post))
@@ -897,10 +895,11 @@ class PyMISP(object):
     def get_all_attributes_txt(self, type_attr):
 
         session = self.__prepare_session('txt')
-        url = urljoin(self.root_url,'attributes/text/download/%s' % type_attr)
+        url = urljoin(self.root_url, 'attributes/text/download/%s' % type_attr)
         response = session.get(url)
         return response
     # ############## Deprecated (Pure XML API should not be used) ##################
+
     @deprecated
     def download_all(self):
         """
