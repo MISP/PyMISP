@@ -566,7 +566,7 @@ class PyMISP(object):
     def prepare_attribute(self, event_id, distribution, to_ids, category, info,
                           analysis, threat_level_id):
         to_post = {'request': {}}
-        authorized_categs = ['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis']
+        authorized_categs = ['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis','Antivirus detection']
 
         if event_id is not None:
             try:
@@ -617,6 +617,32 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'events/upload_sample')
         response = session.post(url, data=json.dumps(to_post))
         return self._check_response(response)
+
+    def upload_attachment(self, filename, filepath, event_id, distribution, to_ids,
+                      category, info, analysis, threat_level_id):
+        to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
+                                         info, analysis, threat_level_id)
+        to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
+        return self._upload_sample(to_post)
+
+    def upload_attachmentlist(self, filepaths, event_id, distribution, to_ids, category,
+                          info, analysis, threat_level_id):
+        to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
+                                         info, analysis, threat_level_id)
+        files = []
+        for path in filepaths:
+            if not os.path.isfile(path):
+                continue
+            files.append({'filename': os.path.basename(path), 'data': self._encode_file_to_upload(path)})
+        to_post['request']['files'] = files
+        return self._upload_sample(to_post)
+    
+    def _upload_attachment(self, to_post):
+        session = self.__prepare_session('json')
+        url = urljoin(self.root_url, 'events/upload_attachment')
+        response = session.post(url, data=json.dumps(to_post))
+        return self._check_response(response)
+
 
     # ############################
     # ######## Proposals #########
