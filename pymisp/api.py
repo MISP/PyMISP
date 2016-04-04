@@ -11,9 +11,7 @@ import re
 
 try:
     from urllib.parse import urljoin
-    from urllib.parse import quote
 except ImportError:
-    from urllib import quote
     from urlparse import urljoin
 from io import BytesIO
 import zipfile
@@ -48,8 +46,10 @@ class NewEventError(PyMISPError):
 class NewAttributeError(PyMISPError):
     pass
 
+
 class SearchError(PyMISPError):
     pass
+
 
 class MissingDependency(PyMISPError):
     pass
@@ -174,8 +174,8 @@ class PyMISP(object):
             raise PyMISPError('Unknown error: {}'.format(response.text))
 
         errors = []
-        if type(to_return) is list:
-            to_return = {'response':to_return}
+        if isinstance(to_return, list):
+            to_return = {'response': to_return}
         if to_return.get('error'):
             if not isinstance(to_return['error'], list):
                 errors.append(to_return['error'])
@@ -706,9 +706,9 @@ class PyMISP(object):
         response = session.post(url, data=json.dumps(query))
         return self._check_response(response)
 
-    def search_index(self, published=None, eventid = None, tag = None, datefrom = None,
-                    dateto = None, eventinfo = None, threatlevel = None, distribution = None,
-                    analysis = None, attribute = None, org=None):
+    def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
+                     dateto=None, eventinfo=None, threatlevel=None, distribution=None,
+                     analysis=None, attribute=None, org=None):
         """
             Search only at the index level. Use ! infront of value as NOT, default OR
 
@@ -724,19 +724,19 @@ class PyMISP(object):
             :param org: Organisation(s) | str or list
 
         """
-        allowed = {'published':published, 'eventid':eventid, 'tag':tag, 'Dateto':dateto,
-                    'Datefrom':datefrom, 'eventinfo':eventinfo, 'threatlevel':threatlevel,
-                    'distribution':distribution, 'analysis':analysis, 'attribute':attribute,
-                    'org':org }
-        rule_levels = {'distribution':["0","1","2","3","!0","!1","!2","!3"],
-                        'threatlevel':["1","2","3","4","!1","!2","!3","!4"],
-                        'analysis':["0","1","2","!0","!1","!2"]}
+        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateto': dateto,
+                   'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
+                   'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
+                   'org': org}
+        rule_levels = {'distribution': ["0", "1", "2", "3", "!0", "!1", "!2", "!3"],
+                       'threatlevel': ["1", "2", "3", "4", "!1", "!2", "!3", "!4"],
+                       'analysis': ["0", "1", "2", "!0", "!1", "!2"]}
         buildup_url = "events/index"
 
         for rule in allowed.keys():
-            if allowed[rule] != None:
-                if type(allowed[rule])!=list:
-                    allowed[rule]=[allowed[rule]]
+            if allowed[rule] is not None:
+                if not isinstance(allowed[rule], list):
+                    allowed[rule] = [allowed[rule]]
                 allowed[rule] = map(str, allowed[rule])
                 if rule in rule_levels:
                     if not set(allowed[rule]).issubset(rule_levels[rule]):
