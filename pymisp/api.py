@@ -629,7 +629,7 @@ class PyMISP(object):
         to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
                                          info, analysis, threat_level_id)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
-        return self._upload_attachment(to_post)
+        return self._upload_sample(to_post)
 
     def upload_attachmentlist(self, filepaths, event_id, distribution, to_ids, category,
                               info, analysis, threat_level_id):
@@ -641,7 +641,7 @@ class PyMISP(object):
                 continue
             files.append({'filename': os.path.basename(path), 'data': self._encode_file_to_upload(path)})
         to_post['request']['files'] = files
-        return self._upload_attachment(to_post)
+        return self._upload_sample(to_post)
 
     def _upload_attachment(self, to_post):
         session = self.__prepare_session('json')
