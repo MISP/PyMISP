@@ -572,7 +572,7 @@ class PyMISP(object):
     def prepare_attribute(self, event_id, distribution, to_ids, category, info,
                           analysis, threat_level_id):
         to_post = {'request': {}}
-        authorized_categs = ['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis']
+        authorized_categs = ['Payload delivery', 'Artifacts dropped', 'Payload Installation', 'External Analysis', 'Network activity', 'Antivirus detection']
 
         if event_id is not None:
             try:
