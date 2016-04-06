@@ -16,7 +16,7 @@ def init(url, key):
     return PyMISP(url, key, True, 'json')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Send malware sample to MISP.')
+    parser = argparse.ArgumentParser(description='Create an event on MISP.')
     parser.add_argument("-d", "--distrib", type=int, help="The distribution setting used for the attributes and for the newly created event, if relevant. [0-3].")
     parser.add_argument("-i", "--info", help="Used to populate the event info field if no event ID supplied.")
     parser.add_argument("-a", "--analysis", type=int, help="The analysis level of the newly created event, if applicatble. [0-2]")
