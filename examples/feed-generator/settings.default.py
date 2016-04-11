@@ -21,3 +21,19 @@ outputdir = 'output'
 # tlp:white and/or feed-export but exclude anything tagged privint
 filters = {}
 
+
+# By default all attributes will be included in the feed generation
+# Remove the levels that you do not wish to include in the feed
+# Use this to further narrow down what gets exported, for example:
+# Setting this to ['3', '5'] will exclude any attributes from the feed that
+# are not exportable to all or inherit the event
+#
+# The levels are as follows:
+# 0: Your Organisation Only
+# 1: This Community Only
+# 2: Connected Communities
+# 3: All
+# 4: Sharing Group
+# 5: Inherit Event
+valid_attribute_distribution_levels = ['0', '1', '2', '3', '4', '5']
+
