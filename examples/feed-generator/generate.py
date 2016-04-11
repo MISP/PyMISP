@@ -5,7 +5,7 @@ import sys
 import json
 import os
 from pymisp import PyMISP
-from settings import url, key, ssl, outputdir, filters
+from settings import *
 
 
 objectsToSave = {
@@ -29,8 +29,16 @@ fieldsToSave = ['uuid', 'info', 'threat_level_id', 'analysis',
                 'timestamp', 'publish_timestamp', 'published',
                 'date']
 
+valid_attribute_distributions = []
+
 
 def init():
+    # If we have an old settings.py file then this variable won't exist
+    global valid_attribute_distributions
+    try:
+        valid_attribute_distributions = valid_attribute_distribution_levels
+    except:
+        valid_attribute_distributions = ['0', '1', '2', '3', '4', '5']
     return PyMISP(url, key, ssl, 'json')
 
 
@@ -61,11 +69,20 @@ def __cleanupEventFields(event, temp):
     return event
 
 
+def __blockAttributeByDistribution(attribute):
+    if attribute['distribution'] not in valid_attribute_distributions:
+        return True
+    return False
+
+
 def __cleanupEventObjects(event, temp):
     for objectType in objectsToSave.keys():
         if objectsToSave[objectType]['multiple'] is True:
             if objectType in temp['Event']:
                 for objectInstance in temp['Event'][objectType]:
+                    if objectType is 'Attribute':
+                        if __blockAttributeByDistribution(objectInstance):
+                            continue
                     tempObject = {}
                     for field in objectsToSave[objectType]['fields']:
                         if field in objectInstance.keys():
