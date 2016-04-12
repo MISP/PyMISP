@@ -109,8 +109,8 @@ class PyMISP(object):
                            'Payload delivery', 'Payload installation', 'Artifacts dropped',
                            'Persistence mechanism', 'Network activity', 'Payload type',
                            'Attribution', 'External analysis', 'Other']
-        self.types = ['md5', 'sha1', 'sha256', 'filename', 'filename|md5', 'filename|sha1',
-                      'filename|sha256', 'ip-src', 'ip-dst', 'hostname', 'domain', 'url',
+        self.types = ['md5', 'sha1', 'sha256', 'ssdeep', 'filename', 'filename|md5', 'filename|sha1',
+                      'filename|sha256', 'filename|ssdeep', 'ip-src', 'ip-dst', 'hostname', 'domain', 'url',
                       'user-agent', 'http-method', 'regkey', 'regkey|value', 'AS', 'snort',
                       'pattern-in-file', 'pattern-in-traffic', 'pattern-in-memory', 'named pipe',
                       'mutex', 'vulnerability', 'attachment', 'malware-sample', 'link', 'comment',
@@ -388,7 +388,7 @@ class PyMISP(object):
             response = self.update_event(event['Event']['id'], event, 'json')
         return self._check_response(response)
 
-    def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, comment=None, to_ids=True, distribution=None, proposal=False):
+    def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, ssdeep=None, comment=None, to_ids=True, distribution=None, proposal=False):
         categories = ['Payload delivery', 'Artifacts dropped', 'Payload installation', 'External analysis']
         if category not in categories:
             raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(categories))))
@@ -408,6 +408,10 @@ class PyMISP(object):
         if sha256:
             attributes.append(self._prepare_full_attribute(category, type_value.format('sha256'), value.format(sha256),
                                                            to_ids, comment, distribution))
+        if ssdeep:
+            attributes.append(self._prepare_full_attribute(category, type_value.format('ssdeep'), value.format(ssdeep),
+                                                           to_ids, comment, distribution))
+
 
         return self._send_attributes(event, attributes, proposal)
 
