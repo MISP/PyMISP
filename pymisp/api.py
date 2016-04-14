@@ -118,27 +118,6 @@ class PyMISP(object):
         self.types = self.describe_types['result']['types']
         self.category_type_mapping = self.describe_types['result']['category_type_mappings']
 
-        self.categories = ['Internal reference', 'Targeting data', 'Antivirus detection',
-                           'Payload delivery', 'Payload installation', 'Artifacts dropped',
-                           'Persistence mechanism', 'Network activity', 'Payload type',
-                           'Attribution', 'External analysis', 'Other']
-        self.types = ['md5', 'sha1', 'sha256', 'ssdeep', 'filename', 'filename|md5', 'filename|sha1',
-                      'filename|sha256', 'filename|ssdeep', 'ip-src', 'ip-dst', 'hostname', 'domain', 'url',
-                      'user-agent', 'http-method', 'regkey', 'regkey|value', 'AS', 'snort',
-                      'pattern-in-file', 'pattern-in-traffic', 'pattern-in-memory', 'named pipe',
-                      'mutex', 'vulnerability', 'attachment', 'malware-sample', 'link', 'comment',
-                      'text', 'email-src', 'email-dst', 'email-subject', 'email-attachment',
-                      'yara', 'target-user', 'target-email', 'target-machine', 'target-org',
-                      'target-location', 'target-external', 'other', 'threat-actor']
-
-
-        session = self.__prepare_session(out_type)
-        self.describe_types = session.get(self.root_url + 'attributes/describeTypes.json').json()
-
-        self.categories = self.describe_types['result']['categories']
-        self.types = self.describe_types['result']['types']
-        self.category_type_mapping = self.describe_types['result']['category_type_mappings']
-
     def __prepare_session(self, force_out=None):
         """
             Prepare the headers of the session
@@ -407,9 +386,6 @@ class PyMISP(object):
         return self._check_response(response)
 
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, ssdeep=None, comment=None, to_ids=True, distribution=None, proposal=False):
-        categories = ['Payload delivery', 'Artifacts dropped', 'Payload installation', 'External analysis']
-        if category not in categories:
-            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(categories))))
 
         attributes = []
         type_value = '{}'
@@ -520,9 +496,6 @@ class PyMISP(object):
         return self._send_attributes(event, attributes, proposal)
 
     def add_email_dst(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False):
-        categories = ['Payload delivery', 'Network activity']
-        if category not in categories:
-            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(categories))))
         attributes = []
         attributes.append(self._prepare_full_attribute(category, 'email-dst', email, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
