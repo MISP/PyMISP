@@ -118,6 +118,27 @@ class PyMISP(object):
         self.types = self.describe_types['result']['types']
         self.category_type_mapping = self.describe_types['result']['category_type_mappings']
 
+        self.categories = ['Internal reference', 'Targeting data', 'Antivirus detection',
+                           'Payload delivery', 'Payload installation', 'Artifacts dropped',
+                           'Persistence mechanism', 'Network activity', 'Payload type',
+                           'Attribution', 'External analysis', 'Other']
+        self.types = ['md5', 'sha1', 'sha256', 'ssdeep', 'filename', 'filename|md5', 'filename|sha1',
+                      'filename|sha256', 'filename|ssdeep', 'ip-src', 'ip-dst', 'hostname', 'domain', 'url',
+                      'user-agent', 'http-method', 'regkey', 'regkey|value', 'AS', 'snort',
+                      'pattern-in-file', 'pattern-in-traffic', 'pattern-in-memory', 'named pipe',
+                      'mutex', 'vulnerability', 'attachment', 'malware-sample', 'link', 'comment',
+                      'text', 'email-src', 'email-dst', 'email-subject', 'email-attachment',
+                      'yara', 'target-user', 'target-email', 'target-machine', 'target-org',
+                      'target-location', 'target-external', 'other', 'threat-actor']
+
+
+        session = self.__prepare_session(out_type)
+        self.describe_types = session.get(self.root_url + 'attributes/describeTypes.json').json()
+
+        self.categories = self.describe_types['result']['categories']
+        self.types = self.describe_types['result']['types']
+        self.category_type_mapping = self.describe_types['result']['category_type_mappings']
+
     def __prepare_session(self, force_out=None):
         """
             Prepare the headers of the session
