@@ -105,6 +105,19 @@ class PyMISP(object):
         self.out_type = out_type
         self.debug = debug
 
+        try:
+            # Make sure the MISP instance is working and the URL is valid
+            self.get_version()
+        except Exception as e:
+            raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
+
+        session = self.__prepare_session(out_type)
+        self.describe_types = session.get(self.root_url + 'attributes/describeTypes.json').json()
+
+        self.categories = self.describe_types['result']['categories']
+        self.types = self.describe_types['result']['types']
+        self.category_type_mapping = self.describe_types['result']['category_type_mappings']
+
         self.categories = ['Internal reference', 'Targeting data', 'Antivirus detection',
                            'Payload delivery', 'Payload installation', 'Artifacts dropped',
                            'Persistence mechanism', 'Network activity', 'Payload type',
@@ -118,11 +131,7 @@ class PyMISP(object):
                       'yara', 'target-user', 'target-email', 'target-machine', 'target-org',
                       'target-location', 'target-external', 'other', 'threat-actor']
 
-        try:
-            # Make sure the MISP instance is working and the URL is valid
-            self.get_version()
-        except Exception as e:
-            raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
+
 
     def __prepare_session(self, force_out=None):
         """
@@ -296,11 +305,14 @@ class PyMISP(object):
         to_return = {}
         if category not in self.categories:
             raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(self.categories))))
-        to_return['category'] = category
 
         if type_value not in self.types:
             raise NewAttributeError('{} is invalid, type_value has to be in {}'.format(type_value, (', '.join(self.types))))
+
+        if type_value not in self.category_type_mapping[category]:
+            raise NewAttributeError('{} and {} is an invalid combinaison, type_value for this category has to be in {}'.format(type_value, category, (', '.join(self.category_type_mapping[category]))))
         to_return['type'] = type_value
+        to_return['category'] = category
 
         if to_ids not in [True, False]:
             raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(to_ids))
