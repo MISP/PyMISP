@@ -406,7 +406,6 @@ class PyMISP(object):
             attributes.append(self._prepare_full_attribute(category, type_value.format('ssdeep'), value.format(ssdeep),
                                                            to_ids, comment, distribution))
 
-
         return self._send_attributes(event, attributes, proposal)
 
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
@@ -548,24 +547,24 @@ class PyMISP(object):
         attributes = []
         attributes.append(self._prepare_full_attribute('Attribution', 'threat-actor', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
-        
+
     # ##### Internal reference attributes #####
-    
+
     def add_internal_link(self, event, reference, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
         attributes.append(self._prepare_full_attribute('Internal reference', 'link', reference, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
-        
+
     def add_internal_comment(self, event, reference, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
         attributes.append(self._prepare_full_attribute('Internal reference', 'comment', reference, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
-        
+
     def add_internal_text(self, event, reference, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
         attributes.append(self._prepare_full_attribute('Internal reference', 'text', reference, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
-        
+
     def add_internal_other(self, event, reference, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
         attributes.append(self._prepare_full_attribute('Internal reference', 'other', reference, to_ids, comment, distribution))
