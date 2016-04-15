@@ -408,6 +408,11 @@ class PyMISP(object):
 
         return self._send_attributes(event, attributes, proposal)
 
+    def add_filename(self, event, filename, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'filename', filename, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
         type_value = '{}'
         value = '{}'
