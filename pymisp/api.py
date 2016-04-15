@@ -583,14 +583,14 @@ class PyMISP(object):
         # Setup details of a new event
         if distribution not in [0, 1, 2, 3]:
             raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(distribution))
-        if threat_level_id not in [0, 1, 2, 3]:
-            raise NewEventError('{} is invalid, the threat_level_id has to be in 0, 1, 2, 3'.format(threat_level_id))
+        if threat_level_id not in [1, 2, 3, 4]:
+            raise NewEventError('{} is invalid, the threat_level_id has to be in 1, 2, 3, 4'.format(threat_level_id))
         if analysis not in [0, 1, 2]:
             raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(analysis))
         return {'distribution': int(distribution), 'info': info,
                 'threat_level_id': int(threat_level_id), 'analysis': analysis}
 
-    def prepare_attribute(self, event_id, distribution, to_ids, category, info,
+    def prepare_attribute(self, event_id, distribution, to_ids, category, comment, info,
                           analysis, threat_level_id):
         to_post = {'request': {}}
         authorized_categs = ['Payload delivery', 'Artifacts dropped', 'Payload installation', 'External analysis', 'Network activity', 'Antivirus detection']
@@ -614,6 +614,7 @@ class PyMISP(object):
             raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(authorized_categs))))
         to_post['request']['category'] = category
 
+        to_post['request']['comment'] = comment
         return to_post
 
     def _encode_file_to_upload(self, path):
@@ -621,9 +622,9 @@ class PyMISP(object):
             return base64.b64encode(f.read())
 
     def upload_sample(self, filename, filepath, event_id, distribution, to_ids,
-                      category, info, analysis, threat_level_id):
+                      category, comment, info, analysis, threat_level_id):
         to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
-                                         info, analysis, threat_level_id)
+                                         comment, info, analysis, threat_level_id)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
         return self._upload_sample(to_post)
 
