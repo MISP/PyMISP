@@ -112,7 +112,7 @@ class PyMISP(object):
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
         session = self.__prepare_session(out_type)
-        self.describe_types = session.get(self.root_url + 'attributes/describeTypes.json').json()
+        self.describe_types = session.get(urljoin(self.root_url, 'attributes/describeTypes.json')).json()
 
         self.categories = self.describe_types['result']['categories']
         self.types = self.describe_types['result']['types']
@@ -448,6 +448,11 @@ class PyMISP(object):
         if not mutex.startswith('\\BaseNamedObjects\\'):
             mutex = '\\BaseNamedObjects\\{}'.format(mutex)
         attributes.append(self._prepare_full_attribute(category, 'mutex', mutex, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
+    def add_yara(self, event, yara, category='Payload delivery', to_ids=False, comment=None, distribution=None, proposal=False):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'yara', yara, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     # ##### Network attributes #####
