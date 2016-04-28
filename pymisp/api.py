@@ -976,8 +976,24 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'attributes/text/download/%s' % type_attr)
         response = session.get(url)
         return response
-    # ############## Deprecated (Pure XML API should not be used) ##################
 
+    # ############## Statistics ##################
+
+    def get_attributes_statistics(self, context='type', percentage=None, force_out=None):
+        """
+            Get statistics from the MISP instance
+        """
+        session = self.__prepare_session(force_out)
+        if (context != 'category'):
+            context = 'type' 
+        if(percentage!=None):
+            url = urljoin(self.root_url, 'attributes/attributeStatistics/{}/{}'.format(context, percentage))
+        else:
+            url = urljoin(self.root_url, 'attributes/attributeStatistics/{}'.format(context))
+        print(url)
+        return session.get(url).json()
+
+    # ############## Deprecated (Pure XML API should not be used) ##################
     @deprecated
     def download_all(self):
         """
@@ -1001,3 +1017,5 @@ class PyMISP(object):
         template = urljoin(self.root_url, 'events/xml/download/{}/{}'.format(event_id, attach))
         session = self.__prepare_session('xml')
         return session.get(template)
+
+
