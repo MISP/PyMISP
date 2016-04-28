@@ -985,12 +985,11 @@ class PyMISP(object):
         """
         session = self.__prepare_session(force_out)
         if (context != 'category'):
-            context = 'type' 
+            context = 'type'
         if(percentage!=None):
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}/{}'.format(context, percentage))
         else:
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}'.format(context))
-        print(url)
         return session.get(url).json()
 
     # ############## Deprecated (Pure XML API should not be used) ##################
