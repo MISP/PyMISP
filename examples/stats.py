@@ -15,4 +15,5 @@ if __name__ == '__main__':
 
     misp = init(misp_url, misp_key)
 
-    print misp.get_attributes_statistics(misp, percentage=True)
+    print (misp.get_attributes_statistics(misp, percentage=True))
+    print (misp.get_attributes_statistics(context='category', percentage=True))
