@@ -992,6 +992,24 @@ class PyMISP(object):
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}'.format(context))
         return session.get(url).json()
 
+    # ############## Sightings ##################
+
+    def sighting_per_id(self, attribute_id, force_out=None):
+        session = self.__prepare_session(force_out)
+        url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_id))       
+        return session.post(url)
+
+    def sighting_per_uuid(self, attribute_uuid, force_out=None):
+        session = self.__prepare_session(force_out)
+        url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_uuid))       
+        return session.post(url)
+
+    def sighting_per_json(self, json_file, force_out=None):
+        session = self.__prepare_session(force_out)
+        jdata = json.load(open(json_file))
+        url = urljoin(self.root_url, 'sightings/add/')       
+        return session.post(url, data=json.dumps(jdata))
+
     # ############## Deprecated (Pure XML API should not be used) ##################
     @deprecated
     def download_all(self):
