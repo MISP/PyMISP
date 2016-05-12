@@ -4,9 +4,9 @@ Python script for ioc import to misp
 
 ### requires
 
-> python 2.7
-> PyMISP
-> BeautifulSoup (apt-get install python-bs4 lxml)
+> python 2.7  
+> PyMISP  
+> BeautifulSoup (apt-get install python-bs4 python-lxml)
 
 ### Usage
 
