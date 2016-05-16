@@ -1,0 +1,12 @@
+link,value,keep,taxonomy,comment
+classification,TLP AMBER,1,tlp:amber,
+classification,TLP GREEN,1,tlp:green,
+confidential,TLP-AMBER,1,tlp:amber,
+confidential,TLP GREEN,1,tlp:green,
+confidential,TLP-GREEN,1,tlp:green,
+confidential,TLP RED,1,tlp:red,
+exportable,Yes,0,,
+family,APT,1,malware_classification:malware-category='APT',
+family,APT3,1,malware_classification:malware-category='APT3',https://github.com/fireeye/iocs/tree/master/APT3
+license,Apache 2.0,0,,
+threatcategory,APT3,1,malware_classification:malware-category='APT3',https://github.com/fireeye/iocs/tree/master/APT3
