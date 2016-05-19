@@ -1023,9 +1023,9 @@ class PyMISP(object):
 
     def get_sharing_groups(self):
         session = self.__prepare_session(force_out=None)
-	url = urljoin(self.root_url, 'sharing_groups/index.json')
-	response =  session.get(url)
-	return self._check_response(response)['response'][0]
+        url = urljoin(self.root_url, 'sharing_groups/index.json')
+        response =  session.get(url)
+        return self._check_response(response)['response'][0]
 
 
     # ############## Deprecated (Pure XML API should not be used) ##################
