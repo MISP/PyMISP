@@ -990,7 +990,7 @@ class PyMISP(object):
 
     def get_attributes_statistics(self, context='type', percentage=None, force_out=None):
         """
-            Get statistics from the MISP instance
+            Get attributes statistics from the MISP instance
         """
         session = self.__prepare_session(force_out)
         if (context != 'category'):
@@ -1001,22 +1001,38 @@ class PyMISP(object):
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}'.format(context))
         return session.get(url).json()
 
-    # ############## Sightings ##################
+    def get_tags_statistics(self, percentage=None, name_sort=None, force_out=None):
+        """
+        Get tags statistics from the MISP instance
+        """
+        session = self.__prepare_session(force_out)
+        if (percentage != None):
+            percentage = 'true'
+        else:
+            percentage = 'false'
+        if (name_sort != None):
+            name_sort = 'true'
+        else:
+            name_sort = 'false'
+        url = urljoin(self.root_url, 'tags/tagStatistics/{}/{}'.format(percentage, name_sort))
+        return session.get(url).json()
+
+# ############## Sightings ##################
 
     def sighting_per_id(self, attribute_id, force_out=None):
         session = self.__prepare_session(force_out)
-        url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_id))       
+        url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_id))
         return session.post(url)
 
     def sighting_per_uuid(self, attribute_uuid, force_out=None):
         session = self.__prepare_session(force_out)
-        url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_uuid))       
+        url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_uuid))
         return session.post(url)
 
     def sighting_per_json(self, json_file, force_out=None):
         session = self.__prepare_session(force_out)
         jdata = json.load(open(json_file))
-        url = urljoin(self.root_url, 'sightings/add/')       
+        url = urljoin(self.root_url, 'sightings/add/')
         return session.post(url, data=json.dumps(jdata))
 
     # ############## Sharing Groups ##################
