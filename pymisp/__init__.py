@@ -1,3 +1,3 @@
-__version__ = '2.4.36'
+__version__ = '2.4.48'
 
 from .api import PyMISP, PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey
