@@ -7,9 +7,6 @@ import argparse
 import json
 
 
-# Usage for pipe masters: ./last.py -l 5h | jq .
-
-
 def init(url, key):
     return PyMISP(url, key, True, 'json', True)
 
