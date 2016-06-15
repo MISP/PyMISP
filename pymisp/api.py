@@ -971,7 +971,7 @@ class PyMISP(object):
         """
             Get the most recent version from github
         """
-        r = requests.get('https://raw.githubusercontent.com/MISP/MISP/master/VERSION.json')
+        r = requests.get('https://raw.githubusercontent.com/MISP/MISP/2.4/VERSION.json')
         if r.status_code == 200:
             master_version = json.loads(r.text)
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
