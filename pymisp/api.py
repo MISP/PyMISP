@@ -995,7 +995,7 @@ class PyMISP(object):
         session = self.__prepare_session(force_out)
         if (context != 'category'):
             context = 'type'
-        if(percentage!=None):
+        if percentage is not None:
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}/{}'.format(context, percentage))
         else:
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}'.format(context))
@@ -1006,11 +1006,11 @@ class PyMISP(object):
         Get tags statistics from the MISP instance
         """
         session = self.__prepare_session(force_out)
-        if (percentage != None):
+        if percentage is not None:
             percentage = 'true'
         else:
             percentage = 'false'
-        if (name_sort != None):
+        if name_sort is not None:
             name_sort = 'true'
         else:
             name_sort = 'false'
@@ -1040,9 +1040,8 @@ class PyMISP(object):
     def get_sharing_groups(self):
         session = self.__prepare_session(force_out=None)
         url = urljoin(self.root_url, 'sharing_groups/index.json')
-        response =  session.get(url)
+        response = session.get(url)
         return self._check_response(response)['response'][0]
-
 
     # ############## Deprecated (Pure XML API should not be used) ##################
     @deprecated
@@ -1068,5 +1067,3 @@ class PyMISP(object):
         template = urljoin(self.root_url, 'events/xml/download/{}/{}'.format(event_id, attach))
         session = self.__prepare_session('xml')
         return session.get(template)
-
-
