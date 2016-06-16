@@ -1,29 +1,24 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import sys
 import json
 import os
 from pymisp import PyMISP
-from settings import *
+from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
 
 
-objectsToSave = {
-               'Orgc': {
-                       'fields': ['name', 'uuid'],
-                       'multiple': False,
-                       },
-               'Tag': {
-                      'fields': ['name', 'colour', 'exportable'],
-                      'multiple': True,
-                      },
-               'Attribute': {
-                            'fields': ['uuid', 'value', 'category', 'type',
-                                       'comment', 'data', 'timestamp',
-                                       'to_ids'],
-                            'multiple': True,
-                            },
-               }
+objectsToSave = {'Orgc': {'fields': ['name', 'uuid'],
+                          'multiple': False,
+                          },
+                 'Tag': {'fields': ['name', 'colour', 'exportable'],
+                         'multiple': True,
+                         },
+                 'Attribute': {'fields': ['uuid', 'value', 'category', 'type',
+                                          'comment', 'data', 'timestamp', 'to_ids'],
+                               'multiple': True,
+                               },
+                 }
 
 fieldsToSave = ['uuid', 'info', 'threat_level_id', 'analysis',
                 'timestamp', 'publish_timestamp', 'published',
@@ -43,15 +38,15 @@ def init():
 
 
 def saveEvent(misp, uuid):
-    try:
-        event = misp.get_event(uuid)
-        event = __cleanUpEvent(event)
-        event = json.dumps(event)
-        eventFile = open(os.path.join(outputdir, uuid + '.json'), 'w')
-        eventFile.write(event)
-        eventFile.close()
-    except:
+    event = misp.get_event(uuid)
+    if not event.json().get('Event'):
+        print('Error while fetching event: {}'.format(event.json()['message']))
         sys.exit('Could not create file for event ' + uuid + '.')
+    event = __cleanUpEvent(event)
+    event = json.dumps(event)
+    eventFile = open(os.path.join(outputdir, uuid + '.json'), 'w')
+    eventFile.write(event)
+    eventFile.close()
 
 
 def __cleanUpEvent(event):
@@ -103,7 +98,8 @@ def saveManifest(manifest):
         manifestFile = open(os.path.join(outputdir, 'manifest.json'), 'w')
         manifestFile.write(json.dumps(manifest))
         manifestFile.close()
-    except:
+    except Exception as e:
+        print(e)
         sys.exit('Could not create the manifest file.')
 
 
@@ -112,8 +108,7 @@ def __addEventToManifest(event):
     for eventTag in event['EventTag']:
         tags.append({'name': eventTag['Tag']['name'],
                      'colour': eventTag['Tag']['colour']})
-    return {
-            'Orgc': event['Orgc'],
+    return {'Orgc': event['Orgc'],
             'Tag': tags,
             'info': event['info'],
             'date': event['date'],
@@ -138,8 +133,7 @@ if __name__ == '__main__':
     for event in events:
         saveEvent(misp, event['uuid'])
         manifest[event['uuid']] = __addEventToManifest(event)
-        print "Event " + str(counter) + "/" + str(total) + " exported."
+        print("Event " + str(counter) + "/" + str(total) + " exported.")
         counter += 1
     saveManifest(manifest)
-    print 'Manifest saved. Feed creation completed.'
-
+    print('Manifest saved. Feed creation completed.')

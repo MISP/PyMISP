@@ -1,6 +1,7 @@
 *.pyc
 examples/keys.py
 examples/cudeso.py
+examples/feed-generator/output/*.json
 build/*
 dist/*
 pymisp.egg-info/*
