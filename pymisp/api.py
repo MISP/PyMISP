@@ -486,6 +486,11 @@ class PyMISP(object):
         attributes.append(self._prepare_full_attribute(category, 'domain', domain, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
+    def add_domain_ip(self, event, domain, ip, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'domain|ip', "%s|%s" % (domain, ip), to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
     def add_url(self, event, url, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
         attributes.append(self._prepare_full_attribute(category, 'url', url, to_ids, comment, distribution))
