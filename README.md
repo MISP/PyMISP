@@ -8,9 +8,15 @@ PyMISP allows you to fetch events, add or update events/attributes, add or updat
 
  * [requests](http://docs.python-requests.org)
 
-## Install
+## Install from pip
+~~~~
+pip install pymisp
+~~~~
+
+## Install the lastest version from repo
 
 ~~~~
+git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
 python setup.py install
 ~~~~
 
