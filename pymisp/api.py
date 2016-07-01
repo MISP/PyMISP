@@ -1027,7 +1027,7 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'tags/tagStatistics/{}/{}'.format(percentage, name_sort))
         return session.get(url).json()
 
-# ############## Sightings ##################
+    # ############## Sightings ##################
 
     def sighting_per_id(self, attribute_id, force_out=None):
         session = self.__prepare_session(force_out)
