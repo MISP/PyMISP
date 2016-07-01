@@ -43,8 +43,8 @@ def floodemail(misp, event, maxlength = 25):
     emailfunctions = [misp.add_email_src, misp.add_email_dst]
     emailfunctions[randint(0,1)](event, email)
 
-def floodattachment(misp, eventid, it, distribution, to_ids, category, comment, info, analysis, threat_level_id):
-    filename = 'dummy' + str(it)
+def floodattachment(misp, eventid, distribution, to_ids, category, comment, info, analysis, threat_level_id):
+    filename = randomStringGenerator(randint(1,128))
     misp.upload_sample(filename, 'dummy', eventid, distribution, to_ids, category, comment, info, analysis, threat_level_id)
 
 def create_dummy_event(misp):
@@ -59,6 +59,6 @@ def create_massive_dummy_events(misp, nbattribute):
     for i in range(nbattribute):
         choice = randint(0,5)
         if choice == 5:
-            floodattachment(misp, eventid, i, event['Event']['distribution'], False, 'Payload delivery', '', event['Event']['info'], event['Event']['analysis'], event['Event']['threat_level_id'])
+            floodattachment(misp, eventid, event['Event']['distribution'], False, 'Payload delivery', '', event['Event']['info'], event['Event']['analysis'], event['Event']['threat_level_id'])
         else:
             functions[choice](misp,event)
