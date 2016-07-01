@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key, misp_verifycert
+from keys import url, key
 import argparse
 import tools
 
-def init(url, key):
-    return PyMISP(url, key, misp_verifycert, 'json')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create a given number of event containing a given number of attributes eachh.')
@@ -15,7 +13,7 @@ if __name__ == '__main__':
     parser.add_argument("-a", "--attribute", type=int, help="Number of attributes per event (default 3000)")
     args = parser.parse_args()
 
-    misp = init(misp_url, misp_key)
+    misp = PyMISP(url, key, True, 'json')
 
     if args.limit is None:
         args.limit = 1
