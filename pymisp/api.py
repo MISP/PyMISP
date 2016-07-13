@@ -364,6 +364,13 @@ class PyMISP(object):
 
         return self._check_response(response)
 
+    def remove_tag(self, event, tag):
+        session = self.__prepare_session('json')
+        to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
+        response = session.post(urljoin(self.root_url, 'events/removeTag'), data=json.dumps(to_post))
+
+        return self._check_response(response)
+
     def change_threat_level(self, event, threat_level_id):
         event['Event']['threat_level_id'] = threat_level_id
         self._prepare_update(event)
