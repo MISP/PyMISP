@@ -127,20 +127,9 @@ def selectInRange(Events, begin=None, end=None):
     temp = Events.columns.tolist()
     inRange.columns = temp
     return inRange
-'''
-def isTagIn(dataframe, tag):
-    print 'tag =' + tag
-    result = []
-    for tagname in dataframe['name']:
-        print tagname
-        if tag in tagname:
-            print 'True'
-            result.append(tagname)
-    return result
-'''
 
 def isTagIn(dataframe, tag):
-    temp = Tags[Tags['name'].str.contains(test)].index.tolist()
+    temp = dataframe[dataframe['name'].str.contains(tag)].index.tolist()
     index = []
     for i in range(len(temp)):
         if temp[i][0] not in index:
