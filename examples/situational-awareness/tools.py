@@ -7,6 +7,52 @@ import random
 import pygal
 from pygal.style import Style
 import pandas as pd
+from datetime import datetime
+from datetime import timedelta
+from dateutil.parser import parse
+
+################ Tools ################
+
+def buildDoubleIndex(index1, index2, datatype):
+    it = -1
+    newindex1 = []
+    for index in index2:
+        if index == 0:
+            it+=1
+        newindex1.append(index1[it])
+    arrays =  [newindex1, index2]
+    tuples = list(zip(*arrays))
+    return pd.MultiIndex.from_tuples(tuples, names=['event', datatype])
+
+def buildNewColumn(index2, column):
+    it = -1
+    newcolumn = []
+    for index in index2:
+        if index == 0:
+            it+=1
+        newcolumn.append(column[it])
+    return newcolumn
+
+def dateInRange(datetimeTested, begin=None, end=None):
+    if begin == None:
+        begin = datetime(1970,1,1)
+    if end == None:
+        end = datetime.now()
+    return begin <= datetimeTested <= end
+
+def addColumn(dataframe, columnList, columnName):
+        dataframe.loc[:, columnName] = pd.Series(columnList, index=dataframe.index)
+
+def dateInRange(datetimeTested, begin=None, end=None):
+    if begin == None:
+        begin = datetime(1970,1,1)
+    if end == None:
+        end = datetime.now()
+    return begin <= datetimeTested <= end
+
+def toDatetime(date):
+    temp = date.split('-')
+    return datetime(int(temp[0]), int(temp[1]), int(temp[2]))
 
 ################ Formatting  ################
 
@@ -59,12 +105,58 @@ def attributesListBuild(Events):
         Attributes.append(pd.DataFrame(Attribute))
     return pd.concat(Attributes)
 
+def tagsListBuild(Events):
+    Tags = []
+    for Tag in Events['Tag']:
+        if type(Tag) is not list:
+            continue
+        Tags.append(pd.DataFrame(Tag))
+    Tags = pd.concat(Tags)
+    columnDate = buildNewColumn(Tags.index, Events['date'])
+    addColumn(Tags, columnDate, 'date')
+    index = buildDoubleIndex(Events.index, Tags.index, 'tag')
+    Tags = Tags.set_index(index)
+    return Tags
+
+def selectInRange(Events, begin=None, end=None):
+    inRange = []
+    for i, Event in Events.iterrows():
+        if dateInRange(parse(Event['date']), begin, end):
+            inRange.append(Event.tolist())
+    inRange = pd.DataFrame(inRange)
+    temp = Events.columns.tolist()
+    inRange.columns = temp
+    return inRange
+'''
+def isTagIn(dataframe, tag):
+    print 'tag =' + tag
+    result = []
+    for tagname in dataframe['name']:
+        print tagname
+        if tag in tagname:
+            print 'True'
+            result.append(tagname)
+    return result
+'''
+
+def isTagIn(dataframe, tag):
+    temp = Tags[Tags['name'].str.contains(test)].index.tolist()
+    index = []
+    for i in range(len(temp)):
+        if temp[i][0] not in index:
+            index.append(temp[i][0])
+    return index
 
 ################ Basic Stats ################
+
+def getNbitems(dataframe):
+        return len(dataframe.index)
 
 def getNbAttributePerEventCategoryType(Attributes):
     return Attributes.groupby(['event_id', 'category', 'type']).count()['id']
 
+def getNbOccurenceTags(Tags):
+        return Tags.groupby('name').count()['id']
 
 ################ Charts ################
 

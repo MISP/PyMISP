@@ -1,5 +1,6 @@
 body 
 {
+    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
@@ -9,6 +10,8 @@ h1
 	width: 290px;
 	text-align:center;
 }
+
+/*** Stats Tables ***/
 
 table
 {

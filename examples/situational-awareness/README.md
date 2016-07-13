@@ -7,5 +7,3 @@
 ## Requierements
 
 * [Pygal](https://github.com/Kozea/pygal/)
-
-
