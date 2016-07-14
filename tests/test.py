@@ -109,6 +109,10 @@ class TestBasic(unittest.TestCase):
         event = self.misp.get_event(eventid)
         print event.json()
 
+    def get_stix(self, **kwargs):
+        event = self.misp.get_stix(kwargs)
+        print(event)
+
     def add(self):
         event = {u'Event': {u'info': u'This is a test', u'locked': False,
                             u'attribute_count': u'3', u'analysis': u'0',
