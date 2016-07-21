@@ -917,10 +917,10 @@ class PyMISP(object):
                 archive = zipfile.ZipFile(zipped)
                 try:
                     # New format
-                    unzipped = BytesIO(archive.open(f['md5'], pwd='infected').read())
+                    unzipped = BytesIO(archive.open(f['md5'], pwd=b'infected').read())
                 except KeyError:
                     # Old format
-                    unzipped = BytesIO(archive.open(f['filename'], pwd='infected').read())
+                    unzipped = BytesIO(archive.open(f['filename'], pwd=b'infected').read())
                 details.append([f['event_id'], f['filename'], unzipped])
             except zipfile.BadZipfile:
                 # In case the sample isn't zipped
