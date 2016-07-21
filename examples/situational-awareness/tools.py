@@ -3,6 +3,7 @@
 
 import json
 from json import JSONDecoder
+import math
 import random
 import pygal
 from pygal.style import Style
@@ -57,7 +58,7 @@ def toDatetime(date):
 ################ Formatting  ################
 
 def eventsListBuildFromList(filename):
-    with open('testt', 'r') as myfile:
+    with open(filename, 'r') as myfile:
         s=myfile.read().replace('\n', '')
     decoder = JSONDecoder()
     s_len = len(s)
@@ -92,7 +93,7 @@ def eventsListBuildFromArray(filename):
         data.append(pd.DataFrame.from_dict(e, orient='index'))
     Events = pd.concat(data)
     for it in range(Events['attribute_count'].size):
-        if Events['attribute_count'][it] == None:
+        if Events['attribute_count'][it] == None or (isinstance(Events['attribute_count'][it], float) and math.isnan(Events['attribute_count'][it])):
             Events['attribute_count'][it]='0'
         else:
             Events['attribute_count'][it]=int(Events['attribute_count'][it])
@@ -127,20 +128,9 @@ def selectInRange(Events, begin=None, end=None):
     temp = Events.columns.tolist()
     inRange.columns = temp
     return inRange
-'''
-def isTagIn(dataframe, tag):
-    print 'tag =' + tag
-    result = []
-    for tagname in dataframe['name']:
-        print tagname
-        if tag in tagname:
-            print 'True'
-            result.append(tagname)
-    return result
-'''
 
 def isTagIn(dataframe, tag):
-    temp = Tags[Tags['name'].str.contains(test)].index.tolist()
+    temp = dataframe[dataframe['name'].str.contains(tag)].index.tolist()
     index = []
     for i in range(len(temp)):
         if temp[i][0] not in index:
