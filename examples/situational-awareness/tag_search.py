@@ -13,23 +13,25 @@ def init(url, key):
 
 ########## fetch data ##########
 
-def searchall(m, search, url):
-    result = m.search_all(search)
+def download_last(m, last):
+    result = m.download_last(last)
     with open('data', 'w') as f:
         f.write(json.dumps(result))
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Take a sample of events (based on last.py of searchall.py) and create a treemap epresenting the distribution of attributes in this sample.')
-    parser.add_argument("-s", "--search", help="string to search")
-    parser.add_argument("-t", "--tag", required=True, help="String to search in tags, can be composed. Example: \"ransomware|Ransomware\"")
-    parser.add_argument("-b", "--begindate", help="The research will look for Tags attached to events posted at or after the given startdate (format: yyyy-mm-dd): If no date is given, default time is epoch time (1970-1-1)")
-    parser.add_argument("-e", "--enddate", help="The research will look for Tags attached to events posted at or before the given enddate (format: yyyy-mm-dd): If no date is given, default time is now()")
+    parser = argparse.ArgumentParser(description='Take a sample of events (based on last.py) and give the number of occurrence of the given tag in this sample.')
+    parser.add_argument("-t", "--tag", required=True, help="tag to search (search for multiple tags is possible by using |. example : \"osint|OSINT\")")
+    parser.add_argument("-d", "--days", help="number of days before today to search. If not define, default value is 7")
+    parser.add_argument("-b", "--begindate", help="The research will look for tags attached to events posted at or after the given startdate (format: yyyy-mm-dd): If no date is given, default time is epoch time (1970-1-1)")
+    parser.add_argument("-e", "--enddate", help="The research will look for tags attached to events posted at or before the given enddate (format: yyyy-mm-dd): If no date is given, default time is now()")
 
     args = parser.parse_args()
 
     misp = init(misp_url, misp_key)
 
-    searchall(misp, args.search, misp_url)
+    if args.days is None:
+        args.days = '7'
+    download_last(misp, args.days + 'd')
 
     if args.begindate is not None:
         args.begindate = tools.toDatetime(args.begindate)

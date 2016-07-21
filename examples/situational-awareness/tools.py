@@ -3,6 +3,7 @@
 
 import json
 from json import JSONDecoder
+import math
 import random
 import pygal
 from pygal.style import Style
@@ -57,7 +58,7 @@ def toDatetime(date):
 ################ Formatting  ################
 
 def eventsListBuildFromList(filename):
-    with open('testt', 'r') as myfile:
+    with open(filename, 'r') as myfile:
         s=myfile.read().replace('\n', '')
     decoder = JSONDecoder()
     s_len = len(s)
@@ -92,7 +93,7 @@ def eventsListBuildFromArray(filename):
         data.append(pd.DataFrame.from_dict(e, orient='index'))
     Events = pd.concat(data)
     for it in range(Events['attribute_count'].size):
-        if Events['attribute_count'][it] == None:
+        if Events['attribute_count'][it] == None or (isinstance(Events['attribute_count'][it], float) and math.isnan(Events['attribute_count'][it])):
             Events['attribute_count'][it]='0'
         else:
             Events['attribute_count'][it]=int(Events['attribute_count'][it])
