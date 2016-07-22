@@ -1,3 +1,4 @@
+*.pem
 *.pyc
 examples/keys.py
 examples/cudeso.py

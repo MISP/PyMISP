@@ -217,6 +217,24 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
         return session.get(url)
 
+    def get_stix_event(self, event_id=None, out_format="json", with_attachments=False, from_date=False, to_date=False, tags=False):
+        """
+            Get an event/events in STIX format
+        """
+        out_format = out_format.lower()
+        if tags:
+          if isinstance(tags, list):
+            tags = "&&".join(tags)
+        
+        session = self.__prepare_session(out_format)
+        url = urljoin(self.root_url, 
+                      "/events/stix/download/{}/{}/{}/{}/{}".format(
+                                        event_id, with_attachments, tags, from_date, to_date
+                                        ))
+        if self.debug:
+          print("Getting STIX event from {}".format(url))  
+        return session.get(url)
+ 
     def add_event(self, event, force_out=None):
         """
             Add a new event
@@ -337,6 +355,10 @@ class PyMISP(object):
 
     def get(self, eid):
         response = self.get_event(int(eid), 'json')
+        return self._check_response(response)
+
+    def get_stix(self, **kwargs):
+        response = self.get_stix_event(**kwargs)
         return self._check_response(response)
 
     def update(self, event):
@@ -895,10 +917,10 @@ class PyMISP(object):
                 archive = zipfile.ZipFile(zipped)
                 try:
                     # New format
-                    unzipped = BytesIO(archive.open(f['md5'], pwd='infected').read())
+                    unzipped = BytesIO(archive.open(f['md5'], pwd=b'infected').read())
                 except KeyError:
                     # Old format
-                    unzipped = BytesIO(archive.open(f['filename'], pwd='infected').read())
+                    unzipped = BytesIO(archive.open(f['filename'], pwd=b'infected').read())
                 details.append([f['event_id'], f['filename'], unzipped])
             except zipfile.BadZipfile:
                 # In case the sample isn't zipped
