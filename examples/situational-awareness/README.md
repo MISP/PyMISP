@@ -11,6 +11,7 @@
     * _enddate_ is the end of the studied period. If it is earlier than _begindate_, an error will be raised.
     * tag\_search.py allows research for multiple tags is possible by separating each tag by the | symbol.
     * Partial research is also possible with tag\_search.py. For instance, search for "ransom" will also return tags containin "ransomware".
+
 :warning: These scripts are not time optimised
 
 ## Requierements
