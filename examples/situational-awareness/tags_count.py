@@ -8,10 +8,12 @@ import argparse
 import json
 import tools
 
+
 def init(url, key):
     return PyMISP(url, key, misp_verifycert, 'json')
 
-########## fetch data ##########
+# ######### fetch data ##########
+
 
 def download_last(m, last):
     result = m.download_last(last)
@@ -21,7 +23,7 @@ def download_last(m, last):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Take a sample of events (based on last.py) and give the repartition of tags in this sample.')
     parser.add_argument("-d", "--days", type=int, help="number of days before today to search. If not define, default value is 7")
-    parser.add_argument("-b", "--begindate", help="The research will look for tags attached to events posted at or after the given startdate (format: yyyy-mm-dd): If no date is given, default time is epoch time (1970-1-1)")
+    parser.add_argument("-b", "--begindate", default='1970-01-01', help="The research will look for tags attached to events posted at or after the given startdate (format: yyyy-mm-dd): If no date is given, default time is epoch time (1970-1-1)")
     parser.add_argument("-e", "--enddate", help="The research will look for tags attached to events posted at or before the given enddate (format: yyyy-mm-dd): If no date is given, default time is now()")
 
     args = parser.parse_args()
@@ -30,7 +32,7 @@ if __name__ == '__main__':
 
     if args.days is None:
         args.days = 7
-    download_last(misp, str(args.days) + 'd')
+    download_last(misp, '{}d'.format(args.days))
 
     tools.checkDateConsistancy(args.begindate, args.enddate, tools.getLastdate(args.days))
 
@@ -67,6 +69,6 @@ if __name__ == '__main__':
     else:
         text = text + str(args.enddate.date())
 
-    print '\n========================================================'
-    print text
-    print result
+    print('\n========================================================')
+    print(text)
+    print(result)

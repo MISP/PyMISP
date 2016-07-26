@@ -8,10 +8,12 @@ import argparse
 import json
 import tools
 
+
 def init(url, key):
     return PyMISP(url, key, misp_verifycert, 'json')
 
-########## fetch data ##########
+# ######### fetch data ##########
+
 
 def download_last(m, last):
     result = m.download_last(last)
@@ -62,8 +64,8 @@ if __name__ == '__main__':
     else:
         text = text + str(args.enddate.date())
 
-    print '\n========================================================'
-    print text
-    print 'During the studied pediod, ' + str(TotalPeriodTags) + ' events out of ' + str(TotalPeriodEvents) + ' contains at least one tag with ' + args.tag + '.'
+    print('\n========================================================')
+    print(text)
+    print('During the studied pediod, ' + str(TotalPeriodTags) + ' events out of ' + str(TotalPeriodEvents) + ' contains at least one tag with ' + args.tag + '.')
     if TotalPeriodEvents != 0:
-        print 'It represents ' + str(round(100*TotalPeriodTags/TotalPeriodEvents, 3)) + '% of the events in this period.'
+        print('It represents {}% of the events in this period.'.format(round(100 * TotalPeriodTags / TotalPeriodEvents, 3)))

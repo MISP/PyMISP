@@ -1,107 +1,97 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 from json import JSONDecoder
-import math
 import random
 import pygal
 from pygal.style import Style
-import pandas as pd
+import pandas
 from datetime import datetime
 from datetime import timedelta
 from dateutil.parser import parse
-import sys
 
-################ Errors ################
+# ############### Errors ################
+
 
 class DateError(Exception):
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return repr(self.value)
 
-################ Tools ################
+# ############### Tools ################
+
 
 def buildDoubleIndex(index1, index2, datatype):
     it = -1
     newindex1 = []
     for index in index2:
         if index == 0:
-            it+=1
+            it += 1
         newindex1.append(index1[it])
-    arrays =  [newindex1, index2]
+    arrays = [newindex1, index2]
     tuples = list(zip(*arrays))
-    return pd.MultiIndex.from_tuples(tuples, names=['event', datatype])
+    return pandas.MultiIndex.from_tuples(tuples, names=['event', datatype])
+
 
 def buildNewColumn(index2, column):
     it = -1
     newcolumn = []
     for index in index2:
         if index == 0:
-            it+=1
+            it += 1
         newcolumn.append(column[it])
     return newcolumn
 
+
 def dateInRange(datetimeTested, begin=None, end=None):
-    if begin == None:
-        begin = datetime(1970,1,1)
-    if end == None:
+    if begin is None:
+        begin = datetime(1970, 1, 1)
+    if end is None:
         end = datetime.now()
     return begin <= datetimeTested <= end
+
 
 def addColumn(dataframe, columnList, columnName):
-        dataframe.loc[:, columnName] = pd.Series(columnList, index=dataframe.index)
+    dataframe.loc[:, columnName] = pandas.Series(columnList, index=dataframe.index)
 
-def dateInRange(datetimeTested, begin=None, end=None):
-    if begin == None:
-        begin = datetime(1970,1,1)
-    if end == None:
-        end = datetime.now()
-    return begin <= datetimeTested <= end
 
 def toDatetime(date):
     return parse(date)
 
+
 def checkDateConsistancy(begindate, enddate, lastdate):
-    try:
-        if begindate is not None and enddate is not None:
-            if begindate > enddate:
-                raise DateError('begindate (' + begindate +  ') cannot be after enddate (' + enddate + ')')
-    except DateError as e:
-        print('DateError: ' + e.value)
-        sys.exit(1)
+    if begindate is not None and enddate is not None:
+        if begindate > enddate:
+            raise DateError('begindate ({}) cannot be after enddate ({})'.format(begindate, enddate))
 
-    try:
-        if enddate is not None:
-            if toDatetime(enddate) < lastdate:
-                raise DateError('enddate (' + enddate + ') cannot be before lastdate (' + str(lastdate) + ')' )
-    except DateError as e:
-        print('DateError: ' + e.value)
-        sys.exit(1)
+    if enddate is not None:
+        if toDatetime(enddate) < lastdate:
+            raise DateError('enddate ({}) cannot be before lastdate ({})'.format(enddate, lastdate))
 
-    try:
-        if begindate is not None:
-            if toDatetime(begindate) > datetime.now():
-                raise DateError('begindate (' + begindate + ') cannot be after today (' + str(datetime.now().date()) + ')')
-    except DateError as e:
-        print('DateError: ' + e.value)
-        sys.exit(1)
+    if begindate is not None:
+        if toDatetime(begindate) > datetime.now():
+            raise DateError('begindate ({}) cannot be after today ({})'.format(begindate, datetime.now().date()))
+
 
 def setBegindate(begindate, lastdate):
     return max(begindate, lastdate)
 
+
 def setEnddate(enddate):
     return min(enddate, datetime.now())
+
 
 def getLastdate(last):
     return (datetime.now() - timedelta(days=int(last))).replace(hour=0, minute=0, second=0, microsecond=0)
 
-################ Formatting  ################
+# ############### Formatting  ################
+
 
 def eventsListBuildFromList(filename):
     with open(filename, 'r') as myfile:
-        s=myfile.read().replace('\n', '')
+        s = myfile.read().replace('\n', '')
     decoder = JSONDecoder()
     s_len = len(s)
     Events = []
@@ -111,65 +101,56 @@ def eventsListBuildFromList(filename):
         Events.append(Event)
     data = []
     for e in Events:
-        data.append(pd.DataFrame.from_dict(e, orient='index'))
-    Events = pd.concat(data)
+        data.append(pandas.DataFrame.from_dict(e, orient='index'))
+    Events = pandas.concat(data)
     for it in range(Events['attribute_count'].size):
-        if Events['attribute_count'][it] == None:
-            Events['attribute_count'][it]='0'
+        if Events['attribute_count'][it] is None:
+            Events['attribute_count'][it] = '0'
         else:
-            Events['attribute_count'][it]=int(Events['attribute_count'][it])
+            Events['attribute_count'][it] = int(Events['attribute_count'][it])
     Events = Events.set_index('id')
     return Events
 
-def eventsListBuildFromArray(filename):
+
+def eventsListBuildFromArray(jdata):
     '''
     returns a structure listing all primary events in the sample
     '''
-    jdata = json.load(open(filename))
-    jdata = jdata['response']
-    Events = []
-    for e in jdata:
-        Events.append(e)
-    data = []
-    for e in Events:
-        data.append(pd.DataFrame.from_dict(e, orient='index'))
-    Events = pd.concat(data)
-    for it in range(Events['attribute_count'].size):
-        if Events['attribute_count'][it] == None or (isinstance(Events['attribute_count'][it], float) and math.isnan(Events['attribute_count'][it])):
-            Events['attribute_count'][it]='0'
-        else:
-            Events['attribute_count'][it]=int(Events['attribute_count'][it])
-    Events = Events.set_index('id')
-    return Events
+    data = [pandas.DataFrame.from_dict(e, orient='index') for e in jdata['response']]
+    events = pandas.concat(data)
+    events = events.set_index(['id'])
+    return events
 
-def attributesListBuild(Events):
-    Attributes = []
-    for Attribute in Events['Attribute']:
-        Attributes.append(pd.DataFrame(Attribute))
-    return pd.concat(Attributes)
+
+def attributesListBuild(events):
+    attributes = [pandas.DataFrame(attribute) for attribute in events['Attribute']]
+    return pandas.concat(attributes)
+
 
 def tagsListBuild(Events):
     Tags = []
     for Tag in Events['Tag']:
         if type(Tag) is not list:
             continue
-        Tags.append(pd.DataFrame(Tag))
-    Tags = pd.concat(Tags)
+        Tags.append(pandas.DataFrame(Tag))
+    Tags = pandas.concat(Tags)
     columnDate = buildNewColumn(Tags.index, Events['date'])
     addColumn(Tags, columnDate, 'date')
     index = buildDoubleIndex(Events.index, Tags.index, 'tag')
     Tags = Tags.set_index(index)
     return Tags
 
+
 def selectInRange(Events, begin=None, end=None):
     inRange = []
     for i, Event in Events.iterrows():
         if dateInRange(parse(Event['date']), begin, end):
             inRange.append(Event.tolist())
-    inRange = pd.DataFrame(inRange)
+    inRange = pandas.DataFrame(inRange)
     temp = Events.columns.tolist()
     inRange.columns = temp
     return inRange
+
 
 def isTagIn(dataframe, tag):
     temp = dataframe[dataframe['name'].str.contains(tag)].index.tolist()
@@ -179,34 +160,38 @@ def isTagIn(dataframe, tag):
             index.append(temp[i][0])
     return index
 
-################ Basic Stats ################
+# ############### Basic Stats ################
+
 
 def getNbitems(dataframe):
         return len(dataframe.index)
 
-def getNbAttributePerEventCategoryType(Attributes):
-    return Attributes.groupby(['event_id', 'category', 'type']).count()['id']
+
+def getNbAttributePerEventCategoryType(attributes):
+    return attributes.groupby(['event_id', 'category', 'type']).count()['id']
+
 
 def getNbOccurenceTags(Tags):
         return Tags.groupby('name').count()['id']
 
-################ Charts ################
+# ############### Charts ################
+
 
 def createStyle(indexlevels):
     colorsList = []
     for i in range(len(indexlevels[0])):
         colorsList.append("#%06X" % random.randint(0, 0xFFFFFF))
-    style = Style(
-                background='transparent',
-                plot_background='#FFFFFF',
-                foreground='#111111',
-                foreground_strong='#111111',
-                foreground_subtle='#111111',
-                opacity='.6',
-                opacity_hover='.9',
-                transition='400ms ease-in',
-                colors=tuple(colorsList))
+    style = Style(background='transparent',
+                  plot_background='#FFFFFF',
+                  foreground='#111111',
+                  foreground_strong='#111111',
+                  foreground_subtle='#111111',
+                  opacity='.6',
+                  opacity_hover='.9',
+                  transition='400ms ease-in',
+                  colors=tuple(colorsList))
     return style, colorsList
+
 
 def createLabelsTreemap(indexlevels, indexlabels):
     categories_levels = indexlevels[0]
@@ -230,7 +215,7 @@ def createLabelsTreemap(indexlevels, indexlabels):
 
 
 def createTable(data, title, tablename, colorsList):
-    if tablename == None:
+    if tablename is None:
         target = open('attribute_table.html', 'w')
     else:
         target = open(tablename, 'w')
@@ -241,7 +226,7 @@ def createTable(data, title, tablename, colorsList):
 
     for i in range(len(categories)):
         table = pygal.Treemap(pretty_print=True)
-        target.write('\n <h1 style="color:'+ colorsList[i]+ ';">' + categories[i] + '</h1>\n')
+        target.write('\n <h1 style="color:{};">{}</h1>\n'.format(colorsList[i], categories[i]))
         for typ in types[i]:
             table.add(typ, data[it])
             it += 1
@@ -250,9 +235,9 @@ def createTable(data, title, tablename, colorsList):
     target.close()
 
 
-def createTreemap(data, title, treename = 'attribute_treemap.svg', tablename = 'attribute_table.html'):
+def createTreemap(data, title, treename='attribute_treemap.svg', tablename='attribute_table.html'):
     style, colorsList = createStyle(data.index.levels)
-    treemap = pygal.Treemap(pretty_print=True, legend_at_bottom=True, style = style)
+    treemap = pygal.Treemap(pretty_print=True, legend_at_bottom=True, style=style)
     treemap.title = title
     treemap.print_values = True
     treemap.print_labels = True
@@ -271,7 +256,7 @@ def createTreemap(data, title, treename = 'attribute_treemap.svg', tablename = '
         treemap.add(categories[i], types_labels)
 
     createTable(data, 'Attribute Distribution', tablename, colorsList)
-    if treename == None:
+    if treename is None:
         treemap.render_to_file('attribute_treemap.svg')
     else:
         treemap.render_to_file(treename)

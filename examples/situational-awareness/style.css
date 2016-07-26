@@ -1,4 +1,4 @@
-body 
+body
 {
     /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
@@ -20,27 +20,27 @@ table
     border: 1px solid #cbcbcb;
 }
 
-tbody 
+tbody
 {
 	font-size:12px;
 }
 
-table td 
+table td
 {
 	border-left: 1px solid #cbcbcb;
 	border-width: 0 0 0 1px;
-	width: 150px;	
+	width: 150px;
 	margin: 0;
 	padding: 0.5em 1em;
 }
 
 
-table tr:nth-child(2n-1) td 
+table tr:nth-child(2n-1) td
 {
 	background-color: #f2f2f2;
 }
 
-table tr td:first-child 
+table tr td:first-child
 {
 	font-weight: bold;
 }
