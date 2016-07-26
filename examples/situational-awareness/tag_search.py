@@ -21,7 +21,7 @@ def download_last(m, last):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Take a sample of events (based on last.py) and give the number of occurrence of the given tag in this sample.')
     parser.add_argument("-t", "--tag", required=True, help="tag to search (search for multiple tags is possible by using |. example : \"osint|OSINT\")")
-    parser.add_argument("-d", "--days", help="number of days before today to search. If not define, default value is 7")
+    parser.add_argument("-d", "--days", type=int, help="number of days before today to search. If not define, default value is 7")
     parser.add_argument("-b", "--begindate", help="The research will look for tags attached to events posted at or after the given startdate (format: yyyy-mm-dd): If no date is given, default time is epoch time (1970-1-1)")
     parser.add_argument("-e", "--enddate", help="The research will look for tags attached to events posted at or before the given enddate (format: yyyy-mm-dd): If no date is given, default time is now()")
 
@@ -30,21 +30,22 @@ if __name__ == '__main__':
     misp = init(misp_url, misp_key)
 
     if args.days is None:
-        args.days = '7'
-    download_last(misp, args.days + 'd')
+        args.days = 7
+    download_last(misp, str(args.days) + 'd')
 
-    if args.begindate is not None:
-        args.begindate = tools.toDatetime(args.begindate)
-    if args.enddate is not None:
-        args.enddate = tools.toDatetime(args.enddate)
+    tools.checkDateConsistancy(args.begindate, args.enddate, tools.getLastdate(args.days))
 
-    Events = tools.eventsListBuildFromArray('data')
-    TotalEvents = tools.getNbitems(Events)
-    Tags = tools.tagsListBuild(Events)
-    result = tools.isTagIn(Tags, args.tag)
-    TotalTags = len(result)
+    if args.begindate is None:
+        args.begindate = tools.getLastdate(args.days)
+    else:
+        args.begindate = tools.setBegindate(tools.toDatetime(args.begindate), tools.getLastdate(args.days))
 
-    Events = tools.selectInRange(Events, begin=args.begindate, end=args.enddate)
+    if args.enddate is None:
+        args.enddate = datetime.now()
+    else:
+        args.enddate = tools.setEnddate(tools.toDatetime(args.enddate))
+
+    Events = tools.selectInRange(tools.eventsListBuildFromArray('data'), begin=args.begindate, end=args.enddate)
     TotalPeriodEvents = tools.getNbitems(Events)
     Tags = tools.tagsListBuild(Events)
     result = tools.isTagIn(Tags, args.tag)
@@ -64,8 +65,5 @@ if __name__ == '__main__':
     print '\n========================================================'
     print text
     print 'During the studied pediod, ' + str(TotalPeriodTags) + ' events out of ' + str(TotalPeriodEvents) + ' contains at least one tag with ' + args.tag + '.'
-    if TotalTags != 0:
-        print 'It represents ' + str(round(100*TotalPeriodTags/TotalTags, 3)) + '% of the fetched events (' + str(TotalTags) + ') including this tag.'
-    if TotalEvents != 0:
-        print 'It also represents ' + str(round(100*TotalPeriodTags/TotalEvents, 3)) + '% of all the fetched events (' + str(TotalEvents) + ').'
-
+    if TotalPeriodEvents != 0:
+        print 'It represents ' + str(round(100*TotalPeriodTags/TotalPeriodEvents, 3)) + '% of the events in this period.'

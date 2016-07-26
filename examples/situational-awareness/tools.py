@@ -11,6 +11,15 @@ import pandas as pd
 from datetime import datetime
 from datetime import timedelta
 from dateutil.parser import parse
+import sys
+
+################ Errors ################
+
+class DateError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 ################ Tools ################
 
@@ -52,8 +61,41 @@ def dateInRange(datetimeTested, begin=None, end=None):
     return begin <= datetimeTested <= end
 
 def toDatetime(date):
-    temp = date.split('-')
-    return datetime(int(temp[0]), int(temp[1]), int(temp[2]))
+    return parse(date)
+
+def checkDateConsistancy(begindate, enddate, lastdate):
+    try:
+        if begindate is not None and enddate is not None:
+            if begindate > enddate:
+                raise DateError('begindate (' + begindate +  ') cannot be after enddate (' + enddate + ')')
+    except DateError as e:
+        print('DateError: ' + e.value)
+        sys.exit(1)
+
+    try:
+        if enddate is not None:
+            if toDatetime(enddate) < lastdate:
+                raise DateError('enddate (' + enddate + ') cannot be before lastdate (' + str(lastdate) + ')' )
+    except DateError as e:
+        print('DateError: ' + e.value)
+        sys.exit(1)
+
+    try:
+        if begindate is not None:
+            if toDatetime(begindate) > datetime.now():
+                raise DateError('begindate (' + begindate + ') cannot be after today (' + str(datetime.now().date()) + ')')
+    except DateError as e:
+        print('DateError: ' + e.value)
+        sys.exit(1)
+
+def setBegindate(begindate, lastdate):
+    return max(begindate, lastdate)
+
+def setEnddate(enddate):
+    return min(enddate, datetime.now())
+
+def getLastdate(last):
+    return (datetime.now() - timedelta(days=int(last))).replace(hour=0, minute=0, second=0, microsecond=0)
 
 ################ Formatting  ################
 
