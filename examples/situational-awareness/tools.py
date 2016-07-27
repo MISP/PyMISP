@@ -177,10 +177,31 @@ def getNbOccurenceTags(Tags):
 # ############### Charts ################
 
 
-def createStyle(indexlevels):
-    colorsList = []
-    for i in range(len(indexlevels[0])):
-        colorsList.append("#%06X" % random.randint(0, 0xFFFFFF))
+def createTable(colors, categ_types_hash, tablename='attribute_table.html'):
+    with open(tablename, 'w') as target:
+        target.write('<!DOCTYPE html>\n<html>\n<head>\n<link rel="stylesheet" href="style.css">\n</head>\n<body>')
+        for categ_name, types in categ_types_hash.items():
+            table = pygal.Treemap(pretty_print=True)
+            target.write('\n <h1 style="color:{};">{}</h1>\n'.format(colors[categ_name], categ_name))
+            for d in types:
+                table.add(d['label'], d['value'])
+            target.write(table.render_table(transpose=True))
+        target.write('\n</body>\n</html>')
+
+
+def createTreemap(data, title, treename='attribute_treemap.svg', tablename='attribute_table.html'):
+    labels_categ = data.index.labels[0]
+    labels_types = data.index.labels[1]
+    names_categ = data.index.levels[0]
+    names_types = data.index.levels[1]
+    categ_types_hash = {}
+    for categ_id, type_val, total in zip(labels_categ, labels_types, data):
+        if not categ_types_hash.get(names_categ[categ_id]):
+            categ_types_hash[names_categ[categ_id]] = []
+        dict_to_print = {'label': names_types[type_val], 'value': total}
+        categ_types_hash[names_categ[categ_id]].append(dict_to_print)
+
+    colors = {categ: "#%06X" % random.randint(0, 0xFFFFFF) for categ in categ_types_hash.keys()}
     style = Style(background='transparent',
                   plot_background='#FFFFFF',
                   foreground='#111111',
@@ -189,74 +210,15 @@ def createStyle(indexlevels):
                   opacity='.6',
                   opacity_hover='.9',
                   transition='400ms ease-in',
-                  colors=tuple(colorsList))
-    return style, colorsList
+                  colors=tuple(colors.values()))
 
-
-def createLabelsTreemap(indexlevels, indexlabels):
-    categories_levels = indexlevels[0]
-    cat = 0
-    types = []
-    cattypes = []
-    categories_labels = indexlabels[0]
-    types_levels = indexlevels[1]
-    types_labels = indexlabels[1]
-
-    for it in range(len(indexlabels[0])):
-        if categories_labels[it] != cat:
-            cattypes.append(types)
-            types = []
-            cat += 1
-
-        types.append(types_levels[types_labels[it]])
-    cattypes.append(types)
-
-    return categories_levels, cattypes
-
-
-def createTable(data, title, tablename, colorsList):
-    if tablename is None:
-        target = open('attribute_table.html', 'w')
-    else:
-        target = open(tablename, 'w')
-    target.truncate()
-    target.write('<!DOCTYPE html>\n<html>\n<head>\n<link rel="stylesheet" href="style.css">\n</head>\n<body>')
-    categories, types = createLabelsTreemap(data.index.levels, data.index.labels)
-    it = 0
-
-    for i in range(len(categories)):
-        table = pygal.Treemap(pretty_print=True)
-        target.write('\n <h1 style="color:{};">{}</h1>\n'.format(colorsList[i], categories[i]))
-        for typ in types[i]:
-            table.add(typ, data[it])
-            it += 1
-        target.write(table.render_table(transpose=True))
-    target.write('\n</body>\n</html>')
-    target.close()
-
-
-def createTreemap(data, title, treename='attribute_treemap.svg', tablename='attribute_table.html'):
-    style, colorsList = createStyle(data.index.levels)
     treemap = pygal.Treemap(pretty_print=True, legend_at_bottom=True, style=style)
     treemap.title = title
     treemap.print_values = True
     treemap.print_labels = True
 
-    categories, types = createLabelsTreemap(data.index.levels, data.index.labels)
-    it = 0
+    for categ_name, types in categ_types_hash.items():
+        treemap.add(categ_name, types)
 
-    for i in range(len(categories)):
-        types_labels = []
-        for typ in types[i]:
-            tempdict = {}
-            tempdict['label'] = typ
-            tempdict['value'] = data[it]
-            types_labels.append(tempdict)
-            it += 1
-        treemap.add(categories[i], types_labels)
-
-    createTable(data, 'Attribute Distribution', tablename, colorsList)
-    if treename is None:
-        treemap.render_to_file('attribute_treemap.svg')
-    else:
-        treemap.render_to_file(treename)
+    createTable(colors, categ_types_hash)
+    treemap.render_to_file(treename)
