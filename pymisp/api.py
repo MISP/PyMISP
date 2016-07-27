@@ -451,6 +451,11 @@ class PyMISP(object):
         attributes.append(self._prepare_full_attribute(category, 'link', link, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
+    def add_detection_name(self, event, name, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'text', name, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
     def add_filename(self, event, filename, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
         attributes.append(self._prepare_full_attribute(category, 'filename', filename, to_ids, comment, distribution))
