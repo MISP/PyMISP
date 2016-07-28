@@ -93,7 +93,7 @@ class PyMISP(object):
         :param out_type: Type of object (json or xml)
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=False):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -102,6 +102,7 @@ class PyMISP(object):
         self.root_url = url
         self.key = key
         self.ssl = ssl
+        self.proxies = proxies
         self.out_type = out_type
         self.debug = debug
 
@@ -134,6 +135,7 @@ class PyMISP(object):
             out = self.out_type
         session = requests.Session()
         session.verify = self.ssl
+        session.proxies = self.proxies
         session.headers.update(
             {'Authorization': self.key,
              'Accept': 'application/' + out,
