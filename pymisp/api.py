@@ -225,18 +225,16 @@ class PyMISP(object):
         """
         out_format = out_format.lower()
         if tags:
-          if isinstance(tags, list):
-            tags = "&&".join(tags)
-        
+            if isinstance(tags, list):
+                tags = "&&".join(tags)
+
         session = self.__prepare_session(out_format)
-        url = urljoin(self.root_url, 
-                      "/events/stix/download/{}/{}/{}/{}/{}".format(
-                                        event_id, with_attachments, tags, from_date, to_date
-                                        ))
+        url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
+            event_id, with_attachments, tags, from_date, to_date))
         if self.debug:
-          print("Getting STIX event from {}".format(url))  
+            print("Getting STIX event from {}".format(url))
         return session.get(url)
- 
+
     def add_event(self, event, force_out=None):
         """
             Add a new event
