@@ -677,7 +677,7 @@ class PyMISP(object):
 
     def _encode_file_to_upload(self, path):
         with open(path, 'rb') as f:
-            return base64.b64encode(f.read())
+            return str(base64.b64encode(f.read()))
 
     def upload_sample(self, filename, filepath, event_id, distribution, to_ids,
                       category, comment, info, analysis, threat_level_id):
