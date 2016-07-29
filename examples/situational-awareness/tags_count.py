@@ -5,7 +5,6 @@ from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 from datetime import datetime
 import argparse
-import json
 import tools
 
 
@@ -14,11 +13,6 @@ def init(url, key):
 
 # ######### fetch data ##########
 
-
-def download_last(m, last):
-    result = m.download_last(last)
-    with open('data', 'w') as f:
-        f.write(json.dumps(result))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Take a sample of events (based on last.py) and give the repartition of tags in this sample.')
@@ -32,7 +26,7 @@ if __name__ == '__main__':
 
     if args.days is None:
         args.days = 7
-    download_last(misp, '{}d'.format(args.days))
+    result = misp.download_last('{}d'.format(args.days))
 
     tools.checkDateConsistancy(args.begindate, args.enddate, tools.getLastdate(args.days))
 
@@ -46,17 +40,9 @@ if __name__ == '__main__':
     else:
         args.enddate = tools.setEnddate(tools.toDatetime(args.enddate))
 
-    Events = tools.eventsListBuildFromArray('data')
-    TotalEvents = tools.getNbitems(Events)
-    Tags = tools.tagsListBuild(Events)
-    result = tools.getNbOccurenceTags(Tags)
-    TotalTags = tools.getNbitems(Tags)
-
-    Events = tools.selectInRange(Events, begin=args.begindate, end=args.enddate)
-    TotalPeriodEvents = tools.getNbitems(Events)
-    Tags = tools.tagsListBuild(Events)
-    result = tools.getNbOccurenceTags(Tags)
-    TotalPeriodTags = tools.getNbitems(Tags)
+    events = tools.selectInRange(tools.eventsListBuildFromArray(result), begin=args.begindate, end=args.enddate)
+    tags = tools.tagsListBuild(events)
+    result = tools.getNbOccurenceTags(tags)
 
     text = 'Studied pediod: from '
     if args.begindate is None:

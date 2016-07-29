@@ -5,7 +5,6 @@ from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 from datetime import datetime
 import argparse
-import json
 import tools
 
 
@@ -14,11 +13,6 @@ def init(url, key):
 
 # ######### fetch data ##########
 
-
-def download_last(m, last):
-    result = m.download_last(last)
-    with open('data', 'w') as f:
-        f.write(json.dumps(result))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Take a sample of events (based on last.py) and give the number of occurrence of the given tag in this sample.')
@@ -33,7 +27,7 @@ if __name__ == '__main__':
 
     if args.days is None:
         args.days = 7
-    download_last(misp, str(args.days) + 'd')
+    result = misp.download_last('{}d'.format(args.days))
 
     tools.checkDateConsistancy(args.begindate, args.enddate, tools.getLastdate(args.days))
 
@@ -47,11 +41,11 @@ if __name__ == '__main__':
     else:
         args.enddate = tools.setEnddate(tools.toDatetime(args.enddate))
 
-    Events = tools.selectInRange(tools.eventsListBuildFromArray('data'), begin=args.begindate, end=args.enddate)
-    TotalPeriodEvents = tools.getNbitems(Events)
-    Tags = tools.tagsListBuild(Events)
-    result = tools.isTagIn(Tags, args.tag)
-    TotalPeriodTags = len(result)
+    events = tools.selectInRange(tools.eventsListBuildFromArray(result), begin=args.begindate, end=args.enddate)
+    totalPeriodEvents = tools.getNbitems(events)
+    tags = tools.tagsListBuild(events)
+    result = tools.isTagIn(tags, args.tag)
+    totalPeriodTags = len(result)
 
     text = 'Studied pediod: from '
     if args.begindate is None:
@@ -66,6 +60,6 @@ if __name__ == '__main__':
 
     print('\n========================================================')
     print(text)
-    print('During the studied pediod, ' + str(TotalPeriodTags) + ' events out of ' + str(TotalPeriodEvents) + ' contains at least one tag with ' + args.tag + '.')
-    if TotalPeriodEvents != 0:
-        print('It represents {}% of the events in this period.'.format(round(100 * TotalPeriodTags / TotalPeriodEvents, 3)))
+    print('During the studied pediod, ' + str(totalPeriodTags) + ' events out of ' + str(totalPeriodEvents) + ' contains at least one tag with ' + args.tag + '.')
+    if totalPeriodEvents != 0:
+        print('It represents {}% of the events in this period.'.format(round(100 * totalPeriodTags / totalPeriodEvents, 3)))
