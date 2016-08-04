@@ -90,7 +90,9 @@ class PyMISP(object):
                     of the certificate. Or a CA_BUNDLE in case of self
                     signed certiifcate (the concatenation of all the
                     *.crt of the chain)
-        :param out_type: Type of object (json or xml)
+        :param out_type: Type of object (json or xml) NOTE: XML is deprecated.
+        :param debug: print all the messages received from the server
+        :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     """
 
     def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None):
@@ -753,10 +755,12 @@ class PyMISP(object):
     # ######## REST Search #########
     # ##############################
 
-    def __query(self, session, path, query):
+    def __query(self, session, path, query, controller='events'):
         if query.get('error') is not None:
             return query
-        url = urljoin(self.root_url, 'events/{}'.format(path.lstrip('/')))
+        if controller not in ['events', 'attributes']:
+            raise Exception('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes'])))
+        url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
         query = {'request': query}
         response = session.post(url, data=json.dumps(query))
         return self._check_response(response)
@@ -837,7 +841,7 @@ class PyMISP(object):
 
     def search(self, values=None, not_values=None, type_attribute=None,
                category=None, org=None, tags=None, not_tags=None, date_from=None,
-               date_to=None, last=None):
+               date_to=None, last=None, controller='events'):
         """
             Search via the Rest API
 
@@ -880,7 +884,7 @@ class PyMISP(object):
             query['last'] = last
 
         session = self.__prepare_session('json')
-        return self.__query(session, 'restSearch/download', query)
+        return self.__query(session, 'restSearch/download', query, controller)
 
     def get_attachement(self, event_id):
         """
