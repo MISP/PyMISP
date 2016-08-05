@@ -115,7 +115,11 @@ class PyMISP(object):
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
         session = self.__prepare_session(out_type)
-        self.describe_types = session.get(urljoin(self.root_url, 'attributes/describeTypes.json')).json()
+        response = session.get(urljoin(self.root_url, 'attributes/describeTypes.json'))
+        self.describe_types = self._check_response(response)
+        if self.describe_types.get('error'):
+            for e in self.describe_types.get('error'):
+                raise PyMISPError('Failed: {}'.format(e))
 
         self.categories = self.describe_types['result']['categories']
         self.types = self.describe_types['result']['types']
