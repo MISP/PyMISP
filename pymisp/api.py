@@ -415,7 +415,7 @@ class PyMISP(object):
             event = self._prepare_update(event)
             for a in attributes:
                 if a.get('distribution') is None:
-                    a['distribution'] = event['Event']['distribution']
+                    a['distribution'] = 5
             event['Event']['Attribute'] = attributes
             response = self.update_event(event['Event']['id'], event, 'json')
         return self._check_response(response)
