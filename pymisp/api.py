@@ -90,7 +90,7 @@ class PyMISP(object):
                     of the certificate. Or a CA_BUNDLE in case of self
                     signed certiifcate (the concatenation of all the
                     *.crt of the chain)
-        :param out_type: Type of object (json or xml) NOTE: XML is deprecated.
+        :param out_type: Type of object (json) NOTE: XML output isn't supported anymore, keeping the flag for compatibility reasons.
         :param debug: print all the messages received from the server
         :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     """
@@ -105,7 +105,8 @@ class PyMISP(object):
         self.key = key
         self.ssl = ssl
         self.proxies = proxies
-        self.out_type = out_type
+        if out_type != 'json':
+            raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
         self.debug = debug
 
         try:
@@ -114,7 +115,7 @@ class PyMISP(object):
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
-        session = self.__prepare_session(out_type)
+        session = self.__prepare_session()
         response = session.get(urljoin(self.root_url, 'attributes/describeTypes.json'))
         self.describe_types = self._check_response(response)
         if self.describe_types.get('error'):
@@ -125,27 +126,19 @@ class PyMISP(object):
         self.types = self.describe_types['result']['types']
         self.category_type_mapping = self.describe_types['result']['category_type_mappings']
 
-    def __prepare_session(self, force_out=None):
+    def __prepare_session(self):
         """
             Prepare the headers of the session
-
-            :param force_out: force the type of the expect output
-                              (overwrite the constructor)
-
         """
         if not HAVE_REQUESTS:
             raise MissingDependency('Missing dependency, install requests (`pip install requests`)')
-        if force_out is not None:
-            out = force_out
-        else:
-            out = self.out_type
         session = requests.Session()
         session.verify = self.ssl
         session.proxies = self.proxies
         session.headers.update(
             {'Authorization': self.key,
-             'Accept': 'application/' + out,
-             'content-type': 'application/' + out})
+             'Accept': 'application/json',
+             'content-type': 'application/json'})
         return session
 
     def flatten_error_messages(self, response):
@@ -200,94 +193,93 @@ class PyMISP(object):
     # ############### Simple REST API ################
     # ################################################
 
-    def get_index(self, force_out=None, filters=None):
+    def get_index(self, filters=None):
         """
             Return the index.
 
             Warning, there's a limit on the number of results
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/index')
         if filters is not None:
             filters = json.dumps(filters)
-            print(filters)
-            return session.post(url, data=filters)
+            response = session.post(url, data=filters)
         else:
-            return session.get(url)
+            response = session.get(url)
+        return self._check_response(response)
 
-    def get_event(self, event_id, force_out=None):
+    def get_event(self, event_id):
         """
             Get an event
 
             :param event_id: Event id to get
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
-        return session.get(url)
+        response = session.get(url)
+        return self._check_response(response)
 
-    def get_stix_event(self, event_id=None, out_format="json", with_attachments=False, from_date=False, to_date=False, tags=False):
+    def get_stix_event(self, event_id=None, with_attachments=False, from_date=False, to_date=False, tags=False):
         """
             Get an event/events in STIX format
         """
-        out_format = out_format.lower()
         if tags:
             if isinstance(tags, list):
                 tags = "&&".join(tags)
 
-        session = self.__prepare_session(out_format)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
             event_id, with_attachments, tags, from_date, to_date))
         if self.debug:
             print("Getting STIX event from {}".format(url))
-        return session.get(url)
+        response = session.get(url)
+        return self._check_response(response)
 
-    def add_event(self, event, force_out=None):
+    def add_event(self, event):
         """
             Add a new event
 
             :param event: Event as JSON object / string or XML to add
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events')
-        if self.out_type == 'json':
-            if isinstance(event, basestring):
-                return session.post(url, data=event)
-            else:
-                return session.post(url, data=json.dumps(event))
+        if isinstance(event, basestring):
+            response = session.post(url, data=event)
         else:
-            return session.post(url, data=event)
+            response = session.post(url, data=json.dumps(event))
+        return self._check_response(response)
 
-    def update_event(self, event_id, event, force_out=None):
+    def update_event(self, event_id, event):
         """
             Update an event
 
             :param event_id: Event id to update
             :param event: Event as JSON object / string or XML to add
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
-        if self.out_type == 'json':
-            if isinstance(event, basestring):
-                return session.post(url, data=event)
-            else:
-                return session.post(url, data=json.dumps(event))
+        if isinstance(event, basestring):
+            response = session.post(url, data=event)
         else:
-            return session.post(url, data=event)
+            response = session.post(url, data=json.dumps(event))
+        return self._check_response(response)
 
-    def delete_event(self, event_id, force_out=None):
+    def delete_event(self, event_id):
         """
             Delete an event
 
             :param event_id: Event id to delete
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
-        return session.delete(url)
+        response = session.delete(url)
+        return self._check_response(response)
 
-    def delete_attribute(self, attribute_id, force_out=None):
-        session = self.__prepare_session(force_out)
+    def delete_attribute(self, attribute_id):
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
-        return session.delete(url)
+        response = session.delete(url)
+        return self._check_response(response)
 
     # ##############################################
     # ######### Event handling (Json only) #########
@@ -389,21 +381,18 @@ class PyMISP(object):
         session = self.__prepare_session('json')
         to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
         response = session.post(urljoin(self.root_url, 'events/addTag'), data=json.dumps(to_post))
-
         return self._check_response(response)
 
     def remove_tag(self, event, tag):
         session = self.__prepare_session('json')
         to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
         response = session.post(urljoin(self.root_url, 'events/removeTag'), data=json.dumps(to_post))
-
         return self._check_response(response)
 
     def change_threat_level(self, event, threat_level_id):
         event['Event']['threat_level_id'] = threat_level_id
         self._prepare_update(event)
         response = self.update_event(event['Event']['id'], event)
-
         return self._check_response(response)
 
     # ##### File attributes #####
@@ -899,7 +888,8 @@ class PyMISP(object):
         """
         attach = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(event_id))
         session = self.__prepare_session('json')
-        return session.get(attach)
+        response = session.get(attach)
+        return self._check_response(response)
 
     def get_yara(self, event_id):
         to_post = {'request': {'eventid': event_id, 'type': 'yara'}}
@@ -957,7 +947,8 @@ class PyMISP(object):
         """
         suricata_rules = urljoin(self.root_url, 'events/nids/suricata/download')
         session = self.__prepare_session('rules')
-        return session.get(suricata_rules)
+        response = session.get(suricata_rules)
+        return self._check_response(response)
 
     def download_suricata_rule_event(self, event_id):
         """
@@ -967,7 +958,8 @@ class PyMISP(object):
         """
         template = urljoin(self.root_url, 'events/nids/suricata/download/{}'.format(event_id))
         session = self.__prepare_session('rules')
-        return session.get(template)
+        response = session.get(template)
+        return self._check_response(response)
 
     # ########## Tags ##########
 
@@ -1036,28 +1028,29 @@ class PyMISP(object):
         session = self.__prepare_session('txt')
         url = urljoin(self.root_url, 'attributes/text/download/%s' % type_attr)
         response = session.get(url)
-        return response
+        return self._check_response(response)
 
     # ############## Statistics ##################
 
-    def get_attributes_statistics(self, context='type', percentage=None, force_out=None):
+    def get_attributes_statistics(self, context='type', percentage=None):
         """
             Get attributes statistics from the MISP instance
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         if (context != 'category'):
             context = 'type'
         if percentage is not None:
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}/{}'.format(context, percentage))
         else:
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}'.format(context))
-        return session.get(url).json()
+        response = session.get(url)
+        return self._check_response(response)
 
-    def get_tags_statistics(self, percentage=None, name_sort=None, force_out=None):
+    def get_tags_statistics(self, percentage=None, name_sort=None):
         """
         Get tags statistics from the MISP instance
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         if percentage is not None:
             percentage = 'true'
         else:
@@ -1067,55 +1060,34 @@ class PyMISP(object):
         else:
             name_sort = 'false'
         url = urljoin(self.root_url, 'tags/tagStatistics/{}/{}'.format(percentage, name_sort))
-        return session.get(url).json()
+        response = session.get(url).json()
+        return self._check_response(response)
 
     # ############## Sightings ##################
 
-    def sighting_per_id(self, attribute_id, force_out=None):
-        session = self.__prepare_session(force_out)
+    def sighting_per_id(self, attribute_id):
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_id))
-        return session.post(url)
+        response = session.post(url)
+        return self._check_response(response)
 
-    def sighting_per_uuid(self, attribute_uuid, force_out=None):
-        session = self.__prepare_session(force_out)
+    def sighting_per_uuid(self, attribute_uuid):
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_uuid))
-        return session.post(url)
+        response = session.post(url)
+        return self._check_response(response)
 
-    def sighting_per_json(self, json_file, force_out=None):
-        session = self.__prepare_session(force_out)
+    def sighting_per_json(self, json_file):
+        session = self.__prepare_session()
         jdata = json.load(open(json_file))
         url = urljoin(self.root_url, 'sightings/add/')
-        return session.post(url, data=json.dumps(jdata))
+        response = session.post(url, data=json.dumps(jdata))
+        return self._check_response(response)
 
     # ############## Sharing Groups ##################
 
     def get_sharing_groups(self):
-        session = self.__prepare_session(force_out=None)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'sharing_groups/index.json')
         response = session.get(url)
         return self._check_response(response)['response'][0]
-
-    # ############## Deprecated (Pure XML API should not be used) ##################
-    @deprecated
-    def download_all(self):
-        """
-            Download all event from the instance
-        """
-        xml = urljoin(self.root_url, 'events/xml/download')
-        session = self.__prepare_session('xml')
-        return session.get(xml)
-
-    @deprecated
-    def download(self, event_id, with_attachement=False):
-        """
-            Download one event in XML
-
-            :param event_id: Event id of the event to download (same as get)
-        """
-        if with_attachement:
-            attach = 'true'
-        else:
-            attach = 'false'
-        template = urljoin(self.root_url, 'events/xml/download/{}/{}'.format(event_id, attach))
-        session = self.__prepare_session('xml')
-        return session.get(template)
