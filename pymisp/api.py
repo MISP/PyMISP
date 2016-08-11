@@ -352,30 +352,30 @@ class PyMISP(object):
     # ########## Helpers ##########
 
     def get(self, eid):
-        response = self.get_event(int(eid), 'json')
-        return self._check_response(response)
+        response = self.get_event(int(eid))
+        return response
 
     def get_stix(self, **kwargs):
         response = self.get_stix_event(**kwargs)
-        return self._check_response(response)
+        return response
 
     def update(self, event):
         eid = event['Event']['id']
-        response = self.update_event(eid, event, 'json')
-        return self._check_response(response)
+        response = self.update_event(eid, event)
+        return response
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
         data = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
-        response = self.add_event(data, 'json')
-        return self._check_response(response)
+        response = self.add_event(data)
+        return response
 
     def publish(self, event):
         if event['Event']['published']:
             return {'error': 'Already published'}
         event = self._prepare_update(event)
         event['Event']['published'] = True
-        response = self.update_event(event['Event']['id'], event, 'json')
-        return self._check_response(response)
+        response = self.update_event(event['Event']['id'], event)
+        return response
 
     def add_tag(self, event, tag):
         session = self.__prepare_session()
@@ -393,7 +393,7 @@ class PyMISP(object):
         event['Event']['threat_level_id'] = threat_level_id
         self._prepare_update(event)
         response = self.update_event(event['Event']['id'], event)
-        return self._check_response(response)
+        return response
 
     # ##### File attributes #####
 
@@ -406,8 +406,8 @@ class PyMISP(object):
                 if a.get('distribution') is None:
                     a['distribution'] = 5
             event['Event']['Attribute'] = attributes
-            response = self.update_event(event['Event']['id'], event, 'json')
-        return self._check_response(response)
+            response = self.update_event(event['Event']['id'], event)
+        return response
 
     def add_named_attribute(self, event, category, type_value, value, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
