@@ -948,7 +948,7 @@ class PyMISP(object):
         suricata_rules = urljoin(self.root_url, 'events/nids/suricata/download')
         session = self.__prepare_session('rules')
         response = session.get(suricata_rules)
-        return self._check_response(response)
+        return response
 
     def download_suricata_rule_event(self, event_id):
         """
@@ -959,7 +959,7 @@ class PyMISP(object):
         template = urljoin(self.root_url, 'events/nids/suricata/download/{}'.format(event_id))
         session = self.__prepare_session('rules')
         response = session.get(template)
-        return self._check_response(response)
+        return response
 
     # ########## Tags ##########
 
@@ -1028,7 +1028,7 @@ class PyMISP(object):
         session = self.__prepare_session('txt')
         url = urljoin(self.root_url, 'attributes/text/download/%s' % type_attr)
         response = session.get(url)
-        return self._check_response(response)
+        return response
 
     # ############## Statistics ##################
 
