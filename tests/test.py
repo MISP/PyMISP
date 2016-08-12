@@ -100,15 +100,15 @@ class TestBasic(unittest.TestCase):
 
     def delete(self, eventid):
         event = self.misp.delete_event(eventid)
-        print(event.json())
+        print(event)
 
     def delete_attr(self, attrid):
         event = self.misp.delete_attribute(attrid)
-        print(event.json())
+        print(event)
 
     def get(self, eventid):
         event = self.misp.get_event(eventid)
-        print(event.json())
+        print(event)
 
     def get_stix(self, **kwargs):
         event = self.misp.get_stix(kwargs)
@@ -130,7 +130,7 @@ class TestBasic(unittest.TestCase):
                                  u'ShadowAttribute': [], u'distribution': u'2', u'type': u'filename|sha256'}],
                             u'proposal_email_lock': False, u'threat_level_id': u'1'}}
         event = self.misp.add_event(event)
-        print(event.json())
+        print(event)
 
     def test_create_event(self):
         eventid = self.new_event()
