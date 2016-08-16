@@ -33,6 +33,29 @@ except NameError:
     basestring = str
 
 
+class distributions(object):
+    """Enumeration of the available distributions."""
+    your_organization = 0
+    this_community = 1
+    connected_communities = 2
+    all_communities = 3
+
+
+class threat_level(object):
+    """Enumeration of the available threat levels."""
+    high = 1
+    medium = 2
+    low = 3
+    undefined = 4
+
+
+class analysis(object):
+    """Enumeration of the available analysis statuses."""
+    initial = 0
+    ongoing = 1
+    completed = 2
+
+
 class PyMISPError(Exception):
     def __init__(self, message):
         super(PyMISPError, self).__init__(message)
@@ -94,6 +117,11 @@ class PyMISP(object):
         :param debug: print all the messages received from the server
         :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     """
+
+    # So it can may be accessed from the misp object.
+    distributions = distributions
+    threat_level = threat_level
+    analysis = analysis
 
     def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None):
         if not url:
