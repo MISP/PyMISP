@@ -156,6 +156,9 @@ class TestBasic(unittest.TestCase):
         time.sleep(1)
         self.delete(eventid)
 
+    def test_one_or_more(self):
+        self.assertEqual(self.misp._one_or_more(1), (1,))
+        self.assertEqual(self.misp._one_or_more([1]), [1])
 
 if __name__ == '__main__':
     unittest.main()
