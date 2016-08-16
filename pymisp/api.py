@@ -753,15 +753,17 @@ class PyMISP(object):
         with open(path, 'rb') as f:
             return str(base64.b64encode(f.read()))
 
-    def upload_sample(self, filename, filepath, event_id, distribution, to_ids,
-                      category, comment, info, analysis, threat_level_id):
+    def upload_sample(self, filename, filepath, event_id, distribution=None,
+                      to_ids=True, category=None, comment=None, info=None,
+                      analysis=None, threat_level_id=None):
         to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
                                          comment, info, analysis, threat_level_id)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
         return self._upload_sample(to_post)
 
-    def upload_samplelist(self, filepaths, event_id, distribution, to_ids, category,
-                          info, analysis, threat_level_id):
+    def upload_samplelist(self, filepaths, event_id, distribution=None,
+                          to_ids=True, category=None, info=None,
+                          analysis=None, threat_level_id=None):
         to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
                                          info, analysis, threat_level_id)
         files = []
