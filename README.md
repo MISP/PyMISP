@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/MISP/PyMISP.svg?branch=master)](https://travis-ci.org/MISP/PyMISP)
+[![Coverage Status](https://coveralls.io/repos/github/MISP/PyMISP/badge.svg?branch=master)](https://coveralls.io/github/MISP/PyMISP?branch=master)
+
 # PyMISP - Python Library to access MISP
 
 PyMISP is a Python library to access [MISP](https://github.com/MISP/MISP) platforms via their REST API.
@@ -20,7 +23,7 @@ git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
 python setup.py install
 ~~~~
 
-## Samples and how to use PyMISP 
+## Samples and how to use PyMISP
 
 Various examples and samples scripts are in the [examples/](examples/) directory.
 

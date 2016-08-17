@@ -10,13 +10,13 @@ import argparse
 
 
 def init(url, key):
-    return PyMISP(url, key, True, 'json')
+    return PyMISP(url, key, True, 'json', debug=True)
 
 
 def up_event(m, event, content):
     with open(content, 'r') as f:
         result = m.update_event(event, f.read())
-    print result.text
+    print(result)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get an event from a MISP instance.')
