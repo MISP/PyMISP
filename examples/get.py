@@ -24,12 +24,11 @@ def init(url, key):
 
 def get_event(m, event, out=None):
     result = m.get_event(event)
-    r = result.json()
     if out is None:
-        print(json.dumps(r) + '\n')
+        print(json.dumps(result) + '\n')
     else:
         with open(out, 'w') as f:
-            f.write(json.dumps(r) + '\n')
+            f.write(json.dumps(result) + '\n')
 
 if __name__ == '__main__':
 
