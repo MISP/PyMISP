@@ -13,8 +13,8 @@ class TestOffline(object):
     def setUp(self):
         self.domain = 'http://misp.local/'
         self.key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        self.event = json.load(open('misp_event.json', 'r'))
-        self.types = json.load(open('describeTypes.json', 'r'))
+        self.event = json.load(open('tests/misp_event.json', 'r'))
+        self.types = json.load(open('tests/describeTypes.json', 'r'))
 
     def initURI(self, m):
         m.register_uri('GET', self.domain + 'servers/getVersion', json={"version": "2.4.50"})

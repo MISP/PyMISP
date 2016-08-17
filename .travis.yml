@@ -1,0 +1,24 @@
+language: python
+
+cache: pip
+
+python:
+    - "2.7"
+    - "3.3"
+    - "3.4"
+    - "3.5"
+    - "3.5-dev"
+    - "nightly"
+
+install:
+    - pip install -U nose
+    - pip install coveralls
+    - pip install codecov
+    - pip install .
+
+script:
+    - nosetests --with-coverage --cover-package=pymisp tests/test_offline.py
+
+after_success:
+    - codecov
+    - coveralls
