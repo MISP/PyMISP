@@ -1,0 +1,100 @@
+{
+  "response": [
+    {
+      "SharingGroup": {
+        "id": "1",
+        "name": "PrivateTrustedGroup",
+        "description": "",
+        "releasability": "",
+        "local": true,
+        "active": true
+      },
+      "Organisation": {
+        "id": "1",
+        "name": "CIRCL",
+        "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+      },
+      "SharingGroupOrg": [
+        {
+          "id": "1",
+          "sharing_group_id": "1",
+          "org_id": "1",
+          "extend": true,
+          "Organisation": {
+            "name": "CIRCL",
+            "id": "1",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          }
+        },
+        {
+          "id": "2",
+          "sharing_group_id": "1",
+          "org_id": "2",
+          "extend": false,
+          "Organisation": {
+            "name": "PifPafPoum",
+            "id": "2",
+            "uuid": "56bf12a7-c19c-4b98-83e7-d9bb02de0b81"
+          }
+        }
+      ],
+      "SharingGroupServer": [
+        {
+          "all_orgs": false,
+          "server_id": "0",
+          "sharing_group_id": "1",
+          "Server": []
+        }
+      ],
+      "editable": true
+    },
+    {
+      "SharingGroup": {
+        "id": "2",
+        "name": "test",
+        "description": "",
+        "releasability": "",
+        "local": true,
+        "active": true
+      },
+      "Organisation": {
+        "id": "1",
+        "name": "CIRCL",
+        "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+      },
+      "SharingGroupOrg": [
+        {
+          "id": "3",
+          "sharing_group_id": "2",
+          "org_id": "1",
+          "extend": true,
+          "Organisation": {
+            "name": "CIRCL",
+            "id": "1",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          }
+        },
+        {
+          "id": "4",
+          "sharing_group_id": "2",
+          "org_id": "2",
+          "extend": false,
+          "Organisation": {
+            "name": "PifPafPoum",
+            "id": "2",
+            "uuid": "56bf12a7-c19c-4b98-83e7-d9bb02de0b81"
+          }
+        }
+      ],
+      "SharingGroupServer": [
+        {
+          "all_orgs": false,
+          "server_id": "0",
+          "sharing_group_id": "2",
+          "Server": []
+        }
+      ],
+      "editable": true
+    }
+  ]
+}

@@ -1071,7 +1071,7 @@ class PyMISP(object):
             Returns the version of the instance.
         """
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'servers/getVersion')
+        url = urljoin(self.root_url, 'servers/getVersion.json')
         response = session.get(url)
         return self._check_response(response)
 

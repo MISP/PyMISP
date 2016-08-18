@@ -5,7 +5,7 @@ import unittest
 import requests_mock
 import json
 
-import pymisp
+import pymisp as pm
 from pymisp import PyMISP
 
 
@@ -18,9 +18,11 @@ class TestOffline(unittest.TestCase):
         self.key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
         self.event = {'Event': json.load(open('tests/misp_event.json', 'r'))}
         self.types = json.load(open('tests/describeTypes.json', 'r'))
+        self.sharing_groups = json.load(open('tests/sharing_groups.json', 'r'))
 
     def initURI(self, m):
-        m.register_uri('GET', self.domain + 'servers/getVersion', json={"version": pymisp.__version__[1:]})
+        m.register_uri('GET', self.domain + 'servers/getVersion.json', json={"version": "2.4.50"})
+        m.register_uri('GET', self.domain + 'sharing_groups/index.json', json=self.sharing_groups)
         m.register_uri('GET', self.domain + 'attributes/describeTypes.json', json=self.types)
         m.register_uri('GET', self.domain + 'events/2', json=self.event)
         m.register_uri('POST', self.domain + 'events/2', json=self.event)
@@ -55,7 +57,6 @@ class TestOffline(unittest.TestCase):
         self.assertEqual(d, {'errors': ['Invalid event'], 'message': 'Invalid event', 'name': 'Invalid event', 'url': '/events/3'})
 
     def test_deleteAttribute(self, m):
-        # FIXME: https://github.com/MISP/MISP/issues/1449
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key, debug=True)
         d = pymisp.delete_attribute(2)
@@ -70,3 +71,17 @@ class TestOffline(unittest.TestCase):
         self.assertEqual(e, pub)
         e = pymisp.publish(self.event)
         self.assertEqual(e, {'error': 'Already published'})
+
+    def test_getVersions(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key, debug=True)
+        api_version = pymisp.get_api_version()
+        self.assertEqual(api_version, {'version': pm.__version__})
+        server_version = pymisp.get_version()
+        self.assertEqual(server_version, {"version": "2.4.50"})
+
+    def test_getSharingGroups(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key, debug=True)
+        sharing_groups = pymisp.get_sharing_groups()
+        self.assertEqual(sharing_groups, self.sharing_groups['response'][0])
