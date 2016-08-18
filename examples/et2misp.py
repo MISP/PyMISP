@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 # Copy Emerging Threats Block IPs list to several MISP events
-# Because of the large size of the list the first run will take about 30 mins
+# Because of the large size of the list the first run will take a minute
 # Running it again will update the MISP events if changes are detected
 #
 # This script requires PyMISP 2.4.50 or later
@@ -78,9 +78,13 @@ def update_et_event(name):
             et_data[name].pop(k, None)
 
         # Add new attributes to MISP event
-        for k,v in et_data[name].items():
-            r = mymisp.add_ipdst(et_event, k, comment=v)
-            echeck(r, et_event['Event']['id'])
+        ipdst = []
+        for i,k in enumerate(et_data[name].items(), 1-len(et_data[name])):
+            ipdst.append(k[0])
+            if i % 100 == 0:
+                r = mymisp.add_ipdst(et_event, ipdst)
+                echeck(r, et_event['Event']['id'])
+                ipdst = []
 
         # Update revision number
         et_drev['value'] = et_rev
