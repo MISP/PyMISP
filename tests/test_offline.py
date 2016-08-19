@@ -19,8 +19,12 @@ class TestOffline(unittest.TestCase):
         self.event = {'Event': json.load(open('tests/misp_event.json', 'r'))}
         self.types = json.load(open('tests/describeTypes.json', 'r'))
         self.sharing_groups = json.load(open('tests/sharing_groups.json', 'r'))
+        self.auth_error_msg = {"name": "Authentication failed. Please make sure you pass the API key of an API enabled user along in the Authorization header.",
+                               "message": "Authentication failed. Please make sure you pass the API key of an API enabled user along in the Authorization header.",
+                               "url": "\/events\/1"}
 
     def initURI(self, m):
+        m.register_uri('GET', self.domain + 'events/1', json=self.auth_error_msg, status_code=403)
         m.register_uri('GET', self.domain + 'servers/getVersion.json', json={"version": "2.4.50"})
         m.register_uri('GET', self.domain + 'sharing_groups/index.json', json=self.sharing_groups)
         m.register_uri('GET', self.domain + 'attributes/describeTypes.json', json=self.types)
@@ -85,3 +89,14 @@ class TestOffline(unittest.TestCase):
         pymisp = PyMISP(self.domain, self.key, debug=True)
         sharing_groups = pymisp.get_sharing_groups()
         self.assertEqual(sharing_groups, self.sharing_groups['response'][0])
+
+    def test_auth_error(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key, debug=True)
+        error = pymisp.get(1)
+        response = self.auth_error_msg
+        response['errors'] = [response['message']]
+        print(error)
+
+if __name__ == '__main__':
+    unittest.main()
