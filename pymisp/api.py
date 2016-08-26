@@ -106,7 +106,7 @@ class PyMISP(object):
     threat_level = threat_level
     analysis = analysis
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None, cert=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -116,6 +116,7 @@ class PyMISP(object):
         self.key = key
         self.ssl = ssl
         self.proxies = proxies
+        self.cert = cert
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
         self.debug = debug
@@ -146,6 +147,7 @@ class PyMISP(object):
         session = requests.Session()
         session.verify = self.ssl
         session.proxies = self.proxies
+        session.cert = self.cert
         session.headers.update(
             {'Authorization': self.key,
              'Accept': 'application/{}'.format(output),
