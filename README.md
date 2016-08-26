@@ -1,7 +1,7 @@
 README
 ======
 
-
+[![Documentation Status](https://readthedocs.org/projects/pymisp/badge/?version=master)](http://pymisp.readthedocs.io/en/master/?badge=master)
 [![Build Status](https://travis-ci.org/MISP/PyMISP.svg?branch=master)](https://travis-ci.org/MISP/PyMISP)
 [![Coverage Status](https://coveralls.io/repos/github/MISP/PyMISP/badge.svg?branch=master)](https://coveralls.io/github/MISP/PyMISP?branch=master)
 
