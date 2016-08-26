@@ -166,10 +166,17 @@ class PyMISP(object):
         elif response.get('errors'):
             if isinstance(response['errors'], dict):
                 for where, errors in response['errors'].items():
-                    for e in errors:
-                        for type_e, msgs in e.items():
-                            for m in msgs:
-                                messages.append('Error in {}: {}'.format(where, m))
+                    if isinstance(errors, dict):
+                        for where, msg in errors.items():
+                            messages.append('Error in {}: {}'.format(where, msg))
+                    else:
+                        for e in errors:
+                            if isinstance(e, str):
+                                messages.append(e)
+                                continue
+                            for type_e, msgs in e.items():
+                                for m in msgs:
+                                    messages.append('Error in {}: {}'.format(where, m))
         return messages
 
     def _check_response(self, response):
