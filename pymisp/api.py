@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-""" Python API using the REST interface of MISP """
+"""Python API using the REST interface of MISP"""
 
 import json
 import datetime
