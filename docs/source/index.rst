@@ -11,6 +11,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   readme
+   modules
+
 
 
 Indices and tables
