@@ -101,7 +101,7 @@ class TestOffline(unittest.TestCase):
 
     def test_newEvent(self, m):
         error_empty_info = {'message': 'The event could not be saved.', 'name': 'Add event failed.', 'errors': {'Event': {'info': ['Info cannot be empty.']}}, 'url': '/events/add'}
-        error_empty_info_flatten = {'message': 'The event could not be saved.', 'name': 'Add event failed.', 'errors': ["Error in info: ['Info cannot be empty.']"], 'url': '/events/add'}
+        error_empty_info_flatten = {u'message': u'The event could not be saved.', u'name': u'Add event failed.', u'errors': [u"Error in info: Info cannot be empty."], u'url': u'/events/add'}
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         with self.assertRaises(pm.api.NewEventError):
