@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-""" Python API using the REST interface of MISP """
+"""Python API using the REST interface of MISP"""
 
 import json
 import datetime
@@ -31,6 +31,29 @@ try:
     basestring
 except NameError:
     basestring = str
+
+
+class distributions(object):
+    """Enumeration of the available distributions."""
+    your_organization = 0
+    this_community = 1
+    connected_communities = 2
+    all_communities = 3
+
+
+class threat_level(object):
+    """Enumeration of the available threat levels."""
+    high = 1
+    medium = 2
+    low = 3
+    undefined = 4
+
+
+class analysis(object):
+    """Enumeration of the available analysis statuses."""
+    initial = 0
+    ongoing = 1
+    completed = 2
 
 
 class PyMISPError(Exception):
@@ -63,23 +86,6 @@ class NoKey(PyMISPError):
     pass
 
 
-def deprecated(func):
-    '''This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used.'''
-
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.warn_explicit(
-            "Call to deprecated function {}.".format(func.__name__),
-            category=DeprecationWarning,
-            filename=func.__code__.co_filename,
-            lineno=func.__code__.co_firstlineno + 1
-        )
-        return func(*args, **kwargs)
-    return new_func
-
-
 class PyMISP(object):
     """
         Python API for MISP
@@ -90,10 +96,18 @@ class PyMISP(object):
                     of the certificate. Or a CA_BUNDLE in case of self
                     signed certiifcate (the concatenation of all the
                     *.crt of the chain)
-        :param out_type: Type of object (json or xml)
+        :param out_type: Type of object (json) NOTE: XML output isn't supported anymore, keeping the flag for compatibility reasons.
+        :param debug: print all the messages received from the server
+        :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
+        :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None):
+    # So it can may be accessed from the misp object.
+    distributions = distributions
+    threat_level = threat_level
+    analysis = analysis
+
+    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None, cert=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -103,7 +117,9 @@ class PyMISP(object):
         self.key = key
         self.ssl = ssl
         self.proxies = proxies
-        self.out_type = out_type
+        self.cert = cert
+        if out_type != 'json':
+            raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
         self.debug = debug
 
         try:
@@ -112,34 +128,31 @@ class PyMISP(object):
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
-        session = self.__prepare_session(out_type)
-        self.describe_types = session.get(urljoin(self.root_url, 'attributes/describeTypes.json')).json()
+        session = self.__prepare_session()
+        response = session.get(urljoin(self.root_url, 'attributes/describeTypes.json'))
+        self.describe_types = self._check_response(response)
+        if self.describe_types.get('error'):
+            for e in self.describe_types.get('error'):
+                raise PyMISPError('Failed: {}'.format(e))
 
         self.categories = self.describe_types['result']['categories']
         self.types = self.describe_types['result']['types']
         self.category_type_mapping = self.describe_types['result']['category_type_mappings']
 
-    def __prepare_session(self, force_out=None):
+    def __prepare_session(self, output='json'):
         """
             Prepare the headers of the session
-
-            :param force_out: force the type of the expect output
-                              (overwrite the constructor)
-
         """
         if not HAVE_REQUESTS:
             raise MissingDependency('Missing dependency, install requests (`pip install requests`)')
-        if force_out is not None:
-            out = force_out
-        else:
-            out = self.out_type
         session = requests.Session()
         session.verify = self.ssl
         session.proxies = self.proxies
+        session.cert = self.cert
         session.headers.update(
             {'Authorization': self.key,
-             'Accept': 'application/' + out,
-             'content-type': 'application/' + out})
+             'Accept': 'application/{}'.format(output),
+             'content-type': 'application/{}'.format(output)})
         return session
 
     def flatten_error_messages(self, response):
@@ -153,10 +166,21 @@ class PyMISP(object):
         elif response.get('errors'):
             if isinstance(response['errors'], dict):
                 for where, errors in response['errors'].items():
-                    for e in errors:
-                        for type_e, msgs in e.items():
-                            for m in msgs:
-                                messages.append('Error in {}: {}'.format(where, m))
+                    if isinstance(errors, dict):
+                        for where, msg in errors.items():
+                            if isinstance(msg, list):
+                                for m in msg:
+                                    messages.append('Error in {}: {}'.format(where, m))
+                            else:
+                                messages.append('Error in {}: {}'.format(where, msg))
+                    else:
+                        for e in errors:
+                            if isinstance(e, str):
+                                messages.append(e)
+                                continue
+                            for type_e, msgs in e.items():
+                                for m in msgs:
+                                    messages.append('Error in {}: {}'.format(where, m))
         return messages
 
     def _check_response(self, response):
@@ -194,94 +218,93 @@ class PyMISP(object):
     # ############### Simple REST API ################
     # ################################################
 
-    def get_index(self, force_out=None, filters=None):
+    def get_index(self, filters=None):
         """
             Return the index.
 
             Warning, there's a limit on the number of results
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/index')
         if filters is not None:
             filters = json.dumps(filters)
-            print(filters)
-            return session.post(url, data=filters)
+            response = session.post(url, data=filters)
         else:
-            return session.get(url)
+            response = session.get(url)
+        return self._check_response(response)
 
-    def get_event(self, event_id, force_out=None):
+    def get_event(self, event_id):
         """
             Get an event
 
             :param event_id: Event id to get
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
-        return session.get(url)
+        response = session.get(url)
+        return self._check_response(response)
 
-    def get_stix_event(self, event_id=None, out_format="json", with_attachments=False, from_date=False, to_date=False, tags=False):
+    def get_stix_event(self, event_id=None, with_attachments=False, from_date=False, to_date=False, tags=False):
         """
             Get an event/events in STIX format
         """
-        out_format = out_format.lower()
         if tags:
             if isinstance(tags, list):
                 tags = "&&".join(tags)
 
-        session = self.__prepare_session(out_format)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
             event_id, with_attachments, tags, from_date, to_date))
         if self.debug:
             print("Getting STIX event from {}".format(url))
-        return session.get(url)
+        response = session.get(url)
+        return self._check_response(response)
 
-    def add_event(self, event, force_out=None):
+    def add_event(self, event):
         """
             Add a new event
 
             :param event: Event as JSON object / string or XML to add
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events')
-        if self.out_type == 'json':
-            if isinstance(event, basestring):
-                return session.post(url, data=event)
-            else:
-                return session.post(url, data=json.dumps(event))
+        if isinstance(event, basestring):
+            response = session.post(url, data=event)
         else:
-            return session.post(url, data=event)
+            response = session.post(url, data=json.dumps(event))
+        return self._check_response(response)
 
-    def update_event(self, event_id, event, force_out=None):
+    def update_event(self, event_id, event):
         """
             Update an event
 
             :param event_id: Event id to update
             :param event: Event as JSON object / string or XML to add
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
-        if self.out_type == 'json':
-            if isinstance(event, basestring):
-                return session.post(url, data=event)
-            else:
-                return session.post(url, data=json.dumps(event))
+        if isinstance(event, basestring):
+            response = session.post(url, data=event)
         else:
-            return session.post(url, data=event)
+            response = session.post(url, data=json.dumps(event))
+        return self._check_response(response)
 
-    def delete_event(self, event_id, force_out=None):
+    def delete_event(self, event_id):
         """
             Delete an event
 
             :param event_id: Event id to delete
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
-        return session.delete(url)
+        response = session.delete(url)
+        return self._check_response(response)
 
-    def delete_attribute(self, attribute_id, force_out=None):
-        session = self.__prepare_session(force_out)
+    def delete_attribute(self, attribute_id):
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
-        return session.delete(url)
+        response = session.delete(url)
+        return self._check_response(response)
 
     # ##############################################
     # ######### Event handling (Json only) #########
@@ -351,54 +374,55 @@ class PyMISP(object):
         event['Event']['id'] = int(event['Event']['id'])
         return event
 
+    def _one_or_more(self, value):
+        """Returns a list/tuple of one or more items, regardless of input."""
+        return value if isinstance(value, (tuple, list)) else (value,)
+
     # ########## Helpers ##########
 
     def get(self, eid):
-        response = self.get_event(int(eid), 'json')
-        return self._check_response(response)
+        response = self.get_event(int(eid))
+        return response
 
     def get_stix(self, **kwargs):
         response = self.get_stix_event(**kwargs)
-        return self._check_response(response)
+        return response
 
     def update(self, event):
         eid = event['Event']['id']
-        response = self.update_event(eid, event, 'json')
-        return self._check_response(response)
+        response = self.update_event(eid, event)
+        return response
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
         data = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
-        response = self.add_event(data, 'json')
-        return self._check_response(response)
+        response = self.add_event(data)
+        return response
 
     def publish(self, event):
         if event['Event']['published']:
             return {'error': 'Already published'}
         event = self._prepare_update(event)
         event['Event']['published'] = True
-        response = self.update_event(event['Event']['id'], event, 'json')
-        return self._check_response(response)
+        response = self.update_event(event['Event']['id'], event)
+        return response
 
     def add_tag(self, event, tag):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
         response = session.post(urljoin(self.root_url, 'events/addTag'), data=json.dumps(to_post))
-
         return self._check_response(response)
 
     def remove_tag(self, event, tag):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
         response = session.post(urljoin(self.root_url, 'events/removeTag'), data=json.dumps(to_post))
-
         return self._check_response(response)
 
     def change_threat_level(self, event, threat_level_id):
         event['Event']['threat_level_id'] = threat_level_id
         self._prepare_update(event)
         response = self.update_event(event['Event']['id'], event)
-
-        return self._check_response(response)
+        return response
 
     # ##### File attributes #####
 
@@ -409,10 +433,10 @@ class PyMISP(object):
             event = self._prepare_update(event)
             for a in attributes:
                 if a.get('distribution') is None:
-                    a['distribution'] = event['Event']['distribution']
+                    a['distribution'] = 5
             event['Event']['Attribute'] = attributes
-            response = self.update_event(event['Event']['id'], event, 'json')
-        return self._check_response(response)
+            response = self.update_event(event['Event']['id'], event)
+        return response
 
     def add_named_attribute(self, event, category, type_value, value, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
@@ -448,22 +472,23 @@ class PyMISP(object):
 
     def av_detection_link(self, event, link, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'link', link, to_ids, comment, distribution))
+        for link in self._one_or_more(link):
+            attributes.append(self._prepare_full_attribute(category, 'link', link, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_detection_name(self, event, name, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'text', name, to_ids, comment, distribution))
+        for name in self._one_or_more(name):
+            attributes.append(self._prepare_full_attribute(category, 'text', name, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_filename(self, event, filename, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'filename', filename, to_ids, comment, distribution))
+        for filename in self._one_or_more(filename):
+            attributes.append(self._prepare_full_attribute(category, 'filename', filename, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
-        type_value = '{}'
-        value = '{}'
         if rvalue:
             type_value = 'regkey|value'
             value = '{}|{}'.format(regkey, rvalue)
@@ -475,20 +500,36 @@ class PyMISP(object):
         attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
+    def add_regkeys(self, event, regkeys_values, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
+        attributes = []
+
+        for regkey, rvalue in regkeys_values.items():
+            if rvalue:
+                type_value = 'regkey|value'
+                value = '{}|{}'.format(regkey, rvalue)
+            else:
+                type_value = 'regkey'
+                value = regkey
+
+            attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
     def add_pattern(self, event, pattern, in_file=True, in_memory=False, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        if in_file:
-            attributes.append(self._prepare_full_attribute(category, 'pattern-in-file', pattern, to_ids, comment, distribution))
-        if in_memory:
-            attributes.append(self._prepare_full_attribute(category, 'pattern-in-memory', pattern, to_ids, comment, distribution))
+        for pattern in self._one_or_more(pattern):
+            if in_file:
+                attributes.append(self._prepare_full_attribute(category, 'pattern-in-file', pattern, to_ids, comment, distribution))
+            if in_memory:
+                attributes.append(self._prepare_full_attribute(category, 'pattern-in-memory', pattern, to_ids, comment, distribution))
 
         return self._send_attributes(event, attributes, proposal)
 
     def add_pipe(self, event, named_pipe, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        if not named_pipe.startswith('\\.\\pipe\\'):
-            named_pipe = '\\.\\pipe\\{}'.format(named_pipe)
-        attributes.append(self._prepare_full_attribute(category, 'named pipe', named_pipe, to_ids, comment, distribution))
+        for named_pipe in self._one_or_more(named_pipe):
+            if not named_pipe.startswith('\\.\\pipe\\'):
+                named_pipe = '\\.\\pipe\\{}'.format(named_pipe)
+            attributes.append(self._prepare_full_attribute(category, 'named pipe', named_pipe, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_mutex(self, event, mutex, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
@@ -500,29 +541,34 @@ class PyMISP(object):
 
     def add_yara(self, event, yara, category='Payload delivery', to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'yara', yara, to_ids, comment, distribution))
+        for yara in self._one_or_more(yara):
+            attributes.append(self._prepare_full_attribute(category, 'yara', yara, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     # ##### Network attributes #####
 
     def add_ipdst(self, event, ipdst, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'ip-dst', ipdst, to_ids, comment, distribution))
+        for ipdst in self._one_or_more(ipdst):
+            attributes.append(self._prepare_full_attribute(category, 'ip-dst', ipdst, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_ipsrc(self, event, ipsrc, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'ip-src', ipsrc, to_ids, comment, distribution))
+        for ipsrc in self._one_or_more(ipsrc):
+            attributes.append(self._prepare_full_attribute(category, 'ip-src', ipsrc, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_hostname(self, event, hostname, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'hostname', hostname, to_ids, comment, distribution))
+        for hostname in self._one_or_more(hostname):
+            attributes.append(self._prepare_full_attribute(category, 'hostname', hostname, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_domain(self, event, domain, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'domain', domain, to_ids, comment, distribution))
+        for domain in self._one_or_more(domain):
+            attributes.append(self._prepare_full_attribute(category, 'domain', domain, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_domain_ip(self, event, domain, ip, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
@@ -530,107 +576,132 @@ class PyMISP(object):
         attributes.append(self._prepare_full_attribute(category, 'domain|ip', "%s|%s" % (domain, ip), to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
+    def add_domains_ips(self, event, domain_ips, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
+        attributes = []
+        for domain, ip in domain_ips.items():
+            attributes.append(self._prepare_full_attribute(category, 'domain|ip', "%s|%s" % (domain, ip), to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
     def add_url(self, event, url, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'url', url, to_ids, comment, distribution))
+        for url in self._one_or_more(url):
+            attributes.append(self._prepare_full_attribute(category, 'url', url, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_useragent(self, event, useragent, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'user-agent', useragent, to_ids, comment, distribution))
+        for useragent in self._one_or_more(useragent):
+            attributes.append(self._prepare_full_attribute(category, 'user-agent', useragent, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_traffic_pattern(self, event, pattern, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'pattern-in-traffic', pattern, to_ids, comment, distribution))
+        for pattern in self._one_or_more(pattern):
+            attributes.append(self._prepare_full_attribute(category, 'pattern-in-traffic', pattern, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_snort(self, event, snort, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'snort', snort, to_ids, comment, distribution))
+        for snort in self._one_or_more(snort):
+            attributes.append(self._prepare_full_attribute(category, 'snort', snort, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     # ##### Email attributes #####
 
     def add_email_src(self, event, email, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Payload delivery', 'email-src', email, to_ids, comment, distribution))
+        for email in self._one_or_more(email):
+            attributes.append(self._prepare_full_attribute('Payload delivery', 'email-src', email, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_email_dst(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute(category, 'email-dst', email, to_ids, comment, distribution))
+        for email in self._one_or_more(email):
+            attributes.append(self._prepare_full_attribute(category, 'email-dst', email, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_email_subject(self, event, email, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Payload delivery', 'email-subject', email, to_ids, comment, distribution))
+        for email in self._one_or_more(email):
+            attributes.append(self._prepare_full_attribute('Payload delivery', 'email-subject', email, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_email_attachment(self, event, email, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Payload delivery', 'email-attachment', email, to_ids, comment, distribution))
+        for email in self._one_or_more(email):
+            attributes.append(self._prepare_full_attribute('Payload delivery', 'email-attachment', email, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     # ##### Target attributes #####
 
     def add_target_email(self, event, target, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Targeting data', 'target-email', target, to_ids, comment, distribution))
+        for target in self._one_or_more(target):
+            attributes.append(self._prepare_full_attribute('Targeting data', 'target-email', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_target_user(self, event, target, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Targeting data', 'target-user', target, to_ids, comment, distribution))
+        for target in self._one_or_more(target):
+            attributes.append(self._prepare_full_attribute('Targeting data', 'target-user', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_target_machine(self, event, target, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Targeting data', 'target-machine', target, to_ids, comment, distribution))
+        for target in self._one_or_more(target):
+            attributes.append(self._prepare_full_attribute('Targeting data', 'target-machine', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_target_org(self, event, target, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Targeting data', 'target-org', target, to_ids, comment, distribution))
+        for target in self._one_or_more(target):
+            attributes.append(self._prepare_full_attribute('Targeting data', 'target-org', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_target_location(self, event, target, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Targeting data', 'target-location', target, to_ids, comment, distribution))
+        for target in self._one_or_more(target):
+            attributes.append(self._prepare_full_attribute('Targeting data', 'target-location', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_target_external(self, event, target, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Targeting data', 'target-external', target, to_ids, comment, distribution))
+        for target in self._one_or_more(target):
+            attributes.append(self._prepare_full_attribute('Targeting data', 'target-external', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     # ##### Attribution attributes #####
 
     def add_threat_actor(self, event, target, to_ids=True, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Attribution', 'threat-actor', target, to_ids, comment, distribution))
+        for target in self._one_or_more(target):
+            attributes.append(self._prepare_full_attribute('Attribution', 'threat-actor', target, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     # ##### Internal reference attributes #####
 
     def add_internal_link(self, event, reference, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Internal reference', 'link', reference, to_ids, comment, distribution))
+        for reference in self._one_or_more(reference):
+            attributes.append(self._prepare_full_attribute('Internal reference', 'link', reference, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_internal_comment(self, event, reference, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Internal reference', 'comment', reference, to_ids, comment, distribution))
+        for reference in self._one_or_more(reference):
+            attributes.append(self._prepare_full_attribute('Internal reference', 'comment', reference, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_internal_text(self, event, reference, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Internal reference', 'text', reference, to_ids, comment, distribution))
+        for reference in self._one_or_more(reference):
+            attributes.append(self._prepare_full_attribute('Internal reference', 'text', reference, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_internal_other(self, event, reference, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        attributes.append(self._prepare_full_attribute('Internal reference', 'other', reference, to_ids, comment, distribution))
+        for reference in self._one_or_more(reference):
+            attributes.append(self._prepare_full_attribute('Internal reference', 'other', reference, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     # ##################################################
@@ -679,15 +750,17 @@ class PyMISP(object):
         with open(path, 'rb') as f:
             return str(base64.b64encode(f.read()))
 
-    def upload_sample(self, filename, filepath, event_id, distribution, to_ids,
-                      category, comment, info, analysis, threat_level_id):
+    def upload_sample(self, filename, filepath, event_id, distribution=None,
+                      to_ids=True, category=None, comment=None, info=None,
+                      analysis=None, threat_level_id=None):
         to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
                                          comment, info, analysis, threat_level_id)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
         return self._upload_sample(to_post)
 
-    def upload_samplelist(self, filepaths, event_id, distribution, to_ids, category,
-                          info, analysis, threat_level_id):
+    def upload_samplelist(self, filepaths, event_id, distribution=None,
+                          to_ids=True, category=None, info=None,
+                          analysis=None, threat_level_id=None):
         to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
                                          info, analysis, threat_level_id)
         files = []
@@ -699,7 +772,7 @@ class PyMISP(object):
         return self._upload_sample(to_post)
 
     def _upload_sample(self, to_post):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/upload_sample')
         response = session.post(url, data=json.dumps(to_post))
         return self._check_response(response)
@@ -724,7 +797,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def proposal_view(self, event_id=None, proposal_id=None):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         if proposal_id is not None and event_id is not None:
             return {'error': 'You can only view an event ID or a proposal ID'}
         if event_id is not None:
@@ -734,29 +807,31 @@ class PyMISP(object):
         return self.__query_proposal(session, 'view', id)
 
     def proposal_add(self, event_id, attribute):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         return self.__query_proposal(session, 'add', event_id, attribute)
 
     def proposal_edit(self, attribute_id, attribute):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         return self.__query_proposal(session, 'edit', attribute_id, attribute)
 
     def proposal_accept(self, proposal_id):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         return self.__query_proposal(session, 'accept', proposal_id)
 
     def proposal_discard(self, proposal_id):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         return self.__query_proposal(session, 'discard', proposal_id)
 
     # ##############################
     # ######## REST Search #########
     # ##############################
 
-    def __query(self, session, path, query):
+    def __query(self, session, path, query, controller='events'):
         if query.get('error') is not None:
             return query
-        url = urljoin(self.root_url, 'events/{}'.format(path.lstrip('/')))
+        if controller not in ['events', 'attributes']:
+            raise Exception('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes'])))
+        url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
         query = {'request': query}
         response = session.post(url, data=json.dumps(query))
         return self._check_response(response)
@@ -801,14 +876,14 @@ class PyMISP(object):
                     buildup_url += '/search{}:{}'.format(rule, joined)
                 else:
                     buildup_url += '/search{}:{}'.format(rule, allowed[rule])
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         url = urljoin(self.root_url, buildup_url)
         response = session.get(url)
         return self._check_response(response)
 
     def search_all(self, value):
         query = {'value': value, 'searchall': 1}
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         return self.__query(session, 'restSearch/download', query)
 
     def __prepare_rest_search(self, values, not_values):
@@ -837,7 +912,7 @@ class PyMISP(object):
 
     def search(self, values=None, not_values=None, type_attribute=None,
                category=None, org=None, tags=None, not_tags=None, date_from=None,
-               date_to=None, last=None):
+               date_to=None, last=None, controller='events'):
         """
             Search via the Rest API
 
@@ -879,8 +954,8 @@ class PyMISP(object):
         if last is not None:
             query['last'] = last
 
-        session = self.__prepare_session('json')
-        return self.__query(session, 'restSearch/download', query)
+        session = self.__prepare_session()
+        return self.__query(session, 'restSearch/download', query, controller)
 
     def get_attachement(self, event_id):
         """
@@ -890,12 +965,13 @@ class PyMISP(object):
                              be fetched
         """
         attach = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(event_id))
-        session = self.__prepare_session('json')
-        return session.get(attach)
+        session = self.__prepare_session()
+        response = session.get(attach)
+        return self._check_response(response)
 
     def get_yara(self, event_id):
         to_post = {'request': {'eventid': event_id, 'type': 'yara'}}
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         response = session.post(urljoin(self.root_url, 'attributes/restSearch'), data=json.dumps(to_post))
         result = self._check_response(response)
         if result.get('error') is not None:
@@ -907,7 +983,7 @@ class PyMISP(object):
 
     def download_samples(self, sample_hash=None, event_id=None, all_samples=False):
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         response = session.post(urljoin(self.root_url, 'attributes/downloadSample'), data=json.dumps(to_post))
         result = self._check_response(response)
         if result.get('error') is not None:
@@ -949,7 +1025,8 @@ class PyMISP(object):
         """
         suricata_rules = urljoin(self.root_url, 'events/nids/suricata/download')
         session = self.__prepare_session('rules')
-        return session.get(suricata_rules)
+        response = session.get(suricata_rules)
+        return response
 
     def download_suricata_rule_event(self, event_id):
         """
@@ -959,12 +1036,13 @@ class PyMISP(object):
         """
         template = urljoin(self.root_url, 'events/nids/suricata/download/{}'.format(event_id))
         session = self.__prepare_session('rules')
-        return session.get(template)
+        response = session.get(template)
+        return response
 
     # ########## Tags ##########
 
     def get_all_tags(self, quiet=False):
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'tags')
         response = session.get(url)
         r = self._check_response(response)
@@ -978,7 +1056,7 @@ class PyMISP(object):
 
     def new_tag(self, name=None, colour="#00ace6", exportable=False):
         to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable}}
-        session = self.__prepare_session('json')
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'tags/add')
         response = session.post(url, data=json.dumps(to_post))
         return self._check_response(response)
@@ -1006,8 +1084,8 @@ class PyMISP(object):
         """
             Returns the version of the instance.
         """
-        session = self.__prepare_session('json')
-        url = urljoin(self.root_url, 'servers/getVersion')
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'servers/getVersion.json')
         response = session.get(url)
         return self._check_response(response)
 
@@ -1032,24 +1110,25 @@ class PyMISP(object):
 
     # ############## Statistics ##################
 
-    def get_attributes_statistics(self, context='type', percentage=None, force_out=None):
+    def get_attributes_statistics(self, context='type', percentage=None):
         """
             Get attributes statistics from the MISP instance
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         if (context != 'category'):
             context = 'type'
         if percentage is not None:
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}/{}'.format(context, percentage))
         else:
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}'.format(context))
-        return session.get(url).json()
+        response = session.get(url)
+        return self._check_response(response)
 
-    def get_tags_statistics(self, percentage=None, name_sort=None, force_out=None):
+    def get_tags_statistics(self, percentage=None, name_sort=None):
         """
         Get tags statistics from the MISP instance
         """
-        session = self.__prepare_session(force_out)
+        session = self.__prepare_session()
         if percentage is not None:
             percentage = 'true'
         else:
@@ -1059,55 +1138,34 @@ class PyMISP(object):
         else:
             name_sort = 'false'
         url = urljoin(self.root_url, 'tags/tagStatistics/{}/{}'.format(percentage, name_sort))
-        return session.get(url).json()
+        response = session.get(url).json()
+        return self._check_response(response)
 
     # ############## Sightings ##################
 
-    def sighting_per_id(self, attribute_id, force_out=None):
-        session = self.__prepare_session(force_out)
+    def sighting_per_id(self, attribute_id):
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_id))
-        return session.post(url)
+        response = session.post(url)
+        return self._check_response(response)
 
-    def sighting_per_uuid(self, attribute_uuid, force_out=None):
-        session = self.__prepare_session(force_out)
+    def sighting_per_uuid(self, attribute_uuid):
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_uuid))
-        return session.post(url)
+        response = session.post(url)
+        return self._check_response(response)
 
-    def sighting_per_json(self, json_file, force_out=None):
-        session = self.__prepare_session(force_out)
+    def sighting_per_json(self, json_file):
+        session = self.__prepare_session()
         jdata = json.load(open(json_file))
         url = urljoin(self.root_url, 'sightings/add/')
-        return session.post(url, data=json.dumps(jdata))
+        response = session.post(url, data=json.dumps(jdata))
+        return self._check_response(response)
 
     # ############## Sharing Groups ##################
 
     def get_sharing_groups(self):
-        session = self.__prepare_session(force_out=None)
+        session = self.__prepare_session()
         url = urljoin(self.root_url, 'sharing_groups/index.json')
         response = session.get(url)
         return self._check_response(response)['response'][0]
-
-    # ############## Deprecated (Pure XML API should not be used) ##################
-    @deprecated
-    def download_all(self):
-        """
-            Download all event from the instance
-        """
-        xml = urljoin(self.root_url, 'events/xml/download')
-        session = self.__prepare_session('xml')
-        return session.get(xml)
-
-    @deprecated
-    def download(self, event_id, with_attachement=False):
-        """
-            Download one event in XML
-
-            :param event_id: Event id of the event to download (same as get)
-        """
-        if with_attachement:
-            attach = 'true'
-        else:
-            attach = 'false'
-        template = urljoin(self.root_url, 'events/xml/download/{}/{}'.format(event_id, attach))
-        session = self.__prepare_session('xml')
-        return session.get(template)

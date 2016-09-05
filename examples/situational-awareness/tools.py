@@ -212,7 +212,7 @@ def createTreemap(data, title, treename='attribute_treemap.svg', tablename='attr
                   transition='400ms ease-in',
                   colors=tuple(colors.values()))
 
-    treemap = pygal.Treemap(pretty_print=True, legend_at_bottom=True, style=style)
+    treemap = pygal.Treemap(pretty_print=True, legend_at_bottom=True, style=style, explicit_size=True, width=2048, height=2048)
     treemap.title = title
     treemap.print_values = True
     treemap.print_labels = True

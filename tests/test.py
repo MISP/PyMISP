@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 from pymisp import PyMISP
 from keys import url, key
@@ -47,7 +48,7 @@ class TestBasic(unittest.TestCase):
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
                                u'threat_level_id': u'1'}}
-        print event
+        print(event)
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
         return int(event_id)
 
@@ -99,15 +100,15 @@ class TestBasic(unittest.TestCase):
 
     def delete(self, eventid):
         event = self.misp.delete_event(eventid)
-        print event.json()
+        print(event)
 
     def delete_attr(self, attrid):
         event = self.misp.delete_attribute(attrid)
-        print event.json()
+        print(event)
 
     def get(self, eventid):
         event = self.misp.get_event(eventid)
-        print event.json()
+        print(event)
 
     def get_stix(self, **kwargs):
         event = self.misp.get_stix(kwargs)
@@ -129,7 +130,7 @@ class TestBasic(unittest.TestCase):
                                  u'ShadowAttribute': [], u'distribution': u'2', u'type': u'filename|sha256'}],
                             u'proposal_email_lock': False, u'threat_level_id': u'1'}}
         event = self.misp.add_event(event)
-        print event.json()
+        print(event)
 
     def test_create_event(self):
         eventid = self.new_event()
@@ -155,6 +156,9 @@ class TestBasic(unittest.TestCase):
         time.sleep(1)
         self.delete(eventid)
 
+    def test_one_or_more(self):
+        self.assertEqual(self.misp._one_or_more(1), (1,))
+        self.assertEqual(self.misp._one_or_more([1]), [1])
 
 if __name__ == '__main__':
     unittest.main()

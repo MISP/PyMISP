@@ -13,7 +13,7 @@ except NameError:
 
 
 def init(url, key):
-    return PyMISP(url, key, True, 'json')
+    return PyMISP(url, key, True, 'json', debug=True)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create an event on MISP.')
@@ -26,7 +26,4 @@ if __name__ == '__main__':
     misp = init(misp_url, misp_key)
 
     event = misp.new_event(args.distrib, args.threat, args.analysis, args.info)
-    print event
-
-    response = misp.add_mutex(event, 'booh')
-    print response
+    print(event)
