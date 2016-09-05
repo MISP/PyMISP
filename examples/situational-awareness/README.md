@@ -16,7 +16,10 @@
     * The studied _period_ can be either the 7, 28 or 360 last days
     * _accuracy_ allows to get smallers splits of data instead of the default values
     * _order_ define the accuracy of the curve fitting. Default value is 3
-    * It will generate three plots:
+    * It will generate two plots comparing all the tags:
+		* tags_repartition_plot that present the raw data
+		* tags_repartition_trend_plot that present the general evolution for each tag
+	* Then each taxonomies will be represented in three plots:
         * Raw datas: in plot folder, named with the name of the corresponding taxonomy
         * Trend: in plot folder, named _taxonomy_\_trend. general evolution of the data (linear fitting, curve fitting at order 1)
         * Curve fitting: in plotlib folder, name as the taxonomy it presents.
