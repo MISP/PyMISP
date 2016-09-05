@@ -20,10 +20,10 @@
 		* tags_repartition_plot that present the raw data
 		* tags_repartition_trend_plot that present the general evolution for each tag
 	* Then each taxonomies will be represented in three plots:
-        * Raw datas: in plot folder, named with the name of the corresponding taxonomy
-        * Trend: in plot folder, named _taxonomy_\_trend. general evolution of the data (linear fitting, curve fitting at order 1)
-        * Curve fitting: in plotlib folder, name as the taxonomy it presents.
-
+        * Raw datas: in "plot" folder, named with the name of the corresponding taxonomy
+        * Trend: in "plot" folder, named _taxonomy_\_trend. general evolution of the data (linear fitting, curve fitting at order 1)
+        * Curve fitting: in "plotlib" folder, name as the taxonomy it presents.
+	* In order to visualize the last plots, a html file is also generated automaticaly (might be improved in the future)
 
 :warning: These scripts are not time optimised
 
