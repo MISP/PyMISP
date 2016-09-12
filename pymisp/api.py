@@ -1138,7 +1138,7 @@ class PyMISP(object):
         else:
             name_sort = 'false'
         url = urljoin(self.root_url, 'tags/tagStatistics/{}/{}'.format(percentage, name_sort))
-        response = session.get(url).json()
+        response = session.get(url)
         return self._check_response(response)
 
     # ############## Sightings ##################

@@ -228,8 +228,7 @@ def push_event_to_misp(jsonEvent):
 
         ####################
         # upload json event
-        r = misp.add_event(jsonEvent)
-        event = r.json()
+        event = misp.add_event(jsonEvent)
 
         # save event id for file upload and tagg
         iocDescriptions["misp_event_id"] = event["Event"]["id"]

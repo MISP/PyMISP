@@ -34,13 +34,13 @@ def init():
         valid_attribute_distributions = valid_attribute_distribution_levels
     except:
         valid_attribute_distributions = ['0', '1', '2', '3', '4', '5']
-    return PyMISP(url, key, ssl, 'json')
+    return PyMISP(url, key, ssl)
 
 
 def saveEvent(misp, uuid):
     event = misp.get_event(uuid)
-    if not event.json().get('Event'):
-        print('Error while fetching event: {}'.format(event.json()['message']))
+    if not event.get('Event'):
+        print('Error while fetching event: {}'.format(event['message']))
         sys.exit('Could not create file for event ' + uuid + '.')
     event = __cleanUpEvent(event)
     event = json.dumps(event)
@@ -50,7 +50,7 @@ def saveEvent(misp, uuid):
 
 
 def __cleanUpEvent(event):
-        temp = event.json()
+        temp = event
         event = {'Event': {}}
         __cleanupEventFields(event, temp)
         __cleanupEventObjects(event, temp)
@@ -120,10 +120,12 @@ def __addEventToManifest(event):
 
 if __name__ == '__main__':
     misp = init()
-    result = misp.get_index(None, filters)
     try:
-        events = result.json()
-    except:
+        r = misp.get_index(filters)
+        events = r['response']
+        print(events[0])
+    except Exception as e:
+        print(e)
         sys.exit("Invalid response received from MISP.")
     if len(events) == 0:
         sys.exit("No events returned.")

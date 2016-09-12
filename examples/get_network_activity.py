@@ -48,41 +48,34 @@ def get_event(event_id):
 
     event_id = int(event_id)
     if event_id > 0:
-        event = source.get_event(event_id)
-        if event.status_code == 200:
+        event_json = source.get_event(event_id)
+        event_core = event_json["Event"]
+        # event_threatlevel_id = event_core["threat_level_id"]
 
-            try:
-                event_json = event.json()
-            except:
-                return False
+        # attribute_count = event_core["attribute_count"]
+        attribute = event_core["Attribute"]
 
-            event_core = event_json["Event"]
-            # event_threatlevel_id = event_core["threat_level_id"]
+        for attribute in event_core["Attribute"]:
+            if app_ids_only and not attribute["to_ids"]:
+                continue
 
-            # attribute_count = event_core["attribute_count"]
-            attribute = event_core["Attribute"]
-
-            for attribute in event_core["Attribute"]:
-                if app_ids_only and not attribute["to_ids"]:
-                    continue
-
-                value = attribute["value"]
-                title = event_core["info"]
-                if app_netflow:
-                    app_printcomment = False
-                    if attribute["type"] == "ip-dst" and app_ip_dst:
-                        network_ip_dst.append([build_entry(value, event_id, title, "ip-dst")])
+            value = attribute["value"]
+            title = event_core["info"]
+            if app_netflow:
+                app_printcomment = False
+                if attribute["type"] == "ip-dst" and app_ip_dst:
+                    network_ip_dst.append([build_entry(value, event_id, title, "ip-dst")])
+            else:
+                if attribute["type"] == "ip-src" and app_ip_src:
+                    network_ip_src.append([build_entry(value, event_id, title, "ip-src")])
+                elif attribute["type"] == "ip-dst" and app_ip_dst:
+                    network_ip_dst.append([build_entry(value, event_id, title, "ip-dst")])
+                elif attribute["type"] == "domain" and app_domain:
+                    network_domain.append([build_entry(value, event_id, title, "domain")])
+                elif attribute["type"] == "hostname" and app_hostname:
+                    network_hostname.append([build_entry(value, event_id, title, "hostname")])
                 else:
-                    if attribute["type"] == "ip-src" and app_ip_src:
-                        network_ip_src.append([build_entry(value, event_id, title, "ip-src")])
-                    elif attribute["type"] == "ip-dst" and app_ip_dst:
-                        network_ip_dst.append([build_entry(value, event_id, title, "ip-dst")])
-                    elif attribute["type"] == "domain" and app_domain:
-                        network_domain.append([build_entry(value, event_id, title, "domain")])
-                    elif attribute["type"] == "hostname" and app_hostname:
-                        network_hostname.append([build_entry(value, event_id, title, "hostname")])
-                    else:
-                        continue
+                    continue
     else:
         print("Not a valid ID")
         return
@@ -121,8 +114,8 @@ def print_events():
             if firsthost:
                 firsthost = False
             else:
-                print " or "
-            print "host %s" % ip[0]
+                print(" or ")
+            print("host %s" % ip[0])
     else:
         if app_ip_src:
             for ip in network_ip_src:

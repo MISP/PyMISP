@@ -25,4 +25,4 @@ if __name__ == '__main__':
     misp = init(misp_url, misp_key)
 
     stats = misp.get_tags_statistics(args.percentage, args.namesort)
-    print json.dumps(stats)
+    print(json.dumps(stats))
