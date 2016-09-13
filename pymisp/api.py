@@ -867,7 +867,7 @@ class PyMISP(object):
             if allowed[rule] is not None:
                 if not isinstance(allowed[rule], list):
                     allowed[rule] = [allowed[rule]]
-                allowed[rule] = map(str, allowed[rule])
+                allowed[rule] = [x for x in map(str, allowed[rule])]
                 if rule in rule_levels:
                     if not set(allowed[rule]).issubset(rule_levels[rule]):
                         raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
