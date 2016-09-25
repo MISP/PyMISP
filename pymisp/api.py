@@ -15,8 +15,6 @@ except ImportError:
     from urlparse import urljoin
 from io import BytesIO
 import zipfile
-import warnings
-import functools
 
 try:
     import requests
@@ -25,6 +23,8 @@ except ImportError:
     HAVE_REQUESTS = False
 
 from . import __version__
+from .exceptions import PyMISPError, NewEventError, NewAttributeError, SearchError, MissingDependency, NoURL, NoKey
+from .mispevent import MISPEvent, MISPAttribute
 
 # Least dirty way to support python 2 and 3
 try:
@@ -56,36 +56,6 @@ class analysis(object):
     completed = 2
 
 
-class PyMISPError(Exception):
-    def __init__(self, message):
-        super(PyMISPError, self).__init__(message)
-        self.message = message
-
-
-class NewEventError(PyMISPError):
-    pass
-
-
-class NewAttributeError(PyMISPError):
-    pass
-
-
-class SearchError(PyMISPError):
-    pass
-
-
-class MissingDependency(PyMISPError):
-    pass
-
-
-class NoURL(PyMISPError):
-    pass
-
-
-class NoKey(PyMISPError):
-    pass
-
-
 class PyMISP(object):
     """
         Python API for MISP
@@ -101,6 +71,9 @@ class PyMISP(object):
         :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
         :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
     """
+
+# TODO: interactive script to create a MISP event from scratch
+# TODO: a parser to verify the validity of an event
 
     # So it can may be accessed from the misp object.
     distributions = distributions
@@ -138,6 +111,11 @@ class PyMISP(object):
         self.categories = self.describe_types['result']['categories']
         self.types = self.describe_types['result']['types']
         self.category_type_mapping = self.describe_types['result']['category_type_mappings']
+        # New in 2.5.52
+        if self.describe_types['result'].get('sane_defaults'):
+            self.sane_default = self.describe_types['result']['sane_defaults']
+        else:
+            self.sane_default = {}
 
     def __prepare_session(self, output='json'):
         """
@@ -311,53 +289,16 @@ class PyMISP(object):
     # ##############################################
 
     def _prepare_full_event(self, distribution, threat_level_id, analysis, info, date=None, published=False):
-        to_return = {'Event': {}}
-        # Setup details of a new event
-        if distribution not in [0, 1, 2, 3]:
-            raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(distribution))
-        if threat_level_id not in [1, 2, 3, 4]:
-            raise NewEventError('{} is invalid, the threat_level_id has to be in 1, 2, 3, 4'.format(threat_level_id))
-        if analysis not in [0, 1, 2]:
-            raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(analysis))
-        if date is None:
-            date = datetime.date.today().isoformat()
-        if published not in [True, False]:
-            raise NewEventError('{} is invalid, published has to be True or False'.format(published))
-        to_return['Event'] = {'distribution': distribution, 'info': info, 'date': date, 'published': published,
-                              'threat_level_id': threat_level_id, 'analysis': analysis}
-        return to_return
+        misp_event = MISPEvent(self.describe_types['result'])
+        misp_event.set_values(info, distribution, threat_level_id, analysis, date)
+        if published:
+            misp_event.publish()
+        return misp_event.dump()
 
-    def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=None):
-        to_return = {}
-        if category not in self.categories:
-            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(self.categories))))
-
-        if type_value not in self.types:
-            raise NewAttributeError('{} is invalid, type_value has to be in {}'.format(type_value, (', '.join(self.types))))
-
-        if type_value not in self.category_type_mapping[category]:
-            raise NewAttributeError('{} and {} is an invalid combinaison, type_value for this category has to be in {}'.format(type_value, category, (', '.join(self.category_type_mapping[category]))))
-        to_return['type'] = type_value
-        to_return['category'] = category
-
-        if to_ids not in [True, False]:
-            raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(to_ids))
-        to_return['to_ids'] = to_ids
-
-        if distribution is not None:
-            distribution = int(distribution)
-        # If None: take the default value of the event
-        if distribution not in [None, 0, 1, 2, 3, 5]:
-            raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 5 or None'.format(distribution))
-        if distribution is not None:
-            to_return['distribution'] = distribution
-
-        to_return['value'] = value
-
-        if comment is not None:
-            to_return['comment'] = comment
-
-        return to_return
+    def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5):
+        misp_attribute = MISPAttribute(self.categories, self.types, self.category_type_mapping)
+        misp_attribute.set_values(type_value, value, category, to_ids, comment, distribution)
+        return misp_attribute.dump()
 
     def _prepare_update(self, event):
         # Cleanup the received event to make it publishable
@@ -381,30 +322,30 @@ class PyMISP(object):
     # ########## Helpers ##########
 
     def get(self, eid):
-        response = self.get_event(int(eid))
-        return response
+        return self.get_event(eid)
 
     def get_stix(self, **kwargs):
-        response = self.get_stix_event(**kwargs)
-        return response
+        return self.get_stix_event(**kwargs)
 
     def update(self, event):
         eid = event['Event']['id']
-        response = self.update_event(eid, event)
-        return response
-
-    def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
-        data = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
-        response = self.add_event(data)
-        return response
+        return self.update_event(eid, event)
 
     def publish(self, event):
         if event['Event']['published']:
             return {'error': 'Already published'}
         event = self._prepare_update(event)
         event['Event']['published'] = True
-        response = self.update_event(event['Event']['id'], event)
-        return response
+        return self.update_event(event['Event']['id'], event)
+
+    def change_threat_level(self, event, threat_level_id):
+        event['Event']['threat_level_id'] = threat_level_id
+        self._prepare_update(event)
+        return self.update_event(event['Event']['id'], event)
+
+    def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
+        data = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
+        return self.add_event(data)
 
     def add_tag(self, event, tag):
         session = self.__prepare_session()
@@ -417,12 +358,6 @@ class PyMISP(object):
         to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
         response = session.post(urljoin(self.root_url, 'events/removeTag'), data=json.dumps(to_post))
         return self._check_response(response)
-
-    def change_threat_level(self, event, threat_level_id):
-        event['Event']['threat_level_id'] = threat_level_id
-        self._prepare_update(event)
-        response = self.update_event(event['Event']['id'], event)
-        return response
 
     # ##### File attributes #####
 
@@ -708,21 +643,9 @@ class PyMISP(object):
     # ######### Upload samples through the API #########
     # ##################################################
 
-    def _create_event(self, distribution, threat_level_id, analysis, info):
-        # Setup details of a new event
-        if distribution not in [0, 1, 2, 3]:
-            raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(distribution))
-        if threat_level_id not in [1, 2, 3, 4]:
-            raise NewEventError('{} is invalid, the threat_level_id has to be in 1, 2, 3, 4'.format(threat_level_id))
-        if analysis not in [0, 1, 2]:
-            raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(analysis))
-        return {'distribution': int(distribution), 'info': info,
-                'threat_level_id': int(threat_level_id), 'analysis': analysis}
-
     def prepare_attribute(self, event_id, distribution, to_ids, category, comment, info,
                           analysis, threat_level_id):
         to_post = {'request': {}}
-        authorized_categs = ['Payload delivery', 'Artifacts dropped', 'Payload installation', 'External analysis', 'Network activity', 'Antivirus detection']
 
         if event_id is not None:
             try:
@@ -731,7 +654,7 @@ class PyMISP(object):
                 pass
         if not isinstance(event_id, int):
             # New event
-            to_post['request'] = self._create_event(distribution, threat_level_id, analysis, info)
+            to_post['request'] = self._prepare_full_event(distribution, threat_level_id, analysis, info)
         else:
             to_post['request']['event_id'] = int(event_id)
 
@@ -739,8 +662,8 @@ class PyMISP(object):
             raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(to_ids))
         to_post['request']['to_ids'] = to_ids
 
-        if category not in authorized_categs:
-            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(authorized_categs))))
+        if category not in self.categories:
+            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(self.categories))))
         to_post['request']['category'] = category
 
         to_post['request']['comment'] = comment
