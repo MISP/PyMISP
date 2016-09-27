@@ -4,6 +4,17 @@
 import datetime
 import time
 import json
+from json import JSONEncoder
+import os
+try:
+    from dateutil.parser import parse
+except ImportError:
+    pass
+
+try:
+    import jsonschema
+except ImportError:
+    pass
 
 from .exceptions import PyMISPError, NewEventError, NewAttributeError
 
@@ -14,8 +25,9 @@ class MISPAttribute(object):
         self.categories = categories
         self.types = types
         self.category_type_mapping = category_type_mapping
-        self.new = True
+        self._reinitialize_attribute()
 
+    def _reinitialize_attribute(self):
         # Default values
         self.category = None
         self.type = None
@@ -24,53 +36,106 @@ class MISPAttribute(object):
         self.comment = ''
         self.distribution = 5
 
-    def set_values(self, type_value, value, category, to_ids, comment, distribution):
-        self._validate(type_value, value, category, to_ids, comment, distribution)
-        self.type = type_value
-        self.value = value
-        self.category = category
-        self.to_ids = to_ids
-        self.comment = comment
-        self.distribution = distribution
+        # other possible values
+        self.id = None
+        self.uuid = None
+        self.timestamp = None
+        self.sharing_group_id = None
+        self.deleted = None
+        self.SharingGroup = []
+        self.ShadowAttribute = []
 
-    def set_values_existing_attribute(self, attribute_id, uuid, timestamp, sharing_group_id, deleted, SharingGroup, ShadowAttribute):
-        self.new = False
-        self.id = int(attribute_id)
-        self.uuid = uuid
-        self.timestamp = datetime.datetime.fromtimestamp(timestamp)
-        self.sharing_group_id = int(sharing_group_id)
-        self.deleted = deleted
-        self.SharingGroup = SharingGroup
-        self.ShadowAttribute = ShadowAttribute
+    def set_all_values(self, **kwargs):
+        # Default values
+        if kwargs.get('category', None):
+            self.category = kwargs['category']
+            if self.category not in self.categories:
+                raise NewAttributeError('{} is invalid, category has to be in {}'.format(self.category, (', '.join(self.categories))))
+        if kwargs.get('type', None):
+            self.type = kwargs['type']
+            if self.type not in self.types:
+                raise NewAttributeError('{} is invalid, type_value has to be in {}'.format(self.type, (', '.join(self.types))))
+            if self.type not in self.category_type_mapping[self.category]:
+                raise NewAttributeError('{} and {} is an invalid combinaison, type_value for this category has to be in {}'.capitalizeformat(self.type, self.category, (', '.join(self.category_type_mapping[self.category]))))
+        if kwargs.get('value', None):
+            self.value = kwargs['value']
+        if kwargs.get('to_ids', None):
+            self.to_ids = kwargs['to_ids']
+            if not isinstance(self.to_ids, bool):
+                raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
+        if kwargs.get('comment', None):
+            self.comment = kwargs['comment']
+        if kwargs.get('distribution', None):
+            self.distribution = int(kwargs['distribution'])
+            if self.distribution not in [0, 1, 2, 3, 5]:
+                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 5'.format(self.distribution))
 
-    def _validate(self, type_value, value, category, to_ids, comment, distribution):
-        if category not in self.categories:
-            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(self.categories))))
-        if type_value not in self.types:
-            raise NewAttributeError('{} is invalid, type_value has to be in {}'.format(type_value, (', '.join(self.types))))
-        if type_value not in self.category_type_mapping[category]:
-            raise NewAttributeError('{} and {} is an invalid combinaison, type_value for this category has to be in {}'.capitalizeformat(type_value, category, (', '.join(self.category_type_mapping[category]))))
-        if to_ids not in [True, False]:
-            raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(to_ids))
-        if distribution not in [0, 1, 2, 3, 5]:
-            raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 5'.format(distribution))
+        # other possible values
+        if kwargs.get('id', None):
+            self.id = int(kwargs['id'])
+        if kwargs.get('uuid', None):
+            self.uuid = kwargs['uuid']
+        if kwargs.get('timestamp', None):
+            self.timestamp = datetime.datetime.fromtimestamp(int(kwargs['timestamp']))
+        if kwargs.get('sharing_group_id', None):
+            self.sharing_group_id = int(kwargs['sharing_group_id'])
+        if kwargs.get('deleted', None):
+            self.deleted = kwargs['deleted']
+        if kwargs.get('SharingGroup', None):
+            self.SharingGroup = kwargs['SharingGroup']
+        if kwargs.get('ShadowAttribute', None):
+            self.ShadowAttribute = kwargs['ShadowAttribute']
 
-    def dump(self):
+    def _json(self):
         to_return = {'type': self.type, 'category': self.category, 'to_ids': self.to_ids,
                      'distribution': self.distribution, 'value': self.value,
                      'comment': self.comment}
-        if not self.new:
-            to_return.update(
-                {'id': self.id, 'uuid': self.uuid,
-                 'timestamp': int(time.mktime(self.timestamp.timetuple())),
-                 'sharing_group_id': self.sharing_group_id, 'deleted': self.deleted,
-                 'SharingGroup': self.SharingGroup, 'ShadowAttribute': self.ShadowAttribute})
+        if self.sharing_group_id:
+            to_return['sharing_group_id'] = self.sharing_group_id
         return to_return
+
+    def _json_full(self):
+        to_return = self._json()
+        if self.id:
+            to_return['id'] = self.id
+        if self.uuid:
+            to_return['uuid'] = self.uuid
+        if self.timestamp:
+            to_return['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
+        if self.deleted is not None:
+            to_return['deleted'] = self.deleted
+        if self.ShadowAttribute:
+            to_return['ShadowAttribute'] = self.ShadowAttribute
+        if self.SharingGroup:
+            to_return['SharingGroup'] = self.SharingGroup
+        return to_return
+
+
+class EncodeUpdate(JSONEncoder):
+    def default(self, obj):
+        try:
+            return obj._json()
+        except AttributeError:
+            return JSONEncoder.default(self, obj)
+
+
+class EncodeFull(JSONEncoder):
+    def default(self, obj):
+        try:
+            return obj._json_full()
+        except AttributeError:
+            return JSONEncoder.default(self, obj)
 
 
 class MISPEvent(object):
 
-    def __init__(self, describe_types):
+    def __init__(self, describe_types=None):
+        self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+        self.json_schema = json.load(open(os.path.join(self.ressources_path, 'schema.json'), 'r'))
+        self.json_schema_lax = json.load(open(os.path.join(self.ressources_path, 'schema-lax.json'), 'r'))
+        if not describe_types:
+            t = json.load(open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r'))
+            describe_types = t['result']
         self.categories = describe_types['categories']
         self.types = describe_types['types']
         self.category_type_mapping = describe_types['category_type_mappings']
@@ -78,7 +143,10 @@ class MISPEvent(object):
         self.new = True
         self.dump_full = False
 
-        # Default values
+        self._reinitialize_event()
+
+    def _reinitialize_event(self):
+        # Default values for a valid event to send to a MISP instance
         self.distribution = 3
         self.threat_level_id = 2
         self.analysis = 0
@@ -87,104 +155,159 @@ class MISPEvent(object):
         self.date = datetime.date.today()
         self.attributes = []
 
-    def _validate(self, distribution, threat_level_id, analysis):
-        if distribution not in [0, 1, 2, 3]:
-            raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(distribution))
-        if threat_level_id not in [1, 2, 3, 4]:
-            raise NewEventError('{} is invalid, the threat_level has to be in 1, 2, 3, 4'.format(threat_level_id))
-        if analysis not in [0, 1, 2]:
-            raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(analysis))
+        # All other keys
+        self.id = None
+        self.orgc_id = None
+        self.org_id = None
+        self.uuid = None
+        self.attribute_count = None
+        self.timestamp = None
+        self.proposal_email_lock = None
+        self.locked = None
+        self.publish_timestamp = None
+        self.sharing_group_id = None
+        self.Org = None
+        self.Orgc = None
+        self.ShadowAttribute = []
+        self.RelatedEvent = []
+        self.Tag = []
 
     def load(self, json_event):
         self.new = False
         self.dump_full = True
-        loaded = json.loads(json_event)
-        if loaded.get('response'):
-            e = loaded.get('response')[0].get('Event')
+        if isinstance(json_event, str):
+            loaded = json.loads(json_event)
+            if loaded.get('response'):
+                event = loaded.get('response')[0]
+            else:
+                event = loaded
+            if not event:
+                raise PyMISPError('Invalid event')
         else:
-            e = loaded.get('Event')
-        if not e:
-            raise PyMISPError('Invalid event')
-        try:
-            date = datetime.date(*map(int, e['date'].split('-')))
-        except:
-            raise NewEventError('{} is an invalid date.'.format(e['date']))
-        self.set_values(e['info'], int(e['distribution']), int(e['threat_level_id']), int(e['analysis']), date)
-        if e['published']:
-            self.publish()
-        self.set_values_existing_event(
-            e['id'], e['orgc_id'], e['org_id'], e['uuid'],
-            e['attribute_count'], e['proposal_email_lock'], e['locked'],
-            e['publish_timestamp'], e['sharing_group_id'], e['Org'], e['Orgc'],
-            e['ShadowAttribute'], e['RelatedEvent'])
-        self.attributes = []
-        for a in e['Attribute']:
-            attribute = MISPAttribute(self.categories, self.types, self.category_type_mapping)
-            attribute.set_values(a['type'], a['value'], a['category'], a['to_ids'],
-                                 a['comment'], int(a['distribution']))
-            attribute.set_values_existing_attribute(a['id'], a['uuid'], a['timestamp'],
-                                                    a['sharing_group_id'], a['deleted'],
-                                                    a['SharingGroup'], a['ShadowAttribute'])
-            self.attributes.append(attribute)
+            event = json_event
+        jsonschema.validate(event, self.json_schema_lax)
+        e = event.get('Event')
+        self._reinitialize_event()
+        self.set_all_values(**e)
 
-    def dump(self):
+    def set_all_values(self, **kwargs):
+        # Default values for a valid event to send to a MISP instance
+        if kwargs.get('distribution', None) is not None:
+            self.distribution = int(kwargs['distribution'])
+            if self.distribution not in [0, 1, 2, 3]:
+                raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(self.distribution))
+        if kwargs.get('threat_level_id', None) is not None:
+            self.threat_level_id = int(kwargs['threat_level_id'])
+            if self.threat_level_id not in [1, 2, 3, 4]:
+                raise NewEventError('{} is invalid, the threat_level has to be in 1, 2, 3, 4'.format(self.threat_level_id))
+        if kwargs.get('analysis', None) is not None:
+            self.analysis = int(kwargs['analysis'])
+            if self.analysis not in [0, 1, 2]:
+                raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(self.analysis))
+        if kwargs.get('info', None):
+            self.info = kwargs['info']
+        if kwargs.get('published', None) is not None:
+            self.publish()
+        if kwargs.get('date', None):
+            if isinstance(kwargs['date'], str):
+                self.date = parse(kwargs['date'])
+            elif isinstance(kwargs['date'], datetime.datetime):
+                self.date = kwargs['date'].date()
+            elif isinstance(kwargs['date'], datetime.date):
+                self.date = kwargs['date']
+            else:
+                raise NewEventError('Invalid format for the date: {} - {}'.format(kwargs['date'], type(kwargs['date'])))
+        if kwargs.get('Attribute', None):
+            for a in kwargs['Attribute']:
+                attribute = MISPAttribute(self.categories, self.types, self.category_type_mapping)
+                attribute.set_all_values(**a)
+                self.attributes.append(attribute)
+
+        # All other keys
+        if kwargs.get('id', None):
+            self.id = int(kwargs['id'])
+        if kwargs.get('orgc_id', None):
+            self.orgc_id = int(kwargs['orgc_id'])
+        if kwargs.get('org_id', None):
+            self.org_id = int(kwargs['org_id'])
+        if kwargs.get('uuid', None):
+            self.uuid = kwargs['uuid']
+        if kwargs.get('attribute_count', None):
+            self.attribute_count = int(kwargs['attribute_count'])
+        if kwargs.get('timestamp', None):
+            self.timestamp = datetime.datetime.fromtimestamp(int(kwargs['timestamp']))
+        if kwargs.get('proposal_email_lock', None):
+            self.proposal_email_lock = kwargs['proposal_email_lock']
+        if kwargs.get('locked', None):
+            self.locked = kwargs['locked']
+        if kwargs.get('publish_timestamp', None):
+            self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs['publish_timestamp']))
+        if kwargs.get('sharing_group_id', None):
+            self.sharing_group_id = int(kwargs['sharing_group_id'])
+        if kwargs.get('Org', None):
+            self.Org = kwargs['Org']
+        if kwargs.get('Orgc', None):
+            self.Orgc = kwargs['Orgc']
+        if kwargs.get('ShadowAttribute', None):
+            self.ShadowAttribute = kwargs['ShadowAttribute']
+        if kwargs.get('RelatedEvent', None):
+            self.RelatedEvent = kwargs['RelatedEvent']
+        if kwargs.get('Tag', None):
+            self.Tag = kwargs['Tag']
+
+    def _json(self):
         to_return = {'Event': {}}
         to_return['Event'] = {'distribution': self.distribution, 'info': self.info,
                               'date': self.date.isoformat(), 'published': self.published,
                               'threat_level_id': self.threat_level_id,
                               'analysis': self.analysis, 'Attribute': []}
-        if not self.new:
-            to_return['Event'].update(
-                {'id': self.id, 'orgc_id': self.orgc_id, 'org_id': self.org_id,
-                 'uuid': self.uuid, 'sharing_group_id': self.sharing_group_id})
-        if self.dump_full:
-            to_return['Event'].update(
-                {'locked': self.locked, 'attribute_count': self.attribute_count,
-                 'RelatedEvent': self.RelatedEvent, 'Orgc': self.Orgc,
-                 'ShadowAttribute': self.ShadowAttribute, 'Org': self.Org,
-                 'proposal_email_lock': self.proposal_email_lock,
-                 'publish_timestamp': int(time.mktime(self.publish_timestamp.timetuple()))})
-        to_return['Event']['Attribute'] = [a.dump() for a in self.attributes]
-        return json.dumps(to_return)
+        if self.id:
+            to_return['Event']['id'] = self.id
+        if self.orgc_id:
+            to_return['Event']['orgc_id'] = self.orgc_id
+        if self.org_id:
+            to_return['Event']['org_id'] = self.org_id
+        if self.uuid:
+            to_return['Event']['uuid'] = self.uuid
+        if self.sharing_group_id:
+            to_return['Event']['sharing_group_id'] = self.sharing_group_id
+        if self.Tag:
+            to_return['Event']['Tag'] = self.Tag
+        to_return['Event']['Attribute'] = [a._json() for a in self.attributes]
+        jsonschema.validate(to_return, self.json_schema)
+        return to_return
 
-    def set_values(self, info, distribution=3, threat_level_id=2, analysis=0, date=None):
-        self._validate(distribution, threat_level_id, analysis)
-        self.info = info
-        self.distribution = distribution
-        self.threat_level_id = threat_level_id
-        self.analysis = analysis
-        if not date:
-            self.date = datetime.date.today()
-        else:
-            self.date = date
-
-    def set_values_existing_event(self, event_id, orgc_id, org_id, uuid, attribute_count,
-                                  proposal_email_lock, locked, publish_timestamp,
-                                  sharing_group_id, Org, Orgc, ShadowAttribute,
-                                  RelatedEvent):
-        self.id = int(event_id)
-        self.orgc_id = int(orgc_id)
-        self.org_id = int(org_id)
-        self.uuid = uuid
-        self.attribute_count = int(attribute_count)
-        self.proposal_email_lock = proposal_email_lock
-        self.locked = locked
-        self.publish_timestamp = datetime.datetime.fromtimestamp(publish_timestamp)
-        self.sharing_group_id = int(sharing_group_id)
-        self.Org = Org
-        self.Orgc = Orgc
-        self.ShadowAttribute = ShadowAttribute
-        self.RelatedEvent = RelatedEvent
+    def _json_full(self):
+        to_return = self._json()
+        if self.locked is not None:
+            to_return['Event']['locked'] = self.locked
+        if self.attribute_count:
+            to_return['Event']['attribute_count'] = self.attribute_count
+        if self.RelatedEvent:
+            to_return['Event']['RelatedEvent'] = self.RelatedEvent
+        if self.Org:
+            to_return['Event']['Org'] = self.Org
+        if self.Orgc:
+            to_return['Event']['Orgc'] = self.Orgc
+        if self.ShadowAttribute:
+            to_return['Event']['ShadowAttribute'] = self.ShadowAttribute
+        if self.proposal_email_lock is not None:
+            to_return['Event']['proposal_email_lock'] = self.proposal_email_lock
+        if self.locked is not None:
+            to_return['Event']['locked'] = self.locked
+        if self.publish_timestamp:
+            to_return['Event']['publish_timestamp'] = int(time.mktime(self.publish_timestamp.timetuple()))
+        if self.timestamp:
+            to_return['Event']['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
+        to_return['Event']['Attribute'] = [a._json_full() for a in self.attributes]
+        jsonschema.validate(to_return, self.json_schema)
+        return to_return
 
     def publish(self):
-        self.publish = True
+        self.published = True
 
     def unpublish(self):
-        self.publish = False
-
-    def prepare_for_update(self):
-        self.unpublish()
-        self.dump_full = False
+        self.published = False
 
     def add_attribute(self, type_value, value, **kwargs):
         if not self.sane_default.get(type_value):
@@ -207,5 +330,6 @@ class MISPEvent(object):
         else:
             distribution = 5
         attribute = MISPAttribute(self.categories, self.types, self.category_type_mapping)
-        attribute.set_values(type_value, value, category, to_ids, comment, distribution)
+        attribute.set_all_values(type=type_value, value=value, category=category,
+                                 to_ids=to_ids, comment=comment, distribution=distribution)
         self.attributes.append(attribute)

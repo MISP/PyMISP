@@ -23,8 +23,8 @@ except ImportError:
     HAVE_REQUESTS = False
 
 from . import __version__
-from .exceptions import PyMISPError, NewEventError, NewAttributeError, SearchError, MissingDependency, NoURL, NoKey
-from .mispevent import MISPEvent, MISPAttribute
+from .exceptions import PyMISPError, NewAttributeError, SearchError, MissingDependency, NoURL, NoKey
+from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
 
 # Least dirty way to support python 2 and 3
 try:
@@ -290,30 +290,17 @@ class PyMISP(object):
 
     def _prepare_full_event(self, distribution, threat_level_id, analysis, info, date=None, published=False):
         misp_event = MISPEvent(self.describe_types['result'])
-        misp_event.set_values(info, distribution, threat_level_id, analysis, date)
+        misp_event.set_all_values(info=info, distribution=distribution, threat_level_id=threat_level_id,
+                                  analysis=analysis, date=date)
         if published:
             misp_event.publish()
-        return misp_event.dump()
+        return json.dumps(misp_event, cls=EncodeUpdate)
 
     def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5):
         misp_attribute = MISPAttribute(self.categories, self.types, self.category_type_mapping)
-        misp_attribute.set_values(type_value, value, category, to_ids, comment, distribution)
-        return misp_attribute.dump()
-
-    def _prepare_update(self, event):
-        # Cleanup the received event to make it publishable
-        event['Event'].pop('locked', None)
-        event['Event'].pop('attribute_count', None)
-        event['Event'].pop('RelatedEvent', None)
-        event['Event'].pop('orgc', None)
-        event['Event'].pop('ShadowAttribute', None)
-        event['Event'].pop('org', None)
-        event['Event'].pop('proposal_email_lock', None)
-        event['Event'].pop('publish_timestamp', None)
-        event['Event'].pop('published', None)
-        event['Event'].pop('timestamp', None)
-        event['Event']['id'] = int(event['Event']['id'])
-        return event
+        misp_attribute.set_all_values(type=type_value, value=value, category=category,
+                                      to_ids=to_ids, comment=comment, distribution=distribution)
+        return json.dumps(misp_attribute, cls=EncodeUpdate)
 
     def _one_or_more(self, value):
         """Returns a list/tuple of one or more items, regardless of input."""
@@ -334,14 +321,16 @@ class PyMISP(object):
     def publish(self, event):
         if event['Event']['published']:
             return {'error': 'Already published'}
-        event = self._prepare_update(event)
-        event['Event']['published'] = True
-        return self.update_event(event['Event']['id'], event)
+        e = MISPEvent(self.describe_types['result'])
+        e.load(event)
+        e.publish()
+        return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
 
     def change_threat_level(self, event, threat_level_id):
-        event['Event']['threat_level_id'] = threat_level_id
-        self._prepare_update(event)
-        return self.update_event(event['Event']['id'], event)
+        e = MISPEvent(self.describe_types['result'])
+        e.load(event)
+        e.threat_level_id = threat_level_id
+        return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
         data = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
@@ -365,12 +354,12 @@ class PyMISP(object):
         if proposal:
             response = self.proposal_add(event['Event']['id'], attributes)
         else:
-            event = self._prepare_update(event)
-            for a in attributes:
+            e = MISPEvent(self.describe_types['result'])
+            e.load(event)
+            for a in e.attributes:
                 if a.get('distribution') is None:
                     a['distribution'] = 5
-            event['Event']['Attribute'] = attributes
-            response = self.update_event(event['Event']['id'], event)
+            response = self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
         return response
 
     def add_named_attribute(self, event, category, type_value, value, to_ids=False, comment=None, distribution=None, proposal=False):
