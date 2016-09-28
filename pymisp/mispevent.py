@@ -18,6 +18,12 @@ except ImportError:
 
 from .exceptions import PyMISPError, NewEventError, NewAttributeError
 
+# Least dirty way to support python 2 and 3
+try:
+    basestring
+except NameError:
+    basestring = str
+
 
 class MISPAttribute(object):
 
@@ -192,7 +198,7 @@ class MISPEvent(object):
     def load(self, json_event):
         self.new = False
         self.dump_full = True
-        if isinstance(json_event, str):
+        if isinstance(json_event, basestring):
             loaded = json.loads(json_event)
             if loaded.get('response'):
                 event = loaded.get('response')[0]
@@ -230,7 +236,7 @@ class MISPEvent(object):
         if kwargs.get('published') is not None:
             self.publish()
         if kwargs.get('date'):
-            if isinstance(kwargs['date'], str):
+            if isinstance(kwargs['date'], basestring):
                 self.date = parse(kwargs['date'])
             elif isinstance(kwargs['date'], datetime.datetime):
                 self.date = kwargs['date'].date()
