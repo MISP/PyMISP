@@ -111,7 +111,8 @@ class TestOffline(unittest.TestCase):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         m.register_uri('POST', self.domain + 'events', json=error_empty_info)
-        response = pymisp.new_event(0, 1, 0)
+        # TODO Add test exception if info field isn't set
+        response = pymisp.new_event(0, 1, 0, 'Foo')
         self.assertEqual(response, error_empty_info_flatten)
         m.register_uri('POST', self.domain + 'events', json=self.new_misp_event)
         response = pymisp.new_event(0, 1, 0, "This is a test.", '2016-08-26', False)

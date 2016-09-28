@@ -23,8 +23,9 @@ except ImportError:
     HAVE_REQUESTS = False
 
 from . import __version__
-from .exceptions import PyMISPError, NewAttributeError, SearchError, MissingDependency, NoURL, NoKey
+from .exceptions import PyMISPError, SearchError, MissingDependency, NoURL, NoKey
 from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
+
 
 # Least dirty way to support python 2 and 3
 try:
@@ -297,10 +298,10 @@ class PyMISP(object):
         return json.dumps(misp_event, cls=EncodeUpdate)
 
     def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5):
-        misp_attribute = MISPAttribute(self.categories, self.types, self.category_type_mapping)
+        misp_attribute = MISPAttribute(self.describe_types['result'])
         misp_attribute.set_all_values(type=type_value, value=value, category=category,
                                       to_ids=to_ids, comment=comment, distribution=distribution)
-        return json.dumps(misp_attribute, cls=EncodeUpdate)
+        return misp_attribute
 
     def _one_or_more(self, value):
         """Returns a list/tuple of one or more items, regardless of input."""
@@ -356,19 +357,14 @@ class PyMISP(object):
         else:
             e = MISPEvent(self.describe_types['result'])
             e.load(event)
-            for a in e.attributes:
-                if a.get('distribution') is None:
-                    a['distribution'] = 5
+            e.attributes += attributes
             response = self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
         return response
 
-    def add_named_attribute(self, event, category, type_value, value, to_ids=False, comment=None, distribution=None, proposal=False):
+    def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        if value and category and type:
-            try:
-                attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
-            except NewAttributeError as e:
-                return e
+        for value in self._one_or_more(value):
+            attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, ssdeep=None, comment=None, to_ids=True, distribution=None, proposal=False):
@@ -632,8 +628,8 @@ class PyMISP(object):
     # ######### Upload samples through the API #########
     # ##################################################
 
-    def prepare_attribute(self, event_id, distribution, to_ids, category, comment, info,
-                          analysis, threat_level_id):
+    def _prepare_upload(self, event_id, distribution, to_ids, category, comment, info,
+                        analysis, threat_level_id):
         to_post = {'request': {}}
 
         if event_id is not None:
@@ -647,12 +643,13 @@ class PyMISP(object):
         else:
             to_post['request']['event_id'] = int(event_id)
 
-        if to_ids not in [True, False]:
-            raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(to_ids))
+        default_values = self.sane_default['malware-sample']
+        if to_ids is None or not isinstance(to_ids, bool):
+            to_ids = bool(int(default_values['to_ids']))
         to_post['request']['to_ids'] = to_ids
 
-        if category not in self.categories:
-            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(self.categories))))
+        if category is None or category not in self.categories:
+            category = default_values['default_category']
         to_post['request']['category'] = category
 
         to_post['request']['comment'] = comment
@@ -665,16 +662,16 @@ class PyMISP(object):
     def upload_sample(self, filename, filepath, event_id, distribution=None,
                       to_ids=True, category=None, comment=None, info=None,
                       analysis=None, threat_level_id=None):
-        to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
-                                         comment, info, analysis, threat_level_id)
+        to_post = self._prepare_upload(event_id, distribution, to_ids, category,
+                                       comment, info, analysis, threat_level_id)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
         return self._upload_sample(to_post)
 
     def upload_samplelist(self, filepaths, event_id, distribution=None,
                           to_ids=True, category=None, info=None,
                           analysis=None, threat_level_id=None):
-        to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
-                                         info, analysis, threat_level_id)
+        to_post = self._prepare_upload(event_id, distribution, to_ids, category,
+                                       info, analysis, threat_level_id)
         files = []
         for path in filepaths:
             if not os.path.isfile(path):
@@ -694,18 +691,14 @@ class PyMISP(object):
     # ############################
 
     def __query_proposal(self, session, path, id, attribute=None):
-        path = path.strip('/')
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
-        query = None
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
-        if path == 'view':
+            response = session.post(url, data=json.dumps(query))
+        elif path == 'view':
             response = session.get(url)
-        else:
-            if query is not None:
-                response = session.post(url, data=json.dumps(query))
-            else:
-                response = session.post(url)
+        else:  # accept or discard
+            response = session.post(url)
         return self._check_response(response)
 
     def proposal_view(self, event_id=None, proposal_id=None):
