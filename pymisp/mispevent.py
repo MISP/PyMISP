@@ -114,6 +114,7 @@ class MISPAttribute(object):
                      'comment': self.comment}
         if self.sharing_group_id:
             to_return['sharing_group_id'] = self.sharing_group_id
+        to_return = _int_to_str(to_return)
         return to_return
 
     def _json_full(self):
@@ -130,6 +131,7 @@ class MISPAttribute(object):
             to_return['ShadowAttribute'] = self.ShadowAttribute
         if self.SharingGroup:
             to_return['SharingGroup'] = self.SharingGroup
+        to_return = _int_to_str(to_return)
         return to_return
 
 
@@ -147,6 +149,14 @@ class EncodeFull(JSONEncoder):
             return obj._json_full()
         except AttributeError:
             return JSONEncoder.default(self, obj)
+
+
+def _int_to_str(d):
+    # transform all integer back to string
+    for k, v in d.items():
+        if isinstance(v, int) and not isinstance(v, bool):
+            d[k] = str(v)
+    return d
 
 
 class MISPEvent(object):
@@ -300,6 +310,7 @@ class MISPEvent(object):
             to_return['Event']['sharing_group_id'] = self.sharing_group_id
         if self.Tag:
             to_return['Event']['Tag'] = self.Tag
+        to_return['Event'] = _int_to_str(to_return['Event'])
         to_return['Event']['Attribute'] = [a._json() for a in self.attributes]
         jsonschema.validate(to_return, self.json_schema)
         return to_return
@@ -308,7 +319,7 @@ class MISPEvent(object):
         to_return = self._json()
         if self.locked is not None:
             to_return['Event']['locked'] = self.locked
-        if self.attribute_count:
+        if self.attribute_count is not None:
             to_return['Event']['attribute_count'] = self.attribute_count
         if self.RelatedEvent:
             to_return['Event']['RelatedEvent'] = self.RelatedEvent
@@ -326,6 +337,7 @@ class MISPEvent(object):
             to_return['Event']['publish_timestamp'] = int(time.mktime(self.publish_timestamp.timetuple()))
         if self.timestamp:
             to_return['Event']['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
+        to_return['Event'] = _int_to_str(to_return['Event'])
         to_return['Event']['Attribute'] = [a._json_full() for a in self.attributes]
         jsonschema.validate(to_return, self.json_schema)
         return to_return

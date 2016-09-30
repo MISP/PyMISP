@@ -9,15 +9,15 @@
       "properties": {
         "id": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/id",
-          "type": "integer"
+          "type": "string"
         },
         "orgc_id": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/orgc_id",
-          "type": "integer"
+          "type": "string"
         },
         "org_id": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/org_id",
-          "type": "integer"
+          "type": "string"
         },
         "date": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/date",
@@ -25,7 +25,7 @@
         },
         "threat_level_id": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/threat_level_id",
-          "type": "integer"
+          "type": "string"
         },
         "info": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/info",
@@ -41,19 +41,19 @@
         },
         "attribute_count": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/attribute_count",
-          "type": "integer"
+          "type": "string"
         },
         "analysis": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/analysis",
-          "type": "integer"
+          "type": "string"
         },
         "timestamp": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/timestamp",
-          "type": "integer"
+          "type": "string"
         },
         "distribution": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/distribution",
-          "type": "integer"
+          "type": "string"
         },
         "proposal_email_lock": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/proposal_email_lock",
@@ -65,11 +65,11 @@
         },
         "publish_timestamp": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/publish_timestamp",
-          "type": "integer"
+          "type": "string"
         },
         "sharing_group_id": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/sharing_group_id",
-          "type": "integer"
+          "type": "string"
         },
         "Org": {
           "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/Org",
@@ -136,15 +136,15 @@
               },
               "event_id": {
                 "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/Attribute/17/event_id",
-                "type": "integer"
+                "type": "string"
               },
               "distribution": {
                 "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/Attribute/17/distribution",
-                "type": "integer"
+                "type": "string"
               },
               "timestamp": {
                 "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/Attribute/17/timestamp",
-                "type": "integer"
+                "type": "string"
               },
               "comment": {
                 "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/Attribute/17/comment",
@@ -152,7 +152,7 @@
               },
               "sharing_group_id": {
                 "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/Attribute/17/sharing_group_id",
-                "type": "integer"
+                "type": "string"
               },
               "value": {
                 "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/Attribute/17/value",
@@ -225,7 +225,7 @@
               },
               "Event": {
                 "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/RelatedEvent/0/Event",
-                "type": "object",
+                "type": "array",
                 "items": {
                   "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/RelatedEvent/0/Event/0",
                   "type": "object",
@@ -240,7 +240,7 @@
                     },
                     "threat_level_id": {
                       "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/RelatedEvent/0/Event/0/threat_level_id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "info": {
                       "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/RelatedEvent/0/Event/0/info",
@@ -260,7 +260,7 @@
                     },
                     "timestamp": {
                       "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/RelatedEvent/0/Event/0/timestamp",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "distribution": {
                       "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/RelatedEvent/0/Event/0/distribution",
@@ -268,11 +268,11 @@
                     },
                     "org_id": {
                       "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/RelatedEvent/0/Event/0/org_id",
-                      "type": "integer"
+                      "type": "string"
                     },
                     "orgc_id": {
                       "id": "https://www.github.com/MISP/MISP/format/2.4/schema.json/Event/RelatedEvent/0/Event/0/orgc_id",
-                      "type": "integer"
+                      "type": "string"
                     }
                   }
                 },
