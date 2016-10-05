@@ -295,7 +295,7 @@ class PyMISP(object):
                                   analysis=analysis, date=date)
         if published:
             misp_event.publish()
-        return json.dumps(misp_event, cls=EncodeUpdate)
+        return misp_event
 
     def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5):
         misp_attribute = MISPAttribute(self.describe_types['result'])
@@ -334,8 +334,8 @@ class PyMISP(object):
         return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
-        data = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
-        return self.add_event(data)
+        misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
+        return self.add_event(json.dumps(misp_event, cls=EncodeUpdate))
 
     def add_tag(self, event, tag):
         session = self.__prepare_session()
@@ -639,7 +639,11 @@ class PyMISP(object):
                 pass
         if not isinstance(event_id, int):
             # New event
-            to_post['request'] = self._prepare_full_event(distribution, threat_level_id, analysis, info)
+            misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info)
+            to_post['request']['distribution'] = misp_event.distribution
+            to_post['request']['info'] = misp_event.info
+            to_post['request']['analysis'] = misp_event.analysis
+            to_post['request']['threat_level_id'] = misp_event.threat_level_id
         else:
             to_post['request']['event_id'] = int(event_id)
 
