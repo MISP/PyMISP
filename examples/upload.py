@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key,misp_verifycert
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
 import glob
@@ -12,8 +12,8 @@ def init(url, key):
     return PyMISP(url, key, misp_verifycert, 'json')
 
 
-def upload_files(m, eid, paths, distrib, ids, categ, info, analysis, threat):
-    out = m.upload_samplelist(paths, eid, distrib, ids, categ, info, analysis, threat)
+def upload_files(m, eid, paths, distrib, ids, categ, comment, info, analysis, threat):
+    out = m.upload_samplelist(paths, eid, distrib, ids, categ, comment, info, analysis, threat)
     print(out)
 
 if __name__ == '__main__':
@@ -26,6 +26,7 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--info", help="Used to populate the event info field if no event ID supplied.")
     parser.add_argument("-a", "--analysis", type=int, help="The analysis level of the newly created event, if applicatble. [0-2]")
     parser.add_argument("-t", "--threat", type=int, help="The threat level ID of the newly created event, if applicatble. [1-4]")
+    parser.add_argument("-co", "--comment", type=str, help="Comment for the uploaded file(s).")
     args = parser.parse_args()
 
     misp = init(misp_url, misp_key)
@@ -39,4 +40,4 @@ if __name__ == '__main__':
         print('invalid file')
         exit(0)
 
-    upload_files(misp, args.event, files, args.distrib, args.ids, args.categ, args.info, args.analysis, args.threat)
+    upload_files(misp, args.event, files, args.distrib, args.ids, args.categ, args.comment, args.info, args.analysis, args.threat)

@@ -668,10 +668,10 @@ class PyMISP(object):
         return self._upload_sample(to_post)
 
     def upload_samplelist(self, filepaths, event_id, distribution=None,
-                          to_ids=True, category=None, info=None,
+                          to_ids=True, category=None, comment=None, info=None,
                           analysis=None, threat_level_id=None):
         to_post = self._prepare_upload(event_id, distribution, to_ids, category,
-                                       info, analysis, threat_level_id)
+                                       comment, info, analysis, threat_level_id)
         files = []
         for path in filepaths:
             if not os.path.isfile(path):
