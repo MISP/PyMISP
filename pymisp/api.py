@@ -112,11 +112,11 @@ class PyMISP(object):
         self.categories = self.describe_types['result']['categories']
         self.types = self.describe_types['result']['types']
         self.category_type_mapping = self.describe_types['result']['category_type_mappings']
-        # New in 2.5.52
         if self.describe_types['result'].get('sane_defaults'):
+            # New in 2.5.52
             self.sane_default = self.describe_types['result']['sane_defaults']
         else:
-            self.sane_default = {}
+            raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
 
     def __prepare_session(self, output='json'):
         """
@@ -131,7 +131,8 @@ class PyMISP(object):
         session.headers.update(
             {'Authorization': self.key,
              'Accept': 'application/{}'.format(output),
-             'content-type': 'application/{}'.format(output)})
+             'content-type': 'application/{}'.format(output),
+             'User-Agent': 'PyMISP {}'.format(__version__)})
         return session
 
     def flatten_error_messages(self, response):
