@@ -102,21 +102,24 @@ class PyMISP(object):
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
-        session = self.__prepare_session()
-        response = session.get(urljoin(self.root_url, 'attributes/describeTypes.json'))
-        self.describe_types = self._check_response(response)
-        if self.describe_types.get('error'):
-            for e in self.describe_types.get('error'):
-                raise PyMISPError('Failed: {}'.format(e))
+        try:
+            session = self.__prepare_session()
+            response = session.get(urljoin(self.root_url, 'attributes/describeTypes.json'))
+            describe_types = self._check_response(response)
+            if describe_types.get('error'):
+                for e in describe_types.get('error'):
+                    raise PyMISPError('Failed: {}'.format(e))
+            self.describe_types = describe_types['result']
+            if not self.describe_types.get('sane_defaults'):
+                raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
+        except:
+            describe_types = json.load(open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r'))
+            self.describe_types = describe_types['result']
 
-        self.categories = self.describe_types['result']['categories']
-        self.types = self.describe_types['result']['types']
-        self.category_type_mapping = self.describe_types['result']['category_type_mappings']
-        if self.describe_types['result'].get('sane_defaults'):
-            # New in 2.5.52
-            self.sane_default = self.describe_types['result']['sane_defaults']
-        else:
-            raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
+        self.categories = self.describe_types['categories']
+        self.types = self.describe_types['types']
+        self.category_type_mapping = self.describe_types['category_type_mappings']
+        self.sane_default = self.describe_types['sane_defaults']
 
     def __prepare_session(self, output='json'):
         """
@@ -291,7 +294,7 @@ class PyMISP(object):
     # ##############################################
 
     def _prepare_full_event(self, distribution, threat_level_id, analysis, info, date=None, published=False):
-        misp_event = MISPEvent(self.describe_types['result'])
+        misp_event = MISPEvent(self.describe_types)
         misp_event.set_all_values(info=info, distribution=distribution, threat_level_id=threat_level_id,
                                   analysis=analysis, date=date)
         if published:
@@ -299,7 +302,7 @@ class PyMISP(object):
         return misp_event
 
     def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5):
-        misp_attribute = MISPAttribute(self.describe_types['result'])
+        misp_attribute = MISPAttribute(self.describe_types)
         misp_attribute.set_all_values(type=type_value, value=value, category=category,
                                       to_ids=to_ids, comment=comment, distribution=distribution)
         return misp_attribute
@@ -323,13 +326,13 @@ class PyMISP(object):
     def publish(self, event):
         if event['Event']['published']:
             return {'error': 'Already published'}
-        e = MISPEvent(self.describe_types['result'])
+        e = MISPEvent(self.describe_types)
         e.load(event)
         e.publish()
         return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
 
     def change_threat_level(self, event, threat_level_id):
-        e = MISPEvent(self.describe_types['result'])
+        e = MISPEvent(self.describe_types)
         e.load(event)
         e.threat_level_id = threat_level_id
         return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
@@ -356,7 +359,7 @@ class PyMISP(object):
         if proposal:
             response = self.proposal_add(event['Event']['id'], attributes)
         else:
-            e = MISPEvent(self.describe_types['result'])
+            e = MISPEvent(self.describe_types)
             e.load(event)
             e.attributes += attributes
             response = self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
