@@ -121,7 +121,7 @@ class TestOffline(unittest.TestCase):
     def test_eventObject(self, m):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
-        misp_event = MISPEvent(pymisp.describe_types['result'])
+        misp_event = MISPEvent(pymisp.describe_types)
         misp_event.load(open('tests/57c4445b-c548-4654-af0b-4be3950d210f.json', 'r').read())
         json.dumps(misp_event, cls=EncodeUpdate)
         json.dumps(misp_event, cls=EncodeFull)
