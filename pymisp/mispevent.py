@@ -311,7 +311,8 @@ class MISPEvent(object):
         if self.Tag:
             to_return['Event']['Tag'] = self.Tag
         to_return['Event'] = _int_to_str(to_return['Event'])
-        to_return['Event']['Attribute'] = [a._json() for a in self.attributes]
+        if self.attributes:
+            to_return['Event']['Attribute'] = [a._json() for a in self.attributes]
         jsonschema.validate(to_return, self.json_schema)
         return to_return
 
@@ -338,7 +339,8 @@ class MISPEvent(object):
         if self.timestamp:
             to_return['Event']['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
         to_return['Event'] = _int_to_str(to_return['Event'])
-        to_return['Event']['Attribute'] = [a._json_full() for a in self.attributes]
+        if self.attributes:
+            to_return['Event']['Attribute'] = [a._json_full() for a in self.attributes]
         jsonschema.validate(to_return, self.json_schema)
         return to_return
 
