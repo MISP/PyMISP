@@ -92,6 +92,7 @@ class PyMISP(object):
         self.ssl = ssl
         self.proxies = proxies
         self.cert = cert
+        self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
         self.debug = debug
