@@ -208,16 +208,23 @@ class MISPEvent(object):
     def load(self, json_event):
         self.new = False
         self.dump_full = True
+        if isinstance(json_event, basestring) and os.path.exists(json_event):
+            # NOTE: is it a good idea? (possible security issue if an untrusted user call this method)
+            json_event = open(json_event, 'r')
+        if hasattr(json_event, 'read'):
+            # python2 and python3 compatible to find if we have a file
+            json_event = json_event.read()
         if isinstance(json_event, basestring):
-            loaded = json.loads(json_event)
-            if loaded.get('response'):
-                event = loaded.get('response')[0]
-            else:
-                event = loaded
-            if not event:
-                raise PyMISPError('Invalid event')
+            json_event = json.loads(json_event)
+        if json_event.get('response'):
+            event = json_event.get('response')[0]
         else:
             event = json_event
+        if not event:
+            raise PyMISPError('Invalid event')
+        # Invalid event created by MISP up to 2.4.52 (attribute_count is none instead of '0')
+        if event.get('Event') and event.get('Event').get('attribute_count') is None:
+            event['Event']['attribute_count'] = '0'
         jsonschema.validate(event, self.json_schema_lax)
         e = event.get('Event')
         self._reinitialize_event()
