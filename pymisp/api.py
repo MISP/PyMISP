@@ -159,6 +159,8 @@ class PyMISP(object):
                                 messages.append('Error in {}: {}'.format(where, msg))
                     else:
                         for e in errors:
+                            if not e:
+                                continue
                             if isinstance(e, str):
                                 messages.append(e)
                                 continue
