@@ -254,7 +254,7 @@ class MISPEvent(object):
             self.publish()
         if kwargs.get('date'):
             if isinstance(kwargs['date'], basestring):
-                self.date = parse(kwargs['date'])
+                self.date = parse(kwargs['date']).date()
             elif isinstance(kwargs['date'], datetime.datetime):
                 self.date = kwargs['date'].date()
             elif isinstance(kwargs['date'], datetime.date):
