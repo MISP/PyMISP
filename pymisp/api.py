@@ -828,7 +828,7 @@ class PyMISP(object):
 
     def search(self, values=None, not_values=None, type_attribute=None,
                category=None, org=None, tags=None, not_tags=None, date_from=None,
-               date_to=None, last=None, controller='events'):
+               date_to=None, last=None, metadata=None, controller='events'):
         """
             Search via the Rest API
 
@@ -869,6 +869,8 @@ class PyMISP(object):
                 query['to'] = date_to
         if last is not None:
             query['last'] = last
+        if metadata is not None:
+            query['metadata'] = metadata
 
         session = self.__prepare_session()
         return self.__query(session, 'restSearch/download', query, controller)
