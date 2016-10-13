@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     if args.days is None:
         args.days = 7
-    result = misp.download_last('{}d'.format(args.days))
+    result = misp.search(last='{}d'.format(args.days), metadata=True)
 
     tools.checkDateConsistancy(args.begindate, args.enddate, tools.getLastdate(args.days))
 

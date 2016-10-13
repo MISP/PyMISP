@@ -5,7 +5,7 @@ from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import tools
-
+import timing
 
 def formattingDataframe(dataframe, dates, NanValue):
     dataframe.reverse()
@@ -49,7 +49,7 @@ if __name__ == '__main__':
         last = '7d'
         title = 'Tags repartition over the last 7 days'
 
-    result = misp.download_last(last)
+    result = misp.search(last=last, metadata=True)
     if 'response' in result:
         events = tools.eventsListBuildFromArray(result)
         result = []
