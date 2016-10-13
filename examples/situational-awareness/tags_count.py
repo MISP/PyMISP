@@ -47,16 +47,16 @@ if __name__ == '__main__':
     else:
         result = 'There is no event during the studied period'
 
-        text = 'Studied pediod: from '
-        if args.begindate is None:
-            text = text + '1970-01-01'
-        else:
-            text = text + str(args.begindate.date())
+    text = 'Studied pediod: from '
+    if args.begindate is None:
+        text = text + '1970-01-01'
+    else:
+        text = text + str(args.begindate.date())
         text = text + ' to '
-        if args.enddate is None:
-            text = text + str(datetime.now().date())
-        else:
-            text = text + str(args.enddate.date())
+    if args.enddate is None:
+        text = text + str(datetime.now().date())
+    else:
+        text = text + str(args.enddate.date())
 
     print('\n========================================================')
     print(text)
