@@ -842,6 +842,7 @@ class PyMISP(object):
             :param date_from: First date
             :param date_to: Last date
             :param last: Last updated events (for example 5d or 12h or 30m)
+            :param metadata: return onlymetadata if True
 
         """
         val = self.__prepare_rest_search(values, not_values).replace('/', '|')
