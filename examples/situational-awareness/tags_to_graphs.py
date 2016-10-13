@@ -5,7 +5,7 @@ from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import tools
-import timing
+
 
 def formattingDataframe(dataframe, dates, NanValue):
     dataframe.reverse()
