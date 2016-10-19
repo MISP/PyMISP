@@ -8,8 +8,10 @@ import datetime
 import os
 import base64
 import re
+import warnings
 
 try:
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
@@ -29,6 +31,7 @@ from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
 
 # Least dirty way to support python 2 and 3
 try:
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
     basestring
 except NameError:
     basestring = str
