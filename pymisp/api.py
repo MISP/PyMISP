@@ -536,6 +536,11 @@ class PyMISP(object):
             attributes.append(self._prepare_full_attribute(category, 'snort', snort, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
+    def add_net_other(self, event, netother, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
+        attributes = []
+        attributes.append(self._prepare_full_attribute(category, 'other', netother, to_ids, comment, distribution))
+        return self._send_attributes(event, attributes, proposal)
+
     # ##### Email attributes #####
 
     def add_email_src(self, event, email, to_ids=True, comment=None, distribution=None, proposal=False):
