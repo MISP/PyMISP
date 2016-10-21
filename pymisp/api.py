@@ -76,9 +76,6 @@ class PyMISP(object):
         :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
     """
 
-# TODO: interactive script to create a MISP event from scratch
-# TODO: a parser to verify the validity of an event
-
     # So it can may be accessed from the misp object.
     distributions = distributions
     threat_level = threat_level
@@ -1026,6 +1023,7 @@ class PyMISP(object):
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
         else:
             return {'error': 'Impossible to retrieve the version of the master branch.'}
+
     # ############## Export Attributes in text ####################################
 
     def get_all_attributes_txt(self, type_attr):
