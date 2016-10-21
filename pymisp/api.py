@@ -8,15 +8,15 @@ import datetime
 import os
 import base64
 import re
+import warnings
 
 try:
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
 from io import BytesIO
 import zipfile
-import warnings
-import functools
 
 try:
     import requests
@@ -25,9 +25,13 @@ except ImportError:
     HAVE_REQUESTS = False
 
 from . import __version__
+from .exceptions import PyMISPError, SearchError, MissingDependency, NoURL, NoKey
+from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
+
 
 # Least dirty way to support python 2 and 3
 try:
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
     basestring
 except NameError:
     basestring = str
@@ -54,36 +58,6 @@ class analysis(object):
     initial = 0
     ongoing = 1
     completed = 2
-
-
-class PyMISPError(Exception):
-    def __init__(self, message):
-        super(PyMISPError, self).__init__(message)
-        self.message = message
-
-
-class NewEventError(PyMISPError):
-    pass
-
-
-class NewAttributeError(PyMISPError):
-    pass
-
-
-class SearchError(PyMISPError):
-    pass
-
-
-class MissingDependency(PyMISPError):
-    pass
-
-
-class NoURL(PyMISPError):
-    pass
-
-
-class NoKey(PyMISPError):
-    pass
 
 
 class PyMISP(object):
@@ -118,6 +92,7 @@ class PyMISP(object):
         self.ssl = ssl
         self.proxies = proxies
         self.cert = cert
+        self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
         self.debug = debug
@@ -128,16 +103,24 @@ class PyMISP(object):
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
-        session = self.__prepare_session()
-        response = session.get(urljoin(self.root_url, 'attributes/describeTypes.json'))
-        self.describe_types = self._check_response(response)
-        if self.describe_types.get('error'):
-            for e in self.describe_types.get('error'):
-                raise PyMISPError('Failed: {}'.format(e))
+        try:
+            session = self.__prepare_session()
+            response = session.get(urljoin(self.root_url, 'attributes/describeTypes.json'))
+            describe_types = self._check_response(response)
+            if describe_types.get('error'):
+                for e in describe_types.get('error'):
+                    raise PyMISPError('Failed: {}'.format(e))
+            self.describe_types = describe_types['result']
+            if not self.describe_types.get('sane_defaults'):
+                raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
+        except:
+            describe_types = json.load(open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r'))
+            self.describe_types = describe_types['result']
 
-        self.categories = self.describe_types['result']['categories']
-        self.types = self.describe_types['result']['types']
-        self.category_type_mapping = self.describe_types['result']['category_type_mappings']
+        self.categories = self.describe_types['categories']
+        self.types = self.describe_types['types']
+        self.category_type_mapping = self.describe_types['category_type_mappings']
+        self.sane_default = self.describe_types['sane_defaults']
 
     def __prepare_session(self, output='json'):
         """
@@ -152,7 +135,8 @@ class PyMISP(object):
         session.headers.update(
             {'Authorization': self.key,
              'Accept': 'application/{}'.format(output),
-             'content-type': 'application/{}'.format(output)})
+             'content-type': 'application/{}'.format(output),
+             'User-Agent': 'PyMISP {}'.format(__version__)})
         return session
 
     def flatten_error_messages(self, response):
@@ -175,6 +159,8 @@ class PyMISP(object):
                                 messages.append('Error in {}: {}'.format(where, msg))
                     else:
                         for e in errors:
+                            if not e:
+                                continue
                             if isinstance(e, str):
                                 messages.append(e)
                                 continue
@@ -311,68 +297,18 @@ class PyMISP(object):
     # ##############################################
 
     def _prepare_full_event(self, distribution, threat_level_id, analysis, info, date=None, published=False):
-        to_return = {'Event': {}}
-        # Setup details of a new event
-        if distribution not in [0, 1, 2, 3]:
-            raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(distribution))
-        if threat_level_id not in [1, 2, 3, 4]:
-            raise NewEventError('{} is invalid, the threat_level_id has to be in 1, 2, 3, 4'.format(threat_level_id))
-        if analysis not in [0, 1, 2]:
-            raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(analysis))
-        if date is None:
-            date = datetime.date.today().isoformat()
-        if published not in [True, False]:
-            raise NewEventError('{} is invalid, published has to be True or False'.format(published))
-        to_return['Event'] = {'distribution': distribution, 'info': info, 'date': date, 'published': published,
-                              'threat_level_id': threat_level_id, 'analysis': analysis}
-        return to_return
+        misp_event = MISPEvent(self.describe_types)
+        misp_event.set_all_values(info=info, distribution=distribution, threat_level_id=threat_level_id,
+                                  analysis=analysis, date=date)
+        if published:
+            misp_event.publish()
+        return misp_event
 
-    def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=None):
-        to_return = {}
-        if category not in self.categories:
-            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(self.categories))))
-
-        if type_value not in self.types:
-            raise NewAttributeError('{} is invalid, type_value has to be in {}'.format(type_value, (', '.join(self.types))))
-
-        if type_value not in self.category_type_mapping[category]:
-            raise NewAttributeError('{} and {} is an invalid combinaison, type_value for this category has to be in {}'.format(type_value, category, (', '.join(self.category_type_mapping[category]))))
-        to_return['type'] = type_value
-        to_return['category'] = category
-
-        if to_ids not in [True, False]:
-            raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(to_ids))
-        to_return['to_ids'] = to_ids
-
-        if distribution is not None:
-            distribution = int(distribution)
-        # If None: take the default value of the event
-        if distribution not in [None, 0, 1, 2, 3, 5]:
-            raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 5 or None'.format(distribution))
-        if distribution is not None:
-            to_return['distribution'] = distribution
-
-        to_return['value'] = value
-
-        if comment is not None:
-            to_return['comment'] = comment
-
-        return to_return
-
-    def _prepare_update(self, event):
-        # Cleanup the received event to make it publishable
-        event['Event'].pop('locked', None)
-        event['Event'].pop('attribute_count', None)
-        event['Event'].pop('RelatedEvent', None)
-        event['Event'].pop('orgc', None)
-        event['Event'].pop('ShadowAttribute', None)
-        event['Event'].pop('org', None)
-        event['Event'].pop('proposal_email_lock', None)
-        event['Event'].pop('publish_timestamp', None)
-        event['Event'].pop('published', None)
-        event['Event'].pop('timestamp', None)
-        event['Event']['id'] = int(event['Event']['id'])
-        return event
+    def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5):
+        misp_attribute = MISPAttribute(self.describe_types)
+        misp_attribute.set_all_values(type=type_value, value=value, category=category,
+                                      to_ids=to_ids, comment=comment, distribution=distribution)
+        return misp_attribute
 
     def _one_or_more(self, value):
         """Returns a list/tuple of one or more items, regardless of input."""
@@ -381,30 +317,32 @@ class PyMISP(object):
     # ########## Helpers ##########
 
     def get(self, eid):
-        response = self.get_event(int(eid))
-        return response
+        return self.get_event(eid)
 
     def get_stix(self, **kwargs):
-        response = self.get_stix_event(**kwargs)
-        return response
+        return self.get_stix_event(**kwargs)
 
     def update(self, event):
         eid = event['Event']['id']
-        response = self.update_event(eid, event)
-        return response
-
-    def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
-        data = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
-        response = self.add_event(data)
-        return response
+        return self.update_event(eid, event)
 
     def publish(self, event):
         if event['Event']['published']:
             return {'error': 'Already published'}
-        event = self._prepare_update(event)
-        event['Event']['published'] = True
-        response = self.update_event(event['Event']['id'], event)
-        return response
+        e = MISPEvent(self.describe_types)
+        e.load(event)
+        e.publish()
+        return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
+
+    def change_threat_level(self, event, threat_level_id):
+        e = MISPEvent(self.describe_types)
+        e.load(event)
+        e.threat_level_id = threat_level_id
+        return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
+
+    def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
+        misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
+        return self.add_event(json.dumps(misp_event, cls=EncodeUpdate))
 
     def add_tag(self, event, tag):
         session = self.__prepare_session()
@@ -418,33 +356,22 @@ class PyMISP(object):
         response = session.post(urljoin(self.root_url, 'events/removeTag'), data=json.dumps(to_post))
         return self._check_response(response)
 
-    def change_threat_level(self, event, threat_level_id):
-        event['Event']['threat_level_id'] = threat_level_id
-        self._prepare_update(event)
-        response = self.update_event(event['Event']['id'], event)
-        return response
-
     # ##### File attributes #####
 
     def _send_attributes(self, event, attributes, proposal=False):
         if proposal:
             response = self.proposal_add(event['Event']['id'], attributes)
         else:
-            event = self._prepare_update(event)
-            for a in attributes:
-                if a.get('distribution') is None:
-                    a['distribution'] = 5
-            event['Event']['Attribute'] = attributes
-            response = self.update_event(event['Event']['id'], event)
+            e = MISPEvent(self.describe_types)
+            e.load(event)
+            e.attributes += attributes
+            response = self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
         return response
 
-    def add_named_attribute(self, event, category, type_value, value, to_ids=False, comment=None, distribution=None, proposal=False):
+    def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False):
         attributes = []
-        if value and category and type:
-            try:
-                attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
-            except NewAttributeError as e:
-                return e
+        for value in self._one_or_more(value):
+            attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, ssdeep=None, comment=None, to_ids=True, distribution=None, proposal=False):
@@ -713,21 +640,9 @@ class PyMISP(object):
     # ######### Upload samples through the API #########
     # ##################################################
 
-    def _create_event(self, distribution, threat_level_id, analysis, info):
-        # Setup details of a new event
-        if distribution not in [0, 1, 2, 3]:
-            raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(distribution))
-        if threat_level_id not in [1, 2, 3, 4]:
-            raise NewEventError('{} is invalid, the threat_level_id has to be in 1, 2, 3, 4'.format(threat_level_id))
-        if analysis not in [0, 1, 2]:
-            raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(analysis))
-        return {'distribution': int(distribution), 'info': info,
-                'threat_level_id': int(threat_level_id), 'analysis': analysis}
-
-    def prepare_attribute(self, event_id, distribution, to_ids, category, comment, info,
-                          analysis, threat_level_id):
+    def _prepare_upload(self, event_id, distribution, to_ids, category, comment, info,
+                        analysis, threat_level_id):
         to_post = {'request': {}}
-        authorized_categs = ['Payload delivery', 'Artifacts dropped', 'Payload installation', 'External analysis', 'Network activity', 'Antivirus detection']
 
         if event_id is not None:
             try:
@@ -736,16 +651,21 @@ class PyMISP(object):
                 pass
         if not isinstance(event_id, int):
             # New event
-            to_post['request'] = self._create_event(distribution, threat_level_id, analysis, info)
+            misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info)
+            to_post['request']['distribution'] = misp_event.distribution
+            to_post['request']['info'] = misp_event.info
+            to_post['request']['analysis'] = misp_event.analysis
+            to_post['request']['threat_level_id'] = misp_event.threat_level_id
         else:
             to_post['request']['event_id'] = int(event_id)
 
-        if to_ids not in [True, False]:
-            raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(to_ids))
+        default_values = self.sane_default['malware-sample']
+        if to_ids is None or not isinstance(to_ids, bool):
+            to_ids = bool(int(default_values['to_ids']))
         to_post['request']['to_ids'] = to_ids
 
-        if category not in authorized_categs:
-            raise NewAttributeError('{} is invalid, category has to be in {}'.format(category, (', '.join(authorized_categs))))
+        if category is None or category not in self.categories:
+            category = default_values['default_category']
         to_post['request']['category'] = category
 
         to_post['request']['comment'] = comment
@@ -758,16 +678,16 @@ class PyMISP(object):
     def upload_sample(self, filename, filepath, event_id, distribution=None,
                       to_ids=True, category=None, comment=None, info=None,
                       analysis=None, threat_level_id=None):
-        to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
-                                         comment, info, analysis, threat_level_id)
+        to_post = self._prepare_upload(event_id, distribution, to_ids, category,
+                                       comment, info, analysis, threat_level_id)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
         return self._upload_sample(to_post)
 
     def upload_samplelist(self, filepaths, event_id, distribution=None,
-                          to_ids=True, category=None, info=None,
+                          to_ids=True, category=None, comment=None, info=None,
                           analysis=None, threat_level_id=None):
-        to_post = self.prepare_attribute(event_id, distribution, to_ids, category,
-                                         info, analysis, threat_level_id)
+        to_post = self._prepare_upload(event_id, distribution, to_ids, category,
+                                       comment, info, analysis, threat_level_id)
         files = []
         for path in filepaths:
             if not os.path.isfile(path):
@@ -787,18 +707,14 @@ class PyMISP(object):
     # ############################
 
     def __query_proposal(self, session, path, id, attribute=None):
-        path = path.strip('/')
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
-        query = None
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
-        if path == 'view':
+            response = session.post(url, data=json.dumps(query))
+        elif path == 'view':
             response = session.get(url)
-        else:
-            if query is not None:
-                response = session.post(url, data=json.dumps(query))
-            else:
-                response = session.post(url)
+        else:  # accept or discard
+            response = session.post(url)
         return self._check_response(response)
 
     def proposal_view(self, event_id=None, proposal_id=None):
@@ -917,7 +833,7 @@ class PyMISP(object):
 
     def search(self, values=None, not_values=None, type_attribute=None,
                category=None, org=None, tags=None, not_tags=None, date_from=None,
-               date_to=None, last=None, controller='events'):
+               date_to=None, last=None, metadata=None, controller='events'):
         """
             Search via the Rest API
 
@@ -931,6 +847,7 @@ class PyMISP(object):
             :param date_from: First date
             :param date_to: Last date
             :param last: Last updated events (for example 5d or 12h or 30m)
+            :param metadata: return onlymetadata if True
 
         """
         val = self.__prepare_rest_search(values, not_values).replace('/', '|')
@@ -958,6 +875,8 @@ class PyMISP(object):
                 query['to'] = date_to
         if last is not None:
             query['last'] = last
+        if metadata is not None:
+            query['metadata'] = metadata
 
         session = self.__prepare_session()
         return self.__query(session, 'restSearch/download', query, controller)
@@ -1104,6 +1023,7 @@ class PyMISP(object):
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
         else:
             return {'error': 'Impossible to retrieve the version of the master branch.'}
+
     # ############## Export Attributes in text ####################################
 
     def get_all_attributes_txt(self, type_attr):

@@ -49,43 +49,46 @@ if __name__ == '__main__':
         last = '7d'
         title = 'Tags repartition over the last 7 days'
 
-    result = misp.download_last(last)
-    events = tools.eventsListBuildFromArray(result)
-    result = []
-    dates = []
-    enddate = tools.getToday()
-    colourDict = {}
-    faketag = False
+    result = misp.search(last=last, metadata=True)
+    if 'response' in result:
+        events = tools.eventsListBuildFromArray(result)
+        result = []
+        dates = []
+        enddate = tools.getToday()
+        colourDict = {}
+        faketag = False
 
-    for i in range(split):
-        begindate = tools.getNDaysBefore(enddate, size)
-        dates.append(str(enddate.date()))
-        eventstemp = tools.selectInRange(events, begin=begindate, end=enddate)
-        if eventstemp is not None:
-            tags = tools.tagsListBuild(eventstemp)
-            if tags is not None:
-                tools.createDictTagsColour(colourDict, tags)
-                result.append(tools.getNbOccurenceTags(tags))
+        for i in range(split):
+            begindate = tools.getNDaysBefore(enddate, size)
+            dates.append(str(enddate.date()))
+            eventstemp = tools.selectInRange(events, begin=begindate, end=enddate)
+            if eventstemp is not None:
+                tags = tools.tagsListBuild(eventstemp)
+                if tags is not None:
+                    tools.createDictTagsColour(colourDict, tags)
+                    result.append(tools.getNbOccurenceTags(tags))
+                else:
+                    result.append(tools.createFakeEmptyTagsSeries())
+                    faketag = True
             else:
                 result.append(tools.createFakeEmptyTagsSeries())
                 faketag = True
-        else:
-            result.append(tools.createFakeEmptyTagsSeries())
-            faketag = True
-        enddate = begindate
+            enddate = begindate
 
-    result = formattingDataframe(result, dates, 0)
-    if faketag:
-        result = tools.removeFaketagRow(result)
+        result = formattingDataframe(result, dates, 0)
+        if faketag:
+            result = tools.removeFaketagRow(result)
 
-    taxonomies, emptyOther = tools.getTaxonomies(tools.getCopyDataframe(result))
+        taxonomies, emptyOther = tools.getTaxonomies(tools.getCopyDataframe(result))
 
+        tools.tagsToLineChart(tools.getCopyDataframe(result), title, dates, colourDict)
+        tools.tagstrendToLineChart(tools.getCopyDataframe(result), title, dates, split, colourDict)
+        tools.tagsToTaxoLineChart(tools.getCopyDataframe(result), title, dates, colourDict, taxonomies, emptyOther)
+        tools.tagstrendToTaxoLineChart(tools.getCopyDataframe(result), title, dates, split, colourDict, taxonomies, emptyOther)
+        if args.order is None:
+            args.order = 3
+        tools.tagsToPolyChart(tools.getCopyDataframe(result), split, colourDict, taxonomies, emptyOther, args.order)
+        tools.createVisualisation(taxonomies)
 
-    tools.tagsToLineChart(tools.getCopyDataframe(result), title, dates, colourDict)
-    tools.tagstrendToLineChart(tools.getCopyDataframe(result), title, dates, split, colourDict)
-    tools.tagsToTaxoLineChart(tools.getCopyDataframe(result), title, dates, colourDict, taxonomies, emptyOther)
-    tools.tagstrendToTaxoLineChart(tools.getCopyDataframe(result), title, dates, split, colourDict, taxonomies, emptyOther)
-    if args.order is None:
-        args.order = 3
-    tools.tagsToPolyChart(tools.getCopyDataframe(result), split, colourDict, taxonomies, emptyOther, args.order)
-    tools.createVisualisation(taxonomies)
+    else:
+        print('There is no event during the studied period')

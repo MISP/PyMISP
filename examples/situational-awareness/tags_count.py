@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     if args.days is None:
         args.days = 7
-    result = misp.download_last('{}d'.format(args.days))
+    result = misp.search(last='{}d'.format(args.days), metadata=True)
 
     tools.checkDateConsistancy(args.begindate, args.enddate, tools.getLastdate(args.days))
 
@@ -40,16 +40,19 @@ if __name__ == '__main__':
     else:
         args.enddate = tools.setEnddate(tools.toDatetime(args.enddate))
 
-    events = tools.selectInRange(tools.eventsListBuildFromArray(result), begin=args.begindate, end=args.enddate)
-    tags = tools.tagsListBuild(events)
-    result = tools.getNbOccurenceTags(tags)
+    if 'response' in result:
+        events = tools.selectInRange(tools.eventsListBuildFromArray(result), begin=args.begindate, end=args.enddate)
+        tags = tools.tagsListBuild(events)
+        result = tools.getNbOccurenceTags(tags)
+    else:
+        result = 'There is no event during the studied period'
 
     text = 'Studied pediod: from '
     if args.begindate is None:
         text = text + '1970-01-01'
     else:
         text = text + str(args.begindate.date())
-    text = text + ' to '
+        text = text + ' to '
     if args.enddate is None:
         text = text + str(datetime.now().date())
     else:

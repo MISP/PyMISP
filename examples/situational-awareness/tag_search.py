@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     if args.days is None:
         args.days = 7
-    result = misp.download_last('{}d'.format(args.days))
+    result = misp.search(last='{}d'.format(args.days), metadata=True)
 
     tools.checkDateConsistancy(args.begindate, args.enddate, tools.getLastdate(args.days))
 
@@ -41,25 +41,29 @@ if __name__ == '__main__':
     else:
         args.enddate = tools.setEnddate(tools.toDatetime(args.enddate))
 
-    events = tools.selectInRange(tools.eventsListBuildFromArray(result), begin=args.begindate, end=args.enddate)
-    totalPeriodEvents = tools.getNbitems(events)
-    tags = tools.tagsListBuild(events)
-    result = tools.isTagIn(tags, args.tag)
-    totalPeriodTags = len(result)
+    if 'response' in result:
+        events = tools.selectInRange(tools.eventsListBuildFromArray(result), begin=args.begindate, end=args.enddate)
+        totalPeriodEvents = tools.getNbitems(events)
+        tags = tools.tagsListBuild(events)
+        result = tools.isTagIn(tags, args.tag)
+        totalPeriodTags = len(result)
 
-    text = 'Studied pediod: from '
-    if args.begindate is None:
-        text = text + '1970-01-01'
-    else:
-        text = text + str(args.begindate.date())
-    text = text + ' to '
-    if args.enddate is None:
-        text = text + str(datetime.now().date())
-    else:
-        text = text + str(args.enddate.date())
+        text = 'Studied pediod: from '
+        if args.begindate is None:
+            text = text + '1970-01-01'
+        else:
+            text = text + str(args.begindate.date())
+        text = text + ' to '
+        if args.enddate is None:
+            text = text + str(datetime.now().date())
+        else:
+            text = text + str(args.enddate.date())
 
-    print('\n========================================================')
-    print(text)
-    print('During the studied pediod, ' + str(totalPeriodTags) + ' events out of ' + str(totalPeriodEvents) + ' contains at least one tag with ' + args.tag + '.')
-    if totalPeriodEvents != 0:
-        print('It represents {}% of the events in this period.'.format(round(100 * totalPeriodTags / totalPeriodEvents, 3)))
+        print('\n========================================================')
+        print(text)
+        print('During the studied pediod, ' + str(totalPeriodTags) + ' events out of ' + str(totalPeriodEvents) + ' contains at least one tag with ' + args.tag + '.')
+        if totalPeriodEvents != 0:
+            print('It represents {}% of the events in this period.'.format(round(100 * totalPeriodTags / totalPeriodEvents, 3)))
+    else:
+        print ('There is no event answering the research criteria')
+

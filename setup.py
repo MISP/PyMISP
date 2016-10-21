@@ -27,5 +27,7 @@ setup(
         'Topic :: Internet',
     ],
     test_suite="tests",
-    install_requires=['requests'],
+    install_requires=['requests', 'python-dateutil', 'jsonschema'],
+    include_package_data=True,
+    package_data={'data': ['schema.json', 'schema-lax.json', 'describeTypes.json']},
 )

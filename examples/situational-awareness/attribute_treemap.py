@@ -21,8 +21,11 @@ if __name__ == '__main__':
     else:
         result = misp.download_last(args.argument)
 
-    events = tools.eventsListBuildFromArray(result)
-    attributes = tools.attributesListBuild(events)
-    temp = tools.getNbAttributePerEventCategoryType(attributes)
-    temp = temp.groupby(level=['category', 'type']).sum()
-    tools.createTreemap(temp, 'Attributes Distribution', 'attribute_treemap.svg', 'attribute_table.html')
+    if 'response' in result:
+        events = tools.eventsListBuildFromArray(result)
+        attributes = tools.attributesListBuild(events)
+        temp = tools.getNbAttributePerEventCategoryType(attributes)
+        temp = temp.groupby(level=['category', 'type']).sum()
+        tools.createTreemap(temp, 'Attributes Distribution', 'attribute_treemap.svg', 'attribute_table.html')
+    else:
+        print ('There is no event answering the research criteria')
