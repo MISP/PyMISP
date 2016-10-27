@@ -4,3 +4,4 @@ from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDe
 from .api import PyMISP
 from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate, EncodeFull
 from .tools.neo4j import Neo4j
+from .tools import stix
