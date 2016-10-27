@@ -13,10 +13,12 @@ if __name__ == '__main__':
     parser.add_argument("--host", default='localhost:7474', help="Host where neo4j is running.")
     parser.add_argument("-u", "--user", default='neo4j', help="User on neo4j.")
     parser.add_argument("-p", "--password", default='neo4j', help="Password on neo4j.")
+    parser.add_argument("-d", "--deleteall", action="store_true", default=False, help="Delete all nodes from the database")
     args = parser.parse_args()
 
     neo4j = Neo4j(args.host, args.user, args.password)
-    neo4j.del_all()
+    if args.deleteall:
+        neo4j.del_all()
     misp = PyMISP(misp_url, misp_key)
     result = misp.search_all(args.search)
     for json_event in result['response']:

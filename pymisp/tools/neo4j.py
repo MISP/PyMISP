@@ -32,8 +32,7 @@ class Neo4j():
 
     def import_event(self, event):
         tx = self.graph.begin()
-        event_node = Node('Event', uuid=event.uuid)
-        event_node['name'] = event.info
+        event_node = Node('Event', uuid=event.uuid, name=event.info)
         # event_node['distribution'] = event.distribution
         # event_node['threat_level_id'] = event.threat_level_id
         # event_node['analysis'] = event.analysis
