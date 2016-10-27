@@ -20,10 +20,11 @@ from .exceptions import PyMISPError, NewEventError, NewAttributeError
 
 # Least dirty way to support python 2 and 3
 try:
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
     basestring
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
 except NameError:
     basestring = str
+    unicode = str
 
 
 class MISPAttribute(object):
