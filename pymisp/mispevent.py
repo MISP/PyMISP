@@ -6,6 +6,7 @@ import time
 import json
 from json import JSONEncoder
 import os
+import warnings
 try:
     from dateutil.parser import parse
 except ImportError:
@@ -21,6 +22,7 @@ from .exceptions import PyMISPError, NewEventError, NewAttributeError
 # Least dirty way to support python 2 and 3
 try:
     basestring
+    unicode
     warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
 except NameError:
     basestring = str
