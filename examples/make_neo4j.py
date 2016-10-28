@@ -7,6 +7,17 @@ from pymisp import MISPEvent
 from keys import misp_url, misp_key
 import argparse
 
+"""
+Sample Neo4J query:
+
+
+MATCH ()-[r:has]->(n)
+WITH n, count(r) as rel_cnt
+WHERE rel_cnt > 5
+MATCH (m)-[r:has]->(n)
+RETURN m, n LIMIT 200;
+"""
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get all the events matching a value.')
     parser.add_argument("-s", "--search", required=True, help="String to search.")
