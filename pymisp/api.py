@@ -1094,3 +1094,49 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'sharing_groups/index.json')
         response = session.get(url)
         return self._check_response(response)['response'][0]
+
+    # ############## Users ##################
+
+    def get_users_list(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'admin/users')
+        response = session.get(url)
+        return self._check_response(response)['response']
+
+    def get_user(self, user_id):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'admin/users/view/{}'.format(user_id))
+        response = session.get(url)
+        return self._check_response(response)
+
+    def add_user(self, json_file):
+        session = self.__prepare_session()
+        jdata = json.load(open(json_file))
+        url = urljoin(self.root_url, 'admin/users/add/')
+        response = session.post(url, data=json.dumps(jdata))
+        return self._check_response(response)
+
+    def get_add_user_fields_list(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'admin/users/add/')
+        response = session.get(url)
+        return self._check_response(response)
+
+    def edit_user(self, json_file, user_id):
+        session = self.__prepare_session()
+        jdata = json.load(open(json_file))
+        url = urljoin(self.root_url, 'admin/users/edit/{}'.format(user_id))
+        response = session.post(url, data=json.dumps(jdata))
+        return self._check_response(response)
+
+    def get_edit_user_fields_list(self, user_id):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'admin/users/edit/{}'.format(user_id))
+        response = session.get(url)
+        return self._check_response(response)
+
+    def delete_user(self, user_id):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'admin/users/delete/{}'.format(user_id))
+        response = session.post(url)
+        return self._check_response(response)

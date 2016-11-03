@@ -16,10 +16,9 @@ def init(url, key):
     return PyMISP(url, key, True, 'json')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Add sighting.')
-    parser.add_argument("-f", "--json_file", required=True, help="The name of the json file describing the attribute you want to add sighting to.")
-    args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Get a list of the sharing groups from the MISP instance.')
 
     misp = init(misp_url, misp_key)
 
-    misp.sighting_per_json(args.json_file)
+    users_list = misp.get_users_list()
+    print (users_list)
