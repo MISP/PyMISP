@@ -23,14 +23,17 @@ iocMispMapping = {
 
     'FileItem/Md5sum': {'type': 'md5'},
     'FileItem/Sha1sum': {'type': 'sha1'},
+    'TaskItem/Sha1sum': {'type': 'sha1'},
     'FileItem/Sha256sum': {'type': 'sha256'},
     'FileItem/FileName': {'type': 'filename'},
     'FileItem/FullPath': {'type': 'filename'},
     'FileItem/FilePath': {'type': 'filename'},
+    'DriverItem/DriverName': {'type': 'filename'},
 
     'Network/URI': {'type': 'uri'},
     'Network/DNS': {'type': 'domain'},
     'Network/String': {'type': 'ip-dst'},
+    'RouteEntryItem/Destination': {'type': 'ip-dst'},
     'Network/UserAgent': {'type': 'user-agent'},
 
     'PortItem/localIP': {'type': 'ip-dst'},
@@ -41,8 +44,16 @@ iocMispMapping = {
     'ProcessItem/Pipe/Name': {'type': 'named pipe'},
     'ProcessItem/Mutex/Name': {'type': 'mutex', 'comment': 'MutexName.'},
 
+    'CookieHistoryItem/HostName': {'type': 'hostname'},
+    'FormHistoryItem/HostName': {'type': 'hostname'},
+    'SystemInfoItem/HostName': {'type': 'hostname'},
+    'UrlHistoryItem/HostName': {'type': 'hostname'},
+    'DnsEntryItem/RecordName': {'type': 'hostname'},
+    'DnsEntryItem/Host': {'type': 'hostname'},
+
     # Is it the regkey value?
     # 'RegistryItem/Text': {'type': 'regkey', 'RegistryText. '},
+    'RegistryItem/KeyPath': {'type': 'regkey'},
     'RegistryItem/Path': {'type': 'regkey'},
 
     'ServiceItem/name': {'type': 'windows-service-name'},
@@ -93,7 +104,6 @@ def get_mapping(openioc_type):
 
 def set_all_attributes(openioc, misp_event):
     for item in openioc.find_all("indicatoritem"):
-        print(item)
         attribute_values = {'comment': ''}
         if item.find('context'):
             mapping = get_mapping(item.find('context')['search'])
