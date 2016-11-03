@@ -311,8 +311,7 @@
         }
       },
       "required": [
-        "info",
-        "Attribute"
+        "info"
       ]
     }
   },
