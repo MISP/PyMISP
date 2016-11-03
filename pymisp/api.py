@@ -3,6 +3,7 @@
 
 """Python API using the REST interface of MISP"""
 
+import sys
 import json
 import datetime
 import os
@@ -136,7 +137,7 @@ class PyMISP(object):
             {'Authorization': self.key,
              'Accept': 'application/{}'.format(output),
              'content-type': 'application/{}'.format(output),
-             'User-Agent': 'PyMISP {}'.format(__version__)})
+             'User-Agent': 'PyMISP {} - Python {}.{}.{}'.format(__version__, *sys.version_info)})
         return session
 
     def flatten_error_messages(self, response):

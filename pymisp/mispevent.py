@@ -6,6 +6,7 @@ import time
 import json
 from json import JSONEncoder
 import os
+import warnings
 try:
     from dateutil.parser import parse
 except ImportError:
@@ -20,10 +21,12 @@ from .exceptions import PyMISPError, NewEventError, NewAttributeError
 
 # Least dirty way to support python 2 and 3
 try:
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
     basestring
+    unicode
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.3")
 except NameError:
     basestring = str
+    unicode = str
 
 
 class MISPAttribute(object):
@@ -231,6 +234,19 @@ class MISPEvent(object):
         self._reinitialize_event()
         self.set_all_values(**e)
 
+    def set_date(self, date, ignore_invalid=False):
+        if isinstance(date, basestring) or isinstance(date, unicode):
+            self.date = parse(date).date()
+        elif isinstance(date, datetime.datetime):
+            self.date = date.date()
+        elif isinstance(date, datetime.date):
+            self.date = date
+        else:
+            if ignore_invalid:
+                self.date = datetime.date.today()
+            else:
+                raise NewEventError('Invalid format for the date: {} - {}'.format(date, type(date)))
+
     def set_all_values(self, **kwargs):
         # Required value
         if kwargs.get('info'):
@@ -254,14 +270,7 @@ class MISPEvent(object):
         if kwargs.get('published') is not None:
             self.publish()
         if kwargs.get('date'):
-            if isinstance(kwargs['date'], basestring) or isinstance(kwargs['date'], unicode):
-                self.date = parse(kwargs['date']).date()
-            elif isinstance(kwargs['date'], datetime.datetime):
-                self.date = kwargs['date'].date()
-            elif isinstance(kwargs['date'], datetime.date):
-                self.date = kwargs['date']
-            else:
-                raise NewEventError('Invalid format for the date: {} - {}'.format(kwargs['date'], type(kwargs['date'])))
+            self.set_date(kwargs['date'])
         if kwargs.get('Attribute'):
             for a in kwargs['Attribute']:
                 attribute = MISPAttribute(self.describe_types)
