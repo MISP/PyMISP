@@ -12,7 +12,7 @@ setup(
     maintainer='Raphaël Vinot',
     url='https://github.com/MISP/PyMISP',
     description='Python API for MISP.',
-    packages=['pymisp'],
+    packages=['pymisp', 'pymisp.tools'],
     classifiers=[
         'License :: OSI Approved :: BSD License',
         'Development Status :: 5 - Production/Stable',
