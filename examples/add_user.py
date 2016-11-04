@@ -16,13 +16,12 @@ def init(url, key):
     return PyMISP(url, key, True, 'json')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Add  the user described in the given json. If no file is provided, returns a json listing all the fields used to describe a user.')
-    parser.add_argument("-f", "--json_file", help="The name of the json file describing the user you want to create.")
+    parser = argparse.ArgumentParser(description='Add a new user by setting the mandory fields.')
+    parser.add_argument("-e", "--email", required=True, help="Email linked to the account.")
+    parser.add_argument("-o", "--org_id", required=True, help="Organisation linked to the user.")
+    parser.add_argument("-r", "--role_id", required=True, help="Role linked to the user.")
     args = parser.parse_args()
 
     misp = init(misp_url, misp_key)
 
-    if args.json_file is None:
-        print (misp.get_add_user_fields_list())
-    else:
-        print(misp.add_user(args.json_file))
+    print (misp.add_user(args.email, args.org_id, args.role_id))

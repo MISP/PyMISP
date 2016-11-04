@@ -1109,7 +1109,58 @@ class PyMISP(object):
         response = session.get(url)
         return self._check_response(response)
 
-    def add_user(self, json_file):
+    def add_user_json(self, json_file):
+        session = self.__prepare_session()
+        jdata = json.load(open(json_file))
+        url = urljoin(self.root_url, 'admin/users/add/')
+        response = session.post(url, data=json.dumps(jdata))
+        return self._check_response(response)
+
+    def add_user(self, email, org_id, role_id, password=None,
+                 external_auth_required=None, external_auth_key=None,
+                 enable_password=None, nids_sid=None, server_id=None,
+                 gpgkey=None, certif_public=None, autoalert=None,
+                 contactalert=None, disabled=None, change_pw=None,
+                 termsaccepted=None, newsread=None):
+        new_user = {}
+        new_user['email'] = email
+        new_user['org_id'] = org_id
+        new_user['role_id'] = role_id
+        if password is not None:
+            new_user['password'] = password
+        if external_auth_required is not None:
+            new_user['external_auth_required'] = external_auth_required
+        if external_auth_key is not None:
+            new_user['external_auth_key'] = external_auth_key
+        if enable_password is not None:
+            new_user['enable_password'] = enable_password
+        if nids_sid is not None:
+            new_user['nids_sid'] = nids_sid
+        if server_id is not None:
+            new_user['server_id'] = server_id
+        if gpgkey is not None:
+            new_user['gpgkey'] = gpgkey
+        if certif_public is not None:
+            new_user['certif_public'] = certif_public
+        if autoalert is not None:
+            new_user['autoalert'] = autoalert
+        if contactalert is not None:
+            new_user['contactalert'] = contactalert
+        if disabled is not None:
+            new_user['disabled'] = disabled
+        if change_pw is not None:
+            new_user['change_pw'] = change_pw
+        if termsaccepted is not None:
+            new_user['termsaccepted'] = termsaccepted
+        if newsread is not None:
+            new_user['newsread'] = newsread
+
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'admin/users/add/')
+        response = session.post(url, data=json.dumps(new_user))
+        return self._check_response(response)
+
+    def add_user_json(self, json_file):
         session = self.__prepare_session()
         jdata = json.load(open(json_file))
         url = urljoin(self.root_url, 'admin/users/add/')
@@ -1122,7 +1173,54 @@ class PyMISP(object):
         response = session.get(url)
         return self._check_response(response)
 
-    def edit_user(self, json_file, user_id):
+    def edit_user(self, user_id, email=None, org_id=None, role_id=None,
+                  password=None, external_auth_required=None,
+                  external_auth_key=None, enable_password=None, nids_sid=None,
+                  server_id=None, gpgkey=None, certif_public=None,
+                  autoalert=None, contactalert=None, disabled=None,
+                  change_pw=None, termsaccepted=None, newsread=None):
+        edit_user = {}
+        if email is not None:
+            edit_user['email'] = email
+        if org_id is not None:
+            edit_user['org_id'] = org_id
+        if role_id is not None:
+            edit_user['role_id'] = role_id
+        if password is not None:
+            edit_user['password'] = password
+        if external_auth_required is not None:
+            edit_user['external_auth_required'] = external_auth_required
+        if external_auth_key is not None:
+            edit_user['external_auth_key'] = external_auth_key
+        if enable_password is not None:
+            edit_user['enable_password'] = enable_password
+        if nids_sid is not None:
+            edit_user['nids_sid'] = nids_sid
+        if server_id is not None:
+            edit_user['server_id'] = server_id
+        if gpgkey is not None:
+            edit_user['gpgkey'] = gpgkey
+        if certif_public is not None:
+            edit_user['certif_public'] = certif_public
+        if autoalert is not None:
+            edit_user['autoalert'] = autoalert
+        if contactalert is not None:
+            edit_user['contactalert'] = contactalert
+        if disabled is not None:
+            edit_user['disabled'] = disabled
+        if change_pw is not None:
+            edit_user['change_pw'] = change_pw
+        if termsaccepted is not None:
+            edit_user['termsaccepted'] = termsaccepted
+        if newsread is not None:
+            edit_user['newsread'] = newsread
+
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'admin/users/edit/{}'.format(user_id))
+        response = session.post(url, data=json.dumps(edit_user))
+        return self._check_response(response)
+
+    def edit_user_json(self, json_file, user_id):
         session = self.__prepare_session()
         jdata = json.load(open(json_file))
         url = urljoin(self.root_url, 'admin/users/edit/{}'.format(user_id))
