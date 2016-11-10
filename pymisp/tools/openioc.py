@@ -16,15 +16,23 @@ iocMispMapping = {
 
     'Email/To': {'type': 'target-email'},
     'Email/Date': {'type': 'comment', 'comment': 'EmailDate.'},
-    'Email/Body': {'type': 'email-subject'},
+    # 'Email/Body': {'type': 'email-subject'},
     'Email/From': {'type': 'email-dst'},
     'Email/Subject': {'type': 'email-subject'},
     'Email/Attachment/Name': {'type': 'email-attachment'},
 
     'FileItem/Md5sum': {'type': 'md5'},
     'FileItem/Sha1sum': {'type': 'sha1'},
-    'TaskItem/Sha1sum': {'type': 'sha1'},
     'FileItem/Sha256sum': {'type': 'sha256'},
+
+    'ServiceItem/serviceDLLmd5sum': {'type': 'md5', 'category': 'Payload installation'},
+    'ServiceItem/serviceDLLsha1sum': {'type': 'sha1', 'category': 'Payload installation'},
+    'ServiceItem/serviceDLLsha256sum': {'type': 'sha256', 'category': 'Payload installation'},
+
+    'TaskItem/md5sum': {'type': 'md5'},
+    'TaskItem/sha1sum': {'type': 'sha1'},
+    'TaskItem/Sha256sum': {'type': 'sha256'},
+
     'FileItem/FileName': {'type': 'filename'},
     'FileItem/FullPath': {'type': 'filename'},
     'FileItem/FilePath': {'type': 'filename'},
@@ -36,7 +44,8 @@ iocMispMapping = {
     'RouteEntryItem/Destination': {'type': 'ip-dst'},
     'Network/UserAgent': {'type': 'user-agent'},
 
-    'PortItem/localIP': {'type': 'ip-dst'},
+    'PortItem/localIP': {'type': 'ip-src'},
+    'PortItem/remoteIP': {'type': 'ip-dst'},
 
     'ProcessItem/name': {'type': 'pattern-in-memory', 'comment': 'ProcessName.'},
     'ProcessItem/path': {'type': 'pattern-in-memory', 'comment': 'ProcessPath.'},
@@ -115,13 +124,13 @@ def set_all_attributes(openioc, misp_event):
                 continue
         else:
             continue
-        value = extract_field(openioc, 'Content')
+        value = extract_field(item, 'Content')
         if value:
             attribute_values['value'] = value
         else:
             # No value, ignoring
             continue
-        comment = extract_field(openioc, 'Comment')
+        comment = extract_field(item, 'Comment')
         if comment:
             attribute_values["comment"] = '{} {}'.format(attribute_values["comment"], comment)
         misp_event.add_attribute(**attribute_values)
