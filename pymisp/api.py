@@ -1098,6 +1098,47 @@ class PyMISP(object):
 
     # ############## Users ##################
 
+    def _set_user_parameters(self, email, org_id, role_id, password, external_auth_required,
+                             external_auth_key, enable_password, nids_sid, server_id,
+                             gpgkey, certif_public, autoalert, contactalert, disabled,
+                             change_pw, termsaccepted, newsread):
+        user = {}
+        if email is not None:
+            user['email'] = email
+        if org_id is not None:
+            user['org_id'] = org_id
+        if role_id is not None:
+            user['role_id'] = role_id
+        if password is not None:
+            user['password'] = password
+        if external_auth_required is not None:
+            user['external_auth_required'] = external_auth_required
+        if external_auth_key is not None:
+            user['external_auth_key'] = external_auth_key
+        if enable_password is not None:
+            user['enable_password'] = enable_password
+        if nids_sid is not None:
+            user['nids_sid'] = nids_sid
+        if server_id is not None:
+            user['server_id'] = server_id
+        if gpgkey is not None:
+            user['gpgkey'] = gpgkey
+        if certif_public is not None:
+            user['certif_public'] = certif_public
+        if autoalert is not None:
+            user['autoalert'] = autoalert
+        if contactalert is not None:
+            user['contactalert'] = contactalert
+        if disabled is not None:
+            user['disabled'] = disabled
+        if change_pw is not None:
+            user['change_pw'] = change_pw
+        if termsaccepted is not None:
+            user['termsaccepted'] = termsaccepted
+        if newsread is not None:
+            user['newsread'] = newsread
+        return user
+
     def get_users_list(self):
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'admin/users')
@@ -1110,52 +1151,18 @@ class PyMISP(object):
         response = session.get(url)
         return self._check_response(response)
 
-    def add_user_json(self, json_file):
-        session = self.__prepare_session()
-        jdata = json.load(open(json_file))
-        url = urljoin(self.root_url, 'admin/users/add/')
-        response = session.post(url, data=json.dumps(jdata))
-        return self._check_response(response)
-
     def add_user(self, email, org_id, role_id, password=None,
                  external_auth_required=None, external_auth_key=None,
                  enable_password=None, nids_sid=None, server_id=None,
                  gpgkey=None, certif_public=None, autoalert=None,
                  contactalert=None, disabled=None, change_pw=None,
                  termsaccepted=None, newsread=None):
-        new_user = {}
-        new_user['email'] = email
-        new_user['org_id'] = org_id
-        new_user['role_id'] = role_id
-        if password is not None:
-            new_user['password'] = password
-        if external_auth_required is not None:
-            new_user['external_auth_required'] = external_auth_required
-        if external_auth_key is not None:
-            new_user['external_auth_key'] = external_auth_key
-        if enable_password is not None:
-            new_user['enable_password'] = enable_password
-        if nids_sid is not None:
-            new_user['nids_sid'] = nids_sid
-        if server_id is not None:
-            new_user['server_id'] = server_id
-        if gpgkey is not None:
-            new_user['gpgkey'] = gpgkey
-        if certif_public is not None:
-            new_user['certif_public'] = certif_public
-        if autoalert is not None:
-            new_user['autoalert'] = autoalert
-        if contactalert is not None:
-            new_user['contactalert'] = contactalert
-        if disabled is not None:
-            new_user['disabled'] = disabled
-        if change_pw is not None:
-            new_user['change_pw'] = change_pw
-        if termsaccepted is not None:
-            new_user['termsaccepted'] = termsaccepted
-        if newsread is not None:
-            new_user['newsread'] = newsread
-
+        new_user = self._set_user_parameters(email, org_id, role_id, password,
+                                             external_auth_required, external_auth_key,
+                                             enable_password, nids_sid, server_id,
+                                             gpgkey, certif_public, autoalert,
+                                             contactalert, disabled, change_pw,
+                                             termsaccepted, newsread)
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'admin/users/add/')
         response = session.post(url, data=json.dumps(new_user))
@@ -1180,41 +1187,12 @@ class PyMISP(object):
                   server_id=None, gpgkey=None, certif_public=None,
                   autoalert=None, contactalert=None, disabled=None,
                   change_pw=None, termsaccepted=None, newsread=None):
-        edit_user = {}
-        if email is not None:
-            edit_user['email'] = email
-        if org_id is not None:
-            edit_user['org_id'] = org_id
-        if role_id is not None:
-            edit_user['role_id'] = role_id
-        if password is not None:
-            edit_user['password'] = password
-        if external_auth_required is not None:
-            edit_user['external_auth_required'] = external_auth_required
-        if external_auth_key is not None:
-            edit_user['external_auth_key'] = external_auth_key
-        if enable_password is not None:
-            edit_user['enable_password'] = enable_password
-        if nids_sid is not None:
-            edit_user['nids_sid'] = nids_sid
-        if server_id is not None:
-            edit_user['server_id'] = server_id
-        if gpgkey is not None:
-            edit_user['gpgkey'] = gpgkey
-        if certif_public is not None:
-            edit_user['certif_public'] = certif_public
-        if autoalert is not None:
-            edit_user['autoalert'] = autoalert
-        if contactalert is not None:
-            edit_user['contactalert'] = contactalert
-        if disabled is not None:
-            edit_user['disabled'] = disabled
-        if change_pw is not None:
-            edit_user['change_pw'] = change_pw
-        if termsaccepted is not None:
-            edit_user['termsaccepted'] = termsaccepted
-        if newsread is not None:
-            edit_user['newsread'] = newsread
+        edit_user = self._set_user_parameters(email, org_id, role_id, password,
+                                              external_auth_required, external_auth_key,
+                                              enable_password, nids_sid, server_id,
+                                              gpgkey, certif_public, autoalert,
+                                              contactalert, disabled, change_pw,
+                                              termsaccepted, newsread)
 
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'admin/users/edit/{}'.format(user_id))
