@@ -297,10 +297,10 @@ class PyMISP(object):
     # ######### Event handling (Json only) #########
     # ##############################################
 
-    def _prepare_full_event(self, distribution, threat_level_id, analysis, info, date=None, published=False):
+    def _prepare_full_event(self, distribution, threat_level_id, analysis, info, date=None, published=False, orgc_id=None, org_id=None):
         misp_event = MISPEvent(self.describe_types)
         misp_event.set_all_values(info=info, distribution=distribution, threat_level_id=threat_level_id,
-                                  analysis=analysis, date=date)
+                                  analysis=analysis, date=date, orgc_id=orgc_id, org_id=org_id)
         if published:
             misp_event.publish()
         return misp_event
@@ -341,8 +341,8 @@ class PyMISP(object):
         e.threat_level_id = threat_level_id
         return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
 
-    def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False):
-        misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published)
+    def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False, orgc_id=None, org_id=None):
+        misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published, orgc_id, org_id)
         return self.add_event(json.dumps(misp_event, cls=EncodeUpdate))
 
     def add_tag(self, event, tag):
