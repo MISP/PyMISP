@@ -24,12 +24,13 @@ try:
     from gpg.constants.sig import mode
     has_pyme = True
 except ImportError:
-    # pyme renamed to gpg the 2016-10-28
-    import pyme as gpg
-    from pyme.constants.sig import mode
-    has_pyme = True
-except ImportError:
-    has_pyme = False
+    try:
+        # pyme renamed to gpg the 2016-10-28
+        import pyme as gpg
+        from pyme.constants.sig import mode
+        has_pyme = True
+    except ImportError:
+        has_pyme = False
 
 from .exceptions import PyMISPError, NewEventError, NewAttributeError
 
