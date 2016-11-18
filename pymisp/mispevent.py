@@ -77,13 +77,15 @@ class MISPAttribute(object):
             type=self.type, category=self.category, to_ids=self.to_ids, uuid=self.uuid, timestamp=self.timestamp,
             comment=self.comment, deleted=self.deleted, value=self.value).encode()
 
-    def sign(self, gpg_uid):
+    def sign(self, gpg_uid, passphrase=None):
         if not has_pyme:
             raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
         to_sign = self._serialize()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
             c.signers = keys[:1]
+            if passphrase:
+                c.set_passphrase_cb(lambda *args: passphrase)
             signed, _ = c.sign(to_sign, mode=mode.DETACH)
             self.sig = base64.b64encode(signed).decode()
 
@@ -265,21 +267,25 @@ class MISPEvent(object):
             all_sigs += a.sig
         return all_sigs.encode()
 
-    def sign(self, gpg_uid):
+    def sign(self, gpg_uid, passphrase=None):
         if not has_pyme:
             raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
         to_sign = self._serialize()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
             c.signers = keys[:1]
+            if passphrase:
+                c.set_passphrase_cb(lambda *args: passphrase)
             signed, _ = c.sign(to_sign, mode=mode.DETACH)
             self.sig = base64.b64encode(signed).decode()
         for a in self.attributes:
-            a.sign(gpg_uid)
+            a.sign(gpg_uid, passphrase)
         to_sign_global = self._serialize_sigs()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
             c.signers = keys[:1]
+            if passphrase:
+                c.set_passphrase_cb(lambda *args: passphrase)
             signed, _ = c.sign(to_sign_global, mode=mode.DETACH)
             self.global_sig = base64.b64encode(signed).decode()
 
