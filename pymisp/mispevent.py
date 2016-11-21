@@ -95,7 +95,11 @@ class MISPAttribute(object):
         signed_data = self._serialize()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
-            c.verify(signed_data, signature=base64.b64decode(self.sig), verify=keys[:1])
+            try:
+                c.verify(signed_data, signature=base64.b64decode(self.sig), verify=keys[:1])
+                return {self.uuid: True}
+            except:
+                return {self.uuid: False}
 
     def set_all_values(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
@@ -292,16 +296,26 @@ class MISPEvent(object):
     def verify(self, gpg_uid):
         if not has_pyme:
             raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
+        to_return = {}
         signed_data = self._serialize()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
-            c.verify(signed_data, signature=base64.b64decode(self.sig), verify=keys[:1])
+            try:
+                c.verify(signed_data, signature=base64.b64decode(self.sig), verify=keys[:1])
+                to_return[self.uuid] = True
+            except:
+                to_return[self.uuid] = False
         for a in self.attributes:
-            a.verify(gpg_uid)
+            to_return.update(a.verify(gpg_uid))
         to_verify_global = self._serialize_sigs()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
-            c.verify(to_verify_global, signature=base64.b64decode(self.global_sig), verify=keys[:1])
+            try:
+                c.verify(to_verify_global, signature=base64.b64decode(self.global_sig), verify=keys[:1])
+                to_return['global'] = True
+            except:
+                to_return['global'] = False
+        return to_return
 
     def load(self, json_event):
         self.new = False
