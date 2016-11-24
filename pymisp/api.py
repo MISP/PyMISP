@@ -755,6 +755,9 @@ class PyMISP(object):
             raise Exception('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes'])))
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
         query = {'request': query}
+        if self.debug:
+            print('URL: ', url)
+            print('Query: ', query)
         response = session.post(url, data=json.dumps(query))
         return self._check_response(response)
 
