@@ -854,8 +854,8 @@ class PyMISP(object):
             :param metadata: return onlymetadata if True
 
         """
-        val = self.__prepare_rest_search(values, not_values).replace('/', '|')
-        tag = self.__prepare_rest_search(tags, not_tags).replace(':', ';')
+        val = self.__prepare_rest_search(values, not_values)
+        tag = self.__prepare_rest_search(tags, not_tags)
         query = {}
         if len(val) != 0:
             query['value'] = val
