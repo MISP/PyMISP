@@ -18,7 +18,7 @@ class Neo4j():
         if not has_py2neo:
             raise Exception('py2neo is required, please install: pip install py2neo')
         authenticate(host, username, password)
-        self.graph = Graph()
+        self.graph = Graph("http://{}/db/data/".format(host))
 
     def load_events_directory(self, directory):
         self.events = []
@@ -54,5 +54,5 @@ class Neo4j():
             av = Relationship(attr_node, "is", val)
             s = val | ev | av
             tx.merge(s)
-            tx.graph.push(s)
+            #tx.graph.push(s)
         tx.commit()
