@@ -477,7 +477,7 @@ class PyMISP(object):
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
 
     def add_domains_ips(self, event, domain_ips, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        composed = map(lambda (x,y): '%s|%s' % (x, y), domain_ips.items())
+        composed = map(lambda x: '%s|%s' % (x[0], x[1]), domain_ips.items())
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
 
     def add_url(self, event, url, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
