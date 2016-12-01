@@ -444,7 +444,7 @@ class PyMISP(object):
             if not s.startswith('\\.\\pipe\\'):
                 s = '\\.\\pipe\\{}'.format(s)
             return s
-        attributes = map(scrub, self._one_or_more(named_pipe))
+        attributes = list(map(scrub, self._one_or_more(named_pipe)))
         return self.add_named_attribute(event, 'named pipe', attributes, category, to_ids, comment, distribution, proposal)
 
     def add_mutex(self, event, mutex, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
@@ -452,7 +452,7 @@ class PyMISP(object):
             if not s.startswith('\\BaseNamedObjects\\'):
                 s = '\\BaseNamedObjects\\{}'.format(s)
             return self
-        attributes = map(scrub, self._one_or_more(mutex))
+        attributes = list(map(scrub, self._one_or_more(mutex)))
         return self.add_named_attribute(event, 'mutex', attributes, category, to_ids, comment, distribution, proposal)
 
     def add_yara(self, event, yara, category='Payload delivery', to_ids=False, comment=None, distribution=None, proposal=False):
@@ -473,11 +473,11 @@ class PyMISP(object):
         return self.add_named_attribute(event, 'domain', domain, category, to_ids, comment, distribution, proposal)
 
     def add_domain_ip(self, event, domain, ip, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        composed = map(lambda x: '%s|%s' % (domain, x), ip)
+        composed = list(map(lambda x: '%s|%s' % (domain, x), ip))
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
 
     def add_domains_ips(self, event, domain_ips, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        composed = map(lambda x: '%s|%s' % (x[0], x[1]), domain_ips.items())
+        composed = list(map(lambda x: '%s|%s' % (x[0], x[1]), domain_ips.items()))
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
 
     def add_url(self, event, url, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):

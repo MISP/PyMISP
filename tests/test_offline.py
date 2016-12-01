@@ -150,7 +150,7 @@ class TestOffline(unittest.TestCase):
                 'HKLM\\Software\\Microsoft\\Outlook\\Addins\\bar': 'baz',
                 'HKLM\\Software\\Microsoft\\Outlook\\Addins\\bae': 0,
         }
-        self.assertEquals(3, p.add_regkeys(evt, regkeys))
+        self.assertEqual(3, p.add_regkeys(evt, regkeys))
         p.add_pattern(evt, '.*foobar.*', in_memory=True)
         p.add_pattern(evt, '.*foobar.*', in_file=True)
         self.assertRaises(pm.PyMISPError, p.add_pattern, evt, '.*foobar.*', in_memory=False, in_file=False)
