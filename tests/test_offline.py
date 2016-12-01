@@ -126,5 +126,77 @@ class TestOffline(unittest.TestCase):
         json.dumps(misp_event, cls=EncodeUpdate)
         json.dumps(misp_event, cls=EncodeFull)
 
+    def test_addAttributes(self, m):
+        class MockPyMISP(PyMISP):
+            def _send_attributes(self, event, attributes, proposal=False):
+                return len(attributes)
+        self.initURI(m)
+        p = MockPyMISP(self.domain, self.key)
+        evt = p.get(1)
+        self.assertEquals(3, p.add_hashes(evt, md5='68b329da9893e34099c7d8ad5cb9c940',
+                          sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
+                          sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b',
+                          filename='foobar.exe'))
+        self.assertEquals(3, p.add_hashes(evt, md5='68b329da9893e34099c7d8ad5cb9c940',
+                          sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
+                          sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b'))
+        p.av_detection_link(evt, 'https://foocorp.com')
+        p.add_detection_name(evt, 'WATERMELON')
+        p.add_filename(evt, 'foobar.exe')
+        p.add_regkey(evt, 'HKLM\\Software\\Microsoft\\Outlook\\Addins\\foobar')
+        p.add_regkey(evt,  'HKLM\\Software\\Microsoft\\Outlook\\Addins\\foobar', rvalue='foobar')
+        regkeys = {
+                'HKLM\\Software\\Microsoft\\Outlook\\Addins\\foo': None,
+                'HKLM\\Software\\Microsoft\\Outlook\\Addins\\bar': 'baz',
+                'HKLM\\Software\\Microsoft\\Outlook\\Addins\\bae': 0,
+        }
+        self.assertEquals(3, p.add_regkeys(evt, regkeys))
+        p.add_pattern(evt, '.*foobar.*', in_memory=True)
+        p.add_pattern(evt, '.*foobar.*', in_file=True)
+        self.assertRaises(pm.PyMISPError, p.add_pattern, evt, '.*foobar.*', in_memory=False, in_file=False)
+        p.add_pipe(evt, 'foo')
+        p.add_pipe(evt, '\\.\\pipe\\foo')
+        self.assertEquals(3, p.add_pipe(evt, ['foo', 'bar', 'baz']))
+        self.assertEquals(3, p.add_pipe(evt, ['foo', 'bar', '\\.\\pipe\\baz']))
+        p.add_mutex(evt, 'foo')
+        self.assertEquals(1, p.add_mutex(evt, '\\BaseNamedObjects\\foo'))
+        self.assertEquals(3, p.add_mutex(evt, ['foo', 'bar', 'baz']))
+        self.assertEquals(3, p.add_mutex(evt, ['foo', 'bar', '\\BaseNamedObjects\\baz']))
+        p.add_yara(evt, 'rule Foo {}')
+        self.assertEquals(2, p.add_yara(evt, ['rule Foo {}', 'rule Bar {}']))
+        p.add_ipdst(evt, '1.2.3.4')
+        self.assertEquals(2, p.add_ipdst(evt, ['1.2.3.4', '5.6.7.8']))
+        p.add_ipsrc(evt, '1.2.3.4')
+        self.assertEquals(2, p.add_ipsrc(evt, ['1.2.3.4', '5.6.7.8']))
+        p.add_hostname(evt, 'a.foobar.com')
+        self.assertEquals(2, p.add_hostname(evt, ['a.foobar.com', 'a.foobaz.com']))
+        p.add_domain(evt, 'foobar.com')
+        self.assertEquals(2, p.add_domain(evt, ['foobar.com', 'foobaz.com']))
+        p.add_domain_ip(evt, 'foo.com', '1.2.3.4')
+        self.assertEquals(2, p.add_domain_ip(evt, 'foo.com', ['1.2.3.4', '5.6.7.8']))
+        self.assertEquals(2, p.add_domains_ips(evt, {'foo.com': '1.2.3.4', 'bar.com': '4.5.6.7'}))
+        p.add_url(evt, 'https://example.com')
+        self.assertEquals(2, p.add_url(evt, ['https://example.com', 'http://foo.com']))
+        p.add_useragent(evt, 'Mozilla')
+        self.assertEquals(2, p.add_useragent(evt, ['Mozilla', 'Godzilla']))
+        p.add_traffic_pattern(evt, 'blabla')
+        p.add_snort(evt, 'blaba')
+        p.add_net_other(evt, 'blabla')
+        p.add_email_src(evt, 'foo@bar.com')
+        p.add_email_dst(evt,  'foo@bar.com')
+        p.add_email_subject(evt, 'you won the lottery')
+        p.add_email_attachment(evt, 'foo.doc')
+        p.add_target_email(evt, 'foo@bar.com')
+        p.add_target_user(evt, 'foo')
+        p.add_target_machine(evt,  'foobar')
+        p.add_target_org(evt,  'foobar')
+        p.add_target_location(evt,  'foobar')
+        p.add_target_external(evt, 'foobar')
+        p.add_threat_actor(evt, 'WATERMELON')
+        p.add_internal_link(evt, 'foobar')
+        p.add_internal_comment(evt, 'foobar')
+        p.add_internal_text(evt, 'foobar')
+        p.add_internal_other(evt, 'foobar')
+
 if __name__ == '__main__':
     unittest.main()

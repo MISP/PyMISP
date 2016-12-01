@@ -399,13 +399,13 @@ class PyMISP(object):
         return self._send_attributes(event, attributes, proposal)
 
     def av_detection_link(self, event, link, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'link', link, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'link', link, category, to_ids, comment, distribution, proposal)
 
     def add_detection_name(self, event, name, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'text', name, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'text', name, category, to_ids, comment, distribution, proposal)
 
     def add_filename(self, event, filename, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'filename', filename, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'filename', filename, category, to_ids, comment, distribution, proposal)
 
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
         if rvalue:
@@ -423,7 +423,7 @@ class PyMISP(object):
         attributes = []
 
         for regkey, rvalue in regkeys_values.items():
-            if rvalue:
+            if rvalue is not None:
                 type_value = 'regkey|value'
                 value = '{}|{}'.format(regkey, rvalue)
             else:
@@ -437,7 +437,7 @@ class PyMISP(object):
         if not (in_file or in_memory):
             raise PyMISPError('Invalid pattern type: please use in_memory=True or in_file=True')
         itemtype = 'pattern-in-file' if in_file else 'pattern-in-memory'
-        return self._add_named_attributes(event, itemtype, pattern, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, itemtype, pattern, category, to_ids, comment, distribution, proposal)
 
     def add_pipe(self, event, named_pipe, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
         def scrub(s):
@@ -445,7 +445,7 @@ class PyMISP(object):
                 s = '\\.\\pipe\\{}'.format(s)
             return s
         attributes = map(scrub, self._one_or_more(named_pipe))
-        return self._add_named_attributes(event, 'named pipe', value, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'named pipe', attributes, category, to_ids, comment, distribution, proposal)
 
     def add_mutex(self, event, mutex, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
         def scrub(s):
@@ -453,100 +453,100 @@ class PyMISP(object):
                 s = '\\BaseNamedObjects\\{}'.format(s)
             return self
         attributes = map(scrub, self._one_or_more(mutex))
-        return self._add_named_attributes(event, 'mutex', attributes, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'mutex', attributes, category, to_ids, comment, distribution, proposal)
 
     def add_yara(self, event, yara, category='Payload delivery', to_ids=False, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'yara', yara, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'yara', yara, category, to_ids, comment, distribution, proposal)
 
     # ##### Network attributes #####
 
     def add_ipdst(self, event, ipdst, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'ip-dst', ipdst, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'ip-dst', ipdst, category, to_ids, comment, distribution, proposal)
 
     def add_ipsrc(self, event, ipsrc, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'ip-src', ipsrc, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'ip-src', ipsrc, category, to_ids, comment, distribution, proposal)
 
     def add_hostname(self, event, hostname, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'hostname', hostname, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'hostname', hostname, category, to_ids, comment, distribution, proposal)
 
     def add_domain(self, event, domain, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'domain', domain, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'domain', domain, category, to_ids, comment, distribution, proposal)
 
     def add_domain_ip(self, event, domain, ip, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        composed = map(lambda x,y: '%s|%s' % (x, z), zip(domain, ip))
-        return self._add_named_attributes(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
+        composed = map(lambda x: '%s|%s' % (domain, x), ip)
+        return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
 
     def add_domains_ips(self, event, domain_ips, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        composed = map(lambda x,y: '%s|%s' % (x, z), domain_ips.items())
-        return self._add_named_attributes(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
+        composed = map(lambda (x,y): '%s|%s' % (x, y), domain_ips.items())
+        return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
 
     def add_url(self, event, url, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'url', url, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'url', url, category, to_ids, comment, distribution, proposal)
 
     def add_useragent(self, event, useragent, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'user-agent', useragent, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'user-agent', useragent, category, to_ids, comment, distribution, proposal)
 
     def add_traffic_pattern(self, event, pattern, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'pattern-in-traffic', pattern, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'pattern-in-traffic', pattern, category, to_ids, comment, distribution, proposal)
 
     def add_snort(self, event, snort, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'snort', snort, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'snort', snort, category, to_ids, comment, distribution, proposal)
 
     def add_net_other(self, event, netother, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'other', netother, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'other', netother, category, to_ids, comment, distribution, proposal)
 
     # ##### Email attributes #####
 
     def add_email_src(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'email-src', email, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'email-src', email, category, to_ids, comment, distribution, proposal)
 
     def add_email_dst(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'email-dst', email, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'email-dst', email, category, to_ids, comment, distribution, proposal)
 
     def add_email_subject(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'email-subject', email, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'email-subject', email, category, to_ids, comment, distribution, proposal)
 
     def add_email_attachment(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'email-attachement', email, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'email-attachment', email, category, to_ids, comment, distribution, proposal)
 
     # ##### Target attributes #####
 
     def add_target_email(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'target-email', target, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'target-email', target, category, to_ids, comment, distribution, proposal)
 
     def add_target_user(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'target-user', target, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'target-user', target, category, to_ids, comment, distribution, proposal)
 
     def add_target_machine(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'target-machine', target, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'target-machine', target, category, to_ids, comment, distribution, proposal)
 
     def add_target_org(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'target-orge', target, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'target-org', target, category, to_ids, comment, distribution, proposal)
 
     def add_target_location(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'target-location', target, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'target-location', target, category, to_ids, comment, distribution, proposal)
 
     def add_target_external(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'target-external', target, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'target-external', target, category, to_ids, comment, distribution, proposal)
 
     # ##### Attribution attributes #####
 
     def add_threat_actor(self, event, target, category='Attribution', to_ids=True, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'threat-actor', target, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'threat-actor', target, category, to_ids, comment, distribution, proposal)
 
     # ##### Internal reference attributes #####
 
     def add_internal_link(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'link', reference, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'link', reference, category, to_ids, comment, distribution, proposal)
 
     def add_internal_comment(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'comment', reference, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'comment', reference, category, to_ids, comment, distribution, proposal)
 
     def add_internal_text(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'text', reference, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'text', reference, category, to_ids, comment, distribution, proposal)
 
     def add_internal_other(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False):
-        return self._add_named_attributes(event, 'other', reference, category, to_ids, comment, distribution, proposal)
+        return self.add_named_attribute(event, 'other', reference, category, to_ids, comment, distribution, proposal)
 
     # ##################################################
     # ######### Upload samples through the API #########
