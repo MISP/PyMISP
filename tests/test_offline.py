@@ -29,6 +29,7 @@ class TestOffline(unittest.TestCase):
         self.auth_error_msg = {"name": "Authentication failed. Please make sure you pass the API key of an API enabled user along in the Authorization header.",
                                "message": "Authentication failed. Please make sure you pass the API key of an API enabled user along in the Authorization header.",
                                "url": "\/events\/1"}
+        self.search_index_result = json.load(open('tests/search_index_result.json', 'r'))
 
     def initURI(self, m):
         m.register_uri('GET', self.domain + 'events/1', json=self.auth_error_msg, status_code=403)
@@ -40,6 +41,7 @@ class TestOffline(unittest.TestCase):
         m.register_uri('DELETE', self.domain + 'events/2', json={'message': 'Event deleted.'})
         m.register_uri('DELETE', self.domain + 'events/3', json={'errors': ['Invalid event'], 'message': 'Invalid event', 'name': 'Invalid event', 'url': '/events/3'})
         m.register_uri('DELETE', self.domain + 'attributes/2', json={'message': 'Attribute deleted.'})
+        m.register_uri('GET', self.domain + 'events/index/searchtag:1', json=self.search_index_result)
 
     def test_getEvent(self, m):
         self.initURI(m)
@@ -125,6 +127,12 @@ class TestOffline(unittest.TestCase):
         misp_event.load(open('tests/57c4445b-c548-4654-af0b-4be3950d210f.json', 'r').read())
         json.dumps(misp_event, cls=EncodeUpdate)
         json.dumps(misp_event, cls=EncodeFull)
+
+    def test_searchIndexByTag (self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        response = pymisp.search_index(tag="1")
+        self.assertEqual(response['response'],self.search_index_result)
 
 if __name__ == '__main__':
     unittest.main()
