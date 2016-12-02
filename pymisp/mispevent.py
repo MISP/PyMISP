@@ -216,8 +216,10 @@ class MISPEvent(object):
 
     def __init__(self, describe_types=None):
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-        self.json_schema = json.load(open(os.path.join(self.ressources_path, 'schema.json'), 'r'))
-        self.json_schema_lax = json.load(open(os.path.join(self.ressources_path, 'schema-lax.json'), 'r'))
+        with open(os.path.join(self.ressources_path, 'schema.json', 'r') as f:
+            self.json_schema = json.load(f)
+        with open(os.path.join(self.ressources_path, 'schema-lax.json'), 'r') as f:
+            self.json_schema_lax = json.load(f)
         if not describe_types:
             t = json.load(open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r'))
             describe_types = t['result']
