@@ -1,0 +1,69 @@
+[
+  {
+    "id": "3",
+    "org": "",
+    "date": "2016-12-01",
+    "info": "Another random Event",
+    "published": false,
+    "uuid": "5758ebf5-c898-48e6-9fe9-5665c0a83866",
+    "attribute_count": "2",
+    "analysis": "0",
+    "orgc": "",
+    "timestamp": "1465681801",
+    "distribution": "3",
+    "proposal_email_lock": false,
+    "locked": false,
+    "threat_level_id": "1",
+    "publish_timestamp": "0",
+    "sharing_group_id": "0",
+    "org_id": "1",
+    "orgc_id": "1",
+    "Org": {
+      "id": "1",
+      "name": "ORGNAME"
+    },
+    "Orgc": {
+      "id": "1",
+      "name": "ORGNAME"
+    },
+    "EventTag": [
+      {
+        "id": "9760",
+        "event_id": "6028",
+        "tag_id": "4",
+        "Tag": {
+          "id": "4",
+          "name": "TLP:GREEN",
+          "colour": "#33822d",
+          "exportable": true
+        }
+      },
+      {
+        "id": "9801",
+        "event_id": "3",
+        "tag_id": "1",
+        "Tag": {
+          "id": "1",
+          "name": "for_intelmq_processing",
+          "colour": "#00ad1c",
+          "exportable": true
+        }
+      },
+      {
+        "id": "9803",
+        "event_id": "3",
+        "tag_id": "6",
+        "Tag": {
+          "id": "6",
+          "name": "ecsirt:malicious-code=\"ransomware\"",
+          "colour": "#005a5a",
+          "exportable": true
+        }
+      }
+    ],
+    "SharingGroup": {
+      "id": null,
+      "name": null
+    }
+  }
+]

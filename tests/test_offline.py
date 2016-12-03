@@ -21,14 +21,20 @@ class TestOffline(unittest.TestCase):
         self.maxDiff = None
         self.domain = 'http://misp.local/'
         self.key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        self.event = {'Event': json.load(open('tests/misp_event.json', 'r'))}
-        self.new_misp_event = {'Event': json.load(open('tests/new_misp_event.json', 'r'))}
+        with open('tests/misp_event.json', 'r') as f:
+            self.event = {'Event': json.load(f)}
+        with open('tests/new_misp_event.json', 'r') as f:
+            self.new_misp_event = {'Event': json.load(f)}
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../pymisp/data')
-        self.types = json.load(open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r'))
-        self.sharing_groups = json.load(open('tests/sharing_groups.json', 'r'))
+        with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
+            self.types = json.load(f)
+        with open('tests/sharing_groups.json', 'r') as f:
+            self.sharing_groups = json.load(f)
         self.auth_error_msg = {"name": "Authentication failed. Please make sure you pass the API key of an API enabled user along in the Authorization header.",
                                "message": "Authentication failed. Please make sure you pass the API key of an API enabled user along in the Authorization header.",
                                "url": "\/events\/1"}
+        with open('tests/search_index_result.json', 'r') as f:
+            self.search_index_result = json.load(f)
 
     def initURI(self, m):
         m.register_uri('GET', self.domain + 'events/1', json=self.auth_error_msg, status_code=403)
@@ -40,6 +46,8 @@ class TestOffline(unittest.TestCase):
         m.register_uri('DELETE', self.domain + 'events/2', json={'message': 'Event deleted.'})
         m.register_uri('DELETE', self.domain + 'events/3', json={'errors': ['Invalid event'], 'message': 'Invalid event', 'name': 'Invalid event', 'url': '/events/3'})
         m.register_uri('DELETE', self.domain + 'attributes/2', json={'message': 'Attribute deleted.'})
+        m.register_uri('GET', self.domain + 'events/index/searchtag:1', json=self.search_index_result)
+        m.register_uri('GET', self.domain + 'events/index/searchtag:ecsirt:malicious-code=%22ransomware%22', json=self.search_index_result)
 
     def test_getEvent(self, m):
         self.initURI(m)
@@ -122,9 +130,22 @@ class TestOffline(unittest.TestCase):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         misp_event = MISPEvent(pymisp.describe_types)
-        misp_event.load(open('tests/57c4445b-c548-4654-af0b-4be3950d210f.json', 'r').read())
+        with open('tests/57c4445b-c548-4654-af0b-4be3950d210f.json', 'r') as f:
+            misp_event.load(f.read())
         json.dumps(misp_event, cls=EncodeUpdate)
         json.dumps(misp_event, cls=EncodeFull)
+
+    def test_searchIndexByTagId (self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        response = pymisp.search_index(tag="1")
+        self.assertEqual(response['response'],self.search_index_result)
+    
+    def test_searchIndexByTagName (self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        response = pymisp.search_index(tag='ecsirt:malicious-code="ransomware"')
+        self.assertEqual(response['response'],self.search_index_result)
 
 if __name__ == '__main__':
     unittest.main()
