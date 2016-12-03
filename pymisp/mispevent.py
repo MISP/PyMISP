@@ -163,8 +163,6 @@ class MISPAttribute(object):
         to_return = {'type': self.type, 'category': self.category, 'to_ids': self.to_ids,
                      'distribution': self.distribution, 'value': self.value,
                      'comment': self.comment}
-        if self.sharing_group_id:
-            to_return['sharing_group_id'] = self.sharing_group_id
         if self.sig:
             to_return['sig'] = self.sig
         to_return = _int_to_str(to_return)
@@ -172,6 +170,8 @@ class MISPAttribute(object):
 
     def _json_full(self):
         to_return = self._json()
+        if self.sharing_group_id:
+            to_return['sharing_group_id'] = self.sharing_group_id
         if self.id:
             to_return['id'] = self.id
         if self.uuid:
@@ -430,21 +430,15 @@ class MISPEvent(object):
                               'threat_level_id': self.threat_level_id,
                               'analysis': self.analysis, 'Attribute': []}
         if self.sig:
-            to_return['sig'] = self.sig
+            to_return['Event']['sig'] = self.sig
         if self.global_sig:
-            to_return['global_sig'] = self.global_sig
-        if self.id:
-            to_return['Event']['id'] = self.id
-        if self.orgc_id:
-            to_return['Event']['orgc_id'] = self.orgc_id
-        if self.org_id:
-            to_return['Event']['org_id'] = self.org_id
+            to_return['Event']['global_sig'] = self.global_sig
         if self.uuid:
             to_return['Event']['uuid'] = self.uuid
-        if self.sharing_group_id:
-            to_return['Event']['sharing_group_id'] = self.sharing_group_id
         if self.Tag:
             to_return['Event']['Tag'] = self.Tag
+        if self.Orgc:
+            to_return['Event']['Orgc'] = self.Orgc
         to_return['Event'] = _int_to_str(to_return['Event'])
         if self.attributes:
             to_return['Event']['Attribute'] = [a._json() for a in self.attributes]
@@ -453,6 +447,14 @@ class MISPEvent(object):
 
     def _json_full(self):
         to_return = self._json()
+        if self.id:
+            to_return['Event']['id'] = self.id
+        if self.orgc_id:
+            to_return['Event']['orgc_id'] = self.orgc_id
+        if self.org_id:
+            to_return['Event']['org_id'] = self.org_id
+        if self.sharing_group_id:
+            to_return['Event']['sharing_group_id'] = self.sharing_group_id
         if self.locked is not None:
             to_return['Event']['locked'] = self.locked
         if self.attribute_count is not None:
@@ -461,8 +463,6 @@ class MISPEvent(object):
             to_return['Event']['RelatedEvent'] = self.RelatedEvent
         if self.Org:
             to_return['Event']['Org'] = self.Org
-        if self.Orgc:
-            to_return['Event']['Orgc'] = self.Orgc
         if self.ShadowAttribute:
             to_return['Event']['ShadowAttribute'] = self.ShadowAttribute
         if self.proposal_email_lock is not None:
