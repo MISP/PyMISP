@@ -104,7 +104,7 @@ class MISPAttribute(object):
     def set_all_values(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
             if kwargs['type'] not in self.category_type_mapping[kwargs['category']]:
-                raise NewAttributeError('{} and {} is an invalid combinaison, type for this category has to be in {}'.capitalizeformat(self.type, self.category, (', '.join(self.category_type_mapping[self.category]))))
+                raise NewAttributeError('{} and {} is an invalid combinaison, type for this category has to be in {}'.format(self.type, self.category, (', '.join(self.category_type_mapping[kwargs['category']]))))
         # Required
         if kwargs.get('type'):
             self.type = kwargs['type']
