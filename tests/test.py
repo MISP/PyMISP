@@ -47,7 +47,8 @@ class TestBasic(unittest.TestCase):
                                u'distribution': u'0', u'Attribute': [], u'proposal_email_lock': False,
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
-                               u'threat_level_id': u'1'}}
+                               u'threat_level_id': u'1'},
+                               u'Galaxy': []}
         print(event)
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
         return int(event_id)
@@ -62,6 +63,7 @@ class TestBasic(unittest.TestCase):
                                u'ShadowAttribute': [], u'published': False, u'distribution': u'0',
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
+                               u'Galaxy': [],
                                u'Attribute': [
                                    {u'category': u'Payload installation', u'comment': u'Fanny modules',
                                     u'to_ids': False, u'value': u'dll_installer.dll|0a209ac0de4ac033f31d6ba9191a8f7a',
@@ -85,6 +87,7 @@ class TestBasic(unittest.TestCase):
                                u'ShadowAttribute': [], u'published': True, u'distribution': u'0',
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
+                               u'Galaxy': [],
                                u'Attribute': [
                                    {u'category': u'Payload installation', u'comment': u'Fanny modules',
                                     u'to_ids': False, u'value': u'dll_installer.dll|0a209ac0de4ac033f31d6ba9191a8f7a',
