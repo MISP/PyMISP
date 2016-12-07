@@ -47,10 +47,10 @@ class TestBasic(unittest.TestCase):
                                u'distribution': u'0', u'Attribute': [], u'proposal_email_lock': False,
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
-                               u'threat_level_id': u'1'},
-                               u'Galaxy': []}
+                               u'Galaxy' : [],
+                               u'threat_level_id': u'1'}}
         print(event)
-        self.assertCountEqual(event, to_check, 'Failed at creating a new Event')
+        self.assertEqual(event, to_check, 'Failed at creating a new Event')
         return int(event_id)
 
     def add_hashes(self, eventid):
