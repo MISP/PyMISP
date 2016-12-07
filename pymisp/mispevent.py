@@ -8,6 +8,10 @@ from json import JSONEncoder
 import os
 import warnings
 import base64
+from io import BytesIO
+from zipfile import ZipFile
+import hashlib
+
 try:
     from dateutil.parser import parse
 except ImportError:
@@ -63,6 +67,8 @@ class MISPAttribute(object):
         self.distribution = 5
 
         # other possible values
+        self.data = None
+        self.encrypt = False
         self.id = None
         self.uuid = None
         self.timestamp = None
@@ -142,6 +148,9 @@ class MISPAttribute(object):
                 raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 5'.format(self.distribution))
 
         # other possible values
+        if kwargs.get('data'):
+            self.data = kwargs['data']
+            self._load_data()
         if kwargs.get('id'):
             self.id = int(kwargs['id'])
         if kwargs.get('uuid'):
@@ -159,12 +168,47 @@ class MISPAttribute(object):
         if kwargs.get('sig'):
             self.sig = kwargs['sig']
 
+    def _prepare_new_malware_sample(self):
+        if '|' in self.value:
+            # Get the filename, ignore the md5, because humans.
+            self.malware_filename, md5 = self.value.split('|')
+        else:
+            # Assuming the user only passed the filename
+            self.malware_filename = self.value
+        m = hashlib.md5()
+        m.update(self.data.getvalue())
+        md5 = m.hexdigest()
+        self.value = '{}|{}'.format(self.malware_filename, md5)
+        self.malware_binary = self.data
+        self.encrypt = True
+
+    def _load_data(self):
+        if not isinstance(self.data, BytesIO):
+            self.data = BytesIO(base64.b64decode(self.data))
+        if self.type == 'malware-sample':
+            try:
+                with ZipFile(self.data) as f:
+                    for name in f.namelist():
+                        if name.endswith('.txt'):
+                            with f.open(name, pwd=b'infected') as unpacked:
+                                self.malware_filename = unpacked.read().decode()
+                        else:
+                            with f.open(name, pwd=b'infected') as unpacked:
+                                self.malware_binary = BytesIO(unpacked.read())
+            except:
+                # not a encrypted zip file, assuming it is a new malware sample
+                self._prepare_new_malware_sample()
+
     def _json(self):
         to_return = {'type': self.type, 'category': self.category, 'to_ids': self.to_ids,
                      'distribution': self.distribution, 'value': self.value,
                      'comment': self.comment}
         if self.sig:
             to_return['sig'] = self.sig
+        if self.data:
+            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
+            if self.encrypt:
+                to_return['entrypt'] = self.encrypt
         to_return = _int_to_str(to_return)
         return to_return
 
@@ -216,7 +260,7 @@ class MISPEvent(object):
 
     def __init__(self, describe_types=None):
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-        with open(os.path.join(self.ressources_path, 'schema.json'),'r') as f:
+        with open(os.path.join(self.ressources_path, 'schema.json'), 'r') as f:
             self.json_schema = json.load(f)
         with open(os.path.join(self.ressources_path, 'schema-lax.json'), 'r') as f:
             self.json_schema_lax = json.load(f)
