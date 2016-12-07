@@ -451,7 +451,7 @@ class PyMISP(object):
         def scrub(s):
             if not s.startswith('\\BaseNamedObjects\\'):
                 s = '\\BaseNamedObjects\\{}'.format(s)
-            return self
+            return s
         attributes = list(map(scrub, self._one_or_more(mutex)))
         return self.add_named_attribute(event, 'mutex', attributes, category, to_ids, comment, distribution, proposal)
 
