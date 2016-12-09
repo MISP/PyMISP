@@ -656,6 +656,17 @@ class PyMISP(object):
         return self.__query_proposal(session, 'discard', proposal_id)
 
     # ##############################
+    # ###### Attribute update ######
+    # ##############################
+
+    def change_toids(self, attribute_uuid, to_ids):
+        if to_ids not in [0, 1]:
+            raise Exception('to_ids can only be 0 or 1')
+        query = {"to_ids": to_ids}
+        session = self.__prepare_session()
+        return self.__query(session, 'edit/{}'.format(attribute_uuid), query, controller='attributes')
+
+    # ##############################
     # ######## REST Search #########
     # ##############################
 
@@ -665,7 +676,6 @@ class PyMISP(object):
         if controller not in ['events', 'attributes']:
             raise Exception('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes'])))
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
-        query = {'request': query}
         if self.debug:
             print('URL: ', url)
             print('Query: ', query)
