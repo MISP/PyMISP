@@ -305,6 +305,7 @@ class MISPEvent(object):
         self.ShadowAttribute = []
         self.RelatedEvent = []
         self.Tag = []
+        self.Galaxy = None
 
     def _serialize(self):
         return '{date}{threat_level_id}{info}{uuid}{analysis}{timestamp}'.format(
@@ -460,6 +461,8 @@ class MISPEvent(object):
             self.ShadowAttribute = kwargs['ShadowAttribute']
         if kwargs.get('RelatedEvent'):
             self.RelatedEvent = kwargs['RelatedEvent']
+        if kwargs.get('Galaxy'):
+            self.Galaxy = kwargs['Galaxy']
         if kwargs.get('Tag'):
             self.Tag = kwargs['Tag']
         if kwargs.get('sig'):
@@ -483,6 +486,8 @@ class MISPEvent(object):
             to_return['Event']['Tag'] = self.Tag
         if self.Orgc:
             to_return['Event']['Orgc'] = self.Orgc
+        if self.Galaxy:
+            to_return['Event']['Galaxy'] = self.Galaxy
         to_return['Event'] = _int_to_str(to_return['Event'])
         if self.attributes:
             to_return['Event']['Attribute'] = [a._json() for a in self.attributes]
