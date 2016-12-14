@@ -144,8 +144,8 @@ class MISPAttribute(object):
             self.comment = kwargs['comment']
         if kwargs.get('distribution'):
             self.distribution = int(kwargs['distribution'])
-            if self.distribution not in [0, 1, 2, 3, 5]:
-                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 5'.format(self.distribution))
+            if self.distribution not in [0, 1, 2, 3, 4, 5]:
+                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
 
         # other possible values
         if kwargs.get('data'):
@@ -205,6 +205,8 @@ class MISPAttribute(object):
                      'comment': self.comment}
         if self.sig:
             to_return['sig'] = self.sig
+        if self.sharing_group_id:
+            to_return['sharing_group_id'] = self.sharing_group_id
         if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
             if self.encrypt:
@@ -214,8 +216,6 @@ class MISPAttribute(object):
 
     def _json_full(self):
         to_return = self._json()
-        if self.sharing_group_id:
-            to_return['sharing_group_id'] = self.sharing_group_id
         if self.id:
             to_return['id'] = self.id
         if self.uuid:
@@ -412,8 +412,8 @@ class MISPEvent(object):
         # Default values for a valid event to send to a MISP instance
         if kwargs.get('distribution') is not None:
             self.distribution = int(kwargs['distribution'])
-            if self.distribution not in [0, 1, 2, 3]:
-                raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3'.format(self.distribution))
+            if self.distribution not in [0, 1, 2, 3, 4]:
+                raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
         if kwargs.get('threat_level_id') is not None:
             self.threat_level_id = int(kwargs['threat_level_id'])
             if self.threat_level_id not in [1, 2, 3, 4]:
@@ -488,6 +488,8 @@ class MISPEvent(object):
             to_return['Event']['Orgc'] = self.Orgc
         if self.Galaxy:
             to_return['Event']['Galaxy'] = self.Galaxy
+        if self.sharing_group_id:
+            to_return['Event']['sharing_group_id'] = self.sharing_group_id
         to_return['Event'] = _int_to_str(to_return['Event'])
         if self.attributes:
             to_return['Event']['Attribute'] = [a._json() for a in self.attributes]
@@ -502,8 +504,6 @@ class MISPEvent(object):
             to_return['Event']['orgc_id'] = self.orgc_id
         if self.org_id:
             to_return['Event']['org_id'] = self.org_id
-        if self.sharing_group_id:
-            to_return['Event']['sharing_group_id'] = self.sharing_group_id
         if self.locked is not None:
             to_return['Event']['locked'] = self.locked
         if self.attribute_count is not None:
