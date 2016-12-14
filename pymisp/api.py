@@ -100,7 +100,19 @@ class PyMISP(object):
 
         try:
             # Make sure the MISP instance is working and the URL is valid
-            self.get_version()
+            response = self.get_version()
+            misp_version = response['version'].split('.')
+            pymisp_version = __version__.split('.')
+            for a, b in zip(misp_version, pymisp_version):
+                if a == b:
+                    continue
+                elif a < b:
+                    warnings.warn("Remote MISP instance (v{}) older than PyMISP (v{}). You should update your MISP instance, or install an older PyMISP version.".format(response['version'], __version__))
+                else:  # a > b
+                    # NOTE: That can happen and should not be blocking
+                    warnings.warn("Remote MISP instance (v{}) newer than PyMISP (v{}). Please check if a newer version of PyMISP is available.".format(response['version'], __version__))
+                    continue
+
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
