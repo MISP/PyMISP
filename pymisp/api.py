@@ -767,7 +767,7 @@ class PyMISP(object):
             :param eventid: Evend ID(s) | str or list
             :param tag: Tag(s) | str or list
             :param datefrom: First date, in format YYYY-MM-DD
-            :param datefrom: Last date, in format YYYY-MM-DD
+            :param dateto: Last date, in format YYYY-MM-DD
             :param eventinfo: Event info(s) to match | str or list
             :param threatlevel: Threat level(s) (1,2,3,4) | str or list
             :param distribution: Distribution level(s) (0,1,2,3) | str or list
