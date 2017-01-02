@@ -534,6 +534,16 @@ class MISPEvent(object):
     def unpublish(self):
         self.published = False
 
+    def delete_attribute(self, attribute_id):
+        found = False
+        for a in self.attributes:
+            if a.id == attribute_id or a.uuid == attribute_id:
+                a.deleted = True
+                found = True
+                break
+        if not found:
+            raise Exception('No attribute with UUID/ID {} found.'.format(attribute_id))
+
     def add_attribute(self, type, value, **kwargs):
         attribute = MISPAttribute(self.describe_types)
         attribute.set_all_values(type=type, value=value, **kwargs)
