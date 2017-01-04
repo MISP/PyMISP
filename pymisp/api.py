@@ -370,7 +370,7 @@ class PyMISP(object):
 
     def _valid_uuid(self,uuid):
         """ 
-            Test valid uuid générate by CakePhp
+            Test if uuid is valid
 
             CakeText::uuid follow RFC 4122
              - the third group must start with a 4,
