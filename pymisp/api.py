@@ -376,7 +376,7 @@ class PyMISP(object):
              - the third group must start with a 4,
              - the fourth group must start with 8, 9, a or b.
              
-             :param uuid: A UUID to validate
+             :param uuid: an uuid
         """
         regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
         match = regex.match(uuid)
@@ -759,7 +759,7 @@ class PyMISP(object):
             :param date_from: First date
             :param date_to: Last date
             :param last: Last updated events (for example 5d or 12h or 30m)
-            :param uuid: A uuid valideted
+            :param uuid: a valid uuid
 
         """
         val = self.__prepare_rest_search(values, not_values).replace('/', '|')
