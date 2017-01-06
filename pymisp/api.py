@@ -369,6 +369,19 @@ class PyMISP(object):
         response = session.post(urljoin(self.root_url, 'events/removeTag'), data=json.dumps(to_post))
         return self._check_response(response)
 
+    def _valid_uuid(self,uuid):
+        """ 
+            Test if uuid is valid
+
+            CakeText::uuid follow RFC 4122
+             - the third group must start with a 4,
+             - the fourth group must start with 8, 9, a or b.
+             
+             :param uuid: an uuid
+        """
+        regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+        match = regex.match(uuid)
+        return bool(match)
     # ##### File attributes #####
 
     def _send_attributes(self, event, attributes, proposal=False):
@@ -770,7 +783,7 @@ class PyMISP(object):
 
     def search(self, values=None, not_values=None, type_attribute=None,
                category=None, org=None, tags=None, not_tags=None, date_from=None,
-               date_to=None, last=None, metadata=None, controller='events'):
+               date_to=None, last=None, metadata=None, uuid=None, controller='events'):
         """
             Search via the Rest API
 
@@ -785,7 +798,7 @@ class PyMISP(object):
             :param date_to: Last date
             :param last: Last updated events (for example 5d or 12h or 30m)
             :param metadata: return onlymetadata if True
-
+            :param uuid: a valid uuid
         """
         val = self.__prepare_rest_search(values, not_values)
         tag = self.__prepare_rest_search(tags, not_tags)
@@ -814,6 +827,11 @@ class PyMISP(object):
             query['last'] = last
         if metadata is not None:
             query['metadata'] = metadata
+        if uuid is not None:
+            if self._valid_uuid(uuid):
+                query['uuid'] = uuid
+            else:
+                return {'error': 'You must enter a valid uuid.'}
 
         session = self.__prepare_session()
         return self.__query(session, 'restSearch/download', query, controller)
