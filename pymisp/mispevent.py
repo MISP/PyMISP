@@ -95,6 +95,9 @@ class MISPAttribute(object):
             signed, _ = c.sign(to_sign, mode=mode.DETACH)
             self.sig = base64.b64encode(signed).decode()
 
+    def delete(self):
+        self.deleted = True
+
     def verify(self, gpg_uid):
         if not has_pyme:
             raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
@@ -460,7 +463,11 @@ class MISPEvent(object):
         if kwargs.get('ShadowAttribute'):
             self.ShadowAttribute = kwargs['ShadowAttribute']
         if kwargs.get('RelatedEvent'):
-            self.RelatedEvent = kwargs['RelatedEvent']
+            self.RelatedEvent = []
+            for rel_event in kwargs['RelatedEvent']:
+                sub_event = MISPEvent()
+                sub_event.load(rel_event)
+                self.RelatedEvent.append(sub_event)
         if kwargs.get('Galaxy'):
             self.Galaxy = kwargs['Galaxy']
         if kwargs.get('Tag'):
@@ -509,7 +516,9 @@ class MISPEvent(object):
         if self.attribute_count is not None:
             to_return['Event']['attribute_count'] = self.attribute_count
         if self.RelatedEvent:
-            to_return['Event']['RelatedEvent'] = self.RelatedEvent
+            to_return['Event']['RelatedEvent'] = []
+            for rel_event in self.RelatedEvent:
+                to_return['Event']['RelatedEvent'].append(rel_event._json_full())
         if self.Org:
             to_return['Event']['Org'] = self.Org
         if self.ShadowAttribute:
@@ -538,7 +547,7 @@ class MISPEvent(object):
         found = False
         for a in self.attributes:
             if a.id == attribute_id or a.uuid == attribute_id:
-                a.deleted = True
+                a.delete()
                 found = True
                 break
         if not found:
