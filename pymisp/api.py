@@ -370,13 +370,13 @@ class PyMISP(object):
         return self._check_response(response)
 
     def _valid_uuid(self,uuid):
-        """ 
+        """
             Test if uuid is valid
 
             CakeText::uuid follow RFC 4122
              - the third group must start with a 4,
              - the fourth group must start with 8, 9, a or b.
-             
+
              :param uuid: an uuid
         """
         regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
@@ -1048,7 +1048,7 @@ class PyMISP(object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'sharing_groups/index.json')
         response = session.get(url)
-        return self._check_response(response)['response'][0]
+        return self._check_response(response)['response']
 
     # ############## Users ##################
 
