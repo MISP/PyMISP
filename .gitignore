@@ -1,3 +1,4 @@
+*.swp
 *.pem
 *.pyc
 examples/keys.py

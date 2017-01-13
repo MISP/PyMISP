@@ -317,10 +317,10 @@ class PyMISP(object):
             misp_event.publish()
         return misp_event
 
-    def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5):
+    def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5, **kwargs):
         misp_attribute = MISPAttribute(self.describe_types)
         misp_attribute.set_all_values(type=type_value, value=value, category=category,
-                                      to_ids=to_ids, comment=comment, distribution=distribution)
+                                      to_ids=to_ids, comment=comment, distribution=distribution, **kwargs)
         return misp_attribute
 
     def _one_or_more(self, value):
@@ -394,10 +394,10 @@ class PyMISP(object):
             response = self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
         return response
 
-    def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False):
+    def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         attributes = []
         for value in self._one_or_more(value):
-            attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
+            attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution, **kwargs))
         return self._send_attributes(event, attributes, proposal)
 
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, ssdeep=None, comment=None, to_ids=True, distribution=None, proposal=False):
@@ -432,6 +432,35 @@ class PyMISP(object):
     def add_filename(self, event, filename, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False):
         return self.add_named_attribute(event, 'filename', filename, category, to_ids, comment, distribution, proposal)
 
+    def add_attachment(self, event, filename, attachment=None, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False):
+        """Add an attachment to the MISP event 
+
+        :param event: The event to add an attachment to
+        :param filename: The name you want to store the file under
+        :param attachment: Either a file handle or a path to a file - will be uploaded
+        """
+    
+        if hasattr(attachment, "read"):
+            # It's a file handle - we can read it
+            fileData = attachment.read()
+
+        elif isinstance(attachment, str):
+            # It can either be the b64 encoded data or a file path
+            if os.path.exists(attachment):
+                # It's a path!
+                with open(attachment, "r") as f:
+                    fileData = f.read()
+            else:
+                # We have to assume it's the actual data
+                fileData = attachment
+
+        # by now we have a string for the file
+        # we just need to b64 encode it and send it on its way
+        # also, just decode it to utf-8 to avoid the b'string' format
+        encodedData = base64.b64encode(fileData.encode("utf-8")).decode("utf-8")
+    
+        # Send it on its way
+        return self.add_named_attribute(event, 'attachment', filename, category, to_ids, comment, distribution, proposal, data=encodedData)
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
         if rvalue:
             type_value = 'regkey|value'
