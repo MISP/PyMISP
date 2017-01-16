@@ -46,6 +46,7 @@ class distributions(object):
     all_communities = 3
     sharing_group = 4
 
+
 class threat_level(object):
     """Enumeration of the available threat levels."""
     high = 1
@@ -320,6 +321,14 @@ class PyMISP(object):
 
     # ########## Helpers ##########
 
+    def _make_mispevent(self, event):
+        if not isinstance(event, MISPEvent):
+            e = MISPEvent(self.describe_types)
+            e.load(event)
+        else:
+            e = event
+        return e
+
     def get(self, eid):
         return self.get_event(eid)
 
@@ -327,33 +336,30 @@ class PyMISP(object):
         return self.get_stix_event(**kwargs)
 
     def update(self, event):
-        if event['Event'].get('uuid'):
-            eid = event['Event']['uuid']
+        e = self._make_mispevent(event)
+        if e.uuid:
+            eid = e.uuid
         else:
-            eid = event['Event']['id']
-        return self.update_event(eid, event)
+            eid = e.id
+        return self.update_event(eid, json.dumps(e, cls=EncodeUpdate))
 
     def publish(self, event):
-        if event['Event']['published']:
+        e = self._make_mispevent(event)
+        if e.published:
             return {'error': 'Already published'}
-        e = MISPEvent(self.describe_types)
-        e.load(event)
         e.publish()
-        return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
+        return self.update(event)
 
     def change_threat_level(self, event, threat_level_id):
-        e = MISPEvent(self.describe_types)
-        e.load(event)
+        e = self._make_mispevent(event)
         e.threat_level_id = threat_level_id
-        return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
+        return self.update(event)
 
     def change_sharing_group(self, event, sharing_group_id):
-        e = MISPEvent(self.describe_types)
-        e.load(event)
+        e = self._make_mispevent(event)
         e.distribution = 4      # Needs to be 'Sharing group'
         e.sharing_group_id = sharing_group_id
-        return self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
-
+        return self.update(event)
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
         misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published, orgc_id, org_id, sharing_group_id)
@@ -391,7 +397,7 @@ class PyMISP(object):
             e = MISPEvent(self.describe_types)
             e.load(event)
             e.attributes += attributes
-            response = self.update_event(event['Event']['id'], json.dumps(e, cls=EncodeUpdate))
+            response = self.update(event)
         return response
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
@@ -1054,10 +1060,9 @@ class PyMISP(object):
 
     def get_sharing_groups(self):
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'sharing_groups')
+        url = urljoin(self.root_url, 'sharing_groups.json')
         response = session.get(url)
         return self._check_response(response)['response']
-
 
     # ############## Users ##################
 

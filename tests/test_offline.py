@@ -38,11 +38,11 @@ class TestOffline(unittest.TestCase):
 
     def initURI(self, m):
         m.register_uri('GET', self.domain + 'events/1', json=self.auth_error_msg, status_code=403)
-        m.register_uri('GET', self.domain + 'servers/getVersion.json', json={"version": "2.4.50"})
-        m.register_uri('GET', self.domain + 'sharing_groups/index.json', json=self.sharing_groups)
+        m.register_uri('GET', self.domain + 'servers/getVersion.json', json={"version": "2.4.56"})
+        m.register_uri('GET', self.domain + 'sharing_groups.json', json=self.sharing_groups)
         m.register_uri('GET', self.domain + 'attributes/describeTypes.json', json=self.types)
         m.register_uri('GET', self.domain + 'events/2', json=self.event)
-        m.register_uri('POST', self.domain + 'events/2', json=self.event)
+        m.register_uri('POST', self.domain + 'events/5758ebf5-c898-48e6-9fe9-5665c0a83866', json=self.event)
         m.register_uri('DELETE', self.domain + 'events/2', json={'message': 'Event deleted.'})
         m.register_uri('DELETE', self.domain + 'events/3', json={'errors': ['Invalid event'], 'message': 'Invalid event', 'name': 'Invalid event', 'url': '/events/3'})
         m.register_uri('DELETE', self.domain + 'attributes/2', json={'message': 'Attribute deleted.'})
@@ -60,8 +60,8 @@ class TestOffline(unittest.TestCase):
     def test_updateEvent(self, m):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
-        e0 = pymisp.update_event(2, json.dumps(self.event))
-        e1 = pymisp.update_event(2, self.event)
+        e0 = pymisp.update_event('5758ebf5-c898-48e6-9fe9-5665c0a83866', json.dumps(self.event))
+        e1 = pymisp.update_event('5758ebf5-c898-48e6-9fe9-5665c0a83866', self.event)
         self.assertEqual(e0, e1)
         e2 = pymisp.update(e0)
         self.assertEqual(e1, e2)
@@ -97,7 +97,7 @@ class TestOffline(unittest.TestCase):
         api_version = pymisp.get_api_version()
         self.assertEqual(api_version, {'version': pm.__version__})
         server_version = pymisp.get_version()
-        self.assertEqual(server_version, {"version": "2.4.50"})
+        self.assertEqual(server_version, {"version": "2.4.56"})
 
     def test_getSharingGroups(self, m):
         self.initURI(m)
