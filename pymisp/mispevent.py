@@ -78,6 +78,7 @@ class MISPAttribute(object):
         self.SharingGroup = []
         self.ShadowAttribute = []
         self.disable_correlation = False
+        self.RelatedAttribute = []
 
     def _serialize(self):
         return '{type}{category}{to_ids}{uuid}{timestamp}{comment}{deleted}{value}'.format(
@@ -172,7 +173,7 @@ class MISPAttribute(object):
         if kwargs.get('sig'):
             self.sig = kwargs['sig']
 
-        # If the user wants to disable correlation, let them. Defaults to False.    
+        # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.get("disable_correlation", False)
 
     def _prepare_new_malware_sample(self):

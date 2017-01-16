@@ -255,7 +255,7 @@ class PyMISP(object):
 
     def add_event(self, event):
         """Add a new event
-    
+
         :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
@@ -327,7 +327,10 @@ class PyMISP(object):
         return self.get_stix_event(**kwargs)
 
     def update(self, event):
-        eid = event['Event']['id']
+        if event['Event'].get('uuid'):
+            eid = event['Event']['uuid']
+        else:
+            eid = event['Event']['id']
         return self.update_event(eid, event)
 
     def publish(self, event):
@@ -360,7 +363,7 @@ class PyMISP(object):
         response = session.post(urljoin(self.root_url, 'events/removeTag'), data=json.dumps(to_post))
         return self._check_response(response)
 
-    def _valid_uuid(self,uuid):
+    def _valid_uuid(self, uuid):
         """Test if uuid is valid
         Will test against CakeText's RFC 4122, i.e
         "the third group must start with a 4,
@@ -422,13 +425,13 @@ class PyMISP(object):
         return self.add_named_attribute(event, 'filename', filename, category, to_ids, comment, distribution, proposal)
 
     def add_attachment(self, event, filename, attachment=None, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False):
-        """Add an attachment to the MISP event 
+        """Add an attachment to the MISP event
 
         :param event: The event to add an attachment to
         :param filename: The name you want to store the file under
         :param attachment: Either a file handle or a path to a file - will be uploaded
         """
-    
+
         if hasattr(attachment, "read"):
             # It's a file handle - we can read it
             fileData = attachment.read()
@@ -447,9 +450,10 @@ class PyMISP(object):
         # we just need to b64 encode it and send it on its way
         # also, just decode it to utf-8 to avoid the b'string' format
         encodedData = base64.b64encode(fileData.encode("utf-8")).decode("utf-8")
-    
+
         # Send it on its way
         return self.add_named_attribute(event, 'attachment', filename, category, to_ids, comment, distribution, proposal, data=encodedData)
+
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False):
         if rvalue:
             type_value = 'regkey|value'

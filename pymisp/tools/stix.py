@@ -3,7 +3,7 @@
 
 try:
     from misp_stix_converter.converters.buildMISPAttribute import buildEvent
-    from misp_stix_converter.converters import convert 
+    from misp_stix_converter.converters import convert
     from misp_stix_converter.converters.convert import MISPtoSTIX
     has_misp_stix_converter = True
 except ImportError:
