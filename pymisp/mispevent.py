@@ -77,6 +77,7 @@ class MISPAttribute(object):
         self.sig = None
         self.SharingGroup = []
         self.ShadowAttribute = []
+        self.disable_correlation = False
 
     def _serialize(self):
         return '{type}{category}{to_ids}{uuid}{timestamp}{comment}{deleted}{value}'.format(
@@ -171,6 +172,9 @@ class MISPAttribute(object):
         if kwargs.get('sig'):
             self.sig = kwargs['sig']
 
+        # If the user wants to disable correlation, let them. Defaults to False.    
+        self.disable_correlation = kwargs.get("disable_correlation", False)
+
     def _prepare_new_malware_sample(self):
         if '|' in self.value:
             # Get the filename, ignore the md5, because humans.
@@ -205,7 +209,7 @@ class MISPAttribute(object):
     def _json(self):
         to_return = {'type': self.type, 'category': self.category, 'to_ids': self.to_ids,
                      'distribution': self.distribution, 'value': self.value,
-                     'comment': self.comment}
+                     'comment': self.comment, 'disable_correlation': self.disable_correlation}
         if self.sig:
             to_return['sig'] = self.sig
         if self.sharing_group_id:
