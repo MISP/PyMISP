@@ -62,19 +62,18 @@ class analysis(object):
 
 
 class PyMISP(object):
-    """
-        Python API for MISP
+    """Python API for MISP
 
-        :param url: URL of the MISP instance you want to connect to
-        :param key: API key of the user you want to use
-        :param ssl: can be True or False (to check ot not the validity
-                    of the certificate. Or a CA_BUNDLE in case of self
-                    signed certiifcate (the concatenation of all the
-                    *.crt of the chain)
-        :param out_type: Type of object (json) NOTE: XML output isn't supported anymore, keeping the flag for compatibility reasons.
-        :param debug: print all the messages received from the server
-        :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
-        :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
+    :param url: URL of the MISP instance you want to connect to
+    :param key: API key of the user you want to use
+    :param ssl: can be True or False (to check ot not the validity
+                of the certificate. Or a CA_BUNDLE in case of self
+                signed certiifcate (the concatenation of all the
+                *.crt of the chain)
+    :param out_type: Type of object (json) NOTE: XML output isn't supported anymore, keeping the flag for compatibility reasons.
+    :param debug: print all the messages received from the server
+    :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
+    :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
     """
 
     # So it can may be accessed from the misp object.
@@ -136,9 +135,8 @@ class PyMISP(object):
         self.sane_default = self.describe_types['sane_defaults']
 
     def __prepare_session(self, output='json'):
-        """
-            Prepare the headers of the session
-        """
+        """Prepare the headers of the session"""
+
         if not HAVE_REQUESTS:
             raise MissingDependency('Missing dependency, install requests (`pip install requests`)')
         session = requests.Session()
@@ -218,10 +216,9 @@ class PyMISP(object):
     # ################################################
 
     def get_index(self, filters=None):
-        """
-            Return the index.
+        """Return the index.
 
-            Warning, there's a limit on the number of results
+        Warning, there's a limit on the number of results
         """
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/index')
@@ -233,10 +230,9 @@ class PyMISP(object):
         return self._check_response(response)
 
     def get_event(self, event_id):
-        """
-            Get an event
+        """Get an event
 
-            :param event_id: Event id to get
+        :param event_id: Event id to get
         """
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
@@ -244,9 +240,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def get_stix_event(self, event_id=None, with_attachments=False, from_date=False, to_date=False, tags=False):
-        """
-            Get an event/events in STIX format
-        """
+        """Get an event/events in STIX format"""
         if tags:
             if isinstance(tags, list):
                 tags = "&&".join(tags)
@@ -260,10 +254,9 @@ class PyMISP(object):
         return self._check_response(response)
 
     def add_event(self, event):
-        """
-            Add a new event
-
-            :param event: Event as JSON object / string or XML to add
+        """Add a new event
+    
+        :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events')
@@ -274,11 +267,10 @@ class PyMISP(object):
         return self._check_response(response)
 
     def update_event(self, event_id, event):
-        """
-            Update an event
+        """Update an event
 
-            :param event_id: Event id to update
-            :param event: Event as JSON object / string or XML to add
+        :param event_id: Event id to update
+        :param event: Event as JSON object / string or XML to add
         """
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
@@ -289,10 +281,9 @@ class PyMISP(object):
         return self._check_response(response)
 
     def delete_event(self, event_id):
-        """
-            Delete an event
+        """Delete an event
 
-            :param event_id: Event id to delete
+        :param event_id: Event id to delete
         """
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
@@ -370,14 +361,12 @@ class PyMISP(object):
         return self._check_response(response)
 
     def _valid_uuid(self,uuid):
-        """
-            Test if uuid is valid
+        """Test if uuid is valid
+        Will test against CakeText's RFC 4122, i.e
+        "the third group must start with a 4,
+        and the fourth group must start with 8, 9, a or b."
 
-            CakeText::uuid follow RFC 4122
-             - the third group must start with a 4,
-             - the fourth group must start with 8, 9, a or b.
-
-             :param uuid: an uuid
+        :param uuid: an uuid
         """
         regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
         match = regex.match(uuid)
@@ -739,20 +728,18 @@ class PyMISP(object):
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateto=None, eventinfo=None, threatlevel=None, distribution=None,
                      analysis=None, attribute=None, org=None):
-        """
-            Search only at the index level. Use ! infront of value as NOT, default OR
+        """Search only at the index level. Use ! infront of value as NOT, default OR
 
-            :param published: Published (0,1)
-            :param eventid: Evend ID(s) | str or list
-            :param tag: Tag(s) | str or list
-            :param datefrom: First date, in format YYYY-MM-DD
-            :param dateto: Last date, in format YYYY-MM-DD
-            :param eventinfo: Event info(s) to match | str or list
-            :param threatlevel: Threat level(s) (1,2,3,4) | str or list
-            :param distribution: Distribution level(s) (0,1,2,3) | str or list
-            :param analysis: Analysis level(s) (0,1,2) | str or list
-            :param org: Organisation(s) | str or list
-
+        :param published: Published (0,1)
+        :param eventid: Evend ID(s) | str or list
+        :param tag: Tag(s) | str or list
+        :param datefrom: First date, in format YYYY-MM-DD
+        :param dateto: Last date, in format YYYY-MM-DD
+        :param eventinfo: Event info(s) to match | str or list
+        :param threatlevel: Threat level(s) (1,2,3,4) | str or list
+        :param distribution: Distribution level(s) (0,1,2,3) | str or list
+        :param analysis: Analysis level(s) (0,1,2) | str or list
+        :param org: Organisation(s) | str or list
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateto': dateto,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
@@ -787,11 +774,10 @@ class PyMISP(object):
         return self.__query(session, 'restSearch/download', query)
 
     def __prepare_rest_search(self, values, not_values):
-        """
-            Prepare a search, generate the chain processed by the server
+        """Prepare a search, generate the chain processed by the server
 
-            :param values: Values to search
-            :param not_values: Values that should not be in the response
+        :param values: Values to search
+        :param not_values: Values that should not be in the response
         """
         to_return = ''
         if values is not None:
@@ -813,21 +799,20 @@ class PyMISP(object):
     def search(self, values=None, not_values=None, type_attribute=None,
                category=None, org=None, tags=None, not_tags=None, date_from=None,
                date_to=None, last=None, metadata=None, uuid=None, controller='events'):
-        """
-            Search via the Rest API
+        """Search via the Rest API
 
-            :param values: values to search for
-            :param not_values: values *not* to search for
-            :param type_attribute: Type of attribute
-            :param category: Category to search
-            :param org: Org reporting the event
-            :param tags: Tags to search for
-            :param not_tags: Tags *not* to search for
-            :param date_from: First date
-            :param date_to: Last date
-            :param last: Last updated events (for example 5d or 12h or 30m)
-            :param metadata: return onlymetadata if True
-            :param uuid: a valid uuid
+        :param values: values to search for
+        :param not_values: values *not* to search for
+        :param type_attribute: Type of attribute
+        :param category: Category to search
+        :param org: Org reporting the event
+        :param tags: Tags to search for
+        :param not_tags: Tags *not* to search for
+        :param date_from: First date
+        :param date_to: Last date
+        :param last: Last updated events (for example 5d or 12h or 30m)
+        :param metadata: return onlymetadata if True
+        :param uuid: a valid uuid
         """
         val = self.__prepare_rest_search(values, not_values)
         tag = self.__prepare_rest_search(tags, not_tags)
@@ -865,12 +850,10 @@ class PyMISP(object):
         session = self.__prepare_session()
         return self.__query(session, 'restSearch/download', query, controller)
 
-    def get_attachement(self, event_id):
-        """
-            Get attachement of an event (not sample)
+    def get_attachment(self, event_id):
+        """Get attachement of an event (not sample)
 
-            :param event_id: Event id from where the attachements will
-                             be fetched
+        :param event_id: Event id from where the attachements will be fetched
         """
         attach = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(event_id))
         session = self.__prepare_session()
@@ -918,29 +901,25 @@ class PyMISP(object):
         return True, details
 
     def download_last(self, last):
-        """
-            Download the last updated events.
+        """Download the last updated events.
 
-            :param last: can be defined in days, hours, minutes (for example 5d or 12h or 30m)
+        :param last: can be defined in days, hours, minutes (for example 5d or 12h or 30m)
         """
         return self.search(last=last)
 
     # ############## Suricata ###############
 
     def download_all_suricata(self):
-        """
-            Download all suricata rules events.
-        """
+        """Download all suricata rules events."""
         suricata_rules = urljoin(self.root_url, 'events/nids/suricata/download')
         session = self.__prepare_session('rules')
         response = session.get(suricata_rules)
         return response
 
     def download_suricata_rule_event(self, event_id):
-        """
-            Download one suricata rule event.
+        """Download one suricata rule event.
 
-            :param event_id: ID of the event to download (same as get)
+        :param event_id: ID of the event to download (same as get)
         """
         template = urljoin(self.root_url, 'events/nids/suricata/download/{}'.format(event_id))
         session = self.__prepare_session('rules')
@@ -972,15 +951,11 @@ class PyMISP(object):
     # ########## Version ##########
 
     def get_api_version(self):
-        """
-            Returns the current version of PyMISP installed on the system
-        """
+        """Returns the current version of PyMISP installed on the system"""
         return {'version': __version__}
 
     def get_api_version_master(self):
-        """
-            Get the most recent version of PyMISP from github
-        """
+        """Get the most recent version of PyMISP from github"""
         r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/master/pymisp/__init__.py')
         if r.status_code == 200:
             version = re.findall("__version__ = '(.*)'", r.text)
@@ -989,18 +964,14 @@ class PyMISP(object):
             return {'error': 'Impossible to retrieve the version of the master branch.'}
 
     def get_version(self):
-        """
-            Returns the version of the instance.
-        """
+        """Returns the version of the instance."""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'servers/getVersion.json')
         response = session.get(url)
         return self._check_response(response)
 
     def get_version_master(self):
-        """
-            Get the most recent version from github
-        """
+        """Get the most recent version from github"""
         r = requests.get('https://raw.githubusercontent.com/MISP/MISP/2.4/VERSION.json')
         if r.status_code == 200:
             master_version = json.loads(r.text)
@@ -1020,9 +991,7 @@ class PyMISP(object):
     # ############## Statistics ##################
 
     def get_attributes_statistics(self, context='type', percentage=None):
-        """
-            Get attributes statistics from the MISP instance
-        """
+        """Get attributes statistics from the MISP instance"""
         session = self.__prepare_session()
         if (context != 'category'):
             context = 'type'
@@ -1034,9 +1003,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def get_tags_statistics(self, percentage=None, name_sort=None):
-        """
-        Get tags statistics from the MISP instance
-        """
+        """Get tags statistics from the MISP instance"""
         session = self.__prepare_session()
         if percentage is not None:
             percentage = 'true'
