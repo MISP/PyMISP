@@ -526,6 +526,8 @@ class MISPEvent(object):
                 to_return['Event']['RelatedEvent'].append(rel_event._json_full())
         if self.Org:
             to_return['Event']['Org'] = self.Org
+        if self.sharing_group_id:
+            to_return['Event']['sharing_group_id'] = self.sharing_group_id
         if self.ShadowAttribute:
             to_return['Event']['ShadowAttribute'] = self.ShadowAttribute
         if self.proposal_email_lock is not None:
