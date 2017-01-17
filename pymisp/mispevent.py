@@ -79,6 +79,7 @@ class MISPAttribute(object):
         self.ShadowAttribute = []
         self.disable_correlation = False
         self.RelatedAttribute = []
+        self.Tag = []
 
     def _serialize(self):
         return '{type}{category}{to_ids}{uuid}{timestamp}{comment}{deleted}{value}'.format(
@@ -172,6 +173,8 @@ class MISPAttribute(object):
             self.ShadowAttribute = kwargs['ShadowAttribute']
         if kwargs.get('sig'):
             self.sig = kwargs['sig']
+        if kwargs.get('Tag'):
+            self.Tag = kwargs['Tag']
 
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.get("disable_correlation", False)
@@ -215,6 +218,8 @@ class MISPAttribute(object):
             to_return['sig'] = self.sig
         if self.sharing_group_id:
             to_return['sharing_group_id'] = self.sharing_group_id
+        if self.Tag:
+            to_return['Event']['Tag'] = self.Tag
         if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
             if self.encrypt:
