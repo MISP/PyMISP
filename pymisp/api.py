@@ -370,9 +370,11 @@ class PyMISP(object):
         session = self.__prepare_session()
         if attribute:
             to_post = {'request': {'Attribute': {'id': event['id'], 'tag': tag}}}
+            path = 'attributes/addTag'
         else:
             to_post = {'request': {'Event': {'id': event['id'], 'tag': tag}}}
-        response = session.post(urljoin(self.root_url, 'events/addTag'), data=json.dumps(to_post))
+            path = 'events/addTag'
+        response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
         return self._check_response(response)
 
     def remove_tag(self, event, tag, attribute=False):
@@ -380,10 +382,11 @@ class PyMISP(object):
         session = self.__prepare_session()
         if attribute:
             to_post = {'request': {'Attribute': {'id': event['id'], 'tag': tag}}}
-            pass
+            path = 'attributes/addTag'
         else:
             to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
-        response = session.post(urljoin(self.root_url, 'events/removeTag'), data=json.dumps(to_post))
+            path = 'events/addTag'
+        response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
         return self._check_response(response)
 
     def _valid_uuid(self, uuid):
