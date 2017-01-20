@@ -219,7 +219,7 @@ class MISPAttribute(object):
         if self.sharing_group_id:
             to_return['sharing_group_id'] = self.sharing_group_id
         if self.Tag:
-            to_return['Event']['Tag'] = self.Tag
+            to_return['Tag'] = self.Tag
         if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
             if self.encrypt:
