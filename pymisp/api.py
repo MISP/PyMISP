@@ -756,7 +756,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
-                     dateto=None, eventinfo=None, threatlevel=None, distribution=None,
+                     dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
                      analysis=None, attribute=None, org=None, to_ids=False, deleted=False):
         """Search only at the index level. Use ! infront of value as NOT, default OR
 
@@ -764,7 +764,7 @@ class PyMISP(object):
         :param eventid: Evend ID(s) | str or list
         :param tag: Tag(s) | str or list
         :param datefrom: First date, in format YYYY-MM-DD
-        :param dateto: Last date, in format YYYY-MM-DD
+        :param dateuntil: Last date, in format YYYY-MM-DD
         :param eventinfo: Event info(s) to match | str or list
         :param threatlevel: Threat level(s) (1,2,3,4) | str or list
         :param distribution: Distribution level(s) (0,1,2,3) | str or list
@@ -779,7 +779,7 @@ class PyMISP(object):
             - true: include deleted attributes
             - "only": ONLY include deleted attributes
         """
-        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateto': dateto,
+        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
                    'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
                    'org': org, 'to_ids': to_ids, 'deleted': deleted}
