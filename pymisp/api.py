@@ -756,7 +756,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
-                     dateto=None, eventinfo=None, threatlevel=None, distribution=None,
+                     dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
                      analysis=None, attribute=None, org=None):
         """Search only at the index level. Use ! infront of value as NOT, default OR
 
