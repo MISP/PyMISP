@@ -826,9 +826,7 @@ class PyMISP(object):
                 to_return += '&&!'.join(not_values)
         return to_return
 
-    def search(self, values=None, not_values=None, type_attribute=None,
-               category=None, org=None, tags=None, not_tags=None, date_from=None,
-               date_to=None, last=None, metadata=None, uuid=None, controller='events'):
+    def search(self, controller='events', **kwargs):
         """Search via the Rest API
 
         :param values: values to search for
@@ -841,41 +839,90 @@ class PyMISP(object):
         :param date_from: First date
         :param date_to: Last date
         :param last: Last updated events (for example 5d or 12h or 30m)
-        :param metadata: return onlymetadata if True
-        :param uuid: a valid uuid
+        :param eventid: Last date
+        :param withAttachments: return events with or without the attachments
+        :param uuid: search by uuid
+        :param publish_timestamp: the publish timestamp
+        :param timestamp: the creation timestamp
+        :param enforceWarninglist: Enforce the warning lists
+        :param searchall: full text search on the database
+        :param metadata: return only metadata if True
+        :param published: return only published events
+        :param to_ids: return only the attributes with the to_ids flag set
+        :param deleted: also return the deleted attributes
         """
-        val = self.__prepare_rest_search(values, not_values)
-        tag = self.__prepare_rest_search(tags, not_tags)
+        # Event:     array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'searchall', 'metadata', 'published');
+        # Attribute: array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'to_ids', 'deleted');
+        val = self.__prepare_rest_search(kwargs.get('values'), kwargs.get('not_values'))
         query = {}
         if len(val) != 0:
             query['value'] = val
+
+        if kwargs.get('type_attribute'):
+            query['type'] = kwargs.get('type_attribute')
+
+        if kwargs.get('category'):
+            query['category'] = kwargs.get('category')
+
+        if kwargs.get('org') is not None:
+            query['org'] = kwargs.get('org')
+
+        tag = self.__prepare_rest_search(kwargs.get('tags'), kwargs.get('not_tags'))
         if len(tag) != 0:
             query['tags'] = tag
-        if type_attribute is not None:
-            query['type'] = type_attribute
-        if category is not None:
-            query['category'] = category
-        if org is not None:
-            query['org'] = org
-        if date_from is not None:
-            if isinstance(date_from, datetime.date) or isinstance(date_to, datetime.datetime):
-                query['from'] = date_from.strftime('%Y-%m-%d')
+
+        if kwargs.get('date_from'):
+            if isinstance(kwargs.get('date_from'), datetime.date) or isinstance(kwargs.get('date_from'), datetime.datetime):
+                query['from'] = kwargs.get('date_from').strftime('%Y-%m-%d')
             else:
-                query['from'] = date_from
-        if date_to is not None:
-            if isinstance(date_to, datetime.date) or isinstance(date_to, datetime.datetime):
-                query['to'] = date_to.strftime('%Y-%m-%d')
+                query['from'] = kwargs.get('date_from')
+
+        if kwargs.get('date_to'):
+            if isinstance(kwargs.get('date_to'), datetime.date) or isinstance(kwargs.get('date_to'), datetime.datetime):
+                query['to'] = kwargs.get('date_to').strftime('%Y-%m-%d')
             else:
-                query['to'] = date_to
-        if last is not None:
-            query['last'] = last
-        if metadata is not None:
-            query['metadata'] = metadata
-        if uuid is not None:
-            if self._valid_uuid(uuid):
-                query['uuid'] = uuid
+                query['to'] = kwargs.get('date_to')
+
+        if kwargs.get('last'):
+            query['last'] = kwargs.get('last')
+
+        if kwargs.get('eventid'):
+            query['eventid'] = kwargs.get('eventid')
+
+        if kwargs.get('withAttachments'):
+            query['withAttachments'] = kwargs.get('withAttachments')
+
+        if kwargs.get('uuid'):
+            if self._valid_uuid(kwargs.get('uuid')):
+                query['uuid'] = kwargs.get('uuid')
             else:
                 return {'error': 'You must enter a valid uuid.'}
+
+        if kwargs.get('publish_timestamp'):
+            query['publish_timestamp'] = kwargs.get('publish_timestamp')
+
+        if kwargs.get('timestamp'):
+            query['timestamp'] = kwargs.get('timestamp')
+
+        if kwargs.get('enforceWarninglist'):
+            query['enforceWarninglist'] = kwargs.get('enforceWarninglist')
+
+        if kwargs.get('to_ids') is not None:
+            query['to_ids'] = kwargs.get('to_ids')
+
+        if kwargs.get('deleted') is not None:
+            query['deleted'] = kwargs.get('deleted')
+
+        if controller == 'events':
+            # Event search only:
+            if kwargs.get('searchall'):
+                query['searchall'] = kwargs.get('searchall')
+
+            if kwargs.get('metadata') is not None:
+                query['metadata'] = kwargs.get('metadata')
+
+            if kwargs.get('published') is not None:
+                query['published'] = kwargs.get('published')
 
         session = self.__prepare_session()
         return self.__query(session, 'restSearch/download', query, controller)
