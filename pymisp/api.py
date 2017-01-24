@@ -764,14 +764,14 @@ class PyMISP(object):
         :param eventid: Evend ID(s) | str or list
         :param tag: Tag(s) | str or list
         :param datefrom: First date, in format YYYY-MM-DD
-        :param dateto: Last date, in format YYYY-MM-DD
+        :param dateuntil: Last date, in format YYYY-MM-DD
         :param eventinfo: Event info(s) to match | str or list
         :param threatlevel: Threat level(s) (1,2,3,4) | str or list
         :param distribution: Distribution level(s) (0,1,2,3) | str or list
         :param analysis: Analysis level(s) (0,1,2) | str or list
         :param org: Organisation(s) | str or list
         """
-        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateto': dateto,
+        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
                    'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
                    'org': org}
