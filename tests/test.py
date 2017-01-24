@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 from pymisp import PyMISP
 from keys import url, key
@@ -41,13 +42,14 @@ class TestBasic(unittest.TestCase):
         event = self.misp.new_event(0, 1, 0, "This is a test")
         event_id = self._clean_event(event)
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
-                               u'attribute_count': None, u'analysis': u'0',
+                               u'attribute_count': None, 'disable_correlation': False, u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False,
                                u'distribution': u'0', u'Attribute': [], u'proposal_email_lock': False,
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
+                               u'Galaxy': [],
                                u'threat_level_id': u'1'}}
-        print event
+        print(event)
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
         return int(event_id)
 
@@ -61,6 +63,7 @@ class TestBasic(unittest.TestCase):
                                u'ShadowAttribute': [], u'published': False, u'distribution': u'0',
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
+                               u'Galaxy': [],
                                u'Attribute': [
                                    {u'category': u'Payload installation', u'comment': u'Fanny modules',
                                     u'to_ids': False, u'value': u'dll_installer.dll|0a209ac0de4ac033f31d6ba9191a8f7a',
@@ -84,6 +87,7 @@ class TestBasic(unittest.TestCase):
                                u'ShadowAttribute': [], u'published': True, u'distribution': u'0',
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
+                               u'Galaxy': [],
                                u'Attribute': [
                                    {u'category': u'Payload installation', u'comment': u'Fanny modules',
                                     u'to_ids': False, u'value': u'dll_installer.dll|0a209ac0de4ac033f31d6ba9191a8f7a',
@@ -99,15 +103,19 @@ class TestBasic(unittest.TestCase):
 
     def delete(self, eventid):
         event = self.misp.delete_event(eventid)
-        print event.json()
+        print(event)
 
     def delete_attr(self, attrid):
         event = self.misp.delete_attribute(attrid)
-        print event.json()
+        print(event)
 
     def get(self, eventid):
         event = self.misp.get_event(eventid)
-        print event.json()
+        print(event)
+
+    def get_stix(self, **kwargs):
+        event = self.misp.get_stix(kwargs)
+        print(event)
 
     def add(self):
         event = {u'Event': {u'info': u'This is a test', u'locked': False,
@@ -125,7 +133,7 @@ class TestBasic(unittest.TestCase):
                                  u'ShadowAttribute': [], u'distribution': u'2', u'type': u'filename|sha256'}],
                             u'proposal_email_lock': False, u'threat_level_id': u'1'}}
         event = self.misp.add_event(event)
-        print event.json()
+        print(event)
 
     def test_create_event(self):
         eventid = self.new_event()
@@ -151,6 +159,9 @@ class TestBasic(unittest.TestCase):
         time.sleep(1)
         self.delete(eventid)
 
+    def test_one_or_more(self):
+        self.assertEqual(self.misp._one_or_more(1), (1,))
+        self.assertEqual(self.misp._one_or_more([1]), [1])
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,0 +1,50 @@
+body
+{
+    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+h1
+{
+	font-size: 16px;
+	width: 290px;
+	text-align:center;
+}
+
+/*** Stats Tables ***/
+
+table
+{
+	border-collapse: collapse;
+	border-spacing: 0;
+    border: 1px solid #cbcbcb;
+}
+
+tbody
+{
+	font-size:12px;
+}
+
+table td
+{
+	border-left: 1px solid #cbcbcb;
+	border-width: 0 0 0 1px;
+	width: 500px;
+	margin: 0;
+	padding: 0.5em 1em;
+}
+
+.test
+{
+	width: 500px;
+}
+
+table tr:nth-child(2n-1) td
+{
+	background-color: #f2f2f2;
+}
+
+table tr td:first-child
+{
+	font-weight: bold;
+}

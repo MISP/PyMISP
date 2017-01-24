@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import sys
@@ -27,25 +27,14 @@ def init(cert_to_priv=True):
         destination = PyMISP(url_cert, cert, cert_cert, 'xml')
 
 
-def _to_utf8(request):
-    to_return = None
-    if 'json' in request.headers['content-type']:
-        to_return = request.json()
-    else:
-        to_return = request.text.encode('utf-8')
-    return to_return
-
-
 def copy_event(event_id):
-    r_src = source.get_event(event_id)
-    to_send = _to_utf8(r_src)
-    return destination.add_event(to_send)
+    e = source.get_event(event_id)
+    return destination.add_event(e)
 
 
 def update_event(event_id, event_to_update):
-    r_src = source.get_event(event_id)
-    to_send = _to_utf8(r_src)
-    return destination.update_event(event_to_update, to_send)
+    e = source.get_event(event_id)
+    return destination.update_event(event_to_update, e)
 
 
 def list_copy(filename):
@@ -83,7 +72,7 @@ def copy(eventid):
 
 def export_our_org():
     circl = source.search(org='CIRCL')
-    return _to_utf8(circl)
+    return circl
 
 if __name__ == '__main__':
     import argparse

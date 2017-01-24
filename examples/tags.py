@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from pymisp import PyMISP
+from keys import misp_url, misp_key
+import argparse
+import json
+
+
+def init(url, key):
+    return PyMISP(url, key, True, 'json', True)
+
+
+def get_tags(m):
+    result = m.get_all_tags(True)
+    r = result
+    print(json.dumps(r) + '\n')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Get tags from MISP instance.')
+
+    args = parser.parse_args()
+
+    misp = init(misp_url, misp_key)
+
+    get_tags(misp)

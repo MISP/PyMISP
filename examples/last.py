@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key,misp_verifycert
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
 import json

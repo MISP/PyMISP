@@ -7,7 +7,7 @@ import argparse
 
 
 def init(url, key):
-    return PyMISP(url, key, True, 'json')
+    return PyMISP(url, key, True)
 
 
 def fetch(m, all_events, event):

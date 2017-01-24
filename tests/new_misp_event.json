@@ -1,0 +1,34 @@
+{
+    "Event": {
+        "uuid": "57c06bb1-625c-4d34-9b9f-4066950d210f",
+        "orgc_id": "1",
+        "publish_timestamp": "0",
+        "RelatedEvent": [],
+        "org_id": "1",
+        "Org": {
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f",
+            "name": "CIRCL",
+            "id": "1"
+        },
+        "attribute_count": null,
+        "distribution": "0",
+        "sharing_group_id": "0",
+        "threat_level_id": "1",
+        "locked": false,
+        "Attribute": [],
+        "published": false,
+        "ShadowAttribute": [],
+        "date": "2016-08-26",
+        "info": "This is a test",
+        "timestamp": "1472228273",
+        "Orgc": {
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f",
+            "name": "CIRCL",
+            "id": "1"
+        },
+        "id": "594",
+        "proposal_email_lock": false,
+        "analysis": "0"
+    }
+}
+
