@@ -757,7 +757,7 @@ class PyMISP(object):
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateto=None, eventinfo=None, threatlevel=None, distribution=None,
-                     analysis=None, attribute=None, org=None):
+                     analysis=None, attribute=None, org=None, to_ids=False, deleted=False):
         """Search only at the index level. Use ! infront of value as NOT, default OR
 
         :param published: Published (0,1)
@@ -770,14 +770,25 @@ class PyMISP(object):
         :param distribution: Distribution level(s) (0,1,2,3) | str or list
         :param analysis: Analysis level(s) (0,1,2) | str or list
         :param org: Organisation(s) | str or list
+        :param to_ids:
+            - false (default): include all attributes, no matter the to_ids flag
+            - true: include only to_ids attributes
+            - "exclude": exclude attributes marked to_ids
+        :param deleted:
+            - false (default): only include non deleted attributes
+            - true: include deleted attributes
+            - "only": ONLY include deleted attributes
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateto': dateto,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
                    'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
-                   'org': org}
+                   'org': org, 'to_ids': to_ids, 'deleted': deleted}
         rule_levels = {'distribution': ["0", "1", "2", "3", "!0", "!1", "!2", "!3"],
                        'threatlevel': ["1", "2", "3", "4", "!1", "!2", "!3", "!4"],
-                       'analysis': ["0", "1", "2", "!0", "!1", "!2"]}
+                       'analysis': ["0", "1", "2", "!0", "!1", "!2"],
+                       'to_ids': ['True', 'False', 'exclude'],
+                       'deleted': ['True', 'False', 'only'],
+                       }
         buildup_url = "events/index"
 
         for rule in allowed.keys():
