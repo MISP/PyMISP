@@ -174,7 +174,7 @@ class PyMISP(object):
                         for e in errors:
                             if not e:
                                 continue
-                            if isinstance(e, str):
+                            if isinstance(e, basestring):
                                 messages.append(e)
                                 continue
                             for type_e, msgs in e.items():
@@ -464,7 +464,7 @@ class PyMISP(object):
             # It's a file handle - we can read it
             fileData = attachment.read()
 
-        elif isinstance(attachment, str):
+        elif isinstance(attachment, basestring):
             # It can either be the b64 encoded data or a file path
             if os.path.exists(attachment):
                 # It's a path!
