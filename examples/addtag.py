@@ -31,6 +31,6 @@ if __name__ == '__main__':
                 attribute = temp
                 break
 
-        misp.add_tag(attribute, args.tag, True)
+        misp.add_tag(attribute, args.tag, attribute=True)
     else:
         misp.add_tag(event['Event'], args.tag)
