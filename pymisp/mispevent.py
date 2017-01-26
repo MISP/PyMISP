@@ -101,6 +101,9 @@ class MISPAttribute(object):
     def delete(self):
         self.deleted = True
 
+    def add_tag(self, tag):
+        self.Tag.append({'name': tag})
+
     def verify(self, gpg_uid):
         if not has_pyme:
             raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
@@ -548,6 +551,19 @@ class MISPEvent(object):
             to_return['Event']['Attribute'] = [a._json_full() for a in self.attributes]
         jsonschema.validate(to_return, self.json_schema)
         return to_return
+
+    def add_tag(self, tag):
+        self.Tag.append({'name': tag})
+
+    def add_attribute_tag(self, tag, attribute_identifier):
+        attribute = None
+        for a in self.attributes:
+            if a.id == attribute_identifier or a.uuid == attribute_identifier or attribute_identifier in a.value:
+                a.add_tag(tag)
+                attribute = a
+        if not attribute:
+            raise Exception('No attribute with identifier {} found.'.format(attribute_identifier))
+        return attribute
 
     def publish(self):
         self.published = True
