@@ -373,7 +373,7 @@ class PyMISP(object):
             to_post = {'request': {'Attribute': {'id': event['id'], 'tag': tag}}}
             path = 'attributes/addTag'
         else:
-            to_post = {'request': {'Event': {'id': event['id'], 'tag': tag}}}
+            to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
             path = 'events/addTag'
         response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
         return self._check_response(response)
