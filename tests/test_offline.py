@@ -38,7 +38,8 @@ class TestOffline(unittest.TestCase):
 
     def initURI(self, m):
         m.register_uri('GET', self.domain + 'events/1', json=self.auth_error_msg, status_code=403)
-        m.register_uri('GET', self.domain + 'servers/getVersion.json', json={"version": "2.4.56"})
+        m.register_uri('GET', self.domain + 'servers/getVersion.json', json={"version": "2.4.62"})
+        m.register_uri('GET', self.domain + 'servers/getPyMISPVersion.json', json={"version": "2.4.62"})
         m.register_uri('GET', self.domain + 'sharing_groups.json', json=self.sharing_groups)
         m.register_uri('GET', self.domain + 'attributes/describeTypes.json', json=self.types)
         m.register_uri('GET', self.domain + 'events/2', json=self.event)
@@ -97,7 +98,7 @@ class TestOffline(unittest.TestCase):
         api_version = pymisp.get_api_version()
         self.assertEqual(api_version, {'version': pm.__version__})
         server_version = pymisp.get_version()
-        self.assertEqual(server_version, {"version": "2.4.56"})
+        self.assertEqual(server_version, {"version": "2.4.62"})
 
     def test_getSharingGroups(self, m):
         self.initURI(m)
