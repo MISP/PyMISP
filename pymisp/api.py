@@ -100,18 +100,19 @@ class PyMISP(object):
 
         try:
             # Make sure the MISP instance is working and the URL is valid
-            response = self.get_version()
-            misp_version = response['version'].split('.')
             pymisp_version = __version__.split('.')
-            for a, b in zip(misp_version, pymisp_version):
-                if a == b:
-                    continue
-                elif a < b:
-                    warnings.warn("Remote MISP instance (v{}) older than PyMISP (v{}). You should update your MISP instance, or install an older PyMISP version.".format(response['version'], __version__))
-                else:  # a > b
-                    # NOTE: That can happen and should not be blocking
-                    warnings.warn("Remote MISP instance (v{}) newer than PyMISP (v{}). Please check if a newer version of PyMISP is available.".format(response['version'], __version__))
-                    continue
+            response = self.get_recommended_api_version()
+            if not response.get('version'):
+                warnings.warn("Unable to check the recommended PyMISP version (MISP <2.4.60), please upgrade.")
+            else:
+                recommended_pymisp_version = response['version'].split('.')
+                for a, b in zip(pymisp_version, recommended_pymisp_version):
+                    if a == b:
+                        continue
+                    elif a > b:
+                        warnings.warn("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). Please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
+                    else:  # a < b
+                        warnings.warn("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
 
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
@@ -1044,6 +1045,13 @@ class PyMISP(object):
             return {'version': version[0]}
         else:
             return {'error': 'Impossible to retrieve the version of the master branch.'}
+
+    def get_recommended_api_version(self):
+        """Returns the recommended API version from the server"""
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'servers/getPyMISPVersion.json')
+        response = session.get(url)
+        return self._check_response(response)
 
     def get_version(self):
         """Returns the version of the instance."""
