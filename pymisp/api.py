@@ -350,18 +350,18 @@ class PyMISP(object):
         if e.published:
             return {'error': 'Already published'}
         e.publish()
-        return self.update(event)
+        return self.update(e)
 
     def change_threat_level(self, event, threat_level_id):
         e = self._make_mispevent(event)
         e.threat_level_id = threat_level_id
-        return self.update(event)
+        return self.update(e)
 
     def change_sharing_group(self, event, sharing_group_id):
         e = self._make_mispevent(event)
         e.distribution = 4      # Needs to be 'Sharing group'
         e.sharing_group_id = sharing_group_id
-        return self.update(event)
+        return self.update(e)
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
         misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published, orgc_id, org_id, sharing_group_id)
@@ -415,7 +415,7 @@ class PyMISP(object):
             e = MISPEvent(self.describe_types)
             e.load(event)
             e.attributes += attributes
-            response = self.update(event)
+            response = self.update(e)
         return response
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
