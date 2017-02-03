@@ -1071,10 +1071,10 @@ class PyMISP(object):
 
     # ############## Export Attributes in text ####################################
 
-    def get_all_attributes_txt(self, type_attr):
-        """Get all attributes from a specific type as plain text. Only published and IDS flagged attributes are exported."""
+    def get_all_attributes_txt(self, type_attr, tags=False, eventId=False, allowNonIDS=False, date_from=False, date_to=False, last=False, enforceWarninglist=False, allowNotPublished=False):
+        """Get all attributes from a specific type as plain text. Only published and IDS flagged attributes are exported, except if stated otherwise."""
         session = self.__prepare_session('txt')
-        url = urljoin(self.root_url, 'attributes/text/download/%s' % type_attr)
+        url = urljoin(self.root_url, 'attributes/text/download/%s/%s/%s/%s/%s/%s/%s/%s/%s' % (type_attr, tags, eventId, allowNonIDS, date_from, date_to, last, enforceWarninglist, allowNotPublished))
         response = session.get(url)
         return response
 
