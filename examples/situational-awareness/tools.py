@@ -2,13 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from json import JSONDecoder
-import random
 import pygal
 from pygal.style import Style
 import pandas
-from datetime import datetime
-from datetime import timedelta
-from dateutil.parser import parse
 import numpy
 from scipy import stats
 from pytaxonomies import Taxonomies
@@ -16,65 +12,23 @@ import re
 import matplotlib.pyplot as plt
 from matplotlib import pylab
 import os
-
-
-class DateError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return repr(self.value)
-
-
-# ############### Date Tools ################
-
-def dateInRange(datetimeTested, begin=None, end=None):
-    if begin is None:
-        begin = datetime(1970, 1, 1)
-    if end is None:
-        end = datetime.now()
-    return begin <= datetimeTested <= end
-
-
-def toDatetime(date):
-    return parse(date)
-
-
-def checkDateConsistancy(begindate, enddate, lastdate):
-    if begindate is not None and enddate is not None:
-        if begindate > enddate:
-            raise DateError('begindate ({}) cannot be after enddate ({})'.format(begindate, enddate))
-
-    if enddate is not None:
-        if toDatetime(enddate) < lastdate:
-            raise DateError('enddate ({}) cannot be before lastdate ({})'.format(enddate, lastdate))
-
-    if begindate is not None:
-        if toDatetime(begindate) > datetime.now():
-            raise DateError('begindate ({}) cannot be after today ({})'.format(begindate, datetime.now().date()))
-
-
-def setBegindate(begindate, lastdate):
-    return max(begindate, lastdate)
-
-
-def setEnddate(enddate):
-    return min(enddate, datetime.now())
-
-
-def getLastdate(last):
-    return (datetime.now() - timedelta(days=int(last))).replace(hour=0, minute=0, second=0, microsecond=0)
-
-
-def getNDaysBefore(date, days):
-    return (date - timedelta(days=days)).replace(hour=0, minute=0, second=0, microsecond=0)
-
-
-def getToday():
-    return (datetime.now()).replace(hour=0, minute=0, second=0, microsecond=0)
-
+import date_tools
+from dateutil.parser import parse
 
 # ############### Tools ################
+
+
+def selectInRange(Events, begin=None, end=None):
+    inRange = []
+    for i, Event in Events.iterrows():
+        if date_tools.dateInRange(parse(Event['date']), begin, end):
+            inRange.append(Event.tolist())
+    inRange = pandas.DataFrame(inRange)
+    temp = Events.columns.tolist()
+    if inRange.empty:
+        return None
+    inRange.columns = temp
+    return inRange
 
 
 def getTaxonomies(dataframe):
@@ -233,19 +187,6 @@ def tagsListBuild(Events):
     return Tags
 
 
-def selectInRange(Events, begin=None, end=None):
-    inRange = []
-    for i, Event in Events.iterrows():
-        if dateInRange(parse(Event['date']), begin, end):
-            inRange.append(Event.tolist())
-    inRange = pandas.DataFrame(inRange)
-    temp = Events.columns.tolist()
-    if inRange.empty:
-        return None
-    inRange.columns = temp
-    return inRange
-
-
 def isTagIn(dataframe, tag):
     temp = dataframe[dataframe['name'].str.contains(tag)].index.tolist()
     index = []
@@ -277,54 +218,8 @@ def getNbAttributePerEventCategoryType(attributes):
 def getNbOccurenceTags(Tags):
         return Tags.groupby('name').count()['id']
 
+
 # ############### Charts ################
-
-
-def createTable(colors, categ_types_hash, tablename='attribute_table.html'):
-    with open(tablename, 'w') as target:
-        target.write('<!DOCTYPE html>\n<html>\n<head>\n<link rel="stylesheet" href="style.css">\n</head>\n<body>')
-        for categ_name, types in categ_types_hash.items():
-            table = pygal.Treemap(pretty_print=True)
-            target.write('\n <h1 style="color:{};">{}</h1>\n'.format(colors[categ_name], categ_name))
-            for d in types:
-                table.add(d['label'], d['value'])
-            target.write(table.render_table(transpose=True))
-        target.write('\n</body>\n</html>')
-
-
-def createTreemap(data, title, treename='attribute_treemap.svg', tablename='attribute_table.html'):
-    labels_categ = data.index.labels[0]
-    labels_types = data.index.labels[1]
-    names_categ = data.index.levels[0]
-    names_types = data.index.levels[1]
-    categ_types_hash = {}
-    for categ_id, type_val, total in zip(labels_categ, labels_types, data):
-        if not categ_types_hash.get(names_categ[categ_id]):
-            categ_types_hash[names_categ[categ_id]] = []
-        dict_to_print = {'label': names_types[type_val], 'value': total}
-        categ_types_hash[names_categ[categ_id]].append(dict_to_print)
-
-    colors = {categ: "#%06X" % random.randint(0, 0xFFFFFF) for categ in categ_types_hash.keys()}
-    style = Style(background='transparent',
-                  plot_background='#FFFFFF',
-                  foreground='#111111',
-                  foreground_strong='#111111',
-                  foreground_subtle='#111111',
-                  opacity='.6',
-                  opacity_hover='.9',
-                  transition='400ms ease-in',
-                  colors=tuple(colors.values()))
-
-    treemap = pygal.Treemap(pretty_print=True, legend_at_bottom=True, style=style)
-    treemap.title = title
-    treemap.print_values = True
-    treemap.print_labels = True
-
-    for categ_name, types in categ_types_hash.items():
-        treemap.add(categ_name, types)
-
-    createTable(colors, categ_types_hash)
-    treemap.render_to_file(treename)
 
 
 def tagsToLineChart(dataframe, title, dates, colourDict):

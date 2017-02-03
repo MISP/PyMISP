@@ -5,6 +5,8 @@ from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import tools
+import date_tools
+import bokeh_tools
 
 
 def formattingDataframe(dataframe, dates, NanValue):
@@ -54,12 +56,12 @@ if __name__ == '__main__':
         events = tools.eventsListBuildFromArray(result)
         result = []
         dates = []
-        enddate = tools.getToday()
+        enddate = date_tools.getToday()
         colourDict = {}
         faketag = False
 
         for i in range(split):
-            begindate = tools.getNDaysBefore(enddate, size)
+            begindate = date_tools.getNDaysBefore(enddate, size)
             dates.append(str(enddate.date()))
             eventstemp = tools.selectInRange(events, begin=begindate, end=enddate)
             if eventstemp is not None:
