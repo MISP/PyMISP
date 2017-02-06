@@ -440,6 +440,8 @@ class MISPEvent(object):
             if self.analysis not in [0, 1, 2]:
                 raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(self.analysis))
         if kwargs.get('published') is not None:
+            self.unpublish()
+        if kwargs.get("published") == True:
             self.publish()
         if kwargs.get('date'):
             self.set_date(kwargs['date'])
