@@ -6,6 +6,7 @@ from keys import misp_url, misp_key, misp_verifycert
 from datetime import datetime
 import argparse
 import tools
+import date_tools
 
 
 def init(url, key):
@@ -28,17 +29,17 @@ if __name__ == '__main__':
         args.days = 7
     result = misp.search(last='{}d'.format(args.days), metadata=True)
 
-    tools.checkDateConsistancy(args.begindate, args.enddate, tools.getLastdate(args.days))
+    date_tools.checkDateConsistancy(args.begindate, args.enddate, date_tools.getLastdate(args.days))
 
     if args.begindate is None:
-        args.begindate = tools.getLastdate(args.days)
+        args.begindate = date_tools.getLastdate(args.days)
     else:
-        args.begindate = tools.setBegindate(tools.toDatetime(args.begindate), tools.getLastdate(args.days))
+        args.begindate = date_tools.setBegindate(date_tools.toDatetime(args.begindate), date_tools.getLastdate(args.days))
 
     if args.enddate is None:
         args.enddate = datetime.now()
     else:
-        args.enddate = tools.setEnddate(tools.toDatetime(args.enddate))
+        args.enddate = date_tools.setEnddate(date_tools.toDatetime(args.enddate))
 
     if 'response' in result:
         events = tools.selectInRange(tools.eventsListBuildFromArray(result), begin=args.begindate, end=args.enddate)
