@@ -367,6 +367,18 @@ class PyMISP(object):
         misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published, orgc_id, org_id, sharing_group_id)
         return self.add_event(json.dumps(misp_event, cls=EncodeUpdate))
 
+    def tag(self, uuid, tag):
+        session = self.__prepare_session()
+        path = '/tags/attachTagToObject/{}/{}/'.format(uuid, tag)
+        response = session.post(urljoin(self.root_url, path))
+        return self._check_response(response)
+
+    def untag(self, uuid, tag):
+        session = self.__prepare_session()
+        path = '/tags/removeTagFromObject/{}/{}/'.format(uuid, tag)
+        response = session.post(urljoin(self.root_url, path))
+        return self._check_response(response)
+
     def add_tag(self, event, tag, attribute=False):
         # FIXME: this is dirty, this function needs to be deprecated with something tagging a UUID
         session = self.__prepare_session()
