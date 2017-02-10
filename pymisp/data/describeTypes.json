@@ -340,6 +340,190 @@
       "x509-fingerprint-sha1": {
         "default_category": "Network activity",
         "to_ids": 1
+      },
+      "dns-soa-email": {
+        "default_category": "Attribution",
+        "to_ids": 0
+      },
+      "size-in-bytes": {
+        "default_category": "Other",
+        "to_ids": 0
+      },
+      "counter": {
+        "default_category": "Other",
+        "to_ids": 0
+      },
+      "datetime": {
+        "default_category": "Other",
+        "to_ids": 0
+      },
+      "cpe": {
+        "default_category": "Other",
+        "to_ids": 0
+      },
+      "port": {
+        "default_category": "Network activity",
+        "to_ids": 0
+      },
+      "ip-dst|port": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
+      "ip-src|port": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
+      "hostname|port": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
+      "email-dst-display-name": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
+      "email-src-display-name": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
+      "email-header": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
+      "email-reply-to": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
+      "email-x-mailer": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
+      "email-mime-boundary": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
+      "email-thread-index": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
+      "email-message-id": {
+        "default_category": "",
+        "to_ids": 0
+      },
+      "github-username": {
+        "default_category": "Social network",
+        "to_ids": 0
+      },
+      "github-repository": {
+        "default_category": "Social network",
+        "to_ids": 0
+      },
+      "github-organisation": {
+        "default_category": "Social network",
+        "to_ids": 0
+      },
+      "jabber-id": {
+        "default_category": "Social network",
+        "to_ids": 0
+      },
+      "twitter-id": {
+        "default_category": "Social network",
+        "to_ids": 0
+      },
+      "first-name": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "middle-name": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "last-name": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "date-of-birth": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "place-of-birth": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "gender": {
+        "default_category": "",
+        "to_ids": 0
+      },
+      "passport-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "passport-country": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "passport-expiration": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "redress-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "nationality": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "visa-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "issue-date-of-the-visa": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "primary-residence": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "country-of-residence": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "special-service-request": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "frequent-flyer-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "travel-details": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "payment-details": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "place-port-of-original-embarkation": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "place-port-of-clearance": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "place-port-of-onward-foreign-destination": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "passenger-name-record-locator-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "mobile-application-id": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
       }
     },
     "types": [
@@ -427,7 +611,53 @@
       "whois-registrant-name",
       "whois-registrar",
       "whois-creation-date",
-      "x509-fingerprint-sha1"
+      "x509-fingerprint-sha1",
+      "dns-soa-email",
+      "size-in-bytes",
+      "counter",
+      "datetime",
+      "cpe",
+      "port",
+      "ip-dst|port",
+      "ip-src|port",
+      "hostname|port",
+      "email-dst-display-name",
+      "email-src-display-name",
+      "email-header",
+      "email-reply-to",
+      "email-x-mailer",
+      "email-mime-boundary",
+      "email-thread-index",
+      "email-message-id",
+      "github-username",
+      "github-repository",
+      "github-organisation",
+      "jabber-id",
+      "twitter-id",
+      "first-name",
+      "middle-name",
+      "last-name",
+      "date-of-birth",
+      "place-of-birth",
+      "gender",
+      "passport-number",
+      "passport-country",
+      "passport-expiration",
+      "redress-number",
+      "nationality",
+      "visa-number",
+      "issue-date-of-the-visa",
+      "primary-residence",
+      "country-of-residence",
+      "special-service-request",
+      "frequent-flyer-number",
+      "travel-details",
+      "payment-details",
+      "place-port-of-original-embarkation",
+      "place-port-of-clearance",
+      "place-port-of-onward-foreign-destination",
+      "passenger-name-record-locator-number",
+      "mobile-application-id"
     ],
     "categories": [
       "Internal reference",
@@ -442,6 +672,9 @@
       "Attribution",
       "External analysis",
       "Financial fraud",
+      "Support Tool",
+      "Social network",
+      "Person",
       "Other"
     ],
     "category_type_mappings": {
@@ -497,6 +730,8 @@
         "filename|pehash",
         "ip-src",
         "ip-dst",
+        "ip-dst|port",
+        "ip-src|port",
         "hostname",
         "domain",
         "email-src",
@@ -517,7 +752,19 @@
         "text",
         "vulnerability",
         "x509-fingerprint-sha1",
-        "other"
+        "other",
+        "ip-dst|port",
+        "ip-src|port",
+        "hostname|port",
+        "email-dst-display-name",
+        "email-src-display-name",
+        "email-header",
+        "email-reply-to",
+        "email-x-mailer",
+        "email-mime-boundary",
+        "email-thread-index",
+        "email-message-id",
+        "mobile-application-id"
       ],
       "Artifacts dropped": [
         "md5",
@@ -602,6 +849,7 @@
         "comment",
         "text",
         "x509-fingerprint-sha1",
+        "mobile-application-id",
         "other"
       ],
       "Persistence mechanism": [
@@ -615,6 +863,8 @@
       "Network activity": [
         "ip-src",
         "ip-dst",
+        "ip-dst|port",
+        "ip-src|port",
         "hostname",
         "domain",
         "domain|ip",
@@ -662,6 +912,8 @@
         "filename|sha256",
         "ip-src",
         "ip-dst",
+        "ip-dst|port",
+        "ip-src|port",
         "hostname",
         "domain",
         "domain|ip",
@@ -681,6 +933,7 @@
         "comment",
         "text",
         "x509-fingerprint-sha1",
+        "github-repository",
         "other"
       ],
       "Financial fraud": [
@@ -696,7 +949,60 @@
         "text",
         "other"
       ],
+      "Support Tool": [
+        "link",
+        "text",
+        "attachment",
+        "comment",
+        "text",
+        "other"
+      ],
+      "Social network": [
+        "github-username",
+        "github-repository",
+        "github-organisation",
+        "jabber-id",
+        "twitter-id",
+        "email-src",
+        "email-dst",
+        "comment",
+        "text",
+        "other"
+      ],
+      "Person": [
+        "first-name",
+        "middle-name",
+        "last-name",
+        "date-of-birth",
+        "place-of-birth",
+        "gender",
+        "passport-number",
+        "passport-country",
+        "passport-expiration",
+        "redress-number",
+        "nationality",
+        "visa-number",
+        "issue-date-of-the-visa",
+        "primary-residence",
+        "country-of-residence",
+        "special-service-request",
+        "frequent-flyer-number",
+        "travel-details",
+        "payment-details",
+        "place-port-of-original-embarkation",
+        "place-port-of-clearance",
+        "place-port-of-onward-foreign-destination",
+        "passenger-name-record-locator-number",
+        "comment",
+        "text",
+        "other"
+      ],
       "Other": [
+        "size-in-bytes",
+        "counter",
+        "datetime",
+        "cpe",
+        "port",
         "comment",
         "text",
         "other"
