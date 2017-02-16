@@ -25,6 +25,13 @@ try:
 except ImportError:
     HAVE_REQUESTS = False
 
+
+try:
+    from requests_futures.sessions import FuturesSession
+    ASYNC_OK = True
+except ImportError:
+    ASYNC_OK = False
+
 from . import __version__
 from .exceptions import PyMISPError, SearchError, MissingDependency, NoURL, NoKey
 from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
@@ -94,13 +101,9 @@ class PyMISP(object):
         self.proxies = proxies
         self.cert = cert
         self.asynch = asynch 
-        if self.asynch:
-            try:
-                from requests_futures.sessions import FuturesSession
-            except ImportError:
-                print("You set Async, but you haven't got requests_futures installed")
-                print("Reverting to synchronous")
-                self.asynch = False
+        if asynch and not ASYNC_OK:
+            warnings.warn("You turned on Async, but don't have requests_futures installed")
+            self.asynch = False
 
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
@@ -146,12 +149,15 @@ class PyMISP(object):
         self.category_type_mapping = self.describe_types['category_type_mappings']
         self.sane_default = self.describe_types['sane_defaults']
 
-    def __prepare_session(self, output='json'):
+    def __prepare_session(self, output='json', async_implemented=False):
         """Prepare the headers of the session"""
 
         if not HAVE_REQUESTS:
             raise MissingDependency('Missing dependency, install requests (`pip install requests`)')
-        session = requests.Session()
+        if self.asynch and async_implemented:
+            session = FuturesSession()
+        else:
+            session = requests.Session() 
         session.verify = self.ssl
         session.proxies = self.proxies
         session.cert = self.cert
@@ -772,7 +778,7 @@ class PyMISP(object):
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
-                     analysis=None, attribute=None, org=None):
+                     analysis=None, attribute=None, org=None, async_callback=None):
         """Search only at the index level. Use ! infront of value as NOT, default OR
 
         :param published: Published (0,1)
@@ -808,10 +814,17 @@ class PyMISP(object):
                     buildup_url += '/search{}:{}'.format(rule, joined)
                 else:
                     buildup_url += '/search{}:{}'.format(rule, allowed[rule])
-        session = self.__prepare_session()
+        session = self.__prepare_session(async_implemented=True)
         url = urljoin(self.root_url, buildup_url)
-        response = session.get(url)
-        return self._check_response(response)
+
+        if self.asynch:
+            if not async_callback:
+                warnings.warn("You haven't provided a callback!")
+            response = session.get(url, background_callback=async_callback)
+ 
+        else:
+            response = session.get(url)
+            return self._check_response(response)
 
     def search_all(self, value):
         query = {'value': value, 'searchall': 1}
