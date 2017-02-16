@@ -82,7 +82,7 @@ class PyMISP(object):
     threat_level = threat_level
     analysis = analysis
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None, cert=None):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None, cert=None, asynch=False):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -93,6 +93,15 @@ class PyMISP(object):
         self.ssl = ssl
         self.proxies = proxies
         self.cert = cert
+        self.asynch = asynch 
+        if self.asynch:
+            try:
+                from requests_futures.sessions import FuturesSession
+            except ImportError:
+                print("You set Async, but you haven't got requests_futures installed")
+                print("Reverting to synchronous")
+                self.asynch = False
+
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
