@@ -33,9 +33,11 @@ from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
 # Least dirty way to support python 2 and 3
 try:
     basestring
+    unicode
     warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
 except NameError:
     basestring = str
+    unicode = str
 
 
 class distributions(object):
@@ -1133,13 +1135,18 @@ class PyMISP(object):
         response = session.post(url)
         return self._check_response(response)
 
-    def sighting_per_json(self, json_file):
+    def set_sightings(self, sightings):
+        if isinstance(sightings, dict):
+            sightings = json.dumps(sightings)
         session = self.__prepare_session()
+        url = urljoin(self.root_url, 'sightings/add/')
+        response = session.post(url, data=sightings)
+        return self._check_response(response)
+
+    def sighting_per_json(self, json_file):
         with open(json_file) as f:
             jdata = json.load(f)
-        url = urljoin(self.root_url, 'sightings/add/')
-        response = session.post(url, data=json.dumps(jdata))
-        return self._check_response(response)
+            return self.set_sightings(jdata)
 
     # ############## Sharing Groups ##################
 
