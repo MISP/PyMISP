@@ -33,9 +33,11 @@ from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
 # Least dirty way to support python 2 and 3
 try:
     basestring
+    unicode
     warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
 except NameError:
     basestring = str
+    unicode = str
 
 
 class distributions(object):
@@ -100,18 +102,19 @@ class PyMISP(object):
 
         try:
             # Make sure the MISP instance is working and the URL is valid
-            response = self.get_version()
-            misp_version = response['version'].split('.')
             pymisp_version = __version__.split('.')
-            for a, b in zip(misp_version, pymisp_version):
-                if a == b:
-                    continue
-                elif a < b:
-                    warnings.warn("Remote MISP instance (v{}) older than PyMISP (v{}). You should update your MISP instance, or install an older PyMISP version.".format(response['version'], __version__))
-                else:  # a > b
-                    # NOTE: That can happen and should not be blocking
-                    warnings.warn("Remote MISP instance (v{}) newer than PyMISP (v{}). Please check if a newer version of PyMISP is available.".format(response['version'], __version__))
-                    continue
+            response = self.get_recommended_api_version()
+            if not response.get('version'):
+                warnings.warn("Unable to check the recommended PyMISP version (MISP <2.4.60), please upgrade.")
+            else:
+                recommended_pymisp_version = response['version'].split('.')
+                for a, b in zip(pymisp_version, recommended_pymisp_version):
+                    if a == b:
+                        continue
+                    elif a > b:
+                        warnings.warn("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). Please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
+                    else:  # a < b
+                        warnings.warn("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
 
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
@@ -174,7 +177,7 @@ class PyMISP(object):
                         for e in errors:
                             if not e:
                                 continue
-                            if isinstance(e, str):
+                            if isinstance(e, basestring):
                                 messages.append(e)
                                 continue
                             for type_e, msgs in e.items():
@@ -349,22 +352,34 @@ class PyMISP(object):
         if e.published:
             return {'error': 'Already published'}
         e.publish()
-        return self.update(event)
+        return self.update(e)
 
     def change_threat_level(self, event, threat_level_id):
         e = self._make_mispevent(event)
         e.threat_level_id = threat_level_id
-        return self.update(event)
+        return self.update(e)
 
     def change_sharing_group(self, event, sharing_group_id):
         e = self._make_mispevent(event)
         e.distribution = 4      # Needs to be 'Sharing group'
         e.sharing_group_id = sharing_group_id
-        return self.update(event)
+        return self.update(e)
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
         misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published, orgc_id, org_id, sharing_group_id)
         return self.add_event(json.dumps(misp_event, cls=EncodeUpdate))
+
+    def tag(self, uuid, tag):
+        session = self.__prepare_session()
+        path = '/tags/attachTagToObject/{}/{}/'.format(uuid, tag)
+        response = session.post(urljoin(self.root_url, path))
+        return self._check_response(response)
+
+    def untag(self, uuid, tag):
+        session = self.__prepare_session()
+        path = '/tags/removeTagFromObject/{}/{}/'.format(uuid, tag)
+        response = session.post(urljoin(self.root_url, path))
+        return self._check_response(response)
 
     def add_tag(self, event, tag, attribute=False):
         # FIXME: this is dirty, this function needs to be deprecated with something tagging a UUID
@@ -373,6 +388,9 @@ class PyMISP(object):
             to_post = {'request': {'Attribute': {'id': event['id'], 'tag': tag}}}
             path = 'attributes/addTag'
         else:
+            # Allow for backwards-compat with old style
+            if "Event" in event:
+                event = event["Event"]
             to_post = {'request': {'Event': {'id': event['id'], 'tag': tag}}}
             path = 'events/addTag'
         response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
@@ -411,7 +429,7 @@ class PyMISP(object):
             e = MISPEvent(self.describe_types)
             e.load(event)
             e.attributes += attributes
-            response = self.update(event)
+            response = self.update(e)
         return response
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
@@ -464,7 +482,7 @@ class PyMISP(object):
             # It's a file handle - we can read it
             fileData = attachment.read()
 
-        elif isinstance(attachment, str):
+        elif isinstance(attachment, basestring):
             # It can either be the b64 encoded data or a file path
             if os.path.exists(attachment):
                 # It's a path!
@@ -1042,6 +1060,13 @@ class PyMISP(object):
         else:
             return {'error': 'Impossible to retrieve the version of the master branch.'}
 
+    def get_recommended_api_version(self):
+        """Returns the recommended API version from the server"""
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'servers/getPyMISPVersion.json')
+        response = session.get(url)
+        return self._check_response(response)
+
     def get_version(self):
         """Returns the version of the instance."""
         session = self.__prepare_session()
@@ -1060,10 +1085,10 @@ class PyMISP(object):
 
     # ############## Export Attributes in text ####################################
 
-    def get_all_attributes_txt(self, type_attr):
-        """Get all attributes from a specific type as plain text. Only published and IDS flagged attributes are exported."""
+    def get_all_attributes_txt(self, type_attr, tags=False, eventId=False, allowNonIDS=False, date_from=False, date_to=False, last=False, enforceWarninglist=False, allowNotPublished=False):
+        """Get all attributes from a specific type as plain text. Only published and IDS flagged attributes are exported, except if stated otherwise."""
         session = self.__prepare_session('txt')
-        url = urljoin(self.root_url, 'attributes/text/download/%s' % type_attr)
+        url = urljoin(self.root_url, 'attributes/text/download/%s/%s/%s/%s/%s/%s/%s/%s/%s' % (type_attr, tags, eventId, allowNonIDS, date_from, date_to, last, enforceWarninglist, allowNotPublished))
         response = session.get(url)
         return response
 
@@ -1110,13 +1135,18 @@ class PyMISP(object):
         response = session.post(url)
         return self._check_response(response)
 
-    def sighting_per_json(self, json_file):
+    def set_sightings(self, sightings):
+        if isinstance(sightings, dict):
+            sightings = json.dumps(sightings)
         session = self.__prepare_session()
+        url = urljoin(self.root_url, 'sightings/add/')
+        response = session.post(url, data=sightings)
+        return self._check_response(response)
+
+    def sighting_per_json(self, json_file):
         with open(json_file) as f:
             jdata = json.load(f)
-        url = urljoin(self.root_url, 'sightings/add/')
-        response = session.post(url, data=json.dumps(jdata))
-        return self._check_response(response)
+            return self.set_sightings(jdata)
 
     # ############## Sharing Groups ##################
 

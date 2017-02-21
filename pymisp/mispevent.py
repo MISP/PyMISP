@@ -101,6 +101,9 @@ class MISPAttribute(object):
     def delete(self):
         self.deleted = True
 
+    def add_tag(self, tag):
+        self.Tag.append({'name': tag})
+
     def verify(self, gpg_uid):
         if not has_pyme:
             raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
@@ -116,7 +119,7 @@ class MISPAttribute(object):
     def set_all_values(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
             if kwargs['type'] not in self.category_type_mapping[kwargs['category']]:
-                raise NewAttributeError('{} and {} is an invalid combinaison, type for this category has to be in {}'.format(self.type, self.category, (', '.join(self.category_type_mapping[kwargs['category']]))))
+                raise NewAttributeError('{} and {} is an invalid combinaison, type for this category has to be in {}'.format(kwargs.get('type'), kwargs.get('category'), (', '.join(self.category_type_mapping[kwargs['category']]))))
         # Required
         if kwargs.get('type'):
             self.type = kwargs['type']
@@ -174,7 +177,7 @@ class MISPAttribute(object):
         if kwargs.get('sig'):
             self.sig = kwargs['sig']
         if kwargs.get('Tag'):
-            self.Tag = kwargs['Tag']
+            self.Tag = [t for t in kwargs['Tag'] if t]
 
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.get("disable_correlation", False)
@@ -214,6 +217,8 @@ class MISPAttribute(object):
         to_return = {'type': self.type, 'category': self.category, 'to_ids': self.to_ids,
                      'distribution': self.distribution, 'value': self.value,
                      'comment': self.comment, 'disable_correlation': self.disable_correlation}
+        if self.uuid:
+            to_return['uuid'] = self.uuid
         if self.sig:
             to_return['sig'] = self.sig
         if self.sharing_group_id:
@@ -231,9 +236,8 @@ class MISPAttribute(object):
         to_return = self._json()
         if self.id:
             to_return['id'] = self.id
-        if self.uuid:
-            to_return['uuid'] = self.uuid
         if self.timestamp:
+            # Should never be set on an update, MISP will automatically set it to now
             to_return['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
         if self.deleted is not None:
             to_return['deleted'] = self.deleted
@@ -436,6 +440,8 @@ class MISPEvent(object):
             if self.analysis not in [0, 1, 2]:
                 raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(self.analysis))
         if kwargs.get('published') is not None:
+            self.unpublish()
+        if kwargs.get("published") == True:
             self.publish()
         if kwargs.get('date'):
             self.set_date(kwargs['date'])
@@ -481,7 +487,7 @@ class MISPEvent(object):
         if kwargs.get('Galaxy'):
             self.Galaxy = kwargs['Galaxy']
         if kwargs.get('Tag'):
-            self.Tag = kwargs['Tag']
+            self.Tag = [t for t in kwargs['Tag'] if t]
         if kwargs.get('sig'):
             self.sig = kwargs['sig']
         if kwargs.get('global_sig'):
@@ -542,12 +548,26 @@ class MISPEvent(object):
         if self.publish_timestamp:
             to_return['Event']['publish_timestamp'] = int(time.mktime(self.publish_timestamp.timetuple()))
         if self.timestamp:
+            # Should never be set on an update, MISP will automatically set it to now
             to_return['Event']['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
         to_return['Event'] = _int_to_str(to_return['Event'])
         if self.attributes:
             to_return['Event']['Attribute'] = [a._json_full() for a in self.attributes]
         jsonschema.validate(to_return, self.json_schema)
         return to_return
+
+    def add_tag(self, tag):
+        self.Tag.append({'name': tag})
+
+    def add_attribute_tag(self, tag, attribute_identifier):
+        attribute = None
+        for a in self.attributes:
+            if a.id == attribute_identifier or a.uuid == attribute_identifier or attribute_identifier in a.value:
+                a.add_tag(tag)
+                attribute = a
+        if not attribute:
+            raise Exception('No attribute with identifier {} found.'.format(attribute_identifier))
+        return attribute
 
     def publish(self):
         self.published = True
