@@ -44,7 +44,7 @@ class TestBasic(unittest.TestCase):
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': None, 'disable_correlation': False, u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False,
-                               u'distribution': u'0', u'Attribute': [], u'proposal_email_lock': False,
+                               u'distribution': u'0', u'event_creator_email': u'admin@admin.test', u'Attribute': [], u'proposal_email_lock': False,
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
                                u'Galaxy': [],
@@ -60,7 +60,7 @@ class TestBasic(unittest.TestCase):
         self._clean_event(event)
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': u'3', u'analysis': u'0',
-                               u'ShadowAttribute': [], u'published': False, u'distribution': u'0',
+                               u'ShadowAttribute': [], u'published': False, u'distribution': u'0', u'event_creator_email': u'admin@admin.test',
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
                                u'Galaxy': [],
@@ -84,7 +84,7 @@ class TestBasic(unittest.TestCase):
         self._clean_event(event)
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': u'3', u'analysis': u'0',
-                               u'ShadowAttribute': [], u'published': True, u'distribution': u'0',
+                               u'ShadowAttribute': [], u'published': True, u'distribution': u'0', u'event_creator_email': u'admin@admin.test',
                                u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
                                u'Galaxy': [],
@@ -120,7 +120,7 @@ class TestBasic(unittest.TestCase):
     def add(self):
         event = {u'Event': {u'info': u'This is a test', u'locked': False,
                             u'attribute_count': u'3', u'analysis': u'0',
-                            u'ShadowAttribute': [], u'published': False, u'distribution': u'0',
+                            u'ShadowAttribute': [], u'published': False, u'distribution': u'0', u'event_creator_email': u'admin@admin.test',
                             u'Attribute': [
                                 {u'category': u'Payload installation', u'comment': u'Fanny modules',
                                  u'to_ids': False, u'value': u'dll_installer.dll|0a209ac0de4ac033f31d6ba9191a8f7a',
