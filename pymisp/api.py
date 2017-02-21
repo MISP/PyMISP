@@ -1187,6 +1187,8 @@ class PyMISP(object):
             user['termsaccepted'] = kwargs.get('termsaccepted')
         if kwargs.get('newsread'):
             user['newsread'] = kwargs.get('newsread')
+        if kwargs.get('authkey'):
+            user['authkey'] = kwargs.get('authkey')
         return user
 
     def get_users_list(self):
