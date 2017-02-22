@@ -203,9 +203,14 @@ class PyMISP(object):
                 errors.append(to_return['error'])
             else:
                 errors += to_return['error']
+        if to_return.get('errors'):
+            if not isinstance(to_return['errors'], list):
+                errors.append(to_return['errors'])
+            else:
+                errors += to_return['errors']
 
         if 400 <= response.status_code < 500:
-            if to_return.get('error') is None and to_return.get('message'):
+            if not errors and to_return.get('message'):
                 errors.append(to_return['message'])
             else:
                 errors.append(basestring(response.status_code))
