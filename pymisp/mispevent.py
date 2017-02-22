@@ -151,7 +151,7 @@ class MISPAttribute(object):
             self.to_ids = bool(int(type_defaults['to_ids']))
         if kwargs.get('comment'):
             self.comment = kwargs['comment']
-        if kwargs.get('distribution'):
+        if kwargs.get('distribution') is not None:
             self.distribution = int(kwargs['distribution'])
             if self.distribution not in [0, 1, 2, 3, 4, 5]:
                 raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
