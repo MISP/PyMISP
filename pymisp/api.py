@@ -1345,7 +1345,8 @@ class PyMISP(object):
 
     def _set_server_parameters(self, url, name, authkey, organisation, internal,
                                 push, pull, self_signed, push_rules, pull_rules,
-                                submitted_cert, submitted_client_cert):
+                                submitted_cert, submitted_client_cert, delete_cert,
+                                delete_client_cert):
         server = {}
         self._set_server_organisation(server, organisation)
         if url is not None:
@@ -1370,6 +1371,10 @@ class PyMISP(object):
             server['submitted_cert'] = submitted_cert
         if submitted_client_cert is not None:
             server['submitted_client_cert'] = submitted_client_cert
+        if delete_cert is not None:
+            server['delete_cert'] = delete_cert
+        if delete_client_cert is not None:
+            server['delete_client_cert'] = delete_client_cert
         return server
 
     def add_server(self, url, name, authkey, organisation, internal=None, push=None,
@@ -1377,7 +1382,7 @@ class PyMISP(object):
                         submitted_cert=None, submitted_client_cert=None):
         new_server = self._set_server_parameters(url, name, authkey, organisation, internal,
                                 push, pull, self_signed, push_rules, pull_rules, submitted_cert,
-                                submitted_client_cert)
+                                submitted_client_cert, None, None)
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'servers/add')
         response = session.post(url, data=json.dumps(new_server))
@@ -1387,5 +1392,23 @@ class PyMISP(object):
         session = self.__prepare_session()
         jdata = json.load(open(json_file))
         url = urljoin(self.root_url, 'servers/add')
+        response = session.post(url, data=json.dumps(jdata))
+        return self._check_response(response)
+
+    def edit_server(self, server_id, url=None, name=None, authkey=None, organisation=None, internal=None, push=None,
+                        pull=None, self_signed=None, push_rules=None, pull_rules=None,
+                        submitted_cert=None, submitted_client_cert=None, delete_cert=None, delete_client_cert=None):
+        new_server = self._set_server_parameters(url, name, authkey, organisation, internal,
+                                push, pull, self_signed, push_rules, pull_rules, submitted_cert,
+                                submitted_client_cert, delete_cert, delete_client_cert)
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'servers/edit/{}'.format(server_id))
+        response = session.post(url, data=json.dumps(new_server))
+        return self._check_response(response)
+
+    def add_server_json(self, json_file, server_id):
+        session = self.__prepare_session()
+        jdata = json.load(open(json_file))
+        url = urljoin(self.root_url, 'servers/edit/{}'.format(server_id))
         response = session.post(url, data=json.dumps(jdata))
         return self._check_response(response)
