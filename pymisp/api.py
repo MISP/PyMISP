@@ -447,22 +447,18 @@ class PyMISP(object):
 
         attributes = []
         type_value = '{}'
-        value = '{}'
+        value = ''
         if filename:
             type_value = 'filename|{}'
-            value = filename + '|{}'
+            value = filename + '|'
         if md5:
-            attributes.append(self._prepare_full_attribute(category, type_value.format('md5'), value.format(md5),
-                                                           to_ids, comment, distribution))
+            attributes.append(self._prepare_full_attribute(category, type_value.format('md5'), value + md5, to_ids, comment, distribution))
         if sha1:
-            attributes.append(self._prepare_full_attribute(category, type_value.format('sha1'), value.format(sha1),
-                                                           to_ids, comment, distribution))
+            attributes.append(self._prepare_full_attribute(category, type_value.format('sha1'), value + sha1, to_ids, comment, distribution))
         if sha256:
-            attributes.append(self._prepare_full_attribute(category, type_value.format('sha256'), value.format(sha256),
-                                                           to_ids, comment, distribution))
+            attributes.append(self._prepare_full_attribute(category, type_value.format('sha256'), value + sha256, to_ids, comment, distribution))
         if ssdeep:
-            attributes.append(self._prepare_full_attribute(category, type_value.format('ssdeep'), value.format(ssdeep),
-                                                           to_ids, comment, distribution))
+            attributes.append(self._prepare_full_attribute(category, type_value.format('ssdeep'), value + ssdeep, to_ids, comment, distribution))
 
         return self._send_attributes(event, attributes, proposal)
 
@@ -1351,9 +1347,9 @@ class PyMISP(object):
         return server
 
     def _set_server_parameters(self, url, name, authkey, organisation, internal,
-                                push, pull, self_signed, push_rules, pull_rules,
-                                submitted_cert, submitted_client_cert, delete_cert,
-                                delete_client_cert):
+                               push, pull, self_signed, push_rules, pull_rules,
+                               submitted_cert, submitted_client_cert, delete_cert,
+                               delete_client_cert):
         server = {}
         self._set_server_organisation(server, organisation)
         if url is not None:
@@ -1385,11 +1381,11 @@ class PyMISP(object):
         return server
 
     def add_server(self, url, name, authkey, organisation, internal=None, push=None,
-                        pull=None, self_signed=None, push_rules=None, pull_rules=None,
-                        submitted_cert=None, submitted_client_cert=None):
+                   pull=None, self_signed=None, push_rules=None, pull_rules=None,
+                   submitted_cert=None, submitted_client_cert=None):
         new_server = self._set_server_parameters(url, name, authkey, organisation, internal,
-                                push, pull, self_signed, push_rules, pull_rules, submitted_cert,
-                                submitted_client_cert, None, None)
+                                                 push, pull, self_signed, push_rules, pull_rules, submitted_cert,
+                                                 submitted_client_cert, None, None)
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'servers/add')
         response = session.post(url, data=json.dumps(new_server))
@@ -1403,17 +1399,17 @@ class PyMISP(object):
         return self._check_response(response)
 
     def edit_server(self, server_id, url=None, name=None, authkey=None, organisation=None, internal=None, push=None,
-                        pull=None, self_signed=None, push_rules=None, pull_rules=None,
-                        submitted_cert=None, submitted_client_cert=None, delete_cert=None, delete_client_cert=None):
+                    pull=None, self_signed=None, push_rules=None, pull_rules=None,
+                    submitted_cert=None, submitted_client_cert=None, delete_cert=None, delete_client_cert=None):
         new_server = self._set_server_parameters(url, name, authkey, organisation, internal,
-                                push, pull, self_signed, push_rules, pull_rules, submitted_cert,
-                                submitted_client_cert, delete_cert, delete_client_cert)
+                                                 push, pull, self_signed, push_rules, pull_rules, submitted_cert,
+                                                 submitted_client_cert, delete_cert, delete_client_cert)
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'servers/edit/{}'.format(server_id))
         response = session.post(url, data=json.dumps(new_server))
         return self._check_response(response)
 
-    def add_server_json(self, json_file, server_id):
+    def edit_server_json(self, json_file, server_id):
         session = self.__prepare_session()
         jdata = json.load(open(json_file))
         url = urljoin(self.root_url, 'servers/edit/{}'.format(server_id))
