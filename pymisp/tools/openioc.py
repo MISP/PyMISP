@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+
 from pymisp import MISPEvent
 try:
     from bs4 import BeautifulSoup
@@ -79,27 +81,34 @@ def extract_field(report, field_name):
     return None
 
 
+def load_openioc_file(openioc_path):
+    if not os.path.exists(openioc_path):
+        raise Exception("Path doesn't exists.")
+    with open(openioc_path, 'r') as f:
+        return load_openioc(f)
+
+
 def load_openioc(openioc):
+    # Takes a opened file, or a string
     if not has_bs4:
         raise Exception('You need to install BeautifulSoup: pip install bs4')
     misp_event = MISPEvent()
-    with open(openioc, "r") as ioc_file:
-        iocreport = BeautifulSoup(ioc_file, "lxml")
-        # Set event fields
-        info = extract_field(iocreport, 'short_description')
-        if info:
-            misp_event.info = info
-        date = extract_field(iocreport, 'authored_date')
-        if date:
-            misp_event.set_date(date)
-        # Set special attributes
-        description = extract_field(iocreport, 'description')
-        if description:
-            misp_event.add_attribute('comment', description)
-        author = extract_field(iocreport, 'authored_by')
-        if author:
-            misp_event.add_attribute('comment', author)
-        misp_event = set_all_attributes(iocreport, misp_event)
+    iocreport = BeautifulSoup(openioc, "lxml")
+    # Set event fields
+    info = extract_field(iocreport, 'short_description')
+    if info:
+        misp_event.info = info
+    date = extract_field(iocreport, 'authored_date')
+    if date:
+        misp_event.set_date(date)
+    # Set special attributes
+    description = extract_field(iocreport, 'description')
+    if description:
+        misp_event.add_attribute('comment', description)
+    author = extract_field(iocreport, 'authored_by')
+    if author:
+        misp_event.add_attribute('comment', author)
+    misp_event = set_all_attributes(iocreport, misp_event)
     return misp_event
 
 
