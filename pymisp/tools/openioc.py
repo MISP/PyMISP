@@ -93,7 +93,7 @@ def load_openioc(openioc):
     if not has_bs4:
         raise Exception('You need to install BeautifulSoup: pip install bs4')
     misp_event = MISPEvent()
-    iocreport = BeautifulSoup(openioc, "lxml")
+    iocreport = BeautifulSoup(openioc, "html.parser")
     # Set event fields
     info = extract_field(iocreport, 'short_description')
     if info:
@@ -104,7 +104,12 @@ def load_openioc(openioc):
     # Set special attributes
     description = extract_field(iocreport, 'description')
     if description:
-        misp_event.add_attribute('comment', description)
+        if not misp_event.info:
+            misp_event.info = description
+        else:
+            misp_event.add_attribute('comment', description)
+    if not misp_event.info:
+        misp_event.info = 'OpenIOC import'
     author = extract_field(iocreport, 'authored_by')
     if author:
         misp_event.add_attribute('comment', author)
