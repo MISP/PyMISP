@@ -88,7 +88,7 @@ class MISPAttribute(object):
 
     def sign(self, gpg_uid, passphrase=None):
         if not has_pyme:
-            raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
+            raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
         to_sign = self._serialize()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
@@ -106,7 +106,7 @@ class MISPAttribute(object):
 
     def verify(self, gpg_uid):
         if not has_pyme:
-            raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
+            raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
         signed_data = self._serialize()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
@@ -337,7 +337,7 @@ class MISPEvent(object):
 
     def sign(self, gpg_uid, passphrase=None):
         if not has_pyme:
-            raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
+            raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
         to_sign = self._serialize()
         with gpg.Context() as c:
             keys = list(c.keylist(gpg_uid))
@@ -359,7 +359,7 @@ class MISPEvent(object):
 
     def verify(self, gpg_uid):
         if not has_pyme:
-            raise Exception('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
+            raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
         to_return = {}
         signed_data = self._serialize()
         with gpg.Context() as c:
@@ -381,12 +381,15 @@ class MISPEvent(object):
                 to_return['global'] = False
         return to_return
 
+    def load_file(self, event_path):
+        if not os.path.exists(event_path):
+            raise PyMISPError('Invalid path, unable to load the event.')
+        with open(event_path, 'r') as f:
+            self.load(f)
+
     def load(self, json_event):
         self.new = False
         self.dump_full = True
-        if isinstance(json_event, basestring) and os.path.exists(json_event):
-            # NOTE: is it a good idea? (possible security issue if an untrusted user call this method)
-            json_event = open(json_event, 'r')
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
             json_event = json_event.read()
