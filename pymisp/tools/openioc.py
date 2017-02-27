@@ -147,5 +147,9 @@ def set_all_attributes(openioc, misp_event):
         comment = extract_field(item, 'Comment')
         if comment:
             attribute_values["comment"] = '{} {}'.format(attribute_values["comment"], comment)
+
+        if mapping['type'] in ['ip-src', 'ip-dst'] and value.count(':') == 1:
+            attribute_values['type'] = mapping['type'] + '|port'
+            attribute_values['value'] = attribute_values['value'].replace(':', '|')
         misp_event.add_attribute(**attribute_values)
     return misp_event
