@@ -18,14 +18,14 @@ PyMISP allows you to fetch events, add or update events/attributes, add or updat
 ## Install from pip
 
 ```
-pip install pymisp
+pip3 install pymisp
 ```
 
 ## Install the lastest version from repo
 
 ```
 git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
-python setup.py install
+python3 setup.py install
 ```
 
 ## Samples and how to use PyMISP
@@ -47,7 +47,7 @@ fetch the last 10 events published.
 
 ```
 cd examples
-python last.py -l 10
+python3 last.py -l 10
 ```
 
 ## Documentation
