@@ -375,12 +375,16 @@ class PyMISP(object):
         return self.add_event(json.dumps(misp_event, cls=EncodeUpdate))
 
     def tag(self, uuid, tag):
+        if not self._valid_uuid(uuid):
+            raise PyMISPError('Invalid UUID')
         session = self.__prepare_session()
         path = '/tags/attachTagToObject/{}/{}/'.format(uuid, tag)
         response = session.post(urljoin(self.root_url, path))
         return self._check_response(response)
 
     def untag(self, uuid, tag):
+        if not self._valid_uuid(uuid):
+            raise PyMISPError('Invalid UUID')
         session = self.__prepare_session()
         path = '/tags/removeTagFromObject/{}/{}/'.format(uuid, tag)
         response = session.post(urljoin(self.root_url, path))
