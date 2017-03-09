@@ -219,6 +219,7 @@ class TestOffline(unittest.TestCase):
         p.add_internal_comment(evt, 'foobar')
         p.add_internal_text(evt, 'foobar')
         p.add_internal_other(evt, 'foobar')
-        p.add_attachment(evt, "testFile", "Attacment added!")
+        p.add_attachment(evt, "testFile")
+
 if __name__ == '__main__':
     unittest.main()
