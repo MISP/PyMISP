@@ -5,6 +5,7 @@ from pymisp import PyMISP
 from keys import misp_url, misp_key
 import argparse
 
+from io import open
 
 # Usage for pipe masters: ./last.py -l 5h | jq .
 
