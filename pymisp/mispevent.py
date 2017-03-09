@@ -228,7 +228,7 @@ class MISPAttribute(object):
         if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
             if self.encrypt:
-                to_return['entrypt'] = self.encrypt
+                to_return['encrypt'] = self.encrypt
         to_return = _int_to_str(to_return)
         return to_return
 
