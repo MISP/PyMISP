@@ -378,16 +378,18 @@ class PyMISP(object):
         if not self._valid_uuid(uuid):
             raise PyMISPError('Invalid UUID')
         session = self.__prepare_session()
-        path = '/tags/attachTagToObject/{}/{}/'.format(uuid, tag)
-        response = session.post(urljoin(self.root_url, path))
+        to_post = {'uuid':uuid, 'tag':tag}
+        path = 'tags/attachTagToObject'
+        response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
         return self._check_response(response)
 
     def untag(self, uuid, tag):
         if not self._valid_uuid(uuid):
             raise PyMISPError('Invalid UUID')
         session = self.__prepare_session()
-        path = '/tags/removeTagFromObject/{}/{}/'.format(uuid, tag)
-        response = session.post(urljoin(self.root_url, path))
+        to_post = {'uuid':uuid, 'tag':tag}
+        path = 'tags/removeTagFromObject'
+        response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
         return self._check_response(response)
 
     def add_tag(self, event, tag, attribute=False):
