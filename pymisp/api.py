@@ -541,6 +541,8 @@ class PyMISP(object):
         return self.add_named_attribute(event, 'domain', domain, category, to_ids, comment, distribution, proposal)
 
     def add_domain_ip(self, event, domain, ip, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False):
+        if isinstance(ip, str):
+            ip = [ip]
         composed = list(map(lambda x: '%s|%s' % (domain, x), ip))
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal)
 
