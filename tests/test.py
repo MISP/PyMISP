@@ -42,7 +42,7 @@ class TestBasic(unittest.TestCase):
         event = self.misp.new_event(0, 1, 0, "This is a test")
         event_id = self._clean_event(event)
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
-                               u'attribute_count': None, 'disable_correlation': False, u'analysis': u'0',
+                               u'attribute_count': u'0', 'disable_correlation': False, u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False,
                                u'distribution': u'0', u'event_creator_email': u'admin@admin.test', u'Attribute': [], u'proposal_email_lock': False,
                                u'Org': {u'name': u'ORGNAME'},
