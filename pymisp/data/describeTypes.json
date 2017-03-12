@@ -69,6 +69,10 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "float": {
+        "default_category": "Other",
+        "to_ids": 0
+      },
       "url": {
         "default_category": "External analysis",
         "to_ids": 1
@@ -544,6 +548,7 @@
       "email-dst",
       "email-subject",
       "email-attachment",
+      "float",
       "url",
       "http-method",
       "user-agent",
@@ -998,14 +1003,15 @@
         "other"
       ],
       "Other": [
+        "comment",
+        "text",
+        "other",
         "size-in-bytes",
         "counter",
         "datetime",
         "cpe",
         "port",
-        "comment",
-        "text",
-        "other"
+        "float"
       ]
     }
   }

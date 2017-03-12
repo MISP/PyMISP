@@ -130,9 +130,9 @@ class MISPAttribute(object):
 
         type_defaults = self.sane_default[self.type]
 
-        if kwargs.get('value'):
-            self.value = kwargs['value']
-        elif not self.value:
+        self.value = kwargs.get('value')
+
+        if self.value is None:
             raise NewAttributeError('The value of the attribute is required.')
 
         # Default values
@@ -444,7 +444,7 @@ class MISPEvent(object):
                 raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(self.analysis))
         if kwargs.get('published') is not None:
             self.unpublish()
-        if kwargs.get("published") == True:
+        if kwargs.get("published") is True:
             self.publish()
         if kwargs.get('date'):
             self.set_date(kwargs['date'])
