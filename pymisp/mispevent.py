@@ -474,7 +474,7 @@ class MISPEvent(object):
         if kwargs.get('locked'):
             self.locked = kwargs['locked']
         if kwargs.get('publish_timestamp'):
-            self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs['publish_timestamp']))
+            self.publish_timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs['publish_timestamp']))
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs['sharing_group_id'])
         if kwargs.get('Org'):
