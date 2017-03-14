@@ -143,12 +143,12 @@ class MISPAttribute(object):
         else:
             self.category = type_defaults['default_category']
 
-        if kwargs.get('to_ids'):
-            self.to_ids = kwargs['to_ids']
-            if not isinstance(self.to_ids, bool):
-                raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
-        else:
+        self.to_ids = kwargs.get('to_ids')
+        if self.to_ids is None:
             self.to_ids = bool(int(type_defaults['to_ids']))
+        if not isinstance(self.to_ids, bool):
+            raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
+
         if kwargs.get('comment'):
             self.comment = kwargs['comment']
         if kwargs.get('distribution') is not None:
@@ -181,6 +181,8 @@ class MISPAttribute(object):
 
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.get("disable_correlation", False)
+        if self.disable_correlation is None:
+            self.disable_correlation = False
 
     def _prepare_new_malware_sample(self):
         if '|' in self.value:
@@ -268,7 +270,7 @@ class EncodeFull(JSONEncoder):
 def _int_to_str(d):
     # transform all integer back to string
     for k, v in d.items():
-        if isinstance(v, int) and not isinstance(v, bool):
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
             d[k] = str(v)
     return d
 
