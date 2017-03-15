@@ -365,7 +365,7 @@ class PyMISP(object):
         if not self._valid_uuid(uuid):
             raise PyMISPError('Invalid UUID')
         session = self.__prepare_session()
-        to_post = {'uuid':uuid, 'tag':tag}
+        to_post = {'uuid': uuid, 'tag': tag}
         path = 'tags/attachTagToObject'
         response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
         return self._check_response(response)
@@ -374,7 +374,7 @@ class PyMISP(object):
         if not self._valid_uuid(uuid):
             raise PyMISPError('Invalid UUID')
         session = self.__prepare_session()
-        to_post = {'uuid':uuid, 'tag':tag}
+        to_post = {'uuid': uuid, 'tag': tag}
         path = 'tags/removeTagFromObject'
         response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
         return self._check_response(response)
@@ -382,24 +382,30 @@ class PyMISP(object):
     # ##### File attributes #####
 
     def _send_attributes(self, event, attributes, proposal=False):
-        # FIXME: unable to send a proposal if we have a full event.
+        eventID_to_update = None
         if isinstance(event, MISPEvent):
-            event.attributes += attributes
-            response = self.update(event)
+            if hasattr(event, 'id'):
+                eventID_to_update = event.id
+            elif hasattr(event, 'uuid'):
+                eventID_to_update = event.uuid
         elif isinstance(event, int) or (isinstance(event, str) and (event.isdigit() or self._valid_uuid(event))):
-            # No full event, just an ID
-            session = self.__prepare_session()
-            url = urljoin(self.root_url, 'attributes/add/{}'.format(event))
-            for a in attributes:
-                if proposal:
-                    response = self.proposal_add(event, json.dumps(a, cls=EncodeUpdate))
-                else:
-                    response = session.post(url, data=json.dumps(a, cls=EncodeUpdate))
+            eventID_to_update = event
         else:
             e = MISPEvent(self.describe_types)
             e.load(event)
-            e.attributes += attributes
-            response = self.update(e)
+            if hasattr(e, 'id'):
+                eventID_to_update = e.id
+            elif hasattr(e, 'uuid'):
+                eventID_to_update = e.uuid
+        if eventID_to_update is None:
+            raise PyMISPError("Unable to find the ID of the event to update")
+        for a in attributes:
+            if proposal:
+                response = self.proposal_add(eventID_to_update, json.dumps(a, cls=EncodeUpdate))
+            else:
+                session = self.__prepare_session()
+                url = urljoin(self.root_url, 'attributes/add/{}'.format(eventID_to_update))
+                response = session.post(url, data=json.dumps(a, cls=EncodeUpdate))
         return response
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
