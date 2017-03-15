@@ -284,10 +284,12 @@ class PyMISP(object):
     def add_event(self, event):
         """Add a new event
 
-        :param event: Event as JSON object / string or XML to add
+        :param event: Event as JSON object / string to add
         """
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events')
+        if isinstance(event, MISPEvent):
+            event = json.dumps(event, cls=EncodeUpdate)
         if isinstance(event, basestring):
             response = session.post(url, data=event)
         else:
@@ -298,10 +300,12 @@ class PyMISP(object):
         """Update an event
 
         :param event_id: Event id to update
-        :param event: Event as JSON object / string or XML to add
+        :param event: Event as JSON object / string to add
         """
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
+        if isinstance(event, MISPEvent):
+            event = json.dumps(event, cls=EncodeUpdate)
         if isinstance(event, basestring):
             response = session.post(url, data=event)
         else:
@@ -337,7 +341,7 @@ class PyMISP(object):
             eid = e.uuid
         else:
             eid = e.id
-        return self.update_event(eid, json.dumps(e, cls=EncodeUpdate))
+        return self.update_event(eid, e)
 
     def publish(self, event):
         e = self._make_mispevent(event)
@@ -359,7 +363,7 @@ class PyMISP(object):
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
         misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published, orgc_id, org_id, sharing_group_id)
-        return self.add_event(json.dumps(misp_event, cls=EncodeUpdate))
+        return self.add_event(misp_event)
 
     def tag(self, uuid, tag):
         if not self._valid_uuid(uuid):
