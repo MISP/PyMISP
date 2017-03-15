@@ -165,7 +165,7 @@ class MISPAttribute(object):
         if kwargs.get('uuid'):
             self.uuid = kwargs['uuid']
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.datetime.fromtimestamp(int(kwargs['timestamp']))
+            self.timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs['timestamp']))
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs['sharing_group_id'])
         if kwargs.get('deleted'):
@@ -468,13 +468,13 @@ class MISPEvent(object):
         if kwargs.get('attribute_count'):
             self.attribute_count = int(kwargs['attribute_count'])
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.datetime.fromtimestamp(int(kwargs['timestamp']))
+            self.timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs['timestamp']))
         if kwargs.get('proposal_email_lock'):
             self.proposal_email_lock = kwargs['proposal_email_lock']
         if kwargs.get('locked'):
             self.locked = kwargs['locked']
         if kwargs.get('publish_timestamp'):
-            self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs['publish_timestamp']))
+            self.publish_timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs['publish_timestamp']))
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs['sharing_group_id'])
         if kwargs.get('Org'):
