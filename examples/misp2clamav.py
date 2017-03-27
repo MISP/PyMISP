@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 expandtab
-# 
+#
 # Export file hashes from MISP to ClamAV hdb file
 
 import sys
-from pymisp import PyMISP
+from pymisp import PyMISP, MISPAttribute
 from keys import misp_url, misp_key
+
 
 def init_misp():
     global mymisp
     mymisp = PyMISP(misp_url, misp_key)
+
 
 def echeck(r):
     if r.get('errors'):
@@ -20,25 +22,25 @@ def echeck(r):
             print(r['errors'])
             sys.exit(1)
 
+
 def find_hashes(htype):
-    r = mymisp.search(type_attribute = htype)
+    r = mymisp.search(controller='attributes', type_attribute=htype)
     echeck(r)
-    if r.get('response'):
-        c = ''
-        v = ''
-        for e in r['response']:
-            for a in e['Event']['Attribute']:
-                if a['type'] == htype:
-                    if '|' in htype and '|' in v:
-                        s = v.split('|')
-                        c = s[0]
-                        v = s[1]
-                    else:
-                        c = a['comment']
-                        v = a['value']
-                    mhash = v.replace(':',';')
-                    mfile = 'MISP event ' + e['Event']['id'] + ' ' + c.replace(':',';').replace('\r', '').replace('\n', '')
-                    print('{}:*:{}:73'.format(mhash, mfile))
+    if not r.get('response'):
+        return
+    for a in r['response']['Attribute']:
+        attribute = MISPAttribute(mymisp.describe_types)
+        attribute.set_all_values(**a)
+        if '|' in attribute.type and '|' in attribute.value:
+            c, value = attribute.value.split('|')
+            comment = '{} - {}'.format(attribute.comment, c)
+        else:
+            comment = attribute.comment
+            value = attribute.value
+        mhash = value.replace(':', ';')
+        mfile = 'MISP event {} {}'.format(a['event_id'], comment.replace(':', ';').replace('\r', '').replace('\n', ''))
+        print('{}:*:{}:73'.format(mhash, mfile))
+
 
 if __name__ == '__main__':
     init_misp()
