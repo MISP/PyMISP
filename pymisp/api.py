@@ -409,7 +409,7 @@ class PyMISP(object):
             else:
                 session = self.__prepare_session()
                 url = urljoin(self.root_url, 'attributes/add/{}'.format(eventID_to_update))
-                response = session.post(url, data=json.dumps(a, cls=EncodeUpdate))
+                response = self._check_response(session.post(url, data=json.dumps(a, cls=EncodeUpdate)))
         return response
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
