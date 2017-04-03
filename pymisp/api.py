@@ -50,14 +50,14 @@ def deprecated(func):
     @functools.wraps(func)
     def new_func(*args, **kwargs):
         if sys.version_info < (3, 0):
-            warnings.warn_explicit(
+            warnings.showwarning(
                 "Call to deprecated function {}.".format(func.__name__),
                 category=DeprecationWarning,
                 filename=func.func_code.co_filename,
                 lineno=func.func_code.co_firstlineno + 1
             )
         else:
-            warnings.warn_explicit(
+            warnings.showwarning(
                 "Call to deprecated function {}.".format(func.__name__),
                 category=DeprecationWarning,
                 filename=func.__code__.co_filename,
@@ -1441,7 +1441,6 @@ class PyMISP(object):
 
     @deprecated
     def add_tag(self, event, tag, attribute=False):
-        # FIXME: this is dirty, this function needs to be deprecated with something tagging a UUID
         session = self.__prepare_session()
         if attribute:
             to_post = {'request': {'Attribute': {'id': event['id'], 'tag': tag}}}
@@ -1457,13 +1456,12 @@ class PyMISP(object):
 
     @deprecated
     def remove_tag(self, event, tag, attribute=False):
-        # FIXME: this is dirty, this function needs to be deprecated with something removing the tag to a UUID
         session = self.__prepare_session()
         if attribute:
             to_post = {'request': {'Attribute': {'id': event['id'], 'tag': tag}}}
-            path = 'attributes/addTag'
+            path = 'attributes/removeTag'
         else:
             to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
-            path = 'events/addTag'
+            path = 'events/removeTag'
         response = session.post(urljoin(self.root_url, path), data=json.dumps(to_post))
         return self._check_response(response)
