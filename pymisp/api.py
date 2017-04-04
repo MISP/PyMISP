@@ -1127,7 +1127,7 @@ class PyMISP(object):
 
     def _set_user_parameters(self, **kwargs):
         user = {}
-        if kwargs.get('email'):
+        if kwargs.get('email'): 
             user['email'] = kwargs.get('email')
         if kwargs.get('org_id'):
             user['org_id'] = kwargs.get('org_id')
@@ -1135,29 +1135,21 @@ class PyMISP(object):
             user['role_id'] = kwargs.get('role_id')
         if kwargs.get('password'):
             user['password'] = kwargs.get('password')
-        if kwargs.get('external_auth_required'):
-            user['external_auth_required'] = kwargs.get('external_auth_required')
-        if kwargs.get('external_auth_key'):
-            user['external_auth_key'] = kwargs.get('external_auth_key')
-        if kwargs.get('enable_password'):
-            user['enable_password'] = kwargs.get('enable_password')
         if kwargs.get('nids_sid'):
             user['nids_sid'] = kwargs.get('nids_sid')
         if kwargs.get('server_id'):
             user['server_id'] = kwargs.get('server_id')
         if kwargs.get('gpgkey'):
             user['gpgkey'] = kwargs.get('gpgkey')
-        if kwargs.get('certif_public'):
-            user['certif_public'] = kwargs.get('certif_public')
-        if kwargs.get('autoalert'):
+        if kwargs.get('autoalert') is not None:
             user['autoalert'] = kwargs.get('autoalert')
-        if kwargs.get('contactalert'):
+        if kwargs.get('contactalert') is not None:
             user['contactalert'] = kwargs.get('contactalert')
-        if kwargs.get('disabled'):
+        if kwargs.get('disabled') is not None:
             user['disabled'] = kwargs.get('disabled')
-        if kwargs.get('change_pw'):
+        if kwargs.get('change_pw') is not None:
             user['change_pw'] = kwargs.get('change_pw')
-        if kwargs.get('termsaccepted'):
+        if kwargs.get('termsaccepted') is not None:
             user['termsaccepted'] = kwargs.get('termsaccepted')
         if kwargs.get('newsread'):
             user['newsread'] = kwargs.get('newsread')
@@ -1225,8 +1217,6 @@ class PyMISP(object):
         organisation = {}
         if kwargs.get('name'):
             organisation['name'] = kwargs.get('name')
-        if kwargs.get('anonymise'):
-            organisation['anonymise'] = kwargs.get('anonymise')
         if kwargs.get('description'):
             organisation['description'] = kwargs.get('description')
         if kwargs.get('type'):
@@ -1239,7 +1229,7 @@ class PyMISP(object):
             organisation['uuid'] = kwargs.get('uuid')
         if kwargs.get('contacts'):
             organisation['contacts'] = kwargs.get('contacts')
-        if kwargs.get('local'):
+        if kwargs.get('local') is not None:
             organisation['local'] = kwargs.get('local')
         return organisation
 
