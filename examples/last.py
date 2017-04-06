@@ -26,9 +26,7 @@ def download_last(m, last, out=None):
             exit(0)
     else:
         with open(out, 'w') as f:
-            for e in result['response']:
-                f.write(json.dumps(e) + '\n')
-
+                f.write(json.dumps(result['response']))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download latest events from a MISP instance.')
