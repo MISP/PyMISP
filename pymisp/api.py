@@ -1258,6 +1258,10 @@ class PyMISP(object):
     def add_organisation(self, name, **kwargs):
         new_org = self._set_organisation_parameters(**dict(name=name, **kwargs))
         session = self.__prepare_session()
+        if local in new_org:
+            if new_org.get('local') == False:
+                if 'uuid' not in new_org:
+                    raise PyMISPError('A remote org MUST have a valid uuid')
         url = urljoin(self.root_url, 'admin/organisations/add/')
         response = session.post(url, data=json.dumps(new_org))
         return self._check_response(response)
