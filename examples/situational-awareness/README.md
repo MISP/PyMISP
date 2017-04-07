@@ -31,3 +31,8 @@
 
 * [Pygal](https://github.com/Kozea/pygal/)
 * [Matplotlib](https://github.com/matplotlib/matplotlib)
+* [Pandas](https://github.com/pandas-dev/pandas)
+* [SciPy](https://github.com/scipy/scipy)
+* [PyTaxonomies](https://github.com/MISP/PyTaxonomies)
+* [Python3-tk](https://github.com/python-git/python/blob/master/Lib/lib-tk/Tkinter.py)
+

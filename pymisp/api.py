@@ -413,7 +413,7 @@ class PyMISP(object):
             raise PyMISPError("Unable to find the ID of the event to update")
         for a in attributes:
             if proposal:
-                response = self.proposal_add(eventID_to_update, json.dumps(a, cls=EncodeUpdate))
+                response = self.proposal_add(eventID_to_update, a)
             else:
                 session = self.__prepare_session()
                 url = urljoin(self.root_url, 'attributes/add/{}'.format(eventID_to_update))
@@ -710,7 +710,7 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
-            response = session.post(url, data=json.dumps(query))
+            response = session.post(url, data=json.dumps(query, cls=EncodeUpdate))
         elif path == 'view':
             response = session.get(url)
         else:  # accept or discard
