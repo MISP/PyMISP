@@ -1300,16 +1300,21 @@ class PyMISP(object):
     # ############## Servers ##################
 
     def _set_server_organisation(self, server, organisation):
-        if organisation is not None and 'type' in organisation:
-            organisation_type = organisation['type']
-            if organisation_type < 2:
-                if 'id' in organisation:
-                    server['organisation_type'] = organisation_type
-                    server['json'] = json.dump({'id': organisation['id']})
-            else:
-                if 'name' in organisation and 'uuid' in organisation:
-                    server['organisation_type'] = organisation_type
-                    server['json'] = json.dumps({'name': organisation['name'], 'uuid': organisation['uuid']})
+        if organisation is None:
+            raise PyMISPError('Need a valid organisation as argument, create it before if needed')
+        if 'Organisation' in organisation:
+            organisation=organisation.get('Organisation')
+        if 'local' not in organisation:
+            raise PyMISPError('Need a valid organisation as argument. "local" value have not been set in this organisation')
+        if 'id' not in organisation:
+            raise PyMISPError('Need a valid organisation as argument. "id" value doesn\'t exist in provided organisation')
+        # Local organisation is '0' and remote organisation is '1'. These values are extracted from web interface of MISP
+        if organisation.get('local') == True:
+            organisation_type = 0
+        else:
+            organisation_type = 1
+        server['organisation_type'] = organisation_type
+        server['json'] = json.dumps({'id': organisation['id']})
         return server
 
     def _set_server_parameters(self, url, name, authkey, organisation, internal,
