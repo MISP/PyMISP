@@ -2,7 +2,6 @@
     "Attribute": [
         {
             "ShadowAttribute": [],
-            "SharingGroup": [],
             "category": "Payload delivery",
             "comment": "",
             "deleted": false,
@@ -18,7 +17,6 @@
         },
         {
             "ShadowAttribute": [],
-            "SharingGroup": [],
             "category": "Payload type",
             "comment": "",
             "deleted": false,
