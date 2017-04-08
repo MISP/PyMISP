@@ -277,14 +277,17 @@ def _int_to_str(d):
 
 class MISPEvent(object):
 
-    def __init__(self, describe_types=None):
+    def __init__(self, describe_types=None, strict_validation=False):
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-        with open(os.path.join(self.ressources_path, 'schema.json'), 'r') as f:
-            self.json_schema = json.load(f)
-        with open(os.path.join(self.ressources_path, 'schema-lax.json'), 'r') as f:
-            self.json_schema_lax = json.load(f)
+        if strict_validation:
+            with open(os.path.join(self.ressources_path, 'schema.json'), 'r') as f:
+                self.json_schema = json.load(f)
+        else:
+            with open(os.path.join(self.ressources_path, 'schema-lax.json'), 'r') as f:
+                self.json_schema = json.load(f)
         if not describe_types:
-            t = json.load(open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r'))
+            with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
+                t = json.load(f)
             describe_types = t['result']
         self.describe_types = describe_types
         self.categories = describe_types['categories']
@@ -406,7 +409,7 @@ class MISPEvent(object):
         # Invalid event created by MISP up to 2.4.52 (attribute_count is none instead of '0')
         if event.get('Event') and event.get('Event').get('attribute_count') is None:
             event['Event']['attribute_count'] = '0'
-        jsonschema.validate(event, self.json_schema_lax)
+        jsonschema.validate(event, self.json_schema)
         e = event.get('Event')
         self._reinitialize_event()
         self.set_all_values(**e)
