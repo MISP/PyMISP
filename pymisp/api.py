@@ -1351,8 +1351,8 @@ class PyMISP(object):
             server['delete_client_cert'] = delete_client_cert
         return server
 
-    def add_server(self, url, name, authkey, organisation, internal=None, push=None,
-                   pull=None, self_signed=None, push_rules=None, pull_rules=None,
+    def add_server(self, url, name, authkey, organisation, internal=None, push=False,
+                   pull=False, self_signed=False, push_rules="", pull_rules="",
                    submitted_cert=None, submitted_client_cert=None):
         new_server = self._set_server_parameters(url, name, authkey, organisation, internal,
                                                  push, pull, self_signed, push_rules, pull_rules, submitted_cert,
@@ -1370,8 +1370,8 @@ class PyMISP(object):
         response = session.post(url, data=json.dumps(jdata))
         return self._check_response(response)
 
-    def edit_server(self, server_id, url=None, name=None, authkey=None, organisation=None, internal=None, push=None,
-                    pull=None, self_signed=None, push_rules=None, pull_rules=None,
+    def edit_server(self, server_id, url=None, name=None, authkey=None, organisation=None, internal=None, push=False,
+                    pull=False, self_signed=False, push_rules="", pull_rules="",
                     submitted_cert=None, submitted_client_cert=None, delete_cert=None, delete_client_cert=None):
         new_server = self._set_server_parameters(url, name, authkey, organisation, internal,
                                                  push, pull, self_signed, push_rules, pull_rules, submitted_cert,
