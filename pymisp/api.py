@@ -1243,9 +1243,12 @@ class PyMISP(object):
             organisation['local'] = kwargs.get('local')
         return organisation
 
-    def get_organisations_list(self):
+    def get_organisations_list(self, scope="local"):
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'organisations')
+        scope=scope.lower()
+        if scope not in ["local", "external", "all"]:
+            raise ValueError("Authorized fields are 'local','external' or 'all'")
+        url = urljoin(self.root_url, 'organisations/index/scope:{}'.format(scope))
         response = session.get(url)
         return self._check_response(response)['response']
 
