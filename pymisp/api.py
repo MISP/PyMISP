@@ -1245,7 +1245,7 @@ class PyMISP(object):
 
     def get_organisations_list(self, scope="local"):
         session = self.__prepare_session()
-        scope=scope.lower()
+        scope = scope.lower()
         if scope not in ["local", "external", "all"]:
             raise ValueError("Authorized fields are 'local','external' or 'all'")
         url = urljoin(self.root_url, 'organisations/index/scope:{}'.format(scope))
@@ -1261,8 +1261,8 @@ class PyMISP(object):
     def add_organisation(self, name, **kwargs):
         new_org = self._set_organisation_parameters(**dict(name=name, **kwargs))
         session = self.__prepare_session()
-        if local in new_org:
-            if new_org.get('local') == False:
+        if 'local' in new_org:
+            if new_org.get('local') is False:
                 if 'uuid' not in new_org:
                     raise PyMISPError('A remote org MUST have a valid uuid')
         url = urljoin(self.root_url, 'admin/organisations/add/')
@@ -1310,13 +1310,13 @@ class PyMISP(object):
         if organisation is None:
             raise PyMISPError('Need a valid organisation as argument, create it before if needed')
         if 'Organisation' in organisation:
-            organisation=organisation.get('Organisation')
+            organisation = organisation.get('Organisation')
         if 'local' not in organisation:
             raise PyMISPError('Need a valid organisation as argument. "local" value have not been set in this organisation')
         if 'id' not in organisation:
             raise PyMISPError('Need a valid organisation as argument. "id" value doesn\'t exist in provided organisation')
-        # Local organisation is '0' and remote organisation is '1'. These values are extracted from web interface of MISP
-        if organisation.get('local') == True:
+
+        if organisation.get('local'):  # Local organisation is '0' and remote organisation is '1'. These values are extracted from web interface of MISP
             organisation_type = 0
         else:
             organisation_type = 1
