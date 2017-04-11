@@ -117,6 +117,10 @@
         "default_category": "Payload installation",
         "to_ids": 1
       },
+      "sigma": {
+        "default_category": "Payload installation",
+        "to_ids": 1
+      },
       "vulnerability": {
         "default_category": "External analysis",
         "to_ids": 0
@@ -138,6 +142,10 @@
         "to_ids": 0
       },
       "text": {
+        "default_category": "Other",
+        "to_ids": 0
+      },
+      "hex": {
         "default_category": "Other",
         "to_ids": 0
       },
@@ -245,6 +253,10 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "impfuzzy": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
       "sha224": {
         "default_category": "Payload delivery",
         "to_ids": 1
@@ -278,6 +290,10 @@
         "to_ids": 1
       },
       "filename|imphash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "filename|impfuzzy": {
         "default_category": "Payload delivery",
         "to_ids": 1
       },
@@ -560,12 +576,14 @@
       "pattern-in-traffic",
       "pattern-in-memory",
       "yara",
+      "sigma",
       "vulnerability",
       "attachment",
       "malware-sample",
       "link",
       "comment",
       "text",
+      "hex",
       "other",
       "named pipe",
       "mutex",
@@ -592,6 +610,7 @@
       "ssdeep",
       "imphash",
       "pehash",
+      "impfuzzy",
       "sha224",
       "sha384",
       "sha512",
@@ -601,6 +620,7 @@
       "filename|authentihash",
       "filename|ssdeep",
       "filename|imphash",
+      "filename|impfuzzy",
       "filename|pehash",
       "filename|sha224",
       "filename|sha384",
@@ -687,7 +707,8 @@
         "text",
         "link",
         "comment",
-        "other"
+        "other",
+        "hex"
       ],
       "Targeting data": [
         "target-user",
@@ -702,6 +723,7 @@
         "link",
         "comment",
         "text",
+        "hex",
         "attachment",
         "other"
       ],
@@ -716,6 +738,7 @@
         "sha512/256",
         "ssdeep",
         "imphash",
+        "impfuzzy",
         "authentihash",
         "pehash",
         "tlsh",
@@ -732,6 +755,7 @@
         "filename|ssdeep",
         "filename|tlsh",
         "filename|imphash",
+        "filename|impfuzzy",
         "filename|pehash",
         "ip-src",
         "ip-dst",
@@ -749,12 +773,14 @@
         "pattern-in-file",
         "pattern-in-traffic",
         "yara",
+        "sigma",
         "attachment",
         "malware-sample",
         "link",
         "malware-type",
         "comment",
         "text",
+        "hex",
         "vulnerability",
         "x509-fingerprint-sha1",
         "other",
@@ -782,6 +808,7 @@
         "sha512/256",
         "ssdeep",
         "imphash",
+        "impfuzzy",
         "authentihash",
         "filename",
         "filename|md5",
@@ -796,6 +823,7 @@
         "filename|ssdeep",
         "filename|tlsh",
         "filename|imphash",
+        "filename|impfuzzy",
         "filename|pehash",
         "regkey",
         "regkey|value",
@@ -803,6 +831,7 @@
         "pattern-in-memory",
         "pdb",
         "yara",
+        "sigma",
         "attachment",
         "malware-sample",
         "named pipe",
@@ -812,6 +841,7 @@
         "windows-service-displayname",
         "comment",
         "text",
+        "hex",
         "x509-fingerprint-sha1",
         "other"
       ],
@@ -826,6 +856,7 @@
         "sha512/256",
         "ssdeep",
         "imphash",
+        "impfuzzy",
         "authentihash",
         "pehash",
         "tlsh",
@@ -842,17 +873,20 @@
         "filename|ssdeep",
         "filename|tlsh",
         "filename|imphash",
+        "filename|impfuzzy",
         "filename|pehash",
         "pattern-in-file",
         "pattern-in-traffic",
         "pattern-in-memory",
         "yara",
+        "sigma",
         "vulnerability",
         "attachment",
         "malware-sample",
         "malware-type",
         "comment",
         "text",
+        "hex",
         "x509-fingerprint-sha1",
         "mobile-application-id",
         "other"
@@ -863,7 +897,8 @@
         "regkey|value",
         "comment",
         "text",
-        "other"
+        "other",
+        "hex"
       ],
       "Network activity": [
         "ip-src",
@@ -886,7 +921,8 @@
         "comment",
         "text",
         "x509-fingerprint-sha1",
-        "other"
+        "other",
+        "hex"
       ],
       "Payload type": [
         "comment",
@@ -952,7 +988,8 @@
         "prtn",
         "comment",
         "text",
-        "other"
+        "other",
+        "hex"
       ],
       "Support Tool": [
         "link",
@@ -960,7 +997,8 @@
         "attachment",
         "comment",
         "text",
-        "other"
+        "other",
+        "hex"
       ],
       "Social network": [
         "github-username",
@@ -1011,7 +1049,8 @@
         "datetime",
         "cpe",
         "port",
-        "float"
+        "float",
+        "hex"
       ]
     }
   }
