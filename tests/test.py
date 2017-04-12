@@ -135,6 +135,83 @@ class TestBasic(unittest.TestCase):
         event = self.misp.add_event(event)
         print(event)
 
+    def add_user(self):
+        email = 'test@misp.local'
+        role_id = '5'
+        org_id = '1'
+        password = 'Password1234!'
+        external_auth_required = 'false'
+        external_auth_key = ''
+        enable_password = 'false'
+        nids_sid = '1238717'
+        server_id = '1'
+        gpgkey = ''
+        certif_public = ''
+        autoalert = False
+        contactalert = False
+        disabled = False
+        change_pw = '0'
+        termsaccepted = False
+        newsread = '0'
+        authkey = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        to_check = {'User':{'email':email, 'org_id':org_id, 'role_id':role_id, 'password':password, 'external_auth_required':external_auth_required, 'external_auth_key':external_auth_key, 'enable_password':enable_password, 'nids_sid':nids_sid, 'server_id':server_id, 'gpgkey':gpgkey, 'certif_public':certif_public, 'autoalert':autoalert, 'contactalert':contactalert, 'disabled':disabled, 'change_pw':change_pw, 'termsaccepted':termsaccepted, 'newsread':newsread, 'authkey':authkey}}
+        user = self.misp.add_user(email=email,
+                                  role_id=role_id,
+                                  org_id=org_id,
+                                  password=password,
+                                  external_auth_required=external_auth_required,
+                                  external_auth_key=external_auth_key,
+                                  enable_password=enable_password,
+                                  nids_sid=nids_sid,
+                                  server_id=server_id,
+                                  gpgkey=gpgkey,
+                                  certif_public=certif_public,
+                                  autoalert=autoalert,
+                                  contactalert=contactalert,
+                                  disabled=disabled,
+                                  change_pw=change_pw,
+                                  termsaccepted=termsaccepted,
+                                  newsread=newsread,
+                                  authkey=authkey)
+        # delete user to allow reuse of test
+        uid = user.get('User').get('id')
+        self.misp.delete_user(uid)
+        # ----------------------------------
+        # test interesting keys only (some keys are modified(password) and some keys are added (lastlogin)
+        tested_keys = ['email', 'org_id','role_id','server_id','autoalert','authkey','gpgkey','certif_public','nids_sid','termsaccepted','newsread','contactalert','disabled']
+        for key in tested_keys:
+            self.assertEqual(user.get('User').get(key), to_check.get('User').get(key), "Failed to match input with output on key: {}".format(key))
+
+    def add_organisation(self):
+        name='Organisation tests'
+        anonymise=True
+        description='This is a test organisation'
+        orgtype='Type is a string'
+        nationality='French'
+        sector='Bank sector'
+        uuid='16fd2706-8baf-433b-82eb-8c7fada847da'
+        contacts='Text field with no limitations'
+        local=False
+        to_check = {'Organisation': {'name':name, 'anonymise':anonymise, 'description':description, 'type':orgtype, 'nationality':nationality, 'sector':sector, 'uuid': uuid, 'contacts': contacts, 'local':local}}
+        org = self.misp.add_organisation(name=name,
+                                         anonymise=anonymise,
+                                         description=description,
+                                         type=orgtype,
+                                         nationality=nationality,
+                                         sector=sector,
+                                         uuid=uuid,
+                                         contacts=contacts,
+                                         local=local,
+                                         )
+        # delete organisation to allow reuse of test
+        oid = org.get('Organisation').get('id')
+        self.misp.delete_organisation(oid)
+        # ----------------------------------
+        tested_keys = ['anonymise','contacts','description','local','name','nationality','sector','type','uuid']
+        for key in tested_keys:
+            self.assertEqual(org.get('Organisation').get(key), to_check.get('Organisation').get(key), "Failed to match input with output on key: {}".format(key))
+
+
     def test_create_event(self):
         eventid = self.new_event()
         time.sleep(1)
@@ -162,6 +239,12 @@ class TestBasic(unittest.TestCase):
     def test_one_or_more(self):
         self.assertEqual(self.misp._one_or_more(1), (1,))
         self.assertEqual(self.misp._one_or_more([1]), [1])
+
+    def test_create_user(self):
+        self.add_user()
+
+    def test_create_organisation(self):
+        self.add_organisation()
 
 if __name__ == '__main__':
     unittest.main()
