@@ -795,22 +795,21 @@ class PyMISP(object):
                        'analysis': ["0", "1", "2", "!0", "!1", "!2"]}
         buildup_url = "events/index"
 
+        to_post = {}
         for rule in allowed.keys():
-            if allowed[rule] is not None:
-                if not isinstance(allowed[rule], list):
-                    allowed[rule] = [allowed[rule]]
-                allowed[rule] = [x for x in map(str, allowed[rule])]
-                if rule in rule_levels:
-                    if not set(allowed[rule]).issubset(rule_levels[rule]):
-                        raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
-                if type(allowed[rule]) == list:
-                    joined = '|'.join(str(x) for x in allowed[rule])
-                    buildup_url += '/search{}:{}'.format(rule, joined)
-                else:
-                    buildup_url += '/search{}:{}'.format(rule, allowed[rule])
+            if allowed.get(rule) is None:
+                continue
+            param = allowed[rule]
+            if not isinstance(param, list):
+                param = [param]
+            param = [x for x in map(str, param)]
+            if rule in rule_levels:
+                if not set(param).issubset(rule_levels[rule]):
+                    raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
+            to_post[rule] = '|'.join(str(x) for x in param)
         session = self.__prepare_session()
         url = urljoin(self.root_url, buildup_url)
-        response = session.get(url)
+        response = session.post(url, data=json.dumps(to_post))
         return self._check_response(response)
 
     def search_all(self, value):
