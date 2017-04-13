@@ -1224,8 +1224,6 @@ class PyMISP(object):
         organisation = {}
         if kwargs.get('name'):
             organisation['name'] = kwargs.get('name')
-        if kwargs.get('anonymise'):
-            organisation['anonymise'] = kwargs.get('anonymise')
         if kwargs.get('description'):
             organisation['description'] = kwargs.get('description')
         if kwargs.get('type'):

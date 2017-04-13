@@ -49,7 +49,6 @@ class TestBasic(unittest.TestCase):
                                u'Orgc': {u'name': u'ORGNAME'},
                                u'Galaxy': [],
                                u'threat_level_id': u'1'}}
-        print(event)
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
         return int(event_id)
 
@@ -140,9 +139,9 @@ class TestBasic(unittest.TestCase):
         role_id = '5'
         org_id = '1'
         password = 'Password1234!'
-        external_auth_required = 'false'
+        external_auth_required = False
         external_auth_key = ''
-        enable_password = 'false'
+        enable_password = False
         nids_sid = '1238717'
         server_id = '1'
         gpgkey = ''
@@ -154,7 +153,14 @@ class TestBasic(unittest.TestCase):
         termsaccepted = False
         newsread = '0'
         authkey = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        to_check = {'User':{'email':email, 'org_id':org_id, 'role_id':role_id, 'password':password, 'external_auth_required':external_auth_required, 'external_auth_key':external_auth_key, 'enable_password':enable_password, 'nids_sid':nids_sid, 'server_id':server_id, 'gpgkey':gpgkey, 'certif_public':certif_public, 'autoalert':autoalert, 'contactalert':contactalert, 'disabled':disabled, 'change_pw':change_pw, 'termsaccepted':termsaccepted, 'newsread':newsread, 'authkey':authkey}}
+        to_check = {'User': {'email': email, 'org_id': org_id, 'role_id': role_id,
+                             'password': password, 'external_auth_required': external_auth_required,
+                             'external_auth_key': external_auth_key, 'enable_password': enable_password,
+                             'nids_sid': nids_sid, 'server_id': server_id, 'gpgkey': gpgkey,
+                             'certif_public': certif_public, 'autoalert': autoalert,
+                             'contactalert': contactalert, 'disabled': disabled,
+                             'change_pw': change_pw, 'termsaccepted': termsaccepted,
+                             'newsread': newsread, 'authkey': authkey}}
         user = self.misp.add_user(email=email,
                                   role_id=role_id,
                                   org_id=org_id,
@@ -178,23 +184,26 @@ class TestBasic(unittest.TestCase):
         self.misp.delete_user(uid)
         # ----------------------------------
         # test interesting keys only (some keys are modified(password) and some keys are added (lastlogin)
-        tested_keys = ['email', 'org_id','role_id','server_id','autoalert','authkey','gpgkey','certif_public','nids_sid','termsaccepted','newsread','contactalert','disabled']
-        for key in tested_keys:
-            self.assertEqual(user.get('User').get(key), to_check.get('User').get(key), "Failed to match input with output on key: {}".format(key))
+        tested_keys = ['email', 'org_id', 'role_id', 'server_id', 'autoalert',
+                       'authkey', 'gpgkey', 'certif_public', 'nids_sid', 'termsaccepted',
+                       'newsread', 'contactalert', 'disabled']
+        for k in tested_keys:
+            self.assertEqual(user.get('User').get(k), to_check.get('User').get(k), "Failed to match input with output on key: {}".format(k))
 
     def add_organisation(self):
-        name='Organisation tests'
-        anonymise=True
-        description='This is a test organisation'
-        orgtype='Type is a string'
-        nationality='French'
-        sector='Bank sector'
-        uuid='16fd2706-8baf-433b-82eb-8c7fada847da'
-        contacts='Text field with no limitations'
-        local=False
-        to_check = {'Organisation': {'name':name, 'anonymise':anonymise, 'description':description, 'type':orgtype, 'nationality':nationality, 'sector':sector, 'uuid': uuid, 'contacts': contacts, 'local':local}}
+        name = 'Organisation tests'
+        description = 'This is a test organisation'
+        orgtype = 'Type is a string'
+        nationality = 'French'
+        sector = 'Bank sector'
+        uuid = '16fd2706-8baf-433b-82eb-8c7fada847da'
+        contacts = 'Text field with no limitations'
+        local = False
+        to_check = {'Organisation': {'name': name, 'description': description,
+                                     'type': orgtype, 'nationality': nationality,
+                                     'sector': sector, 'uuid': uuid, 'contacts': contacts,
+                                     'local': local}}
         org = self.misp.add_organisation(name=name,
-                                         anonymise=anonymise,
                                          description=description,
                                          type=orgtype,
                                          nationality=nationality,
@@ -207,10 +216,10 @@ class TestBasic(unittest.TestCase):
         oid = org.get('Organisation').get('id')
         self.misp.delete_organisation(oid)
         # ----------------------------------
-        tested_keys = ['anonymise','contacts','description','local','name','nationality','sector','type','uuid']
-        for key in tested_keys:
-            self.assertEqual(org.get('Organisation').get(key), to_check.get('Organisation').get(key), "Failed to match input with output on key: {}".format(key))
-
+        tested_keys = ['anonymise', 'contacts', 'description', 'local', 'name',
+                       'nationality', 'sector', 'type', 'uuid']
+        for k in tested_keys:
+            self.assertEqual(org.get('Organisation').get(k), to_check.get('Organisation').get(k), "Failed to match input with output on key: {}".format(k))
 
     def test_create_event(self):
         eventid = self.new_event()
