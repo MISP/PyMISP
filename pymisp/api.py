@@ -411,6 +411,8 @@ class PyMISP(object):
                 eventID_to_update = e.uuid
         if eventID_to_update is None:
             raise PyMISPError("Unable to find the ID of the event to update")
+        if not attributes:
+            return {'error': 'No attributes.'}
         for a in attributes:
             if proposal:
                 response = self.proposal_add(eventID_to_update, a)
