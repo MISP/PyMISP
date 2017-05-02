@@ -18,12 +18,10 @@ def searchall(m, search, quiet, url, out=None):
         for e in result['response']:
             print('{}{}{}\n'.format(url, '/events/view/', e['Event']['id']))
     elif out is None:
-        for e in result['response']:
-            print(json.dumps(e) + '\n')
+        print(json.dumps(result['response']))
     else:
         with open(out, 'w') as f:
-            for e in result['response']:
-                f.write(json.dumps(e) + '\n')
+            f.write(json.dumps(result['response']))
 
 
 if __name__ == '__main__':
