@@ -215,7 +215,7 @@ class PyMISP(object):
             if not errors and to_return.get('message'):
                 errors.append(to_return['message'])
             else:
-                errors.append(basestring(response.status_code))
+                errors.append(str(response.status_code))
         errors += self.flatten_error_messages(to_return)
         if errors:
             to_return['errors'] = errors
