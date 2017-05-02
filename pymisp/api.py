@@ -792,6 +792,7 @@ class PyMISP(object):
         :param distribution: Distribution level(s) (0,1,2,3) | str or list
         :param analysis: Analysis level(s) (0,1,2) | str or list
         :param org: Organisation(s) | str or list
+        :param async_callback: Function to call when the request returns (if running async)
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
