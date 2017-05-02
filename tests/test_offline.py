@@ -47,8 +47,7 @@ class TestOffline(unittest.TestCase):
         m.register_uri('DELETE', self.domain + 'events/2', json={'message': 'Event deleted.'})
         m.register_uri('DELETE', self.domain + 'events/3', json={'errors': ['Invalid event'], 'message': 'Invalid event', 'name': 'Invalid event', 'url': '/events/3'})
         m.register_uri('DELETE', self.domain + 'attributes/2', json={'message': 'Attribute deleted.'})
-        m.register_uri('GET', self.domain + 'events/index/searchtag:1', json=self.search_index_result)
-        m.register_uri('GET', self.domain + 'events/index/searchtag:ecsirt:malicious-code=%22ransomware%22', json=self.search_index_result)
+        m.register_uri('POST', self.domain + 'events/index', json=self.search_index_result)
 
     def test_getEvent(self, m):
         self.initURI(m)

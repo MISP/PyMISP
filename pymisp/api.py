@@ -411,6 +411,8 @@ class PyMISP(object):
                 eventID_to_update = e.uuid
         if eventID_to_update is None:
             raise PyMISPError("Unable to find the ID of the event to update")
+        if not attributes:
+            return {'error': 'No attributes.'}
         for a in attributes:
             if proposal:
                 response = self.proposal_add(eventID_to_update, a)
@@ -795,22 +797,21 @@ class PyMISP(object):
                        'analysis': ["0", "1", "2", "!0", "!1", "!2"]}
         buildup_url = "events/index"
 
+        to_post = {}
         for rule in allowed.keys():
-            if allowed[rule] is not None:
-                if not isinstance(allowed[rule], list):
-                    allowed[rule] = [allowed[rule]]
-                allowed[rule] = [x for x in map(str, allowed[rule])]
-                if rule in rule_levels:
-                    if not set(allowed[rule]).issubset(rule_levels[rule]):
-                        raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
-                if type(allowed[rule]) == list:
-                    joined = '|'.join(str(x) for x in allowed[rule])
-                    buildup_url += '/search{}:{}'.format(rule, joined)
-                else:
-                    buildup_url += '/search{}:{}'.format(rule, allowed[rule])
+            if allowed.get(rule) is None:
+                continue
+            param = allowed[rule]
+            if not isinstance(param, list):
+                param = [param]
+            param = [x for x in map(str, param)]
+            if rule in rule_levels:
+                if not set(param).issubset(rule_levels[rule]):
+                    raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
+            to_post[rule] = '|'.join(str(x) for x in param)
         session = self.__prepare_session()
         url = urljoin(self.root_url, buildup_url)
-        response = session.get(url)
+        response = session.post(url, data=json.dumps(to_post))
         return self._check_response(response)
 
     def search_all(self, value):
@@ -1135,31 +1136,31 @@ class PyMISP(object):
             user['role_id'] = kwargs.get('role_id')
         if kwargs.get('password'):
             user['password'] = kwargs.get('password')
-        if kwargs.get('external_auth_required'):
+        if kwargs.get('external_auth_required') is not None:
             user['external_auth_required'] = kwargs.get('external_auth_required')
         if kwargs.get('external_auth_key'):
             user['external_auth_key'] = kwargs.get('external_auth_key')
-        if kwargs.get('enable_password'):
+        if kwargs.get('enable_password') is not None:
             user['enable_password'] = kwargs.get('enable_password')
         if kwargs.get('nids_sid'):
             user['nids_sid'] = kwargs.get('nids_sid')
-        if kwargs.get('server_id'):
+        if kwargs.get('server_id') is not None:
             user['server_id'] = kwargs.get('server_id')
         if kwargs.get('gpgkey'):
             user['gpgkey'] = kwargs.get('gpgkey')
         if kwargs.get('certif_public'):
             user['certif_public'] = kwargs.get('certif_public')
-        if kwargs.get('autoalert'):
+        if kwargs.get('autoalert') is not None:
             user['autoalert'] = kwargs.get('autoalert')
-        if kwargs.get('contactalert'):
+        if kwargs.get('contactalert') is not None:
             user['contactalert'] = kwargs.get('contactalert')
-        if kwargs.get('disabled'):
+        if kwargs.get('disabled') is not None:
             user['disabled'] = kwargs.get('disabled')
-        if kwargs.get('change_pw'):
+        if kwargs.get('change_pw') is not None:
             user['change_pw'] = kwargs.get('change_pw')
-        if kwargs.get('termsaccepted'):
+        if kwargs.get('termsaccepted') is not None:
             user['termsaccepted'] = kwargs.get('termsaccepted')
-        if kwargs.get('newsread'):
+        if kwargs.get('newsread') is not None:
             user['newsread'] = kwargs.get('newsread')
         if kwargs.get('authkey'):
             user['authkey'] = kwargs.get('authkey')
@@ -1225,8 +1226,6 @@ class PyMISP(object):
         organisation = {}
         if kwargs.get('name'):
             organisation['name'] = kwargs.get('name')
-        if kwargs.get('anonymise'):
-            organisation['anonymise'] = kwargs.get('anonymise')
         if kwargs.get('description'):
             organisation['description'] = kwargs.get('description')
         if kwargs.get('type'):
@@ -1239,13 +1238,13 @@ class PyMISP(object):
             organisation['uuid'] = kwargs.get('uuid')
         if kwargs.get('contacts'):
             organisation['contacts'] = kwargs.get('contacts')
-        if kwargs.get('local'):
+        if kwargs.get('local') is not None:
             organisation['local'] = kwargs.get('local')
         return organisation
 
     def get_organisations_list(self, scope="local"):
         session = self.__prepare_session()
-        scope=scope.lower()
+        scope = scope.lower()
         if scope not in ["local", "external", "all"]:
             raise ValueError("Authorized fields are 'local','external' or 'all'")
         url = urljoin(self.root_url, 'organisations/index/scope:{}'.format(scope))
@@ -1261,8 +1260,8 @@ class PyMISP(object):
     def add_organisation(self, name, **kwargs):
         new_org = self._set_organisation_parameters(**dict(name=name, **kwargs))
         session = self.__prepare_session()
-        if local in new_org:
-            if new_org.get('local') == False:
+        if 'local' in new_org:
+            if new_org.get('local') is False:
                 if 'uuid' not in new_org:
                     raise PyMISPError('A remote org MUST have a valid uuid')
         url = urljoin(self.root_url, 'admin/organisations/add/')
@@ -1310,13 +1309,13 @@ class PyMISP(object):
         if organisation is None:
             raise PyMISPError('Need a valid organisation as argument, create it before if needed')
         if 'Organisation' in organisation:
-            organisation=organisation.get('Organisation')
+            organisation = organisation.get('Organisation')
         if 'local' not in organisation:
             raise PyMISPError('Need a valid organisation as argument. "local" value have not been set in this organisation')
         if 'id' not in organisation:
             raise PyMISPError('Need a valid organisation as argument. "id" value doesn\'t exist in provided organisation')
-        # Local organisation is '0' and remote organisation is '1'. These values are extracted from web interface of MISP
-        if organisation.get('local') == True:
+
+        if organisation.get('local'):  # Local organisation is '0' and remote organisation is '1'. These values are extracted from web interface of MISP
             organisation_type = 0
         else:
             organisation_type = 1
