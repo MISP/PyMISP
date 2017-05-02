@@ -82,6 +82,7 @@ class PyMISP(object):
     :param debug: print all the messages received from the server
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
+    :param asynch: Use asynchronous processing where possible
     """
 
     # So it can may be accessed from the misp object.
