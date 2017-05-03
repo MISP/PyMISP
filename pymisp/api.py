@@ -27,6 +27,13 @@ try:
 except ImportError:
     HAVE_REQUESTS = False
 
+
+try:
+    from requests_futures.sessions import FuturesSession
+    ASYNC_OK = True
+except ImportError:
+    ASYNC_OK = False
+
 from . import __version__
 from .exceptions import PyMISPError, SearchError, MissingDependency, NoURL, NoKey
 from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
@@ -80,9 +87,10 @@ class PyMISP(object):
     :param debug: print all the messages received from the server
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
+    :param asynch: Use asynchronous processing where possible
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None, cert=None):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None, cert=None, asynch=False):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -93,6 +101,11 @@ class PyMISP(object):
         self.ssl = ssl
         self.proxies = proxies
         self.cert = cert
+        self.asynch = asynch 
+        if asynch and not ASYNC_OK:
+            warnings.warn("You turned on Async, but don't have requests_futures installed")
+            self.asynch = False
+
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
@@ -137,12 +150,15 @@ class PyMISP(object):
         self.category_type_mapping = self.describe_types['category_type_mappings']
         self.sane_default = self.describe_types['sane_defaults']
 
-    def __prepare_session(self, output='json'):
+    def __prepare_session(self, output='json', async_implemented=False):
         """Prepare the headers of the session"""
 
         if not HAVE_REQUESTS:
             raise MissingDependency('Missing dependency, install requests (`pip install requests`)')
-        session = requests.Session()
+        if self.asynch and async_implemented:
+            session = FuturesSession()
+        else:
+            session = requests.Session() 
         session.verify = self.ssl
         session.proxies = self.proxies
         session.cert = self.cert
@@ -774,8 +790,11 @@ class PyMISP(object):
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
-                     analysis=None, attribute=None, org=None):
+                     analysis=None, attribute=None, org=None, async_callback=None):
         """Search only at the index level. Use ! infront of value as NOT, default OR
+        If using async, give a callback that takes 2 args, session and response:
+            basic usage is
+            pymisp.search_index(..., async_callback=lambda ses,resp: print(resp.json()))
 
         :param published: Published (0,1)
         :param eventid: Evend ID(s) | str or list
@@ -787,6 +806,7 @@ class PyMISP(object):
         :param distribution: Distribution level(s) (0,1,2,3) | str or list
         :param analysis: Analysis level(s) (0,1,2) | str or list
         :param org: Organisation(s) | str or list
+        :param async_callback: Function to call when the request returns (if running async)
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
@@ -799,6 +819,7 @@ class PyMISP(object):
 
         to_post = {}
         for rule in allowed.keys():
+
             if allowed.get(rule) is None:
                 continue
             param = allowed[rule]
@@ -809,10 +830,17 @@ class PyMISP(object):
                 if not set(param).issubset(rule_levels[rule]):
                     raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
             to_post[rule] = '|'.join(str(x) for x in param)
-        session = self.__prepare_session()
+        session = self.__prepare_session(async_implemented=True)
         url = urljoin(self.root_url, buildup_url)
-        response = session.post(url, data=json.dumps(to_post))
-        return self._check_response(response)
+
+        if self.asynch:
+            if not async_callback:
+                warnings.warn("You haven't provided a callback!")
+            response = session.get(url, background_callback=async_callback)
+        
+        else:
+            response = session.post(url, data=json.dumps(to_post))
+            return self._check_response(response)
 
     def search_all(self, value):
         query = {'value': value, 'searchall': 1}
