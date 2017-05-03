@@ -104,7 +104,7 @@ class PyMISP(object):
         self.ssl = ssl
         self.proxies = proxies
         self.cert = cert
-        self.asynch = asynch 
+        self.asynch = asynch
         if asynch and not ASYNC_OK:
             warnings.warn("You turned on Async, but don't have requests_futures installed")
             self.asynch = False
@@ -113,7 +113,7 @@ class PyMISP(object):
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
         if debug is not None:
-            warning.warn('debug is deprecated, configure logging in api client')
+            warnings.warn('debug is deprecated, configure logging in api client')
 
         try:
             # Make sure the MISP instance is working and the URL is valid
@@ -159,7 +159,7 @@ class PyMISP(object):
         if self.asynch and async_implemented:
             session = FuturesSession()
         else:
-            session = requests.Session() 
+            session = requests.Session()
         session.verify = self.ssl
         session.proxies = self.proxies
         session.cert = self.cert
@@ -834,7 +834,7 @@ class PyMISP(object):
                 if not set(param).issubset(rule_levels[rule]):
                     raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
             to_post[rule] = '|'.join(str(x) for x in param)
-        session = self.__prepare_session(async_implemented=(async_callback!=None))
+        session = self.__prepare_session(async_implemented=(async_callback is not None))
         url = urljoin(self.root_url, buildup_url)
 
         if self.asynch and async_callback:
@@ -978,7 +978,7 @@ class PyMISP(object):
                 query['published'] = kwargs.get('published')
 
         # Create a session, make it async if and only if we have a callback
-        session = self.__prepare_session(async_implemented=(async_callback!=None))
+        session = self.__prepare_session(async_implemented=(async_callback is not None))
         return self.__query(session, 'restSearch/download', query, controller, async_callback)
 
     def get_attachment(self, event_id):
