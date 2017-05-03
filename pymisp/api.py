@@ -776,7 +776,7 @@ class PyMISP(object):
     # ######## REST Search #########
     # ##############################
 
-    def __query(self, session, path, query, controller='events'):
+    def __query(self, session, path, query, controller='events', async_callback=None):
         if query.get('error') is not None:
             return query
         if controller not in ['events', 'attributes']:
@@ -785,8 +785,12 @@ class PyMISP(object):
         if self.debug:
             print('URL: ', url)
             print('Query: ', query)
-        response = session.post(url, data=json.dumps(query))
-        return self._check_response(response)
+
+        if isinstance(session, FuturesSession) and async_callback:
+            response = session.post(url, data=json.dumps(query), background_callback=async_callback)
+        else:
+            response = session.post(url, data=json.dumps(query))
+            return self._check_response(response)
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
@@ -831,14 +835,11 @@ class PyMISP(object):
                 if not set(param).issubset(rule_levels[rule]):
                     raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
             to_post[rule] = '|'.join(str(x) for x in param)
-        session = self.__prepare_session(async_implemented=True)
+        session = self.__prepare_session(async_implemented=(async_callback!=None))
         url = urljoin(self.root_url, buildup_url)
 
-        if self.asynch:
-            if not async_callback:
-                warnings.warn("You haven't provided a callback!")
+        if self.asynch and async_callback:
             response = session.post(url, data=json.dumps(to_post), background_callback=async_callback)
-        
         else:
             response = session.post(url, data=json.dumps(to_post))
             res = self._check_response(response)
@@ -878,7 +879,7 @@ class PyMISP(object):
                 to_return += '&&!'.join(not_values)
         return to_return
 
-    def search(self, controller='events', **kwargs):
+    def search(self, controller='events', async_callback=None, **kwargs):
         """Search via the Rest API
 
         :param values: values to search for
@@ -902,6 +903,7 @@ class PyMISP(object):
         :param published: return only published events
         :param to_ids: return only the attributes with the to_ids flag set
         :param deleted: also return the deleted attributes
+        :param async_callback: The function to run when results are returned
         """
         # Event:     array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'searchall', 'metadata', 'published');
         # Attribute: array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'to_ids', 'deleted');
@@ -976,8 +978,9 @@ class PyMISP(object):
             if kwargs.get('published') is not None:
                 query['published'] = kwargs.get('published')
 
-        session = self.__prepare_session()
-        return self.__query(session, 'restSearch/download', query, controller)
+        # Create a session, make it async if and only if we have a callback
+        session = self.__prepare_session(async_implemented=(async_callback!=None))
+        return self.__query(session, 'restSearch/download', query, controller, async_callback)
 
     def get_attachment(self, event_id):
         """Get attachement of an event (not sample)
