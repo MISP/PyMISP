@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -10,11 +10,8 @@ try:
 except ImportError:
     has_bs4 = False
 
-unknowMapping = {'category': 'Artifacts dropped', 'type': 'other'},
-
 iocMispMapping = {
     #~ @Link https://wiki.ops.fr/doku.php/manuels:misp:event-guidelines
-    
     'CookieHistoryItem/HostName': {'type': 'hostname', 'comment': 'CookieHistory.'},
 
     'DriverItem/DriverName': {'category': 'Artifacts dropped', 'type': 'other', 'comment': 'DriverName.'},
@@ -323,4 +320,8 @@ if __name__ == '__main__':
     # https://github.com/fireeye/iocs/blob/master/BlogPosts/9cee306d-5441-4cd3-932d-f3119752634c.ioc
     x = open('test.ioc', 'r')
     mispEvent = load_openioc(x.read())
-    print(mispEvent._json_full())
+    #~ print(mispEvent._json_full())
+    from pymisp import PyMISP
+    misp = PyMISP('http://misp.local', 'xxxxx')
+    r = misp.add_event(mispEvent)
+    print(r)
