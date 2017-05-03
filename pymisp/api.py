@@ -117,19 +117,16 @@ class PyMISP(object):
 
         try:
             # Make sure the MISP instance is working and the URL is valid
-            pymisp_version = __version__.split('.')
             response = self.get_recommended_api_version()
             if not response.get('version'):
                 logger.warning("Unable to check the recommended PyMISP version (MISP <2.4.60), please upgrade.")
             else:
-                recommended_pymisp_version = response['version'].split('.')
-                for a, b in zip(pymisp_version, recommended_pymisp_version):
-                    if a == b:
-                        continue
-                    elif a > b:
-                        logger.warning("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). Please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
-                    else:  # a < b
-                        logger.warning("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
+                pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))
+                recommended_version_tup = tuple(int(x) for x in response['version'].split('.'))
+                if recommended_version_tup < pymisp_version_tup:
+                    logger.warning("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). Please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
+                elif pymisp_version_tup < recommended_version_tup:
+                    logger.warning("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
 
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
