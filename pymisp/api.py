@@ -790,7 +790,7 @@ class PyMISP(object):
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
-                     analysis=None, attribute=None, org=None, async_callback=None):
+                     analysis=None, attribute=None, org=None, async_callback=None, normalize=False):
         """Search only at the index level. Use ! infront of value as NOT, default OR
         If using async, give a callback that takes 2 args, session and response:
             basic usage is
@@ -807,6 +807,7 @@ class PyMISP(object):
         :param analysis: Analysis level(s) (0,1,2) | str or list
         :param org: Organisation(s) | str or list
         :param async_callback: Function to call when the request returns (if running async)
+        :param normalize: Normalize output | True or False
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
@@ -836,11 +837,18 @@ class PyMISP(object):
         if self.asynch:
             if not async_callback:
                 warnings.warn("You haven't provided a callback!")
-            response = session.get(url, background_callback=async_callback)
+            response = session.post(url, data=json.dumps(to_post), background_callback=async_callback)
         
         else:
             response = session.post(url, data=json.dumps(to_post))
-            return self._check_response(response)
+            res = self._check_response(response)
+            if normalize:
+                to_return = {'response': []}
+                for elem in res['response']:
+                    tmp = {'Event': elem}
+                    to_return['response'].append(tmp)
+                res = to_return
+            return res
 
     def search_all(self, value):
         query = {'value': value, 'searchall': 1}

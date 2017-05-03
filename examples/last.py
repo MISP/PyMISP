@@ -19,8 +19,7 @@ def download_last(m, last, out=None):
     result = m.download_last(last)
     if out is None:
         if 'response' in result:
-            for e in result['response']:
-                print(json.dumps(e) + '\n')
+            print(json.dumps(result['response']))
         else:
             print('No results for that time period')
             exit(0)
