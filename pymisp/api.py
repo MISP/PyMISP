@@ -140,7 +140,7 @@ class PyMISP(object):
             self.describe_types = describe_types['result']
             if not self.describe_types.get('sane_defaults'):
                 raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
-        except:
+        except Exception:
             with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
                 describe_types = json.load(f)
             self.describe_types = describe_types['result']
@@ -208,7 +208,7 @@ class PyMISP(object):
             response.raise_for_status()
         try:
             to_return = response.json()
-        except:
+        except ValueError:
             if self.debug:
                 print(response.text)
             raise PyMISPError('Unknown error: {}'.format(response.text))
@@ -665,7 +665,7 @@ class PyMISP(object):
         if event_id is not None:
             try:
                 event_id = int(event_id)
-            except:
+            except ValueError:
                 pass
         if not isinstance(event_id, int):
             # New event
