@@ -11,6 +11,7 @@ import base64
 import re
 import warnings
 import functools
+import logging
 
 
 try:
@@ -37,6 +38,8 @@ except ImportError:
 from . import __version__
 from .exceptions import PyMISPError, SearchError, MissingDependency, NoURL, NoKey
 from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
+
+logger = logging.getLogger(__name__)
 
 
 # Least dirty way to support python 2 and 3
@@ -84,13 +87,13 @@ class PyMISP(object):
                 signed certiifcate (the concatenation of all the
                 *.crt of the chain)
     :param out_type: Type of object (json) NOTE: XML output isn't supported anymore, keeping the flag for compatibility reasons.
-    :param debug: print all the messages received from the server
+    :param debug: deprecated, configure logging in api client instead
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
     :param asynch: Use asynchronous processing where possible
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=False, proxies=None, cert=None, asynch=False):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -109,23 +112,24 @@ class PyMISP(object):
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
-        self.debug = debug
+        if debug is not None:
+            warning.warn('debug is deprecated, configure logging in api client')
 
         try:
             # Make sure the MISP instance is working and the URL is valid
             pymisp_version = __version__.split('.')
             response = self.get_recommended_api_version()
             if not response.get('version'):
-                warnings.warn("Unable to check the recommended PyMISP version (MISP <2.4.60), please upgrade.")
+                logger.warning("Unable to check the recommended PyMISP version (MISP <2.4.60), please upgrade.")
             else:
                 recommended_pymisp_version = response['version'].split('.')
                 for a, b in zip(pymisp_version, recommended_pymisp_version):
                     if a == b:
                         continue
                     elif a > b:
-                        warnings.warn("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). Please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
+                        logger.warning("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). Please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
                     else:  # a < b
-                        warnings.warn("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
+                        logger.warning("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
 
         except Exception as e:
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
@@ -209,8 +213,7 @@ class PyMISP(object):
         try:
             to_return = response.json()
         except ValueError:
-            if self.debug:
-                print(response.text)
+            logger.debug(response.text)
             raise PyMISPError('Unknown error: {}'.format(response.text))
 
         errors = []
@@ -235,8 +238,8 @@ class PyMISP(object):
         errors += self.flatten_error_messages(to_return)
         if errors:
             to_return['errors'] = errors
-        if self.debug:
-            print(json.dumps(to_return, indent=4))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(json.dumps(to_return, indent=4))
         return to_return
 
     def _one_or_more(self, value):
@@ -782,9 +785,8 @@ class PyMISP(object):
         if controller not in ['events', 'attributes']:
             raise Exception('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes'])))
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
-        if self.debug:
-            print('URL: ', url)
-            print('Query: ', query)
+        logger.debug('URL: ', url)
+        logger.debug('Query: ', query)
 
         if isinstance(session, FuturesSession) and async_callback:
             response = session.post(url, data=json.dumps(query), background_callback=async_callback)
@@ -1477,8 +1479,7 @@ class PyMISP(object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
             event_id, with_attachments, tags, from_date, to_date))
-        if self.debug:
-            print("Getting STIX event from {}".format(url))
+        logger.debug("Getting STIX event from", url)
         response = session.get(url)
         return self._check_response(response)
 
