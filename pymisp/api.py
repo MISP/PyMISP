@@ -774,7 +774,7 @@ class PyMISP(object):
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
-                     analysis=None, attribute=None, org=None):
+                     analysis=None, attribute=None, org=None, normalize=False):
         """Search only at the index level. Use ! infront of value as NOT, default OR
 
         :param published: Published (0,1)
@@ -787,6 +787,7 @@ class PyMISP(object):
         :param distribution: Distribution level(s) (0,1,2,3) | str or list
         :param analysis: Analysis level(s) (0,1,2) | str or list
         :param org: Organisation(s) | str or list
+        :param normalize: Normalize output | True or False
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
@@ -812,7 +813,14 @@ class PyMISP(object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, buildup_url)
         response = session.post(url, data=json.dumps(to_post))
-        return self._check_response(response)
+        res = self._check_response(response)
+        if normalize:
+            to_return = {'response': []}
+            for elem in res['response']:
+                tmp = {'Event': elem}
+                to_return['response'].append(tmp)
+            res = to_return
+        return res
 
     def search_all(self, value):
         query = {'value': value, 'searchall': 1}
