@@ -1,0 +1,1669 @@
+Changelog
+=========
+
+%%version%% (unreleased)
+------------------------
+
+New
+~~~
+
+- Enable async option for search() [Hannah Ward]
+
+- Added async method for search_index. [Hannah Ward]
+
+- Added base async imports. [Hannah Ward]
+
+Fix
+~~~
+
+- Added docstring for search. [Hannah Ward]
+
+- Add docstring for asynch. [Hannah Ward]
+
+- Can't instantiate basestring fixes #76. [Hannah Ward]
+
+Other
+~~~~~
+
+- Cleanup warning function. [Raphaël Vinot]
+
+- Fix typos. [Raphaël Vinot]
+
+- Merge pull request #82 from truckydev/master. [Raphaël Vinot]
+
+  add mapping and composite feature
+
+- Remove unused variable. [Tristan METAYER]
+
+- Remove category It will be automaticly detected
+  https://github.com/MISP/PyMISP/blob/master/pymisp/tools/openioc.py.
+  [Tristan METAYER]
+
+- Revert tab to escape. [Tristan METAYER]
+
+- Ajout de mapping Ajout de la prise en compte d'autre composite.
+  [Tristan METAYER]
+
+- Merge pull request #83 from bernhl/fix_api_version_check. [Raphaël
+  Vinot]
+
+  Fix checks of recommended version
+
+- Fix checks of recommended version. [Lukas Bernhard]
+
+- Merge pull request #81 from bernhl/logging. [Raphaël Vinot]
+
+  Use logging instead of print; deprecate debug param
+
+- Merge branch 'master' into logging. [Raphaël Vinot]
+
+- Merge pull request #80 from bernhl/exception_types. [Raphaël Vinot]
+
+  Add exception types to api.py
+
+- Add exception types to api.py. [fluxas]
+
+- Use logging instead of print; deprecate debug param. [fluxas]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Hannah Ward]
+
+- Merge pull request #79 from PaulSec/master. [Raphaël Vinot]
+
+  Normalize output between misp.search_index and misp.search
+
+- Normalize output between misp.search_index and misp.search Fix issue:
+  https://github.com/CIRCL/PyMISP/issues/78. [Paul A]
+
+- Merge pull request #77 from PaulSec/master. [Raphaël Vinot]
+
+  Fixed the JSON output format (\n breaks JSON loading afterwards)
+
+- Fixed the JSON output format (\n breaks JSON loading afterwards) [Paul
+  A]
+
+- Merge branch 'async' [Hannah Ward]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Hannah Ward]
+
+- Add: gitchangelogrc configuration file added. [Alexandre Dulaunoy]
+
+- Quick and dirty fix for #97. [Raphaël Vinot]
+
+- Update offline tests. [Raphaël Vinot]
+
+- Fix testing. [Raphaël Vinot]
+
+- Merge pull request #74 from SekoiaLab/test/unitTests. [Raphaël Vinot]
+
+  test: add test for user and organisation
+
+- Test: add test for user and organisation. [Adrien RAFFIN]
+
+  This is a proposition of test to create a user and an organisation in MISP
+
+- Allow to pass some parameters as False or 0. [Raphaël Vinot]
+
+  When creating or updating users and organisations
+
+  Fix #70
+
+- Use POST instead of get in search_index. [Raphaël Vinot]
+
+  Fix #73
+
+- Fix typos and pep8. [Raphaël Vinot]
+
+v2.4.71 (2017-04-11)
+--------------------
+
+Fix
+~~~
+
+- Pass disable_correlation flag from add_attribute. [Hannah Ward]
+
+- Add default values for mandatory variable. [Adrien RAFFIN]
+
+- Org_type was not the correct variable. [Adrien RAFFIN]
+
+- Raise exception if uuid not setted in remote org. [Adrien RAFFIN]
+
+- Update script had `latest`'s docstrings. [Hannah Ward]
+
+- Don't double-json-encode when sending proposals. [Hannah Ward]
+
+- Entrypt isn't a word! fixes #59. [Hannah Ward]
+
+Other
+~~~~~
+
+- Update types. [Raphaël Vinot]
+
+- Version Dump. [Raphaël Vinot]
+
+- Merge pull request #69 from SekoiaLab/fix/serverCreation. [Raphaël
+  Vinot]
+
+  Fix/server creation
+
+- Merge pull request #71 from SekoiaLab/fix/remoteOrgUUID. [Raphaël
+  Vinot]
+
+  fix: raise exception if uuid not setted in remote org
+
+- Merge pull request #72 from SekoiaLab/feat/getAllOrganisations.
+  [Raphaël Vinot]
+
+  feat: add filter to specify which organisation to list
+
+- Feat: add filter to specify which organisation to list. [Adrien
+  RAFFIN]
+
+- Update validation. [Raphaël Vinot]
+
+  * Allow strict validation
+  * Add workaround to avoid all JSON dumps from MISP <=2.4.70 to fail
+
+- Update test file. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Hannah Ward]
+
+- Merge pull request #68 from PaulSec/patch-1. [Raphaël Vinot]
+
+  Updated last.py to dump json results straight away
+
+- Update last.py. [Paul]
+
+- Updated last.py to dump json results straight away. [Paul]
+
+  Output was not usable with cli utilities such as: ```cat results.json | python -m simplejson.tool```.
+  It's now usable and works perfectly.
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Hannah Ward]
+
+- Merge pull request #66 from YacineKhamis/master. [Raphaël Vinot]
+
+  Treemap.py requirements updated in the README.MD file
+
+- Treemap.py requirements updated in the README.MD file. [Student CIRCL]
+
+- Major rewrite of the schema. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #95 from RichieB2B/ncsc-nl/send-attributes.
+  [Raphaël Vinot]
+
+  Return json when adding attributes
+
+- Return json when adding attributes. [Richard van den Berg]
+
+- Properly display deprecation warning. [Raphaël Vinot]
+
+- Fix python 3 support. [Raphaël Vinot]
+
+  Fix #94
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Alexandre Dulaunoy]
+
+- Cleanup misp2clamav. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #93 from RichieB2B/ncsc-nl/misp2clamav. [Alexandre
+  Dulaunoy]
+
+  Convert MISP file hashes to ClamAV hdb file
+
+- Add misp2clamav. [Richard van den Berg]
+
+- Merge pull request #63 from TheDr1ver/patch-5. [Raphaël Vinot]
+
+  publish_timestamp Windows 7 Fix
+
+- Extended the Windows fix to lines 168 and 471. [Nick Driver]
+
+- Publish_timestamp Windows 7 Fix. [Nick Driver]
+
+  On Windows 7 datetime.datetime.fromtimestamp(int(0)) returns a date before 1970, which causes the script to crash. This fixes the bug.
+
+- Allow to pass a MISPEvent to add_event and update_event. [Raphaël
+  Vinot]
+
+- Add an attributes to an event without sending the full existing event.
+  [Raphaël Vinot]
+
+- Allow to pass None to to_ids, default to sane default. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #61 from iglocska/master. [Raphaël Vinot]
+
+  Small change to make travis happy
+
+- Small change to make travis happy. [iglocska]
+
+  - attribute_count default changed to 0 in misp
+
+- Fix add_domain_ip. [Déborah Servili]
+
+- Merge pull request #60 from TheDr1ver/patch-3. [Alexandre Dulaunoy]
+
+  Example using the search() function
+
+- Example using the search() function. [Nick Driver]
+
+  Accepts specific parameters from search() instead of just using search_all().
+
+- Update types, allow 0 as attribute value. [Raphaël Vinot]
+
+v2.4.68 (2017-03-09)
+--------------------
+
+- Version bump. [Raphaël Vinot]
+
+- Fix tests. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #58 from rmarsollier/master. [Raphaël Vinot]
+
+  Using the facilities introduced by MISP commit ...
+
+- Using the facilities introduced by MISP commit
+  bdbd0920ba760a514cffdb30cc741b61b589d9da (fix: attachTagToObject and
+  removeTagFromObject now accept posted JSON objects) [rmarsollier]
+
+- Merge pull request #56 from rmarsollier/master. [Raphaël Vinot]
+
+  throw exception for invalid uuid
+
+- Throw exception for invalid uuid. [rmarsollier]
+
+- Merge pull request #55 from rmarsollier/master. [Raphaël Vinot]
+
+  example using tag() function instead of add_tag()
+
+- Example using tag() function instead of add_tag() [rmarsollier]
+
+- Reorganisation, make add attribute more flexible. [Raphaël Vinot]
+
+- Properly split ip:port for ipv4 (openioc import) [Raphaël Vinot]
+
+- Properly support CDATA fields in OpenIOC files. [Raphaël Vinot]
+
+v2.4.67 (2017-02-27)
+--------------------
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Install PyMISP with python3 by default. [Raphaël Vinot]
+
+  Because reasons.
+
+- Version bump. [Raphaël Vinot]
+
+- Allow to pass a pseudo file to OpenIOC loader. [Raphaël Vinot]
+
+- Security fix: do not try to load any valid path as a MISP Event.
+  [Raphaël Vinot]
+
+  The MISP Event loader was trying to open any string passed as parameter
+  if is an existing filepath. Anything that isn't a valid MISP event would
+  raise an exception, but I can see it used for malicous purposes.
+
+  load_file is will do the same, but the user can decide if it is safe to
+  use.
+
+- Allow filenames with regexes. [Raphaël Vinot]
+
+  Fix #52
+
+- Merge pull request #53 from SekoiaLab/feature/serversRestApi. [Raphaël
+  Vinot]
+
+  Adds new methods to add and edit servers in MISP
+
+- Feature: Adds new methods to edit servers in MISP. [Sebastien Quioc]
+
+- Feature: Adds new methods to add new servers in MISP. [Sebastien
+  Quioc]
+
+- Merge pull request #51 from SekoiaLab/feature/AddAuthkeyAtCreation.
+  [Raphaël Vinot]
+
+  feature: Add support for authkey in PyMISP operations
+
+- Feature: Add support for authkey in PyMISP operations. [Adrien RAFFIN]
+
+- Update tests. [Raphaël Vinot]
+
+  Fix #86
+
+- Merge pull request #85 from MISP/errorhandling2. [Alexandre Dulaunoy]
+
+  Errorhandling2
+
+- Merge branch 'master' into errorhandling2. [iglocska]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #84 from RichieB2B/ncsc-nl/fix-distribution.
+  [Raphaël Vinot]
+
+  Allow 'Your organisation only' distribution for attributes
+
+- Allow 'Your organisation only' distribution for attributes. [Richard
+  van den Berg]
+
+- Potential fix for the errors not being picked up by pymisp from the
+  response "errors" field. [iglocska]
+
+- Merge branch 'master' into travisfix. [iglocska]
+
+- Add method to set sightings from a string. [Raphaël Vinot]
+
+- Fix travis online. [Raphaël Vinot]
+
+- Update bundled-in describeTypes.json. [Raphaël Vinot]
+
+- Added creator email field to the assertions. [iglocska]
+
+v2.4.65 (2017-02-09)
+--------------------
+
+Fix
+~~~
+
+- Don't auto-publish events. [Hannah Ward]
+
+Other
+~~~~~
+
+- Version dump. [Raphaël Vinot]
+
+- Add support for {attach,remove}TagToObject. [Raphaël Vinot]
+
+  Fix #47
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Add legend. [Déborah Servili]
+
+- Merge branch 'master' of https://github.com/MISP/PyMISP. [Déborah
+  Servili]
+
+- Merge pull request #49 from cvandeplas/master. [Alexandre Dulaunoy]
+
+  YARA dumper for all rules
+
+- YARA dumper for all rules. [Christophe Vandeplas]
+
+  This dumper also does YARA rule validation, ignores invalid rules and prevents duplicate rule names. The output is a file called misp.yara which can be used with your favorite YARA tool.
+
+- Merge pull request #50 from cvandeplas/feature_get_all_attributes_txt.
+  [Alexandre Dulaunoy]
+
+  get_all_attributes_txt - support the additional flags
+
+- Get_all_attributes_txt - support the additional flags. [Christophe
+  Vandeplas]
+
+- Restore file deleted by mistake. [Déborah Servili]
+
+- Add ta_scatter.py script & reorganise tools. [Déborah Servili]
+
+- Fix error message. [Raphaël Vinot]
+
+v2.4.63 (2017-01-31)
+--------------------
+
+Changes
+~~~~~~~
+
+- Allow for old-style tag add. [Hannah Ward]
+
+Other
+~~~~~
+
+- Version bump. [Raphaël Vinot]
+
+- Fix regression. [Raphaël Vinot]
+
+  Fix #46
+
+- Version bump. [Raphaël Vinot]
+
+- Fix testing. [Raphaël Vinot]
+
+- Bug fixes. [Raphaël Vinot]
+
+  * Improve version checking
+  * Fix attribute update
+
+- Allow to add a tag to a MISPEvent and MISPAttribute. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Hannah Ward]
+
+- Merge pull request #41 from deralexxx/patch-1. [Raphaël Vinot]
+
+  make it little more readable
+
+- Make it little more readable. [Alexander J]
+
+  guess that way it is easier to understand
+
+v2.4.62 (2017-01-25)
+--------------------
+
+New
+~~~
+
+- Added ability to disable correlation on attributes. [Hannah Ward]
+
+- Added ability to add attachments to events. [Hannah Ward]
+
+Changes
+~~~~~~~
+
+- Updated api.py docstrings to comply with PEP257. [Hannah Ward]
+
+Other
+~~~~~
+
+- Fix python3 support. [Raphaël Vinot]
+
+- Bump version. [Raphaël Vinot]
+
+- Add orgs managment. [Raphaël Vinot]
+
+- Merge branch 'master' of https://github.com/MISP/PyMISP. [Déborah
+  Servili]
+
+- Run on more python versions. [Raphaël Vinot]
+
+- Exemple addtag (dirty) [Déborah Servili]
+
+- Fix last commit. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #83 from cudeso/master. [Alexandre Dulaunoy]
+
+  Wrong use of API for dateuntil
+
+- Wrong use of API for dateuntil. [Koen Van Impe]
+
+  PyMISP uses “dateto” whereas the API expects “dateuntil”.
+  https://github.com/MISP/misp-book/tree/master/automation
+
+- Merge remote-tracking branch 'CIRCL/master' [Koen Van Impe]
+
+- Refactoring search method. [Raphaël Vinot]
+
+- Revert "Add options to restsearch calls." [Raphaël Vinot]
+
+  This reverts commit 3241e415b5cb166fffb14dcc1ac3beb7bde8d883.
+
+- Add options to restsearch calls. [Raphaël Vinot]
+
+  Related to:
+  https://github.com/MISP/MISP/commit/8c63e6f3d54a262bc4bf6f77138c058287be5826
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Doc link updated. Fix #39. [Alexandre Dulaunoy]
+
+- Merge pull request #81 from cvandeplas/master. [Alexandre Dulaunoy]
+
+  Minor documentation clarification
+
+- Minor documentation clarification. [Christophe Vandeplas]
+
+- Fix typo. [Raphaël Vinot]
+
+- Fix last commit. [Raphaël Vinot]
+
+- Add support for attribute level tagging. [Raphaël Vinot]
+
+- Fix travis. [Raphaël Vinot]
+
+- Merge branch 'master' of git://github.com/cgi1/PyMISP into
+  cgi1-master. [Raphaël Vinot]
+
+- + separate function change_sharing_group using update_event. [cgi]
+
+- Allow to update an event by UUID, syntax fixes. [Raphaël Vinot]
+
+- Update tests. [Raphaël Vinot]
+
+- Fix get sharing groups. [Raphaël Vinot]
+
+  Fix #79
+
+- Add new key in online test. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Merge branch 'master' of https://github.com/truckydev/PyMISP. [Hannah
+  Ward]
+
+- Idem. [Tristan METAYER]
+
+- Refere to FloatingGhost comment. [Tristan METAYER]
+
+- Add uuid serch with pymisp. [Tristan METAYER]
+
+- Load RelatedEvent as MISPEvent. [Raphaël Vinot]
+
+  Fix #76
+
+- Allow to mark an attribute as deleted in a MISPEvent. [Raphaël Vinot]
+
+  Related to #33
+
+- Fix typo in comments of 'search_index' method definition. [Georges
+  Bossert]
+
+- Add warning of PyMISP and MISP version don't match. [Raphaël Vinot]
+
+- Fix sharing group distribution level. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/MISP/issues/1761
+
+v2.4.56 (2016-12-09)
+--------------------
+
+- Add basic support for Galaxy. [Raphaël Vinot]
+
+- Bump to v2.4.56. [Raphaël Vinot]
+
+- Allow to change the to_ids flag of an attribute. [Raphaël Vinot]
+
+- Add support for data field (malware-sample) [Raphaël Vinot]
+
+- Fix tests. [Raphaël Vinot]
+
+- Ignore order in event. [Raphaël Vinot]
+
+- Fix typo in add_mutex. [Raphaël Vinot]
+
+- Added galaxyies to the test. [Iglocska]
+
+- Reorganize json dumps. [Raphaël Vinot]
+
+- Merge branch 'nbareil-master' [Raphaël Vinot]
+
+- Fix merge conflict, make pep8 happy. [Raphaël Vinot]
+
+- Map() is a generator in Python3. [Nicolas Bareil]
+
+- Python3 does not like lambda (x,y) syntax. [Nicolas Bareil]
+
+- Unit-tests. [Nicolas Bareil]
+
+- Capitalizeformat() does not exist on Python2 and fix category
+  variables. [Nicolas Bareil]
+
+- Factorize all add_* in favor of add_named_attribute() [Nicolas Bareil]
+
+  Not tested...
+
+- Merge pull request #31 from morallo/master. [Raphaël Vinot]
+
+  Added test for search_index and solved warnings
+
+- Added test for search_index by tag string. [morallo]
+
+- Fixed missing parenthesis. [morallo]
+
+- Fixed synthax error. [morallo]
+
+- Solved warnings in tests when run under Python3. [morallo]
+
+- Added test case for search_index by tag. [morallo]
+
+- Fix neo4j. [Raphaël Vinot]
+
+- Remove crazy replace. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #74 from FloatingGhost/master. [Raphaël Vinot]
+
+  Use convert's load_stix method
+
+- Use misp_stix_converter.converters.convert's load_stix method. [Hannah
+  Ward]
+
+- Improve debug mode. [Raphaël Vinot]
+
+- More granularity in the verification. [Raphaël Vinot]
+
+- Allow to pass a passphrase as parameter for signing. [Raphaël Vinot]
+
+- Avoid error if pyme3 isn't installed. [Raphaël Vinot]
+
+- Bump recommended python3 version. [Raphaël Vinot]
+
+- Add signing support for MISP events. [Raphaël Vinot]
+
+v2.4.54 (2016-11-16)
+--------------------
+
+- Version bump. [Raphaël Vinot]
+
+- Update missing dependency exception. [Raphaël Vinot]
+
+- Fix documentation generation. [Raphaël Vinot]
+
+- Set user parameters in a function. [Raphaël Vinot]
+
+- Allow to set org_id and orgc_id when creating a new MISPEvent.
+  [Raphaël Vinot]
+
+  Squashed commit of the following:
+
+  commit 8a5dfda8a728d8722dfba890729066948e744e44
+
+- Fix openioc loader, update mapping. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+- Improvements in the user api. [Déborah Servili]
+
+- Neo4j stuff moved into graphdb directory. [Alexandre Dulaunoy]
+
+- Moving Neo4j into graphdb. [Alexandre Dulaunoy]
+
+- Improvements in the user api. [Déborah Servili]
+
+- Fix package installation. [Raphaël Vinot]
+
+- Merge pull request #68 from MISP/tooling. [Raphaël Vinot]
+
+  [WIP] Tooling
+
+- Add some mapping to openioc, add python version in the user agent.
+  [Raphaël Vinot]
+
+- Initial version of the OpenIOC loader. [Raphaël Vinot]
+
+- Add query example. [Raphaël Vinot]
+
+- Fix forgotten import. [Raphaël Vinot]
+
+- Update import. [Raphaël Vinot]
+
+- Add helper tool to load STIX objects. [Raphaël Vinot]
+
+- Fix Python2 - Python3 support. [Raphaël Vinot]
+
+- Cleanup neo4j support. [Raphaël Vinot]
+
+- Add simple script to push MISP events into Neo4j. [Raphaël Vinot]
+
+- Add user management and examples. [Déborah Servili]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Properly warn if the user is using python2. [Raphaël Vinot]
+
+- Allow to load a MISP event without attributes. [Raphaël Vinot]
+
+- Add user management and examples. [Déborah Servili]
+
+- Add example add_named_argument.py. [Déborah Servili]
+
+v2.4.53 (2016-10-21)
+--------------------
+
+- Merge pull request #67 from CIRCL/next. [Raphaël Vinot]
+
+  Major refactoring, release v2.4.53
+
+- Bump to v2.4.53. [Raphaël Vinot]
+
+- Cleanup. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP into next. [Raphaël
+  Vinot]
+
+- Merge pull request #66 from tomking2/master. [Raphaël Vinot]
+
+  Including Network-Other option for API
+
+- Including Network-Other option for API. [Tom]
+
+- Fix Python2 support. [Raphaël Vinot]
+
+- Print a warning in case python2 is used. [Raphaël Vinot]
+
+- Fix schemas. [Raphaël Vinot]
+
+- Remove test import. [Déborah Servili]
+
+- Update comment. [Déborah Servili]
+
+- Use only metadata in situational awareness tags functions. [Déborah
+  Servili]
+
+- Add metadata flag to search. [Déborah Servili]
+
+- Fix indentation. [Déborah Servili]
+
+- Fix date formatting in mispevent.py + some PEP8 cleaning. [Déborah
+  Servili]
+
+- Fix situational-awareness examples. [Déborah Servili]
+
+- Avoid validation issue if attribute_count is none. [Raphaël Vinot]
+
+- Fix flatten. [Déborah Servili]
+
+- Add forgotten variable. [Raphaël Vinot]
+
+- Fix test. [Raphaël Vinot]
+
+- Use sane_defaults from describeTypes.json if unable to fetch it from
+  the instance. [Raphaël Vinot]
+
+- Do not dump an empty list of attrbutes. [Raphaël Vinot]
+
+- Raise exception if the dest instance is < 2.4.52, set User-Agent.
+  [Raphaël Vinot]
+
+- More logical output for _prepare_full_event. [Raphaël Vinot]
+
+- Fix upload function. [Raphaël Vinot]
+
+- Make sure all integers are string in the dumped json. [Raphaël Vinot]
+
+- Fix python 2.7 support, add missing test file. [Raphaël Vinot]
+
+- More cleanup. [Raphaël Vinot]
+
+- Getting closed to a full support of a misp event as a Python Object.
+  [Raphaël Vinot]
+
+- First batch of changes, will be squashed. [Raphaël Vinot]
+
+- Merge pull request #64 from FloatingGhost/master. [Raphaël Vinot]
+
+  Fixed search_index
+
+- Fixed search_index. [Hannah Ward]
+
+- Toggle flag instead of value. [Alexandre Dulaunoy]
+
+- Version bump. [Raphaël Vinot]
+
+- Fix examples after removal of MISP XML support. [Raphaël Vinot]
+
+- Merge pull request #27 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  Add Examples
+
+- Add some examples. [Déborah Servili]
+
+- Add tags_to_graphs.py in ecamples/situational-awareness. [Déborah
+  Servili]
+
+- Merge https://github.com/MISP/PyMISP. [Déborah Servili]
+
+- Update examples/situational-awareness/README.md. [Déborah Servili]
+
+- Update examples/situational-awareness/README.md. [Déborah Servili]
+
+v2.4.51 (2016-08-29)
+--------------------
+
+- Bump to 2.4.51. [Raphaël Vinot]
+
+- Fix flattening, fix python2.7. [Raphaël Vinot]
+
+- Cleanup create_events. [Raphaël Vinot]
+
+- Improve testing. [Raphaël Vinot]
+
+- Fix error flattening. [Raphaël Vinot]
+
+- Add badge. [Raphaël Vinot]
+
+- Update rendering doc. [Raphaël Vinot]
+
+- Fix auto generation of doc. [Raphaël Vinot]
+
+- Update doc. [Raphaël Vinot]
+
+- Add doc. [Raphaël Vinot]
+
+- Update documentation for client side certificate. [Raphaël Vinot]
+
+- Merge pull request #62 from RichieB2B/nscs-nl/ssl-client-cert.
+  [Raphaël Vinot]
+
+  Add ssl client certificate support
+
+- Add ssl client certificate support. [Richard van den Berg]
+
+- Add auth error test. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #61 from RichieB2B/ncsc-nl/speedup-et2misp.
+  [Alexandre Dulaunoy]
+
+  Speed up et2misp
+
+- Speed up et2misp. [Richard van den Berg]
+
+- Add some more tests. [Raphaël Vinot]
+
+- Add tests. [Raphaël Vinot]
+
+- Update testing. [Raphaël Vinot]
+
+- Add dependency. [Raphaël Vinot]
+
+- Add travis. [Raphaël Vinot]
+
+- Add forgotten files. [Raphaël Vinot]
+
+- Initial version of the offline TestCases. [Raphaël Vinot]
+
+  Related #56
+
+v2.4.50 (2016-08-17)
+--------------------
+
+- Version bump. [Raphaël Vinot]
+
+- Merge pull request #26 from jbremer/master. [Raphaël Vinot]
+
+  Various improvements
+
+- Provide sane defaults for upload-sample/samplelist. [Jurriaan Bremer]
+
+  Most of the arguments are unused when a proper event ID has been
+  provided, hence default them to standard values.
+
+- Magic value enumerations. [Jurriaan Bremer]
+
+- Allow multiple attributes to be sent off at once. [Jurriaan Bremer]
+
+  Slightly worked out version of the suggestion by doomedraven in #42.
+
+- Fix tests. [Raphaël Vinot]
+
+- Merge pull request #60 from RichieB2B/ncsc-nl/et2misp. [Alexandre
+  Dulaunoy]
+
+  Add Emerging Threat to MISP example
+
+- Add et2misp example. [Richard van den Berg]
+
+- Merge pull request #59 from tomking2/master. [Raphaël Vinot]
+
+  Fixed double status code check on helpers and other functions
+
+- Fixed double status code check on helpers and other functions. [Thomas
+  King]
+
+- Proper support of functions returning plain text instead of json.
+  [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #57 from sebix/fix-test. [Raphaël Vinot]
+
+  Fix prints in tests
+
+- Fix prints in tests. [Sebastian Wagner]
+
+- Fix calls to __prepare_session. [Raphaël Vinot]
+
+  Fix #58
+
+- Change: remove XML output, all functions return a Python dictionary.
+  [Raphaël Vinot]
+
+- Merge pull request #55 from RichieB2B/ncsc-nl/fix-distribution.
+  [Raphaël Vinot]
+
+  Set default distribution for attributes to inherit
+
+- Set default distribution for attributes to inherit. [Richard van den
+  Berg]
+
+- Properly handle errors while fetching the types. [Raphaël Vinot]
+
+  Fix #53
+
+- Add option to search function to only return attributes instead of
+  events. [Raphaël Vinot]
+
+v2.4.49 (2016-08-02)
+--------------------
+
+- Version bump. [Raphaël Vinot]
+
+- Merge pull request #24 from Delta-Sierra/master. [Raphaël Vinot]
+
+  Fix fetching method for tag_search and tags_count
+
+- Fix fetching method for tag_search and tags_count. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #52 from KennethAdamMiller/master. [Raphaël Vinot]
+
+  Caught exception on python3.4 where base64encode returns bytes
+
+- Caught exception on python3.4 where base64encode returns bytes and not
+  str, and bytes are not json encodable. This caused a failure in
+  upload_sample. [Kenneth Adam Miller]
+
+- Fix PEP8. [Raphaël Vinot]
+
+- Add support for proxies in the library. [Raphaël Vinot]
+
+  Fix #48
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #51 from ek0/add_detection_name. [Alexandre
+  Dulaunoy]
+
+  Add a method to add a textual detection name under the 'Antivirus detection' category
+
+- Add a method to add a textual detection name under the 'Antivirus
+  detection' category. [Jessy Campos]
+
+- Major refactoring of the SVG generator. [Raphaël Vinot]
+
+- Initial refactoring, PEP8 and cleanup. [Raphaël Vinot]
+
+- Merge pull request #23 from Delta-Sierra/master. [Raphaël Vinot]
+
+  Add tags_count and tag_search script in examples/situational-awareness/
+
+- Update README.md. [Deborah Servili]
+
+- Make printed date more consistent + update README.md. [Déborah
+  Servili]
+
+- Merge https://github.com/MISP/PyMISP. [Déborah Servili]
+
+- Merge pull request #22 from 3c7/patch-1. [Raphaël Vinot]
+
+- Fixes: expected bytes, got <class 'str'> in download_samples() [Nils]
+
+- Merge pull request #49 from FloatingGhost/master. [Raphaël Vinot]
+
+  Added STIX retrieval
+
+- Added STIX retrieval    - misp.get_stix(event_id=ID,
+  with_attachment=True/False,                        from_date=YYYY-MM-
+  DD, to_date=YYYY-MM-DD,                       tags=["tag1", "tag2"]
+  ) [Hannah Ward]
+
+- Merge pull request #3 from Delta-Sierra/newbranch. [Deborah Servili]
+
+- Merge branch 'master' of https://github.com/Delta-Sierra/PyMISP into
+  newbranch. [Déborah Servili]
+
+- Update tools.py. [Deborah Servili]
+
+  Correct function isTagIn(dataframe, tag)
+
+- Merge pull request #2 from Delta-Sierra/newbranch. [Deborah Servili]
+
+- Modify fetching method to use last. [Déborah Servili]
+
+- Handling some NaN exceptions. [Déborah Servili]
+
+- Delete some files. [Déborah Servili]
+
+- Merge pull request #1. [Deborah Servili]
+
+- Rename examples/statistics/attribute_treemap.py to
+  examples/treemap/treemap.py. [Deborah Servili]
+
+- Move files from examples/treemap to examples/situational-awareness/
+  [Déborah Servili]
+
+- Merge https://github.com/MISP/PyMISP into newbranch. [Déborah Servili]
+
+- Version bump. [Raphaël Vinot]
+
+- Add remove tag method. [Raphaël Vinot]
+
+- Use same variable names as testing environment. [Raphaël Vinot]
+
+- Make scripts executable. [Raphaël Vinot]
+
+- Merge pull request #21 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  Add examples "create_dummy_event" and "create_massive_dummy_events"
+
+- Rename examples/treemap/treemap.py to
+  examples/statistics/attribute_treemap.py. [Deborah Servili]
+
+- Random names for dummy files. [Déborah Servili]
+
+- Add examples "create_dummy_event" and "create_massive_dummy_events"
+  [Déborah Servili]
+
+- Merge pull request #46 from plutec/master. [Raphaël Vinot]
+
+  Update README.md with install instructions
+
+- Update README.md with install instructions. [Antonio Sánchez]
+
+- Merge pull request #44 from plutec/master. [Alexandre Dulaunoy]
+
+  Added function to AV detection link
+
+- Added function to AV detection link. [Antonio S]
+
+- Merge pull request #43 from plutec/master. [Alexandre Dulaunoy]
+
+  Added add_domain_ip function for attribute
+
+- Added add_domain_ip attribute function. [Antonio S]
+
+- Merge pull request #20 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  Add example "create attributes distribution treemap"
+
+- Remove useless comments. [Déborah Servili]
+
+- Add example "create attributes distribution treemap" [Déborah Servili]
+
+- Fix python3 compat. Make Pep8 happy. [Raphaël Vinot]
+
+- Make pep8 happy. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Comment removed. [Alexandre Dulaunoy]
+
+- Fix check MISP latest version. [Raphaël Vinot]
+
+- Add tag script. [Raphaël Vinot]
+
+- Make pep8 happy. [Raphaël Vinot]
+
+v2.4.48 (2016-06-09)
+--------------------
+
+- Tag version 2.4.48. [Raphaël Vinot]
+
+- Merge pull request #19 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  add function get_tags_statistics
+
+- Add function get_tags_statistics. [Déborah Servili]
+
+- File indention fixed. [Alexandre Dulaunoy]
+
+- Merge pull request #18 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  add function get_sharing_groups
+
+- Add function get_sharing_groups. [Déborah Servili]
+
+- Merge pull request #40 from ANSSI-BSOD/master. [Alexandre Dulaunoy]
+
+  import ioc with python
+
+- Form. [ANSSI-BSO-D]
+
+- Init for ioc-2-misp. [Tristan METAYER]
+
+- Merge pull request #39 from kevthehermit/master. [Alexandre Dulaunoy]
+
+  Add Attribute by named category and type
+
+- Add Attribute by named category and type. [KevTheHermit]
+
+- Merge pull request #17 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  Add function for sighting using attribute id, uuid or a json file
+
+- Add function for sighting using attribute id, uuid or a json file.
+  [Déborah Servili]
+
+- More stats example. [Alexandre Dulaunoy]
+
+- Debug print removed. [Alexandre Dulaunoy]
+
+- Statistics test script added. [Alexandre Dulaunoy]
+
+- Merge pull request #16 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  add function get_attributes_statistics
+
+- Add function get_attributes_statistics. [Déborah Servili]
+
+- Add 'add_yara' to upload yara rules, increase flexibility of config.
+  [Raphaël Vinot]
+
+  fix #38
+
+v2.4.36 (2016-04-15)
+--------------------
+
+- Update version to v2.4.36. [Raphaël Vinot]
+
+- Merge pull request #15 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  add comment field in upload_sample
+
+- Add comment field in upload_sample. [Déborah Servili]
+
+- Merge pull request #14 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  add function add filename
+
+- Add function add filename. [Déborah Servili]
+
+- Type-category association checking automated. [Déborah Servili]
+
+- Merge pull request #13 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  removing some unnecessary checks
+
+- Removing some unnecessary checks. [Déborah Servili]
+
+- Merge https://github.com/MISP/PyMISP. [Déborah Servili]
+
+- Merge pull request #12 from Delta-Sierra/master. [Alexandre Dulaunoy]
+
+  type-category association checking automated
+
+- Type-category association checking automated. [Déborah Servili]
+
+- Merge pull request #10 from TheDr1ver/patch-1. [Alexandre Dulaunoy]
+
+  Add SSDEEP and FILENAME|SSDEEP support
+
+- Add SSDEEP and FILENAME|SSDEEP support. [Nick Driver]
+
+- Merge pull request #11 from TheDr1ver/patch-2. [Alexandre Dulaunoy]
+
+  Add internal reference attributes
+
+- Add internal reference attributes. [Nick Driver]
+
+- Merge pull request #9 from iglocska/master. [Alexandre Dulaunoy]
+
+  Added the option to filter out attributes based on distribution level
+
+- Added the option to filter out attributes based on distribution level.
+  [Iglocska]
+
+- Type-category association checking automated. [Déborah Servili]
+
+- Add SSDEEP and FILENAME|SSDEEP support. [Nick Driver]
+
+- Add internal reference attributes. [Nick Driver]
+
+- Added the option to filter out attributes based on distribution level.
+  [Iglocska]
+
+- Correct module help. [Déborah Servili]
+
+- Merge pull request #34 from iglocska/master. [Alexandre Dulaunoy]
+
+  Capitalisation issues
+
+- Capitalisation issues. [Iglocska]
+
+- Merge remote-tracking branch 'circl/master' [Iglocska]
+
+- Ann missing categories in the authorized ones. [Raphaël Vinot]
+
+- Revert "Add upload_attachment" [Raphaël Vinot]
+
+  This reverts commit 6db19ace9eb7d69aecd4708a000b13e9eba741aa.
+
+- Revert "Use correct function to upload an attachment" [Raphaël Vinot]
+
+  This reverts commit 1b7877dd0652ff12a6fdef5b51d392a578f575e7.
+
+- Make PEP8 happy. [Raphaël Vinot]
+
+- Use correct function to upload an attachment. [Raphaël Vinot]
+
+  Fix #33
+
+- Merge pull request #32 from tomking2/master. [Alexandre Dulaunoy]
+
+  Search Event Index
+
+- Designed in same style as search, all attributes can be used. [=]
+
+- Merge remote-tracking branch 'upstream/master' [Thomas King]
+
+  Merging new pymisp changes
+
+- Fix pep8. [Raphaël Vinot]
+
+- Merge pull request #8 from truckydev/master. [Raphaël Vinot]
+
+  Add upload_attachment
+
+- Add upload_attachment. [Tristan METAYER]
+
+- Improve examples. [Raphaël Vinot]
+
+- Update version to 2.3. [Raphaël Vinot]
+
+- Make pep8 happy. [Raphaël Vinot]
+
+- Python 2/3 compatible, urllib module. [Thomas King]
+
+- Added in searchable indexes, only brings back index and count etc, not
+  results within the index. [Thomas King]
+
+- Merge pull request #7 from sebdraven/master. [Alexandre Dulaunoy]
+
+  add method change_threat_level
+
+- Add method change_threat_level. [Sébastien Larinier]
+
+- Merge pull request #31 from tomking2/Actor_Tag. [Alexandre Dulaunoy]
+
+  Add threat actor through API, Create new tag
+
+- Add threat actor through API, Create new tag. [Thomas King]
+
+- Merge pull request #6 from sebdraven/master. [Alexandre Dulaunoy]
+
+  add add_tag method to an event and value 5 to distribution attribute
+
+- Add add_tag method to an event and value 5 to distribution attribute.
+  [Sébastien Larinier]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Alexandre Dulaunoy]
+
+- Merge pull request #5 from sebdraven/master. [Raphaël Vinot]
+
+  add method to export txt all attributes by type
+
+- Add method to export txt all attributes by type. [Sébastien Larinier]
+
+- Merge pull request #29 from cudeso/master. [Alexandre Dulaunoy]
+
+  Check if objectType exists in event
+
+- Check if objectType exists in event. [Koen Van Impe]
+
+  Prevent failing when f.e. an event does not have a tag.
+
+- Merge pull request #4 from iglocska/master. [Alexandre Dulaunoy]
+
+  Updated the feed generator
+
+- Updated the feed generator. [Iglocska]
+
+  - only save fields that are actually necessary and don't reveal too much of unneeded information (such as correlation)
+  - add contextual fields to the manifest
+
+- Remove a small bug introduced by previous commit. [Alexandre Dulaunoy]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Alexandre Dulaunoy]
+
+- Merge pull request #28 from deralexxx/master. [Alexandre Dulaunoy]
+
+  respect misp_verifycert in some tests
+
+- Update yara.py. [Alexander J]
+
+- Update upload.py. [Alexander J]
+
+- Update searchall.py. [Alexander J]
+
+- Update get.py. [Alexander J]
+
+- Update last.py. [Alexander J]
+
+- Merge pull request #3 from iglocska/master. [Alexandre Dulaunoy]
+
+  Script for the upcoming feed generator
+
+- Script for the upcoming feed generator. [Iglocska]
+
+  - also some minor modifications to the get_index api
+
+- Update testcases for 2.4. [Raphaël Vinot]
+
+- Initial Tags API. [Raphaël Vinot]
+
+- Normalize error messages. [Raphaël Vinot]
+
+- Add debug option. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:MISP/PyMISP. [Alexandre Dulaunoy]
+
+- Merge pull request #26 from urbanski/master. [Raphaël Vinot]
+
+  Fix KeyError when no results in time period
+
+- Fix KeyError when no results in time period. [Will Urbanski]
+
+  Fix a KeyError when no results were found for the specified time period.
+
+- Threat level id is from 1 to 4 (not from 0 to 3) [Alexandre Dulaunoy]
+
+  https://github.com/MISP/MISP/issues/729
+
+- Merge pull request #25 from iglocska/master. [Alexandre Dulaunoy]
+
+  reverted my previous commit that broke an assertion
+
+- Reverted my previous commit that broke an assertion. [iglocska]
+
+- Merge pull request #24 from iglocska/master. [Alexandre Dulaunoy]
+
+  Print the event so we can see what travis is trying to compare against
+
+- Print the event so we can see what travis is trying to compare
+  against. [iglocska]
+
+  - should help with the debugw
+
+- Merge pull request #23 from iglocska/master. [Alexandre Dulaunoy]
+
+  Should fix the test failures
+
+- Fixed an invalid assertion. [iglocska]
+
+  - attribute count is None not u'0' when no attributes exist (should be fixed on MISP side in the long run)
+
+- Fixed a typo causing the tests to fail. [iglocska]
+
+- README updated including keys.py usage. [Alexandre Dulaunoy]
+
+- Authentication parameters updated. [Alexandre Dulaunoy]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Alexandre Dulaunoy]
+
+- Auth parameters updated. [Alexandre Dulaunoy]
+
+- Updated auth parameters. [Alexandre Dulaunoy]
+
+- Normalized auth parameters. [Alexandre Dulaunoy]
+
+- Normalized auth parameters. [Alexandre Dulaunoy]
+
+- Sample keys file added. [Alexandre Dulaunoy]
+
+- Normalized auth parameters. [Alexandre Dulaunoy]
+
+- Normalized auth parameters. [Alexandre Dulaunoy]
+
+- Auth parameters normalized. [Alexandre Dulaunoy]
+
+v2.1.1 (2015-11-05)
+-------------------
+
+- Add add_ipsrc. [Raphaël Vinot]
+
+- Add basic support for the proposal API. [Raphaël Vinot]
+
+- Merge pull request #22 from grolinet/master. [Raphaël Vinot]
+
+  Helper methods added
+
+- Whitespace cleaned. [grolinet]
+
+- Helper methods added. [grolinet]
+
+- Merge pull request #21 from grolinet/master. [Raphaël Vinot]
+
+  Added missing types
+
+- Missing types added. [unknown]
+
+- Missing types added. [unknown]
+
+- Missing types added. [unknown]
+
+- [UnitTest] Add some functions, testing. [Raphaël Vinot]
+
+- Improve error handling. [Raphaël Vinot]
+
+v2.0.1 (2015-09-22)
+-------------------
+
+- Add test cases (initial) [Raphaël Vinot]
+
+- Fix typo in categories names. [Raphaël Vinot]
+
+- Check the MISP instance to query is valid. [Raphaël Vinot]
+
+  And return a json object from upload_sample.
+
+- Force json if nothing else is supported. [Raphaël Vinot]
+
+- Better error handling of no URL/Key are passed. [Raphaël Vinot]
+
+- Add support for downloading unzipped samples. [Raphaël Vinot]
+
+- Add version-related methods. [Raphaël Vinot]
+
+- Add methods to query the version of MISP (master and local) [Raphaël
+  Vinot]
+
+- Add publish method. [Raphaël Vinot]
+
+v1.8.2 (2015-09-12)
+-------------------
+
+- Try to convert event ID to integer if not None. [Raphaël Vinot]
+
+v1.8.1 (2015-09-12)
+-------------------
+
+- Fix bug in download sample function. [Raphaël Vinot]
+
+  Thanks to @kevthehermit
+
+- Timestamp not needed to update an event. [Raphaël Vinot]
+
+  Fix #18
+
+- Restore python3 support. [Raphaël Vinot]
+
+- Cleanup + add helpers for network attributes. [Raphaël Vinot]
+
+- Add helpers to update events with specific attributes. [Raphaël Vinot]
+
+- Reorganise. [Raphaël Vinot]
+
+- Multiple updates, cleanup. [Raphaël Vinot]
+
+  * Remove attribute (Fix #4)
+  * Deprecate pure XML API
+  * Cleanups and fixes in the upload file functionality
+
+- Fix download of samples with the new archive format. [Raphaël Vinot]
+
+- Add Yara rules download support (by event) [Raphaël Vinot]
+
+- Fix license mentioned in setup.py. [Raphaël Vinot]
+
+  fix #16
+
+- Events id are integers not strings. [Alexandre Dulaunoy]
+
+- Merge pull request #15 from iglocska/master. [Alexandre Dulaunoy]
+
+  Dump the entire event including the 'Event' container element
+
+- Dump the entire event including the 'Event' container element.
+  [iglocska]
+
+- Add test scripts to get and update an event. [Raphaël Vinot]
+
+- Fix bug introduced by using urljoin. [Raphaël Vinot]
+
+- Add sample download. [Raphaël Vinot]
+
+- Add search all. [Raphaël Vinot]
+
+- Increase flexibility of upload sample. [Raphaël Vinot]
+
+- Fix last commit. [Raphaël Vinot]
+
+- Initial changes to increase flexibility for Viper module. [Raphaël
+  Vinot]
+
+v1.1.2 (2015-08-05)
+-------------------
+
+- Fix PyPi package. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #14 from cudeso/master. [Alexandre Dulaunoy]
+
+  Add netflow filter output
+
+- Add netflow filter output. [Koen Van Impe]
+
+  - get event data for event with “—event X”
+  - get netflow filter with “—netflow”
+     simple host X or host X
+
+- Add last param to restSearch + example script. [Raphaël Vinot]
+
+- Cleanup of the upload API. [Raphaël Vinot]
+
+- Preliminary version of the file uploader. [Raphaël Vinot]
+
+- Add test script to add attachement to event. [Raphaël Vinot]
+
+- Merge remote-tracking branch 'origin/master' [Raphaël Vinot]
+
+  Conflicts:
+  	examples/get_network_activity.py  (python 2.7 & 3 compatible print)
+
+- Bug fix: get_index now works properly and return the events index.
+  [Alexandre Dulaunoy]
+
+  An bug was introduced and appending "{}" to the /index url which
+  gives a 404 on a MISP server.
+
+- Merge branch 'master' of https://github.com/CIRCL/PyMISP. [Alexandre
+  Dulaunoy]
+
+- Merge pull request #12 from iglocska/xml_json_fix. [Alexandre
+  Dulaunoy]
+
+  API made a bit more flexible with input data
+
+- API made a bit more flexible with input data. [Iglocska]
+
+  - input for add_event() and update_event() can now be a JSON object, JSON string, XML
+
+- Merge branch 'master' of https://github.com/CIRCL/PyMISP. [Alexandre
+  Dulaunoy]
+
+- Merge pull request #11 from iglocska/xml_json_fix. [Alexandre
+  Dulaunoy]
+
+  Fix to an issue with using XML as input for add_event() and update_ev…
+
+- Fix to an issue with using XML as input for add_event() and
+  update_event() [Iglocska]
+
+  - also a change to the copy_list.py script to account for the change
+
+- Merge branch 'master' of https://github.com/CIRCL/PyMISP. [Alexandre
+  Dulaunoy]
+
+- Merge pull request #10 from Starow/master. [Raphaël Vinot]
+
+  Add 2 download functions of suricata rules events
+
+- Add 2 download functions of suricata rules events. [Debra Jules]
+
+- Merge pull request #8 from didelphodon/master. [Raphaël Vinot]
+
+  Update / Add need a JSON object as data
+
+- Update / Add need a JSON object as data. [didelphodon]
+
+  ... furthermore content-type application was necessary otherwise MISP-REST API refuses to work as expected, at least with my installation.
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Alexandre Dulaunoy]
+
+- Make the code python3 friendly. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Alexandre Dulaunoy]
+
+- Merge pull request #1 from CIRCL/master. [Alexandre Dulaunoy]
+
+  More sample added - #1 pull import
+
+- Make PEP8 Happy. [Raphaël Vinot]
+
+- Use JSON POST to do the search. [Raphaël Vinot]
+
+- Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
+
+- Merge pull request #1 from cudeso/master. [Alexandre Dulaunoy]
+
+  Example script to download MISP network activity
+
+- Example script to download MISP network activity. [Koen Van Impe]
+
+- Documentation reference added. [Alexandre Dulaunoy]
+
+- Add license. [Raphaël Vinot]
+
+- Support update events. [Raphaël Vinot]
+
+- Small cleanup, update to 1.0.1. [Raphaël Vinot]
+
+- Add the following options: [Raphaël Vinot]
+
+  - possibility to copy in one direction or the other between instance
+  - add loop to simply put event ids to copy
+
+- Add readme. [Raphaël Vinot]
+
+- Add installer, proper copy script. [Raphaël Vinot]
+
+- Add support for self-signed certificate. [Raphaël Vinot]
+
+  Add comments
+
+- Add search by organisation. [Raphaël Vinot]
+
+- Add export-import of a list. [Raphaël Vinot]
+
+- Cleanup style. [Raphaël Vinot]
+
+- Support xml and json copy. [Raphaël Vinot]
+
+- Delete export_import.py. [Raphaël Vinot]
+
+- Fix event_add, add example. [Raphaël Vinot]
+
+- Make the API a class. [Raphaël Vinot]
+
+- Json export is not supported everywhere. [Raphaël Vinot]
+
+- Some testing. [Raphaël Vinot]
+
+- Initial commit. [Raphaël Vinot]
+
+
