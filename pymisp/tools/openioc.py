@@ -129,8 +129,10 @@ iocMispMapping = {
     'UrlHistoryItem/URL' : {'type': 'url','comment': 'UrlHistory. '},
     'UrlHistoryItem/HostName': {'type': 'hostname','comment': 'UrlHistory. '},
 
-    'Yara/Yara' : {'type': 'yara'},
+    'Yara/Yara' : {'type': 'yara'}
+}
 
+iocMispCompositeMapping = {
     # mapping for composite object
     # maybe later filename|sizeinbyte
     'FileItem/FileName|FileItem/Md5sum' : {'type': 'filename|md5'},
@@ -140,13 +142,14 @@ iocMispMapping = {
     'PortItem/remoteIP|PortItem/remotePort' : {'comment': 'ip-dst|port'},
     'RegistryItem/Path|RegistryItem/Value' : {'type': 'regkey|value'},
     'RegistryItem/KeyPath|RegistryItem/Value' : {'type': 'regkey|value'},
+    'RegistryItem/Path|RegistryItem/Text' : {'type': 'regkey|value'}
 }
 
-
 def extract_field(report, field_name):
-    data = report.find(field_name.lower())
-    if data and hasattr(data, 'text'):
-        return data.text
+    if report:
+        data = report.find(field_name.lower())
+        if data and hasattr(data, 'text'):
+            return data.text
     return None
 
 
@@ -186,44 +189,61 @@ def load_openioc(openioc):
     return misp_event
 
 
-def get_mapping(openioc_type):
+def get_mapping(openioc_type, mappingDict=iocMispMapping):
     t = openioc_type.lower()
-    for k, v in iocMispMapping.items():
+    for k, v in mappingDict.items():
         if k.lower() == t:
             return v
     return False
 
-def set_composite_values(value1, value2):
-    attribute_values = {'comment': ''}
-    
-    # construct attribut composite type
-    compositeMapping = value1.find('context')['search']+'|'+value2.find('context')['search']
-    mapping = get_mapping(compositeMapping)
+
+def set_values(value1, value2=None):
+    attribute_values = {}
+
+    if value2 is not None:
+        # construct attribut composite value
+        value = "{}|{}".format(
+                            extract_field(value1, 'Content'),
+                            extract_field(value2, 'Content')
+                        )
+    else:
+        value = extract_field(value1, 'Content')
+
+    if value:
+        attribute_values['value'] = value
+    else:
+        return None
+
+    if value2 is not None:
+        # construct attribut composite type
+        compositeMapping = value1.find('context')['search']+'|'+value2.find('context')['search']
+        mapping = get_mapping(compositeMapping, mappingDict=iocMispCompositeMapping)
+    else:
+        mapping = get_mapping(value1.find('context')['search'])
+
     if mapping:
         attribute_values.update(mapping)
     else:
-        # prevent some mistake error
-        attribute_values.update({'category': 'External analysis', 'type': 'other'})
+        # Unknown mapping, assign to default
+        attribute_values['category'] = 'External analysis'
+        attribute_values['type'] = 'other'
 
-    # construct attribut composite value
-    compositeValue = value1.find('content').text + "|" +value2.find('content').text
-    if compositeValue:
-        attribute_values['value'] = compositeValue
+    # change value to composite
+    # 127.0.0.1:80 ip-* to 127.0.0.1|80 ip-*|port
+    if attribute_values['type'] in ['ip-src', 'ip-dst'] and attribute_values['value'].count(':') == 1:
+        attribute_values['type'] = attribute_values['type'] + '|port'
+        attribute_values['value'] = attribute_values['value'].replace(':', '|')
 
-    # construct composite comment
-    compositeComment = ""
-    if value1.find('comment'):
-        compositeComment += value1.find('comment').text
-    if value2.find('comment'):
-        compositeComment += value2.find('comment').text
-    attribute_values["comment"] = compositeComment
-    
+    attribute_values["comment"] = '{}{}'.format(
+                        extract_field(value1, 'Comment'),
+                        extract_field(value2, 'Comment')
+                    )
+
     return attribute_values
 
 def set_all_attributes(openioc, misp_event):
     processed = set()
-    hashName = ["FileItem/Md5sum","FileItem/Sha1sum","FileItem/Sha256sum"]
-    
+
     # check for composite item
     for composite in openioc.find_all("indicator", operator="AND"):
 
@@ -233,95 +253,42 @@ def set_all_attributes(openioc, misp_event):
         if len(childs) == 2:
             childList = [child.find('context')['search'] for child in childs]
 
-            if ('FileItem/FileName' in childList) and\
-                (set(hashName) - set(childList) != set(hashName)):
-                if childs[0].find('context')['search'] == 'FileItem/FileName':
-                    value1, value2 = childs[0], childs[1]
-                else:
-                    value1, value2 = childs[1], childs[0]
+            def check_and_add(value1, value2):
+                if (value1 and value2) in childList:
+                    if childs[0].find('context')['search'] == value1:
+                        attribute_values = set_values(childs[0], childs[1])
+                    else:
+                        attribute_values = set_values(childs[1], childs[0])
 
-                attribute_values = set_composite_values(value1, value2)
-                misp_event.add_attribute(**attribute_values)
-                processed.add(childs[0]['id'])
-                processed.add(childs[1]['id'])
+                    misp_event.add_attribute(**attribute_values)
+                    processed.add(childs[0]['id'])
+                    processed.add(childs[1]['id'])
 
-
-            elif ("Network/DNS" and "PortItem/RemoteIP") in childList:
-                if childs[0].find('context')['search'] == 'Network/DNS':
-                    value1, value2 = childs[0], childs[1]
-                else:
-                    value1, value2 = childs[1], childs[0]
-
-                attribute_values = set_composite_values(value1, value2)
-                misp_event.add_attribute(**attribute_values)
-                processed.add(childs[0]['id'])
-                processed.add(childs[1]['id'])
-
-
-            elif ("PortItem/RemoteIP" and "PortItem/RemotePort") in childList:
-                if childs[0].find('context')['search'] == 'PortItem/RemoteIP':
-                    value1, value2 = childs[0], childs[1]
-                else:
-                    value1, value2 = childs[1], childs[0]
-                
-                attribute_values = set_composite_values(value1, value2)
-                misp_event.add_attribute(**attribute_values)
-                processed.add(childs[0]['id'])
-                processed.add(childs[1]['id'])
-
-
-            elif ("RegistryItem/Path" and "RegistryItem/Value") in childList:
-                if childs[0].find('context')['search'] == 'RegistryItem/PathP':
-                    value1, value2 = childs[0], childs[1]
-                else:
-                    value1, value2 = childs[1], childs[0]
-
-                attribute_values = set_composite_values(value1, value2)
-                misp_event.add_attribute(**attribute_values)
-                processed.add(childs[0]['id'])
-                processed.add(childs[1]['id'])
+            for k in iocMispCompositeMapping:
+                check_and_add(k.split('|')[0], k.split('|')[1])
 
     for item in openioc.find_all("indicatoritem"):
         # check if id in processed list
         if item['id'] in processed:
             continue
-        attribute_values = {'comment': ''}
-        if item.find('context'):
-            mapping = get_mapping(item.find('context')['search'])
-            if mapping:
-                attribute_values.update(mapping)
-            else:
-                # Unknown mapping, assign to default
-                attribute_values.update({'category': 'External analysis', 'type': 'other'})
-                #continue
-        else:
+        attribute_values = set_values(item)
+        
+        if attribute_values is None:
             continue
-        value = extract_field(item, 'Content')
-        if value:
-            attribute_values['value'] = value
-        else:
-            # No value, ignoring
-            continue
-        comment = extract_field(item, 'Comment')
-        if comment:
-            attribute_values["comment"] = '{} {}'.format(attribute_values["comment"], comment)
 
-        # change value to composite
-        # 127.0.0.1:80 ip-* to 127.0.0.1|80 ip-*|port
-        if mapping['type'] in ['ip-src', 'ip-dst'] and value.count(':') == 1:
-            attribute_values['type'] = mapping['type'] + '|port'
-            attribute_values['value'] = attribute_values['value'].replace(':', '|')
         misp_event.add_attribute(**attribute_values)
 
     return misp_event
 
 if __name__ == '__main__':
+    import requests
     # test file for composite
-    # https://github.com/fireeye/iocs/blob/master/BlogPosts/9cee306d-5441-4cd3-932d-f3119752634c.ioc
-    x = open('test.ioc', 'r')
-    mispEvent = load_openioc(x.read())
-    #~ print(mispEvent._json_full())
-    from pymisp import PyMISP
-    misp = PyMISP('http://misp.local', 'xxxxx')
-    r = misp.add_event(mispEvent)
-    print(r)
+    url = 'https://raw.githubusercontent.com/fireeye/iocs/master/BlogPosts/9cee306d-5441-4cd3-932d-f3119752634c.ioc'
+    #~ url = 'https://raw.githubusercontent.com/MISP/misp-modules/master/tests/openioc.xml'
+    x = requests.get(url)
+    mispEvent = load_openioc(x.text)
+    print(mispEvent)
+    #~ from pymisp import PyMISP
+    #~ misp = PyMISP('http://misp.local', 'xxxxx')
+    #~ r = misp.add_event(mispEvent)
+    #~ print(r)
