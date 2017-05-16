@@ -777,7 +777,7 @@ class PyMISP(object):
         logger.debug('URL: ', url)
         logger.debug('Query: ', query)
 
-        if isinstance(session, FuturesSession) and async_callback:
+        if ASYNC_OK and isinstance(session, FuturesSession) and async_callback:
             response = session.post(url, data=json.dumps(query), background_callback=async_callback)
         else:
             response = session.post(url, data=json.dumps(query))
