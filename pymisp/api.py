@@ -864,7 +864,7 @@ class PyMISP(object):
                 to_return += '&&!'
             else:
                 to_return += '!'
-            if not isinstance(values, list):
+            if not isinstance(not_values, list):
                 to_return += not_values
             else:
                 to_return += '&&!'.join(not_values)
