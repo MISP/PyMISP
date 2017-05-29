@@ -1476,6 +1476,16 @@ class PyMISP(object):
         return self.get_stix_event(**kwargs)
 
     # ###########################
+    # ########   Feed   #########
+    # ###########################
+    
+    def fetch_feed(self, feed_id):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds/fetchFromFeed/{}'.format(feed_id))
+        response = session.get(url)
+        return self._check_response(response)
+    
+    # ###########################
     # ####### Deprecated ########
     # ###########################
 
