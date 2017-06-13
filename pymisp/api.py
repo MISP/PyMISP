@@ -790,8 +790,8 @@ class PyMISP(object):
         if controller not in ['events', 'attributes']:
             raise Exception('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes'])))
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
-        logger.debug('URL: ', url)
-        logger.debug('Query: ', query)
+        logger.debug('URL: %s', url)
+        logger.debug('Query: %s', query)
 
         if ASYNC_OK and isinstance(session, FuturesSession) and async_callback:
             response = session.post(url, data=json.dumps(query), background_callback=async_callback)
@@ -1484,7 +1484,7 @@ class PyMISP(object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
             event_id, with_attachments, tags, from_date, to_date))
-        logger.debug("Getting STIX event from", url)
+        logger.debug("Getting STIX event from %s", url)
         response = session.get(url)
         return self._check_response(response)
 
