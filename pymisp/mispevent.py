@@ -593,7 +593,11 @@ class MISPEvent(object):
         if not found:
             raise Exception('No attribute with UUID/ID {} found.'.format(attribute_id))
 
-    def add_attribute(self, type, value, **kwargs):
+    def add_attribute(self, type_, value, **kwargs):
         attribute = MISPAttribute(self.describe_types)
-        attribute.set_all_values(type=type, value=value, **kwargs)
-        self.attributes.append(attribute)
+        if isinstance(value, list):
+            for a in value:
+                self.add_attribute(type_, a, **kwargs)
+        else:
+            attribute.set_all_values(type=type_, value=value, **kwargs)
+            self.attributes.append(attribute)
