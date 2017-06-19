@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key,misp_verifycert
 import argparse
 
 
@@ -10,7 +10,7 @@ import argparse
 
 
 def init(url, key):
-    return PyMISP(url, key, True, 'json', debug=True)
+    return PyMISP(url, key, misp_verifycert, 'json', debug=True)
 
 
 def del_event(m, eventid):
