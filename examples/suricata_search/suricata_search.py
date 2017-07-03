@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+https://github.com/raw-data/pymisp-suricata_search
+
+    2017.06.28  start
+    2017.07.03  fixed args.quiet and status msgs
+
+"""
+
 import argparse
 import os
 import queue
@@ -15,7 +23,6 @@ except ImportError as err:
     sys.stderr.write("\t[try] with pip install pymisp\n")
     sys.stderr.write("\t[try] with pip3 install pymisp\n")
     sys.exit(1)
-
 
 HEADER = """
 #This part might still contain bugs, use and your own risk and report any issues.
@@ -150,7 +157,9 @@ def format_request(param, term, misp, quiet, output, thread, noevent):
 
     kwargs = {param: term}
 
-    print ("[+] Searching for: {}".format(kwargs))
+    if not quiet:
+        print ("[+] Searching for: {}".format(kwargs))
+
     search(misp, quiet, noevent, **kwargs)
 
     # collect Suricata rules
@@ -181,7 +190,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.output is not None and os.path.exists(args.output):
+    if args.output is not None and os.path.exists(args.output) and not args.quiet:
         try:
             check = input("[!] Output file {} exists, do you want to continue [Y/n]? ".format(args.output))
             if check not in ["Y","y"]:
@@ -191,8 +200,7 @@ if __name__ == "__main__":
 
     if not args.quiet:
         print ("[i] Connecting to MISP instance: {}".format(misp_url))
-
-    print ("[i] Note: duplicated IDS rules will be removed")
+        print ("[i] Note: duplicated IDS rules will be removed")
 
     # Based on # of terms, format request
     if "," in args.search:
@@ -201,9 +209,8 @@ if __name__ == "__main__":
             misp = init()
             format_request(args.param, term, misp, args.quiet, args.output, args.thread, args.noevent)
     else:
-        if not args.quiet:
-            misp = init()
-            format_request(args.param, args.search, misp, args.quiet, args.output, args.thread, args.noevent)
+        misp = init()
+        format_request(args.param, args.search, misp, args.quiet, args.output, args.thread, args.noevent)
 
     # return collected rules
     return_rules(args.output, args.quiet)
