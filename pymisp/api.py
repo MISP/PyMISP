@@ -1501,6 +1501,48 @@ class PyMISP(object):
         response = session.get(url)
         return self._check_response(response)
 
+    def view_feeds(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds')
+        response = session.get(url)
+        return self._check_response(response)
+
+    def view_feed(self, feed_ids):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds/view/{}'.format(feed_ids))
+        response = session.get(url)
+        return self._check_response(response)
+
+    def cache_feeds_all(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds/cacheFeeds/all')
+        response = session.get(url)
+        return self._check_response(response)
+
+    def cache_feed(self, feed_id):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds/cacheFeeds/{}'.format(feed_id))
+        response = session.get(url)
+        return self._check_response(response)
+
+    def cache_feeds_freetext(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds/cacheFeeds/freetext')
+        response = session.get(url)
+        return self._check_response(response)
+
+    def cache_feeds_misp(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds/cacheFeeds/misp')
+        response = session.get(url)
+        return self._check_response(response)
+
+    def compare_feeds(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds/compareFeeds')
+        response = session.get(url)
+        return self._check_response(response)
+
     # ###########################
     # ####### Deprecated ########
     # ###########################
