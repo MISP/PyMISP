@@ -1502,6 +1502,16 @@ class PyMISP(object):
         return self._check_response(response)
 
     # ###########################
+    # ###   Cache All Feeds   ###
+    # ###########################
+
+    def cache_all_feeds(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'feeds/cacheFeeds/all')
+        response = session.post(url)
+        return self._check_response(response)
+
+    # ###########################
     # ####### Deprecated ########
     # ###########################
 
