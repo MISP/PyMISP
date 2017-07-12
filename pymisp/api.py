@@ -206,7 +206,7 @@ class PyMISP(object):
             raise PyMISPError('Unknown error: {}'.format(response.text))
 
         errors = []
-        if isinstance(to_return, list):
+        if isinstance(to_return, (list, str)):
             to_return = {'response': to_return}
         if to_return.get('error'):
             if not isinstance(to_return['error'], list):
