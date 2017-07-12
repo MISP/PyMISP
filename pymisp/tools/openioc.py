@@ -226,12 +226,12 @@ def set_values(value1, value2=None):
     else:
         # Unknown mapping, assign to default
         attribute_values['category'] = 'External analysis'
-        attribute_values['type'] = 'other'
+        attribute_values['type_'] = 'other'
 
     # change value to composite
     # 127.0.0.1:80 ip-* to 127.0.0.1|80 ip-*|port
-    if attribute_values['type'] in ['ip-src', 'ip-dst'] and attribute_values['value'].count(':') == 1:
-        attribute_values['type'] = attribute_values['type'] + '|port'
+    if attribute_values['type_'] in ['ip-src', 'ip-dst'] and attribute_values['value'].count(':') == 1:
+        attribute_values['type_'] = attribute_values['type_'] + '|port'
         attribute_values['value'] = attribute_values['value'].replace(':', '|')
 
     attribute_values["comment"] = '{}{}'.format(extract_field(value1, 'Comment'),
