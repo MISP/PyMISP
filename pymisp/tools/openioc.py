@@ -151,7 +151,7 @@ def extract_field(report, field_name):
         data = report.find(field_name.lower())
         if data and hasattr(data, 'text'):
             return data.text
-    return None
+    return ''
 
 
 def load_openioc_file(openioc_path):
