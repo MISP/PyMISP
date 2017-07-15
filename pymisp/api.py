@@ -185,15 +185,19 @@ class PyMISP(object):
                             else:
                                 messages.append('Error in {}: {}'.format(where, msg))
                     else:
-                        for e in errors:
-                            if not e:
-                                continue
-                            if isinstance(e, basestring):
-                                messages.append(e)
-                                continue
-                            for type_e, msgs in e.items():
-                                for m in msgs:
-                                    messages.append('Error in {}: {}'.format(where, m))
+                        if isinstance(errors, list):
+                            for e in errors:
+                                if not e:
+                                    continue
+                                if isinstance(e, basestring):
+                                    messages.append(e)
+                                    continue
+                                for type_e, msgs in e.items():
+                                    for m in msgs:
+                                        messages.append('Error in {}: {}'.format(where, m))
+                        else:
+                            messages.append('{} ({})'.format(errors, where))
+
         return messages
 
     def _check_response(self, response):
