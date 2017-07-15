@@ -1445,6 +1445,22 @@ class PyMISP(object):
         response = session.post(url, data=json.dumps(jdata))
         return self._check_response(response)
 
+    # ############## Roles ##################
+
+    def get_roles_list(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, '/admin/roles')
+        response = session.get(url)
+        return self._check_response(response)['response']
+
+    # ############## Tags ##################
+
+    def get_tags_list(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, '/tags')
+        response = session.get(url)
+        return self._check_response(response)['Tag']
+
     # ##############################################
     # ############### Non-JSON output ##############
     # ##############################################
