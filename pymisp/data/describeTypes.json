@@ -69,6 +69,10 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "email-body": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
       "float": {
         "default_category": "Other",
         "to_ids": 0
@@ -544,6 +548,10 @@
       "mobile-application-id": {
         "default_category": "Payload delivery",
         "to_ids": 1
+      },
+      "cortex": {
+        "default_category": "External analysis",
+        "to_ids": 0
       }
     },
     "types": [
@@ -564,6 +572,7 @@
       "email-dst",
       "email-subject",
       "email-attachment",
+      "email-body",
       "float",
       "url",
       "http-method",
@@ -682,7 +691,8 @@
       "place-port-of-clearance",
       "place-port-of-onward-foreign-destination",
       "passenger-name-record-locator-number",
-      "mobile-application-id"
+      "mobile-application-id",
+      "cortex"
     ],
     "categories": [
       "Internal reference",
@@ -767,6 +777,7 @@
         "email-dst",
         "email-subject",
         "email-attachment",
+        "email-body",
         "url",
         "user-agent",
         "AS",
@@ -975,7 +986,8 @@
         "text",
         "x509-fingerprint-sha1",
         "github-repository",
-        "other"
+        "other",
+        "cortex"
       ],
       "Financial fraud": [
         "btc",
