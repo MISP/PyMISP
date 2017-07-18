@@ -920,78 +920,63 @@ class PyMISP(object):
         :param deleted: also return the deleted attributes
         :param async_callback: The function to run when results are returned
         """
+        query = {}
         # Event:     array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'searchall', 'metadata', 'published');
         # Attribute: array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'to_ids', 'deleted');
-        val = self.__prepare_rest_search(kwargs.get('values'), kwargs.get('not_values'))
-        query = {}
+        val = self.__prepare_rest_search(kwargs.pop('values', None), kwargs.pop('not_values', None))
         if len(val) != 0:
             query['value'] = val
 
-        if kwargs.get('type_attribute'):
-            query['type'] = kwargs.get('type_attribute')
+        query['type'] = kwargs.pop('type_attribute', None)
+        query['category'] = kwargs.pop('category', None)
+        query['org'] = kwargs.pop('org', None)
 
-        if kwargs.get('category'):
-            query['category'] = kwargs.get('category')
-
-        if kwargs.get('org') is not None:
-            query['org'] = kwargs.get('org')
-
-        tag = self.__prepare_rest_search(kwargs.get('tags'), kwargs.get('not_tags'))
+        tag = self.__prepare_rest_search(kwargs.pop('tags', None), kwargs.pop('not_tags', None))
         if len(tag) != 0:
             query['tags'] = tag
 
-        if kwargs.get('date_from'):
-            if isinstance(kwargs.get('date_from'), datetime.date) or isinstance(kwargs.get('date_from'), datetime.datetime):
-                query['from'] = kwargs.get('date_from').strftime('%Y-%m-%d')
+        date_from = kwargs.pop('date_from', None)
+        if date_from:
+            if isinstance(date_from, datetime.date) or isinstance(date_from, datetime.datetime):
+                query['from'] = date_from.strftime('%Y-%m-%d')
             else:
-                query['from'] = kwargs.get('date_from')
+                query['from'] = date_from
 
-        if kwargs.get('date_to'):
-            if isinstance(kwargs.get('date_to'), datetime.date) or isinstance(kwargs.get('date_to'), datetime.datetime):
-                query['to'] = kwargs.get('date_to').strftime('%Y-%m-%d')
+        date_to = kwargs.pop('date_to', None)
+        if date_to:
+            if isinstance(date_to, datetime.date) or isinstance(date_to, datetime.datetime):
+                query['to'] = date_to.strftime('%Y-%m-%d')
             else:
-                query['to'] = kwargs.get('date_to')
+                query['to'] = date_to
 
-        if kwargs.get('last'):
-            query['last'] = kwargs.get('last')
+        query['last'] = kwargs.pop('last', None)
+        query['eventid'] = kwargs.pop('eventid', None)
+        query['withAttachments'] = kwargs.pop('withAttachments', None)
 
-        if kwargs.get('eventid'):
-            query['eventid'] = kwargs.get('eventid')
-
-        if kwargs.get('withAttachments'):
-            query['withAttachments'] = kwargs.get('withAttachments')
-
-        if kwargs.get('uuid'):
-            if self._valid_uuid(kwargs.get('uuid')):
-                query['uuid'] = kwargs.get('uuid')
+        uuid = kwargs.pop('uuid', None)
+        if uuid:
+            if self._valid_uuid(uuid):
+                query['uuid'] = uuid
             else:
                 return {'error': 'You must enter a valid uuid.'}
 
-        if kwargs.get('publish_timestamp'):
-            query['publish_timestamp'] = kwargs.get('publish_timestamp')
-
-        if kwargs.get('timestamp'):
-            query['timestamp'] = kwargs.get('timestamp')
-
-        if kwargs.get('enforceWarninglist'):
-            query['enforceWarninglist'] = kwargs.get('enforceWarninglist')
-
-        if kwargs.get('to_ids') is not None:
-            query['to_ids'] = kwargs.get('to_ids')
-
-        if kwargs.get('deleted') is not None:
-            query['deleted'] = kwargs.get('deleted')
+        query['publish_timestamp'] = kwargs.pop('publish_timestamp', None)
+        query['timestamp'] = kwargs.pop('timestamp', None)
+        query['enforceWarninglist'] = kwargs.pop('enforceWarninglist', None)
+        query['to_ids'] = kwargs.pop('to_ids', None)
+        query['deleted'] = kwargs.pop('deleted', None)
 
         if controller == 'events':
             # Event search only:
-            if kwargs.get('searchall'):
-                query['searchall'] = kwargs.get('searchall')
+            query['searchall'] = kwargs.pop('searchall', None)
+            query['metadata'] = kwargs.pop('metadata', None)
+            query['published'] = kwargs.pop('published', None)
 
-            if kwargs.get('metadata') is not None:
-                query['metadata'] = kwargs.get('metadata')
+        # Cleanup
+        query = {k: v for k, v in query.items() if v is not None}
 
-            if kwargs.get('published') is not None:
-                query['published'] = kwargs.get('published')
+        if kwargs:
+            raise SearchError('Unused parameter: {}'.format(', '.join(kwargs.keys())))
 
         # Create a session, make it async if and only if we have a callback
         session = self.__prepare_session(async_implemented=(async_callback is not None))
