@@ -685,16 +685,20 @@ class PyMISP(object):
         to_post['request']['comment'] = comment
         return to_post
 
-    def _encode_file_to_upload(self, path):
-        with open(path, 'rb') as f:
-            return base64.b64encode(f.read()).decode()
+    def _encode_file_to_upload(self, filepath_or_bytes):
+        if isinstance(filepath_or_bytes, basestring) and os.path.isfile(filepath_or_bytes):
+            with open(filepath_or_bytes, 'rb') as f:
+                binblob = f.read()
+        else:
+            binblob = filepath_or_bytes
+        return base64.b64encode(binblob).decode()
 
-    def upload_sample(self, filename, filepath, event_id, distribution=None,
+    def upload_sample(self, filename, filepath_or_bytes, event_id, distribution=None,
                       to_ids=True, category=None, comment=None, info=None,
                       analysis=None, threat_level_id=None):
         to_post = self._prepare_upload(event_id, distribution, to_ids, category,
                                        comment, info, analysis, threat_level_id)
-        to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath)}]
+        to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath_or_bytes)}]
         return self._upload_sample(to_post)
 
     def upload_samplelist(self, filepaths, event_id, distribution=None,
