@@ -993,15 +993,22 @@ class PyMISP(object):
         session = self.__prepare_session(async_implemented=(async_callback is not None))
         return self.__query(session, 'restSearch/download', query, controller, async_callback)
 
-    def get_attachment(self, event_id):
-        """Get attachement of an event (not sample)
+    def get_attachment(self, attribute_id):
+        """Get an attachement (not a malware sample) by attribute ID.
+        Returns the attachment as a bytestream, or a dictionary containing the error message.
 
-        :param event_id: Event id from where the attachements will be fetched
+        :param attribute_id: Attribute ID to fetched
         """
-        attach = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(event_id))
+        attach = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(attribute_id))
         session = self.__prepare_session()
         response = session.get(attach)
-        return self._check_response(response)
+        try:
+            response.json()
+            # The query fails, response contains a json blob
+            return self._check_response(response)
+        except ValueError:
+            # content contains the attachment in binary
+            return response.content
 
     def get_yara(self, event_id):
         to_post = {'request': {'eventid': event_id, 'type': 'yara'}}
