@@ -110,7 +110,9 @@ class PyMISP(object):
         try:
             # Make sure the MISP instance is working and the URL is valid
             response = self.get_recommended_api_version()
-            if not response.get('version'):
+            if response.get('errors'):
+                logger.warning(response.get('errors')[0])
+            elif not response.get('version'):
                 logger.warning("Unable to check the recommended PyMISP version (MISP <2.4.60), please upgrade.")
             else:
                 pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))
@@ -276,6 +278,13 @@ class PyMISP(object):
     # ################################################
     # ############### Simple REST API ################
     # ################################################
+
+    def test_connexion(self):
+        """Test the auth key"""
+        response = self.get_version()
+        if response.get('errors'):
+            raise PyMISPError(response.get('errors')[0])
+        return True
 
     def get_index(self, filters=None):
         """Return the index.
