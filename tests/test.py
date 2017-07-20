@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-
 from pymisp import PyMISP
 from keys import url, key
 import time
