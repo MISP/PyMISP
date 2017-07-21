@@ -125,6 +125,10 @@
         "default_category": "Payload installation",
         "to_ids": 1
       },
+      "cookie": {
+        "default_category": "Network activity",
+        "to_ids": 0
+      },
       "vulnerability": {
         "default_category": "External analysis",
         "to_ids": 0
@@ -586,6 +590,7 @@
       "pattern-in-memory",
       "yara",
       "sigma",
+      "cookie",
       "vulnerability",
       "attachment",
       "malware-sample",
@@ -854,7 +859,8 @@
         "text",
         "hex",
         "x509-fingerprint-sha1",
-        "other"
+        "other",
+        "cookie"
       ],
       "Payload installation": [
         "md5",
@@ -933,7 +939,8 @@
         "text",
         "x509-fingerprint-sha1",
         "other",
-        "hex"
+        "hex",
+        "cookie"
       ],
       "Payload type": [
         "comment",
