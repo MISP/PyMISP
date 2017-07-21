@@ -279,7 +279,7 @@ class PyMISP(object):
     # ############### Simple REST API ################
     # ################################################
 
-    def test_connexion(self):
+    def test_connection(self):
         """Test the auth key"""
         response = self.get_version()
         if response.get('errors'):
