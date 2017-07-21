@@ -1578,6 +1578,18 @@ class PyMISP(object):
         response = session.post(url)
         return self._check_response(response)
 
+    # ###################
+    # ###   Objects   ###
+    # ###################
+
+    def add_object(self, event_id, template_id, misp_object):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'objectTemplates/add/{}/{}'.format(event_id, template_id))
+        if not misp_object.get('object'):
+            misp_object = {'object': misp_object}
+        response = session.post(url, data=json.dumps(misp_object))
+        return self._check_response(response)
+
     # ###########################
     # ####### Deprecated ########
     # ###########################

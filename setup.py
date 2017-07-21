@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup
 import pymisp
@@ -29,5 +29,6 @@ setup(
     test_suite="tests",
     install_requires=['requests', 'python-dateutil', 'jsonschema'],
     include_package_data=True,
-    package_data={'data': ['schema.json', 'schema-lax.json', 'describeTypes.json']},
+    package_data={'pymisp': ['data/*.json', 'data/misp-objects/schema.json',
+                             'data/misp-objects/objects/*/definition.json']},
 )
