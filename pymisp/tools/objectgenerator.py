@@ -7,7 +7,7 @@ import json
 import uuid
 import abc
 import sys
-import six
+import six  # Remove that import when discarding python2 support.
 
 
 class MISPObjectException(Exception):
@@ -72,7 +72,7 @@ class MISPObjectGenerator():
             # Set all the values in the MISP attribute
             attribute.set_all_values(**value)
             # Finalize the actual MISP Object
-            new_object['ObjectAttribute'].append({'type': object_type, 'Attribute': attribute._json()})
+            new_object['Attribute'].append({'type': object_type, 'Attribute': attribute._json()})
         return new_object
 
     def _validate(self, dump):
@@ -95,7 +95,7 @@ class MISPObjectGenerator():
         """Create a new empty object out of the template"""
         return {'name': object_definiton['name'], 'meta-category': object_definiton['meta-category'],
                 'uuid': self.uuid, 'description': object_definiton['description'],
-                'version': object_definiton['version'], 'ObjectAttribute': []}
+                'version': object_definiton['version'], 'Attribute': []}
 
     @abc.abstractmethod
     def generate_attributes(self):

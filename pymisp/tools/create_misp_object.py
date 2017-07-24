@@ -32,7 +32,7 @@ def make_binary_objects(filepath):
     try:
         lief_parsed = lief.parse(filepath)
         if isinstance(lief_parsed, lief.PE.Binary):
-            make_pe_objects(lief_parsed, misp_file)
+            return make_pe_objects(lief_parsed, misp_file)
         elif isinstance(lief_parsed, lief.ELF.Binary):
             raise FileTypeNotImplemented('ELF not implemented yet.')
         elif isinstance(lief_parsed, lief.MachO.Binary):

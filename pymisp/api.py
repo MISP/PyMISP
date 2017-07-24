@@ -1584,11 +1584,22 @@ class PyMISP(object):
 
     def add_object(self, event_id, template_id, misp_object):
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'objectTemplates/add/{}/{}'.format(event_id, template_id))
-        if not misp_object.get('object'):
-            misp_object = {'object': misp_object}
+        url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
         response = session.post(url, data=json.dumps(misp_object))
         return self._check_response(response)
+
+    def get_object_templates_list(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'objectTemplates')
+        response = session.get(url)
+        return self._check_response(response)['response']
+
+    def get_object_template_id(self, object_name):
+        templates = self.get_object_templates_list()
+        for t in templates:
+            if t['ObjectTemplate']['name'] == object_name:
+                return t['ObjectTemplate']['id']
+        raise Exception('Unable to find template name {} on the MISP instance'.format(object_name))
 
     # ###########################
     # ####### Deprecated ########
