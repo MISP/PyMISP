@@ -50,7 +50,12 @@ except NameError:
 
 class MISPAttribute(object):
 
-    def __init__(self, describe_types):
+    def __init__(self, describe_types=None):
+        if not describe_types:
+            with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
+                t = json.load(f)
+            describe_types = t['result']
+        self.describe_types = describe_types
         self.categories = describe_types['categories']
         self.types = describe_types['types']
         self.category_type_mapping = describe_types['category_type_mappings']
