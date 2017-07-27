@@ -53,6 +53,7 @@ class MISPAttribute(object):
 
     def __init__(self, describe_types=None):
         if not describe_types:
+            self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
             with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
                 t = json.load(f)
             describe_types = t['result']
