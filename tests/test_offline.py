@@ -25,8 +25,8 @@ class TestOffline(unittest.TestCase):
             self.event = {'Event': json.load(f)}
         with open('tests/new_misp_event.json', 'r') as f:
             self.new_misp_event = {'Event': json.load(f)}
-        self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../pymisp/data')
-        with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
+        self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../pymisp/data')
+        with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
             self.types = json.load(f)
         with open('tests/sharing_groups.json', 'r') as f:
             self.sharing_groups = json.load(f)
@@ -155,12 +155,12 @@ class TestOffline(unittest.TestCase):
         p = MockPyMISP(self.domain, self.key)
         evt = p.get(1)
         self.assertEqual(3, p.add_hashes(evt, md5='68b329da9893e34099c7d8ad5cb9c940',
-                          sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
-                          sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b',
-                          filename='foobar.exe'))
+                         sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
+                         sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b',
+                         filename='foobar.exe'))
         self.assertEqual(3, p.add_hashes(evt, md5='68b329da9893e34099c7d8ad5cb9c940',
-                          sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
-                          sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b'))
+                         sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
+                         sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b'))
         p.av_detection_link(evt, 'https://foocorp.com')
         p.add_detection_name(evt, 'WATERMELON')
         p.add_filename(evt, 'foobar.exe')

@@ -101,7 +101,7 @@ class PyMISP(object):
             warnings.warn("You turned on Async, but don't have requests_futures installed")
             self.asynch = False
 
-        self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+        self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
         if debug is not None:
@@ -136,7 +136,7 @@ class PyMISP(object):
             if not self.describe_types.get('sane_defaults'):
                 raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
         except Exception:
-            with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
+            with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
                 describe_types = json.load(f)
             self.describe_types = describe_types['result']
 

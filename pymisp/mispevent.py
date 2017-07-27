@@ -52,8 +52,8 @@ class MISPAttribute(object):
 
     def __init__(self, describe_types=None):
         if not describe_types:
-            self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-            with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
+            self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+            with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
                 t = json.load(f)
             describe_types = t['result']
         self.describe_types = describe_types
@@ -289,15 +289,15 @@ def _int_to_str(d):
 class MISPEvent(object):
 
     def __init__(self, describe_types=None, strict_validation=False):
-        self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+        self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
-            with open(os.path.join(self.ressources_path, 'schema.json'), 'r') as f:
+            with open(os.path.join(self.resources_path, 'schema.json'), 'r') as f:
                 self.json_schema = json.load(f)
         else:
-            with open(os.path.join(self.ressources_path, 'schema-lax.json'), 'r') as f:
+            with open(os.path.join(self.resources_path, 'schema-lax.json'), 'r') as f:
                 self.json_schema = json.load(f)
         if not describe_types:
-            with open(os.path.join(self.ressources_path, 'describeTypes.json'), 'r') as f:
+            with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
                 t = json.load(f)
             describe_types = t['result']
         self.describe_types = describe_types
