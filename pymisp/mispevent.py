@@ -75,6 +75,7 @@ class MISPAttribute(object):
         self.data = None
         self.encrypt = False
         self.id = None
+        self.event_id = None
         self.uuid = None
         self.timestamp = None
         self.sharing_group_id = None
@@ -167,6 +168,8 @@ class MISPAttribute(object):
             self._load_data()
         if kwargs.get('id'):
             self.id = int(kwargs['id'])
+        if kwargs.get('event_id'):
+            self.event_id = int(kwargs['event_id'])
         if kwargs.get('uuid'):
             self.uuid = kwargs['uuid']
         if kwargs.get('timestamp'):
@@ -241,6 +244,8 @@ class MISPAttribute(object):
 
     def _json_full(self):
         to_return = self._json()
+        if self.event_id:
+            to_return['event_id'] = self.event_id
         if self.id:
             to_return['id'] = self.id
         if self.timestamp:
