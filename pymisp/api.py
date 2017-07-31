@@ -371,7 +371,21 @@ class PyMISP(object):
         else:
             eid = e.id
         return self.update_event(eid, e)
-
+    
+    def publish_event_alert(self, event_id):
+        """Publish event (sending emails)
+        :param eventID: Event id to publish
+        :return publish status
+        """
+        event = self._make_mispevent(self.get_event(event_id))
+        if event.published:
+            return {'error': 'Already published'}
+        else:
+            session = self.__prepare_session()
+            url = urljoin(self.root_url, 'events/alert/{}'.format(event_id))
+            response = session.post(url)
+        return self._check_response(response)
+    
     def publish(self, event):
         e = self._make_mispevent(event)
         if e.published:
