@@ -1454,7 +1454,7 @@ class PyMISP(object):
 
     def get_roles_list(self):
         session = self.__prepare_session()
-        url = urljoin(self.root_url, '/admin/roles')
+        url = urljoin(self.root_url, '/roles')
         response = session.get(url)
         return self._check_response(response)['response']
 
