@@ -392,6 +392,8 @@ class PyMISP(object):
         else:
             url = urljoin(self.root_url, 'events/alert/{}'.format(event_id))
         response = session.post(url)
+        return self._check_response(response)
+
         
     def change_threat_level(self, event, threat_level_id):
         e = self._make_mispevent(event)
