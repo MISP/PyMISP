@@ -357,6 +357,12 @@ class PyMISP(object):
         response = session.delete(url)
         return self._check_response(response)
 
+    def pushEventToZMQ(self, event_id):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'events/pushEventToZMQ/{}.json'.format(event_id))
+        response = session.post(url)
+        return self._check_response(response)
+
     # ##############################################
     # ############### Event handling ###############
     # ##############################################
