@@ -81,16 +81,6 @@ class TestOffline(unittest.TestCase):
         d = pymisp.delete_attribute(2)
         self.assertEqual(d, {'message': 'Attribute deleted.'})
 
-    def test_publish(self, m):
-        self.initURI(m)
-        pymisp = PyMISP(self.domain, self.key)
-        e = pymisp.publish(self.event)  # requests-mock always return the non-published event
-        pub = self.event
-        pub['Event']['published'] = True
-        # self.assertEqual(e, pub) FIXME: broken test, not-published event returned
-        e = pymisp.publish(self.event)
-        self.assertEqual(e, {'error': 'Already published'})
-
     def test_getVersions(self, m):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)

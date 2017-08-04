@@ -377,19 +377,18 @@ class PyMISP(object):
         else:
             eid = e.id
         return self.update_event(eid, e)
-    
+
     def publish(self, event, alert=True):
         """Publish event (with or without alert email)
         :param event: pass event or event id (as string or int) to publish
         :param alert: set to True by default (send alerting email) if False will not send alert
         :return publish status
         """
-        if type(event) is int or type(event) is str:
+        if isinstance(event, int) or (isinstance(event, basestring) and event.is_digit()):
             full_event = self._make_mispevent(self.get_event(event))
-            event_id = event
         else:
             full_event = self._make_mispevent(event)
-            event_id = full_event.id
+        event_id = full_event.id
         if full_event.published:
             return {'error': 'Already published'}
         session = self.__prepare_session()
@@ -400,7 +399,6 @@ class PyMISP(object):
         response = session.post(url)
         return self._check_response(response)
 
-        
     def change_threat_level(self, event, threat_level_id):
         e = self._make_mispevent(event)
         e.threat_level_id = threat_level_id
