@@ -21,7 +21,7 @@ PyMISP allows you to fetch events, add or update events/attributes, add or updat
 pip3 install pymisp
 ```
 
-## Install the lastest version from repo
+## Install the latest version from repo
 
 ```
 git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
