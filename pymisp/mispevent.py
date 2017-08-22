@@ -581,7 +581,8 @@ class MISPEvent(object):
     def add_attribute_tag(self, tag, attribute_identifier):
         attribute = None
         for a in self.attributes:
-            if a.id == attribute_identifier or a.uuid == attribute_identifier or attribute_identifier in a.value:
+            if (a.id == attribute_identifier or a.uuid == attribute_identifier or 
+                    attribute_identifier == a.value or attribute_identifier in a.value.split('|')):
                 a.add_tag(tag)
                 attribute = a
         if not attribute:
