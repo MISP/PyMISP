@@ -18,7 +18,7 @@ try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
 from io import BytesIO, open
 import zipfile
 

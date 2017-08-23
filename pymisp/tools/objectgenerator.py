@@ -21,7 +21,7 @@ class InvalidMISPObject(MISPObjectException):
 
 if six.PY2:
     import warnings
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
 
 
 class MISPObjectReference(AbstractMISP):
@@ -80,7 +80,14 @@ class MISPObjectGenerator(AbstractMISP):
             if attribute.value is None:
                 continue
             # Finalize the actual MISP Object
-            new_object['Attribute'].append({'object_relation': object_type, **attribute._json()})
+            # FIXME: This only works on python >= 3.5
+            # new_object['Attribute'].append({'object_relation': object_type, **attribute._json()})
+            # ### BEGIN ####
+            # Because we still need to support old python.
+            temp_attribute = {'object_relation': object_type}
+            temp_attribute.update(attribute._json())
+            new_object['Attribute'].append(temp_attribute)
+            # ###  END  ####
         return new_object, [r.to_dict() for r in self.references]
 
     def _validate(self):

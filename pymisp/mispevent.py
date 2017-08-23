@@ -43,7 +43,7 @@ from .exceptions import PyMISPError, NewEventError, NewAttributeError
 try:
     basestring
     unicode
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
 except NameError:
     basestring = str
     unicode = str
