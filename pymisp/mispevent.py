@@ -11,6 +11,7 @@ import base64
 from io import BytesIO
 from zipfile import ZipFile
 import hashlib
+from .abstract import AbstractMISP
 
 try:
     from dateutil.parser import parse
@@ -198,8 +199,7 @@ class MISPAttribute(object):
             self.malware_filename = self.value
         m = hashlib.md5()
         m.update(self.data.getvalue())
-        md5 = m.hexdigest()
-        self.value = '{}|{}'.format(self.malware_filename, md5)
+        self.value = self.malware_filename
         self.malware_binary = self.data
         self.encrypt = True
 
@@ -280,7 +280,7 @@ def _int_to_str(d):
     return d
 
 
-class MISPEvent(object):
+class MISPEvent(AbstractMISP):
 
     def __init__(self, describe_types=None, strict_validation=False):
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')

@@ -60,18 +60,21 @@ class PEObject(MISPObjectGenerator):
             return True
         return False
 
-    def generate_attributes(self):
+    def _get_pe_type(self):
         if self._is_dll():
-            self.pe_type = 'dll'
+            return 'dll'
         elif self._is_driver():
-            self.pe_type = 'driver'
+            return 'driver'
         elif self._is_exe():
-            self.pe_type = 'exe'
+            return 'exe'
         else:
-            self.pe_type = 'unknown'
+            return 'unknown'
+
+    def generate_attributes(self):
+        self._create_attribute('type', value=self._get_pe_type())
         # General information
-        self.entrypoint_address = self.pe.entrypoint
-        self.compilation_timestamp = datetime.utcfromtimestamp(self.pe.header.time_date_stamps).isoformat()
+        self._create_attribute('entrypoint-address', value=self.pe.entrypoint)
+        self._create_attribute('compilation-timestamp', value=datetime.utcfromtimestamp(self.pe.header.time_date_stamps).isoformat())
         # self.imphash = self.pe.get_imphash()
         try:
             if (self.pe.has_resources and
@@ -79,15 +82,15 @@ class PEObject(MISPObjectGenerator):
                     self.pe.resources_manager.version.has_string_file_info and
                     self.pe.resources_manager.version.string_file_info.langcode_items):
                 fileinfo = dict(self.pe.resources_manager.version.string_file_info.langcode_items[0].items.items())
-                self.original_filename = fileinfo.get('OriginalFilename')
-                self.internal_filename = fileinfo.get('InternalName')
-                self.file_description = fileinfo.get('FileDescription')
-                self.file_version = fileinfo.get('FileVersion')
-                self.lang_id = self.pe.resources_manager.version.string_file_info.langcode_items[0].key
-                self.product_name = fileinfo.get('ProductName')
-                self.product_version = fileinfo.get('ProductVersion')
-                self.company_name = fileinfo.get('CompanyName')
-                self.legal_copyright = fileinfo.get('LegalCopyright')
+                self._create_attribute('original-filename', value=fileinfo.get('OriginalFilename'))
+                self._create_attribute('internal-filename', value=fileinfo.get('InternalName'))
+                self._create_attribute('file-description', value=fileinfo.get('FileDescription'))
+                self._create_attribute('file-version', value=fileinfo.get('FileVersion'))
+                self._create_attribute('lang-id', value=self.pe.resources_manager.version.string_file_info.langcode_items[0].key)
+                self._create_attribute('product-name', value=fileinfo.get('ProductName'))
+                self._create_attribute('product-version', value=fileinfo.get('ProductVersion'))
+                self._create_attribute('company-name', value=fileinfo.get('CompanyName'))
+                self._create_attribute('legal-copyright', value=fileinfo.get('LegalCopyright'))
         except lief.read_out_of_bound:
             # The file is corrupted
             pass
@@ -97,45 +100,14 @@ class PEObject(MISPObjectGenerator):
             pos = 0
             for section in self.pe.sections:
                 s = PESectionObject(section)
-                self.add_link(s.uuid, 'Section {} of PE'.format(pos))
-                if ((self.entrypoint_address >= section.virtual_address) and
-                        (self.entrypoint_address < (section.virtual_address + section.virtual_size))):
-                    self.entrypoint_section = (section.name, pos)  # Tuple: (section_name, position)
+                self.add_reference(s.uuid, 'included-in', 'Section {} of PE'.format(pos))
+                if ((self.pe.entrypoint >= section.virtual_address) and
+                        (self.pe.entrypoint < (section.virtual_address + section.virtual_size))):
+                    self._create_attribute('entrypoint-section|position', value='{}|{}'.format(section.name, pos))
                 pos += 1
                 self.sections.append(s)
-        self.nb_sections = len(self.sections)
+        self._create_attribute('number-sections', value=len(self.sections))
         # TODO: TLSSection / DIRECTORY_ENTRY_TLS
-
-    def dump(self):
-        pe_object = {}
-        pe_object['type'] = {'value': self.pe_type}
-        if hasattr(self, 'imphash'):
-            pe_object['imphash'] = {'value': self.imphash}
-        if hasattr(self, 'original_filename'):
-            pe_object['original-filename'] = {'value': self.original_filename}
-        if hasattr(self, 'internal_filename'):
-            pe_object['internal-filename'] = {'value': self.internal_filename}
-        if hasattr(self, 'compilation_timestamp'):
-            pe_object['compilation-timestamp'] = {'value': self.compilation_timestamp}
-        if hasattr(self, 'entrypoint_section'):
-            pe_object['entrypoint-section|position'] = {'value': '{}|{}'.format(*self.entrypoint_section)}
-        if hasattr(self, 'entrypoint_address'):
-            pe_object['entrypoint-address'] = {'value': self.entrypoint_address}
-        if hasattr(self, 'file_description'):
-            pe_object['file-description'] = {'value': self.file_description}
-        if hasattr(self, 'file_version'):
-            pe_object['file-version'] = {'value': self.file_version}
-        if hasattr(self, 'lang_id'):
-            pe_object['lang-id'] = {'value': self.lang_id}
-        if hasattr(self, 'product_name'):
-            pe_object['product-name'] = {'value': self.product_name}
-        if hasattr(self, 'product_version'):
-            pe_object['product-version'] = {'value': self.product_version}
-        if hasattr(self, 'company_name'):
-            pe_object['company-name'] = {'value': self.company_name}
-        if hasattr(self, 'nb_sections'):
-            pe_object['number-sections'] = {'value': self.nb_sections}
-        return self._fill_object(pe_object)
 
 
 class PESectionObject(MISPObjectGenerator):
@@ -147,26 +119,13 @@ class PESectionObject(MISPObjectGenerator):
         self.generate_attributes()
 
     def generate_attributes(self):
-        self.name = self.section.name
-        self.size = self.section.size
-        if self.size > 0:
-            self.entropy = self.section.entropy
-            self.md5 = md5(self.data).hexdigest()
-            self.sha1 = sha1(self.data).hexdigest()
-            self.sha256 = sha256(self.data).hexdigest()
-            self.sha512 = sha512(self.data).hexdigest()
+        self._create_attribute('name', value=self.section.name)
+        self._create_attribute('size-in-bytes', value=self.section.size)
+        if getattr(self, 'size-in-bytes').value > 0:
+            self._create_attribute('entropy', value=self.section.entropy)
+            self._create_attribute('md5', value=md5(self.data).hexdigest())
+            self._create_attribute('sha1', value=sha1(self.data).hexdigest())
+            self._create_attribute('sha256', value=sha256(self.data).hexdigest())
+            self._create_attribute('sha512', value=sha512(self.data).hexdigest())
             if HAS_PYDEEP:
-                self.ssdeep = pydeep.hash_buf(self.data).decode()
-
-    def dump(self):
-        section = {}
-        section['name'] = {'value': self.name}
-        section['size-in-bytes'] = {'value': self.size}
-        if self.size > 0:
-            section['entropy'] = {'value': self.entropy}
-            section['md5'] = {'value': self.md5}
-            section['sha1'] = {'value': self.sha1}
-            section['sha256'] = {'value': self.sha256}
-            section['sha512'] = {'value': self.sha512}
-            section['ssdeep'] = {'value': self.ssdeep}
-        return self._fill_object(section)
+                self._create_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())

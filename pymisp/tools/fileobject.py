@@ -45,15 +45,17 @@ class FileObject(MISPObjectGenerator):
         self.generate_attributes()
 
     def generate_attributes(self):
-        self.size = len(self.data)
-        if self.size > 0:
-            self.entropy = self.__entropy_H(self.data)
-            self.md5 = md5(self.data).hexdigest()
-            self.sha1 = sha1(self.data).hexdigest()
-            self.sha256 = sha256(self.data).hexdigest()
-            self.sha512 = sha512(self.data).hexdigest()
-            self.filetype = magic.from_buffer(self.data)
-            self.ssdeep = pydeep.hash_buf(self.data).decode()
+        self._create_attribute('filename', value=self.filename)
+        self._create_attribute('size-in-bytes', value=len(self.data))
+        if getattr(self, 'size-in-bytes').value > 0:
+            self._create_attribute('entropy', value=self.__entropy_H(self.data))
+            self._create_attribute('md5', value=md5(self.data).hexdigest())
+            self._create_attribute('sha1', value=sha1(self.data).hexdigest())
+            self._create_attribute('sha256', value=sha256(self.data).hexdigest())
+            self._create_attribute('sha512', value=sha512(self.data).hexdigest())
+            self._create_attribute('mimetype', value=magic.from_buffer(self.data))
+            self._create_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
+            self._create_attribute('malware-sample', value=self.filename.value, data=self.pseudofile)
 
     def __entropy_H(self, data):
         """Calculate the entropy of a chunk of data."""
@@ -70,23 +72,3 @@ class FileObject(MISPObjectGenerator):
             entropy -= p_x * math.log(p_x, 2)
 
         return entropy
-
-    def dump(self):
-        file_object = {}
-        file_object['filename'] = {'value': self.filename}
-        file_object['size-in-bytes'] = {'value': self.size}
-        if self.size > 0:
-            file_object['entropy'] = {'value': self.entropy}
-            file_object['ssdeep'] = {'value': self.ssdeep}
-            file_object['sha512'] = {'value': self.sha512}
-            file_object['md5'] = {'value': self.md5}
-            file_object['sha1'] = {'value': self.sha1}
-            file_object['sha256'] = {'value': self.sha256}
-            file_object['malware-sample'] = {'value': '{}|{}'.format(self.filename, self.md5), 'data': self.pseudofile}
-            # file_object['authentihash'] = self.
-            # file_object['sha-224'] = self.
-            # file_object['sha-384'] = self.
-            # file_object['sha512/224'] = self.
-            # file_object['sha512/256'] = self.
-            # file_object['tlsh'] = self.
-        return self._fill_object(file_object)

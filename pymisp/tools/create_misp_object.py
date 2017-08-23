@@ -16,7 +16,7 @@ class FileTypeNotImplemented(MISPObjectException):
 
 def make_pe_objects(lief_parsed, misp_file):
     misp_pe = PEObject(parsed=lief_parsed)
-    misp_file.add_link(misp_pe.uuid, 'PE indicators')
+    misp_file.add_reference(misp_pe.uuid, 'included-in', 'PE indicators')
     file_object = misp_file.dump()
     pe_object = misp_pe.dump()
     pe_sections = []

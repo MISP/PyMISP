@@ -29,6 +29,8 @@ setup(
     test_suite="tests",
     install_requires=['requests', 'python-dateutil', 'jsonschema'],
     include_package_data=True,
-    package_data={'pymisp': ['data/*.json', 'data/misp-objects/schema.json',
-                             'data/misp-objects/objects/*/definition.json']},
+    package_data={'pymisp': ['data/*.json', 'data/misp-objects/schema_objects.json',
+                             'data/misp-objects/schema_relationships.json',
+                             'data/misp-objects/objects/*/definition.json',
+                             'data/misp-objects/relationships/definition.json']},
 )

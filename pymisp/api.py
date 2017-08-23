@@ -1588,6 +1588,12 @@ class PyMISP(object):
         response = session.post(url, data=json.dumps(misp_object))
         return self._check_response(response)
 
+    def add_object_reference(self, parent_uuid, misp_object_reference):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'object_references/add/{}'.format(parent_uuid))
+        response = session.post(url, data=json.dumps(misp_object_reference))
+        return self._check_response(response)
+
     def get_object_templates_list(self):
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'objectTemplates')

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import MISPEvent, MISPAttribute
+from pymisp import MISPEvent, MISPAttribute, AbstractMISP
 import os
 import json
 import uuid
@@ -24,9 +24,17 @@ if six.PY2:
     warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
 
 
-@six.add_metaclass(abc.ABCMeta)   # Remove that line when discarding python2 support.
-# Python3 way: class MISPObjectGenerator(metaclass=abc.ABCMeta):
-class MISPObjectGenerator():
+class MISPObjectReference(AbstractMISP):
+
+    attributes = ['uuid', 'relationship_type', 'comment']
+
+    def __init__(self, uuid, relationship_type, comment=None):
+        self['uuid'] = uuid
+        self['relationship_type'] = relationship_type
+        self['comment'] = comment
+
+
+class MISPObjectGenerator(AbstractMISP):
 
     def __init__(self, template_dir):
         """This class is used to fill a new MISP object with the default values defined in the object template
@@ -38,46 +46,46 @@ class MISPObjectGenerator():
             'data', 'misp-objects', 'objects')
         with open(os.path.join(self.misp_objects_path, template_dir, 'definition.json'), 'r') as f:
             self.definition = json.load(f)
+        self.attributes = self.definition['attributes'].keys()
         self.misp_event = MISPEvent()
         self.uuid = str(uuid.uuid4())
-        self.links = []
+        self.references = []
 
-    def _fill_object(self, values, strict=True):
+    def _create_attribute(self, object_type, **value):
+        if value.get('value') is None:
+            return None
+        # Initialize the new MISPAttribute
+        # Get the misp attribute type from the definition
+        value['type'] = self.definition['attributes'][object_type]['misp-attribute']
+        if value.get('disable_correlation') is None:
+            # The correlation can be disabled by default in the object definition.
+            # Use this value if it isn't overloaded by the object
+            value['disable_correlation'] = self.definition['attributes'][object_type].get('disable_correlation')
+        if value.get('to_ids') is None:
+            # Same for the to_ids flag
+            value['to_ids'] = self.definition['attributes'][object_type].get('to_ids')
+        # Set all the values in the MISP attribute
+        attribute = MISPAttribute(self.misp_event.describe_types)
+        attribute.set_all_values(**value)
+        self[object_type] = attribute
+
+    def dump(self, strict=True):
         """Create a new object with the values gathered by the sub-class, use the default values from the template if needed"""
         if strict:
-            self._validate(values)
+            self._validate()
         # Create an empty object based om the object definition
         new_object = self.__new_empty_object(self.definition)
-        if self.links:
-            # Set the links to other objects
-            new_object["ObjectReference"] = []
-            for link in self.links:
-                uuid, comment = link
-                new_object['ObjectReference'].append({'referenced_object_uuid': uuid, 'comment': comment})
-        for object_type, value in values.items():
+        for object_type, attribute in self.items():
             # Add all the values as MISPAttributes to the current object
-            if value.get('value') is None:
+            if attribute.value is None:
                 continue
-            # Initialize the new MISPAttribute
-            attribute = MISPAttribute(self.misp_event.describe_types)
-            # Get the misp attribute type from the definition
-            value['type'] = self.definition['attributes'][object_type]['misp-attribute']
-            if value.get('disable_correlation') is None:
-                # The correlation can be disabled by default in the object definition.
-                # Use this value if it isn't overloaded by the object
-                value['disable_correlation'] = self.definition['attributes'][object_type].get('disable_correlation')
-            if value.get('to_ids') is None:
-                # Same for the to_ids flag
-                value['to_ids'] = self.definition['attributes'][object_type].get('to_ids')
-            # Set all the values in the MISP attribute
-            attribute.set_all_values(**value)
             # Finalize the actual MISP Object
-            new_object['Attribute'].append({'type': object_type, 'Attribute': attribute._json()})
-        return new_object
+            new_object['Attribute'].append({'object_relation': object_type, **attribute._json()})
+        return new_object, [r.to_dict() for r in self.references]
 
-    def _validate(self, dump):
+    def _validate(self):
         """Make sure the object we're creating has the required fields"""
-        all_attribute_names = set(dump.keys())
+        all_attribute_names = set(self.keys())
         if self.definition.get('requiredOneOf'):
             if not set(self.definition['requiredOneOf']) & all_attribute_names:
                 raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self.definition['requiredOneOf'])))
@@ -87,9 +95,9 @@ class MISPObjectGenerator():
                     raise InvalidMISPObject('{} is required is required'.format(r))
         return True
 
-    def add_link(self, uuid, comment=None):
+    def add_reference(self, uuid, relationship_type, comment=None):
         """Add a link (uuid) to an other object"""
-        self.links.append((uuid, comment))
+        self.references.append(MISPObjectReference(uuid, relationship_type, comment))
 
     def __new_empty_object(self, object_definiton):
         """Create a new empty object out of the template"""
@@ -100,11 +108,4 @@ class MISPObjectGenerator():
     @abc.abstractmethod
     def generate_attributes(self):
         """Contains the logic where all the values of the object are gathered"""
-        pass
-
-    @abc.abstractmethod
-    def dump(self):
-        """This method normalize the attributes to add to the object.
-        It returns an python dictionary where the key is the type defined in the object,
-        and the value the value of the MISP Attribute"""
         pass

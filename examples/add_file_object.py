@@ -7,7 +7,7 @@ import traceback
 from keys import misp_url, misp_key, misp_verifycert
 import glob
 import argparse
-
+import json
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract indicators out of binaries and add MISP objects to a MISP instance.')
@@ -18,31 +18,27 @@ if __name__ == '__main__':
     pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     for f in glob.glob(args.path):
-        print('\n', f)
         try:
             fo, peo, seos = make_binary_objects(f)
         except Exception as e:
             traceback.print_exc()
-            continue
-        if fo:
-            template_id = pymisp.get_object_template_id(fo['name'])
-            try:
-                response = pymisp.add_object(args.event, template_id, fo)
-                print(response)
-            except Exception as e:
-                traceback.print_exc()
-                continue
-        continue
-        if peo:
-            template_id = pymisp.get_object_template_id(peo['name'])
-            print(template_id)
-            r = pymisp.add_object(args.event, template_id, peo)
-            print(r)
-        continue
+
         if seos:
             for s in seos:
-                print(s)
-                template_id = pymisp.get_object_template_id(s['name'])
-                r = pymisp.add_object(args.event, template_id, s)
-                print(r)
-                break
+                obj, refs = s
+                template_id = pymisp.get_object_template_id(obj['name'])
+                r = pymisp.add_object(args.event, template_id, obj)
+
+        if peo:
+            obj, refs = peo
+            template_id = pymisp.get_object_template_id(obj['name'])
+            r = pymisp.add_object(args.event, template_id, obj)
+            for ref in refs:
+                r = pymisp.add_object_reference(obj['uuid'], ref)
+
+        if fo:
+            obj, refs = fo
+            template_id = pymisp.get_object_template_id(obj['name'])
+            response = pymisp.add_object(args.event, template_id, obj)
+            for ref in refs:
+                r = pymisp.add_object_reference(obj['uuid'], ref)
