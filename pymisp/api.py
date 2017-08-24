@@ -1585,13 +1585,13 @@ class PyMISP(object):
     def add_object(self, event_id, template_id, misp_object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
-        response = session.post(url, data=json.dumps(misp_object))
+        response = session.post(url, data=misp_object.to_json())
         return self._check_response(response)
 
-    def add_object_reference(self, parent_uuid, misp_object_reference):
+    def add_object_reference(self, misp_object_reference):
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'object_references/add/{}'.format(parent_uuid))
-        response = session.post(url, data=json.dumps(misp_object_reference))
+        url = urljoin(self.root_url, 'object_references/add')
+        response = session.post(url, data=misp_object_reference.to_json())
         return self._check_response(response)
 
     def get_object_templates_list(self):

@@ -7,7 +7,6 @@ import traceback
 from keys import misp_url, misp_key, misp_verifycert
 import glob
 import argparse
-import json
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract indicators out of binaries and add MISP objects to a MISP instance.')
@@ -25,20 +24,17 @@ if __name__ == '__main__':
 
         if seos:
             for s in seos:
-                obj, refs = s
-                template_id = pymisp.get_object_template_id(obj['name'])
-                r = pymisp.add_object(args.event, template_id, obj)
+                template_id = pymisp.get_object_template_id(s['name'])
+                r = pymisp.add_object(args.event, template_id, s)
 
         if peo:
-            obj, refs = peo
-            template_id = pymisp.get_object_template_id(obj['name'])
-            r = pymisp.add_object(args.event, template_id, obj)
-            for ref in refs:
-                r = pymisp.add_object_reference(obj['uuid'], ref)
+            template_id = pymisp.get_object_template_id(peo['name'])
+            r = pymisp.add_object(args.event, template_id, peo)
+            for ref in peo.references:
+                r = pymisp.add_object_reference(ref)
 
         if fo:
-            obj, refs = fo
-            template_id = pymisp.get_object_template_id(obj['name'])
-            response = pymisp.add_object(args.event, template_id, obj)
-            for ref in refs:
-                r = pymisp.add_object_reference(obj['uuid'], ref)
+            template_id = pymisp.get_object_template_id(fo['name'])
+            response = pymisp.add_object(args.event, template_id, fo)
+            for ref in fo.references:
+                r = pymisp.add_object_reference(ref)

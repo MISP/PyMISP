@@ -26,15 +26,52 @@ if six.PY2:
 
 class MISPObjectReference(AbstractMISP):
 
-    attributes = ['uuid', 'relationship_type', 'comment']
+    attributes = ['source_uuid', 'destination_uuid', 'relationship_type', 'comment']
 
-    def __init__(self, uuid, relationship_type, comment=None):
-        self['uuid'] = uuid
-        self['relationship_type'] = relationship_type
-        self['comment'] = comment
+    def __init__(self, source_uuid, destination_uuid, relationship_type, comment=None):
+        self.source_uuid = source_uuid
+        self.destination_uuid = destination_uuid
+        self.relationship_type = relationship_type
+        self.comment = comment
+
+
+class MISPObjectAttribute(AbstractMISP):
+
+    # This list is very limited and hardcoded to fit the current needs (file/pe/pesection creation): MISPAttriute will follow the
+    # same spec and just add one attribute: object_relation
+    attributes = ['object_relation', 'value', 'type', 'category', 'disable_correlation', 'to_ids',
+                  'data', 'encrypt', 'distribution', 'comment']
+
+    def __init__(self, definition, object_relation, value, **kwargs):
+        self.object_relation = object_relation
+        self.value = value
+        # Initialize the new MISPAttribute
+        # Get the misp attribute type from the definition
+        self.type = kwargs.pop('type', None)
+        if self.type is None:
+            self.type = definition['misp-attribute']
+        self.disable_correlation = kwargs.pop('disable_correlation', None)
+        if self.disable_correlation is None:
+            # The correlation can be disabled by default in the object definition.
+            # Use this value if it isn't overloaded by the object
+            self.disable_correlation = definition.get('disable_correlation')
+        self.to_ids = kwargs.pop('to_ids', None)
+        if self.to_ids is None:
+            # Same for the to_ids flag
+            self.to_ids = definition.get('to_ids')
+        # Initialise rest of the values
+        for k, v in kwargs.items():
+            self[k] = v
+        # FIXME: dirty hack until all the classes are ported to the new format but we get the default values
+        temp_attribute = MISPAttribute()
+        temp_attribute.set_all_values(**self)
+        # Update default values
+        self.from_dict(**temp_attribute.to_dict())
 
 
 class MISPObjectGenerator(AbstractMISP):
+
+    attributes = ['name', 'meta-category', 'uuid', 'description', 'version', 'Attribute']
 
     def __init__(self, template_dir):
         """This class is used to fill a new MISP object with the default values defined in the object template
@@ -46,53 +83,38 @@ class MISPObjectGenerator(AbstractMISP):
             'data', 'misp-objects', 'objects')
         with open(os.path.join(self.misp_objects_path, template_dir, 'definition.json'), 'r') as f:
             self.definition = json.load(f)
-        self.attributes = self.definition['attributes'].keys()
+        self.object_attributes = self.definition['attributes'].keys()
         self.misp_event = MISPEvent()
+        self.name = self.definition['name']
+        setattr(self, 'meta-category', self.definition['meta-category'])
         self.uuid = str(uuid.uuid4())
+        self.description = self.definition['description']
+        self.version = self.definition['version']
+        self.Attribute = []
         self.references = []
 
     def _create_attribute(self, object_type, **value):
         if value.get('value') is None:
             return None
-        # Initialize the new MISPAttribute
-        # Get the misp attribute type from the definition
-        value['type'] = self.definition['attributes'][object_type]['misp-attribute']
-        if value.get('disable_correlation') is None:
-            # The correlation can be disabled by default in the object definition.
-            # Use this value if it isn't overloaded by the object
-            value['disable_correlation'] = self.definition['attributes'][object_type].get('disable_correlation')
-        if value.get('to_ids') is None:
-            # Same for the to_ids flag
-            value['to_ids'] = self.definition['attributes'][object_type].get('to_ids')
-        # Set all the values in the MISP attribute
-        attribute = MISPAttribute(self.misp_event.describe_types)
-        attribute.set_all_values(**value)
-        self[object_type] = attribute
+        attribute = MISPObjectAttribute(self.definition['attributes'][object_type], object_type, **value)
+        self.Attribute.append(attribute)
+        return attribute
 
-    def dump(self, strict=True):
-        """Create a new object with the values gathered by the sub-class, use the default values from the template if needed"""
+    def to_dict(self, strict=True):
         if strict:
             self._validate()
-        # Create an empty object based om the object definition
-        new_object = self.__new_empty_object(self.definition)
-        for object_type, attribute in self.items():
-            # Add all the values as MISPAttributes to the current object
-            if attribute.value is None:
-                continue
-            # Finalize the actual MISP Object
-            # FIXME: This only works on python >= 3.5
-            # new_object['Attribute'].append({'object_relation': object_type, **attribute._json()})
-            # ### BEGIN ####
-            # Because we still need to support old python.
-            temp_attribute = {'object_relation': object_type}
-            temp_attribute.update(attribute._json())
-            new_object['Attribute'].append(temp_attribute)
-            # ###  END  ####
-        return new_object, [r.to_dict() for r in self.references]
+        return super(MISPObjectGenerator, self).to_dict()
+
+    def to_json(self, strict=True):
+        if strict:
+            self._validate()
+        return super(MISPObjectGenerator, self).to_json()
 
     def _validate(self):
         """Make sure the object we're creating has the required fields"""
-        all_attribute_names = set(self.keys())
+        all_attribute_names = set()
+        for a in self.Attribute:
+            all_attribute_names.add(a.object_relation)
         if self.definition.get('requiredOneOf'):
             if not set(self.definition['requiredOneOf']) & all_attribute_names:
                 raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self.definition['requiredOneOf'])))
@@ -102,15 +124,9 @@ class MISPObjectGenerator(AbstractMISP):
                     raise InvalidMISPObject('{} is required is required'.format(r))
         return True
 
-    def add_reference(self, uuid, relationship_type, comment=None):
+    def add_reference(self, destination_uuid, relationship_type, comment=None):
         """Add a link (uuid) to an other object"""
-        self.references.append(MISPObjectReference(uuid, relationship_type, comment))
-
-    def __new_empty_object(self, object_definiton):
-        """Create a new empty object out of the template"""
-        return {'name': object_definiton['name'], 'meta-category': object_definiton['meta-category'],
-                'uuid': self.uuid, 'description': object_definiton['description'],
-                'version': object_definiton['version'], 'Attribute': []}
+        self.references.append(MISPObjectReference(self.uuid, destination_uuid, relationship_type, comment))
 
     @abc.abstractmethod
     def generate_attributes(self):

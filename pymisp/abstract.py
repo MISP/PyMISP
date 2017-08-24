@@ -4,7 +4,16 @@
 import six  # Remove that import when discarding python2 support.
 import abc
 import json
+from json import JSONEncoder
 import collections
+
+
+class MISPEncode(JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, AbstractMISP):
+            return obj.jsonable()
+        return JSONEncoder.default(self, obj)
 
 
 @six.add_metaclass(abc.ABCMeta)   # Remove that line when discarding python2 support.
@@ -48,8 +57,11 @@ class AbstractMISP(collections.MutableMapping):
             to_return[attribute] = val
         return to_return
 
+    def jsonable(self):
+        return self.to_dict()
+
     def to_json(self):
-        return json.dumps(self.to_dict(), indent=4, sort_keys=True)
+        return json.dumps(self.to_dict(), cls=MISPEncode)
 
     def __getitem__(self, key):
         if self.__check_dict_key(key):

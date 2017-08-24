@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from pymisp.tools import FileObject, PEObject, MISPObjectException
@@ -17,11 +17,11 @@ class FileTypeNotImplemented(MISPObjectException):
 def make_pe_objects(lief_parsed, misp_file):
     misp_pe = PEObject(parsed=lief_parsed)
     misp_file.add_reference(misp_pe.uuid, 'included-in', 'PE indicators')
-    file_object = misp_file.dump()
-    pe_object = misp_pe.dump()
+    file_object = misp_file
+    pe_object = misp_pe
     pe_sections = []
     for s in misp_pe.sections:
-        pe_sections.append(s.dump())
+        pe_sections.append(s)
     return file_object, pe_object, pe_sections
 
 
@@ -45,5 +45,5 @@ def make_binary_objects(filepath):
         print('\tParser error: ', e)
     except FileTypeNotImplemented as e:
         print(e)
-    file_object = misp_file.dump()
+    file_object = misp_file.to_json()
     return file_object, None, None

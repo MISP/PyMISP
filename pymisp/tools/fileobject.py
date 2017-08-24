@@ -7,6 +7,7 @@ from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import math
 from collections import Counter
+import warnings
 
 try:
     import pydeep
@@ -25,9 +26,9 @@ class FileObject(MISPObjectGenerator):
 
     def __init__(self, filepath=None, pseudofile=None, filename=None):
         if not HAS_PYDEEP:
-            raise ImportError("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            warnings.warn("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_MAGIC:
-            raise ImportError("Please install python-magic: pip install python-magic.")
+            warnings.warn("Please install python-magic: pip install python-magic.")
         if filepath:
             self.filepath = filepath
             self.filename = os.path.basename(self.filepath)
@@ -46,16 +47,18 @@ class FileObject(MISPObjectGenerator):
 
     def generate_attributes(self):
         self._create_attribute('filename', value=self.filename)
-        self._create_attribute('size-in-bytes', value=len(self.data))
-        if getattr(self, 'size-in-bytes').value > 0:
+        size = self._create_attribute('size-in-bytes', value=len(self.data))
+        if int(size.value) > 0:
             self._create_attribute('entropy', value=self.__entropy_H(self.data))
             self._create_attribute('md5', value=md5(self.data).hexdigest())
             self._create_attribute('sha1', value=sha1(self.data).hexdigest())
             self._create_attribute('sha256', value=sha256(self.data).hexdigest())
             self._create_attribute('sha512', value=sha512(self.data).hexdigest())
-            self._create_attribute('mimetype', value=magic.from_buffer(self.data))
-            self._create_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
-            self._create_attribute('malware-sample', value=self.filename.value, data=self.pseudofile)
+            self._create_attribute('malware-sample', value=self.filename, data=self.pseudofile)
+            if HAS_MAGIC:
+                self._create_attribute('mimetype', value=magic.from_buffer(self.data))
+            if HAS_PYDEEP:
+                self._create_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
 
     def __entropy_H(self, data):
         """Calculate the entropy of a chunk of data."""
