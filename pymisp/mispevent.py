@@ -221,6 +221,10 @@ class MISPAttribute(object):
                 self._prepare_new_malware_sample()
 
     def _json(self):
+        # DEPRECATED
+        return self.to_dict()
+
+    def to_dict(self):
         to_return = {'type': self.type, 'category': self.category, 'to_ids': self.to_ids,
                      'distribution': self.distribution, 'value': self.value,
                      'comment': self.comment, 'disable_correlation': self.disable_correlation}
@@ -507,6 +511,10 @@ class MISPEvent(AbstractMISP):
             self.global_sig = kwargs['global_sig']
 
     def _json(self):
+        # DEPTECATED
+        return self.to_dict()
+
+    def to_dict(self):
         to_return = {'Event': {}}
         to_return['Event'] = {'distribution': self.distribution, 'info': self.info,
                               'date': self.date.isoformat(), 'published': self.published,
