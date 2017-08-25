@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp import MISPEncode
-from pymisp.tools import make_binary_objects
 import argparse
 import json
 
+try:
+    from pymisp import MISPEncode
+    from pymisp.tools import make_binary_objects
+except ImportError:
+    pass
 
 def check():
     missing_dependencies = {'pydeep': False, 'lief': False, 'magic': False, 'pymisp': False}

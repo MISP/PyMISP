@@ -27,7 +27,7 @@ setup(
         'Topic :: Internet',
     ],
     test_suite="tests",
-    install_requires=['requests', 'python-dateutil', 'jsonschema'],
+    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema'],
     include_package_data=True,
     package_data={'pymisp': ['data/*.json', 'data/misp-objects/schema_objects.json',
                              'data/misp-objects/schema_relationships.json',

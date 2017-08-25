@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import six  # Remove that import when discarding python2 support.
 import abc
 import json
 from json import JSONEncoder
 import collections
 
+import six  # Remove that import when discarding python2 support.
 
 class MISPEncode(JSONEncoder):
 
