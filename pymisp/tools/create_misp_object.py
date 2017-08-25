@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp.tools import FileObject, PEObject, ELFObject, MachOObject, MISPObjectException
+import warnings
 
 try:
     import lief
@@ -55,15 +56,13 @@ def make_binary_objects(filepath):
             elif isinstance(lief_parsed, lief.MachO.Binary):
                 return make_macho_objects(lief_parsed, misp_file)
         except lief.bad_format as e:
-            # print('\tBad format: ', e)
-            pass
+            warnings.warn('\tBad format: ', e)
         except lief.bad_file as e:
-            # print('\tBad file: ', e)
-            pass
+            warnings.warn('\tBad file: ', e)
         except lief.parser_error as e:
-            # print('\tParser error: ', e)
-            pass
+            warnings.warn('\tParser error: ', e)
         except FileTypeNotImplemented as e:  # noqa
-            # print(e)
-            pass
+            warnings.warn(e)
+    else:
+        warnings.warn('Please install lief, documentation here: https://github.com/lief-project/LIEF')
     return misp_file, None, None
