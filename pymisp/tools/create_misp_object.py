@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp.tools import FileObject, PEObject, MISPObjectException
+from pymisp.tools import FileObject, PEObject, ELFObject, MachOObject, MISPObjectException
 
 try:
     import lief
+    from lief import Logger
+    Logger.disable()
     HAS_LIEF = True
 except ImportError:
     HAS_LIEF = False
@@ -15,14 +17,30 @@ class FileTypeNotImplemented(MISPObjectException):
 
 
 def make_pe_objects(lief_parsed, misp_file):
-    misp_pe = PEObject(parsed=lief_parsed)
-    misp_file.add_reference(misp_pe.uuid, 'included-in', 'PE indicators')
-    file_object = misp_file
-    pe_object = misp_pe
+    pe_object = PEObject(parsed=lief_parsed)
+    misp_file.add_reference(pe_object.uuid, 'included-in', 'PE indicators')
     pe_sections = []
-    for s in misp_pe.sections:
+    for s in pe_object.sections:
         pe_sections.append(s)
-    return file_object, pe_object, pe_sections
+    return misp_file, pe_object, pe_sections
+
+
+def make_elf_objects(lief_parsed, misp_file):
+    elf_object = ELFObject(parsed=lief_parsed)
+    misp_file.add_reference(elf_object.uuid, 'included-in', 'ELF indicators')
+    elf_sections = []
+    for s in elf_object.sections:
+        elf_sections.append(s)
+    return misp_file, elf_object, elf_sections
+
+
+def make_macho_objects(lief_parsed, misp_file):
+    macho_object = MachOObject(parsed=lief_parsed)
+    misp_file.add_reference(macho_object.uuid, 'included-in', 'MachO indicators')
+    macho_sections = []
+    for s in macho_object.sections:
+        macho_sections.append(s)
+    return misp_file, macho_object, macho_sections
 
 
 def make_binary_objects(filepath):
@@ -34,16 +52,19 @@ def make_binary_objects(filepath):
         if isinstance(lief_parsed, lief.PE.Binary):
             return make_pe_objects(lief_parsed, misp_file)
         elif isinstance(lief_parsed, lief.ELF.Binary):
-            raise FileTypeNotImplemented('ELF not implemented yet.')
+            return make_elf_objects(lief_parsed, misp_file)
         elif isinstance(lief_parsed, lief.MachO.Binary):
-            raise FileTypeNotImplemented('MachO not implemented yet.')
+            return make_macho_objects(lief_parsed, misp_file)
     except lief.bad_format as e:
-        print('\tBad format: ', e)
+        # print('\tBad format: ', e)
+        pass
     except lief.bad_file as e:
-        print('\tBad file: ', e)
+        # print('\tBad file: ', e)
+        pass
     except lief.parser_error as e:
-        print('\tParser error: ', e)
-    except FileTypeNotImplemented as e:
-        print(e)
-    file_object = misp_file.to_json()
-    return file_object, None, None
+        # print('\tParser error: ', e)
+        pass
+    except FileTypeNotImplemented as e:  # noqa
+        # print(e)
+        pass
+    return misp_file, None, None
