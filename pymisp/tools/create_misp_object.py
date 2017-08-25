@@ -45,24 +45,25 @@ def make_macho_objects(lief_parsed, misp_file):
 
 def make_binary_objects(filepath):
     misp_file = FileObject(filepath)
-    try:
-        lief_parsed = lief.parse(filepath)
-        if isinstance(lief_parsed, lief.PE.Binary):
-            return make_pe_objects(lief_parsed, misp_file)
-        elif isinstance(lief_parsed, lief.ELF.Binary):
-            return make_elf_objects(lief_parsed, misp_file)
-        elif isinstance(lief_parsed, lief.MachO.Binary):
-            return make_macho_objects(lief_parsed, misp_file)
-    except lief.bad_format as e:
-        # print('\tBad format: ', e)
-        pass
-    except lief.bad_file as e:
-        # print('\tBad file: ', e)
-        pass
-    except lief.parser_error as e:
-        # print('\tParser error: ', e)
-        pass
-    except FileTypeNotImplemented as e:  # noqa
-        # print(e)
-        pass
+    if HAS_LIEF:
+        try:
+            lief_parsed = lief.parse(filepath)
+            if isinstance(lief_parsed, lief.PE.Binary):
+                return make_pe_objects(lief_parsed, misp_file)
+            elif isinstance(lief_parsed, lief.ELF.Binary):
+                return make_elf_objects(lief_parsed, misp_file)
+            elif isinstance(lief_parsed, lief.MachO.Binary):
+                return make_macho_objects(lief_parsed, misp_file)
+        except lief.bad_format as e:
+            # print('\tBad format: ', e)
+            pass
+        except lief.bad_file as e:
+            # print('\tBad file: ', e)
+            pass
+        except lief.parser_error as e:
+            # print('\tParser error: ', e)
+            pass
+        except FileTypeNotImplemented as e:  # noqa
+            # print(e)
+            pass
     return misp_file, None, None
