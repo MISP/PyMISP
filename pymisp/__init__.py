@@ -1,4 +1,4 @@
-__version__ = '2.4.77'
+__version__ = '2.4.79'
 
 from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey
 from .api import PyMISP
