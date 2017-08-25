@@ -43,7 +43,9 @@ class PEObject(MISPObjectGenerator):
                 self.pe = parsed
             else:
                 raise Exception('Not a lief.PE.Binary: {}'.format(type(parsed)))
-        MISPObjectGenerator.__init__(self, 'pe')
+        # Python3 way
+        # super().__init__('pe')
+        super(PEObject, self).__init__('pe')
         self.generate_attributes()
 
     def _is_exe(self):
@@ -114,7 +116,9 @@ class PEObject(MISPObjectGenerator):
 class PESectionObject(MISPObjectGenerator):
 
     def __init__(self, section):
-        MISPObjectGenerator.__init__(self, 'pe-section')
+        # Python3 way
+        # super().__init__('pe-section')
+        super(PESectionObject, self).__init__('pe-section')
         self.section = section
         self.data = bytes(self.section.content)
         self.generate_attributes()

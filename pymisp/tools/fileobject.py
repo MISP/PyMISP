@@ -41,7 +41,9 @@ class FileObject(MISPObjectGenerator):
             self.filename = filename
         else:
             raise Exception('File buffer (BytesIO) or a path is required.')
-        MISPObjectGenerator.__init__(self, 'file')
+        # PY3 way:
+        # super().__init__('file')
+        super(FileObject, self).__init__('file')
         self.data = self.pseudofile.getvalue()
         self.generate_attributes()
 

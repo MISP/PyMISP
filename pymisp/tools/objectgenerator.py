@@ -83,13 +83,13 @@ class MISPObjectGenerator(AbstractMISP):
             'data', 'misp-objects', 'objects')
         with open(os.path.join(self.misp_objects_path, template_dir, 'definition.json'), 'r') as f:
             self.definition = json.load(f)
-        self.object_attributes = self.definition['attributes'].keys()
         self.misp_event = MISPEvent()
         self.name = self.definition['name']
         setattr(self, 'meta-category', self.definition['meta-category'])
-        self.uuid = str(uuid.uuid4())
+        self.template_uuid = self.definition['uuid']
         self.description = self.definition['description']
         self.version = self.definition['version']
+        self.uuid = str(uuid.uuid4())
         self.Attribute = []
         self.references = []
 
@@ -121,7 +121,7 @@ class MISPObjectGenerator(AbstractMISP):
         if self.definition.get('required'):
             for r in self.definition.get('required'):
                 if r not in all_attribute_names:
-                    raise InvalidMISPObject('{} is required is required'.format(r))
+                    raise InvalidMISPObject('{} is required'.format(r))
         return True
 
     def add_reference(self, destination_uuid, relationship_type, comment=None):

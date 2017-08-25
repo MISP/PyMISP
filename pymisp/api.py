@@ -1600,12 +1600,12 @@ class PyMISP(object):
         response = session.get(url)
         return self._check_response(response)['response']
 
-    def get_object_template_id(self, object_name):
+    def get_object_template_id(self, object_uuid):
         templates = self.get_object_templates_list()
         for t in templates:
-            if t['ObjectTemplate']['name'] == object_name:
+            if t['ObjectTemplate']['uuid'] == object_uuid:
                 return t['ObjectTemplate']['id']
-        raise Exception('Unable to find template name {} on the MISP instance'.format(object_name))
+        raise Exception('Unable to find template uuid {} on the MISP instance'.format(object_uuid))
 
     # ###########################
     # ####### Deprecated ########

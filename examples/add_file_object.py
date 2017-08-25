@@ -24,17 +24,17 @@ if __name__ == '__main__':
 
         if seos:
             for s in seos:
-                template_id = pymisp.get_object_template_id(s['name'])
+                template_id = pymisp.get_object_template_id(s.template_uuid)
                 r = pymisp.add_object(args.event, template_id, s)
 
         if peo:
-            template_id = pymisp.get_object_template_id(peo['name'])
+            template_id = pymisp.get_object_template_id(peo.template_uuid)
             r = pymisp.add_object(args.event, template_id, peo)
             for ref in peo.references:
                 r = pymisp.add_object_reference(ref)
 
         if fo:
-            template_id = pymisp.get_object_template_id(fo['name'])
+            template_id = pymisp.get_object_template_id(fo.template_uuid)
             response = pymisp.add_object(args.event, template_id, fo)
             for ref in fo.references:
                 r = pymisp.add_object_reference(ref)
