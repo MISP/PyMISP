@@ -13,6 +13,9 @@ from pymisp import MISPEvent
 from pymisp import EncodeUpdate
 from pymisp import EncodeFull
 
+from pymisp import MISPEncode
+from pymisp.tools import make_binary_objects
+
 
 @requests_mock.Mocker()
 class TestOffline(unittest.TestCase):
@@ -155,12 +158,12 @@ class TestOffline(unittest.TestCase):
         p = MockPyMISP(self.domain, self.key)
         evt = p.get(1)
         self.assertEqual(3, p.add_hashes(evt, md5='68b329da9893e34099c7d8ad5cb9c940',
-                          sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
-                          sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b',
-                          filename='foobar.exe'))
+                         sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
+                         sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b',
+                         filename='foobar.exe'))
         self.assertEqual(3, p.add_hashes(evt, md5='68b329da9893e34099c7d8ad5cb9c940',
-                          sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
-                          sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b'))
+                         sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
+                         sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b'))
         p.av_detection_link(evt, 'https://foocorp.com')
         p.add_detection_name(evt, 'WATERMELON')
         p.add_filename(evt, 'foobar.exe')
@@ -219,6 +222,34 @@ class TestOffline(unittest.TestCase):
         p.add_internal_text(evt, 'foobar')
         p.add_internal_other(evt, 'foobar')
         p.add_attachment(evt, "testFile")
+
+    def make_objects(self, path):
+        to_return = {'objects': [], 'references': []}
+        fo, peo, seos = make_binary_objects(path)
+
+        if seos:
+            for s in seos:
+                to_return['objects'].append(s)
+                if s.references:
+                    to_return['references'] += s.references
+
+        if peo:
+            to_return['objects'].append(peo)
+            if peo.references:
+                to_return['references'] += peo.references
+
+        if fo:
+            to_return['objects'].append(fo)
+            if fo.references:
+                to_return['references'] += fo.references
+        return json.dumps(to_return, cls=MISPEncode)
+
+    def test_objects(self, m):
+        paths = ['cmd.exe', 'tmux', 'MachO-OSX-x64-ls']
+        for path in paths:
+            json_blob = self.make_objects(os.path.join('tests',
+                                          'viper-test-files', 'test_files', path))
+        print(json_blob)
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,8 +16,11 @@ install:
     - pip install -U nose
     - pip install coveralls
     - pip install codecov
-    - pip install requests-mock
+    - pip install requests-mock pytest
     - pip install .
+    - pushd tests
+    - git clone https://github.com/viper-framework/viper-test-files.git
+    - popd
 
 script:
     - nosetests --with-coverage --cover-package=pymisp tests/test_offline.py
