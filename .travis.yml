@@ -17,6 +17,8 @@ install:
     - pip install coveralls
     - pip install codecov
     - pip install requests-mock pytest
+    - pip install https://github.com/lief-project/packages/raw/lief-master-latest/pylief-0.7.0.dev.zip
+    - pip install python-magic
     - pip install .
     - pushd tests
     - git clone https://github.com/viper-framework/viper-test-files.git
