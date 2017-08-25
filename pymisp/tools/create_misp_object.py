@@ -44,8 +44,6 @@ def make_macho_objects(lief_parsed, misp_file):
 
 
 def make_binary_objects(filepath):
-    if not HAS_LIEF:
-        raise ImportError('Please install lief, documentation here: https://github.com/lief-project/LIEF')
     misp_file = FileObject(filepath)
     try:
         lief_parsed = lief.parse(filepath)
