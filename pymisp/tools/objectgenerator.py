@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from collections import Counter
 from pymisp import MISPEvent, MISPAttribute, AbstractMISP
 import os
 import json
@@ -112,9 +113,16 @@ class MISPObjectGenerator(AbstractMISP):
 
     def _validate(self):
         """Make sure the object we're creating has the required fields"""
-        all_attribute_names = set()
+        all_object_relations = []
         for a in self.Attribute:
-            all_attribute_names.add(a.object_relation)
+            all_object_relations.append(a.object_relation)
+        count_relations = dict(Counter(all_object_relations))
+        for key, counter in count_relations.items():
+            if counter == 1:
+                continue
+            if not self.definition['attributes'][key].get('multiple'):
+                raise InvalidMISPObject('Multiple occurrences of {} is not allowed'.format(key))
+        all_attribute_names = set(count_relations.keys())
         if self.definition.get('requiredOneOf'):
             if not set(self.definition['requiredOneOf']) & all_attribute_names:
                 raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self.definition['requiredOneOf'])))

@@ -78,8 +78,8 @@ class ELFSectionObject(MISPObjectGenerator):
     def generate_attributes(self):
         self._create_attribute('name', value=self.section.name)
         self._create_attribute('type', value=str(self.section.type).split('.')[1])
-        print(self.section.flags)
-        # self._create_attribute('flag', value=str(self.section.flags).split('.')[1])
+        for flag in self.section.flags_list:
+            self._create_attribute('flag', value=str(flag).split('.')[1])
         size = self._create_attribute('size-in-bytes', value=self.section.size)
         if int(size.value) > 0:
             self._create_attribute('entropy', value=self.section.entropy)
