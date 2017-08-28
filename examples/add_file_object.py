@@ -30,11 +30,11 @@ if __name__ == '__main__':
         if peo:
             template_id = pymisp.get_object_template_id(peo.template_uuid)
             r = pymisp.add_object(args.event, template_id, peo)
-            for ref in peo.references:
+            for ref in peo.ObjectReference:
                 r = pymisp.add_object_reference(ref)
 
         if fo:
             template_id = pymisp.get_object_template_id(fo.template_uuid)
             response = pymisp.add_object(args.event, template_id, fo)
-            for ref in fo.references:
+            for ref in fo.ObjectReference:
                 r = pymisp.add_object_reference(ref)

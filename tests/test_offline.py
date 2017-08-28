@@ -230,18 +230,18 @@ class TestOffline(unittest.TestCase):
         if seos:
             for s in seos:
                 to_return['objects'].append(s)
-                if s.references:
-                    to_return['references'] += s.references
+                if s.ObjectReference:
+                    to_return['references'] += s.ObjectReference
 
         if peo:
             to_return['objects'].append(peo)
-            if peo.references:
-                to_return['references'] += peo.references
+            if peo.ObjectReference:
+                to_return['references'] += peo.ObjectReference
 
         if fo:
             to_return['objects'].append(fo)
-            if fo.references:
-                to_return['references'] += fo.references
+            if fo.ObjectReference:
+                to_return['references'] += fo.ObjectReference
         return json.dumps(to_return, cls=MISPEncode)
 
     def test_objects(self, m):

@@ -5,8 +5,12 @@ import abc
 import json
 from json import JSONEncoder
 import collections
-
 import six  # Remove that import when discarding python2 support.
+
+if six.PY2:
+    import warnings
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
+
 
 class MISPEncode(JSONEncoder):
 
@@ -17,7 +21,6 @@ class MISPEncode(JSONEncoder):
 
 
 @six.add_metaclass(abc.ABCMeta)   # Remove that line when discarding python2 support.
-# Python3 way: class MISPObjectGenerator(metaclass=abc.ABCMeta):
 class AbstractMISP(collections.MutableMapping):
 
     attributes = None

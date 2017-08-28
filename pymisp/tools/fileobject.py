@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp.tools import MISPObjectGenerator
+from pymisp.defaultobjects import AbstractMISPObjectGenerator
 import os
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
@@ -22,7 +22,7 @@ except ImportError:
     HAS_MAGIC = False
 
 
-class FileObject(MISPObjectGenerator):
+class FileObject(AbstractMISPObjectGenerator):
 
     def __init__(self, filepath=None, pseudofile=None, filename=None):
         if not HAS_PYDEEP:
@@ -48,19 +48,19 @@ class FileObject(MISPObjectGenerator):
         self.generate_attributes()
 
     def generate_attributes(self):
-        self._create_attribute('filename', value=self.filename)
-        size = self._create_attribute('size-in-bytes', value=len(self.data))
+        self.add_attribute('filename', value=self.filename)
+        size = self.add_attribute('size-in-bytes', value=len(self.data))
         if int(size.value) > 0:
-            self._create_attribute('entropy', value=self.__entropy_H(self.data))
-            self._create_attribute('md5', value=md5(self.data).hexdigest())
-            self._create_attribute('sha1', value=sha1(self.data).hexdigest())
-            self._create_attribute('sha256', value=sha256(self.data).hexdigest())
-            self._create_attribute('sha512', value=sha512(self.data).hexdigest())
-            self._create_attribute('malware-sample', value=self.filename, data=self.pseudofile)
+            self.add_attribute('entropy', value=self.__entropy_H(self.data))
+            self.add_attribute('md5', value=md5(self.data).hexdigest())
+            self.add_attribute('sha1', value=sha1(self.data).hexdigest())
+            self.add_attribute('sha256', value=sha256(self.data).hexdigest())
+            self.add_attribute('sha512', value=sha512(self.data).hexdigest())
+            self.add_attribute('malware-sample', value=self.filename, data=self.pseudofile)
             if HAS_MAGIC:
-                self._create_attribute('mimetype', value=magic.from_buffer(self.data))
+                self.add_attribute('mimetype', value=magic.from_buffer(self.data))
             if HAS_PYDEEP:
-                self._create_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
+                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
 
     def __entropy_H(self, data):
         """Calculate the entropy of a chunk of data."""

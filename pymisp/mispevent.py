@@ -11,7 +11,6 @@ import base64
 from io import BytesIO
 from zipfile import ZipFile
 import hashlib
-from .abstract import AbstractMISP
 
 try:
     from dateutil.parser import parse
@@ -38,6 +37,7 @@ except ImportError:
         has_pyme = False
 
 from .exceptions import PyMISPError, NewEventError, NewAttributeError
+from .defaultobjects import MISPObject
 
 # Least dirty way to support python 2 and 3
 try:
@@ -285,7 +285,7 @@ def _int_to_str(d):
     return d
 
 
-class MISPEvent(AbstractMISP):
+class MISPEvent(object):
 
     def __init__(self, describe_types=None, strict_validation=False):
         self.ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
@@ -338,6 +338,7 @@ class MISPEvent(AbstractMISP):
         self.RelatedEvent = []
         self.Tag = []
         self.Galaxy = None
+        self.Object = None
 
     def _serialize(self):
         return '{date}{threat_level_id}{info}{uuid}{analysis}{timestamp}'.format(
@@ -510,6 +511,12 @@ class MISPEvent(AbstractMISP):
             self.sig = kwargs['sig']
         if kwargs.get('global_sig'):
             self.global_sig = kwargs['global_sig']
+        if kwargs.get('Object'):
+            self.Object = []
+            for obj in kwargs['Object']:
+                tmp_object = MISPObject(obj['name'])
+                tmp_object.from_dict(**obj)
+                self.Object.append(tmp_object)
 
     def _json(self):
         # DEPTECATED

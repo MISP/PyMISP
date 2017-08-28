@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp.tools import MISPObjectGenerator
+from pymisp.defaultobjects import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 from datetime import datetime
@@ -21,7 +21,7 @@ except ImportError:
     HAS_PYDEEP = False
 
 
-class PEObject(MISPObjectGenerator):
+class PEObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parsed=None, filepath=None, pseudofile=None):
         if not HAS_PYDEEP:
@@ -74,10 +74,10 @@ class PEObject(MISPObjectGenerator):
             return 'unknown'
 
     def generate_attributes(self):
-        self._create_attribute('type', value=self._get_pe_type())
+        self.add_attribute('type', value=self._get_pe_type())
         # General information
-        self._create_attribute('entrypoint-address', value=self.pe.entrypoint)
-        self._create_attribute('compilation-timestamp', value=datetime.utcfromtimestamp(self.pe.header.time_date_stamps).isoformat())
+        self.add_attribute('entrypoint-address', value=self.pe.entrypoint)
+        self.add_attribute('compilation-timestamp', value=datetime.utcfromtimestamp(self.pe.header.time_date_stamps).isoformat())
         # self.imphash = self.pe.get_imphash()
         try:
             if (self.pe.has_resources and
@@ -85,15 +85,15 @@ class PEObject(MISPObjectGenerator):
                     self.pe.resources_manager.version.has_string_file_info and
                     self.pe.resources_manager.version.string_file_info.langcode_items):
                 fileinfo = dict(self.pe.resources_manager.version.string_file_info.langcode_items[0].items.items())
-                self._create_attribute('original-filename', value=fileinfo.get('OriginalFilename'))
-                self._create_attribute('internal-filename', value=fileinfo.get('InternalName'))
-                self._create_attribute('file-description', value=fileinfo.get('FileDescription'))
-                self._create_attribute('file-version', value=fileinfo.get('FileVersion'))
-                self._create_attribute('lang-id', value=self.pe.resources_manager.version.string_file_info.langcode_items[0].key)
-                self._create_attribute('product-name', value=fileinfo.get('ProductName'))
-                self._create_attribute('product-version', value=fileinfo.get('ProductVersion'))
-                self._create_attribute('company-name', value=fileinfo.get('CompanyName'))
-                self._create_attribute('legal-copyright', value=fileinfo.get('LegalCopyright'))
+                self.add_attribute('original-filename', value=fileinfo.get('OriginalFilename'))
+                self.add_attribute('internal-filename', value=fileinfo.get('InternalName'))
+                self.add_attribute('file-description', value=fileinfo.get('FileDescription'))
+                self.add_attribute('file-version', value=fileinfo.get('FileVersion'))
+                self.add_attribute('lang-id', value=self.pe.resources_manager.version.string_file_info.langcode_items[0].key)
+                self.add_attribute('product-name', value=fileinfo.get('ProductName'))
+                self.add_attribute('product-version', value=fileinfo.get('ProductVersion'))
+                self.add_attribute('company-name', value=fileinfo.get('CompanyName'))
+                self.add_attribute('legal-copyright', value=fileinfo.get('LegalCopyright'))
         except lief.read_out_of_bound:
             # The file is corrupted
             pass
@@ -106,14 +106,14 @@ class PEObject(MISPObjectGenerator):
                 self.add_reference(s.uuid, 'included-in', 'Section {} of PE'.format(pos))
                 if ((self.pe.entrypoint >= section.virtual_address) and
                         (self.pe.entrypoint < (section.virtual_address + section.virtual_size))):
-                    self._create_attribute('entrypoint-section|position', value='{}|{}'.format(section.name, pos))
+                    self.add_attribute('entrypoint-section|position', value='{}|{}'.format(section.name, pos))
                 pos += 1
                 self.sections.append(s)
-        self._create_attribute('number-sections', value=len(self.sections))
+        self.add_attribute('number-sections', value=len(self.sections))
         # TODO: TLSSection / DIRECTORY_ENTRY_TLS
 
 
-class PESectionObject(MISPObjectGenerator):
+class PESectionObject(AbstractMISPObjectGenerator):
 
     def __init__(self, section):
         # Python3 way
@@ -124,13 +124,13 @@ class PESectionObject(MISPObjectGenerator):
         self.generate_attributes()
 
     def generate_attributes(self):
-        self._create_attribute('name', value=self.section.name)
-        size = self._create_attribute('size-in-bytes', value=self.section.size)
+        self.add_attribute('name', value=self.section.name)
+        size = self.add_attribute('size-in-bytes', value=self.section.size)
         if int(size.value) > 0:
-            self._create_attribute('entropy', value=self.section.entropy)
-            self._create_attribute('md5', value=md5(self.data).hexdigest())
-            self._create_attribute('sha1', value=sha1(self.data).hexdigest())
-            self._create_attribute('sha256', value=sha256(self.data).hexdigest())
-            self._create_attribute('sha512', value=sha512(self.data).hexdigest())
+            self.add_attribute('entropy', value=self.section.entropy)
+            self.add_attribute('md5', value=md5(self.data).hexdigest())
+            self.add_attribute('sha1', value=sha1(self.data).hexdigest())
+            self.add_attribute('sha256', value=sha256(self.data).hexdigest())
+            self.add_attribute('sha512', value=sha512(self.data).hexdigest())
             if HAS_PYDEEP:
-                self._create_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
+                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())

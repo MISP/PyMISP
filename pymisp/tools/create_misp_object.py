@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp.tools import FileObject, PEObject, ELFObject, MachOObject, MISPObjectException
+from pymisp.tools import FileObject, PEObject, ELFObject, MachOObject
+from pymisp.exceptions import MISPObjectException
 import warnings
 
 try:

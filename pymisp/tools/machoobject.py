@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp.tools import MISPObjectGenerator
+from pymisp.defaultobjects import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import warnings
@@ -20,7 +20,7 @@ except ImportError:
     HAS_PYDEEP = False
 
 
-class MachOObject(MISPObjectGenerator):
+class MachOObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parsed=None, filepath=None, pseudofile=None):
         if not HAS_PYDEEP:
@@ -48,11 +48,11 @@ class MachOObject(MISPObjectGenerator):
         self.generate_attributes()
 
     def generate_attributes(self):
-        self._create_attribute('type', value=str(self.macho.header.file_type).split('.')[1])
-        self._create_attribute('name', value=self.macho.name)
+        self.add_attribute('type', value=str(self.macho.header.file_type).split('.')[1])
+        self.add_attribute('name', value=self.macho.name)
         # General information
         if self.macho.has_entrypoint:
-            self._create_attribute('entrypoint-address', value=self.macho.entrypoint)
+            self.add_attribute('entrypoint-address', value=self.macho.entrypoint)
         # Sections
         self.sections = []
         if self.macho.sections:
@@ -62,10 +62,10 @@ class MachOObject(MISPObjectGenerator):
                 self.add_reference(s.uuid, 'included-in', 'Section {} of MachO'.format(pos))
                 pos += 1
                 self.sections.append(s)
-        self._create_attribute('number-sections', value=len(self.sections))
+        self.add_attribute('number-sections', value=len(self.sections))
 
 
-class MachOSectionObject(MISPObjectGenerator):
+class MachOSectionObject(AbstractMISPObjectGenerator):
 
     def __init__(self, section):
         # Python3 way
@@ -76,13 +76,13 @@ class MachOSectionObject(MISPObjectGenerator):
         self.generate_attributes()
 
     def generate_attributes(self):
-        self._create_attribute('name', value=self.section.name)
-        size = self._create_attribute('size-in-bytes', value=self.section.size)
+        self.add_attribute('name', value=self.section.name)
+        size = self.add_attribute('size-in-bytes', value=self.section.size)
         if int(size.value) > 0:
-            self._create_attribute('entropy', value=self.section.entropy)
-            self._create_attribute('md5', value=md5(self.data).hexdigest())
-            self._create_attribute('sha1', value=sha1(self.data).hexdigest())
-            self._create_attribute('sha256', value=sha256(self.data).hexdigest())
-            self._create_attribute('sha512', value=sha512(self.data).hexdigest())
+            self.add_attribute('entropy', value=self.section.entropy)
+            self.add_attribute('md5', value=md5(self.data).hexdigest())
+            self.add_attribute('sha1', value=sha1(self.data).hexdigest())
+            self.add_attribute('sha256', value=sha256(self.data).hexdigest())
+            self.add_attribute('sha512', value=sha512(self.data).hexdigest())
             if HAS_PYDEEP:
-                self._create_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
+                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
