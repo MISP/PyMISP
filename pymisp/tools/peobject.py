@@ -106,7 +106,7 @@ class PEObject(AbstractMISPObjectGenerator):
                 self.add_reference(s.uuid, 'included-in', 'Section {} of PE'.format(pos))
                 if ((self.pe.entrypoint >= section.virtual_address) and
                         (self.pe.entrypoint < (section.virtual_address + section.virtual_size))):
-                    self.add_attribute('entrypoint-section|position', value='{}|{}'.format(section.name, pos))
+                    self.add_attribute('entrypoint-section-at-position', value='{}|{}'.format(section.name, pos))
                 pos += 1
                 self.sections.append(s)
         self.add_attribute('number-sections', value=len(self.sections))
