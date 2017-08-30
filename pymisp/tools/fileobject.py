@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp.defaultobjects import AbstractMISPObjectGenerator
+from .. import AbstractMISPObjectGenerator
 import os
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
