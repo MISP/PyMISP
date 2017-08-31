@@ -10,7 +10,6 @@ import base64
 from io import BytesIO
 from zipfile import ZipFile
 import hashlib
-import abc
 import sys
 import uuid
 from collections import Counter
@@ -796,13 +795,3 @@ class MISPObject(AbstractMISP):
         attribute.from_dict(object_relation, **value)
         self.Attribute.append(attribute)
         return attribute
-
-
-@six.add_metaclass(abc.ABCMeta)   # Remove that line when discarding python2 support.
-# Python3 way: class MISPObjectGenerator(metaclass=abc.ABCMeta):
-class AbstractMISPObjectGenerator(MISPObject):
-
-    @abc.abstractmethod
-    def generate_attributes(self):
-        """Contains the logic where all the values of the object are gathered"""
-        pass
