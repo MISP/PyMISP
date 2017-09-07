@@ -638,14 +638,14 @@ class MISPEvent(object):
 
 class MISPObjectReference(AbstractMISP):
 
-    attributes = ['source_uuid', 'destination_uuid', 'relationship_type', 'comment', 'uuid', 'deleted']
+    attributes = ['source_uuid', 'referenced_uuid', 'relationship_type', 'comment', 'uuid', 'deleted']
 
     def __init__(self):
         super(MISPObjectReference, self).__init__()
 
-    def from_dict(self, source_uuid, destination_uuid, relationship_type, comment=None, **kwargs):
+    def from_dict(self, source_uuid, referenced_uuid, relationship_type, comment=None, **kwargs):
         self.source_uuid = source_uuid
-        self.destination_uuid = destination_uuid
+        self.referenced_uuid = referenced_uuid
         self.relationship_type = relationship_type
         self.comment = comment
         for k, v in kwargs:
@@ -772,7 +772,7 @@ class MISPObject(AbstractMISP):
                     raise InvalidMISPObject('{} is required'.format(r))
         return True
 
-    def add_reference(self, destination_uuid, relationship_type, comment=None, **kwargs):
+    def add_reference(self, referenced_uuid, relationship_type, comment=None, **kwargs):
         """Add a link (uuid) to an other object"""
         if kwargs.get('source_uuid'):
             # Load existing object
@@ -781,7 +781,7 @@ class MISPObject(AbstractMISP):
             # New reference
             source_uuid = self.uuid
         reference = MISPObjectReference()
-        reference.from_dict(source_uuid=source_uuid, destination_uuid=destination_uuid,
+        reference.from_dict(source_uuid=source_uuid, referenced_uuid=referenced_uuid,
                             relationship_type=relationship_type, comment=comment, **kwargs)
         self.ObjectReference.append(reference)
 
