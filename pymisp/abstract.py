@@ -23,29 +23,28 @@ class MISPEncode(JSONEncoder):
 @six.add_metaclass(abc.ABCMeta)   # Remove that line when discarding python2 support.
 class AbstractMISP(collections.MutableMapping):
 
-    attributes = None
+    __not_jsonable = []
 
-    def __init__(self):
-        """Initialize the list of class-level attributes to set in the JSON dump"""
-        # The attribute names will be set automatically by the schemas when we will have them.
-        if self.attributes is None:
-            raise NotImplementedError('{} must define attributes'.format(type(self).__name__))
-        self.attributes = sorted(self.attributes)
-
-    def __check_dict_key(self, key):
-        if key not in self.attributes:
-            raise Exception('{} not a valid key in {}. Alowed keys: {}'.format(
-                key, type(self).__name__, ', '.join(self.attributes)))
-        return True
+    @property
+    def __properties(self):
+        to_return = []
+        for prop, value in vars(self).items():
+            if prop.startswith('_') or prop in self.__not_jsonable:
+                continue
+            to_return.append(prop)
+        return to_return
 
     def from_dict(self, **kwargs):
-        for attribute in self.attributes:
-            val = kwargs.pop(attribute, None)
-            if val is None:
+        for prop, value in kwargs.items():
+            if value is None:
                 continue
-            setattr(self, attribute, val)
-        if kwargs:
-            raise Exception('Unused parameter(s): {}'.format(', '.join(kwargs.keys())))
+            setattr(self, prop, value)
+
+    def update_not_jsonable(self, *args):
+        self.__not_jsonable += args
+
+    def set_not_jsonable(self, *args):
+        self.__not_jsonable = args
 
     def from_json(self, json_string):
         """Load a JSON string"""
@@ -53,7 +52,7 @@ class AbstractMISP(collections.MutableMapping):
 
     def to_dict(self):
         to_return = {}
-        for attribute in self.attributes:
+        for attribute in self.__properties:
             val = getattr(self, attribute, None)
             if val is None:
                 continue
@@ -67,16 +66,13 @@ class AbstractMISP(collections.MutableMapping):
         return json.dumps(self.to_dict(), cls=MISPEncode)
 
     def __getitem__(self, key):
-        if self.__check_dict_key(key):
-            return getattr(self, key)
+        return getattr(self, key)
 
     def __setitem__(self, key, value):
-        if self.__check_dict_key(key):
-            setattr(self, key, value)
+        setattr(self, key, value)
 
     def __delitem__(self, key):
-        if self.__check_dict_key(key):
-            delattr(self, key)
+        delattr(self, key)
 
     def __iter__(self):
         return iter(self.to_dict())

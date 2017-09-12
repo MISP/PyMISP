@@ -33,34 +33,36 @@ class FileObject(AbstractMISPObjectGenerator):
             self.filepath = filepath
             self.filename = os.path.basename(self.filepath)
             with open(filepath, 'rb') as f:
-                self.pseudofile = BytesIO(f.read())
+                self.__pseudofile = BytesIO(f.read())
         elif pseudofile and isinstance(pseudofile, BytesIO):
             # WARNING: lief.parse requires a path
             self.filepath = None
-            self.pseudofile = pseudofile
+            self.__pseudofile = pseudofile
             self.filename = filename
         else:
             raise Exception('File buffer (BytesIO) or a path is required.')
         # PY3 way:
         # super().__init__('file')
         super(FileObject, self).__init__('file')
-        self.data = self.pseudofile.getvalue()
+        self.__data = self.__pseudofile.getvalue()
         self.generate_attributes()
+        # Mark as non_jsonable because we need to add them manually
+        self.update_not_jsonable('ObjectReference')
 
     def generate_attributes(self):
         self.add_attribute('filename', value=self.filename)
-        size = self.add_attribute('size-in-bytes', value=len(self.data))
+        size = self.add_attribute('size-in-bytes', value=len(self.__data))
         if int(size.value) > 0:
-            self.add_attribute('entropy', value=self.__entropy_H(self.data))
-            self.add_attribute('md5', value=md5(self.data).hexdigest())
-            self.add_attribute('sha1', value=sha1(self.data).hexdigest())
-            self.add_attribute('sha256', value=sha256(self.data).hexdigest())
-            self.add_attribute('sha512', value=sha512(self.data).hexdigest())
-            self.add_attribute('malware-sample', value=self.filename, data=self.pseudofile)
+            self.add_attribute('entropy', value=self.__entropy_H(self.__data))
+            self.add_attribute('md5', value=md5(self.__data).hexdigest())
+            self.add_attribute('sha1', value=sha1(self.__data).hexdigest())
+            self.add_attribute('sha256', value=sha256(self.__data).hexdigest())
+            self.add_attribute('sha512', value=sha512(self.__data).hexdigest())
+            self.add_attribute('malware-sample', value=self.filename, data=self.__pseudofile)
             if HAS_MAGIC:
-                self.add_attribute('mimetype', value=magic.from_buffer(self.data))
+                self.add_attribute('mimetype', value=magic.from_buffer(self.__data))
             if HAS_PYDEEP:
-                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
+                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode())
 
     def __entropy_H(self, data):
         """Calculate the entropy of a chunk of data."""

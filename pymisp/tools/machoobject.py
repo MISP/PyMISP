@@ -29,35 +29,37 @@ class MachOObject(AbstractMISPObjectGenerator):
             raise ImportError('Please install lief, documentation here: https://github.com/lief-project/LIEF')
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                self.macho = lief.MachO.parse(raw=pseudofile.getvalue())
+                self.__macho = lief.MachO.parse(raw=pseudofile.getvalue())
             elif isinstance(pseudofile, bytes):
-                self.macho = lief.MachO.parse(raw=pseudofile)
+                self.__macho = lief.MachO.parse(raw=pseudofile)
             else:
                 raise Exception('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
         elif filepath:
-            self.macho = lief.MachO.parse(filepath)
+            self.__macho = lief.MachO.parse(filepath)
         elif parsed:
             # Got an already parsed blob
             if isinstance(parsed, lief.MachO.Binary):
-                self.macho = parsed
+                self.__macho = parsed
             else:
                 raise Exception('Not a lief.MachO.Binary: {}'.format(type(parsed)))
         # Python3 way
         # super().__init__('elf')
         super(MachOObject, self).__init__('macho')
         self.generate_attributes()
+        # Mark as non_jsonable because we need to add them manually
+        self.update_not_jsonable(['ObjectReference'])
 
     def generate_attributes(self):
-        self.add_attribute('type', value=str(self.macho.header.file_type).split('.')[1])
-        self.add_attribute('name', value=self.macho.name)
+        self.add_attribute('type', value=str(self.__macho.header.file_type).split('.')[1])
+        self.add_attribute('name', value=self.__macho.name)
         # General information
-        if self.macho.has_entrypoint:
-            self.add_attribute('entrypoint-address', value=self.macho.entrypoint)
+        if self.__macho.has_entrypoint:
+            self.add_attribute('entrypoint-address', value=self.__macho.entrypoint)
         # Sections
         self.sections = []
-        if self.macho.sections:
+        if self.__macho.sections:
             pos = 0
-            for section in self.macho.sections:
+            for section in self.__macho.sections:
                 s = MachOSectionObject(section)
                 self.add_reference(s.uuid, 'included-in', 'Section {} of MachO'.format(pos))
                 pos += 1
@@ -71,18 +73,20 @@ class MachOSectionObject(AbstractMISPObjectGenerator):
         # Python3 way
         # super().__init__('pe-section')
         super(MachOSectionObject, self).__init__('macho-section')
-        self.section = section
-        self.data = bytes(self.section.content)
+        self.__section = section
+        self.__data = bytes(self.__section.content)
         self.generate_attributes()
+        # Mark as non_jsonable because we need to add them manually
+        self.update_not_jsonable(['ObjectReference'])
 
     def generate_attributes(self):
-        self.add_attribute('name', value=self.section.name)
-        size = self.add_attribute('size-in-bytes', value=self.section.size)
+        self.add_attribute('name', value=self.__section.name)
+        size = self.add_attribute('size-in-bytes', value=self.__section.size)
         if int(size.value) > 0:
-            self.add_attribute('entropy', value=self.section.entropy)
-            self.add_attribute('md5', value=md5(self.data).hexdigest())
-            self.add_attribute('sha1', value=sha1(self.data).hexdigest())
-            self.add_attribute('sha256', value=sha256(self.data).hexdigest())
-            self.add_attribute('sha512', value=sha512(self.data).hexdigest())
+            self.add_attribute('entropy', value=self.__section.entropy)
+            self.add_attribute('md5', value=md5(self.__data).hexdigest())
+            self.add_attribute('sha1', value=sha1(self.__data).hexdigest())
+            self.add_attribute('sha256', value=sha256(self.__data).hexdigest())
+            self.add_attribute('sha512', value=sha512(self.__data).hexdigest())
             if HAS_PYDEEP:
-                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.data).decode())
+                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode())

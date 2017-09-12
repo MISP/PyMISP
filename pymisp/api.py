@@ -37,7 +37,8 @@ except ImportError:
 
 from . import __version__
 from .exceptions import PyMISPError, SearchError, MissingDependency, NoURL, NoKey
-from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
+from .mispevent import MISPEvent, MISPAttribute
+from .abstract import MISPEncode
 
 logger = logging.getLogger(__name__)
 
@@ -318,7 +319,7 @@ class PyMISP(object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events')
         if isinstance(event, MISPEvent):
-            event = json.dumps(event, cls=EncodeUpdate)
+            event = json.dumps(event, cls=MISPEncode)
         if isinstance(event, basestring):
             response = session.post(url, data=event)
         else:
@@ -334,7 +335,7 @@ class PyMISP(object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
         if isinstance(event, MISPEvent):
-            event = json.dumps(event, cls=EncodeUpdate)
+            event = json.dumps(event, cls=MISPEncode)
         if isinstance(event, basestring):
             response = session.post(url, data=event)
         else:
@@ -440,7 +441,7 @@ class PyMISP(object):
             else:
                 session = self.__prepare_session()
                 url = urljoin(self.root_url, 'attributes/add/{}'.format(eventID_to_update))
-                response = self._check_response(session.post(url, data=json.dumps(a, cls=EncodeUpdate)))
+                response = self._check_response(session.post(url, data=json.dumps(a, cls=MISPEncode)))
         return response
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
@@ -737,7 +738,7 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
-            response = session.post(url, data=json.dumps(query, cls=EncodeUpdate))
+            response = session.post(url, data=json.dumps(query, cls=MISPEncode))
         elif path == 'view':
             response = session.get(url)
         else:  # accept or discard

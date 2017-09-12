@@ -10,10 +10,8 @@ import pymisp as pm
 from pymisp import PyMISP
 # from pymisp import NewEventError
 from pymisp import MISPEvent
-from pymisp import EncodeUpdate
-from pymisp import EncodeFull
-
 from pymisp import MISPEncode
+
 from pymisp.tools import make_binary_objects
 
 
@@ -135,8 +133,7 @@ class TestOffline(unittest.TestCase):
         misp_event = MISPEvent(pymisp.describe_types)
         with open('tests/57c4445b-c548-4654-af0b-4be3950d210f.json', 'r') as f:
             misp_event.load(f.read())
-        json.dumps(misp_event, cls=EncodeUpdate)
-        json.dumps(misp_event, cls=EncodeFull)
+        json.dumps(misp_event, cls=MISPEncode)
 
     def test_searchIndexByTagId(self, m):
         self.initURI(m)
