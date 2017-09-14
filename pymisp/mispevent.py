@@ -255,6 +255,8 @@ class MISPEvent(AbstractMISP):
                 t = json.load(f)
             describe_types = t['result']
 
+        self.__types = describe_types['types']
+
         self._reinitialize_event()
 
     def _reinitialize_event(self):
@@ -287,6 +289,9 @@ class MISPEvent(AbstractMISP):
         self.Tag = []
         self.Galaxy = None
         self.Object = None
+
+    def get_known_types(self):
+        return self.__types
 
     def _serialize(self):
         return '{date}{threat_level_id}{info}{uuid}{analysis}{timestamp}'.format(
