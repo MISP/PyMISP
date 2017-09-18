@@ -73,10 +73,9 @@ class MISPAttribute(AbstractMISP):
                 t = json.load(f)
             describe_types = t['result']
         self.__categories = describe_types['categories']
-        self.__types = describe_types['types']
+        self._types = describe_types['types']
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
-        self._reinitialize_attribute()
 
     def _reinitialize_attribute(self):
         # Default values
@@ -102,6 +101,9 @@ class MISPAttribute(AbstractMISP):
         self.disable_correlation = False
         self.RelatedAttribute = []
         self.Tag = []
+
+    def get_known_types(self):
+        return self._types
 
     def _serialize(self):
         return '{type}{category}{to_ids}{uuid}{timestamp}{comment}{deleted}{value}'.format(
@@ -151,8 +153,8 @@ class MISPAttribute(AbstractMISP):
         self.type = kwargs.pop('type', None)
         if self.type is None:
             raise NewAttributeError('The type of the attribute is required.')
-        if self.type not in self.__types:
-            raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self.__types))))
+        if self.type not in self.get_known_types():
+            raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self._types))))
 
         type_defaults = self.__sane_default[self.type]
 
@@ -207,7 +209,9 @@ class MISPAttribute(AbstractMISP):
         m = hashlib.md5()
         m.update(self.data.getvalue())
         self.value = self.malware_filename
-        self.malware_binary = self.data
+        md5 = m.hexdigest()
+        self.value = '{}|{}'.format(self.malware_filename, md5)
+        self._malware_binary = self.data
         self.encrypt = True
 
     def _load_data(self):
@@ -222,10 +226,15 @@ class MISPAttribute(AbstractMISP):
                                 self.malware_filename = unpacked.read().decode()
                         else:
                             with f.open(name, pwd=b'infected') as unpacked:
-                                self.malware_binary = BytesIO(unpacked.read())
+                                self._malware_binary = BytesIO(unpacked.read())
             except:
                 # not a encrypted zip file, assuming it is a new malware sample
                 self._prepare_new_malware_sample()
+
+    def get_malware_binary(self):
+        if hasattr(self, '_malware_binary'):
+            return self._malware_binary
+        return None
 
     def _json(self):
         # DEPRECATED
@@ -236,13 +245,19 @@ class MISPAttribute(AbstractMISP):
         return self.to_dict()
 
     def to_dict(self, with_timestamp=False):
-        to_return = super(MISPAttribute, self).to_dict()
-        if to_return.get('data'):
-            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
-        if with_timestamp and to_return.get('timestamp'):
-            to_return['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
-        else:
-            to_return.pop('timestamp', None)
+        to_return = {}
+        for attribute in self.properties():
+            val = getattr(self, attribute, None)
+            if val in [None, []]:
+                continue
+
+            if attribute == 'data':
+                to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
+            elif attribute == 'timestamp':
+                if with_timestamp:
+                    to_return['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
+            else:
+                to_return[attribute] = val
         to_return = _int_to_str(to_return)
         return to_return
 
@@ -262,9 +277,8 @@ class MISPEvent(AbstractMISP):
                 t = json.load(f)
             describe_types = t['result']
 
-        self.__types = describe_types['types']
-
-        self._reinitialize_event()
+        self._types = describe_types['types']
+        self.attributes = []
 
     def _reinitialize_event(self):
         # Default values for a valid event to send to a MISP instance
@@ -298,7 +312,7 @@ class MISPEvent(AbstractMISP):
         self.Object = None
 
     def get_known_types(self):
-        return self.__types
+        return self._types
 
     def _serialize(self):
         return '{date}{threat_level_id}{info}{uuid}{analysis}{timestamp}'.format(
@@ -380,7 +394,6 @@ class MISPEvent(AbstractMISP):
             event['Event']['attribute_count'] = '0'
         jsonschema.validate(event, self.__json_schema)
         e = event.get('Event')
-        self._reinitialize_event()
         self.set_all_values(**e)
 
     def set_date(self, date, ignore_invalid=False):
@@ -434,6 +447,8 @@ class MISPEvent(AbstractMISP):
             for a in kwargs.pop('Attribute'):
                 attribute = MISPAttribute()
                 attribute.set_all_values(**a)
+                if not hasattr(self, 'attributes'):
+                    self.attributes = []
                 self.attributes.append(attribute)
 
         # All other keys
@@ -530,6 +545,8 @@ class MISPEvent(AbstractMISP):
                 self.add_attribute(type, a, **kwargs)
         else:
             attribute.set_all_values(type=type, value=value, **kwargs)
+            if not hasattr(self, 'attributes'):
+                self.attributes = []
             self.attributes.append(attribute)
 
 
@@ -550,7 +567,7 @@ class MISPObjectReference(AbstractMISP):
 class MISPObjectAttribute(MISPAttribute):
 
     def __init__(self, definition):
-        super(MISPAttribute, self).__init__()
+        super(MISPObjectAttribute, self).__init__()
         self.__definition = definition
 
     def from_dict(self, object_relation, value, **kwargs):
@@ -571,7 +588,7 @@ class MISPObjectAttribute(MISPAttribute):
             # Same for the to_ids flag
             self.to_ids = self.__definition.get('to_ids')
         kwargs.update(**self)
-        super(MISPAttribute, self).from_dict(**kwargs)
+        super(MISPObjectAttribute, self).from_dict(**kwargs)
 
 
 class MISPObject(AbstractMISP):

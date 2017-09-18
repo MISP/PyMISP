@@ -25,8 +25,7 @@ class AbstractMISP(collections.MutableMapping):
 
     __not_jsonable = []
 
-    @property
-    def __properties(self):
+    def properties(self):
         to_return = []
         for prop, value in vars(self).items():
             if prop.startswith('_') or prop in self.__not_jsonable:
@@ -52,7 +51,7 @@ class AbstractMISP(collections.MutableMapping):
 
     def to_dict(self):
         to_return = {}
-        for attribute in self.__properties:
+        for attribute in self.properties():
             val = getattr(self, attribute, None)
             if val is None:
                 continue
