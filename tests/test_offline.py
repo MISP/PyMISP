@@ -10,8 +10,9 @@ import pymisp as pm
 from pymisp import PyMISP
 # from pymisp import NewEventError
 from pymisp import MISPEvent
-from pymisp import EncodeUpdate
-from pymisp import EncodeFull
+from pymisp import MISPEncode
+
+from pymisp.tools import make_binary_objects
 
 
 @requests_mock.Mocker()
@@ -122,8 +123,7 @@ class TestOffline(unittest.TestCase):
         misp_event = MISPEvent(pymisp.describe_types)
         with open('tests/57c4445b-c548-4654-af0b-4be3950d210f.json', 'r') as f:
             misp_event.load(f.read())
-        json.dumps(misp_event, cls=EncodeUpdate)
-        json.dumps(misp_event, cls=EncodeFull)
+        json.dumps(misp_event, cls=MISPEncode)
 
     def test_searchIndexByTagId(self, m):
         self.initURI(m)
@@ -209,6 +209,34 @@ class TestOffline(unittest.TestCase):
         p.add_internal_text(evt, 'foobar')
         p.add_internal_other(evt, 'foobar')
         p.add_attachment(evt, "testFile")
+
+    def make_objects(self, path):
+        to_return = {'objects': [], 'references': []}
+        fo, peo, seos = make_binary_objects(path)
+
+        if seos:
+            for s in seos:
+                to_return['objects'].append(s)
+                if s.ObjectReference:
+                    to_return['references'] += s.ObjectReference
+
+        if peo:
+            to_return['objects'].append(peo)
+            if peo.ObjectReference:
+                to_return['references'] += peo.ObjectReference
+
+        if fo:
+            to_return['objects'].append(fo)
+            if fo.ObjectReference:
+                to_return['references'] += fo.ObjectReference
+        return json.dumps(to_return, cls=MISPEncode)
+
+    def test_objects(self, m):
+        paths = ['cmd.exe', 'tmux', 'MachO-OSX-x64-ls']
+        for path in paths:
+            json_blob = self.make_objects(os.path.join('tests',
+                                          'viper-test-files', 'test_files', path))
+        print(json_blob)
 
 if __name__ == '__main__':
     unittest.main()

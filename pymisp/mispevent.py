@@ -4,13 +4,24 @@
 import datetime
 import time
 import json
-from json import JSONEncoder
 import os
-import warnings
 import base64
 from io import BytesIO
 from zipfile import ZipFile
 import hashlib
+import sys
+import uuid
+from collections import Counter
+
+from .abstract import AbstractMISP
+from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
+
+
+import six  # Remove that import when discarding python2 support.
+
+if six.PY2:
+    import warnings
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
 
 try:
     from dateutil.parser import parse
@@ -36,31 +47,35 @@ except ImportError:
     except ImportError:
         has_pyme = False
 
-from .exceptions import PyMISPError, NewEventError, NewAttributeError
-
 # Least dirty way to support python 2 and 3
 try:
     basestring
     unicode
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
 except NameError:
     basestring = str
     unicode = str
 
 
-class MISPAttribute(object):
+def _int_to_str(d):
+    # transform all integer back to string
+    for k, v in d.items():
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            d[k] = str(v)
+    return d
+
+
+class MISPAttribute(AbstractMISP):
 
     def __init__(self, describe_types=None):
         if not describe_types:
-            self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-            with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
+            ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+            with open(os.path.join(ressources_path, 'describeTypes.json'), 'r') as f:
                 t = json.load(f)
             describe_types = t['result']
-        self.describe_types = describe_types
-        self.categories = describe_types['categories']
-        self.types = describe_types['types']
-        self.category_type_mapping = describe_types['category_type_mappings']
-        self.sane_default = describe_types['sane_defaults']
+        self.__categories = describe_types['categories']
+        self.__types = describe_types['types']
+        self.__category_type_mapping = describe_types['category_type_mappings']
+        self.__sane_default = describe_types['sane_defaults']
         self._reinitialize_attribute()
 
     def _reinitialize_attribute(self):
@@ -124,74 +139,63 @@ class MISPAttribute(object):
                 return {self.uuid: False}
 
     def set_all_values(self, **kwargs):
+        # to be deprecated
+        self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
-            if kwargs['type'] not in self.category_type_mapping[kwargs['category']]:
-                raise NewAttributeError('{} and {} is an invalid combination, type for this category has to be in {}'.format(kwargs.get('type'), kwargs.get('category'), (', '.join(self.category_type_mapping[kwargs['category']]))))
+            if kwargs['type'] not in self.__category_type_mapping[kwargs['category']]:
+                raise NewAttributeError('{} and {} is an invalid combination, type for this category has to be in {}'.format(
+                    kwargs.get('type'), kwargs.get('category'), (', '.join(self.__category_type_mapping[kwargs['category']]))))
         # Required
-        if kwargs.get('type'):
-            self.type = kwargs['type']
-            if self.type not in self.types:
-                raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self.types))))
-        elif not self.type:
+        self.type = kwargs.pop('type', None)
+        if self.type is None:
             raise NewAttributeError('The type of the attribute is required.')
+        if self.type not in self.__types:
+            raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self.__types))))
 
-        type_defaults = self.sane_default[self.type]
+        type_defaults = self.__sane_default[self.type]
 
-        self.value = kwargs.get('value')
-
+        self.value = kwargs.pop('value', None)
         if self.value is None:
             raise NewAttributeError('The value of the attribute is required.')
 
         # Default values
-        if kwargs.get('category'):
-            self.category = kwargs['category']
-            if self.category not in self.categories:
-                raise NewAttributeError('{} is invalid, category has to be in {}'.format(self.category, (', '.join(self.categories))))
-        else:
-            self.category = type_defaults['default_category']
+        self.category = kwargs.pop('category', type_defaults['default_category'])
+        if self.category not in self.__categories:
+            raise NewAttributeError('{} is invalid, category has to be in {}'.format(self.category, (', '.join(self.__categories))))
 
-        self.to_ids = kwargs.get('to_ids')
-        if self.to_ids is None:
-            self.to_ids = bool(int(type_defaults['to_ids']))
+        self.to_ids = kwargs.pop('to_ids', bool(int(type_defaults['to_ids'])))
         if not isinstance(self.to_ids, bool):
             raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
 
-        if kwargs.get('comment'):
-            self.comment = kwargs['comment']
         if kwargs.get('distribution') is not None:
-            self.distribution = int(kwargs['distribution'])
+            self.distribution = int(kwargs.pop('distribution'))
             if self.distribution not in [0, 1, 2, 3, 4, 5]:
                 raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
 
         # other possible values
         if kwargs.get('data'):
-            self.data = kwargs['data']
+            self.data = kwargs.pop('data')
             self._load_data()
         if kwargs.get('id'):
-            self.id = int(kwargs['id'])
+            self.id = int(kwargs.pop('id'))
         if kwargs.get('event_id'):
-            self.event_id = int(kwargs['event_id'])
-        if kwargs.get('uuid'):
-            self.uuid = kwargs['uuid']
+            self.event_id = int(kwargs.pop('event_id'))
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs['timestamp']))
+            self.timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs.pop('timestamp')))
         if kwargs.get('sharing_group_id'):
-            self.sharing_group_id = int(kwargs['sharing_group_id'])
-        if kwargs.get('deleted'):
-            self.deleted = kwargs['deleted']
-        if kwargs.get('SharingGroup'):
-            self.SharingGroup = kwargs['SharingGroup']
-        if kwargs.get('ShadowAttribute'):
-            self.ShadowAttribute = kwargs['ShadowAttribute']
-        if kwargs.get('sig'):
-            self.sig = kwargs['sig']
+            self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('Tag'):
-            self.Tag = [t for t in kwargs['Tag'] if t]
+            self.Tag = [t for t in kwargs.pop('Tag', []) if t]
 
         # If the user wants to disable correlation, let them. Defaults to False.
-        self.disable_correlation = kwargs.get("disable_correlation", False)
+        self.disable_correlation = kwargs.pop("disable_correlation", False)
         if self.disable_correlation is None:
             self.disable_correlation = False
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     def _prepare_new_malware_sample(self):
         if '|' in self.value:
@@ -202,8 +206,7 @@ class MISPAttribute(object):
             self.malware_filename = self.value
         m = hashlib.md5()
         m.update(self.data.getvalue())
-        md5 = m.hexdigest()
-        self.value = '{}|{}'.format(self.malware_filename, md5)
+        self.value = self.malware_filename
         self.malware_binary = self.data
         self.encrypt = True
 
@@ -225,88 +228,41 @@ class MISPAttribute(object):
                 self._prepare_new_malware_sample()
 
     def _json(self):
-        to_return = {'type': self.type, 'category': self.category, 'to_ids': self.to_ids,
-                     'distribution': self.distribution, 'value': self.value,
-                     'comment': self.comment, 'disable_correlation': self.disable_correlation}
-        if self.uuid:
-            to_return['uuid'] = self.uuid
-        if self.sig:
-            to_return['sig'] = self.sig
-        if self.sharing_group_id:
-            to_return['sharing_group_id'] = self.sharing_group_id
-        if self.Tag:
-            to_return['Tag'] = self.Tag
-        if self.data:
-            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
-            if self.encrypt:
-                to_return['encrypt'] = self.encrypt
-        to_return = _int_to_str(to_return)
-        return to_return
+        # DEPRECATED
+        return self.to_dict()
 
     def _json_full(self):
-        to_return = self._json()
-        if self.event_id:
-            to_return['event_id'] = self.event_id
-        if self.id:
-            to_return['id'] = self.id
-        if self.timestamp:
-            # Should never be set on an update, MISP will automatically set it to now
+        # DEPRECATED
+        return self.to_dict()
+
+    def to_dict(self, with_timestamp=False):
+        to_return = super(MISPAttribute, self).to_dict()
+        if to_return.get('data'):
+            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
+        if with_timestamp and to_return.get('timestamp'):
             to_return['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
-        if self.deleted is not None:
-            to_return['deleted'] = self.deleted
-        if self.ShadowAttribute:
-            to_return['ShadowAttribute'] = self.ShadowAttribute
-        if self.SharingGroup:
-            to_return['SharingGroup'] = self.SharingGroup
+        else:
+            to_return.pop('timestamp', None)
         to_return = _int_to_str(to_return)
         return to_return
 
 
-class EncodeUpdate(JSONEncoder):
-    def default(self, obj):
-        try:
-            return obj._json()
-        except AttributeError:
-            return JSONEncoder.default(self, obj)
-
-
-class EncodeFull(JSONEncoder):
-    def default(self, obj):
-        try:
-            return obj._json_full()
-        except AttributeError:
-            return JSONEncoder.default(self, obj)
-
-
-def _int_to_str(d):
-    # transform all integer back to string
-    for k, v in d.items():
-        if isinstance(v, (int, float)) and not isinstance(v, bool):
-            d[k] = str(v)
-    return d
-
-
-class MISPEvent(object):
+class MISPEvent(AbstractMISP):
 
     def __init__(self, describe_types=None, strict_validation=False):
-        self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+        ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
-            with open(os.path.join(self.resources_path, 'schema.json'), 'r') as f:
-                self.json_schema = json.load(f)
+            with open(os.path.join(ressources_path, 'schema.json'), 'r') as f:
+                self.__json_schema = json.load(f)
         else:
-            with open(os.path.join(self.resources_path, 'schema-lax.json'), 'r') as f:
-                self.json_schema = json.load(f)
+            with open(os.path.join(ressources_path, 'schema-lax.json'), 'r') as f:
+                self.__json_schema = json.load(f)
         if not describe_types:
-            with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
+            with open(os.path.join(ressources_path, 'describeTypes.json'), 'r') as f:
                 t = json.load(f)
             describe_types = t['result']
-        self.describe_types = describe_types
-        self.categories = describe_types['categories']
-        self.types = describe_types['types']
-        self.category_type_mapping = describe_types['category_type_mappings']
-        self.sane_default = describe_types['sane_defaults']
-        self.new = True
-        self.dump_full = False
+
+        self.__types = describe_types['types']
 
         self._reinitialize_event()
 
@@ -339,6 +295,10 @@ class MISPEvent(object):
         self.RelatedEvent = []
         self.Tag = []
         self.Galaxy = None
+        self.Object = None
+
+    def get_known_types(self):
+        return self.__types
 
     def _serialize(self):
         return '{date}{threat_level_id}{info}{uuid}{analysis}{timestamp}'.format(
@@ -404,8 +364,6 @@ class MISPEvent(object):
             self.load(f)
 
     def load(self, json_event):
-        self.new = False
-        self.dump_full = True
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
             json_event = json_event.read()
@@ -420,7 +378,7 @@ class MISPEvent(object):
         # Invalid event created by MISP up to 2.4.52 (attribute_count is none instead of '0')
         if event.get('Event') and event.get('Event').get('attribute_count') is None:
             event['Event']['attribute_count'] = '0'
-        jsonschema.validate(event, self.json_schema)
+        jsonschema.validate(event, self.__json_schema)
         e = event.get('Event')
         self._reinitialize_event()
         self.set_all_values(**e)
@@ -439,140 +397,100 @@ class MISPEvent(object):
                 raise NewEventError('Invalid format for the date: {} - {}'.format(date, type(date)))
 
     def set_all_values(self, **kwargs):
+        # to be deprecated
+        self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs):
         # Required value
-        if kwargs.get('info'):
-            self.info = kwargs['info']
-        elif not self.info:
+        self.info = kwargs.pop('info', None)
+        if not self.info:
             raise NewAttributeError('The info field of the new event is required.')
 
         # Default values for a valid event to send to a MISP instance
         if kwargs.get('distribution') is not None:
-            self.distribution = int(kwargs['distribution'])
+            self.distribution = int(kwargs.pop('distribution'))
             if self.distribution not in [0, 1, 2, 3, 4]:
-                raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
+                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
+
         if kwargs.get('threat_level_id') is not None:
-            self.threat_level_id = int(kwargs['threat_level_id'])
+            self.threat_level_id = int(kwargs.pop('threat_level_id'))
             if self.threat_level_id not in [1, 2, 3, 4]:
                 raise NewEventError('{} is invalid, the threat_level has to be in 1, 2, 3, 4'.format(self.threat_level_id))
+
         if kwargs.get('analysis') is not None:
-            self.analysis = int(kwargs['analysis'])
+            self.analysis = int(kwargs.pop('analysis'))
             if self.analysis not in [0, 1, 2]:
                 raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(self.analysis))
-        if kwargs.get('published') is not None:
-            self.unpublish()
-        if kwargs.get("published") is True:
+
+        self.published = kwargs.pop('published', None)
+        if self.published is True:
             self.publish()
+        else:
+            self.unpublish()
+
         if kwargs.get('date'):
-            self.set_date(kwargs['date'])
+            self.set_date(kwargs.pop('date'))
         if kwargs.get('Attribute'):
-            for a in kwargs['Attribute']:
-                attribute = MISPAttribute(self.describe_types)
+            for a in kwargs.pop('Attribute'):
+                attribute = MISPAttribute()
                 attribute.set_all_values(**a)
                 self.attributes.append(attribute)
 
         # All other keys
         if kwargs.get('id'):
-            self.id = int(kwargs['id'])
+            self.id = int(kwargs.pop('id'))
         if kwargs.get('orgc_id'):
-            self.orgc_id = int(kwargs['orgc_id'])
+            self.orgc_id = int(kwargs.pop('orgc_id'))
         if kwargs.get('org_id'):
-            self.org_id = int(kwargs['org_id'])
-        if kwargs.get('uuid'):
-            self.uuid = kwargs['uuid']
-        if kwargs.get('attribute_count'):
-            self.attribute_count = int(kwargs['attribute_count'])
+            self.org_id = int(kwargs.pop('org_id'))
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs['timestamp']))
-        if kwargs.get('proposal_email_lock'):
-            self.proposal_email_lock = kwargs['proposal_email_lock']
-        if kwargs.get('locked'):
-            self.locked = kwargs['locked']
+            self.timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs.pop('timestamp')))
         if kwargs.get('publish_timestamp'):
-            self.publish_timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs['publish_timestamp']))
+            self.publish_timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs.pop('publish_timestamp')))
         if kwargs.get('sharing_group_id'):
-            self.sharing_group_id = int(kwargs['sharing_group_id'])
-        if kwargs.get('Org'):
-            self.Org = kwargs['Org']
-        if kwargs.get('Orgc'):
-            self.Orgc = kwargs['Orgc']
-        if kwargs.get('ShadowAttribute'):
-            self.ShadowAttribute = kwargs['ShadowAttribute']
+            self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('RelatedEvent'):
             self.RelatedEvent = []
-            for rel_event in kwargs['RelatedEvent']:
+            for rel_event in kwargs.pop('RelatedEvent'):
                 sub_event = MISPEvent()
                 sub_event.load(rel_event)
                 self.RelatedEvent.append(sub_event)
-        if kwargs.get('Galaxy'):
-            self.Galaxy = kwargs['Galaxy']
         if kwargs.get('Tag'):
-            self.Tag = [t for t in kwargs['Tag'] if t]
-        if kwargs.get('sig'):
-            self.sig = kwargs['sig']
-        if kwargs.get('global_sig'):
-            self.global_sig = kwargs['global_sig']
+            self.Tag = [t for t in kwargs.pop('Tag', []) if t]
+        if kwargs.get('Object'):
+            self.Object = []
+            for obj in kwargs.pop('Object'):
+                tmp_object = MISPObject(obj['name'])
+                tmp_object.from_dict(**obj)
+                self.Object.append(tmp_object)
+
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
     def _json(self):
-        to_return = {'Event': {}}
-        to_return['Event'] = {'distribution': self.distribution, 'info': self.info,
-                              'date': self.date.isoformat(), 'published': self.published,
-                              'threat_level_id': self.threat_level_id,
-                              'analysis': self.analysis, 'Attribute': []}
-        if self.sig:
-            to_return['Event']['sig'] = self.sig
-        if self.global_sig:
-            to_return['Event']['global_sig'] = self.global_sig
-        if self.uuid:
-            to_return['Event']['uuid'] = self.uuid
-        if self.Tag:
-            to_return['Event']['Tag'] = self.Tag
-        if self.Orgc:
-            to_return['Event']['Orgc'] = self.Orgc
-        if self.Galaxy:
-            to_return['Event']['Galaxy'] = self.Galaxy
-        if self.sharing_group_id:
-            to_return['Event']['sharing_group_id'] = self.sharing_group_id
-        to_return['Event'] = _int_to_str(to_return['Event'])
-        if self.attributes:
-            to_return['Event']['Attribute'] = [a._json() for a in self.attributes]
-        jsonschema.validate(to_return, self.json_schema)
-        return to_return
+        # DEPTECATED
+        return self.to_dict()
 
-    def _json_full(self):
-        to_return = self._json()
-        if self.id:
-            to_return['Event']['id'] = self.id
-        if self.orgc_id:
-            to_return['Event']['orgc_id'] = self.orgc_id
-        if self.org_id:
-            to_return['Event']['org_id'] = self.org_id
-        if self.locked is not None:
-            to_return['Event']['locked'] = self.locked
-        if self.attribute_count is not None:
-            to_return['Event']['attribute_count'] = self.attribute_count
-        if self.RelatedEvent:
-            to_return['Event']['RelatedEvent'] = []
-            for rel_event in self.RelatedEvent:
-                to_return['Event']['RelatedEvent'].append(rel_event._json_full())
-        if self.Org:
-            to_return['Event']['Org'] = self.Org
-        if self.sharing_group_id:
-            to_return['Event']['sharing_group_id'] = self.sharing_group_id
-        if self.ShadowAttribute:
-            to_return['Event']['ShadowAttribute'] = self.ShadowAttribute
-        if self.proposal_email_lock is not None:
-            to_return['Event']['proposal_email_lock'] = self.proposal_email_lock
-        if self.locked is not None:
-            to_return['Event']['locked'] = self.locked
-        if self.publish_timestamp:
-            to_return['Event']['publish_timestamp'] = int(time.mktime(self.publish_timestamp.timetuple()))
-        if self.timestamp:
-            # Should never be set on an update, MISP will automatically set it to now
-            to_return['Event']['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
-        to_return['Event'] = _int_to_str(to_return['Event'])
-        if self.attributes:
-            to_return['Event']['Attribute'] = [a._json_full() for a in self.attributes]
-        jsonschema.validate(to_return, self.json_schema)
+    def to_dict(self, with_timestamp=False):
+        to_return = super(MISPEvent, self).to_dict()
+        if to_return.get('date'):
+            to_return['date'] = self.date.isoformat()
+        if to_return.get('attributes'):
+            attributes = to_return.pop('attributes')
+            to_return['Attribute'] = [attribute.to_dict(with_timestamp) for attribute in attributes]
+        if to_return.get('RelatedEvent'):
+            to_return['RelatedEvent'] = [rel_event.to_dict() for rel_event in self.RelatedEvent]
+        if with_timestamp and to_return.get('timestamp'):
+            to_return['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
+        else:
+            to_return.pop('timestamp', None)
+        if with_timestamp and to_return.get('publish_timestamp'):
+            to_return['publish_timestamp'] = int(time.mktime(self.publish_timestamp.timetuple()))
+        else:
+            to_return.pop('publish_timestamp', None)
+        to_return = _int_to_str(to_return)
+        to_return = {'Event': to_return}
+        jsonschema.validate(to_return, self.__json_schema)
         return to_return
 
     def add_tag(self, tag):
@@ -581,7 +499,7 @@ class MISPEvent(object):
     def add_attribute_tag(self, tag, attribute_identifier):
         attribute = None
         for a in self.attributes:
-            if (a.id == attribute_identifier or a.uuid == attribute_identifier or 
+            if (a.id == attribute_identifier or a.uuid == attribute_identifier or
                     attribute_identifier == a.value or attribute_identifier in a.value.split('|')):
                 a.add_tag(tag)
                 attribute = a
@@ -606,10 +524,160 @@ class MISPEvent(object):
             raise Exception('No attribute with UUID/ID {} found.'.format(attribute_id))
 
     def add_attribute(self, type, value, **kwargs):
-        attribute = MISPAttribute(self.describe_types)
+        attribute = MISPAttribute()
         if isinstance(value, list):
             for a in value:
                 self.add_attribute(type, a, **kwargs)
         else:
             attribute.set_all_values(type=type, value=value, **kwargs)
             self.attributes.append(attribute)
+
+
+class MISPObjectReference(AbstractMISP):
+
+    def __init__(self):
+        super(MISPObjectReference, self).__init__()
+
+    def from_dict(self, object_uuid, referenced_uuid, relationship_type, comment=None, **kwargs):
+        self.object_uuid = object_uuid
+        self.referenced_uuid = referenced_uuid
+        self.relationship_type = relationship_type
+        self.comment = comment
+        for k, v in kwargs:
+            setattr(self, k, v)
+
+
+class MISPObjectAttribute(MISPAttribute):
+
+    def __init__(self, definition):
+        super(MISPAttribute, self).__init__()
+        self.__definition = definition
+
+    def from_dict(self, object_relation, value, **kwargs):
+        self.object_relation = object_relation
+        self.value = value
+        # Initialize the new MISPAttribute
+        # Get the misp attribute type from the definition
+        self.type = kwargs.pop('type', None)
+        if self.type is None:
+            self.type = self.__definition.get('misp-attribute')
+        self.disable_correlation = kwargs.pop('disable_correlation', None)
+        if self.disable_correlation is None:
+            # The correlation can be disabled by default in the object definition.
+            # Use this value if it isn't overloaded by the object
+            self.disable_correlation = self.__definition.get('disable_correlation')
+        self.to_ids = kwargs.pop('to_ids', None)
+        if self.to_ids is None:
+            # Same for the to_ids flag
+            self.to_ids = self.__definition.get('to_ids')
+        kwargs.update(**self)
+        super(MISPAttribute, self).from_dict(**kwargs)
+
+
+class MISPObject(AbstractMISP):
+
+    def __init__(self, name, strict=True):
+        super(MISPObject, self).__init__()
+        self.__strict = strict
+        self.name = name
+        self.__misp_objects_path = os.path.join(
+            os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)),
+            'data', 'misp-objects', 'objects')
+        if os.path.exists(os.path.join(self.__misp_objects_path, self.name, 'definition.json')):
+            self.__known_template = True
+        else:
+            if self.__strict:
+                raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.')
+            else:
+                self.__known_template = False
+        if self.__known_template:
+            with open(os.path.join(self.__misp_objects_path, self.name, 'definition.json'), 'r') as f:
+                self.__definition = json.load(f)
+            setattr(self, 'meta-category', self.__definition['meta-category'])
+            self.template_uuid = self.__definition['uuid']
+            self.description = self.__definition['description']
+            self.template_version = self.__definition['version']
+        else:
+            # FIXME We need to set something for meta-category, template_uuid, description and template_version
+            pass
+        self.uuid = str(uuid.uuid4())
+        self.Attribute = []
+        self.ObjectReference = []
+
+    def from_dict(self, **kwargs):
+        if self.__known_template:
+            if kwargs.get('template_uuid') and kwargs['template_uuid'] != self.template_uuid:
+                if self.__strict:
+                    raise UnknownMISPObjectTemplate('UUID of the object is different from the one of the template.')
+                else:
+                    self.__known_template = False
+            if kwargs.get('template_version') and int(kwargs['template_version']) != self.template_version:
+                if self.strict:
+                    raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
+                else:
+                    self.__known_template = False
+
+        for key, value in kwargs.items():
+            if key == 'Attribute':
+                for v in value:
+                    self.add_attribute(**v)
+            elif key == 'ObjectReference':
+                for v in value:
+                    self.add_reference(**v)
+            else:
+                setattr(self, key, value)
+
+    def to_dict(self, strict=True):
+        if strict or self.__strict and self.__known_template:
+            self._validate()
+        return super(MISPObject, self).to_dict()
+
+    def to_json(self, strict=True):
+        if strict or self.__strict and self.__known_template:
+            self._validate()
+        return super(MISPObject, self).to_json()
+
+    def _validate(self):
+        """Make sure the object we're creating has the required fields"""
+        all_object_relations = []
+        for a in self.Attribute:
+            all_object_relations.append(a.object_relation)
+        count_relations = dict(Counter(all_object_relations))
+        for key, counter in count_relations.items():
+            if counter == 1:
+                continue
+            if not self.__definition['attributes'][key].get('multiple'):
+                raise InvalidMISPObject('Multiple occurrences of {} is not allowed'.format(key))
+        all_attribute_names = set(count_relations.keys())
+        if self.__definition.get('requiredOneOf'):
+            if not set(self.__definition['requiredOneOf']) & all_attribute_names:
+                raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self.__definition['requiredOneOf'])))
+        if self.__definition.get('required'):
+            for r in self.__definition.get('required'):
+                if r not in all_attribute_names:
+                    raise InvalidMISPObject('{} is required'.format(r))
+        return True
+
+    def add_reference(self, referenced_uuid, relationship_type, comment=None, **kwargs):
+        """Add a link (uuid) to an other object"""
+        if kwargs.get('object_uuid'):
+            # Load existing object
+            object_uuid = kwargs.get('object_uuid')
+        else:
+            # New reference
+            object_uuid = self.uuid
+        reference = MISPObjectReference()
+        reference.from_dict(object_uuid=object_uuid, referenced_uuid=referenced_uuid,
+                            relationship_type=relationship_type, comment=comment, **kwargs)
+        self.ObjectReference.append(reference)
+
+    def add_attribute(self, object_relation, **value):
+        if value.get('value') is None:
+            return None
+        if self.__known_template:
+            attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
+        else:
+            attribute = MISPObjectAttribute({})
+        attribute.from_dict(object_relation, **value)
+        self.Attribute.append(attribute)
+        return attribute

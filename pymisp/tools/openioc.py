@@ -3,7 +3,7 @@
 
 import os
 
-from pymisp import MISPEvent
+from .. import MISPEvent
 try:
     from bs4 import BeautifulSoup
     has_bs4 = True

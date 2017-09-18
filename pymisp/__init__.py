@@ -1,7 +1,12 @@
-__version__ = '2.4.79'
+__version__ = '2.4.80'
 
-from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey
-from .api import PyMISP
-from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate, EncodeFull
-from .tools.neo4j import Neo4j
-from .tools import stix
+try:
+    from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate  # noqa
+    from .api import PyMISP  # noqa
+    from .abstract import AbstractMISP, MISPEncode  # noqa
+    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject  # noqa
+    from .tools import AbstractMISPObjectGenerator  # noqa
+    from .tools import Neo4j  # noqa
+    from .tools import stix  # noqa
+except ImportError:
+    pass

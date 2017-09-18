@@ -1,6 +1,7 @@
 
 # -*- coding: utf-8 -*-
 
+
 class PyMISPError(Exception):
     def __init__(self, message):
         super(PyMISPError, self).__init__(message)
@@ -28,4 +29,17 @@ class NoURL(PyMISPError):
 
 
 class NoKey(PyMISPError):
+    pass
+
+
+class MISPObjectException(PyMISPError):
+    pass
+
+
+class InvalidMISPObject(MISPObjectException):
+    """Exception raised when an object doesn't respect the contrains in the definition"""
+    pass
+
+class UnknownMISPObjectTemplate(MISPObjectException):
+    """Exception raised when the template is unknown"""
     pass

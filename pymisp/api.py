@@ -18,7 +18,7 @@ try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
+    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
 from io import BytesIO, open
 import zipfile
 
@@ -37,7 +37,8 @@ except ImportError:
 
 from . import __version__
 from .exceptions import PyMISPError, SearchError, MissingDependency, NoURL, NoKey
-from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate
+from .mispevent import MISPEvent, MISPAttribute
+from .abstract import MISPEncode
 
 logger = logging.getLogger(__name__)
 
@@ -318,7 +319,7 @@ class PyMISP(object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events')
         if isinstance(event, MISPEvent):
-            event = json.dumps(event, cls=EncodeUpdate)
+            event = json.dumps(event, cls=MISPEncode)
         if isinstance(event, basestring):
             response = session.post(url, data=event)
         else:
@@ -334,7 +335,7 @@ class PyMISP(object):
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
         if isinstance(event, MISPEvent):
-            event = json.dumps(event, cls=EncodeUpdate)
+            event = json.dumps(event, cls=MISPEncode)
         if isinstance(event, basestring):
             response = session.post(url, data=event)
         else:
@@ -460,7 +461,7 @@ class PyMISP(object):
             else:
                 session = self.__prepare_session()
                 url = urljoin(self.root_url, 'attributes/add/{}'.format(eventID_to_update))
-                response = self._check_response(session.post(url, data=json.dumps(a, cls=EncodeUpdate)))
+                response = self._check_response(session.post(url, data=json.dumps(a, cls=MISPEncode)))
         return response
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
@@ -757,7 +758,7 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
-            response = session.post(url, data=json.dumps(query, cls=EncodeUpdate))
+            response = session.post(url, data=json.dumps(query, cls=MISPEncode))
         elif path == 'view':
             response = session.get(url)
         else:  # accept or discard
@@ -1597,6 +1598,35 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'feeds/cacheFeeds/all')
         response = session.post(url)
         return self._check_response(response)
+
+    # ###################
+    # ###   Objects   ###
+    # ###################
+
+    def add_object(self, event_id, template_id, misp_object):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
+        response = session.post(url, data=misp_object.to_json())
+        return self._check_response(response)
+
+    def add_object_reference(self, misp_object_reference):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'object_references/add')
+        response = session.post(url, data=misp_object_reference.to_json())
+        return self._check_response(response)
+
+    def get_object_templates_list(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, 'objectTemplates')
+        response = session.get(url)
+        return self._check_response(response)['response']
+
+    def get_object_template_id(self, object_uuid):
+        templates = self.get_object_templates_list()
+        for t in templates:
+            if t['ObjectTemplate']['uuid'] == object_uuid:
+                return t['ObjectTemplate']['id']
+        raise Exception('Unable to find template uuid {} on the MISP instance'.format(object_uuid))
 
     # ###########################
     # ####### Deprecated ########
