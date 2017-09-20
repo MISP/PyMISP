@@ -11,7 +11,7 @@ class TestBasic(unittest.TestCase):
 
     def setUp(self):
         self.maxDiff = None
-        self.misp = PyMISP(url, key, True, 'json', True)
+        self.misp = PyMISP(url, key, True, 'json')
 
     def _clean_event(self, event):
         event['Event'].pop('orgc_id', None)
@@ -43,7 +43,7 @@ class TestBasic(unittest.TestCase):
                                u'attribute_count': u'0', 'disable_correlation': False, u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False,
                                u'distribution': u'0', u'event_creator_email': u'admin@admin.test', u'Attribute': [], u'proposal_email_lock': False,
-                               u'Org': {u'name': u'ORGNAME'},
+                               u'Object': [], u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
                                u'Galaxy': [],
                                u'threat_level_id': u'1'}}
