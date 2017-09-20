@@ -20,7 +20,7 @@ install:
     - pip install -U nose
     - pip install coveralls
     - pip install codecov
-    - pip install requests-mock pytest
+    - pip install requests-mock
     - pip install https://github.com/lief-project/packages/raw/lief-master-latest/pylief-0.7.0.dev.zip
     - pip install git+https://github.com/kbandla/pydeep.git
     - pip install python-magic
