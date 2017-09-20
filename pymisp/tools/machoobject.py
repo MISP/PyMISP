@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
@@ -33,7 +34,7 @@ class MachOObject(AbstractMISPObjectGenerator):
             elif isinstance(pseudofile, bytes):
                 self.__macho = lief.MachO.parse(raw=pseudofile)
             else:
-                raise Exception('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
+                raise InvalidMISPObject('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
         elif filepath:
             self.__macho = lief.MachO.parse(filepath)
         elif parsed:
@@ -41,7 +42,7 @@ class MachOObject(AbstractMISPObjectGenerator):
             if isinstance(parsed, lief.MachO.Binary):
                 self.__macho = parsed
             else:
-                raise Exception('Not a lief.MachO.Binary: {}'.format(type(parsed)))
+                raise InvalidMISPObject('Not a lief.MachO.Binary: {}'.format(type(parsed)))
         # Python3 way
         # super().__init__('elf')
         super(MachOObject, self).__init__('macho')

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .abstractgenerator import AbstractMISPObjectGenerator
+from ..exceptions import InvalidMISPObject
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import warnings
@@ -33,7 +34,7 @@ class ELFObject(AbstractMISPObjectGenerator):
             elif isinstance(pseudofile, bytes):
                 self.__elf = lief.ELF.parse(raw=pseudofile)
             else:
-                raise Exception('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
+                raise InvalidMISPObject('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
         elif filepath:
             self.__elf = lief.ELF.parse(filepath)
         elif parsed:
@@ -41,7 +42,7 @@ class ELFObject(AbstractMISPObjectGenerator):
             if isinstance(parsed, lief.ELF.Binary):
                 self.__elf = parsed
             else:
-                raise Exception('Not a lief.ELF.Binary: {}'.format(type(parsed)))
+                raise InvalidMISPObject('Not a lief.ELF.Binary: {}'.format(type(parsed)))
         super(ELFObject, self).__init__('elf')
         self.generate_attributes()
         # Mark as non_jsonable because we need to add them manually

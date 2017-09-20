@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
@@ -34,7 +35,7 @@ class PEObject(AbstractMISPObjectGenerator):
             elif isinstance(pseudofile, bytes):
                 self.__pe = lief.PE.parse(raw=pseudofile)
             else:
-                raise Exception('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
+                raise InvalidMISPObject('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
         elif filepath:
             self.__pe = lief.PE.parse(filepath)
         elif parsed:
@@ -42,7 +43,7 @@ class PEObject(AbstractMISPObjectGenerator):
             if isinstance(parsed, lief.PE.Binary):
                 self.__pe = parsed
             else:
-                raise Exception('Not a lief.PE.Binary: {}'.format(type(parsed)))
+                raise InvalidMISPObject('Not a lief.PE.Binary: {}'.format(type(parsed)))
         # Python3 way
         # super().__init__('pe')
         super(PEObject, self).__init__('pe')

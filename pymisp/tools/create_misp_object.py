@@ -45,9 +45,9 @@ def make_macho_objects(lief_parsed, misp_file):
     return misp_file, macho_object, macho_sections
 
 
-def make_binary_objects(filepath):
-    misp_file = FileObject(filepath)
-    if HAS_LIEF:
+def make_binary_objects(filepath=None, pseudofile=None, filename=None):
+    misp_file = FileObject(filepath=filepath, pseudofile=pseudofile, filename=filename)
+    if HAS_LIEF and filepath:
         try:
             lief_parsed = lief.parse(filepath)
             if isinstance(lief_parsed, lief.PE.Binary):
@@ -64,6 +64,8 @@ def make_binary_objects(filepath):
             warnings.warn('\tParser error: ', e)
         except FileTypeNotImplemented as e:  # noqa
             warnings.warn(e)
-    else:
+    if not HAS_LIEF:
         warnings.warn('Please install lief, documentation here: https://github.com/lief-project/LIEF')
+    if not filepath:
+        warnings.warn('LIEF currently requires a filepath and not a pseudo file')
     return misp_file, None, None
