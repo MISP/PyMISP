@@ -26,8 +26,15 @@ setup(
         'Topic :: Security',
         'Topic :: Internet',
     ],
-    test_suite="tests",
+    test_suite="tests.test_offline",
     install_requires=['six', 'requests', 'python-dateutil', 'jsonschema'],
+    tests_require=[
+        'jsonschema',
+        'python-dateutil',
+        'python-magic',
+        'requests-mock',
+        'six'
+    ],
     include_package_data=True,
     package_data={'pymisp': ['data/*.json', 'data/misp-objects/schema_objects.json',
                              'data/misp-objects/schema_relationships.json',
