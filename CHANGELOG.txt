@@ -2,6 +2,75 @@ Changelog
 =========
 
 
+%%version%% (unreleased)
+------------------------
+
+Fix
+~~~
+- Import the openioc converter from tool again. [Raphaël Vinot]
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #111 from wagner-certat/skip-tests. [Raphaël Vinot]
+- TST: skip test with optional files if not existing. [Sebastian Wagner]
+- TST: update test requirements. [Sebastian Wagner]
+- Update: make make_binary_objects more flexible. [Raphaël Vinot]
+
+  fix: use proper exception handlers
+
+
+v2.4.80 (2017-09-18)
+--------------------
+- Properly initialize a new malware sample. [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Permission issue... [Alexandre Dulaunoy]
+- Merge branch 'objects' [Raphaël Vinot]
+- Bump misp object. [Raphaël Vinot]
+- Allow to get the list of known types out of MISPEvent again. [Raphaël
+  Vinot]
+- Merge branch 'objects' of github.com:MISP/PyMISP into objects.
+  [Raphaël Vinot]
+- Changed source => object / destination => referenced. [iglocska]
+- Use MISPAbstract as a master class everywhere. [Raphaël Vinot]
+
+  This is probably breaking everything.... ¯\_(ツ)_/¯
+- Bump miso-objects. [Raphaël Vinot]
+- Changed two fields in object references. [iglocska]
+
+  - source_uuid => object_uuid
+  - destination_uuid => referenced_uuid
+- Some more refactoring. [Raphaël Vinot]
+- Some more refactoring and cleanup. [Raphaël Vinot]
+- Update object definitions. [Raphaël Vinot]
+- Update PE generator. [Raphaël Vinot]
+- Refactoring in order to load objects. [Raphaël Vinot]
+- Add support for multiple entries of the same type in an object.
+  [Raphaël Vinot]
+- Remove some python versions from travis. [Raphaël Vinot]
+- Do not try to run code requiring lief. [Raphaël Vinot]
+- Remove ImportError. [Raphaël Vinot]
+- Install deps in travis. [Raphaël Vinot]
+- Update tests. [Raphaël Vinot]
+- Do not fail if pymisp is not installed. [Raphaël Vinot]
+- Add support for ELF and MachO objects. [Raphaël Vinot]
+- Update get_template_id, cleanup. [Raphaël Vinot]
+- Refactor all the things. [Raphaël Vinot]
+
+  Add script for MISP core, make everything generic.
+- Fixing undefined ressources_path. [edhoedt]
+- Update function names in mispevent. [Raphaël Vinot]
+- Re-enable python < 3.5 support. [Raphaël Vinot]
+- Update file/pe/pe-sections objects creator. [Raphaël Vinot]
+- Doesn't require describe_types in MISPAttribute's constructor.
+  [Raphaël Vinot]
+- Update accordingly to the current server implementation. [Raphaël
+  Vinot]
+- Re-enable python2 support... [Raphaël Vinot]
+- Initial commit supporting MISP Objects. [Raphaël Vinot]
+- ChangeLog updated to the latest version. [Alexandre Dulaunoy]
+
+
 v2.4.79 (2017-08-25)
 --------------------
 
