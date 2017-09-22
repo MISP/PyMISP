@@ -604,7 +604,7 @@ class MISPObject(AbstractMISP):
             self.__known_template = True
         else:
             if self.__strict:
-                raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.')
+                raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
             else:
                 self.__known_template = False
         if self.__known_template:
