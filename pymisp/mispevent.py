@@ -279,6 +279,7 @@ class MISPEvent(AbstractMISP):
 
         self._types = describe_types['types']
         self.attributes = []
+        self.Tag = []
 
     def _reinitialize_event(self):
         # Default values for a valid event to send to a MISP instance
