@@ -522,6 +522,17 @@ class MISPEvent(AbstractMISP):
         if not attribute:
             raise Exception('No attribute with identifier {} found.'.format(attribute_identifier))
         return attribute
+    
+    
+    def get_attribute_tags(self, attribute_identifier):
+        attribute = None
+        for a in self.attributes:
+            if (a.id == attribute_identifier or a.uuid == attribute_identifier or
+                        attribute_identifier == a.value or attribute_identifier in a.value.split('|')):
+                return a.Tag
+        if not attribute:
+            raise Exception('No attribute with identifier {} found.'.format(attribute_identifier))
+        return attribute
 
     def publish(self):
         self.published = True
