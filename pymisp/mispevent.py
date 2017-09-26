@@ -76,6 +76,7 @@ class MISPAttribute(AbstractMISP):
         self._types = describe_types['types']
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
+        self.Tag = []
 
     def _reinitialize_attribute(self):
         # Default values
