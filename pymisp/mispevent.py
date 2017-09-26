@@ -514,15 +514,17 @@ class MISPEvent(AbstractMISP):
         self.Tag.append({'name': tag})
 
     def add_attribute_tag(self, tag, attribute_identifier):
-        attribute = None
+        attributes = []
         for a in self.attributes:
-            if (a.id == attribute_identifier or a.uuid == attribute_identifier or
-                    attribute_identifier == a.value or attribute_identifier in a.value.split('|')):
+            if ((hasattr(a, 'id') and a.id == attribute_identifier) or
+                (hasattr(a, 'uuid') and a.uuid == attribute_identifier) or
+                (hasattr(a, 'value') and attribute_identifier == a.value or
+                 attribute_identifier in a.value.split('|'))):
                 a.add_tag(tag)
-                attribute = a
-        if not attribute:
+                attributes.append(a)
+        if not attributes:
             raise Exception('No attribute with identifier {} found.'.format(attribute_identifier))
-        return attribute
+        return attributes
 
     def publish(self):
         self.published = True
@@ -533,7 +535,8 @@ class MISPEvent(AbstractMISP):
     def delete_attribute(self, attribute_id):
         found = False
         for a in self.attributes:
-            if a.id == attribute_id or a.uuid == attribute_id:
+            if ((hasattr(a, 'id') and a.id == attribute_id) or
+                    (hasattr(a, 'uuid') and a.uuid == attribute_id)):
                 a.delete()
                 found = True
                 break
