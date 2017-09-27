@@ -57,11 +57,11 @@ def make_binary_objects(filepath=None, pseudofile=None, filename=None):
             elif isinstance(lief_parsed, lief.MachO.Binary):
                 return make_macho_objects(lief_parsed, misp_file)
         except lief.bad_format as e:
-            warnings.warn('\tBad format: ', e)
+            warnings.warn('\tBad format: {}'.format(e))
         except lief.bad_file as e:
-            warnings.warn('\tBad file: ', e)
+            warnings.warn('\tBad file: {}'.format(e))
         except lief.parser_error as e:
-            warnings.warn('\tParser error: ', e)
+            warnings.warn('\tParser error: {}'.format(e))
         except FileTypeNotImplemented as e:  # noqa
             warnings.warn(e)
     if not HAS_LIEF:
