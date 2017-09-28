@@ -25,7 +25,7 @@ pip3 install pymisp
 
 ```
 git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
-python3 setup.py install
+pip install -I .
 ```
 
 ## Samples and how to use PyMISP
