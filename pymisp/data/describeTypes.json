@@ -225,6 +225,10 @@
         "default_category": "Financial fraud",
         "to_ids": 1
       },
+      "phone-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
       "threat-actor": {
         "default_category": "Attribution",
         "to_ids": 0
@@ -615,6 +619,7 @@
       "bin",
       "cc-number",
       "prtn",
+      "phone-number",
       "threat-actor",
       "campaign-name",
       "campaign-id",
@@ -811,7 +816,8 @@
         "email-mime-boundary",
         "email-thread-index",
         "email-message-id",
-        "mobile-application-id"
+        "mobile-application-id",
+        "whois-registrant-email"
       ],
       "Artifacts dropped": [
         "md5",
@@ -922,6 +928,7 @@
         "ip-dst",
         "ip-dst|port",
         "ip-src|port",
+        "port",
         "hostname",
         "domain",
         "domain|ip",
@@ -1005,6 +1012,7 @@
         "bin",
         "cc-number",
         "prtn",
+        "phone-number",
         "comment",
         "text",
         "other",
@@ -1029,7 +1037,8 @@
         "email-dst",
         "comment",
         "text",
-        "other"
+        "other",
+        "whois-registrant-email"
       ],
       "Person": [
         "first-name",
@@ -1057,7 +1066,8 @@
         "passenger-name-record-locator-number",
         "comment",
         "text",
-        "other"
+        "other",
+        "phone-number"
       ],
       "Other": [
         "comment",
@@ -1069,7 +1079,8 @@
         "cpe",
         "port",
         "float",
-        "hex"
+        "hex",
+        "phone-number"
       ]
     }
   }
