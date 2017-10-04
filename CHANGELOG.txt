@@ -2,15 +2,48 @@ Changelog
 =========
 
 
-%%version%% (unreleased)
-------------------------
+v2.4.80.1 (2017-10-04)
+----------------------
+
+Changes
+~~~~~~~
+- Update changelog. [Raphaël Vinot]
 
 Fix
 ~~~
+- Change readme. [Raphaël Vinot]
+- Create file object. [Raphaël Vinot]
+
+  Was broken in case the file was neither PE/ELF/Mach-O
+- Allow again to tag/delete unsaved attributes. [Raphaël Vinot]
+- Live tests. [Raphaël Vinot]
 - Import the openioc converter from tool again. [Raphaël Vinot]
 
 Other
 ~~~~~
+- Up: Version bump. [Raphaël Vinot]
+- Up: Bump misp-objects & describeTypes. [Raphaël Vinot]
+- Update readme. [Raphaël Vinot]
+- Merge pull request #116 from cgi1/patch-2. [Raphaël Vinot]
+
+  Similar to #114 on attribute level
+- Similar to #114 on attribute level. [cgi1]
+
+  `add_attribute_tag(tag,attribute_identifier)` fails if attribute does not have any tag in before.
+- Merge pull request #115 from cgi1/patch-1. [Raphaël Vinot]
+
+  Fixing #114 (MISPEvent.add_tag(tag) fails if inital event does not contain tag )
+- Fixing #114. [cgi1]
+- Merge pull request #112 from CenturyLinkCIRT/unknown-object-name-
+  patch. [Raphaël Vinot]
+
+  Formatted "Unknown MISP object" error message
+- Formatted "Unknown MISP object" error message. [infosec-intern]
+
+  When a user tries to add an object with a name that doesn't exist, the error thrown was missing its format string
+  This ended up looking like
+  pymisp.exceptions.UnknownMISPObjectTemplate: {} is unknown in the MISP object directory.
+  Here's a patch that adds self.name to the format string
 - Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
 - Merge pull request #111 from wagner-certat/skip-tests. [Raphaël Vinot]
 - TST: skip test with optional files if not existing. [Sebastian Wagner]
@@ -523,6 +556,14 @@ Other
 
 v2.4.63 (2017-01-31)
 --------------------
+- Version bump. [Raphaël Vinot]
+- Fix regression. [Raphaël Vinot]
+
+  Fix #46
+
+
+v2.4.62.1 (2017-01-27)
+----------------------
 
 Changes
 ~~~~~~~
@@ -530,10 +571,6 @@ Changes
 
 Other
 ~~~~~
-- Version bump. [Raphaël Vinot]
-- Fix regression. [Raphaël Vinot]
-
-  Fix #46
 - Version bump. [Raphaël Vinot]
 - Fix testing. [Raphaël Vinot]
 - Bug fixes. [Raphaël Vinot]
@@ -760,6 +797,10 @@ v2.4.53 (2016-10-21)
   Fixed search_index
 - Fixed search_index. [Hannah Ward]
 - Toggle flag instead of value. [Alexandre Dulaunoy]
+
+
+v2.4.51.1 (2016-09-12)
+----------------------
 - Version bump. [Raphaël Vinot]
 - Fix examples after removal of MISP XML support. [Raphaël Vinot]
 - Merge pull request #27 from Delta-Sierra/master. [Alexandre Dulaunoy]
@@ -918,6 +959,12 @@ v2.4.49 (2016-08-02)
 - Move files from examples/treemap to examples/situational-awareness/
   [Déborah Servili]
 - Merge https://github.com/MISP/PyMISP into newbranch. [Déborah Servili]
+- Rename examples/treemap/treemap.py to
+  examples/statistics/attribute_treemap.py. [Deborah Servili]
+
+
+v2.4.48.2 (2016-07-11)
+----------------------
 - Version bump. [Raphaël Vinot]
 - Add remove tag method. [Raphaël Vinot]
 - Use same variable names as testing environment. [Raphaël Vinot]
@@ -925,8 +972,6 @@ v2.4.49 (2016-08-02)
 - Merge pull request #21 from Delta-Sierra/master. [Alexandre Dulaunoy]
 
   Add examples "create_dummy_event" and "create_massive_dummy_events"
-- Rename examples/treemap/treemap.py to
-  examples/statistics/attribute_treemap.py. [Deborah Servili]
 - Random names for dummy files. [Déborah Servili]
 - Add examples "create_dummy_event" and "create_massive_dummy_events"
   [Déborah Servili]
@@ -951,6 +996,10 @@ v2.4.49 (2016-08-02)
 - Make pep8 happy. [Raphaël Vinot]
 - Merge branch 'master' of github.com:CIRCL/PyMISP. [Raphaël Vinot]
 - Comment removed. [Alexandre Dulaunoy]
+
+
+v2.4.48.1 (2016-06-15)
+----------------------
 - Fix check MISP latest version. [Raphaël Vinot]
 - Add tag script. [Raphaël Vinot]
 - Make pep8 happy. [Raphaël Vinot]
