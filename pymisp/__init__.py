@@ -1,4 +1,4 @@
-__version__ = '2.4.80'
+__version__ = '2.4.80.1'
 
 try:
     from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate  # noqa
