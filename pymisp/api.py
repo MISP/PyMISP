@@ -1486,6 +1486,14 @@ class PyMISP(object):
         url = urljoin(self.root_url, '/tags')
         response = session.get(url)
         return self._check_response(response)['Tag']
+    
+    # ############## Taxonomies ##################
+
+    def get_taxonomes_list(self):
+        session = self.__prepare_session()
+        url = urljoin(self.root_url, '/taxonomies')
+        response = session.get(url)
+        return self._check_response(response)
 
     # ##############################################
     # ############### Non-JSON output ##############
