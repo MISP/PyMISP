@@ -39,6 +39,8 @@ To update it:
 pip3 install git+https://github.com/CIRCL/PyMISP.git --upgrade
 ```
 
+**Caveat:** Running `pip3 install pymisp --upgrade` after `pip3 install git+https://github.com/CIRCL/PyMISP.git` seems to install the PyPI version over the git version instead of updating from the git repo.
+
 ## Samples and how to use PyMISP
 
 Various examples and samples scripts are in the [examples/](examples/) directory.
