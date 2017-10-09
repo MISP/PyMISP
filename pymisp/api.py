@@ -535,7 +535,7 @@ class PyMISP(object):
         encodedData = base64.b64encode(fileData).decode("utf-8")
 
         # Send it on its way
-        return self.add_named_attribute(event, 'attachment', filename, category, to_ids, comment, distribution, proposal, data=encodedData)
+        return self.add_named_attribute(event, 'attachment', filename, category, to_ids, comment, distribution, proposal, data=encodedData, **kwargs)
 
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         if rvalue:
