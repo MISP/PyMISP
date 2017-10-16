@@ -2,6 +2,19 @@ Changelog
 =========
 
 
+v2.4.81 (2017-10-09)
+--------------------
+
+Fix
+~~~
+- Changelog config + update. [Raphaël Vinot]
+
+Other
+~~~~~
+- Up: bump version. [Raphaël Vinot]
+- Up: Bump misp-objects. [Raphaël Vinot]
+
+
 v2.4.80.1 (2017-10-04)
 ----------------------
 

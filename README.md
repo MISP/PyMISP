@@ -59,3 +59,26 @@ Documentation can be generated with epydoc:
 ```
 epydoc --url https://github.com/CIRCL/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
 ```
+
+## Everything is a Mutable Mapping
+
+... or at least everything that can be imported/exported from/to a json blob
+
+`AbstractMISP` is the master class, and inherit `collections.MutableMapping` which means
+the class can be represented as a python dictionary.
+
+The abstraction assumes every property that should not be seen in the dictionary is prepended with a `_`,
+or its name is added to the private list `__not_jsonable` (accessible through `update_not_jsonable` and `set_not_jsonable`.
+
+This master class has helpers that will make it easy to load, and export, to, and from, a json string.
+
+`MISPEvent`, `MISPAttribute`, `MISPObjectReference`, `MISPObjectAttribute`, and `MISPObject`
+are subclasses of AbstractMISP, which mean that they can be handled as python dictionaries.
+
+## MISP Objects
+
+Creating a new MISP object generator should be done using a pre-defined template and inherit `AbstractMISPObjectGenerator`.
+
+Your new MISPObject generator need to generate attributes, and add them as class properties using `add_attribute`.
+
+When the object is sent to MISP, all the class properties will be exported to the JSON export.
