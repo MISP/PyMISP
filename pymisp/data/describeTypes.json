@@ -805,8 +805,6 @@
         "vulnerability",
         "x509-fingerprint-sha1",
         "other",
-        "ip-dst|port",
-        "ip-src|port",
         "hostname|port",
         "email-dst-display-name",
         "email-src-display-name",
@@ -1023,7 +1021,6 @@
         "text",
         "attachment",
         "comment",
-        "text",
         "other",
         "hex"
       ],
