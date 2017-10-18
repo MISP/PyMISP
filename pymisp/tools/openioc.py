@@ -11,7 +11,6 @@ except ImportError:
     has_bs4 = False
 
 iocMispMapping = {
-    # ~ @Link https://wiki.ops.fr/doku.php/manuels:misp:event-guidelines
     'CookieHistoryItem/HostName': {'type': 'hostname', 'comment': 'CookieHistory.'},
 
     'DriverItem/DriverName': {'category': 'Artifacts dropped', 'type': 'other', 'comment': 'DriverName.'},
