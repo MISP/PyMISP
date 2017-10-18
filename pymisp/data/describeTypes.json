@@ -438,7 +438,7 @@
         "to_ids": 0
       },
       "email-message-id": {
-        "default_category": "",
+        "default_category": "Payload delivery",
         "to_ids": 0
       },
       "github-username": {
