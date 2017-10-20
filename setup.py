@@ -27,7 +27,7 @@ setup(
         'Topic :: Internet',
     ],
     test_suite="tests.test_offline",
-    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema'],
+    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema', 'setuptools>=36.4'],
     extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4']},
