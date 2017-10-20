@@ -28,6 +28,9 @@ setup(
     ],
     test_suite="tests.test_offline",
     install_requires=['six', 'requests', 'python-dateutil', 'jsonschema'],
+    extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
+                    'neo': ['py2neo'],
+                    'openioc': ['beautifulsoup4']},
     tests_require=[
         'jsonschema',
         'python-dateutil',
