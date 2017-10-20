@@ -17,10 +17,8 @@ python:
     - "3.6-dev"
 
 install:
-    - pip install -U nose
-    - pip install coveralls
-    - pip install codecov
-    - pip install requests-mock
+    - pip install -U nose pip setuptools
+    - pip install coveralls codecov requests-mock
     - pip install git+https://github.com/kbandla/pydeep.git
     - pip install .[fileobjects,neo,openioc]
     - pushd tests
