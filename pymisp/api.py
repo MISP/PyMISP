@@ -147,7 +147,7 @@ class PyMISP(object):
         self.sane_default = self.describe_types['sane_defaults']
 
     def __prepare_session(self, output='json', async_implemented=False):
-        """Prepare the headers of the session"""
+        """Prepare the session headers"""
 
         if not HAVE_REQUESTS:
             raise MissingDependency('Missing dependency, install requests (`pip install requests`)')
@@ -170,6 +170,10 @@ class PyMISP(object):
     # #####################
 
     def flatten_error_messages(self, response):
+        """Dirty dirty method to normalize the error messages between the API calls.
+        Any response containing the a key 'error' or 'errors' failed at some point,
+        we make one single list out of it.
+        """
         messages = []
         if response.get('error'):
             if isinstance(response['error'], list):
@@ -204,6 +208,7 @@ class PyMISP(object):
         return messages
 
     def _check_response(self, response):
+        """Check if the response from the server is not an unexpected error"""
         if response.status_code >= 500:
             response.raise_for_status()
         try:
@@ -243,6 +248,7 @@ class PyMISP(object):
         return value if isinstance(value, (tuple, list)) else (value,)
 
     def _make_mispevent(self, event):
+        """Transform a Json MISP event into a MISPEvent"""
         if not isinstance(event, MISPEvent):
             e = MISPEvent(self.describe_types)
             e.load(event)
@@ -251,6 +257,7 @@ class PyMISP(object):
         return e
 
     def _prepare_full_event(self, distribution, threat_level_id, analysis, info, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
+        """Initialize a new MISPEvent from scratch"""
         misp_event = MISPEvent(self.describe_types)
         misp_event.set_all_values(info=info, distribution=distribution, threat_level_id=threat_level_id,
                                   analysis=analysis, date=date, orgc_id=orgc_id, org_id=org_id, sharing_group_id=sharing_group_id)
@@ -259,6 +266,7 @@ class PyMISP(object):
         return misp_event
 
     def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5, **kwargs):
+        """Initialize a new MISPAttribute from scratch"""
         misp_attribute = MISPAttribute(self.describe_types)
         misp_attribute.set_all_values(type=type_value, value=value, category=category,
                                       to_ids=to_ids, comment=comment, distribution=distribution, **kwargs)
@@ -353,12 +361,14 @@ class PyMISP(object):
         return self._check_response(response)
 
     def delete_attribute(self, attribute_id):
+        """Delete an attribute by ID"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
         response = session.delete(url)
         return self._check_response(response)
 
     def pushEventToZMQ(self, event_id):
+        """Force push an event on ZMQ"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/pushEventToZMQ/{}.json'.format(event_id))
         response = session.post(url)
@@ -369,9 +379,11 @@ class PyMISP(object):
     # ##############################################
 
     def get(self, eid):
+        """Get an event by event ID"""
         return self.get_event(eid)
 
     def update(self, event):
+        """Update an event by ID"""
         e = self._make_mispevent(event)
         if e.uuid:
             eid = e.uuid
@@ -401,21 +413,25 @@ class PyMISP(object):
         return self._check_response(response)
 
     def change_threat_level(self, event, threat_level_id):
+        """Change the threat level of an event"""
         e = self._make_mispevent(event)
         e.threat_level_id = threat_level_id
         return self.update(e)
 
     def change_sharing_group(self, event, sharing_group_id):
+        """Change the sharing group of an event"""
         e = self._make_mispevent(event)
         e.distribution = 4      # Needs to be 'Sharing group'
         e.sharing_group_id = sharing_group_id
         return self.update(e)
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
+        """Create and add a new event"""
         misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published, orgc_id, org_id, sharing_group_id)
         return self.add_event(misp_event)
 
     def tag(self, uuid, tag):
+        """Tag an event or an attribute"""
         if not self._valid_uuid(uuid):
             raise PyMISPError('Invalid UUID')
         session = self.__prepare_session()
@@ -425,6 +441,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def untag(self, uuid, tag):
+        """Untag an event or an attribute"""
         if not self._valid_uuid(uuid):
             raise PyMISPError('Invalid UUID')
         session = self.__prepare_session()
@@ -436,6 +453,7 @@ class PyMISP(object):
     # ##### File attributes #####
 
     def _send_attributes(self, event, attributes, proposal=False):
+        """Helper to add new attributes to an existing events"""
         eventID_to_update = None
         if isinstance(event, MISPEvent):
             if hasattr(event, 'id'):
@@ -465,12 +483,14 @@ class PyMISP(object):
         return response
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add one or more attributes to an existing event"""
         attributes = []
         for value in self._one_or_more(value):
             attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution, **kwargs))
         return self._send_attributes(event, attributes, proposal)
 
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, ssdeep=None, comment=None, to_ids=True, distribution=None, proposal=False, **kwargs):
+        """Add hashe(s) to an existing event"""
 
         attributes = []
         type_value = '{}'
@@ -490,12 +510,15 @@ class PyMISP(object):
         return self._send_attributes(event, attributes, proposal)
 
     def av_detection_link(self, event, link, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add AV detection link(s)"""
         return self.add_named_attribute(event, 'link', link, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_detection_name(self, event, name, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add AV detection name(s)"""
         return self.add_named_attribute(event, 'text', name, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_filename(self, event, filename, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add filename(s)"""
         return self.add_named_attribute(event, 'filename', filename, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_attachment(self, event, attachment, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
@@ -538,6 +561,7 @@ class PyMISP(object):
         return self.add_named_attribute(event, 'attachment', filename, category, to_ids, comment, distribution, proposal, data=encodedData, **kwargs)
 
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add a registry key"""
         if rvalue:
             type_value = 'regkey|value'
             value = '{}|{}'.format(regkey, rvalue)
@@ -550,6 +574,7 @@ class PyMISP(object):
         return self._send_attributes(event, attributes, proposal)
 
     def add_regkeys(self, event, regkeys_values, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add a registry keys"""
         attributes = []
 
         for regkey, rvalue in regkeys_values.items():
@@ -564,12 +589,14 @@ class PyMISP(object):
         return self._send_attributes(event, attributes, proposal)
 
     def add_pattern(self, event, pattern, in_file=True, in_memory=False, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add a pattern(s) in file or in memory"""
         if not (in_file or in_memory):
             raise PyMISPError('Invalid pattern type: please use in_memory=True or in_file=True')
         itemtype = 'pattern-in-file' if in_file else 'pattern-in-memory'
         return self.add_named_attribute(event, itemtype, pattern, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_pipe(self, event, named_pipe, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add pipes(s)"""
         def scrub(s):
             if not s.startswith('\\.\\pipe\\'):
                 s = '\\.\\pipe\\{}'.format(s)
@@ -578,6 +605,7 @@ class PyMISP(object):
         return self.add_named_attribute(event, 'named pipe', attributes, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_mutex(self, event, mutex, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add mutex(es)"""
         def scrub(s):
             if not s.startswith('\\BaseNamedObjects\\'):
                 s = '\\BaseNamedObjects\\{}'.format(s)
@@ -586,98 +614,125 @@ class PyMISP(object):
         return self.add_named_attribute(event, 'mutex', attributes, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_yara(self, event, yara, category='Payload delivery', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add yara rule(es)"""
         return self.add_named_attribute(event, 'yara', yara, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Network attributes #####
 
     def add_ipdst(self, event, ipdst, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add destination IP(s)"""
         return self.add_named_attribute(event, 'ip-dst', ipdst, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_ipsrc(self, event, ipsrc, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add source IP(s)"""
         return self.add_named_attribute(event, 'ip-src', ipsrc, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_hostname(self, event, hostname, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add hostname(s)"""
         return self.add_named_attribute(event, 'hostname', hostname, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_domain(self, event, domain, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add domain(s)"""
         return self.add_named_attribute(event, 'domain', domain, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_domain_ip(self, event, domain, ip, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add domain|ip"""
         if isinstance(ip, str):
             ip = [ip]
         composed = list(map(lambda x: '%s|%s' % (domain, x), ip))
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_domains_ips(self, event, domain_ips, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add multiple domain|ip"""
         composed = list(map(lambda x: '%s|%s' % (x[0], x[1]), domain_ips.items()))
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_url(self, event, url, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add url(s)"""
         return self.add_named_attribute(event, 'url', url, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_useragent(self, event, useragent, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add user agent(s)"""
         return self.add_named_attribute(event, 'user-agent', useragent, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_traffic_pattern(self, event, pattern, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add pattern(s) in traffic"""
         return self.add_named_attribute(event, 'pattern-in-traffic', pattern, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_snort(self, event, snort, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add SNORT rule(s)"""
         return self.add_named_attribute(event, 'snort', snort, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_net_other(self, event, netother, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add a free text entry"""
         return self.add_named_attribute(event, 'other', netother, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Email attributes #####
 
     def add_email_src(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add a source email"""
         return self.add_named_attribute(event, 'email-src', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_email_dst(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add a destination email"""
         return self.add_named_attribute(event, 'email-dst', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_email_subject(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an email subject"""
         return self.add_named_attribute(event, 'email-subject', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_email_attachment(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an email atachment"""
         return self.add_named_attribute(event, 'email-attachment', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Target attributes #####
 
     def add_target_email(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an target email"""
         return self.add_named_attribute(event, 'target-email', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_target_user(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an target user"""
         return self.add_named_attribute(event, 'target-user', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_target_machine(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an target machine"""
         return self.add_named_attribute(event, 'target-machine', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_target_org(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an target organisation"""
         return self.add_named_attribute(event, 'target-org', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_target_location(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an target location"""
         return self.add_named_attribute(event, 'target-location', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_target_external(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an target external"""
         return self.add_named_attribute(event, 'target-external', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Attribution attributes #####
 
     def add_threat_actor(self, event, target, category='Attribution', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an threat actor"""
         return self.add_named_attribute(event, 'threat-actor', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Internal reference attributes #####
 
     def add_internal_link(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an internal link"""
         return self.add_named_attribute(event, 'link', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_internal_comment(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an internal comment"""
         return self.add_named_attribute(event, 'comment', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_internal_text(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an internal text"""
         return self.add_named_attribute(event, 'text', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
     def add_internal_other(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an internal reference (type other)"""
         return self.add_named_attribute(event, 'other', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##################################################
@@ -686,6 +741,7 @@ class PyMISP(object):
 
     def _prepare_upload(self, event_id, distribution, to_ids, category, comment, info,
                         analysis, threat_level_id):
+        """Helper to prepare a sample to upload"""
         to_post = {'request': {}}
 
         if event_id is not None:
@@ -716,6 +772,7 @@ class PyMISP(object):
         return to_post
 
     def _encode_file_to_upload(self, filepath_or_bytes):
+        """Helper to encode a file to upload"""
         if isinstance(filepath_or_bytes, basestring) and os.path.isfile(filepath_or_bytes):
             with open(filepath_or_bytes, 'rb') as f:
                 binblob = f.read()
@@ -726,6 +783,7 @@ class PyMISP(object):
     def upload_sample(self, filename, filepath_or_bytes, event_id, distribution=None,
                       to_ids=True, category=None, comment=None, info=None,
                       analysis=None, threat_level_id=None):
+        """Upload a sample"""
         to_post = self._prepare_upload(event_id, distribution, to_ids, category,
                                        comment, info, analysis, threat_level_id)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath_or_bytes)}]
@@ -734,6 +792,7 @@ class PyMISP(object):
     def upload_samplelist(self, filepaths, event_id, distribution=None,
                           to_ids=True, category=None, comment=None, info=None,
                           analysis=None, threat_level_id=None):
+        """Upload a list of samples"""
         to_post = self._prepare_upload(event_id, distribution, to_ids, category,
                                        comment, info, analysis, threat_level_id)
         files = []
@@ -745,6 +804,7 @@ class PyMISP(object):
         return self._upload_sample(to_post)
 
     def _upload_sample(self, to_post):
+        """Helper to upload a sample"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'events/upload_sample')
         response = session.post(url, data=json.dumps(to_post))
@@ -755,6 +815,7 @@ class PyMISP(object):
     # ############################
 
     def __query_proposal(self, session, path, id, attribute=None):
+        """Helper to prepare a query to handle proposals"""
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
@@ -766,6 +827,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def proposal_view(self, event_id=None, proposal_id=None):
+        """View a proposal"""
         session = self.__prepare_session()
         if proposal_id is not None and event_id is not None:
             return {'error': 'You can only view an event ID or a proposal ID'}
@@ -776,18 +838,22 @@ class PyMISP(object):
         return self.__query_proposal(session, 'view', id)
 
     def proposal_add(self, event_id, attribute):
+        """Add a proposal"""
         session = self.__prepare_session()
         return self.__query_proposal(session, 'add', event_id, attribute)
 
     def proposal_edit(self, attribute_id, attribute):
+        """Edit a proposal"""
         session = self.__prepare_session()
         return self.__query_proposal(session, 'edit', attribute_id, attribute)
 
     def proposal_accept(self, proposal_id):
+        """Accept a proposal"""
         session = self.__prepare_session()
         return self.__query_proposal(session, 'accept', proposal_id)
 
     def proposal_discard(self, proposal_id):
+        """Discard a proposal"""
         session = self.__prepare_session()
         return self.__query_proposal(session, 'discard', proposal_id)
 
@@ -796,6 +862,7 @@ class PyMISP(object):
     # ##############################
 
     def change_toids(self, attribute_uuid, to_ids):
+        """Change the toids flag"""
         if to_ids not in [0, 1]:
             raise Exception('to_ids can only be 0 or 1')
         query = {"to_ids": to_ids}
@@ -807,6 +874,7 @@ class PyMISP(object):
     # ##############################
 
     def freetext(self, event_id, string, adhereToWarninglists=False, distribution=None):
+        """Pass a text to the freetext importer"""
         query = {"value": string}
         wl_params = [False, True, 'soft']
         if adhereToWarninglists not in wl_params:
@@ -823,6 +891,7 @@ class PyMISP(object):
     # ##############################
 
     def __query(self, session, path, query, controller='events', async_callback=None):
+        """Helper to prepare a search query"""
         if query.get('error') is not None:
             return query
         if controller not in ['events', 'attributes']:
@@ -897,6 +966,7 @@ class PyMISP(object):
             return res
 
     def search_all(self, value):
+        """Search a value in the whole database"""
         query = {'value': value, 'searchall': 1}
         session = self.__prepare_session()
         return self.__query(session, 'restSearch/download', query)
@@ -1030,6 +1100,7 @@ class PyMISP(object):
             return response.content
 
     def get_yara(self, event_id):
+        """Get the yara rules from an event"""
         to_post = {'request': {'eventid': event_id, 'type': 'yara'}}
         session = self.__prepare_session()
         response = session.post(urljoin(self.root_url, 'attributes/restSearch'), data=json.dumps(to_post))
@@ -1042,6 +1113,7 @@ class PyMISP(object):
         return True, rules
 
     def download_samples(self, sample_hash=None, event_id=None, all_samples=False):
+        """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch"""
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
         session = self.__prepare_session()
         response = session.post(urljoin(self.root_url, 'attributes/downloadSample'), data=json.dumps(to_post))
@@ -1079,6 +1151,7 @@ class PyMISP(object):
     # ########## Tags ##########
 
     def get_all_tags(self, quiet=False):
+        """Get all the tags used on the instance"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'tags')
         response = session.get(url)
@@ -1092,6 +1165,7 @@ class PyMISP(object):
             return to_return
 
     def new_tag(self, name=None, colour="#00ace6", exportable=False):
+        """Create a new tag"""
         to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable}}
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'tags/add')
@@ -1168,18 +1242,21 @@ class PyMISP(object):
     # ############## Sightings ##################
 
     def sighting_per_id(self, attribute_id):
+        """Add a sighting to an attribute (by attribute ID)"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_id))
         response = session.post(url)
         return self._check_response(response)
 
     def sighting_per_uuid(self, attribute_uuid):
+        """Add a sighting to an attribute (by attribute UUID)"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_uuid))
         response = session.post(url)
         return self._check_response(response)
 
     def set_sightings(self, sightings):
+        """Push a sighting (python dictionary)"""
         if isinstance(sightings, dict):
             sightings = json.dumps(sightings)
         session = self.__prepare_session()
@@ -1188,6 +1265,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def sighting_per_json(self, json_file):
+        """Push a sighting (JSON file)"""
         with open(json_file, 'r') as f:
             jdata = json.load(f)
             return self.set_sightings(jdata)
@@ -1195,6 +1273,7 @@ class PyMISP(object):
     # ############## Sharing Groups ##################
 
     def get_sharing_groups(self):
+        """Get the existing sharing groups"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'sharing_groups.json')
         response = session.get(url)
@@ -1474,6 +1553,7 @@ class PyMISP(object):
     # ############## Roles ##################
 
     def get_roles_list(self):
+        """Get the list of existing roles"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, '/roles')
         response = session.get(url)
@@ -1482,6 +1562,7 @@ class PyMISP(object):
     # ############## Tags ##################
 
     def get_tags_list(self):
+        """Get the list of existing tags"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, '/tags')
         response = session.get(url)
@@ -1542,86 +1623,93 @@ class PyMISP(object):
     # ###########################
 
     def fetch_feed(self, feed_id):
+        """Fetch one single feed"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'feeds/fetchFromFeed/{}'.format(feed_id))
         response = session.get(url)
         return self._check_response(response)
 
     def view_feeds(self):
+        """Get the content of all the feeds"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'feeds')
         response = session.get(url)
         return self._check_response(response)
 
     def view_feed(self, feed_ids):
+        """Get the content of a single feed"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'feeds/view/{}'.format(feed_ids))
         response = session.get(url)
         return self._check_response(response)
 
     def cache_feeds_all(self):
+        """ Cache all the feeds"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'feeds/cacheFeeds/all')
         response = session.get(url)
         return self._check_response(response)
 
     def cache_feed(self, feed_id):
+        """Cache a specific feed"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'feeds/cacheFeeds/{}'.format(feed_id))
         response = session.get(url)
         return self._check_response(response)
 
     def cache_feeds_freetext(self):
+        """Cache all the freetext feeds"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'feeds/cacheFeeds/freetext')
         response = session.get(url)
         return self._check_response(response)
 
     def cache_feeds_misp(self):
+        """Cache all the MISP feeds"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'feeds/cacheFeeds/misp')
         response = session.get(url)
         return self._check_response(response)
 
     def compare_feeds(self):
+        """Generate the comparison matrix for all the MISP feeds"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'feeds/compareFeeds')
         response = session.get(url)
         return self._check_response(response)
 
-    # ###########################
-    # ###   Cache All Feeds   ###
-    # ###########################
-
     def cache_all_feeds(self):
-        session = self.__prepare_session()
-        url = urljoin(self.root_url, 'feeds/cacheFeeds/all')
-        response = session.post(url)
-        return self._check_response(response)
+        """Alias for cache_feeds_all"""
+        # DEPRECATED
+        return self.cache_feeds_all()
 
     # ###################
     # ###   Objects   ###
     # ###################
 
     def add_object(self, event_id, template_id, misp_object):
+        """Add an object"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
         response = session.post(url, data=misp_object.to_json())
         return self._check_response(response)
 
     def add_object_reference(self, misp_object_reference):
+        """Add a reference to an object"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'object_references/add')
         response = session.post(url, data=misp_object_reference.to_json())
         return self._check_response(response)
 
     def get_object_templates_list(self):
+        """Returns the list of Object templates available on the MISP instance"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'objectTemplates')
         response = session.get(url)
         return self._check_response(response)['response']
 
     def get_object_template_id(self, object_uuid):
+        """Gets the template ID corresponting the UUID passed as parameter"""
         templates = self.get_object_templates_list()
         for t in templates:
             if t['ObjectTemplate']['uuid'] == object_uuid:
