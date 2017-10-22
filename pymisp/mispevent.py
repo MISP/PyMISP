@@ -165,10 +165,15 @@ class MISPAttribute(AbstractMISP):
 
         # Default values
         self.category = kwargs.pop('category', type_defaults['default_category'])
+        if self.category is None:
+            # In case the category key is passed, but None
+            self.category = type_defaults['default_category']
         if self.category not in self.__categories:
             raise NewAttributeError('{} is invalid, category has to be in {}'.format(self.category, (', '.join(self.__categories))))
 
         self.to_ids = kwargs.pop('to_ids', bool(int(type_defaults['to_ids'])))
+        if self.to_ids is None:
+            self.to_ids = bool(int(type_defaults['to_ids']))
         if not isinstance(self.to_ids, bool):
             raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
 
@@ -565,7 +570,7 @@ class MISPObjectReference(AbstractMISP):
         self.referenced_uuid = referenced_uuid
         self.relationship_type = relationship_type
         self.comment = comment
-        for k, v in kwargs:
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
 
@@ -684,7 +689,7 @@ class MISPObject(AbstractMISP):
         """Add a link (uuid) to an other object"""
         if kwargs.get('object_uuid'):
             # Load existing object
-            object_uuid = kwargs.get('object_uuid')
+            object_uuid = kwargs.pop('object_uuid')
         else:
             # New reference
             object_uuid = self.uuid
