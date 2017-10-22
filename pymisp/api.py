@@ -360,11 +360,14 @@ class PyMISP(object):
         response = session.delete(url)
         return self._check_response(response)
 
-    def delete_attribute(self, attribute_id):
+    def delete_attribute(self, attribute_id, hard_delete=False):
         """Delete an attribute by ID"""
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
-        response = session.delete(url)
+        if hard_delete:
+            url = urljoin(self.root_url, 'attributes/delete/{}/1'.format(attribute_id))
+        else:
+            url = urljoin(self.root_url, 'attributes/delete/{}'.format(attribute_id))
+        response = session.get(url)
         return self._check_response(response)
 
     def pushEventToZMQ(self, event_id):
