@@ -639,7 +639,7 @@ class MISPObject(AbstractMISP):
                 else:
                     self.__known_template = False
             if kwargs.get('template_version') and int(kwargs['template_version']) != self.template_version:
-                if self.strict:
+                if self.__strict:
                     raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
                 else:
                     self.__known_template = False
