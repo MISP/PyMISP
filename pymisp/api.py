@@ -1022,10 +1022,12 @@ class PyMISP(object):
         :param to_ids: return only the attributes with the to_ids flag set
         :param deleted: also return the deleted attributes
         :param async_callback: The function to run when results are returned
+        :param attributeTags: returns only the attributes with the specified tag(s)
+        :param not_attributeTags: returns only the attributes who don't conatine the specified tag(s)
         """
         query = {}
         # Event:     array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'searchall', 'metadata', 'published');
-        # Attribute: array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'to_ids', 'deleted');
+        # Attribute: array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'to_ids', 'deleted', 'attributeTags', not_attributeTags);
         val = self.__prepare_rest_search(kwargs.pop('values', None), kwargs.pop('not_values', None))
         if len(val) != 0:
             query['value'] = val
@@ -1037,6 +1039,10 @@ class PyMISP(object):
         tag = self.__prepare_rest_search(kwargs.pop('tags', None), kwargs.pop('not_tags', None))
         if len(tag) != 0:
             query['tags'] = tag
+            
+        attributeTags = self.__prepare_rest_search(kwargs.pop('attributeTags', None), kwargs.pop('not_attributeTags', None))
+        if len(attributeTags) != 0:
+            query['attributeTags'] = attributeTags
 
         date_from = kwargs.pop('date_from', None)
         if date_from:
