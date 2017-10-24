@@ -603,7 +603,7 @@ class MISPObjectAttribute(MISPAttribute):
 
 class MISPObject(AbstractMISP):
 
-    def __init__(self, name, strict=True):
+    def __init__(self, name, strict=False):
         super(MISPObject, self).__init__()
         self.__strict = strict
         self.name = name
@@ -639,7 +639,7 @@ class MISPObject(AbstractMISP):
                 else:
                     self.__known_template = False
             if kwargs.get('template_version') and int(kwargs['template_version']) != self.template_version:
-                if self.strict:
+                if self.__strict:
                     raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
                 else:
                     self.__known_template = False
@@ -654,12 +654,12 @@ class MISPObject(AbstractMISP):
             else:
                 setattr(self, key, value)
 
-    def to_dict(self, strict=True):
+    def to_dict(self, strict=False):
         if strict or self.__strict and self.__known_template:
             self._validate()
         return super(MISPObject, self).to_dict()
 
-    def to_json(self, strict=True):
+    def to_json(self, strict=False):
         if strict or self.__strict and self.__known_template:
             self._validate()
         return super(MISPObject, self).to_json()
