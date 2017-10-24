@@ -2,6 +2,19 @@ Changelog
 =========
 
 
+v2.4.81.2 (2017-10-24)
+----------------------
+
+Changes
+~~~~~~~
+- Version bump. [Raphaël Vinot]
+- Update changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly bundle object templates. [Raphaël Vinot]
+
+
 v2.4.81.1 (2017-10-24)
 ----------------------
 
