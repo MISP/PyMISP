@@ -39,7 +39,7 @@ setup(
         'six'
     ],
     include_package_data=True,
-    package_data={'pymisp': ['data/*.json', 'data/misp-objects',
+    package_data={'pymisp': ['data/*.json',
                              'data/misp-objects/schema_objects.json',
                              'data/misp-objects/schema_relationships.json',
                              'data/misp-objects/objects/*/definition.json',

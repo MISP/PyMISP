@@ -1,4 +1,4 @@
 include pymisp/data/*.json
 include pymisp/data/misp-objects/*.json
-include pymisp/misp-objects/objects/*/definition.json
-include pymisp/misp-objects/relationships/definition.json
+include pymisp/data/misp-objects/objects/*/definition.json
+include pymisp/data/misp-objects/relationships/definition.json
