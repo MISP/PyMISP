@@ -4,7 +4,12 @@
 import re
 
 import requests
-import validators
+try:
+    import validators
+    has_validators = True
+except ImportError:
+    has_validators = False
+
 
 from .abstractgenerator import AbstractMISPObjectGenerator
 from .. import InvalidMISPObject
@@ -48,6 +53,8 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
         :ioc: Indicator to search VirusTotal for
         '''
+        if not has_validators:
+            raise Exception('You need to install validators: pip install validators')
         if validators.url(ioc):
             return "url"
         elif re.match(r"\b([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64})\b", ioc):

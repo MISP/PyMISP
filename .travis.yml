@@ -20,7 +20,7 @@ install:
     - pip install -U nose pip setuptools
     - pip install coveralls codecov requests-mock
     - pip install git+https://github.com/kbandla/pydeep.git
-    - pip install .[fileobjects,neo,openioc]
+    - pip install .[fileobjects,neo,openioc,virustotal]
     - pushd tests
     - git clone https://github.com/viper-framework/viper-test-files.git
     - popd
