@@ -177,8 +177,9 @@ class MISPAttribute(AbstractMISP):
         if not isinstance(self.to_ids, bool):
             raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
 
-        if kwargs.get('distribution') is not None:
-            self.distribution = int(kwargs.pop('distribution'))
+        self.distribution = kwargs.pop('distribution', None)
+        if self.distribution is not None:
+            self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4, 5]:
                 raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
 
