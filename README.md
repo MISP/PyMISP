@@ -17,16 +17,29 @@ PyMISP allows you to fetch events, add or update events/attributes, add or updat
 
 ## Install from pip
 
+To install the package:
 ```
 pip3 install pymisp
 ```
 
+To update it:
+```
+pip3 install pymisp --upgrade
+```
+
 ## Install the latest version from repo
 
+To install the package:
 ```
-git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
-pip3 install -I .
+pip3 install git+https://github.com/CIRCL/PyMISP.git
 ```
+
+To update it:
+```
+pip3 install git+https://github.com/CIRCL/PyMISP.git --upgrade
+```
+
+**Caveat:** Running `pip3 install pymisp --upgrade` after `pip3 install git+https://github.com/CIRCL/PyMISP.git` seems to install the PyPI version over the git version instead of updating from the git repo.
 
 ## Samples and how to use PyMISP
 
