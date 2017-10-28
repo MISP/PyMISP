@@ -118,9 +118,9 @@ class PyMISP(object):
             else:
                 pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))
                 recommended_version_tup = tuple(int(x) for x in response['version'].split('.'))
-                if recommended_version_tup < pymisp_version_tup:
-                    logger.warning("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). Please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
-                elif pymisp_version_tup < recommended_version_tup:
+                if recommended_version_tup < pymisp_version_tup[:3]:
+                    logger.info("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
+                elif pymisp_version_tup[:3] < recommended_version_tup:
                     logger.warning("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
 
         except Exception as e:
