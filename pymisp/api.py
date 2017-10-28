@@ -265,7 +265,7 @@ class PyMISP(object):
             misp_event.publish()
         return misp_event
 
-    def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=5, **kwargs):
+    def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=None, **kwargs):
         """Initialize a new MISPAttribute from scratch"""
         misp_attribute = MISPAttribute(self.describe_types)
         misp_attribute.set_all_values(type=type_value, value=value, category=category,
