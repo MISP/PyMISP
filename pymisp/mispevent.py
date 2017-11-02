@@ -221,16 +221,33 @@ class MISPAttribute(AbstractMISP):
         self._malware_binary = self.data
         self.encrypt = True
 
+    def __is_misp_encrypted_file(self, f):
+        files_list = f.namelist()
+        if len(files_list) != 2:
+            return False
+        md5_from_filename = ''
+        md5_from_file = ''
+        for name in files_list:
+            if name.endswith('.filename.txt'):
+                md5_from_filename = name.replace('.filename.txt', '')
+            else:
+                md5_from_file = name
+        if not md5_from_filename or not md5_from_file or md5_from_filename != md5_from_file:
+            return False
+        return True
+
     def _load_data(self):
         if not isinstance(self.data, BytesIO):
             self.data = BytesIO(base64.b64decode(self.data))
         if self.type == 'malware-sample':
             try:
                 with ZipFile(self.data) as f:
+                    if not self.__is_misp_encrypted_file(f):
+                        raise Exception('Not an existing malware sample')
                     for name in f.namelist():
-                        if name.endswith('.txt'):
+                        if name.endswith('.filename.txt'):
                             with f.open(name, pwd=b'infected') as unpacked:
-                                self.malware_filename = unpacked.read().decode()
+                                self.malware_filename = unpacked.read().decode().strip()
                         else:
                             with f.open(name, pwd=b'infected') as unpacked:
                                 self._malware_binary = BytesIO(unpacked.read())
