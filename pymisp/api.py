@@ -759,8 +759,6 @@ class PyMISP(object):
             to_post['request']['info'] = misp_event.info
             to_post['request']['analysis'] = misp_event.analysis
             to_post['request']['threat_level_id'] = misp_event.threat_level_id
-        else:
-            to_post['request']['event_id'] = int(event_id)
 
         default_values = self.sane_default['malware-sample']
         if to_ids is None or not isinstance(to_ids, bool):
@@ -772,7 +770,7 @@ class PyMISP(object):
         to_post['request']['category'] = category
 
         to_post['request']['comment'] = comment
-        return to_post
+        return to_post, event_id
 
     def _encode_file_to_upload(self, filepath_or_bytes):
         """Helper to encode a file to upload"""
@@ -787,29 +785,33 @@ class PyMISP(object):
                       to_ids=True, category=None, comment=None, info=None,
                       analysis=None, threat_level_id=None):
         """Upload a sample"""
-        to_post = self._prepare_upload(event_id, distribution, to_ids, category,
-                                       comment, info, analysis, threat_level_id)
+        to_post, event_id = self._prepare_upload(event_id, distribution, to_ids, category,
+                                                 comment, info, analysis, threat_level_id)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath_or_bytes)}]
-        return self._upload_sample(to_post)
+        return self._upload_sample(to_post, event_id)
 
     def upload_samplelist(self, filepaths, event_id, distribution=None,
                           to_ids=True, category=None, comment=None, info=None,
                           analysis=None, threat_level_id=None):
         """Upload a list of samples"""
-        to_post = self._prepare_upload(event_id, distribution, to_ids, category,
-                                       comment, info, analysis, threat_level_id)
+        to_post, event_id = self._prepare_upload(event_id, distribution, to_ids, category,
+                                                 comment, info, analysis, threat_level_id)
         files = []
         for path in filepaths:
             if not os.path.isfile(path):
                 continue
             files.append({'filename': os.path.basename(path), 'data': self._encode_file_to_upload(path)})
         to_post['request']['files'] = files
-        return self._upload_sample(to_post)
+        return self._upload_sample(to_post, event_id)
 
-    def _upload_sample(self, to_post):
+    def _upload_sample(self, to_post, event_id=None):
         """Helper to upload a sample"""
         session = self.__prepare_session()
-        url = urljoin(self.root_url, 'events/upload_sample')
+        if event_id is None:
+            url = urljoin(self.root_url, 'events/upload_sample')
+        else:
+            url = urljoin(self.root_url, 'events/upload_sample/{}'.format(event_id))
+        logger.info(to_post)
         response = session.post(url, data=json.dumps(to_post))
         return self._check_response(response)
 
