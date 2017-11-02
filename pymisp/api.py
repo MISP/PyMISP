@@ -759,6 +759,9 @@ class PyMISP(object):
             to_post['request']['info'] = misp_event.info
             to_post['request']['analysis'] = misp_event.analysis
             to_post['request']['threat_level_id'] = misp_event.threat_level_id
+        else:
+            if distribution is not None:
+                to_post['request']['distribution'] = distribution
 
         default_values = self.sane_default['malware-sample']
         if to_ids is None or not isinstance(to_ids, bool):
