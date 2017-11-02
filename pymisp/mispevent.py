@@ -721,7 +721,11 @@ class MISPObject(AbstractMISP):
         if value.get('value') is None:
             return None
         if self.__known_template:
-            attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
+            if self.__definition['attributes'].get(object_relation):
+                attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
+            else:
+                # Woopsie, this object_relation is unknown, no sane defaults for you.
+                attribute = MISPObjectAttribute({})
         else:
             attribute = MISPObjectAttribute({})
         attribute.from_dict(object_relation, **value)
