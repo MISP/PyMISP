@@ -6,10 +6,12 @@ import json
 from json import JSONEncoder
 import collections
 import six  # Remove that import when discarding python2 support.
+import logging
+
+logger = logging.getLogger('pymisp')
 
 if six.PY2:
-    import warnings
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
 
 
 class MISPEncode(JSONEncoder):

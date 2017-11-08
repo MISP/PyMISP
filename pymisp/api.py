@@ -9,16 +9,19 @@ import datetime
 import os
 import base64
 import re
-import warnings
 import functools
 import logging
 
+logger = logging.getLogger('pymisp')
 
 try:
     from urllib.parse import urljoin
+    # Least dirty way to support python 2 and 3
+    basestring = str
+    unicode = str
 except ImportError:
     from urlparse import urljoin
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
+    loger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
 from io import BytesIO, open
 import zipfile
 
@@ -39,19 +42,6 @@ from . import __version__
 from .exceptions import PyMISPError, SearchError, MissingDependency, NoURL, NoKey
 from .mispevent import MISPEvent, MISPAttribute
 from .abstract import MISPEncode
-
-logger = logging.getLogger(__name__)
-
-
-# Least dirty way to support python 2 and 3
-try:
-    basestring
-    unicode
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.4")
-except NameError:
-    basestring = str
-    unicode = str
-
 
 def deprecated(func):
     '''This is a decorator which can be used to mark functions
@@ -99,14 +89,14 @@ class PyMISP(object):
         self.cert = cert
         self.asynch = asynch
         if asynch and not ASYNC_OK:
-            warnings.warn("You turned on Async, but don't have requests_futures installed")
+            logger.warning("You turned on Async, but don't have requests_futures installed")
             self.asynch = False
 
         self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
         if debug is not None:
-            warnings.warn('debug is deprecated, configure logging in api client')
+            logger.warning('debug is deprecated, configure logging in your script: import logging; logging.getLogger(\'pymisp\').setLevel(logging.DEBUG)')
 
         try:
             # Make sure the MISP instance is working and the URL is valid
@@ -163,6 +153,8 @@ class PyMISP(object):
              'Accept': 'application/{}'.format(output),
              'content-type': 'application/{}'.format(output),
              'User-Agent': 'PyMISP {} - Python {}.{}.{}'.format(__version__, *sys.version_info)})
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(session.headers)
         return session
 
     # #####################
@@ -209,15 +201,16 @@ class PyMISP(object):
 
     def _check_response(self, response):
         """Check if the response from the server is not an unexpected error"""
+        errors = []
         if response.status_code >= 500:
-            response.raise_for_status()
+            errors.append(response.json())
+            logger.critical('Something bad happened on the server-side: {}'.format(response.json()))
         try:
             to_return = response.json()
         except ValueError:
-            logger.debug(response.text)
-            raise PyMISPError('Unknown error: {}'.format(response.text))
+            # It the server didn't return a JSON blob, we've a problem.
+            raise PyMISPError('Unknown error (something is very broken server-side: {}'.format(response.text))
 
-        errors = []
         if isinstance(to_return, (list, str)):
             to_return = {'response': to_return}
         if to_return.get('error'):
@@ -905,8 +898,9 @@ class PyMISP(object):
         if controller not in ['events', 'attributes']:
             raise Exception('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes'])))
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
-        logger.debug('URL: %s', url)
-        logger.debug('Query: %s', query)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('URL: %s', url)
+            logger.debug('Query: %s', query)
 
         if ASYNC_OK and isinstance(session, FuturesSession) and async_callback:
             response = session.post(url, data=json.dumps(query), background_callback=async_callback)
@@ -1699,6 +1693,8 @@ class PyMISP(object):
         """Add an object"""
         session = self.__prepare_session()
         url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(url)
         response = session.post(url, data=misp_object.to_json())
         return self._check_response(response)
 

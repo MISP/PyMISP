@@ -16,12 +16,13 @@ from collections import Counter
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
+import logging
+logger = logging.getLogger('pymisp')
 
 import six  # Remove that import when discarding python2 support.
 
 if six.PY2:
-    import warnings
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
 
 try:
     from dateutil.parser import parse
