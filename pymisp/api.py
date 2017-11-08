@@ -95,8 +95,9 @@ class PyMISP(object):
         self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
             raise PyMISPError('The only output type supported by PyMISP is JSON. If you still rely on XML, use PyMISP v2.4.49')
-        if debug is not None:
-            logger.warning('debug is deprecated, configure logging in your script: import logging; logging.getLogger(\'pymisp\').setLevel(logging.DEBUG)')
+        if debug:
+            logger.setLevel(logging.DEBUG)
+            logger.info('To configure logging in your script, leave it to None and use the following: import logging; logging.getLogger(\'pymisp\').setLevel(logging.DEBUG)')
 
         try:
             # Make sure the MISP instance is working and the URL is valid

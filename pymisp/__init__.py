@@ -2,7 +2,7 @@ __version__ = '2.4.81.2'
 import sys
 import logging
 logger = logging.getLogger(__name__)
-FORMAT = "[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
+FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
 logging.basicConfig(stream=sys.stderr, level=logging.WARNING, format=FORMAT)
 
 try:
