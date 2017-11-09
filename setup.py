@@ -27,7 +27,11 @@ setup(
         'Topic :: Internet',
     ],
     test_suite="tests.test_offline",
-    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema'],
+    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema', 'setuptools>=36.4'],
+    extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
+                    'neo': ['py2neo'],
+                    'openioc': ['beautifulsoup4'],
+                    'virustotal': ['validators']},
     tests_require=[
         'jsonschema',
         'python-dateutil',
@@ -36,7 +40,8 @@ setup(
         'six'
     ],
     include_package_data=True,
-    package_data={'pymisp': ['data/*.json', 'data/misp-objects/schema_objects.json',
+    package_data={'pymisp': ['data/*.json',
+                             'data/misp-objects/schema_objects.json',
                              'data/misp-objects/schema_relationships.json',
                              'data/misp-objects/objects/*/definition.json',
                              'data/misp-objects/relationships/definition.json']},

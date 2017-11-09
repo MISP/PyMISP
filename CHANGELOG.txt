@@ -2,6 +2,61 @@ Changelog
 =========
 
 
+v2.4.81.2 (2017-10-24)
+----------------------
+
+Changes
+~~~~~~~
+- Version bump. [Raphaël Vinot]
+- Update changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly bundle object templates. [Raphaël Vinot]
+
+
+v2.4.81.1 (2017-10-24)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Do not raise an exception when the object template is unknown.
+  [Raphaël Vinot]
+
+  + bump misp-object
+- Bump misp-objects. [Raphaël Vinot]
+- Allow to hard delete an attribute by ID. [Raphaël Vinot]
+- Update comments. [Raphaël Vinot]
+- Bump misp-objects and describeTypes. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly bundle object templates. [Raphaël Vinot]
+- Fix typos and logic mistakes in mispevent. [Raphaël Vinot]
+- Fix travis build. [Raphaël Vinot]
+- Min required version of setuptools. [Raphaël Vinot]
+- Improve dependencies listing. [Raphaël Vinot]
+
+  Partial fix for #110
+- Missing default category. [Raphaël Vinot]
+
+  Fix #119
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Update openioc.py. [Andras Iklody]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #121 from kx499/master. [Raphaël Vinot]
+
+  Added **kwargs to add_named_attribute call in add_attachment
+- Added **kwargs to add_named_attribute call in add_attachment.
+  [tssbo82]
+- Update README. [Raphaël Vinot]
+- Update changelog. [Raphaël Vinot]
+
+
 v2.4.81 (2017-10-09)
 --------------------
 

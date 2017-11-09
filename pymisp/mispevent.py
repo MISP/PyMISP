@@ -16,12 +16,14 @@ from collections import Counter
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
-
 import six  # Remove that import when discarding python2 support.
 
+import logging
+logger = logging.getLogger('pymisp')
+
+
 if six.PY2:
-    import warnings
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
 
 try:
     from dateutil.parser import parse
@@ -138,7 +140,7 @@ class MISPAttribute(AbstractMISP):
             try:
                 c.verify(signed_data, signature=base64.b64decode(self.sig), verify=keys[:1])
                 return {self.uuid: True}
-            except:
+            except Exception:
                 return {self.uuid: False}
 
     def set_all_values(self, **kwargs):
@@ -165,15 +167,21 @@ class MISPAttribute(AbstractMISP):
 
         # Default values
         self.category = kwargs.pop('category', type_defaults['default_category'])
+        if self.category is None:
+            # In case the category key is passed, but None
+            self.category = type_defaults['default_category']
         if self.category not in self.__categories:
             raise NewAttributeError('{} is invalid, category has to be in {}'.format(self.category, (', '.join(self.__categories))))
 
         self.to_ids = kwargs.pop('to_ids', bool(int(type_defaults['to_ids'])))
+        if self.to_ids is None:
+            self.to_ids = bool(int(type_defaults['to_ids']))
         if not isinstance(self.to_ids, bool):
             raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
 
-        if kwargs.get('distribution') is not None:
-            self.distribution = int(kwargs.pop('distribution'))
+        self.distribution = kwargs.pop('distribution', None)
+        if self.distribution is not None:
+            self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4, 5]:
                 raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
 
@@ -215,20 +223,37 @@ class MISPAttribute(AbstractMISP):
         self._malware_binary = self.data
         self.encrypt = True
 
+    def __is_misp_encrypted_file(self, f):
+        files_list = f.namelist()
+        if len(files_list) != 2:
+            return False
+        md5_from_filename = ''
+        md5_from_file = ''
+        for name in files_list:
+            if name.endswith('.filename.txt'):
+                md5_from_filename = name.replace('.filename.txt', '')
+            else:
+                md5_from_file = name
+        if not md5_from_filename or not md5_from_file or md5_from_filename != md5_from_file:
+            return False
+        return True
+
     def _load_data(self):
         if not isinstance(self.data, BytesIO):
             self.data = BytesIO(base64.b64decode(self.data))
         if self.type == 'malware-sample':
             try:
                 with ZipFile(self.data) as f:
+                    if not self.__is_misp_encrypted_file(f):
+                        raise Exception('Not an existing malware sample')
                     for name in f.namelist():
-                        if name.endswith('.txt'):
+                        if name.endswith('.filename.txt'):
                             with f.open(name, pwd=b'infected') as unpacked:
-                                self.malware_filename = unpacked.read().decode()
+                                self.malware_filename = unpacked.read().decode().strip()
                         else:
                             with f.open(name, pwd=b'infected') as unpacked:
                                 self._malware_binary = BytesIO(unpacked.read())
-            except:
+            except Exception:
                 # not a encrypted zip file, assuming it is a new malware sample
                 self._prepare_new_malware_sample()
 
@@ -359,7 +384,7 @@ class MISPEvent(AbstractMISP):
             try:
                 c.verify(signed_data, signature=base64.b64decode(self.sig), verify=keys[:1])
                 to_return[self.uuid] = True
-            except:
+            except Exception:
                 to_return[self.uuid] = False
         for a in self.attributes:
             to_return.update(a.verify(gpg_uid))
@@ -369,7 +394,7 @@ class MISPEvent(AbstractMISP):
             try:
                 c.verify(to_verify_global, signature=base64.b64decode(self.global_sig), verify=keys[:1])
                 to_return['global'] = True
-            except:
+            except Exception:
                 to_return['global'] = False
         return to_return
 
@@ -422,8 +447,9 @@ class MISPEvent(AbstractMISP):
             raise NewAttributeError('The info field of the new event is required.')
 
         # Default values for a valid event to send to a MISP instance
-        if kwargs.get('distribution') is not None:
-            self.distribution = int(kwargs.pop('distribution'))
+        self.distribution = kwargs.pop('distribution', None)
+        if self.distribution is not None:
+            self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4]:
                 raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
 
@@ -565,7 +591,7 @@ class MISPObjectReference(AbstractMISP):
         self.referenced_uuid = referenced_uuid
         self.relationship_type = relationship_type
         self.comment = comment
-        for k, v in kwargs:
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
 
@@ -598,7 +624,7 @@ class MISPObjectAttribute(MISPAttribute):
 
 class MISPObject(AbstractMISP):
 
-    def __init__(self, name, strict=True):
+    def __init__(self, name, strict=False):
         super(MISPObject, self).__init__()
         self.__strict = strict
         self.name = name
@@ -634,7 +660,7 @@ class MISPObject(AbstractMISP):
                 else:
                     self.__known_template = False
             if kwargs.get('template_version') and int(kwargs['template_version']) != self.template_version:
-                if self.strict:
+                if self.__strict:
                     raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
                 else:
                     self.__known_template = False
@@ -649,12 +675,12 @@ class MISPObject(AbstractMISP):
             else:
                 setattr(self, key, value)
 
-    def to_dict(self, strict=True):
+    def to_dict(self, strict=False):
         if strict or self.__strict and self.__known_template:
             self._validate()
         return super(MISPObject, self).to_dict()
 
-    def to_json(self, strict=True):
+    def to_json(self, strict=False):
         if strict or self.__strict and self.__known_template:
             self._validate()
         return super(MISPObject, self).to_json()
@@ -684,7 +710,7 @@ class MISPObject(AbstractMISP):
         """Add a link (uuid) to an other object"""
         if kwargs.get('object_uuid'):
             # Load existing object
-            object_uuid = kwargs.get('object_uuid')
+            object_uuid = kwargs.pop('object_uuid')
         else:
             # New reference
             object_uuid = self.uuid
@@ -697,7 +723,11 @@ class MISPObject(AbstractMISP):
         if value.get('value') is None:
             return None
         if self.__known_template:
-            attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
+            if self.__definition['attributes'].get(object_relation):
+                attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
+            else:
+                # Woopsie, this object_relation is unknown, no sane defaults for you.
+                attribute = MISPObjectAttribute({})
         else:
             attribute = MISPObjectAttribute({})
         attribute.from_dict(object_relation, **value)

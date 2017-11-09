@@ -8,7 +8,10 @@ from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import math
 from collections import Counter
-import warnings
+import logging
+
+logger = logging.getLogger('pymisp')
+
 
 try:
     import pydeep
@@ -27,9 +30,9 @@ class FileObject(AbstractMISPObjectGenerator):
 
     def __init__(self, filepath=None, pseudofile=None, filename=None):
         if not HAS_PYDEEP:
-            warnings.warn("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_MAGIC:
-            warnings.warn("Please install python-magic: pip install python-magic.")
+            logger.warning("Please install python-magic: pip install python-magic.")
         if filename:
             # Useful in case the file is copied with a pre-defined name by a script but we want to keep the original name
             self.__filename = filename

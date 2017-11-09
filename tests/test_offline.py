@@ -47,7 +47,7 @@ class TestOffline(unittest.TestCase):
         m.register_uri('POST', self.domain + 'events/5758ebf5-c898-48e6-9fe9-5665c0a83866', json=self.event)
         m.register_uri('DELETE', self.domain + 'events/2', json={'message': 'Event deleted.'})
         m.register_uri('DELETE', self.domain + 'events/3', json={'errors': ['Invalid event'], 'message': 'Invalid event', 'name': 'Invalid event', 'url': '/events/3'})
-        m.register_uri('DELETE', self.domain + 'attributes/2', json={'message': 'Attribute deleted.'})
+        m.register_uri('GET', self.domain + 'attributes/delete/2', json={'message': 'Attribute deleted.'})
         m.register_uri('POST', self.domain + 'events/index', json=self.search_index_result)
 
     def test_getEvent(self, m):
