@@ -64,7 +64,7 @@ class AbstractMISP(collections.MutableMapping):
         return self.to_dict()
 
     def to_json(self):
-        return json.dumps(self.to_dict(), cls=MISPEncode)
+        return json.dumps(self, cls=MISPEncode)
 
     def __getitem__(self, key):
         return getattr(self, key)
