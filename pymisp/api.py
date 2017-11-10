@@ -72,7 +72,7 @@ class PyMISP(object):
                 signed certiifcate (the concatenation of all the
                 *.crt of the chain)
     :param out_type: Type of object (json) NOTE: XML output isn't supported anymore, keeping the flag for compatibility reasons.
-    :param debug: deprecated, configure logging in api client instead
+    :param debug: Write all the debug information to stderr
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
     :param asynch: Use asynchronous processing where possible

@@ -67,6 +67,16 @@ logger = logging.getLogger('pymisp')
 logger.setLevel(logging.DEBUG)
 ```
 
+Or if you want to write the debug output to a file instead of stderr:
+
+```python
+import pymisp
+import logging
+
+logger = logging.getLogger('pymisp')
+logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', format=pymisp.FORMAT)
+```
+
 ## Documentation
 
 [PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/master/pymisp.pdf).
