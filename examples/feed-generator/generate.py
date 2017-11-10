@@ -4,28 +4,79 @@
 import sys
 import json
 import os
+import hashlib
 from pymisp import PyMISP
 from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
 
+objectsFields = {
+    'Attribute': {
+        'uuid',
+        'value',
+        'category',
+        'type',
+        'comment',
+        'data',
+        'timestamp',
+        'to_ids'
+    },
+    'Event': {
+        'uuid',
+        'info',
+        'threat_level_id',
+        'analysis',
+        'timestamp',
+        'publish_timestamp',
+        'published',
+        'date'
+    },
+    'Object': {
+        'name',
+        'meta-category',
+        'description',
+        'template_uuid',
+        'template_version',
+        'uuid',
+        'timestamp',
+        'distribution',
+        'sharing_group_id',
+        'comment'
+    },
+    'ObjectReference': {
+        'uuid',
+        'timestamp',
+        'relationship_type',
+        'comment',
+        'object_uuid',
+        'referenced_uuid'
+    },
+    'Orgc': {
+        'name',
+        'uuid'
+    },
+    'Tag': {
+        'name',
+        'colour',
+        'exportable'
+    }
+}
 
-objectsToSave = {'Orgc': {'fields': ['name', 'uuid'],
-                          'multiple': False,
-                          },
-                 'Tag': {'fields': ['name', 'colour', 'exportable'],
-                         'multiple': True,
-                         },
-                 'Attribute': {'fields': ['uuid', 'value', 'category', 'type',
-                                          'comment', 'data', 'timestamp', 'to_ids'],
-                               'multiple': True,
-                               },
-                 }
-
-fieldsToSave = ['uuid', 'info', 'threat_level_id', 'analysis',
-                'timestamp', 'publish_timestamp', 'published',
-                'date']
+objectsToSave = {
+    'Orgc': {},
+    'Tag': {},
+    'Attribute': {
+        'Tag': {}
+    },
+    'Object': {
+        'Attribute': {
+            'Tag': {}
+        },
+        'ObjectReference': {}
+    }
+}
 
 valid_attribute_distributions = []
 
+attributeHashes = []
 
 def init():
     # If we have an old settings.py file then this variable won't exist
@@ -36,61 +87,65 @@ def init():
         valid_attribute_distributions = ['0', '1', '2', '3', '4', '5']
     return PyMISP(url, key, ssl)
 
+def recursiveExtract(container, containerType, leaf, eventUuid):
+    temp = {}
+    if containerType in ['Attribute', 'Object']:
+        if (__blockByDistribution(container)):
+            return False
+    for field in objectsFields[containerType]:
+        if field in container:
+            temp[field] = container[field]
+    if (containerType == 'Attribute'):
+        global attributeHashes
+        if ('|' in container['type'] or container['type'] == 'malware-sample'):
+            split = container['value'].split('|')
+            attributeHashes.append([hashlib.md5(split[0].encode("utf-8")).hexdigest(), eventUuid])
+            attributeHashes.append([hashlib.md5(split[1].encode("utf-8")).hexdigest(), eventUuid])
+        else:
+            attributeHashes.append([hashlib.md5(container['value'].encode("utf-8")).hexdigest(), eventUuid])
+    children = leaf.keys()
+    for childType in children:
+        childContainer = container.get(childType)
+        if (childContainer):
+            if (type(childContainer) is dict):
+                temp[childType] = recursiveExtract(childContainer, childType, leaf[childType], eventUuid)
+            else:
+                temp[childType] = []
+                for element in childContainer:
+                    processed = recursiveExtract(element, childType, leaf[childType], eventUuid)
+                    if (processed):
+                        temp[childType].append(processed)
+    return temp
 
 def saveEvent(misp, uuid):
+    result = {}
     event = misp.get_event(uuid)
     if not event.get('Event'):
         print('Error while fetching event: {}'.format(event['message']))
         sys.exit('Could not create file for event ' + uuid + '.')
-    event = __cleanUpEvent(event)
+    event['Event'] = recursiveExtract(event['Event'], 'Event', objectsToSave, event['Event']['uuid'])
     event = json.dumps(event)
     eventFile = open(os.path.join(outputdir, uuid + '.json'), 'w')
     eventFile.write(event)
     eventFile.close()
 
-
-def __cleanUpEvent(event):
-        temp = event
-        event = {'Event': {}}
-        __cleanupEventFields(event, temp)
-        __cleanupEventObjects(event, temp)
-        return event
-
-
-def __cleanupEventFields(event, temp):
-    for field in fieldsToSave:
-        if field in temp['Event'].keys():
-            event['Event'][field] = temp['Event'][field]
-    return event
-
-
-def __blockAttributeByDistribution(attribute):
-    if attribute['distribution'] not in valid_attribute_distributions:
+def __blockByDistribution(element):
+    if element['distribution'] not in valid_attribute_distributions:
         return True
     return False
 
+def saveHashes():
+    if not attributeHashes:
+        return False
+    try:
+        hashFile = open(os.path.join(outputdir, 'hashes.csv'), 'w')
+        for element in attributeHashes:
+            hashFile.write('{},{}\n'.format(element[0], element[1]))
+        hashFile.close()
+    except Exception as e:
+        print(e)
+        sys.exit('Could not create the quick hash lookup file.')
 
-def __cleanupEventObjects(event, temp):
-    for objectType in objectsToSave.keys():
-        if objectsToSave[objectType]['multiple'] is True:
-            if objectType in temp['Event']:
-                for objectInstance in temp['Event'][objectType]:
-                    if objectType is 'Attribute':
-                        if __blockAttributeByDistribution(objectInstance):
-                            continue
-                    tempObject = {}
-                    for field in objectsToSave[objectType]['fields']:
-                        if field in objectInstance.keys():
-                            tempObject[field] = objectInstance[field]
-                    if objectType not in event['Event']:
-                        event['Event'][objectType] = []
-                    event['Event'][objectType].append(tempObject)
-        else:
-            tempObject = {}
-            for field in objectsToSave[objectType]['fields']:
-                tempObject[field] = temp['Event'][objectType][field]
-            event['Event'][objectType] = tempObject
-    return event
 
 
 def saveManifest(manifest):
@@ -138,4 +193,6 @@ if __name__ == '__main__':
         print("Event " + str(counter) + "/" + str(total) + " exported.")
         counter += 1
     saveManifest(manifest)
-    print('Manifest saved. Feed creation completed.')
+    print('Manifest saved.')
+    saveHashes()
+    print('Hashes saved. Feed creation completed.')
