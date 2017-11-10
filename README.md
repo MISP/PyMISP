@@ -50,6 +50,23 @@ cd examples
 python3 last.py -l 10
 ```
 
+## Debugging
+
+You have two options there:
+
+1. Pass `debug=True` to `PyMISP` and it will enable logging.DEBUG to stderr on the whole module
+
+2. Use the python logging module directly:
+
+```python
+
+import logging
+logger = logging.getLogger('pymisp')
+
+# Configure it as you whish, for example, enable DEBUG mode:
+logger.setLevel(logging.DEBUG)
+```
+
 ## Documentation
 
 [PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/master/pymisp.pdf).

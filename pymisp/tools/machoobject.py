@@ -5,7 +5,9 @@ from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
-import warnings
+import logging
+
+logger = logging.getLogger('pymisp')
 
 
 try:
@@ -25,7 +27,7 @@ class MachOObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parsed=None, filepath=None, pseudofile=None):
         if not HAS_PYDEEP:
-            warnings.warn("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_LIEF:
             raise ImportError('Please install lief, documentation here: https://github.com/lief-project/LIEF')
         if pseudofile:

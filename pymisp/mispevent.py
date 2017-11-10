@@ -16,12 +16,14 @@ from collections import Counter
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
-
 import six  # Remove that import when discarding python2 support.
 
+import logging
+logger = logging.getLogger('pymisp')
+
+
 if six.PY2:
-    import warnings
-    warnings.warn("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
 
 try:
     from dateutil.parser import parse
@@ -138,7 +140,7 @@ class MISPAttribute(AbstractMISP):
             try:
                 c.verify(signed_data, signature=base64.b64decode(self.sig), verify=keys[:1])
                 return {self.uuid: True}
-            except:
+            except Exception:
                 return {self.uuid: False}
 
     def set_all_values(self, **kwargs):
@@ -251,7 +253,7 @@ class MISPAttribute(AbstractMISP):
                         else:
                             with f.open(name, pwd=b'infected') as unpacked:
                                 self._malware_binary = BytesIO(unpacked.read())
-            except:
+            except Exception:
                 # not a encrypted zip file, assuming it is a new malware sample
                 self._prepare_new_malware_sample()
 
@@ -382,7 +384,7 @@ class MISPEvent(AbstractMISP):
             try:
                 c.verify(signed_data, signature=base64.b64decode(self.sig), verify=keys[:1])
                 to_return[self.uuid] = True
-            except:
+            except Exception:
                 to_return[self.uuid] = False
         for a in self.attributes:
             to_return.update(a.verify(gpg_uid))
@@ -392,7 +394,7 @@ class MISPEvent(AbstractMISP):
             try:
                 c.verify(to_verify_global, signature=base64.b64decode(self.global_sig), verify=keys[:1])
                 to_return['global'] = True
-            except:
+            except Exception:
                 to_return['global'] = False
         return to_return
 

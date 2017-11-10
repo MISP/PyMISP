@@ -1,4 +1,9 @@
 __version__ = '2.4.81.2'
+import sys
+import logging
+logger = logging.getLogger(__name__)
+FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
+logging.basicConfig(stream=sys.stderr, level=logging.WARNING, format=FORMAT)
 
 try:
     from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate  # noqa
@@ -9,5 +14,6 @@ try:
     from .tools import Neo4j  # noqa
     from .tools import stix  # noqa
     from .tools import openioc  # noqa
-except ImportError:
-    pass
+    logger.debug('pymisp loaded properly')
+except ImportError as e:
+    logger.warning('Unable to load pymisp properly: {}'.format(e))

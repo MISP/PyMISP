@@ -3,7 +3,9 @@
 
 from . import FileObject, PEObject, ELFObject, MachOObject
 from ..exceptions import MISPObjectException
-import warnings
+import logging
+
+logger = logging.getLogger('pymisp')
 
 try:
     import lief
@@ -57,15 +59,15 @@ def make_binary_objects(filepath=None, pseudofile=None, filename=None):
             elif isinstance(lief_parsed, lief.MachO.Binary):
                 return make_macho_objects(lief_parsed, misp_file)
         except lief.bad_format as e:
-            warnings.warn('\tBad format: {}'.format(e))
+            logger.warning('Bad format: {}'.format(e))
         except lief.bad_file as e:
-            warnings.warn('\tBad file: {}'.format(e))
+            logger.warning('Bad file: {}'.format(e))
         except lief.parser_error as e:
-            warnings.warn('\tParser error: {}'.format(e))
+            logger.warning('Parser error: {}'.format(e))
         except FileTypeNotImplemented as e:  # noqa
-            warnings.warn(e)
+            logger.warning(e)
     if not HAS_LIEF:
-        warnings.warn('Please install lief, documentation here: https://github.com/lief-project/LIEF')
+        logger.warning('Please install lief, documentation here: https://github.com/lief-project/LIEF')
     if not filepath:
-        warnings.warn('LIEF currently requires a filepath and not a pseudo file')
+        logger.warning('LIEF currently requires a filepath and not a pseudo file')
     return misp_file, None, None
