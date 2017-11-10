@@ -385,6 +385,18 @@ class PyMISP(object):
             eid = e.id
         return self.update_event(eid, e)
 
+    def fast_publish(self, event_id, alert=False):
+        """Does the same as the publish method, but just try to publish the event
+        even with one single HTTP GET.
+        The default is to not send a mail as it is assumed this method is called on update.
+        """
+        if not alert:
+            url = urljoin(self.root_url, 'events/publish/{}'.format(event_id))
+        else:
+            url = urljoin(self.root_url, 'events/alert/{}'.format(event_id))
+        response = self.__prepare_request('POST', url)
+        return self._check_response(response)
+
     def publish(self, event, alert=True):
         """Publish event (with or without alert email)
         :param event: pass event or event id (as string or int) to publish
@@ -398,12 +410,7 @@ class PyMISP(object):
         event_id = full_event.id
         if full_event.published:
             return {'error': 'Already published'}
-        if not alert:
-            url = urljoin(self.root_url, 'events/publish/{}'.format(event_id))
-        else:
-            url = urljoin(self.root_url, 'events/alert/{}'.format(event_id))
-        response = self.__prepare_request('POST', url)
-        return self._check_response(response)
+        return self.fast_publish(event_id, alert)
 
     def change_threat_level(self, event, threat_level_id):
         """Change the threat level of an event"""
