@@ -3,7 +3,7 @@
 
 import json
 from pymisp import PyMISP
-from pymisp.tools.abstractgenerator import AbstractMISPObjectGenerator
+from pymisp.tools import GenericObjectGenerator
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
@@ -11,19 +11,6 @@ import argparse
 Sample usage:
 ./add_generic_object.py -e 5065 -t email -l '[{"to": "undisclosed@ppp.com"}, {"to": "second.to@mail.com"}]'
 """
-
-
-class GenericObject(AbstractMISPObjectGenerator):
-    def __init__(self, type, attr_list):
-        super(GenericObject, self).__init__(type)
-        self.__data = attr_list
-        self.generate_attributes()
-
-    def generate_attributes(self):
-        for attribute in self.__data:
-            for key, value in attribute.items():
-                self.add_attribute(key, value=value)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create a MISP Object selectable by type starting from a dictionary')
@@ -40,5 +27,6 @@ if __name__ == '__main__':
         print ("Template for type %s not found! Valid types are: %s" % (args.type, valid_types))
         exit()
 
-    misp_object = GenericObject(args.type.replace("|", "-"), json.loads(args.attr_list))
+    misp_object = GenericObjectGenerator(args.type.replace("|", "-"))
+    misp_object.generate_attributes(json.loads(args.attr_list))
     r = pymisp.add_object(args.event, template_id, misp_object)

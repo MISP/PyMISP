@@ -6,3 +6,4 @@ from .elfobject import ELFObject, ELFSectionObject  # noqa
 from .machoobject import MachOObject, MachOSectionObject  # noqa
 from .create_misp_object import make_binary_objects  # noqa
 from .abstractgenerator import AbstractMISPObjectGenerator  # noqa
+from .genericgenerator import GenericObjectGenerator  # noqa

@@ -727,6 +727,7 @@ class MISPObject(AbstractMISP):
                 attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
             else:
                 # Woopsie, this object_relation is unknown, no sane defaults for you.
+                logger.warning("The template ({}) doesn't have the object_relation ({}) you're trying to add.".format(self.name, object_relation))
                 attribute = MISPObjectAttribute({})
         else:
             attribute = MISPObjectAttribute({})
