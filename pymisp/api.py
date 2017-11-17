@@ -17,7 +17,7 @@ import zipfile
 
 from . import __version__
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey
-from .mispevent import MISPEvent, MISPAttribute
+from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation
 from .abstract import MISPEncode
 
 logger = logging.getLogger('pymisp')
@@ -1258,46 +1258,6 @@ class PyMISP(object):
 
     # ############## Users ##################
 
-    def _set_user_parameters(self, **kwargs):
-        user = {}
-        if kwargs.get('email'):
-            user['email'] = kwargs.get('email')
-        if kwargs.get('org_id'):
-            user['org_id'] = kwargs.get('org_id')
-        if kwargs.get('role_id'):
-            user['role_id'] = kwargs.get('role_id')
-        if kwargs.get('password'):
-            user['password'] = kwargs.get('password')
-        if kwargs.get('external_auth_required') is not None:
-            user['external_auth_required'] = kwargs.get('external_auth_required')
-        if kwargs.get('external_auth_key'):
-            user['external_auth_key'] = kwargs.get('external_auth_key')
-        if kwargs.get('enable_password') is not None:
-            user['enable_password'] = kwargs.get('enable_password')
-        if kwargs.get('nids_sid'):
-            user['nids_sid'] = kwargs.get('nids_sid')
-        if kwargs.get('server_id') is not None:
-            user['server_id'] = kwargs.get('server_id')
-        if kwargs.get('gpgkey'):
-            user['gpgkey'] = kwargs.get('gpgkey')
-        if kwargs.get('certif_public'):
-            user['certif_public'] = kwargs.get('certif_public')
-        if kwargs.get('autoalert') is not None:
-            user['autoalert'] = kwargs.get('autoalert')
-        if kwargs.get('contactalert') is not None:
-            user['contactalert'] = kwargs.get('contactalert')
-        if kwargs.get('disabled') is not None:
-            user['disabled'] = kwargs.get('disabled')
-        if kwargs.get('change_pw') is not None:
-            user['change_pw'] = kwargs.get('change_pw')
-        if kwargs.get('termsaccepted') is not None:
-            user['termsaccepted'] = kwargs.get('termsaccepted')
-        if kwargs.get('newsread') is not None:
-            user['newsread'] = kwargs.get('newsread')
-        if kwargs.get('authkey'):
-            user['authkey'] = kwargs.get('authkey')
-        return user
-
     def get_users_list(self):
         url = urljoin(self.root_url, 'admin/users')
         response = self.__prepare_request('GET', url)
@@ -1310,8 +1270,9 @@ class PyMISP(object):
 
     def add_user(self, email, org_id, role_id, **kwargs):
         url = urljoin(self.root_url, 'admin/users/add/')
-        new_user = self._set_user_parameters(**dict(email=email, org_id=org_id, role_id=role_id, **kwargs))
-        response = self.__prepare_request('POST', url, json.dumps(new_user))
+        new_user = MISPUser()
+        new_user.from_dict(email=email, org_id=org_id, role_id=role_id, **kwargs)
+        response = self.__prepare_request('POST', url, new_user.to_json())
         return self._check_response(response)
 
     def add_user_json(self, json_file):
@@ -1327,7 +1288,8 @@ class PyMISP(object):
         return self._check_response(response)
 
     def edit_user(self, user_id, **kwargs):
-        edit_user = self._set_user_parameters(**kwargs)
+        edit_user = MISPUser()
+        edit_user.from_dict(**kwargs)
         url = urljoin(self.root_url, 'admin/users/edit/{}'.format(user_id))
         response = self.__prepare_request('POST', url, json.dumps(edit_user))
         return self._check_response(response)
@@ -1346,26 +1308,6 @@ class PyMISP(object):
 
     # ############## Organisations ##################
 
-    def _set_organisation_parameters(self, **kwargs):
-        organisation = {}
-        if kwargs.get('name'):
-            organisation['name'] = kwargs.get('name')
-        if kwargs.get('description'):
-            organisation['description'] = kwargs.get('description')
-        if kwargs.get('type'):
-            organisation['type'] = kwargs.get('type')
-        if kwargs.get('nationality'):
-            organisation['nationality'] = kwargs.get('nationality')
-        if kwargs.get('sector'):
-            organisation['sector'] = kwargs.get('sector')
-        if kwargs.get('uuid'):
-            organisation['uuid'] = kwargs.get('uuid')
-        if kwargs.get('contacts'):
-            organisation['contacts'] = kwargs.get('contacts')
-        if kwargs.get('local') is not None:
-            organisation['local'] = kwargs.get('local')
-        return organisation
-
     def get_organisations_list(self, scope="local"):
         scope = scope.lower()
         if scope not in ["local", "external", "all"]:
@@ -1380,7 +1322,8 @@ class PyMISP(object):
         return self._check_response(response)
 
     def add_organisation(self, name, **kwargs):
-        new_org = self._set_organisation_parameters(**dict(name=name, **kwargs))
+        new_org = MISPOrganisation()
+        new_org.from_dict(name=name, **kwargs)
         if 'local' in new_org:
             if new_org.get('local') is False:
                 if 'uuid' not in new_org:
@@ -1402,7 +1345,8 @@ class PyMISP(object):
         return self._check_response(response)
 
     def edit_organisation(self, org_id, **kwargs):
-        edit_org = self._set_organisation_parameters(**kwargs)
+        edit_org = MISPOrganisation()
+        edit_org.from_dict(**kwargs)
         url = urljoin(self.root_url, 'admin/organisations/edit/{}'.format(org_id))
         response = self.__prepare_request('POST', url, json.dumps(edit_org))
         return self._check_response(response)
