@@ -24,7 +24,7 @@ pip3 install pymisp
 ## Install the latest version from repo
 
 ```
-git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
+git clone https://github.com/MISP/PyMISP.git && cd PyMISP
 pip3 install -I .
 ```
 
@@ -84,7 +84,7 @@ logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', for
 Documentation can be generated with epydoc:
 
 ```
-epydoc --url https://github.com/CIRCL/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
+epydoc --url https://github.com/MISP/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
 ```
 
 ## Everything is a Mutable Mapping
