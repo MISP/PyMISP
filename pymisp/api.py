@@ -68,9 +68,9 @@ class PyMISP(object):
     :param url: URL of the MISP instance you want to connect to
     :param key: API key of the user you want to use
     :param ssl: can be True or False (to check ot not the validity
-                of the certificate. Or a CA_BUNDLE in case of self
-                signed certiifcate (the concatenation of all the
-                *.crt of the chain)
+    of the certificate. Or a CA_BUNDLE in case of self
+    signed certiifcate (the concatenation of all the
+    *.crt of the chain)
     :param out_type: Type of object (json) NOTE: XML output isn't supported anymore, keeping the flag for compatibility reasons.
     :param debug: Write all the debug information to stderr
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
@@ -902,8 +902,8 @@ class PyMISP(object):
                      analysis=None, attribute=None, org=None, async_callback=None, normalize=False):
         """Search only at the index level. Use ! infront of value as NOT, default OR
         If using async, give a callback that takes 2 args, session and response:
-            basic usage is
-            pymisp.search_index(..., async_callback=lambda ses,resp: print(resp.json()))
+        basic usage is
+        pymisp.search_index(..., async_callback=lambda ses,resp: print(resp.json()))
 
         :param published: Published (0,1)
         :param eventid: Evend ID(s) | str or list
