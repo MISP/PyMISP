@@ -403,7 +403,7 @@ class PyMISP(object):
         :param alert: set to True by default (send alerting email) if False will not send alert
         :return publish status
         """
-        if isinstance(event, int) or (isinstance(event, basestring) and event.is_digit()):
+        if isinstance(event, int) or (isinstance(event, basestring) and event.isdigit()):
             full_event = self._make_mispevent(self.get_event(event))
         else:
             full_event = self._make_mispevent(event)
