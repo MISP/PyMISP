@@ -24,7 +24,7 @@ pip3 install pymisp
 ## Install the latest version from repo
 
 ```
-git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
+git clone https://github.com/MISP/PyMISP.git && cd PyMISP
 pip3 install -I .
 ```
 
@@ -67,6 +67,16 @@ logger = logging.getLogger('pymisp')
 logger.setLevel(logging.DEBUG)
 ```
 
+Or if you want to write the debug output to a file instead of stderr:
+
+```python
+import pymisp
+import logging
+
+logger = logging.getLogger('pymisp')
+logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', format=pymisp.FORMAT)
+```
+
 ## Documentation
 
 [PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/master/pymisp.pdf).
@@ -74,7 +84,7 @@ logger.setLevel(logging.DEBUG)
 Documentation can be generated with epydoc:
 
 ```
-epydoc --url https://github.com/CIRCL/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
+epydoc --url https://github.com/MISP/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
 ```
 
 ## Everything is a Mutable Mapping

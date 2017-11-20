@@ -1,4 +1,4 @@
-__version__ = '2.4.81.2'
+__version__ = '2.4.82'
 import sys
 import logging
 logger = logging.getLogger(__name__)
