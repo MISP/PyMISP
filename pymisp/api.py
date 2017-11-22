@@ -449,35 +449,73 @@ class PyMISP(object):
         return self._check_response(response)
 
     # ##### File attributes #####
-
     def _send_attributes(self, event, attributes, proposal=False):
-        """Helper to add new attributes to an existing events"""
-        eventID_to_update = None
-        if isinstance(event, MISPEvent):
-            if hasattr(event, 'id'):
-                eventID_to_update = event.id
-            elif hasattr(event, 'uuid'):
-                eventID_to_update = event.uuid
-        elif isinstance(event, int) or (isinstance(event, str) and (event.isdigit() or self._valid_uuid(event))):
-            eventID_to_update = event
-        else:
-            e = MISPEvent(self.describe_types)
-            e.load(event)
-            if hasattr(e, 'id'):
-                eventID_to_update = e.id
-            elif hasattr(e, 'uuid'):
-                eventID_to_update = e.uuid
-        if eventID_to_update is None:
-            raise PyMISPError("Unable to find the ID of the event to update")
+        """
+        Helper to add new attributes to an existing event, identified by an event object or an event id
+
+
+        :param event: EventID (int) or Event to alter
+        :param attributes: One or more attribute to add
+        :param proposal: True or False based on whether the attributes should be proposed or directly save
+        :type event: MISPEvent, int
+        :type attributes: MISPAttribute, list
+        :type proposal: bool
+        :return: list of responses
+        :rtype: list
+        """
+        event_id = self._extract_event_id(event)
+        responses = []
+        if not event_id:
+            raise PyMISPError("Unable to find the ID of the event to update.")
         if not attributes:
             return {'error': 'No attributes.'}
-        for a in attributes:
-            if proposal:
-                response = self.proposal_add(eventID_to_update, a)
+
+        # Propals need to be posted in single requests
+        if proposal:
+            for a in attributes:
+                # proposal_add(...) returns a dict
+                responses.append(self.proposal_add(event_id, a))
+        else:
+            url = urljoin(self.root_url, 'attributes/add/{}'.format(event_id))
+            if isinstance(attributes, list):
+                values = []
+                for a in attributes:
+                    values.append(a['value'])
+                attributes[0]['value'] = values
+                data = attributes[0].to_json()
             else:
-                url = urljoin(self.root_url, 'attributes/add/{}'.format(eventID_to_update))
-                response = self.__prepare_request('POST', url, a.to_json())
-        return response
+                data = attributes.to_json()
+            # __prepare_request(...) returns a requests.Response Object
+            responses.append(self.__prepare_request('POST', url, data).json())
+        return responses
+
+    def _extract_event_id(self, event):
+        """
+        Extracts the eventId from a given MISPEvent
+
+        :param event: MISPEvent to extract the id from
+        :type event: MISPEvent
+        :return: EventId
+        :rtype: int
+        """
+        event_id = None
+        if isinstance(event, MISPEvent):
+            if hasattr(event, 'id'):
+                event_id = event.id
+            elif hasattr(event, 'uuid'):
+                event_id = event.uuid
+        elif isinstance(event, int):
+            event_id = event
+        else:
+            e = MISPEvent(describe_types=self.describe_types)
+            e.load(event)
+            if hasattr(e, 'id'):
+                event_id = e.id
+            elif hasattr(e, 'uuid'):
+                event_id = e.uuid
+        return event_id
+
+
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add one or more attributes to an existing event"""
