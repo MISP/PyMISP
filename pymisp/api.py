@@ -1617,10 +1617,22 @@ class PyMISP(object):
         response = self.__prepare_request('POST', url, misp_object.to_json())
         return self._check_response(response)
 
+    def delete_object(self, id):
+        """Deletes an object"""
+        url = urljoin(self.root_url, 'objects/delete/{}'.format(id))
+        response = self.__prepare_request('POST', url)
+        return self._check_response(response)
+
     def add_object_reference(self, misp_object_reference):
         """Add a reference to an object"""
         url = urljoin(self.root_url, 'object_references/add')
         response = self.__prepare_request('POST', url, misp_object_reference.to_json())
+        return self._check_response(response)
+
+    def delete_object_reference(self, id):
+        """Deletes a reference to an object"""
+        url = urljoin(self.root_url, 'object_references/delete/{}'.format(id))
+        response = self.__prepare_request('POST', url)
         return self._check_response(response)
 
     def get_object_templates_list(self):
