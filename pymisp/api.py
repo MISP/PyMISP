@@ -1033,7 +1033,7 @@ class PyMISP(object):
         :param not_tags: Tags *not* to search for
         :param date_from: First date
         :param date_to: Last date
-        :param last: Last updated events (for example 5d or 12h or 30m)
+        :param last: Last published events (for example 5d or 12h or 30m)
         :param eventid: Last date
         :param withAttachments: return events with or without the attachments
         :param uuid: search by uuid
@@ -1167,11 +1167,38 @@ class PyMISP(object):
         return True, details
 
     def download_last(self, last):
-        """Download the last updated events.
+        """Download the last published events.
 
         :param last: can be defined in days, hours, minutes (for example 5d or 12h or 30m)
         """
         return self.search(last=last)
+
+    def get_events_last_modified(self, search_from, search_to=None):
+        """Download the last modified events.
+
+        :param search_from: timestamp periode to start. can be defined as a date (2000-12-21)
+        :param search_to: tamestamp periode to stop
+        """
+        
+        def checkIfDateAndConvert(d):
+            """Check if the format is a date otherwise we keep the temistamp"""
+            if d and len(d) == 10:
+                if d[4] == '-' and d[7] == '-':
+                    return int(datetime.datetime.strptime(d, '%Y-%m-%d').strftime("%s"))
+                if d.isnumeric():
+                    return d
+            return False
+
+        search_from = checkIfDateAndConvert(search_from)
+        search_to = checkIfDateAndConvert(search_to)
+
+        if search_from:
+            if search_to:
+                return self.search(timestamp=[search_from, search_to])
+            else:
+                return self.search(timestamp=search_from)
+
+        return {'error': '"search_from" or "search_to" are not in a valid format (timestamp or date(2000-12-21'}
 
     # ########## Tags ##########
 
