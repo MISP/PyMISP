@@ -79,7 +79,7 @@ logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', for
 
 ## Documentation
 
-[PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/master/pymisp.pdf).
+[PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/latest/pymisp.pdf).
 
 Documentation can be generated with epydoc:
 
