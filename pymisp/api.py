@@ -120,14 +120,7 @@ class PyMISP(object):
             raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
         try:
-            response = self.__prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
-            describe_types = self._check_response(response)
-            if describe_types.get('error'):
-                for e in describe_types.get('error'):
-                    raise PyMISPError('Failed: {}'.format(e))
-            self.describe_types = describe_types['result']
-            if not self.describe_types.get('sane_defaults'):
-                raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
+            self.describe_types = self.get_live_describe_types()
         except Exception:
             with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
                 describe_types = json.load(f)
@@ -137,6 +130,17 @@ class PyMISP(object):
         self.types = self.describe_types['types']
         self.category_type_mapping = self.describe_types['category_type_mappings']
         self.sane_default = self.describe_types['sane_defaults']
+
+    def get_live_describe_types(self):
+        response = self.__prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
+        describe_types = self._check_response(response)
+        if describe_types.get('error'):
+            for e in describe_types.get('error'):
+                raise PyMISPError('Failed: {}'.format(e))
+        describe_types = describe_types['result']
+        if not describe_types.get('sane_defaults'):
+            raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
+        return describe_types
 
     def __prepare_request(self, request_type, url, data=None,
                           background_callback=None, output_type='json'):
