@@ -282,6 +282,10 @@ class TestBasic(unittest.TestCase):
             self.assertTrue(sd['to_ids'] in [0, 1])
             self.assertTrue(sd['default_category'] in categories)
 
+    def test_live_acl(self):
+        query_acl = self.misp.get_live_query_acl()
+        self.assertEqual(query_acl, [])
+
 
 if __name__ == '__main__':
     unittest.main()

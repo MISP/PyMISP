@@ -131,6 +131,11 @@ class PyMISP(object):
         self.category_type_mapping = self.describe_types['category_type_mappings']
         self.sane_default = self.describe_types['sane_defaults']
 
+    def get_live_query_acl(self):
+        """This should return an empty list, unless the ACL is outdated."""
+        response = self.__prepare_request('GET', urljoin(self.root_url, 'events/queryACL.json'))
+        return self._check_response(response)
+
     def get_live_describe_types(self):
         response = self.__prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
         describe_types = self._check_response(response)
