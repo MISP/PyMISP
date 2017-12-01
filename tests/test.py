@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pymisp import PyMISP
+from pymisp import PyMISP, __version__
 from keys import url, key
 import time
 
@@ -282,9 +282,18 @@ class TestBasic(unittest.TestCase):
             self.assertTrue(sd['to_ids'] in [0, 1])
             self.assertTrue(sd['default_category'] in categories)
 
+    def test_describeTypes_uptodate(self):
+        self.assertEqual(self.live_describe_types, self.misp.get_local_describe_types())
+
     def test_live_acl(self):
         query_acl = self.misp.get_live_query_acl()
         self.assertEqual(query_acl['response'], [])
+
+    def test_recommended_pymisp_version(self):
+        response = self.misp.get_recommended_api_version()
+        recommended_version_tup = tuple(int(x) for x in response['version'].split('.'))
+        pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))[:3]
+        self.assertEqual(recommended_version_tup, pymisp_version_tup)
 
 
 if __name__ == '__main__':

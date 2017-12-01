@@ -122,9 +122,7 @@ class PyMISP(object):
         try:
             self.describe_types = self.get_live_describe_types()
         except Exception:
-            with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
-                describe_types = json.load(f)
-            self.describe_types = describe_types['result']
+            self.describe_types = self.get_local_describe_types()
 
         self.categories = self.describe_types['categories']
         self.types = self.describe_types['types']
@@ -135,6 +133,11 @@ class PyMISP(object):
         """This should return an empty list, unless the ACL is outdated."""
         response = self.__prepare_request('GET', urljoin(self.root_url, 'events/queryACL.json'))
         return self._check_response(response)
+
+    def get_local_describe_types(self):
+        with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
+            describe_types = json.load(f)
+        return describe_types['result']
 
     def get_live_describe_types(self):
         response = self.__prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
