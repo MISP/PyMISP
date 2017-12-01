@@ -416,12 +416,12 @@ class PyMISP(object):
         :return publish status
         """
         if isinstance(event, int) or (isinstance(event, basestring) and event.isdigit()):
-            full_event = self._make_mispevent(self.get_event(event))
+            event_id = event
         else:
             full_event = self._make_mispevent(event)
-        event_id = full_event.id
-        if full_event.published:
-            return {'error': 'Already published'}
+            if full_event.published:
+                return {'error': 'Already published'}
+            event_id = full_event.id
         return self.fast_publish(event_id, alert)
 
     def change_threat_level(self, event, threat_level_id):
