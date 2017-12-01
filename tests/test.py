@@ -258,24 +258,24 @@ class TestBasic(unittest.TestCase):
         sane_default = self.live_describe_types['sane_defaults']
         self.assertEqual(sorted(sane_default.keys()), sorted(self.live_describe_types['types']))
 
-    def test_describeTypes_categories(self, m):
+    def test_describeTypes_categories(self):
         category_type_mappings = self.live_describe_types['category_type_mappings']
         self.assertEqual(sorted(category_type_mappings.keys()), sorted(self.live_describe_types['categories']))
 
-    def test_describeTypes_types_in_categories(self, m):
+    def test_describeTypes_types_in_categories(self):
         category_type_mappings = self.live_describe_types['category_type_mappings']
         for category, types in category_type_mappings.items():
                 existing_types = [t for t in types if t in self.live_describe_types['types']]
                 self.assertEqual(sorted(existing_types), sorted(types))
 
-    def test_describeTypes_types_have_category(self, m):
+    def test_describeTypes_types_have_category(self):
         category_type_mappings = self.live_describe_types['category_type_mappings']
         all_types = set()
         for category, types in category_type_mappings.items():
             all_types.update(types)
         self.assertEqual(sorted(list(all_types)), sorted(self.live_describe_types['types']))
 
-    def test_describeTypes_sane_default_valid_category(self, m):
+    def test_describeTypes_sane_default_valid_category(self):
         sane_default = self.live_describe_types['sane_defaults']
         categories = self.live_describe_types['categories']
         for t, sd in sane_default.items():
