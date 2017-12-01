@@ -515,8 +515,6 @@ class PyMISP(object):
                 event_id = e.uuid
         return event_id
 
-
-
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add one or more attributes to an existing event"""
         attributes = []
@@ -1329,7 +1327,7 @@ class PyMISP(object):
         edit_user = MISPUser()
         edit_user.from_dict(**kwargs)
         url = urljoin(self.root_url, 'admin/users/edit/{}'.format(user_id))
-        response = self.__prepare_request('POST', url, json.dumps(edit_user))
+        response = self.__prepare_request('POST', url, edit_user.to_json())
         return self._check_response(response)
 
     def edit_user_json(self, json_file, user_id):
@@ -1367,7 +1365,7 @@ class PyMISP(object):
                 if 'uuid' not in new_org:
                     raise PyMISPError('A remote org MUST have a valid uuid')
         url = urljoin(self.root_url, 'admin/organisations/add/')
-        response = self.__prepare_request('POST', url, json.dumps(new_org))
+        response = self.__prepare_request('POST', url, new_org.to_json())
         return self._check_response(response)
 
     def add_organisation_json(self, json_file):
@@ -1386,7 +1384,7 @@ class PyMISP(object):
         edit_org = MISPOrganisation()
         edit_org.from_dict(**kwargs)
         url = urljoin(self.root_url, 'admin/organisations/edit/{}'.format(org_id))
-        response = self.__prepare_request('POST', url, json.dumps(edit_org))
+        response = self.__prepare_request('POST', url, edit_org.to_json())
         return self._check_response(response)
 
     def edit_organisation_json(self, json_file, org_id):
@@ -1549,6 +1547,38 @@ class PyMISP(object):
 
     def get_stix(self, **kwargs):
         return self.get_stix_event(**kwargs)
+
+    def get_csv(self, eventid=None, attributes=[], object_attributes=[], misp_types=[], context=False, ignore=False):
+        """Get MISP values in CSV format
+        :param eventid: The event ID to query
+        :param attributes: The column names to export from normal attributes (i.e. uuid, value, type, ...)
+        :param object_attributes: The column names to export from attributes within objects (i.e. uuid, value, type, ...)
+        :param misp_types: MISP types to get (i.e. ip-src, hostname, ...)
+        :param context: Add event level context (event_info,event_member_org,event_source_org,event_distribution,event_threat_level_id,event_analysis,event_date,event_tag)
+        :param ignore: Returns the attributes even if the event isn't published, or the attribute doesn't have the to_ids flag set
+        """
+        url = urljoin(self.root_url, '/events/csv/download')
+        to_post = {}
+        if eventid:
+            to_post['eventid'] = eventid
+        if attributes:
+            to_post['attributes'] = attributes
+        if object_attributes:
+            to_post['object_attributes'] = object_attributes
+        if misp_types:
+            for t in misp_types:
+                if t not in self.types:
+                    logger.warning('{} is not a valid type'.format(t))
+            to_post['type'] = misp_types
+        if context:
+            to_post['includeContext'] = True
+        if ignore:
+            to_post['ignore'] = True
+        if to_post:
+            response = self.__prepare_request('POST', url, json.dumps(to_post), output_type='json')
+        else:
+            response = self.__prepare_request('POST', url, output_type='json')
+        return response.text
 
     # ###########################
     # ########   Feed   #########
