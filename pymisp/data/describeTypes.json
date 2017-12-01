@@ -409,6 +409,14 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
+      "mac-address": {
+        "default_category": "Network activity",
+        "to_ids": 0
+      },
+      "mac-eui-64": {
+        "default_category": "Network activity",
+        "to_ids": 0
+      },
       "email-dst-display-name": {
         "default_category": "Payload delivery",
         "to_ids": 0
@@ -482,7 +490,7 @@
         "to_ids": 0
       },
       "gender": {
-        "default_category": "",
+        "default_category": "Person",
         "to_ids": 0
       },
       "passport-number": {
@@ -665,6 +673,8 @@
       "ip-dst|port",
       "ip-src|port",
       "hostname|port",
+      "mac-address",
+      "mac-eui-64",
       "email-dst-display-name",
       "email-src-display-name",
       "email-header",
@@ -777,6 +787,8 @@
         "filename|imphash",
         "filename|impfuzzy",
         "filename|pehash",
+        "mac-address",
+        "mac-eui-64",
         "ip-src",
         "ip-dst",
         "ip-dst|port",
@@ -930,6 +942,8 @@
         "hostname",
         "domain",
         "domain|ip",
+        "mac-address",
+        "mac-eui-64",
         "email-dst",
         "url",
         "uri",
@@ -964,7 +978,8 @@
         "comment",
         "text",
         "x509-fingerprint-sha1",
-        "other"
+        "other",
+        "dns-soa-email"
       ],
       "External analysis": [
         "md5",
@@ -978,6 +993,8 @@
         "ip-dst",
         "ip-dst|port",
         "ip-src|port",
+        "mac-address",
+        "mac-eui-64",
         "hostname",
         "domain",
         "domain|ip",
