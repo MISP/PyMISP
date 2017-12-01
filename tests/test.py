@@ -284,7 +284,7 @@ class TestBasic(unittest.TestCase):
 
     def test_live_acl(self):
         query_acl = self.misp.get_live_query_acl()
-        self.assertEqual(query_acl, [])
+        self.assertEqual(query_acl['response'], [])
 
 
 if __name__ == '__main__':
