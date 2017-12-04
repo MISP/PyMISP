@@ -23,13 +23,14 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
     :indicator: IOC to search VirusTotal for
     '''
-    def __init__(self, apikey, indicator):
+    def __init__(self, apikey, indicator, vt_proxies=None):
         # PY3 way:
         # super().__init__("virustotal-report")
         super(VTReportObject, self).__init__("virustotal-report")
         indicator = indicator.strip()
         self._resource_type = self.__validate_resource(indicator)
         if self._resource_type:
+            self._proxies = vt_proxies
             self._report = self.__query_virustotal(apikey, indicator)
             self.generate_attributes()
         else:
@@ -37,6 +38,9 @@ class VTReportObject(AbstractMISPObjectGenerator):
             raise InvalidMISPObject(error_msg)
         # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
         self.update_not_jsonable('ObjectReference')
+
+    def get_report(self):
+        return self._report
 
     def generate_attributes(self):
         ''' Parse the VirusTotal report for relevant attributes '''
@@ -72,7 +76,10 @@ class VTReportObject(AbstractMISPObjectGenerator):
         url = "https://www.virustotal.com/vtapi/v2/{}/report".format(self._resource_type)
         params = {"apikey": apikey, "resource": resource}
         # for now assume we're using a public API key - we'll figure out private keys later
-        report = requests.get(url, params=params)
+        if self._proxies:
+            report = requests.get(url, params=params, proxies=self._proxies)
+        else:
+            report = requests.get(url, params=params)
         report = report.json()
         if report["response_code"] == 1:
             return report
