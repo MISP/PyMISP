@@ -62,8 +62,20 @@ def make_binary_objects(filepath=None, pseudofile=None, filename=None):
             logger.warning('Bad format: {}'.format(e))
         except lief.bad_file as e:
             logger.warning('Bad file: {}'.format(e))
+        except lief.conversion_error as e:
+            logger.warning('Conversion file: {}'.format(e))
+        except lief.builder_error as e:
+            logger.warning('Builder file: {}'.format(e))
         except lief.parser_error as e:
             logger.warning('Parser error: {}'.format(e))
+        except lief.integrity_error as e:
+            logger.warning('Integrity error: {}'.format(e))
+        except lief.pe_error as e:
+            logger.warning('PE error: {}'.format(e))
+        except lief.type_error as e:
+            logger.warning('Type error: {}'.format(e))
+        except lief.exception as e:
+            logger.warning('Lief exception: {}'.format(e))
         except FileTypeNotImplemented as e:  # noqa
             logger.warning(e)
     if not HAS_LIEF:
