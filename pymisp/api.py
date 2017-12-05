@@ -224,7 +224,7 @@ class PyMISP(object):
         errors = []
         if response.status_code >= 500:
             if len(response.content) == 0:
-                raise PyMISPError('Something bad happened on the server-side and there was no content to be decoded')
+                raise PyMISPError('Something bad happened on the server-side, but there was no response content to be decoded')
             else:
                 errors.append(response.json())
                 logger.critical('Something bad happened on the server-side: {}'.format(response.json()))
