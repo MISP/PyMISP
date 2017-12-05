@@ -223,13 +223,16 @@ class PyMISP(object):
         """Check if the response from the server is not an unexpected error"""
         errors = []
         if response.status_code >= 500:
-            errors.append(response.json())
-            logger.critical('Something bad happened on the server-side: {}'.format(response.json()))
+            if len(response.content) == 0:
+                raise PyMISPError('Something bad happened on the server-side and there was no content to be decoded')
+            else:
+                errors.append(response.json())
+                logger.critical('Something bad happened on the server-side: {}'.format(response.json()))
         try:
             to_return = response.json()
         except ValueError:
             # It the server didn't return a JSON blob, we've a problem.
-            raise PyMISPError('Unknown error (something is very broken server-side: {}'.format(response.text))
+            raise PyMISPError('Unknown error (something is very broken server-side: {})'.format(response.text))
 
         if isinstance(to_return, (list, str)):
             to_return = {'response': to_return}
