@@ -2,6 +2,111 @@ Changelog
 =========
 
 
+v2.4.83 (2017-12-06)
+--------------------
+
+New
+~~~
+- Add get CSV method. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Allow to pass a proxy to query VT. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump version to 2.4.83. [Raphaël Vinot]
+- Do not get the event from the server before publishing if
+  PyMISP.publish gets an ID. [Raphaël Vinot]
+- Add live tests for recommended pymisp version and describeTypes up-to-
+  date. [Raphaël Vinot]
+- Add a way to check if the ACL is up-to-date. [Raphaël Vinot]
+- Add validators for describeTypes on the live instance. [Raphaël Vinot]
+- Update PDF link to doc. [Raphaël Vinot]
+- Add example file to push OpenIOC file to MISP. [Raphaël Vinot]
+
+  chg: Add some imports in the tool's init file
+- Bump misp-objects. [Raphaël Vinot]
+- Change version number to master in the doc. [Raphaël Vinot]
+- Add new objects: MISPUser and MISPOrganisation. [Raphaël Vinot]
+- Add a generic MISP object generator. [Raphaël Vinot]
+- Allow to add multiple attribute of the same type. [Raphaël Vinot]
+- Add fast publish method. [Raphaël Vinot]
+
+  Fix #86
+- Improve documentation. [Raphaël Vinot]
+
+  Fix #121
+
+Fix
+~~~
+- Typo in the tests. [Raphaël Vinot]
+- Typo in live tests. [Raphaël Vinot]
+- Bump describeTypes.json. [Raphaël Vinot]
+
+  Add testing
+
+Other
+~~~~~
+- Merge pull request #147 from StrayLightning/master. [Raphaël Vinot]
+
+  Check explicitly for a 500 response from the server with no response content
+- Improve the exception message for a server 500+ response with no
+  response content. [StrayLightning]
+- Check for zero-length 500 response from the server and produce a
+  suitable error message. [StrayLightning]
+
+  In experimenting with PyMISP I am triggering problems on the server I
+  am using.  Occasionally the server will return a 500 response with a
+  message indicating an internal error, but more often than not it returns
+  a 500 response with no contents, and _check_response falls over itself,
+  generating hard-to-fathom exception from the json internals.
+
+  This commit hardens _check_response by detecting zero-length responses
+  and raising a suitable exception.
+
+  Also fix a missing bracket in one of the subsequent exception strings.
+- Merge pull request #146 from c-goes/lief_integrity_exception. [Raphaël
+  Vinot]
+
+  Make FileObject creation work if lief parsing fails
+- Make FileObject creation work if lief parsing fails. [c-goes]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #144 from c-goes/objects_delete. [Raphaël Vinot]
+
+  allow deletion of objects and object references
+- Allow deletion of objects and object references. [c-goes]
+- Update doc badge links. [Raphaël Vinot]
+- Merge pull request #143 from 3c7/feature/send_attributes. [Raphaël
+  Vinot]
+
+  Adding multiple named attributes (without proposal) require a single POST request now
+- Adding multiple named attributes require a single POST request now.
+  [3c7]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #142 from c-goes/master. [Raphaël Vinot]
+
+  replaced is_digit() with isdigit()
+- Fixed typo. [c-goes]
+- Merge remote-tracking branch 'upstream/master' [c-goes]
+- Merge pull request #141 from SteveClement/master. [Raphaël Vinot]
+
+  Remove CIRCL repo references from README.md & fix epydoc
+- - Remove CIRCL reference from README.md - Updated 2 bad indentations
+  where epydoc was Warning. [Steve Clement]
+- Merge remote-tracking branch 'upstream/master' [c-goes]
+- Merge branch 'master' of https://github.com/MISP/PyMISP into
+  messageidtype. [c-goes]
+- Added default_category for email-message-id. [c-goes]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge branch 'feature/feedgenerator_rework' [iglocska]
+- Merge branch 'master' of https://github.com/MISP/PyMISP into
+  feature/feedgenerator_rework. [iglocska]
+- Rework of the feed generator. [iglocska]
+
+  - use objects, attribute tags and object references correctly
+  - generate quickhashlist for fast lookups / future MISP caching mechanism
+  - saner structure (herp-a-derp)
+
+
 v2.4.82 (2017-11-09)
 --------------------
 
@@ -13,6 +118,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump PyMISP version. [Raphaël Vinot]
+- Bump CHANGELOG. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Update readme for new logging system. [Raphaël Vinot]
 - Small improvments in the logging system. [Raphaël Vinot]
