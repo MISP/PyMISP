@@ -5,6 +5,7 @@ import unittest
 import requests_mock
 import json
 import os
+import six
 from io import BytesIO
 
 import pymisp as pm
@@ -243,6 +244,8 @@ class TestOffline(unittest.TestCase):
         return json.dumps(to_return, cls=MISPEncode)
 
     def test_objects_pseudofile(self, m):
+        if six.PY2:
+            return unittest.SkipTest()
         paths = ['cmd.exe', 'tmux', 'MachO-OSX-x64-ls']
         try:
             for path in paths:
