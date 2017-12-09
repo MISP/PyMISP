@@ -49,9 +49,12 @@ def make_macho_objects(lief_parsed, misp_file):
 
 def make_binary_objects(filepath=None, pseudofile=None, filename=None):
     misp_file = FileObject(filepath=filepath, pseudofile=pseudofile, filename=filename)
-    if HAS_LIEF and filepath:
+    if HAS_LIEF and filepath or (pseudofile and filename):
         try:
-            lief_parsed = lief.parse(filepath)
+            if filepath:
+                lief_parsed = lief.parse(filepath=filepath)
+            else:
+                lief_parsed = lief.parse(raw=pseudofile.getvalue(), name=filename)
             if isinstance(lief_parsed, lief.PE.Binary):
                 return make_pe_objects(lief_parsed, misp_file)
             elif isinstance(lief_parsed, lief.ELF.Binary):
