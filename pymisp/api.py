@@ -189,8 +189,11 @@ class PyMISP(object):
         messages = []
         if response.get('error'):
             if isinstance(response['error'], list):
-                for e in response['errors']:
-                    messages.append(e['error']['value'][0])
+                for e in response['error']:
+                    if isinstance(e, dict):
+                        messages.append(e['error']['value'][0])
+                    else:
+                        messages.append(e)
             else:
                 messages.append(['error'])
         elif response.get('errors'):

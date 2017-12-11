@@ -269,6 +269,39 @@ class TestOffline(unittest.TestCase):
             self.assertTrue(sd['to_ids'] in [0, 1])
             self.assertTrue(sd['default_category'] in categories)
 
+    def test_flatten_error_messages_singular(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        error = pymisp.get(1)
+        response = self.auth_error_msg
+        response['error'] = ['foo', 'bar', 'baz']
+        messages = pymisp.flatten_error_messages(response)
+        self.assertEqual(["foo", "bar", "baz"], messages)
+
+    def test_flatten_error_messages_plural(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        error = pymisp.get(1)
+        response = self.auth_error_msg
+        response['errors'] = {'foo': 42, 'bar': False, 'baz': ['oo', 'ka']}
+        messages = pymisp.flatten_error_messages(response)
+        self.assertEqual(['42 (foo)', 'False (bar)', 'oo', 'ka'], messages)
+
+    def test_flatten_error_messages_nested(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        error = pymisp.get(1)
+        response = self.auth_error_msg
+        response['errors'] = {
+            'fo': {'o': 42}, 'ba': {'r': True}, 'b': {'a': ['z']}, 'd': {'e': {'e': ['p']}}}
+        messages = pymisp.flatten_error_messages(response)
+        self.assertEqual(['Error in o: 42', 'Error in r: True', 'Error in a: z', "Error in e: {'e': ['p']}"], messages)
+
+    def test_test_connection(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertTrue(pymisp.test_connection())
+
 
 if __name__ == '__main__':
     unittest.main()
