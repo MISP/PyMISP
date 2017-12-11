@@ -1492,13 +1492,13 @@ class PyMISP(object):
     def get_taxonomies_list(self):
         session = self.__prepare_session()
         url = urljoin(self.root_url, '/taxonomies')
-        response = session.get(url)
+        response = self.__prepare_request('POST', url)
         return self._check_response(response)
     
     def get_taxonomy(self, taxonomy_id):
         session = self.__prepare_session()
         url = urljoin(self.root_url, '/taxonomies/view/{}'.format(taxonomy_id))
-        response = session.get(url)
+        response = self.__prepare_request('POST', url)
         return self._check_response(response)
 
     # ##############################################
