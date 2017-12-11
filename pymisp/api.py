@@ -6,6 +6,7 @@
 import sys
 import json
 import datetime
+from dateutil.parser import parse
 import os
 import base64
 import re
@@ -1046,12 +1047,12 @@ class PyMISP(object):
         :param not_tags: Tags *not* to search for
         :param date_from: First date
         :param date_to: Last date
-        :param last: Last updated events (for example 5d or 12h or 30m)
+        :param last: Last published events (for example 5d or 12h or 30m)
         :param eventid: Last date
         :param withAttachments: return events with or without the attachments
         :param uuid: search by uuid
         :param publish_timestamp: the publish timestamp
-        :param timestamp: the creation timestamp
+        :param timestamp: the timestamp of the last modification. Can be a list (from->to)
         :param enforceWarninglist: Enforce the warning lists
         :param searchall: full text search on the database
         :param metadata: return only metadata if True
@@ -1180,11 +1181,39 @@ class PyMISP(object):
         return True, details
 
     def download_last(self, last):
-        """Download the last updated events.
+        """Download the last published events.
 
         :param last: can be defined in days, hours, minutes (for example 5d or 12h or 30m)
         """
         return self.search(last=last)
+
+    def _string_to_timestamp(self, date_string):
+        pydate = parse(date_string)
+        if sys.version_info >= (3, 3):
+            # Sane python version
+            timestamp = pydate.timestamp()
+        else:
+            # Whatever
+            from datetime import timezone  # Only for Python < 3.3
+            timestamp = (pydate - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
+        return timestamp
+
+    def get_events_last_modified(self, search_from, search_to=None):
+        """Download the last modified events.
+
+        :param search_from: Beginning of the interval. Can be either a timestamp, or a date (2000-12-21)
+        :param search_to: End of the interval. Can be either a timestamp, or a date (2000-12-21)
+        """
+
+        search_from = self._string_to_timestamp(search_from)
+
+        if search_to is not None:
+            search_to = self._string_to_timestamp(search_to)
+            to_search = [search_from, search_to]
+        else:
+            to_search = search_from
+
+        return self.search(timestamp=to_search)
 
     # ########## Tags ##########
 
