@@ -51,6 +51,13 @@ class TestOffline(unittest.TestCase):
         m.register_uri('DELETE', self.domain + 'events/3', json={'errors': ['Invalid event'], 'message': 'Invalid event', 'name': 'Invalid event', 'url': '/events/3'})
         m.register_uri('GET', self.domain + 'attributes/delete/2', json={'message': 'Attribute deleted.'})
         m.register_uri('POST', self.domain + 'events/index', json=self.search_index_result)
+        m.register_uri('POST', self.domain + 'attributes/edit/' + self.key, json={})
+        m.register_uri('GET', self.domain + 'shadow_attributes/view/None', json={})
+        m.register_uri('GET', self.domain + 'shadow_attributes/view/1', json={})
+        m.register_uri('POST', self.domain + 'events/freeTextImport/1', json={})
+        m.register_uri('POST', self.domain + 'attributes/restSearch', json={})
+        m.register_uri('POST', self.domain + 'attributes/downloadSample', json={})
+        m.register_uri('GET', self.domain + 'tags', json={'Tag': 'foo'})
 
     def test_getEvent(self, m):
         self.initURI(m)
@@ -329,6 +336,64 @@ class TestOffline(unittest.TestCase):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         self.assertTrue(pymisp.test_connection())
+
+    def test_change_toids(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertEqual({}, pymisp.change_toids(self.key, 1))
+
+    def test_change_toids_invalid(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        try:
+            _ = pymisp.change_toids(self.key, 42)
+            self.assertFalse('Exception required for off domain value')
+        except Exception:
+            pass
+
+    def test_proposal_view_default(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertEqual({}, pymisp.proposal_view())
+
+    def test_proposal_view_event_1(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertEqual({}, pymisp.proposal_view(event_id=1))
+
+    def test_proposal_view_event_overdetermined(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertTrue(pymisp.proposal_view(event_id=1, proposal_id=42).get('error') is not None)
+
+    def test_freetext(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertEqual({}, pymisp.freetext(1, 'foo', adhereToWarninglists=True, distribution=42))
+
+    def test_freetext_offdomain(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        try:
+            _ = pymisp.freetext(1, None, adhereToWarninglists='hard')
+            self.assertFalse('Exception required for off domain value')
+        except Exception:
+            pass
+
+    def test_get_yara(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertEqual((False, None), pymisp.get_yara(1))
+
+    def test_download_samples(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertEqual((False, None), pymisp.download_samples())
+
+    def test_get_all_tags(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        self.assertEqual({'Tag': 'foo'}, pymisp.get_all_tags())
 
 
 if __name__ == '__main__':
