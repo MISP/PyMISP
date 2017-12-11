@@ -313,7 +313,7 @@ class TestOffline(unittest.TestCase):
         response = self.auth_error_msg
         response['errors'] = {'foo': 42, 'bar': False, 'baz': ['oo', 'ka']}
         messages = pymisp.flatten_error_messages(response)
-        self.assertEqual(['42 (foo)', 'False (bar)', 'oo', 'ka'], messages)
+        self.assertEqual(set(['42 (foo)', 'False (bar)', 'oo', 'ka']), set(messages))
 
     def test_flatten_error_messages_nested(self, m):
         self.initURI(m)
@@ -323,7 +323,7 @@ class TestOffline(unittest.TestCase):
         response['errors'] = {
             'fo': {'o': 42}, 'ba': {'r': True}, 'b': {'a': ['z']}, 'd': {'e': {'e': ['p']}}}
         messages = pymisp.flatten_error_messages(response)
-        self.assertEqual(['Error in o: 42', 'Error in r: True', 'Error in a: z', "Error in e: {'e': ['p']}"], messages)
+        self.assertEqual(set(['Error in o: 42', 'Error in r: True', 'Error in a: z', "Error in e: {'e': ['p']}"]), set(messages))
 
     def test_test_connection(self, m):
         self.initURI(m)
