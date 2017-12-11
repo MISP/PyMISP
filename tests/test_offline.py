@@ -5,6 +5,8 @@ import unittest
 import requests_mock
 import json
 import os
+import six
+from io import BytesIO
 
 import pymisp as pm
 from pymisp import PyMISP
@@ -210,9 +212,12 @@ class TestOffline(unittest.TestCase):
         p.add_internal_other(evt, 'foobar')
         p.add_attachment(evt, "testFile")
 
-    def make_objects(self, path):
+    def make_objects(self, path=None, pseudofile=None, filename=None):
         to_return = {'objects': [], 'references': []}
-        fo, peo, seos = make_binary_objects(path)
+        if path:
+            fo, peo, seos = make_binary_objects(path)
+        else:
+            fo, peo, seos = make_binary_objects(pseudofile=pseudofile, filename=filename)
 
         if seos:
             for s in seos:
@@ -229,7 +234,30 @@ class TestOffline(unittest.TestCase):
             to_return['objects'].append(fo)
             if fo.ObjectReference:
                 to_return['references'] += fo.ObjectReference
+
+        # Remove UUIDs for comparing the objects.
+        for o in to_return['objects']:
+            o.pop('uuid')
+        for o in to_return['references']:
+            o.pop('referenced_uuid')
+            o.pop('object_uuid')
         return json.dumps(to_return, cls=MISPEncode)
+
+    def test_objects_pseudofile(self, m):
+        if six.PY2:
+            return unittest.SkipTest()
+        paths = ['cmd.exe', 'tmux', 'MachO-OSX-x64-ls']
+        try:
+            for path in paths:
+                with open(os.path.join('tests', 'viper-test-files', 'test_files', path), 'rb') as f:
+                    pseudo = BytesIO(f.read())
+                    json_blob = self.make_objects(pseudofile=pseudo, filename=path)
+                # Compare pseudo file / path
+                filepath_blob = self.make_objects(os.path.join('tests', 'viper-test-files', 'test_files', path))
+                self.assertEqual(json_blob, filepath_blob)
+        except IOError:  # Can be replaced with FileNotFoundError when support for python 2 is dropped
+            return unittest.SkipTest()
+        print(json_blob)
 
     def test_objects(self, m):
         paths = ['cmd.exe', 'tmux', 'MachO-OSX-x64-ls']
