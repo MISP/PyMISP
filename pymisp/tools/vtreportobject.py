@@ -23,10 +23,10 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
     :indicator: IOC to search VirusTotal for
     '''
-    def __init__(self, apikey, indicator, vt_proxies=None):
+    def __init__(self, apikey, indicator, vt_proxies=None, standalone=True, **kwargs):
         # PY3 way:
         # super().__init__("virustotal-report")
-        super(VTReportObject, self).__init__("virustotal-report")
+        super(VTReportObject, self).__init__("virustotal-report", standalone=standalone, **kwargs)
         indicator = indicator.strip()
         self._resource_type = self.__validate_resource(indicator)
         if self._resource_type:
@@ -36,8 +36,6 @@ class VTReportObject(AbstractMISPObjectGenerator):
         else:
             error_msg = "A valid indicator is required. (One of type url, md5, sha1, sha256). Received '{}' instead".format(indicator)
             raise InvalidMISPObject(error_msg)
-        # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
-        self.update_not_jsonable('ObjectReference')
 
     def get_report(self):
         return self._report

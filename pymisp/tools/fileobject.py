@@ -28,7 +28,7 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath=None, pseudofile=None, filename=None):
+    def __init__(self, filepath=None, pseudofile=None, filename=None, standalone=True, **kwargs):
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_MAGIC:
@@ -51,11 +51,9 @@ class FileObject(AbstractMISPObjectGenerator):
             raise InvalidMISPObject('File buffer (BytesIO) or a path is required.')
         # PY3 way:
         # super().__init__('file')
-        super(FileObject, self).__init__('file')
+        super(FileObject, self).__init__('file', standalone=standalone, **kwargs)
         self.__data = self.__pseudofile.getvalue()
         self.generate_attributes()
-        # Mark as non_jsonable because we need to add them manually
-        self.update_not_jsonable('ObjectReference')
 
     def generate_attributes(self):
         self.add_attribute('filename', value=self.__filename)

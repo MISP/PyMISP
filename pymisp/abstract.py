@@ -27,6 +27,9 @@ class AbstractMISP(collections.MutableMapping):
 
     __not_jsonable = []
 
+    def __init__(self, **kwargs):
+        super(AbstractMISP, self).__init__()
+
     def properties(self):
         to_return = []
         for prop, value in vars(self).items():
@@ -67,7 +70,11 @@ class AbstractMISP(collections.MutableMapping):
         return json.dumps(self, cls=MISPEncode)
 
     def __getitem__(self, key):
-        return getattr(self, key)
+        try:
+            return getattr(self, key)
+        except AttributeError:
+            # Expected by pop and other dict-related methods
+            raise KeyError
 
     def __setitem__(self, key, value):
         setattr(self, key, value)

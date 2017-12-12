@@ -24,7 +24,7 @@ except ImportError:
 
 class ELFObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed=None, filepath=None, pseudofile=None):
+    def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_LIEF:
@@ -44,10 +44,8 @@ class ELFObject(AbstractMISPObjectGenerator):
                 self.__elf = parsed
             else:
                 raise InvalidMISPObject('Not a lief.ELF.Binary: {}'.format(type(parsed)))
-        super(ELFObject, self).__init__('elf')
+        super(ELFObject, self).__init__('elf', standalone=standalone, **kwargs)
         self.generate_attributes()
-        # Mark as non_jsonable because we need to add them manually
-        self.update_not_jsonable('ObjectReference')
 
     def generate_attributes(self):
         # General information
@@ -60,7 +58,7 @@ class ELFObject(AbstractMISPObjectGenerator):
         if self.__elf.sections:
             pos = 0
             for section in self.__elf.sections:
-                s = ELFSectionObject(section)
+                s = ELFSectionObject(section, self._standalone, default_attributes_paramaters=self._default_attributes_paramaters)
                 self.add_reference(s.uuid, 'included-in', 'Section {} of ELF'.format(pos))
                 pos += 1
                 self.sections.append(s)
@@ -69,15 +67,13 @@ class ELFObject(AbstractMISPObjectGenerator):
 
 class ELFSectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section):
+    def __init__(self, section, standalone=True, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
-        super(ELFSectionObject, self).__init__('elf-section')
+        super(ELFSectionObject, self).__init__('elf-section', standalone=standalone, **kwargs)
         self.__section = section
         self.__data = bytes(self.__section.content)
         self.generate_attributes()
-        # Mark as non_jsonable because we need to add them manually
-        self.update_not_jsonable('ObjectReference')
 
     def generate_attributes(self):
         self.add_attribute('name', value=self.__section.name)

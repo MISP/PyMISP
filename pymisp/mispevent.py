@@ -304,7 +304,6 @@ class MISPEvent(AbstractMISP):
             describe_types = t['result']
 
         self._types = describe_types['types']
-        self.attributes = []
         self.Tag = []
 
     def _reinitialize_event(self):
@@ -315,7 +314,6 @@ class MISPEvent(AbstractMISP):
         self.info = None
         self.published = False
         self.date = datetime.date.today()
-        self.attributes = []
 
         # All other keys
         self.sig = None
@@ -475,9 +473,9 @@ class MISPEvent(AbstractMISP):
             for a in kwargs.pop('Attribute'):
                 attribute = MISPAttribute()
                 attribute.set_all_values(**a)
-                if not hasattr(self, 'attributes'):
-                    self.attributes = []
-                self.attributes.append(attribute)
+                if not hasattr(self, 'Attribute'):
+                    self.Attribute = []
+                self.Attribute.append(attribute)
 
         # All other keys
         if kwargs.get('id'):
@@ -518,22 +516,24 @@ class MISPEvent(AbstractMISP):
         to_return = super(MISPEvent, self).to_dict()
         if to_return.get('date'):
             to_return['date'] = self.date.isoformat()
-        if to_return.get('attributes'):
-            attributes = to_return.pop('attributes')
-            to_return['Attribute'] = [attribute.to_dict(with_timestamp) for attribute in attributes]
-        if to_return.get('RelatedEvent'):
-            to_return['RelatedEvent'] = [rel_event.to_dict() for rel_event in self.RelatedEvent]
         if with_timestamp and to_return.get('timestamp'):
-            to_return['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
+            if sys.version_info >= (3, 3):
+                to_return['timestamp'] = self.timestamp.timestamp()
+            else:
+                from datetime import timezone  # Only for Python < 3.3
+                to_return['timestamp'] = (self.timestamp - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
         else:
             to_return.pop('timestamp', None)
         if with_timestamp and to_return.get('publish_timestamp'):
-            to_return['publish_timestamp'] = int(time.mktime(self.publish_timestamp.timetuple()))
+            if sys.version_info >= (3, 3):
+                to_return['publish_timestamp'] = self.publish_timestamp.timestamp()
+            else:
+                from datetime import timezone  # Only for Python < 3.3
+                to_return['publish_timestamp'] = (self.publish_timestamp - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
         else:
             to_return.pop('publish_timestamp', None)
         to_return = _int_to_str(to_return)
         to_return = {'Event': to_return}
-        jsonschema.validate(to_return, self.__json_schema)
         return to_return
 
     def add_tag(self, tag):
@@ -579,6 +579,38 @@ class MISPEvent(AbstractMISP):
             if not hasattr(self, 'attributes'):
                 self.attributes = []
             self.attributes.append(attribute)
+
+    @property
+    def attributes(self):
+        return self.Attribute
+
+    @property
+    def related_events(self):
+        return self.RelatedEvent
+
+    @property
+    def objects(self):
+        return self.Object
+
+    @property
+    def tags(self):
+        return self.Tag
+
+    def get_object_by_id(self, object_id):
+        for obj in self.objects:
+            if hasattr(obj, 'id') and obj.id == object_id:
+                return obj
+        raise InvalidMISPObject('Object with {} does not exists in ths event'.format(object_id))
+
+    def add_object(self, obj):
+        if isinstance(obj, MISPObject):
+            self.Object.append(obj)
+        elif isinstance(obj, dict):
+            tmp_object = MISPObject(obj['name'])
+            tmp_object.from_dict(**obj)
+            self.Object.append(tmp_object)
+        else:
+            raise InvalidMISPObject("An object to add to an existing Event needs to be either a MISPObject, or a plain python dictionary")
 
 
 class MISPObjectReference(AbstractMISP):
@@ -644,8 +676,18 @@ class MISPObjectAttribute(MISPAttribute):
 
 class MISPObject(AbstractMISP):
 
-    def __init__(self, name, strict=False):
-        super(MISPObject, self).__init__()
+    def __init__(self, name, strict=False, standalone=False, default_attributes_paramaters={}, **kwargs):
+        ''' Master class representing a generic MISP object
+        :name: Name of the object
+
+        :strict: Enforce validation with the object templates
+
+        :standalone: The object will be pushed as directly on MISP, not as a part of an event.
+            In this case the ObjectReference needs to be pushed manually and cannot be in the JSON dump.
+
+        :default_attributes_paramaters: Used as template for the attributes if they are not overwritten in add_attribute
+        '''
+        super(MISPObject, self).__init__(**kwargs)
         self.__strict = strict
         self.name = name
         self.__misp_objects_path = os.path.join(
@@ -666,11 +708,30 @@ class MISPObject(AbstractMISP):
             self.description = self.__definition['description']
             self.template_version = self.__definition['version']
         else:
-            # FIXME We need to set something for meta-category, template_uuid, description and template_version
+            # Then we have no meta-category, template_uuid, description and template_version
             pass
         self.uuid = str(uuid.uuid4())
-        self.Attribute = []
+        self.__fast_attribute_access = {}  # Hashtable object_relation: [attributes]
+        self._default_attributes_paramaters = default_attributes_paramaters
+        if self._default_attributes_paramaters:
+            # Let's clean that up
+            self._default_attributes_paramaters.pop('value', None)  # duh
+            self._default_attributes_paramaters.pop('uuid', None)  # duh
+            self._default_attributes_paramaters.pop('id', None)  # duh
+            self._default_attributes_paramaters.pop('object_id', None)  # duh
+            self._default_attributes_paramaters.pop('type', None)  # depends on the value
+            self._default_attributes_paramaters.pop('object_relation', None)  # depends on the value
+            self._default_attributes_paramaters.pop('disable_correlation', None)  # depends on the value
+            self._default_attributes_paramaters.pop('to_ids', None)  # depends on the value
+            self._default_attributes_paramaters.pop('category', None)  # depends on the value
+            self._default_attributes_paramaters.pop('deleted', None)  # doesn't make sense to pre-set it
+            self._default_attributes_paramaters.pop('data', None)  # in case the original in a sample or an attachment
+            self.distribution = self._default_attributes_paramaters.distribution
         self.ObjectReference = []
+        self._standalone = standalone
+        if self._standalone:
+            # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
+            self.update_not_jsonable('ObjectReference')
 
     def from_dict(self, **kwargs):
         if self.__known_template:
@@ -696,6 +757,8 @@ class MISPObject(AbstractMISP):
                 setattr(self, key, value)
 
     def to_dict(self, strict=False):
+        # Set the expected key (Attributes)
+        self.Attribute = self.attributes
         if strict or self.__strict and self.__known_template:
             self._validate()
         return super(MISPObject, self).to_dict()
@@ -708,7 +771,7 @@ class MISPObject(AbstractMISP):
     def _validate(self):
         """Make sure the object we're creating has the required fields"""
         all_object_relations = []
-        for a in self.Attribute:
+        for a in self.attributes:
             all_object_relations.append(a.object_relation)
         count_relations = dict(Counter(all_object_relations))
         for key, counter in count_relations.items():
@@ -739,6 +802,22 @@ class MISPObject(AbstractMISP):
                             relationship_type=relationship_type, comment=comment, **kwargs)
         self.ObjectReference.append(reference)
 
+    def get_attributes_by_relation(self, object_relation):
+        '''Returns the list of attributes with the given object relation in the object'''
+        return self.__fast_attribute_access.get(object_relation, [])
+
+    def has_attributes_by_relation(self, list_of_relations):
+        '''True if all the relations in the list are defined in the object'''
+        return all(relation in self.__fast_attribute_access for relation in list_of_relations)
+
+    @property
+    def attributes(self):
+        return [a for sublist in self.__fast_attribute_access.values() for a in sublist]
+
+    @property
+    def references(self):
+        return self.ObjectReference
+
     def add_attribute(self, object_relation, **value):
         if value.get('value') is None:
             return None
@@ -751,6 +830,9 @@ class MISPObject(AbstractMISP):
                 attribute = MISPObjectAttribute({})
         else:
             attribute = MISPObjectAttribute({})
-        attribute.from_dict(object_relation, **value)
-        self.Attribute.append(attribute)
+        # Overwrite the parameters of self._default_attributes_paramaters with the ones of value
+        attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_paramaters, **value))
+        if not self.__fast_attribute_access.get(object_relation):
+            self.__fast_attribute_access[object_relation] = []
+        self.__fast_attribute_access[object_relation].append(attribute)
         return attribute
