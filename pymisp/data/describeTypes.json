@@ -373,6 +373,14 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
+      "x509-fingerprint-md5": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
+      "x509-fingerprint-sha256": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
       "dns-soa-email": {
         "default_category": "Attribution",
         "to_ids": 0
@@ -664,6 +672,8 @@
       "whois-registrar",
       "whois-creation-date",
       "x509-fingerprint-sha1",
+      "x509-fingerprint-md5",
+      "x509-fingerprint-sha256",
       "dns-soa-email",
       "size-in-bytes",
       "counter",
@@ -816,6 +826,8 @@
         "hex",
         "vulnerability",
         "x509-fingerprint-sha1",
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
         "other",
         "hostname|port",
         "email-dst-display-name",
@@ -875,6 +887,8 @@
         "text",
         "hex",
         "x509-fingerprint-sha1",
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
         "other",
         "cookie"
       ],
@@ -921,6 +935,8 @@
         "text",
         "hex",
         "x509-fingerprint-sha1",
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
         "mobile-application-id",
         "other"
       ],
@@ -978,6 +994,8 @@
         "comment",
         "text",
         "x509-fingerprint-sha1",
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
         "other",
         "dns-soa-email"
       ],
@@ -1014,6 +1032,8 @@
         "comment",
         "text",
         "x509-fingerprint-sha1",
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
         "github-repository",
         "other",
         "cortex"
