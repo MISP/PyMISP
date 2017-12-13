@@ -2,6 +2,59 @@ Changelog
 =========
 
 
+v2.4.84 (2017-12-13)
+--------------------
+
+New
+~~~
+- Add methods to get taxonomy(ies) [Raphaël Vinot]
+
+  Thanks to @truckydev
+- Add method to get all the events modified in an interval. [Raphaël
+  Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Make the library easier to use. [Raphaël Vinot]
+- Allow to pass a pseudofile to LIEF. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Update changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Disable pseudofile support in py2, skip tests. [Raphaël Vinot]
+- Typo in error output text description. [Eric Jaw]
+
+Other
+~~~~~
+- Merge pull request #151 from MISP/refactor. [Raphaël Vinot]
+
+  chg: Make the library easier to use
+- Merge pull request #150 from sdrees/first-friendly-contribution-
+  enhance-coverage. [Raphaël Vinot]
+
+  First friendly contribution enhance coverage
+- Further tests added (for public methods) [Stefan Hagen (Individual)]
+- Changed asserts from dict usecases to set comparison to workaround non
+  3.6 behavior. [Stefan Hagen (Individual)]
+- Merge branch 'master' of https://github.com/MISP/PyMISP into first-
+  friendly-contribution-enhance-coverage. [Stefan Hagen (Individual)]
+- Enhance coverage and fix en passant with focus on api. [Stefan Hagen
+  (Individual)]
+- Merge branch 'truckydev-get_last_modified_event' [Raphaël Vinot]
+- Merge branch 'get_last_modified_event' of
+  https://github.com/truckydev/PyMISP into truckydev-
+  get_last_modified_event. [Raphaël Vinot]
+- - Correction for 'last' param. 'last' gives the latest events that
+  have been published - add get_events_last_modified() this function
+  returns the modified events based on timestamp. [Tristan METAYER]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #149 from naisanza/master. [Raphaël Vinot]
+
+  fix: Typo in error output text description
+
+
 v2.4.83 (2017-12-06)
 --------------------
 
