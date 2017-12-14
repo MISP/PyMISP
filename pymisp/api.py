@@ -1021,21 +1021,17 @@ class PyMISP(object):
         :param values: Values to search
         :param not_values: Values that should not be in the response
         """
-        to_return = ''
+        to_return = []
         if values is not None:
-            if not isinstance(values, list):
+            if isinstance(values, list):
                 to_return += values
             else:
-                to_return += '&&'.join(values)
+                to_return.append(values)
         if not_values is not None:
-            if len(to_return) > 0:
-                to_return += '&&!'
+            if isinstance(not_values, list):
+                to_return += ['!{}'.format(v) for v in not_values]
             else:
-                to_return += '!'
-            if not isinstance(not_values, list):
-                to_return += not_values
-            else:
-                to_return += '&&!'.join(not_values)
+                to_return.append('!{}'.format(not_values))
         return to_return
 
     def search(self, controller='events', async_callback=None, **kwargs):
@@ -1068,7 +1064,7 @@ class PyMISP(object):
         # Event:     array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'searchall', 'metadata', 'published');
         # Attribute: array('value', 'type', 'category', 'org', 'tags', 'from', 'to', 'last', 'eventid', 'withAttachments', 'uuid', 'publish_timestamp', 'timestamp', 'enforceWarninglist', 'to_ids', 'deleted');
         val = self.__prepare_rest_search(kwargs.pop('values', None), kwargs.pop('not_values', None))
-        if len(val) != 0:
+        if val:
             query['value'] = val
 
         query['type'] = kwargs.pop('type_attribute', None)
@@ -1076,7 +1072,7 @@ class PyMISP(object):
         query['org'] = kwargs.pop('org', None)
 
         tag = self.__prepare_rest_search(kwargs.pop('tags', None), kwargs.pop('not_tags', None))
-        if len(tag) != 0:
+        if tag:
             query['tags'] = tag
 
         date_from = kwargs.pop('date_from', None)
