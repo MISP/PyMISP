@@ -147,6 +147,9 @@ class MISPAttribute(AbstractMISP):
         # to be deprecated
         self.from_dict(**kwargs)
 
+    def __repr__(self):
+        return '<{self.__class__.__name__}(self.type, self.value)'.format(self=self)
+
     def from_dict(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
             if kwargs['type'] not in self.__category_type_mapping[kwargs['category']]:
@@ -438,6 +441,9 @@ class MISPEvent(AbstractMISP):
         # to be deprecated
         self.from_dict(**kwargs)
 
+    def __repr__(self):
+        return '<{self.__class__.__name__}(self.info, self.date)'.format(self=self)
+
     def from_dict(self, **kwargs):
         # Required value
         self.info = kwargs.pop('info', None)
@@ -618,6 +624,9 @@ class MISPObjectReference(AbstractMISP):
     def __init__(self):
         super(MISPObjectReference, self).__init__()
 
+    def __repr__(self):
+        return '<{self.__class__.__name__}(self.object_uuid, self.referenced_uuid, self.relationship_type)'.format(self=self)
+
     def from_dict(self, object_uuid, referenced_uuid, relationship_type, comment=None, **kwargs):
         self.object_uuid = object_uuid
         self.referenced_uuid = referenced_uuid
@@ -652,6 +661,9 @@ class MISPObjectAttribute(MISPAttribute):
     def __init__(self, definition):
         super(MISPObjectAttribute, self).__init__()
         self.__definition = definition
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}(self.object_relation, self.value)'.format(self=self)
 
     def from_dict(self, object_relation, value, **kwargs):
         self.object_relation = object_relation
@@ -732,6 +744,9 @@ class MISPObject(AbstractMISP):
         if self._standalone:
             # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
             self.update_not_jsonable('ObjectReference')
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}(self.name)'.format(self=self)
 
     def from_dict(self, **kwargs):
         if self.__known_template:
