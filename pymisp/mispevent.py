@@ -148,7 +148,9 @@ class MISPAttribute(AbstractMISP):
         self.from_dict(**kwargs)
 
     def __repr__(self):
-        return '<{self.__class__.__name__}(self.type, self.value)'.format(self=self)
+        if hasattr(self, 'value'):
+            return '<{self.__class__.__name__}(type={self.type}, value={self.value})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
     def from_dict(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
@@ -442,7 +444,9 @@ class MISPEvent(AbstractMISP):
         self.from_dict(**kwargs)
 
     def __repr__(self):
-        return '<{self.__class__.__name__}(self.info, self.date)'.format(self=self)
+        if hasattr(self, 'info'):
+            return '<{self.__class__.__name__}(info={self.info}, date={self.date})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
     def from_dict(self, **kwargs):
         # Required value
@@ -625,7 +629,9 @@ class MISPObjectReference(AbstractMISP):
         super(MISPObjectReference, self).__init__()
 
     def __repr__(self):
-        return '<{self.__class__.__name__}(self.object_uuid, self.referenced_uuid, self.relationship_type)'.format(self=self)
+        if hasattr(self, 'referenced_uuid'):
+            return '<{self.__class__.__name__}(object_uuid={self.object_uuid}, referenced_uuid={self.referenced_uuid}, relationship_type={self.relationship_type})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
     def from_dict(self, object_uuid, referenced_uuid, relationship_type, comment=None, **kwargs):
         self.object_uuid = object_uuid
@@ -663,7 +669,9 @@ class MISPObjectAttribute(MISPAttribute):
         self.__definition = definition
 
     def __repr__(self):
-        return '<{self.__class__.__name__}(self.object_relation, self.value)'.format(self=self)
+        if hasattr(self, 'value'):
+            return '<{self.__class__.__name__}(object_relation={self.object_relation}, value={self.value})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
     def from_dict(self, object_relation, value, **kwargs):
         self.object_relation = object_relation
@@ -746,7 +754,9 @@ class MISPObject(AbstractMISP):
             self.update_not_jsonable('ObjectReference')
 
     def __repr__(self):
-        return '<{self.__class__.__name__}(self.name)'.format(self=self)
+        if hasattr(self, 'name'):
+            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
     def from_dict(self, **kwargs):
         if self.__known_template:
