@@ -361,6 +361,10 @@
         "default_category": "Attribution",
         "to_ids": 0
       },
+      "whois-registrant-org": {
+        "default_category": "Attribution",
+        "to_ids": 0
+      },
       "whois-registrar": {
         "default_category": "Attribution",
         "to_ids": 0
@@ -669,6 +673,7 @@
       "whois-registrant-email",
       "whois-registrant-phone",
       "whois-registrant-name",
+      "whois-registrant-org",
       "whois-registrar",
       "whois-creation-date",
       "x509-fingerprint-sha1",
@@ -989,6 +994,7 @@
         "whois-registrant-phone",
         "whois-registrant-email",
         "whois-registrant-name",
+        "whois-registrant-org",
         "whois-registrar",
         "whois-creation-date",
         "comment",
