@@ -1,4 +1,10 @@
+graft docs
+graft examples
+graft tests
+include CHANGELOG.txt
+include LICENSE
 include pymisp/data/*.json
 include pymisp/data/misp-objects/*.json
 include pymisp/data/misp-objects/objects/*/definition.json
 include pymisp/data/misp-objects/relationships/definition.json
+include README.md
