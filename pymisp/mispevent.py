@@ -310,6 +310,9 @@ class MISPEvent(AbstractMISP):
 
         self._types = describe_types['types']
         self.Tag = []
+        self.Attribute = []
+        self.Object = []
+        self.RelatedEvent = []
 
     def _reinitialize_event(self):
         # Default values for a valid event to send to a MISP instance
@@ -445,7 +448,7 @@ class MISPEvent(AbstractMISP):
 
     def __repr__(self):
         if hasattr(self, 'info'):
-            return '<{self.__class__.__name__}(info={self.info}, date={self.date})'.format(self=self)
+            return '<{self.__class__.__name__}(info={self.info})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
     def from_dict(self, **kwargs):
