@@ -25,6 +25,7 @@ pip3 install pymisp
 
 ```
 git clone https://github.com/MISP/PyMISP.git && cd PyMISP
+git submodule update --init
 pip3 install -I .
 ```
 
