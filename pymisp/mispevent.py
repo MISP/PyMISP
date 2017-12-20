@@ -72,7 +72,7 @@ def _datetime_to_timestamp(d):
     if sys.version_info >= (3, 3):
         return d.timestamp()
     else:
-        return (d - datetime.utcfromtimestamp(0)).total_seconds()
+        return (d - datetime.datetime.utcfromtimestamp(0)).total_seconds()
 
 
 class MISPAttribute(AbstractMISP):
