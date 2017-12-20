@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import time
 import json
 import os
 import base64
@@ -66,6 +65,17 @@ def _int_to_str(d):
     return d
 
 
+def _datetime_to_timestamp(d):
+    if isinstance(d, (int, str)):
+        # Assume we already have a timestamp
+        return d
+    if sys.version_info >= (3, 3):
+        return d.timestamp()
+    else:
+        from datetime import timezone  # Only for Python < 3.3
+        return (d - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
+
+
 class MISPAttribute(AbstractMISP):
 
     def __init__(self, describe_types=None):
@@ -78,31 +88,6 @@ class MISPAttribute(AbstractMISP):
         self._types = describe_types['types']
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
-        self.Tag = []
-
-    def _reinitialize_attribute(self):
-        # Default values
-        self.category = None
-        self.type = None
-        self.value = None
-        self.to_ids = False
-        self.comment = ''
-        self.distribution = 5
-
-        # other possible values
-        self.data = None
-        self.encrypt = False
-        self.id = None
-        self.event_id = None
-        self.uuid = None
-        self.timestamp = None
-        self.sharing_group_id = None
-        self.deleted = None
-        self.sig = None
-        self.SharingGroup = []
-        self.ShadowAttribute = []
-        self.disable_correlation = False
-        self.RelatedAttribute = []
         self.Tag = []
 
     def get_known_types(self):
@@ -219,8 +204,7 @@ class MISPAttribute(AbstractMISP):
         if self.disable_correlation is None:
             self.disable_correlation = False
 
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+        super(MISPAttribute, self).from_dict(**kwargs)
 
     def _prepare_new_malware_sample(self):
         if '|' in self.value:
@@ -284,20 +268,16 @@ class MISPAttribute(AbstractMISP):
         # DEPRECATED
         return self.to_dict()
 
-    def to_dict(self, with_timestamp=False):
-        to_return = {}
-        for attribute in self.properties():
-            val = getattr(self, attribute, None)
-            if val in [None, []]:
-                continue
+    def to_dict(self):
+        to_return = super(MISPAttribute, self).to_dict()
+        if to_return.get('data'):
+            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
 
-            if attribute == 'data':
-                to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
-            elif attribute == 'timestamp':
-                if with_timestamp:
-                    to_return['timestamp'] = int(time.mktime(self.timestamp.timetuple()))
-            else:
-                to_return[attribute] = val
+        if self.edited:
+            to_return.pop('timestamp', None)
+        elif to_return.get('timestamp'):
+            to_return['timestamp'] = _datetime_to_timestamp(self.timestamp)
+
         to_return = _int_to_str(to_return)
         return to_return
 
@@ -322,36 +302,6 @@ class MISPEvent(AbstractMISP):
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
-
-    def _reinitialize_event(self):
-        # Default values for a valid event to send to a MISP instance
-        self.distribution = 3
-        self.threat_level_id = 2
-        self.analysis = 0
-        self.info = None
-        self.published = False
-        self.date = datetime.date.today()
-
-        # All other keys
-        self.sig = None
-        self.global_sig = None
-        self.id = None
-        self.orgc_id = None
-        self.org_id = None
-        self.uuid = None
-        self.attribute_count = None
-        self.timestamp = None
-        self.proposal_email_lock = None
-        self.locked = None
-        self.publish_timestamp = None
-        self.sharing_group_id = None
-        self.Org = None
-        self.Orgc = None
-        self.ShadowAttribute = []
-        self.RelatedEvent = []
-        self.Tag = []
-        self.Galaxy = None
-        self.Object = None
 
     def get_known_types(self):
         return self._types
@@ -531,33 +481,34 @@ class MISPEvent(AbstractMISP):
                 tmp_object.from_dict(**obj)
                 self.Object.append(tmp_object)
 
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+        super(MISPEvent, self).from_dict(**kwargs)
 
     def _json(self):
         # DEPTECATED
         return self.to_dict()
 
-    def to_dict(self, with_timestamp=False):
+    def to_dict(self):
+        for o in self.objects:
+            if o.edited:
+                self.edited = True
+                break
+        for a in self.attributes:
+            if a.edited:
+                self.edited = True
+                break
+
         to_return = super(MISPEvent, self).to_dict()
+
         if to_return.get('date'):
             to_return['date'] = self.date.isoformat()
-        if with_timestamp and to_return.get('timestamp'):
-            if sys.version_info >= (3, 3):
-                to_return['timestamp'] = self.timestamp.timestamp()
-            else:
-                from datetime import timezone  # Only for Python < 3.3
-                to_return['timestamp'] = (self.timestamp - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
-        else:
+        if self.edited:
             to_return.pop('timestamp', None)
-        if with_timestamp and to_return.get('publish_timestamp'):
-            if sys.version_info >= (3, 3):
-                to_return['publish_timestamp'] = self.publish_timestamp.timestamp()
-            else:
-                from datetime import timezone  # Only for Python < 3.3
-                to_return['publish_timestamp'] = (self.publish_timestamp - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
-        else:
-            to_return.pop('publish_timestamp', None)
+        elif to_return.get('timestamp'):
+            to_return['timestamp'] = _datetime_to_timestamp(self.timestamp)
+
+        if to_return.get('publish_timestamp'):
+            to_return['publish_timestamp'] = _datetime_to_timestamp(self.publish_timestamp)
+
         to_return = _int_to_str(to_return)
         to_return = {'Event': to_return}
         return to_return
@@ -672,8 +623,7 @@ class MISPTag(AbstractMISP):
 
     def from_dict(self, name, **kwargs):
         self.name = name
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+        super(MISPTag, self).from_dict(**kwargs)
 
 
 class MISPObjectReference(AbstractMISP):
@@ -691,8 +641,7 @@ class MISPObjectReference(AbstractMISP):
         self.referenced_uuid = referenced_uuid
         self.relationship_type = relationship_type
         self.comment = comment
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+        super(MISPObjectReference, self).from_dict(**kwargs)
 
 
 class MISPUser(AbstractMISP):
@@ -700,19 +649,11 @@ class MISPUser(AbstractMISP):
     def __init__(self):
         super(MISPUser, self).__init__()
 
-    def from_dict(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
 
 class MISPOrganisation(AbstractMISP):
 
     def __init__(self):
         super(MISPOrganisation, self).__init__()
-
-    def from_dict(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
 
 class MISPObjectAttribute(MISPAttribute):
@@ -824,22 +765,30 @@ class MISPObject(AbstractMISP):
                 else:
                     self.__known_template = False
 
-        for key, value in kwargs.items():
-            if key == 'Attribute':
-                for v in value:
-                    self.add_attribute(**v)
-            elif key == 'ObjectReference':
-                for v in value:
-                    self.add_reference(**v)
-            else:
-                setattr(self, key, value)
+        if kwargs.get('Attribute'):
+            for a in kwargs.pop('Attribute'):
+                self.add_attribute(**a)
+        if kwargs.get('ObjectReference'):
+            for r in kwargs.pop('ObjectReference'):
+                self.add_reference(**r)
+
+        super(MISPObject, self).from_dict(**kwargs)
 
     def to_dict(self, strict=False):
-        # Set the expected key (Attributes)
-        self.Attribute = self.attributes
+        for a in self.attributes:
+            if a.edited:
+                self.edited = True
+                break
         if strict or self.__strict and self.__known_template:
             self._validate()
-        return super(MISPObject, self).to_dict()
+        # Set the expected key (Attributes)
+        self.Attribute = self.attributes
+        to_return = super(MISPObject, self).to_dict()
+        if self.edited:
+            to_return.pop('timestamp', None)
+        elif to_return.get('timestamp'):
+            to_return['timestamp'] = _datetime_to_timestamp(self.timestamp)
+        return to_return
 
     def to_json(self, strict=False):
         if strict or self.__strict and self.__known_template:
