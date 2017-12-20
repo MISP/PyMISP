@@ -129,7 +129,12 @@ class MISPAttribute(AbstractMISP):
         self.deleted = True
 
     def add_tag(self, tag):
-        self.Tag.append({'name': tag})
+        misp_tag = MISPTag()
+        if isinstance(tag, str):
+            misp_tag.from_dict(name=tag)
+        elif isinstance(tag, dict):
+            misp_tag.from_dict(**tag)
+        self.Tag.append(misp_tag)
 
     def verify(self, gpg_uid):
         if not has_pyme:
@@ -203,7 +208,11 @@ class MISPAttribute(AbstractMISP):
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('Tag'):
-            self.Tag = [t for t in kwargs.pop('Tag', []) if t]
+            self.Tag = []
+            for tag in kwargs.pop('Tag'):
+                t = MISPTag()
+                t.from_dict(**tag)
+                self.Tag.append(t)
 
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.pop("disable_correlation", False)
@@ -510,7 +519,11 @@ class MISPEvent(AbstractMISP):
                 sub_event.load(rel_event)
                 self.RelatedEvent.append(sub_event)
         if kwargs.get('Tag'):
-            self.Tag = [t for t in kwargs.pop('Tag', []) if t]
+            self.Tag = []
+            for tag in kwargs.pop('Tag'):
+                t = MISPTag()
+                t.from_dict(**tag)
+                self.Tag.append(t)
         if kwargs.get('Object'):
             self.Object = []
             for obj in kwargs.pop('Object'):
@@ -550,9 +563,31 @@ class MISPEvent(AbstractMISP):
         return to_return
 
     def add_tag(self, tag):
-        self.Tag.append({'name': tag})
+        misp_tag = MISPTag()
+        if isinstance(tag, str):
+            misp_tag.from_dict(name=tag)
+        elif isinstance(tag, dict):
+            misp_tag.from_dict(**tag)
+        self.Tag.append(misp_tag)
+
+    def get_attribute_tag(self, attribute_identifier):
+        '''Return the tags associated to an attribute or an object attribute.
+           :attribute_identifier: can be an ID, UUID, or the value.
+        '''
+        tags = []
+        for a in self.attributes + [attribute for o in self.objects for attribute in o.attributes]:
+            if ((hasattr(a, 'id') and a.id == attribute_identifier) or
+                (hasattr(a, 'uuid') and a.uuid == attribute_identifier) or
+                (hasattr(a, 'value') and attribute_identifier == a.value or
+                 attribute_identifier in a.value.split('|'))):
+                tags += a.tags
+        return tags
 
     def add_attribute_tag(self, tag, attribute_identifier):
+        '''Add a tag to an existing attribute, raise an Exception if the attribute doesn't exists.
+            :tag: Tag name
+            :attribute_identifier: can be an ID, UUID, or the value.
+        '''
         attributes = []
         for a in self.attributes:
             if ((hasattr(a, 'id') and a.id == attribute_identifier) or
@@ -624,6 +659,21 @@ class MISPEvent(AbstractMISP):
             self.Object.append(tmp_object)
         else:
             raise InvalidMISPObject("An object to add to an existing Event needs to be either a MISPObject, or a plain python dictionary")
+
+
+class MISPTag(AbstractMISP):
+    def __init__(self):
+        super(MISPTag, self).__init__()
+
+    def __repr__(self):
+        if hasattr(self, 'name'):
+            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
+    def from_dict(self, name, **kwargs):
+        self.name = name
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
 
 class MISPObjectReference(AbstractMISP):
