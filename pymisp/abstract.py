@@ -29,6 +29,7 @@ class AbstractMISP(collections.MutableMapping):
 
     def __init__(self, **kwargs):
         super(AbstractMISP, self).__init__()
+        self.edited = True
 
     def properties(self):
         to_return = []
@@ -43,6 +44,8 @@ class AbstractMISP(collections.MutableMapping):
             if value is None:
                 continue
             setattr(self, prop, value)
+        # We load an existing dictionary, marking it an not-edited
+        self.edited = False
 
     def update_not_jsonable(self, *args):
         self.__not_jsonable += args
@@ -87,3 +90,19 @@ class AbstractMISP(collections.MutableMapping):
 
     def __len__(self):
         return len(self.to_dict())
+
+    @property
+    def edited(self):
+        return self.__edited
+
+    @edited.setter
+    def edited(self, val):
+        if isinstance(val, bool):
+            self.__edited = val
+        else:
+            raise Exception('edited can only be True or False')
+
+    def __setattr__(self, name, value):
+        if name in self.properties():
+            self.__edited = True
+        super(AbstractMISP, self).__setattr__(name, value)
