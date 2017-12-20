@@ -72,8 +72,7 @@ def _datetime_to_timestamp(d):
     if sys.version_info >= (3, 3):
         return d.timestamp()
     else:
-        from datetime import timezone  # Only for Python < 3.3
-        return (d - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
+        return (d - datetime.utcfromtimestamp(0)).total_seconds()
 
 
 class MISPAttribute(AbstractMISP):
