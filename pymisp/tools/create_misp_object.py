@@ -22,8 +22,8 @@ class FileTypeNotImplemented(MISPObjectException):
     pass
 
 
-def make_pe_objects(lief_parsed, misp_file, standalone=True, default_attributes_paramaters={}):
-    pe_object = PEObject(parsed=lief_parsed, standalone=standalone, default_attributes_paramaters=default_attributes_paramaters)
+def make_pe_objects(lief_parsed, misp_file, standalone=True, default_attributes_parameters={}):
+    pe_object = PEObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(pe_object.uuid, 'included-in', 'PE indicators')
     pe_sections = []
     for s in pe_object.sections:
@@ -31,8 +31,8 @@ def make_pe_objects(lief_parsed, misp_file, standalone=True, default_attributes_
     return misp_file, pe_object, pe_sections
 
 
-def make_elf_objects(lief_parsed, misp_file, standalone=True, default_attributes_paramaters={}):
-    elf_object = ELFObject(parsed=lief_parsed, standalone=standalone, default_attributes_paramaters=default_attributes_paramaters)
+def make_elf_objects(lief_parsed, misp_file, standalone=True, default_attributes_parameters={}):
+    elf_object = ELFObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(elf_object.uuid, 'included-in', 'ELF indicators')
     elf_sections = []
     for s in elf_object.sections:
@@ -40,8 +40,8 @@ def make_elf_objects(lief_parsed, misp_file, standalone=True, default_attributes
     return misp_file, elf_object, elf_sections
 
 
-def make_macho_objects(lief_parsed, misp_file, standalone=True, default_attributes_paramaters={}):
-    macho_object = MachOObject(parsed=lief_parsed, standalone=standalone, default_attributes_paramaters=default_attributes_paramaters)
+def make_macho_objects(lief_parsed, misp_file, standalone=True, default_attributes_parameters={}):
+    macho_object = MachOObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(macho_object.uuid, 'included-in', 'MachO indicators')
     macho_sections = []
     for s in macho_object.sections:
@@ -49,9 +49,9 @@ def make_macho_objects(lief_parsed, misp_file, standalone=True, default_attribut
     return misp_file, macho_object, macho_sections
 
 
-def make_binary_objects(filepath=None, pseudofile=None, filename=None, standalone=True, default_attributes_paramaters={}):
+def make_binary_objects(filepath=None, pseudofile=None, filename=None, standalone=True, default_attributes_parameters={}):
     misp_file = FileObject(filepath=filepath, pseudofile=pseudofile, filename=filename,
-                           standalone=standalone, default_attributes_paramaters=default_attributes_paramaters)
+                           standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     if HAS_LIEF and filepath or (pseudofile and filename):
         try:
             if filepath:
@@ -63,11 +63,11 @@ def make_binary_objects(filepath=None, pseudofile=None, filename=None, standalon
                 else:
                     lief_parsed = lief.parse(raw=pseudofile.getvalue(), name=filename)
             if isinstance(lief_parsed, lief.PE.Binary):
-                return make_pe_objects(lief_parsed, misp_file, standalone, default_attributes_paramaters)
+                return make_pe_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
             elif isinstance(lief_parsed, lief.ELF.Binary):
-                return make_elf_objects(lief_parsed, misp_file, standalone, default_attributes_paramaters)
+                return make_elf_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
             elif isinstance(lief_parsed, lief.MachO.Binary):
-                return make_macho_objects(lief_parsed, misp_file, standalone, default_attributes_paramaters)
+                return make_macho_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
         except lief.bad_format as e:
             logger.warning('Bad format: {}'.format(e))
         except lief.bad_file as e:
