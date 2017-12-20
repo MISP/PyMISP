@@ -689,7 +689,7 @@ class MISPObjectAttribute(MISPAttribute):
 
 class MISPObject(AbstractMISP):
 
-    def __init__(self, name, strict=False, standalone=False, default_attributes_paramaters={}, **kwargs):
+    def __init__(self, name, strict=False, standalone=False, default_attributes_parameters={}, **kwargs):
         ''' Master class representing a generic MISP object
         :name: Name of the object
 
@@ -698,7 +698,7 @@ class MISPObject(AbstractMISP):
         :standalone: The object will be pushed as directly on MISP, not as a part of an event.
             In this case the ObjectReference needs to be pushed manually and cannot be in the JSON dump.
 
-        :default_attributes_paramaters: Used as template for the attributes if they are not overwritten in add_attribute
+        :default_attributes_parameters: Used as template for the attributes if they are not overwritten in add_attribute
         '''
         super(MISPObject, self).__init__(**kwargs)
         self.__strict = strict
@@ -725,21 +725,25 @@ class MISPObject(AbstractMISP):
             pass
         self.uuid = str(uuid.uuid4())
         self.__fast_attribute_access = {}  # Hashtable object_relation: [attributes]
-        self._default_attributes_paramaters = default_attributes_paramaters
-        if self._default_attributes_paramaters:
+        self._default_attributes_parameters = default_attributes_parameters
+        if self._default_attributes_parameters:
             # Let's clean that up
-            self._default_attributes_paramaters.pop('value', None)  # duh
-            self._default_attributes_paramaters.pop('uuid', None)  # duh
-            self._default_attributes_paramaters.pop('id', None)  # duh
-            self._default_attributes_paramaters.pop('object_id', None)  # duh
-            self._default_attributes_paramaters.pop('type', None)  # depends on the value
-            self._default_attributes_paramaters.pop('object_relation', None)  # depends on the value
-            self._default_attributes_paramaters.pop('disable_correlation', None)  # depends on the value
-            self._default_attributes_paramaters.pop('to_ids', None)  # depends on the value
-            self._default_attributes_paramaters.pop('category', None)  # depends on the value
-            self._default_attributes_paramaters.pop('deleted', None)  # doesn't make sense to pre-set it
-            self._default_attributes_paramaters.pop('data', None)  # in case the original in a sample or an attachment
-            self.distribution = self._default_attributes_paramaters.distribution
+            self._default_attributes_parameters.pop('value', None)  # duh
+            self._default_attributes_parameters.pop('uuid', None)  # duh
+            self._default_attributes_parameters.pop('id', None)  # duh
+            self._default_attributes_parameters.pop('object_id', None)  # duh
+            self._default_attributes_parameters.pop('type', None)  # depends on the value
+            self._default_attributes_parameters.pop('object_relation', None)  # depends on the value
+            self._default_attributes_parameters.pop('disable_correlation', None)  # depends on the value
+            self._default_attributes_parameters.pop('to_ids', None)  # depends on the value
+            self._default_attributes_parameters.pop('category', None)  # depends on the value
+            self._default_attributes_parameters.pop('deleted', None)  # doesn't make sense to pre-set it
+            self._default_attributes_parameters.pop('data', None)  # in case the original in a sample or an attachment
+            self.distribution = self._default_attributes_parameters.distribution
+            self.sharing_group_id = self._default_attributes_parameters.sharing_group_id
+        else:
+            self.distribution = 3
+            self.sharing_group_id = None
         self.ObjectReference = []
         self._standalone = standalone
         if self._standalone:
@@ -856,8 +860,8 @@ class MISPObject(AbstractMISP):
                 attribute = MISPObjectAttribute({})
         else:
             attribute = MISPObjectAttribute({})
-        # Overwrite the parameters of self._default_attributes_paramaters with the ones of value
-        attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_paramaters, **value))
+        # Overwrite the parameters of self._default_attributes_parameters with the ones of value
+        attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
         if not self.__fast_attribute_access.get(object_relation):
             self.__fast_attribute_access[object_relation] = []
         self.__fast_attribute_access[object_relation].append(attribute)
