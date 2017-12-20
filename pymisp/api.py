@@ -77,9 +77,10 @@ class PyMISP(object):
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
     :param asynch: Use asynchronous processing where possible
+    :param get_only: can be True or False. If True the methods for making changes in misp are deactivated.
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False, get_only=False):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -101,34 +102,42 @@ class PyMISP(object):
         if debug:
             logger.setLevel(logging.DEBUG)
             logger.info('To configure logging in your script, leave it to None and use the following: import logging; logging.getLogger(\'pymisp\').setLevel(logging.DEBUG)')
+        if get_only:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('get_only is active')
+            methodes_to_disable = ["add_", "change_", "delete_", "edit_", "fast_", "new_", "proposal_", "publish", "set_", "sighting_", "tag", "untag", "update"]
+            for methode_name in dir(self.__class__):
+                for m in methodes_to_disable:
+                    if methode_name.startswith(m):
+                        delattr(self.__class__,methode_name)
+        else:
+            try:
+                # Make sure the MISP instance is working and the URL is valid
+                response = self.get_recommended_api_version()
+                if response.get('errors'):
+                    logger.warning(response.get('errors')[0])
+                elif not response.get('version'):
+                    logger.warning("Unable to check the recommended PyMISP version (MISP <2.4.60), please upgrade.")
+                else:
+                    pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))
+                    recommended_version_tup = tuple(int(x) for x in response['version'].split('.'))
+                    if recommended_version_tup < pymisp_version_tup[:3]:
+                        logger.info("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
+                    elif pymisp_version_tup[:3] < recommended_version_tup:
+                        logger.warning("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
 
-        try:
-            # Make sure the MISP instance is working and the URL is valid
-            response = self.get_recommended_api_version()
-            if response.get('errors'):
-                logger.warning(response.get('errors')[0])
-            elif not response.get('version'):
-                logger.warning("Unable to check the recommended PyMISP version (MISP <2.4.60), please upgrade.")
-            else:
-                pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))
-                recommended_version_tup = tuple(int(x) for x in response['version'].split('.'))
-                if recommended_version_tup < pymisp_version_tup[:3]:
-                    logger.info("The version of PyMISP recommended by the MISP instance ({}) is older than the one you're using now ({}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.".format(response['version'], __version__))
-                elif pymisp_version_tup[:3] < recommended_version_tup:
-                    logger.warning("The version of PyMISP recommended by the MISP instance ({}) is newer than the one you're using now ({}). Please upgrade PyMISP.".format(response['version'], __version__))
+            except Exception as e:
+                raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
 
-        except Exception as e:
-            raise PyMISPError('Unable to connect to MISP ({}). Please make sure the API key and the URL are correct (http/https is required): {}'.format(self.root_url, e))
+            try:
+                self.describe_types = self.get_live_describe_types()
+            except Exception:
+                self.describe_types = self.get_local_describe_types()
 
-        try:
-            self.describe_types = self.get_live_describe_types()
-        except Exception:
-            self.describe_types = self.get_local_describe_types()
-
-        self.categories = self.describe_types['categories']
-        self.types = self.describe_types['types']
-        self.category_type_mapping = self.describe_types['category_type_mappings']
-        self.sane_default = self.describe_types['sane_defaults']
+            self.categories = self.describe_types['categories']
+            self.types = self.describe_types['types']
+            self.category_type_mapping = self.describe_types['category_type_mappings']
+            self.sane_default = self.describe_types['sane_defaults']
 
     def __repr__(self):
         return '<{self.__class__.__name__}(url={self.root_url})'.format(self=self)
