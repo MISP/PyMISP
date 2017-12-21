@@ -121,6 +121,10 @@
         "default_category": "Payload installation",
         "to_ids": 1
       },
+      "stix2-pattern": {
+        "default_category": "Payload installation",
+        "to_ids": 1
+      },
       "sigma": {
         "default_category": "Payload installation",
         "to_ids": 1
@@ -613,6 +617,7 @@
       "pattern-in-traffic",
       "pattern-in-memory",
       "yara",
+      "stix2-pattern",
       "sigma",
       "cookie",
       "vulnerability",
@@ -820,6 +825,7 @@
         "AS",
         "pattern-in-file",
         "pattern-in-traffic",
+        "stix2-pattern",
         "yara",
         "sigma",
         "attachment",
@@ -879,6 +885,7 @@
         "pattern-in-file",
         "pattern-in-memory",
         "pdb",
+        "stix2-pattern",
         "yara",
         "sigma",
         "attachment",
@@ -930,6 +937,7 @@
         "pattern-in-file",
         "pattern-in-traffic",
         "pattern-in-memory",
+        "stix2-pattern",
         "yara",
         "sigma",
         "vulnerability",
@@ -973,6 +981,7 @@
         "AS",
         "snort",
         "pattern-in-file",
+        "stix2-pattern",
         "pattern-in-traffic",
         "attachment",
         "comment",
