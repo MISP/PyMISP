@@ -1606,7 +1606,7 @@ class PyMISP(object):
     def get_stix(self, **kwargs):
         return self.get_stix_event(**kwargs)
 
-    def get_csv(self, eventid=None, attributes=[], object_attributes=[], misp_types=[], context=False, ignore=False):
+    def get_csv(self, eventid=None, attributes=[], object_attributes=[], misp_types=[], context=False, ignore=False, last=None):
         """Get MISP values in CSV format
         :param eventid: The event ID to query
         :param attributes: The column names to export from normal attributes (i.e. uuid, value, type, ...)
@@ -1632,6 +1632,8 @@ class PyMISP(object):
             to_post['includeContext'] = True
         if ignore:
             to_post['ignore'] = True
+        if last:
+            to_post['last'] = last
         if to_post:
             response = self.__prepare_request('POST', url, json.dumps(to_post), output_type='json')
         else:
