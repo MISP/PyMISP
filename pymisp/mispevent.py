@@ -586,7 +586,10 @@ class MISPEvent(AbstractMISP):
 
     @attributes.setter
     def attributes(self, attributes):
-        self.Attribute = attributes
+        if all(isinstance(x, MISPAttribute) for x in attributes):
+            self.Attribute = attributes
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPAttribute.')
 
     @property
     def related_events(self):
