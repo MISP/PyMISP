@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import abc
+import sys
+import datetime
 import json
 from json import JSONEncoder
 import collections
@@ -29,8 +31,9 @@ class AbstractMISP(collections.MutableMapping):
 
     def __init__(self, **kwargs):
         super(AbstractMISP, self).__init__()
-        self.edited = True
+        self.__edited = True
 
+    @property
     def properties(self):
         to_return = []
         for prop, value in vars(self).items():
@@ -45,7 +48,7 @@ class AbstractMISP(collections.MutableMapping):
                 continue
             setattr(self, prop, value)
         # We load an existing dictionary, marking it an not-edited
-        self.edited = False
+        self.__edited = False
 
     def update_not_jsonable(self, *args):
         self.__not_jsonable += args
@@ -59,10 +62,19 @@ class AbstractMISP(collections.MutableMapping):
 
     def to_dict(self):
         to_return = {}
-        for attribute in self.properties():
+        for attribute in self.properties:
             val = getattr(self, attribute, None)
             if val is None:
                 continue
+            if attribute == 'timestamp':
+                if self.edited:
+                    # In order to be accepted by MISP, the timestamp of an object
+                    # needs to be either newer, or None.
+                    # If the current object is marked as edited, the easiest is to
+                    # skip the timestamp and let MISP deal with it
+                    continue
+                else:
+                    val = self._datetime_to_timestamp(val)
             to_return[attribute] = val
         return to_return
 
@@ -93,6 +105,16 @@ class AbstractMISP(collections.MutableMapping):
 
     @property
     def edited(self):
+        if self.__edited:
+            return self.__edited
+        for p in self.properties:
+            if self.__edited:
+                break
+            if isinstance(p, AbstractMISP) and p.edited:
+                self.__edited = True
+            elif isinstance(p, list) and all(isinstance(a, AbstractMISP) for a in p):
+                if any(a.edited for a in p):
+                    self.__edited = True
         return self.__edited
 
     @edited.setter
@@ -103,6 +125,15 @@ class AbstractMISP(collections.MutableMapping):
             raise Exception('edited can only be True or False')
 
     def __setattr__(self, name, value):
-        if name in self.properties():
+        if name in self.properties:
             self.__edited = True
         super(AbstractMISP, self).__setattr__(name, value)
+
+    def _datetime_to_timestamp(self, d):
+        if isinstance(d, (int, str)):
+            # Assume we already have a timestamp
+            return d
+        if sys.version_info >= (3, 3):
+            return d.timestamp()
+        else:
+            return (d - datetime.datetime.utcfromtimestamp(0)).total_seconds()
