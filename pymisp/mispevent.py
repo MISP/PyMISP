@@ -584,6 +584,10 @@ class MISPEvent(AbstractMISP):
     def attributes(self):
         return self.Attribute
 
+    @attributes.setter
+    def attributes(self, attributes):
+        self.Attribute = attributes
+
     @property
     def related_events(self):
         return self.RelatedEvent
