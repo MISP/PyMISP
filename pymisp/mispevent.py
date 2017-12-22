@@ -12,6 +12,7 @@ import sys
 import uuid
 from collections import Counter
 
+from . import deprecated
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
@@ -102,9 +103,11 @@ class MISPAttribute(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPAttribute.')
 
     def delete(self):
+        """Mark the attribute as deleted (soft delete)"""
         self.deleted = True
 
     def add_tag(self, tag):
+        """Add a tag to the attribute (by name or a MISPTag object)"""
         misp_tag = MISPTag()
         if isinstance(tag, str):
             misp_tag.from_dict(name=tag)
@@ -115,11 +118,6 @@ class MISPAttribute(AbstractMISP):
         self.tags.append(misp_tag)
         self.edited = True
 
-    def __repr__(self):
-        if hasattr(self, 'value'):
-            return '<{self.__class__.__name__}(type={self.type}, value={self.value})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
-
     def from_dict(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
             if kwargs['type'] not in self.__category_type_mapping[kwargs['category']]:
@@ -129,7 +127,7 @@ class MISPAttribute(AbstractMISP):
         self.type = kwargs.pop('type', None)  # Required
         if self.type is None:
             raise NewAttributeError('The type of the attribute is required.')
-        if self.type not in self.get_known_types():
+        if self.type not in self.known_types:
             raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self._types))))
 
         type_defaults = self.__sane_default[self.type]
@@ -184,6 +182,13 @@ class MISPAttribute(AbstractMISP):
 
         super(MISPAttribute, self).from_dict(**kwargs)
 
+    def to_dict(self):
+        to_return = super(MISPAttribute, self).to_dict()
+        if to_return.get('data'):
+            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
+        to_return = _int_to_str(to_return)
+        return to_return
+
     def _prepare_new_malware_sample(self):
         if '|' in self.value:
             # Get the filename, ignore the md5, because humans.
@@ -233,12 +238,10 @@ class MISPAttribute(AbstractMISP):
                 # not a encrypted zip file, assuming it is a new malware sample
                 self._prepare_new_malware_sample()
 
-    def to_dict(self):
-        to_return = super(MISPAttribute, self).to_dict()
-        if to_return.get('data'):
-            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
-        to_return = _int_to_str(to_return)
-        return to_return
+    def __repr__(self):
+        if hasattr(self, 'value'):
+            return '<{self.__class__.__name__}(type={self.type}, value={self.value})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
     def verify(self, gpg_uid):
         # Not used
@@ -272,24 +275,24 @@ class MISPAttribute(AbstractMISP):
             signed, _ = c.sign(to_sign, mode=mode.DETACH)
             self.sig = base64.b64encode(signed).decode()
 
+    @deprecated
     def get_known_types(self):
-        # Deprecated
         return self.known_types
 
+    @deprecated
     def get_malware_binary(self):
-        # Deprecated
         return self.malware_binary
 
+    @deprecated
     def _json(self):
-        # DEPRECATED
         return self.to_dict()
 
+    @deprecated
     def _json_full(self):
-        # Deprecated
         return self.to_dict()
 
+    @deprecated
     def set_all_values(self, **kwargs):
-        # Deprecated
         self.from_dict(**kwargs)
 
 
@@ -319,13 +322,38 @@ class MISPEvent(AbstractMISP):
     def known_types(self):
         return self._types
 
+    @property
+    def attributes(self):
+        return self.Attribute
+
+    @attributes.setter
+    def attributes(self, attributes):
+        if all(isinstance(x, MISPAttribute) for x in attributes):
+            self.Attribute = attributes
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPAttribute.')
+
+    @property
+    def related_events(self):
+        return self.RelatedEvent
+
+    @property
+    def objects(self):
+        return self.Object
+
+    @property
+    def tags(self):
+        return self.Tag
+
     def load_file(self, event_path):
+        """Load a JSON dump from a file on the disk"""
         if not os.path.exists(event_path):
             raise PyMISPError('Invalid path, unable to load the event.')
         with open(event_path, 'r') as f:
             self.load(f)
 
     def load(self, json_event):
+        """Load a JSON dump from a pseudo file or a JSON string"""
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
             json_event = json_event.read()
@@ -342,9 +370,10 @@ class MISPEvent(AbstractMISP):
             event['Event']['attribute_count'] = '0'
         jsonschema.validate(event, self.__json_schema)
         e = event.get('Event')
-        self.set_all_values(**e)
+        self.from_dict(**e)
 
     def set_date(self, date, ignore_invalid=False):
+        """Set a date for the event (string, datetime, or date object)"""
         if isinstance(date, basestring) or isinstance(date, unicode):
             self.date = parse(date).date()
         elif isinstance(date, datetime.datetime):
@@ -356,11 +385,6 @@ class MISPEvent(AbstractMISP):
                 self.date = datetime.date.today()
             else:
                 raise NewEventError('Invalid format for the date: {} - {}'.format(date, type(date)))
-
-    def __repr__(self):
-        if hasattr(self, 'info'):
-            return '<{self.__class__.__name__}(info={self.info})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
     def from_dict(self, **kwargs):
         # Required value
@@ -396,7 +420,7 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('Attribute'):
             for a in kwargs.pop('Attribute'):
                 attribute = MISPAttribute()
-                attribute.set_all_values(**a)
+                attribute.from_dict(**a)
                 if not hasattr(self, 'Attribute'):
                     self.Attribute = []
                 self.Attribute.append(attribute)
@@ -448,6 +472,7 @@ class MISPEvent(AbstractMISP):
         return to_return
 
     def add_tag(self, tag):
+        """Add a tag to the attribute (by name or a MISPTag object)"""
         misp_tag = MISPTag()
         if isinstance(tag, str):
             misp_tag.from_dict(name=tag)
@@ -490,12 +515,15 @@ class MISPEvent(AbstractMISP):
         return attributes
 
     def publish(self):
+        """Mark the attribute as published"""
         self.published = True
 
     def unpublish(self):
+        """Mark the attribute as un-published (set publish flag to false)"""
         self.published = False
 
     def delete_attribute(self, attribute_id):
+        """Delete an attribute, you can search by ID or UUID"""
         found = False
         for a in self.attributes:
             if ((hasattr(a, 'id') and a.id == attribute_id) or
@@ -507,47 +535,28 @@ class MISPEvent(AbstractMISP):
             raise Exception('No attribute with UUID/ID {} found.'.format(attribute_id))
 
     def add_attribute(self, type, value, **kwargs):
+        """Add an attribute. type and value are required but you can pass all
+        other parameters supported by MISPAttribute"""
         if isinstance(value, list):
             for a in value:
                 self.add_attribute(type=type, value=a, **kwargs)
         else:
             attribute = MISPAttribute()
-            attribute.set_all_values(type=type, value=value, **kwargs)
+            attribute.from_dict(type=type, value=value, **kwargs)
             if not hasattr(self, 'attributes'):
                 self.attributes = []
             self.attributes.append(attribute)
         self.edited = True
 
-    @property
-    def attributes(self):
-        return self.Attribute
-
-    @attributes.setter
-    def attributes(self, attributes):
-        if all(isinstance(x, MISPAttribute) for x in attributes):
-            self.Attribute = attributes
-        else:
-            raise PyMISPError('All the attributes have to be of type MISPAttribute.')
-
-    @property
-    def related_events(self):
-        return self.RelatedEvent
-
-    @property
-    def objects(self):
-        return self.Object
-
-    @property
-    def tags(self):
-        return self.Tag
-
     def get_object_by_id(self, object_id):
+        """Get an object by ID (the ID is the one set by the server when creating the new object)"""
         for obj in self.objects:
             if hasattr(obj, 'id') and obj.id == object_id:
                 return obj
         raise InvalidMISPObject('Object with {} does not exists in ths event'.format(object_id))
 
     def add_object(self, obj):
+        """Add an object to the Event, either by passing a MISPObject, or a dictionary"""
         if isinstance(obj, MISPObject):
             self.Object.append(obj)
         elif isinstance(obj, dict):
@@ -558,18 +567,25 @@ class MISPEvent(AbstractMISP):
             raise InvalidMISPObject("An object to add to an existing Event needs to be either a MISPObject, or a plain python dictionary")
         self.edited = True
 
+    def __repr__(self):
+        if hasattr(self, 'info'):
+            return '<{self.__class__.__name__}(info={self.info})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
     def _serialize(self):
         return '{date}{threat_level_id}{info}{uuid}{analysis}{timestamp}'.format(
             date=self.date, threat_level_id=self.threat_level_id, info=self.info,
             uuid=self.uuid, analysis=self.analysis, timestamp=self.timestamp).encode()
 
     def _serialize_sigs(self):
+        # Not used
         all_sigs = self.sig
         for a in self.attributes:
             all_sigs += a.sig
         return all_sigs.encode()
 
     def sign(self, gpg_uid, passphrase=None):
+        # Not used
         if not has_pyme:
             raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
         to_sign = self._serialize()
@@ -592,6 +608,7 @@ class MISPEvent(AbstractMISP):
             self.global_sig = base64.b64encode(signed).decode()
 
     def verify(self, gpg_uid):
+        # Not used
         if not has_pyme:
             raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
         to_return = {}
@@ -615,16 +632,16 @@ class MISPEvent(AbstractMISP):
                 to_return['global'] = False
         return to_return
 
+    @deprecated
     def get_known_types(self):
-        # Deprecated
         return self.known_types
 
+    @deprecated
     def set_all_values(self, **kwargs):
-        # Deprecated
         self.from_dict(**kwargs)
 
+    @deprecated
     def _json(self):
-        # DEPTECATED
         return self.to_dict()
 
 
@@ -632,14 +649,14 @@ class MISPTag(AbstractMISP):
     def __init__(self):
         super(MISPTag, self).__init__()
 
+    def from_dict(self, name, **kwargs):
+        self.name = name
+        super(MISPTag, self).from_dict(**kwargs)
+
     def __repr__(self):
         if hasattr(self, 'name'):
             return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
-
-    def from_dict(self, name, **kwargs):
-        self.name = name
-        super(MISPTag, self).from_dict(**kwargs)
 
 
 class MISPObjectReference(AbstractMISP):
@@ -647,17 +664,17 @@ class MISPObjectReference(AbstractMISP):
     def __init__(self):
         super(MISPObjectReference, self).__init__()
 
-    def __repr__(self):
-        if hasattr(self, 'referenced_uuid'):
-            return '<{self.__class__.__name__}(object_uuid={self.object_uuid}, referenced_uuid={self.referenced_uuid}, relationship_type={self.relationship_type})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
-
     def from_dict(self, object_uuid, referenced_uuid, relationship_type, comment=None, **kwargs):
         self.object_uuid = object_uuid
         self.referenced_uuid = referenced_uuid
         self.relationship_type = relationship_type
         self.comment = comment
         super(MISPObjectReference, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        if hasattr(self, 'referenced_uuid'):
+            return '<{self.__class__.__name__}(object_uuid={self.object_uuid}, referenced_uuid={self.referenced_uuid}, relationship_type={self.relationship_type})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
 class MISPUser(AbstractMISP):
@@ -678,11 +695,6 @@ class MISPObjectAttribute(MISPAttribute):
         super(MISPObjectAttribute, self).__init__()
         self.__definition = definition
 
-    def __repr__(self):
-        if hasattr(self, 'value'):
-            return '<{self.__class__.__name__}(object_relation={self.object_relation}, value={self.value})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
-
     def from_dict(self, object_relation, value, **kwargs):
         self.object_relation = object_relation
         self.value = value
@@ -702,6 +714,11 @@ class MISPObjectAttribute(MISPAttribute):
             self.to_ids = self.__definition.get('to_ids')
         kwargs.update(**self)
         super(MISPObjectAttribute, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        if hasattr(self, 'value'):
+            return '<{self.__class__.__name__}(object_relation={self.object_relation}, value={self.value})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
 class MISPObject(AbstractMISP):
@@ -760,7 +777,7 @@ class MISPObject(AbstractMISP):
             self.distribution = self._default_attributes_parameters.distribution
             self.sharing_group_id = self._default_attributes_parameters.sharing_group_id
         else:
-            self.distribution = 3
+            self.distribution = 5  # Default to inherit
             self.sharing_group_id = None
         self.ObjectReference = []
         self._standalone = standalone
@@ -768,10 +785,13 @@ class MISPObject(AbstractMISP):
             # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
             self.update_not_jsonable('ObjectReference')
 
-    def __repr__(self):
-        if hasattr(self, 'name'):
-            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+    @property
+    def attributes(self):
+        return self.Attribute
+
+    @property
+    def references(self):
+        return self.ObjectReference
 
     def from_dict(self, **kwargs):
         if self.__known_template:
@@ -794,6 +814,51 @@ class MISPObject(AbstractMISP):
                 self.add_reference(**r)
 
         super(MISPObject, self).from_dict(**kwargs)
+
+    def add_reference(self, referenced_uuid, relationship_type, comment=None, **kwargs):
+        """Add a link (uuid) to an other object"""
+        if kwargs.get('object_uuid'):
+            # Load existing object
+            object_uuid = kwargs.pop('object_uuid')
+        else:
+            # New reference
+            object_uuid = self.uuid
+        reference = MISPObjectReference()
+        reference.from_dict(object_uuid=object_uuid, referenced_uuid=referenced_uuid,
+                            relationship_type=relationship_type, comment=comment, **kwargs)
+        self.ObjectReference.append(reference)
+        self.edited = True
+
+    def get_attributes_by_relation(self, object_relation):
+        '''Returns the list of attributes with the given object relation in the object'''
+        return self.__fast_attribute_access.get(object_relation, [])
+
+    def has_attributes_by_relation(self, list_of_relations):
+        '''True if all the relations in the list are defined in the object'''
+        return all(relation in self.__fast_attribute_access for relation in list_of_relations)
+
+    def add_attribute(self, object_relation, **value):
+        """Add an attribute. object_relation is required and the value key is a
+        dictionary with all the keys supported by MISPAttribute"""
+        if value.get('value') is None:
+            return None
+        if self.__known_template:
+            if self.__definition['attributes'].get(object_relation):
+                attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
+            else:
+                # Woopsie, this object_relation is unknown, no sane defaults for you.
+                logger.warning("The template ({}) doesn't have the object_relation ({}) you're trying to add.".format(self.name, object_relation))
+                attribute = MISPObjectAttribute({})
+        else:
+            attribute = MISPObjectAttribute({})
+        # Overwrite the parameters of self._default_attributes_parameters with the ones of value
+        attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
+        if not self.__fast_attribute_access.get(object_relation):
+            self.__fast_attribute_access[object_relation] = []
+        self.Attribute.append(attribute)
+        self.__fast_attribute_access[object_relation].append(attribute)
+        self.edited = True
+        return attribute
 
     def to_dict(self, strict=False):
         if strict or self.__strict and self.__known_template:
@@ -826,53 +891,7 @@ class MISPObject(AbstractMISP):
                     raise InvalidMISPObject('{} is required'.format(r))
         return True
 
-    def add_reference(self, referenced_uuid, relationship_type, comment=None, **kwargs):
-        """Add a link (uuid) to an other object"""
-        if kwargs.get('object_uuid'):
-            # Load existing object
-            object_uuid = kwargs.pop('object_uuid')
-        else:
-            # New reference
-            object_uuid = self.uuid
-        reference = MISPObjectReference()
-        reference.from_dict(object_uuid=object_uuid, referenced_uuid=referenced_uuid,
-                            relationship_type=relationship_type, comment=comment, **kwargs)
-        self.ObjectReference.append(reference)
-        self.edited = True
-
-    def get_attributes_by_relation(self, object_relation):
-        '''Returns the list of attributes with the given object relation in the object'''
-        return self.__fast_attribute_access.get(object_relation, [])
-
-    def has_attributes_by_relation(self, list_of_relations):
-        '''True if all the relations in the list are defined in the object'''
-        return all(relation in self.__fast_attribute_access for relation in list_of_relations)
-
-    @property
-    def attributes(self):
-        return self.Attribute
-
-    @property
-    def references(self):
-        return self.ObjectReference
-
-    def add_attribute(self, object_relation, **value):
-        if value.get('value') is None:
-            return None
-        if self.__known_template:
-            if self.__definition['attributes'].get(object_relation):
-                attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
-            else:
-                # Woopsie, this object_relation is unknown, no sane defaults for you.
-                logger.warning("The template ({}) doesn't have the object_relation ({}) you're trying to add.".format(self.name, object_relation))
-                attribute = MISPObjectAttribute({})
-        else:
-            attribute = MISPObjectAttribute({})
-        # Overwrite the parameters of self._default_attributes_parameters with the ones of value
-        attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
-        if not self.__fast_attribute_access.get(object_relation):
-            self.__fast_attribute_access[object_relation] = []
-        self.Attribute.append(attribute)
-        self.__fast_attribute_access[object_relation].append(attribute)
-        self.edited = True
-        return attribute
+    def __repr__(self):
+        if hasattr(self, 'name'):
+            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)

@@ -10,13 +10,11 @@ from dateutil.parser import parse
 import os
 import base64
 import re
-import functools
 import logging
-import warnings
 from io import BytesIO, open
 import zipfile
 
-from . import __version__
+from . import __version__, deprecated
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation
 from .abstract import MISPEncode
@@ -44,23 +42,6 @@ try:
     ASYNC_OK = True
 except ImportError:
     ASYNC_OK = False
-
-
-def deprecated(func):
-    '''This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used.'''
-
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.showwarning(
-            "Call to deprecated function {}.".format(func.__name__),
-            category=DeprecationWarning,
-            filename=func.__code__.co_filename,
-            lineno=func.__code__.co_firstlineno + 1
-        )
-        return func(*args, **kwargs)
-    return new_func
 
 
 class PyMISP(object):
@@ -282,8 +263,8 @@ class PyMISP(object):
     def _prepare_full_event(self, distribution, threat_level_id, analysis, info, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
         """Initialize a new MISPEvent from scratch"""
         misp_event = MISPEvent(self.describe_types)
-        misp_event.set_all_values(info=info, distribution=distribution, threat_level_id=threat_level_id,
-                                  analysis=analysis, date=date, orgc_id=orgc_id, org_id=org_id, sharing_group_id=sharing_group_id)
+        misp_event.from_dict(info=info, distribution=distribution, threat_level_id=threat_level_id,
+                             analysis=analysis, date=date, orgc_id=orgc_id, org_id=org_id, sharing_group_id=sharing_group_id)
         if published:
             misp_event.publish()
         return misp_event
@@ -291,8 +272,8 @@ class PyMISP(object):
     def _prepare_full_attribute(self, category, type_value, value, to_ids, comment=None, distribution=None, **kwargs):
         """Initialize a new MISPAttribute from scratch"""
         misp_attribute = MISPAttribute(self.describe_types)
-        misp_attribute.set_all_values(type=type_value, value=value, category=category,
-                                      to_ids=to_ids, comment=comment, distribution=distribution, **kwargs)
+        misp_attribute.from_dict(type=type_value, value=value, category=category,
+                                 to_ids=to_ids, comment=comment, distribution=distribution, **kwargs)
         return misp_attribute
 
     def _valid_uuid(self, uuid):

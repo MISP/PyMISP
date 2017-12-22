@@ -30,11 +30,15 @@ class AbstractMISP(collections.MutableMapping):
     __not_jsonable = []
 
     def __init__(self, **kwargs):
+        """Abstract class for all the MISP objects"""
         super(AbstractMISP, self).__init__()
-        self.__edited = True
+        self.__edited = True  # As we create a new object, we assume it is edited
 
     @property
     def properties(self):
+        """All the class public properties that will be dumped in the dictionary, and the JSON export.
+        Note: all the properties starting with a `_` (private), or listed in __not_jsonable will be skipped.
+        """
         to_return = []
         for prop, value in vars(self).items():
             if prop.startswith('_') or prop in self.__not_jsonable:
@@ -43,6 +47,11 @@ class AbstractMISP(collections.MutableMapping):
         return to_return
 
     def from_dict(self, **kwargs):
+        """Loading all the parameters as class properties, if they aren't `None`.
+        This method aims to be called when all the properties requiring a special
+        treatment are processed.
+        Note: This method is used when you initialize an object with existing data so by default,
+        the class is flaged as not edited."""
         for prop, value in kwargs.items():
             if value is None:
                 continue
@@ -51,9 +60,11 @@ class AbstractMISP(collections.MutableMapping):
         self.__edited = False
 
     def update_not_jsonable(self, *args):
+        """Add entries to the __not_jsonable list"""
         self.__not_jsonable += args
 
     def set_not_jsonable(self, *args):
+        """Set __not_jsonable to a new list"""
         self.__not_jsonable = args
 
     def from_json(self, json_string):
@@ -61,6 +72,9 @@ class AbstractMISP(collections.MutableMapping):
         self.from_dict(json.loads(json_string))
 
     def to_dict(self):
+        """Dump the lass to a dictionary.
+        This method automatically removes the timestamp recursively in every object
+        that has been edited is order to let MISP update the event accordingly."""
         to_return = {}
         for attribute in self.properties:
             val = getattr(self, attribute, None)
@@ -79,9 +93,11 @@ class AbstractMISP(collections.MutableMapping):
         return to_return
 
     def jsonable(self):
+        """This method is used by the JSON encoder"""
         return self.to_dict()
 
     def to_json(self):
+        """Dump recursively any class of type MISPAbstract to a json string"""
         return json.dumps(self, cls=MISPEncode)
 
     def __getitem__(self, key):
@@ -105,6 +121,8 @@ class AbstractMISP(collections.MutableMapping):
 
     @property
     def edited(self):
+        """Recursively check if an object has been edited and update the flag accordingly
+        to the parent objects"""
         if self.__edited:
             return self.__edited
         for p in self.properties:
@@ -119,6 +137,7 @@ class AbstractMISP(collections.MutableMapping):
 
     @edited.setter
     def edited(self, val):
+        """Set the edit flag"""
         if isinstance(val, bool):
             self.__edited = val
         else:
@@ -130,6 +149,7 @@ class AbstractMISP(collections.MutableMapping):
         super(AbstractMISP, self).__setattr__(name, value)
 
     def _datetime_to_timestamp(self, d):
+        """Convert a datetime.datetime object to a timestamp (int)"""
         if isinstance(d, (int, str)):
             # Assume we already have a timestamp
             return d
