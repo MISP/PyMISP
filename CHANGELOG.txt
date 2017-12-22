@@ -2,6 +2,71 @@ Changelog
 =========
 
 
+v2.4.85 (2017-12-22)
+--------------------
+
+New
+~~~
+- Add last field to get_csv. [Raphaël Vinot]
+- (hopefully) Cleverer handling of timestamps in the objects. [Raphaël
+  Vinot]
+
+  & some cleanup
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- Update documentation. [Raphaël Vinot]
+- Update documentation, cleanup. [Raphaël Vinot]
+- Bump describeTypes.json. [Raphaël Vinot]
+- Validate attributes in attributes.setter. [Raphaël Vinot]
+- Add get_attribute_tag method at MISPEvent level. [Raphaël Vinot]
+
+  Also add a MISPTag class for consistency.
+- Bump misp-objects. [Raphaël Vinot]
+- Bump describeTypes. [Raphaël Vinot]
+- Add __repr__ methods (fix last commit) [Raphaël Vinot]
+- Add __repr__ methods. [Raphaël Vinot]
+- Use new format for filtering. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump describeTypes. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly use the edited flag. [Raphaël Vinot]
+- Add setter for Attribute in MISPEvent. [Raphaël Vinot]
+- Forgotten calls to master class. [Raphaël Vinot]
+- Properly call datetime.datetime.utcfromtimestamp. [Raphaël Vinot]
+- Fix typo. [Raphaël Vinot]
+- Fix python2.7 support. [Raphaël Vinot]
+- Initialize default class parameters. [Raphaël Vinot]
+
+  Fix #155
+
+Other
+~~~~~
+- Merge branch 'cvandeplas-master' [Raphaël Vinot]
+- Merge branch 'master' of https://github.com/cvandeplas/PyMISP into
+  cvandeplas-master. [Raphaël Vinot]
+- Merge remote-tracking branch 'MISP/master' [Christophe Vandeplas]
+- Fix MISPObject missing distribution and sharing_group_id. [Christophe
+  Vandeplas]
+
+  - fix MISPObject missing distribution concept
+  - fix language typo paramaters => parameters
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #156 from cvandeplas/master. [Alexandre Dulaunoy]
+
+  document submodule downloading
+- Document submodule downloading. [Christophe Vandeplas]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #154 from wagner-certat/inc-meta. [Raphaël Vinot]
+
+  Include documentation and examples in source dist
+- Include documentation and examples in source dist. [Sebastian Wagner]
+
+
 v2.4.84 (2017-12-13)
 --------------------
 
@@ -15,6 +80,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Make the library easier to use. [Raphaël Vinot]
 - Allow to pass a pseudofile to LIEF. [Raphaël Vinot]
