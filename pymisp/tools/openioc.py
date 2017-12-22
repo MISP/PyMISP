@@ -278,17 +278,3 @@ def set_all_attributes(openioc, misp_event):
         misp_event.add_attribute(**attribute_values)
 
     return misp_event
-
-
-if __name__ == '__main__':
-    import requests
-    # test file for composite
-    url = 'https://raw.githubusercontent.com/fireeye/iocs/master/BlogPosts/9cee306d-5441-4cd3-932d-f3119752634c.ioc'
-    # ~ url = 'https://raw.githubusercontent.com/MISP/misp-modules/master/tests/openioc.xml'
-    x = requests.get(url)
-    mispEvent = load_openioc(x.text)
-    print(mispEvent)
-    # ~ from pymisp import PyMISP
-    # ~ misp = PyMISP('http://misp.local', 'xxxxx')
-    # ~ r = misp.add_event(mispEvent)
-    # ~ print(r)
