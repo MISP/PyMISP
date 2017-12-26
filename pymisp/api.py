@@ -16,7 +16,7 @@ import zipfile
 
 from . import __version__, deprecated
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey
-from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation
+from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting
 from .abstract import MISPEncode
 
 logger = logging.getLogger('pymisp')
@@ -1296,10 +1296,16 @@ class PyMISP(object):
 
     def set_sightings(self, sightings):
         """Push a sighting (python dictionary)"""
-        if isinstance(sightings, dict):
-            sightings = json.dumps(sightings)
+        to_post = []
+        if not isinstance(sightings, list):
+            sightings = [sightings]
+        for sighting in sightings:
+            if isinstance(sighting, MISPSighting):
+                to_post.appent(sighting.to_json())
+            elif isinstance(sighting, dict):
+                to_post.append(json.dumps(sightings))
         url = urljoin(self.root_url, 'sightings/add/')
-        response = self.__prepare_request('POST', url, sightings)
+        response = self.__prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
 
     def sighting_per_json(self, json_file):
@@ -1307,6 +1313,18 @@ class PyMISP(object):
         with open(json_file, 'r') as f:
             jdata = json.load(f)
             return self.set_sightings(jdata)
+
+    def sighting(self, value, source=None, type=None, timestamp=None, **kwargs):
+        """ Set a single sighting.
+        :value: Value can either be the attribute's value (to update sighting on all the attributes with this value),
+                or an UUID in order to update the sightings of one particular attribute.
+        :source: Source of the sighting
+        :type: Type of the sighting
+        :timestamp: Timestamp associated to the sighting
+        """
+        s = MISPSighting()
+        s.from_dict(value=value, source=source, type=type, timestamp=timestamp, **kwargs)
+        return self.set_sightings(s)
 
     # ############## Sharing Groups ##################
 

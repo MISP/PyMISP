@@ -689,6 +689,31 @@ class MISPOrganisation(AbstractMISP):
         super(MISPOrganisation, self).__init__()
 
 
+class MISPSighting(AbstractMISP):
+
+    def __init__(self):
+        super(MISPSighting, self).__init__()
+
+    def from_dict(self, value, source=None, type=None, timestamp=None, **kwargs):
+        """Initialize the MISPSighting from a dictionary
+        :value: Value can either be the attribute's value (to update sighting on all the attributes with this value),
+                or an UUID in order to update the sightings of one particular attribute.
+        :source: Source of the sighting
+        :type: Type of the sighting
+        :timestamp: Timestamp associated to the sighting
+        """
+        self.value = value
+        self.source = source
+        self.type = type
+        self.timestamp = timestamp
+        super(MISPSighting, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        if hasattr(self, 'value'):
+            return '<{self.__class__.__name__}(value={self.value})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
+
 class MISPObjectAttribute(MISPAttribute):
 
     def __init__(self, definition):
