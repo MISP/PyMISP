@@ -1301,7 +1301,7 @@ class PyMISP(object):
             sightings = [sightings]
         for sighting in sightings:
             if isinstance(sighting, MISPSighting):
-                to_post.appent(sighting.to_json())
+                to_post.append(sighting.to_json())
             elif isinstance(sighting, dict):
                 to_post.append(json.dumps(sightings))
         url = urljoin(self.root_url, 'sightings/add/')
