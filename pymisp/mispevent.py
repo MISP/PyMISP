@@ -737,6 +737,7 @@ class MISPObjectAttribute(MISPAttribute):
         if self.to_ids is None:
             # Same for the to_ids flag
             self.to_ids = self.__definition.get('to_ids')
+        self.Tag = kwargs.pop('Tag', [])
         kwargs.update(**self)
         super(MISPObjectAttribute, self).from_dict(**kwargs)
 
