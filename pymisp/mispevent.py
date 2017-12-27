@@ -785,6 +785,7 @@ class MISPObject(AbstractMISP):
         self.uuid = str(uuid.uuid4())
         self.__fast_attribute_access = {}  # Hashtable object_relation: [attributes]
         self.Attribute = []
+        self.Tag = []
         self._default_attributes_parameters = default_attributes_parameters
         if self._default_attributes_parameters:
             # Let's clean that up
@@ -837,6 +838,9 @@ class MISPObject(AbstractMISP):
         if kwargs.get('ObjectReference'):
             for r in kwargs.pop('ObjectReference'):
                 self.add_reference(**r)
+        if kwargs.get('Tag'):
+            for tag in kwargs.pop('Tag'):
+                self.add_tag(**tag)
 
         super(MISPObject, self).from_dict(**kwargs)
 
@@ -852,6 +856,12 @@ class MISPObject(AbstractMISP):
         reference.from_dict(object_uuid=object_uuid, referenced_uuid=referenced_uuid,
                             relationship_type=relationship_type, comment=comment, **kwargs)
         self.ObjectReference.append(reference)
+        self.edited = True
+
+    def add_tag(self, name, **kwargs):
+        tag = MISPTag()
+        tag.from_dict(name=name, **kwargs)
+        self.Tag.append(tag)
         self.edited = True
 
     def get_attributes_by_relation(self, object_relation):
