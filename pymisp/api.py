@@ -1295,17 +1295,16 @@ class PyMISP(object):
         return self._check_response(response)
 
     def set_sightings(self, sightings):
-        """Push a sighting (python dictionary)"""
-        to_post = []
+        """Push a sighting (python dictionary or MISPSighting) or a list of sightings"""
         if not isinstance(sightings, list):
             sightings = [sightings]
         for sighting in sightings:
             if isinstance(sighting, MISPSighting):
-                to_post.append(sighting.to_json())
+                to_post = sighting.to_json()
             elif isinstance(sighting, dict):
-                to_post.append(json.dumps(sightings))
-        url = urljoin(self.root_url, 'sightings/add/')
-        response = self.__prepare_request('POST', url, json.dumps(to_post))
+                to_post = json.dumps(sighting)
+            url = urljoin(self.root_url, 'sightings/add/')
+            response = self.__prepare_request('POST', url, to_post)
         return self._check_response(response)
 
     def sighting_per_json(self, json_file):
