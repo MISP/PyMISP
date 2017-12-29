@@ -169,11 +169,8 @@ class MISPAttribute(AbstractMISP):
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('Tag'):
-            self.Tag = []
             for tag in kwargs.pop('Tag'):
-                t = MISPTag()
-                t.from_dict(**tag)
-                self.Tag.append(t)
+                self.add_tag(**tag)
 
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.pop("disable_correlation", False)
@@ -419,11 +416,7 @@ class MISPEvent(AbstractMISP):
             self.set_date(kwargs.pop('date'))
         if kwargs.get('Attribute'):
             for a in kwargs.pop('Attribute'):
-                attribute = MISPAttribute()
-                attribute.from_dict(**a)
-                if not hasattr(self, 'Attribute'):
-                    self.Attribute = []
-                self.Attribute.append(attribute)
+                self.add_attribute(**a)
 
         # All other keys
         if kwargs.get('id'):
@@ -439,23 +432,16 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('RelatedEvent'):
-            self.RelatedEvent = []
             for rel_event in kwargs.pop('RelatedEvent'):
                 sub_event = MISPEvent()
                 sub_event.load(rel_event)
                 self.RelatedEvent.append(sub_event)
         if kwargs.get('Tag'):
-            self.Tag = []
             for tag in kwargs.pop('Tag'):
-                t = MISPTag()
-                t.from_dict(**tag)
-                self.Tag.append(t)
+                self.add_tag(**tag)
         if kwargs.get('Object'):
-            self.Object = []
             for obj in kwargs.pop('Object'):
-                tmp_object = MISPObject(obj['name'])
-                tmp_object.from_dict(**obj)
-                self.Object.append(tmp_object)
+                self.add_object(**obj)
 
         super(MISPEvent, self).from_dict(**kwargs)
 
@@ -543,8 +529,6 @@ class MISPEvent(AbstractMISP):
         else:
             attribute = MISPAttribute()
             attribute.from_dict(type=type, value=value, **kwargs)
-            if not hasattr(self, 'attributes'):
-                self.attributes = []
             self.attributes.append(attribute)
         self.edited = True
 
@@ -784,6 +768,7 @@ class MISPObject(AbstractMISP):
             pass
         self.uuid = str(uuid.uuid4())
         self.__fast_attribute_access = {}  # Hashtable object_relation: [attributes]
+        self.ObjectReference = []
         self.Attribute = []
         self.Tag = []
         self._default_attributes_parameters = default_attributes_parameters
@@ -805,7 +790,6 @@ class MISPObject(AbstractMISP):
         else:
             self.distribution = 5  # Default to inherit
             self.sharing_group_id = None
-        self.ObjectReference = []
         self._standalone = standalone
         if self._standalone:
             # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
