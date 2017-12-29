@@ -106,7 +106,7 @@ class MISPAttribute(AbstractMISP):
         """Mark the attribute as deleted (soft delete)"""
         self.deleted = True
 
-    def add_tag(self, tag):
+    def add_tag(self, **tag):
         """Add a tag to the attribute (by name or a MISPTag object)"""
         misp_tag = MISPTag()
         if isinstance(tag, str):
@@ -457,7 +457,7 @@ class MISPEvent(AbstractMISP):
         to_return = {'Event': to_return}
         return to_return
 
-    def add_tag(self, tag):
+    def add_tag(self, **tag):
         """Add a tag to the attribute (by name or a MISPTag object)"""
         misp_tag = MISPTag()
         if isinstance(tag, str):
@@ -539,7 +539,7 @@ class MISPEvent(AbstractMISP):
                 return obj
         raise InvalidMISPObject('Object with {} does not exists in ths event'.format(object_id))
 
-    def add_object(self, obj):
+    def add_object(self, **obj):
         """Add an object to the Event, either by passing a MISPObject, or a dictionary"""
         if isinstance(obj, MISPObject):
             self.Object.append(obj)
@@ -721,8 +721,7 @@ class MISPObjectAttribute(MISPAttribute):
         if self.to_ids is None:
             # Same for the to_ids flag
             self.to_ids = self.__definition.get('to_ids')
-        kwargs.update(**self)
-        super(MISPObjectAttribute, self).from_dict(**kwargs)
+        super(MISPObjectAttribute, self).from_dict(**dict(self, **kwargs))
 
     def __repr__(self):
         if hasattr(self, 'value'):
