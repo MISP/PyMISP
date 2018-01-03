@@ -15,6 +15,21 @@ logger = logging.getLogger('pymisp')
 if six.PY2:
     logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
 
+    # This is required because Python 2 is a pain.
+    from datetime import tzinfo, timedelta
+
+    class UTC(tzinfo):
+        """UTC"""
+
+        def utcoffset(self, dt):
+            return timedelta(0)
+
+        def tzname(self, dt):
+            return "UTC"
+
+        def dst(self, dt):
+            return timedelta(0)
+
 
 class MISPEncode(JSONEncoder):
 
@@ -80,6 +95,8 @@ class AbstractMISP(collections.MutableMapping):
             val = getattr(self, attribute, None)
             if val is None:
                 continue
+            elif isinstance(val, list) and len(val) == 0:
+                continue
             if attribute == 'timestamp':
                 if self.edited:
                     # In order to be accepted by MISP, the timestamp of an object
@@ -98,7 +115,7 @@ class AbstractMISP(collections.MutableMapping):
 
     def to_json(self):
         """Dump recursively any class of type MISPAbstract to a json string"""
-        return json.dumps(self, cls=MISPEncode)
+        return json.dumps(self, cls=MISPEncode, sort_keys=True, indent=2)
 
     def __getitem__(self, key):
         try:
@@ -150,10 +167,10 @@ class AbstractMISP(collections.MutableMapping):
 
     def _datetime_to_timestamp(self, d):
         """Convert a datetime.datetime object to a timestamp (int)"""
-        if isinstance(d, (int, str)):
+        if isinstance(d, (int, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
             # Assume we already have a timestamp
             return d
         if sys.version_info >= (3, 3):
-            return d.timestamp()
+            return int(d.timestamp())
         else:
-            return (d - datetime.datetime.utcfromtimestamp(0)).total_seconds()
+            return int((d - datetime.datetime.fromtimestamp(0, UTC())).total_seconds())

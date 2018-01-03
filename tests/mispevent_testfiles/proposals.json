@@ -1,0 +1,36 @@
+{
+  "Event": {
+    "Attribute": [
+      {
+        "ShadowAttribute": [
+          {
+            "category": "Payload delivery",
+            "disable_correlation": false,
+            "to_ids": true,
+            "type": "filename",
+            "value": "bar.pdf"
+          }
+        ],
+        "category": "Payload delivery",
+        "disable_correlation": false,
+        "to_ids": true,
+        "type": "filename",
+        "value": "bar.exe"
+      }
+    ],
+    "ShadowAttribute": [
+      {
+        "category": "Payload delivery",
+        "disable_correlation": false,
+        "to_ids": true,
+        "type": "filename",
+        "value": "baz.jpg"
+      }
+    ],
+    "analysis": "1",
+    "date": "2017-12-31",
+    "distribution": "1",
+    "info": "This is a test",
+    "threat_level_id": "1"
+  }
+}
