@@ -68,7 +68,11 @@ def _int_to_str(d):
 
 class MISPAttribute(AbstractMISP):
 
-    def __init__(self, describe_types=None):
+    def __init__(self, describe_types=None, strict=False):
+        """Represents an Attribute
+            :describe_type: Use it is you want to overwrite the defualt describeTypes.json file (you don't)
+            :strict: If false, fallback to sane defaults for the attribute type if the ones passed by the user are incorrect
+        """
         super(MISPAttribute, self).__init__()
         if not describe_types:
             ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
@@ -79,6 +83,7 @@ class MISPAttribute(AbstractMISP):
         self._types = describe_types['types']
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
+        self.__strict = strict
         self.Tag = []
 
     @property
@@ -121,8 +126,11 @@ class MISPAttribute(AbstractMISP):
     def from_dict(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
             if kwargs['type'] not in self.__category_type_mapping[kwargs['category']]:
-                raise NewAttributeError('{} and {} is an invalid combination, type for this category has to be in {}'.format(
-                    kwargs.get('type'), kwargs.get('category'), (', '.join(self.__category_type_mapping[kwargs['category']]))))
+                if self.__strict:
+                    raise NewAttributeError('{} and {} is an invalid combination, type for this category has to be in {}'.format(
+                        kwargs.get('type'), kwargs.get('category'), (', '.join(self.__category_type_mapping[kwargs['category']]))))
+                else:
+                    kwargs.pop('category', None)
 
         self.type = kwargs.pop('type', None)  # Required
         if self.type is None:
@@ -781,7 +789,6 @@ class MISPObject(AbstractMISP):
             self._default_attributes_parameters.pop('object_relation', None)  # depends on the value
             self._default_attributes_parameters.pop('disable_correlation', None)  # depends on the value
             self._default_attributes_parameters.pop('to_ids', None)  # depends on the value
-            self._default_attributes_parameters.pop('category', None)  # depends on the value
             self._default_attributes_parameters.pop('deleted', None)  # doesn't make sense to pre-set it
             self._default_attributes_parameters.pop('data', None)  # in case the original in a sample or an attachment
             self.distribution = self._default_attributes_parameters.pop('distribution', 5)
