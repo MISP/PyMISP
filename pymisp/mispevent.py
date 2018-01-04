@@ -791,11 +791,13 @@ class MISPObject(AbstractMISP):
             self._default_attributes_parameters.pop('to_ids', None)  # depends on the value
             self._default_attributes_parameters.pop('deleted', None)  # doesn't make sense to pre-set it
             self._default_attributes_parameters.pop('data', None)  # in case the original in a sample or an attachment
-            self.distribution = self._default_attributes_parameters.pop('distribution', 5)
-            self.sharing_group_id = self._default_attributes_parameters.pop('sharing_group_id', 0)
+
+            # Those values are set for the current object, if they exist, but not pop'd because they are still useful for the attributes
+            self.distribution = self._default_attributes_parameters.get('distribution', 5)
+            self.sharing_group_id = self._default_attributes_parameters.get('sharing_group_id', 0)
         else:
             self.distribution = 5  # Default to inherit
-            self.sharing_group_id = None
+            self.sharing_group_id = 0
         self._standalone = standalone
         if self._standalone:
             # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
