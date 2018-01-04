@@ -784,9 +784,8 @@ class MISPObject(AbstractMISP):
             self._default_attributes_parameters.pop('category', None)  # depends on the value
             self._default_attributes_parameters.pop('deleted', None)  # doesn't make sense to pre-set it
             self._default_attributes_parameters.pop('data', None)  # in case the original in a sample or an attachment
-            self.distribution = self._default_attributes_parameters.distribution
-            if self._default_attributes_parameters.get('sharing_group_id'):
-                self.sharing_group_id = self._default_attributes_parameters.sharing_group_id
+            self.distribution = self._default_attributes_parameters.pop('distribution', 5)
+            self.sharing_group_id = self._default_attributes_parameters.pop('sharing_group_id', 0)
         else:
             self.distribution = 5  # Default to inherit
             self.sharing_group_id = None
