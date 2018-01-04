@@ -25,6 +25,21 @@ logger = logging.getLogger('pymisp')
 if six.PY2:
     logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
 
+    # This is required because Python 2 is a pain.
+    from datetime import tzinfo, timedelta
+
+    class UTC(tzinfo):
+        """UTC"""
+
+        def utcoffset(self, dt):
+            return timedelta(0)
+
+        def tzname(self, dt):
+            return "UTC"
+
+        def dst(self, dt):
+            return timedelta(0)
+
 try:
     from dateutil.parser import parse
 except ImportError:
@@ -85,42 +100,84 @@ class MISPAttribute(AbstractMISP):
         self.__sane_default = describe_types['sane_defaults']
         self.__strict = strict
         self.Tag = []
+        self.ShadowAttribute = []
 
     @property
     def known_types(self):
+        """Returns a list of all the known MISP attributes types"""
         return self._types
 
     @property
     def malware_binary(self):
+        """Returns a BytesIO of the malware (if the attribute has one, obvs)."""
         if hasattr(self, '_malware_binary'):
             return self._malware_binary
         return None
 
     @property
     def tags(self):
+        """Returns a lost of tags associated to this Attribute"""
         return self.Tag
 
     @tags.setter
     def tags(self, tags):
+        """Set a list of prepared MISPTag."""
         if all(isinstance(x, MISPTag) for x in tags):
             self.Tag = tags
         else:
-            raise PyMISPError('All the attributes have to be of type MISPAttribute.')
+            raise PyMISPError('All the attributes have to be of type MISPTag.')
+
+    @property
+    def shadow_attributes(self):
+        return self.ShadowAttribute
+
+    @shadow_attributes.setter
+    def shadow_attributes(self, shadow_attributes):
+        """Set a list of prepared MISPShadowAttribute."""
+        if all(isinstance(x, MISPShadowAttribute) for x in shadow_attributes):
+            self.ShadowAttribute = shadow_attributes
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPShadowAttribute.')
 
     def delete(self):
         """Mark the attribute as deleted (soft delete)"""
         self.deleted = True
 
-    def add_tag(self, **tag):
+    def add_tag(self, tag=None, **kwargs):
         """Add a tag to the attribute (by name or a MISPTag object)"""
-        misp_tag = MISPTag()
         if isinstance(tag, str):
+            misp_tag = MISPTag()
             misp_tag.from_dict(name=tag)
+        elif isinstance(tag, MISPTag):
+            misp_tag = tag
         elif isinstance(tag, dict):
+            misp_tag = MISPTag()
             misp_tag.from_dict(**tag)
+        elif kwargs:
+            misp_tag = MISPTag()
+            misp_tag.from_dict(**kwargs)
         else:
-            raise PyMISPError("The tag is in an invalid format (can be either string, or list): {}".format(tag))
+            raise PyMISPError("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
         self.tags.append(misp_tag)
+        self.edited = True
+
+    def add_proposal(self, shadow_attribute=None, **kwargs):
+        """Alias for add_shadow_attribute"""
+        self.add_shadow_attribute(shadow_attribute, **kwargs)
+
+    def add_shadow_attribute(self, shadow_attribute=None, **kwargs):
+        """Add a tag to the attribute (by name or a MISPTag object)"""
+        if isinstance(shadow_attribute, MISPShadowAttribute):
+            misp_shadow_attribute = shadow_attribute
+        elif isinstance(shadow_attribute, dict):
+            misp_shadow_attribute = MISPShadowAttribute()
+            misp_shadow_attribute.from_dict(**shadow_attribute)
+        elif kwargs:
+            misp_shadow_attribute = MISPShadowAttribute()
+            misp_shadow_attribute.from_dict(**kwargs)
+        else:
+            raise PyMISPError("The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(shadow_attribute))
+        self.shadow_attributes.append(misp_shadow_attribute)
         self.edited = True
 
     def from_dict(self, **kwargs):
@@ -173,12 +230,18 @@ class MISPAttribute(AbstractMISP):
         if kwargs.get('event_id'):
             self.event_id = int(kwargs.pop('event_id'))
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs.pop('timestamp')))
+            if sys.version_info >= (3, 3):
+                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), datetime.timezone.utc)
+            else:
+                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), UTC())
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('Tag'):
             for tag in kwargs.pop('Tag'):
-                self.add_tag(**tag)
+                self.add_tag(tag)
+        if kwargs.get('ShadowAttribute'):
+            for s_attr in kwargs.pop('ShadowAttribute'):
+                self.add_shadow_attribute(s_attr)
 
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.pop("disable_correlation", False)
@@ -248,7 +311,7 @@ class MISPAttribute(AbstractMISP):
             return '<{self.__class__.__name__}(type={self.type}, value={self.value})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
-    def verify(self, gpg_uid):
+    def verify(self, gpg_uid):  # pragma: no cover
         # Not used
         if not has_pyme:
             raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
@@ -261,13 +324,13 @@ class MISPAttribute(AbstractMISP):
             except Exception:
                 return {self.uuid: False}
 
-    def _serialize(self):
+    def _serialize(self):  # pragma: no cover
         # Not used
         return '{type}{category}{to_ids}{uuid}{timestamp}{comment}{deleted}{value}'.format(
             type=self.type, category=self.category, to_ids=self.to_ids, uuid=self.uuid, timestamp=self.timestamp,
             comment=self.comment, deleted=self.deleted, value=self.value).encode()
 
-    def sign(self, gpg_uid, passphrase=None):
+    def sign(self, gpg_uid, passphrase=None):  # pragma: no cover
         # Not used
         if not has_pyme:
             raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
@@ -281,23 +344,23 @@ class MISPAttribute(AbstractMISP):
             self.sig = base64.b64encode(signed).decode()
 
     @deprecated
-    def get_known_types(self):
+    def get_known_types(self):  # pragma: no cover
         return self.known_types
 
     @deprecated
-    def get_malware_binary(self):
+    def get_malware_binary(self):  # pragma: no cover
         return self.malware_binary
 
     @deprecated
-    def _json(self):
+    def _json(self):  # pragma: no cover
         return self.to_dict()
 
     @deprecated
-    def _json_full(self):
+    def _json_full(self):  # pragma: no cover
         return self.to_dict()
 
     @deprecated
-    def set_all_values(self, **kwargs):
+    def set_all_values(self, **kwargs):  # pragma: no cover
         self.from_dict(**kwargs)
 
 
@@ -322,6 +385,7 @@ class MISPEvent(AbstractMISP):
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
+        self.ShadowAttribute = []
 
     @property
     def known_types(self):
@@ -339,6 +403,17 @@ class MISPEvent(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPAttribute.')
 
     @property
+    def shadow_attributes(self):
+        return self.ShadowAttribute
+
+    @shadow_attributes.setter
+    def shadow_attributes(self, shadow_attributes):
+        if all(isinstance(x, MISPShadowAttribute) for x in shadow_attributes):
+            self.ShadowAttribute = shadow_attributes
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPShadowAttribute.')
+
+    @property
     def related_events(self):
         return self.RelatedEvent
 
@@ -346,9 +421,23 @@ class MISPEvent(AbstractMISP):
     def objects(self):
         return self.Object
 
+    @objects.setter
+    def objects(self, objects):
+        if all(isinstance(x, MISPObject) for x in objects):
+            self.Object = objects
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPObject.')
+
     @property
     def tags(self):
         return self.Tag
+
+    @tags.setter
+    def tags(self, tags):
+        if all(isinstance(x, MISPTag) for x in tags):
+            self.Tag = tags
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPTag.')
 
     def load_file(self, event_path):
         """Load a JSON dump from a file on the disk"""
@@ -371,7 +460,9 @@ class MISPEvent(AbstractMISP):
         if not event:
             raise PyMISPError('Invalid event')
         # Invalid event created by MISP up to 2.4.52 (attribute_count is none instead of '0')
-        if event.get('Event') and event.get('Event').get('attribute_count') is None:
+        if (event.get('Event') and
+                'attribute_count' in event.get('Event') and
+                event.get('Event').get('attribute_count') is None):
             event['Event']['attribute_count'] = '0'
         jsonschema.validate(event, self.__json_schema)
         e = event.get('Event')
@@ -434,9 +525,15 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('org_id'):
             self.org_id = int(kwargs.pop('org_id'))
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs.pop('timestamp')))
+            if sys.version_info >= (3, 3):
+                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), datetime.timezone.utc)
+            else:
+                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), UTC())
         if kwargs.get('publish_timestamp'):
-            self.publish_timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(kwargs.pop('publish_timestamp')))
+            if sys.version_info >= (3, 3):
+                self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), datetime.timezone.utc)
+            else:
+                self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), UTC())
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('RelatedEvent'):
@@ -446,10 +543,10 @@ class MISPEvent(AbstractMISP):
                 self.RelatedEvent.append(sub_event)
         if kwargs.get('Tag'):
             for tag in kwargs.pop('Tag'):
-                self.add_tag(**tag)
+                self.add_tag(tag)
         if kwargs.get('Object'):
             for obj in kwargs.pop('Object'):
-                self.add_object(**obj)
+                self.add_object(obj)
 
         super(MISPEvent, self).from_dict(**kwargs)
 
@@ -457,6 +554,8 @@ class MISPEvent(AbstractMISP):
         to_return = super(MISPEvent, self).to_dict()
 
         if to_return.get('date'):
+            if isinstance(self.date, datetime.datetime):
+                self.date = self.date.date()
             to_return['date'] = self.date.isoformat()
         if to_return.get('publish_timestamp'):
             to_return['publish_timestamp'] = self._datetime_to_timestamp(self.publish_timestamp)
@@ -465,15 +564,40 @@ class MISPEvent(AbstractMISP):
         to_return = {'Event': to_return}
         return to_return
 
-    def add_tag(self, **tag):
+    def add_proposal(self, shadow_attribute=None, **kwargs):
+        """Alias for add_shadow_attribute"""
+        self.add_shadow_attribute(shadow_attribute, **kwargs)
+
+    def add_shadow_attribute(self, shadow_attribute=None, **kwargs):
         """Add a tag to the attribute (by name or a MISPTag object)"""
-        misp_tag = MISPTag()
-        if isinstance(tag, str):
-            misp_tag.from_dict(name=tag)
-        elif isinstance(tag, dict):
-            misp_tag.from_dict(**tag)
+        if isinstance(shadow_attribute, MISPShadowAttribute):
+            misp_shadow_attribute = shadow_attribute
+        elif isinstance(shadow_attribute, dict):
+            misp_shadow_attribute = MISPShadowAttribute()
+            misp_shadow_attribute.from_dict(**shadow_attribute)
+        elif kwargs:
+            misp_shadow_attribute = MISPShadowAttribute()
+            misp_shadow_attribute.from_dict(**kwargs)
         else:
-            raise PyMISPError("The tag is in an invalid format (can be either string, or list): {}".format(tag))
+            raise PyMISPError("The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(shadow_attribute))
+        self.shadow_attributes.append(misp_shadow_attribute)
+        self.edited = True
+
+    def add_tag(self, tag=None, **kwargs):
+        """Add a tag to the attribute (by name or a MISPTag object)"""
+        if isinstance(tag, str):
+            misp_tag = MISPTag()
+            misp_tag.from_dict(name=tag)
+        elif isinstance(tag, MISPTag):
+            misp_tag = tag
+        elif isinstance(tag, dict):
+            misp_tag = MISPTag()
+            misp_tag.from_dict(**tag)
+        elif kwargs:
+            misp_tag = MISPTag()
+            misp_tag.from_dict(**kwargs)
+        else:
+            raise PyMISPError("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
         self.tags.append(misp_tag)
         self.edited = True
 
@@ -492,7 +616,7 @@ class MISPEvent(AbstractMISP):
 
     def add_attribute_tag(self, tag, attribute_identifier):
         '''Add a tag to an existing attribute, raise an Exception if the attribute doesn't exists.
-            :tag: Tag name
+            :tag: Tag name as a string, MISPTag instance, or dictionary
             :attribute_identifier: can be an ID, UUID, or the value.
         '''
         attributes = []
@@ -547,16 +671,23 @@ class MISPEvent(AbstractMISP):
                 return obj
         raise InvalidMISPObject('Object with {} does not exists in ths event'.format(object_id))
 
-    def add_object(self, **obj):
+    def add_object(self, obj=None, **kwargs):
         """Add an object to the Event, either by passing a MISPObject, or a dictionary"""
         if isinstance(obj, MISPObject):
-            self.Object.append(obj)
+            misp_obj = obj
         elif isinstance(obj, dict):
-            tmp_object = MISPObject(obj['name'])
-            tmp_object.from_dict(**obj)
-            self.Object.append(tmp_object)
+            misp_obj = MISPObject(name=obj.pop('name'), strict=obj.pop('strict', False),
+                                  default_attributes_parameters=obj.pop('default_attributes_parameters', {}),
+                                  **obj)
+            misp_obj.from_dict(**obj)
+        elif kwargs:
+            misp_obj = MISPObject(name=kwargs.pop('name'), strict=kwargs.pop('strict', False),
+                                  default_attributes_parameters=kwargs.pop('default_attributes_parameters', {}),
+                                  **kwargs)
+            misp_obj.from_dict(**kwargs)
         else:
             raise InvalidMISPObject("An object to add to an existing Event needs to be either a MISPObject, or a plain python dictionary")
+        self.Object.append(misp_obj)
         self.edited = True
 
     def __repr__(self):
@@ -569,14 +700,14 @@ class MISPEvent(AbstractMISP):
             date=self.date, threat_level_id=self.threat_level_id, info=self.info,
             uuid=self.uuid, analysis=self.analysis, timestamp=self.timestamp).encode()
 
-    def _serialize_sigs(self):
+    def _serialize_sigs(self):  # pragma: no cover
         # Not used
         all_sigs = self.sig
         for a in self.attributes:
             all_sigs += a.sig
         return all_sigs.encode()
 
-    def sign(self, gpg_uid, passphrase=None):
+    def sign(self, gpg_uid, passphrase=None):  # pragma: no cover
         # Not used
         if not has_pyme:
             raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
@@ -599,7 +730,7 @@ class MISPEvent(AbstractMISP):
             signed, _ = c.sign(to_sign_global, mode=mode.DETACH)
             self.global_sig = base64.b64encode(signed).decode()
 
-    def verify(self, gpg_uid):
+    def verify(self, gpg_uid):  # pragma: no cover
         # Not used
         if not has_pyme:
             raise PyMISPError('pyme is required, please install: pip install --pre pyme3. You will also need libgpg-error-dev and libgpgme11-dev.')
@@ -625,15 +756,15 @@ class MISPEvent(AbstractMISP):
         return to_return
 
     @deprecated
-    def get_known_types(self):
+    def get_known_types(self):  # pragma: no cover
         return self.known_types
 
     @deprecated
-    def set_all_values(self, **kwargs):
+    def set_all_values(self, **kwargs):  # pragma: no cover
         self.from_dict(**kwargs)
 
     @deprecated
-    def _json(self):
+    def _json(self):  # pragma: no cover
         return self.to_dict()
 
 
@@ -720,7 +851,7 @@ class MISPObjectAttribute(MISPAttribute):
         self.type = kwargs.pop('type', None)
         if self.type is None:
             self.type = self.__definition.get('misp-attribute')
-        self.disable_correlation = kwargs.pop('disable_correlation', None)
+        self.disable_correlation = kwargs.pop('disable_correlation', False)
         if self.disable_correlation is None:
             # The correlation can be disabled by default in the object definition.
             # Use this value if it isn't overloaded by the object
@@ -735,6 +866,12 @@ class MISPObjectAttribute(MISPAttribute):
         if hasattr(self, 'value'):
             return '<{self.__class__.__name__}(object_relation={self.object_relation}, value={self.value})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
+
+class MISPShadowAttribute(MISPAttribute):
+
+    def __init__(self):
+        super(MISPShadowAttribute, self).__init__()
 
 
 class MISPObject(AbstractMISP):
@@ -777,8 +914,12 @@ class MISPObject(AbstractMISP):
         self.__fast_attribute_access = {}  # Hashtable object_relation: [attributes]
         self.ObjectReference = []
         self.Attribute = []
-        self.Tag = []
-        self._default_attributes_parameters = default_attributes_parameters
+        # self.Tag = []  See https://github.com/MISP/PyMISP/issues/168
+        if isinstance(default_attributes_parameters, MISPAttribute):
+            # Just make sure we're not modifying an existing MISPAttribute
+            self._default_attributes_parameters = default_attributes_parameters.to_dict()
+        else:
+            self._default_attributes_parameters = default_attributes_parameters
         if self._default_attributes_parameters:
             # Let's clean that up
             self._default_attributes_parameters.pop('value', None)  # duh
@@ -830,9 +971,11 @@ class MISPObject(AbstractMISP):
         if kwargs.get('ObjectReference'):
             for r in kwargs.pop('ObjectReference'):
                 self.add_reference(**r)
-        if kwargs.get('Tag'):
-            for tag in kwargs.pop('Tag'):
-                self.add_tag(**tag)
+
+        # Not supported yet - https://github.com/MISP/PyMISP/issues/168
+        # if kwargs.get('Tag'):
+        #    for tag in kwargs.pop('Tag'):
+        #        self.add_tag(tag)
 
         super(MISPObject, self).from_dict(**kwargs)
 
@@ -850,11 +993,35 @@ class MISPObject(AbstractMISP):
         self.ObjectReference.append(reference)
         self.edited = True
 
-    def add_tag(self, name, **kwargs):
-        tag = MISPTag()
-        tag.from_dict(name=name, **kwargs)
-        self.Tag.append(tag)
-        self.edited = True
+    # Not supported yet - https://github.com/MISP/PyMISP/issues/168
+    # @property
+    # def tags(self):
+    #    return self.Tag
+
+    # @tags.setter
+    # def tags(self, tags):
+    #    if all(isinstance(x, MISPTag) for x in tags):
+    #        self.Tag = tags
+    #    else:
+    #        raise PyMISPError('All the attributes have to be of type MISPTag.')
+
+    # def add_tag(self, tag=None, **kwargs):
+    #    """Add a tag to the attribute (by name or a MISPTag object)"""
+    #    if isinstance(tag, str):
+    #        misp_tag = MISPTag()
+    #        misp_tag.from_dict(name=tag)
+    #    elif isinstance(tag, MISPTag):
+    #        misp_tag = tag
+    #    elif isinstance(tag, dict):
+    #        misp_tag = MISPTag()
+    #        misp_tag.from_dict(**tag)
+    #    elif kwargs:
+    #        misp_tag = MISPTag()
+    #        misp_tag.from_dict(**kwargs)
+    #    else:
+    #        raise PyMISPError("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
+    #    self.tags.append(misp_tag)
+    #    self.edited = True
 
     def get_attributes_by_relation(self, object_relation):
         '''Returns the list of attributes with the given object relation in the object'''
