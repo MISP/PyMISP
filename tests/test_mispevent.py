@@ -93,6 +93,14 @@ class TestMISPEvent(unittest.TestCase):
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
 
+    def test_existing_malware(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/malware_exist.json')
+        with open('tests/mispevent_testfiles/simple.json', 'rb') as f:
+            pseudofile = BytesIO(f.read())
+        self.assertEqual(
+            self.mispevent.objects[0].get_attributes_by_relation('malware-sample')[0].malware_binary.read(),
+            pseudofile.read())
+
     def test_sighting(self):
         sighting = MISPSighting()
         sighting.from_dict(value='1', type='bar', timestamp=11111111)
