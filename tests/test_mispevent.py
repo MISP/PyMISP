@@ -140,6 +140,18 @@ class TestMISPEvent(unittest.TestCase):
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
 
+    def test_obj_default_values(self):
+        self.init_event()
+        self.mispevent.add_object(name='whois', strict=True)
+        self.mispevent.objects[0].add_attribute('registrar', value='registar.example.com')
+        self.mispevent.objects[0].add_attribute('domain', value='domain.example.com')
+        self.mispevent.objects[0].add_attribute('nameserver', value='ns1.example.com')
+        self.mispevent.objects[0].add_attribute('nameserver', value='ns2.example.com', disable_correlation=False, to_ids=True, category='External analysis')
+        self.mispevent.objects[0].uuid = 'a'
+        with open('tests/mispevent_testfiles/def_param.json', 'r') as f:
+            ref_json = json.load(f)
+        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+
 
 if __name__ == '__main__':
     unittest.main()

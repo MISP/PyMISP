@@ -851,7 +851,7 @@ class MISPObjectAttribute(MISPAttribute):
         self.type = kwargs.pop('type', None)
         if self.type is None:
             self.type = self.__definition.get('misp-attribute')
-        self.disable_correlation = kwargs.pop('disable_correlation', False)
+        self.disable_correlation = kwargs.pop('disable_correlation', None)
         if self.disable_correlation is None:
             # The correlation can be disabled by default in the object definition.
             # Use this value if it isn't overloaded by the object
