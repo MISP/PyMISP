@@ -10,7 +10,7 @@
               }
             ],
             "category": "Payload delivery",
-            "disable_correlation": false,
+            "disable_correlation": true,
             "object_relation": "filename",
             "to_ids": true,
             "type": "filename",
