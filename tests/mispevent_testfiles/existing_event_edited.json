@@ -667,6 +667,11 @@
       {
         "Attribute": [
           {
+            "Tag": [
+              {
+                "name": "blah"
+              }
+            ],
             "category": "Payload delivery",
             "comment": "",
             "deleted": false,
@@ -677,7 +682,6 @@
             "object_id": "1555",
             "object_relation": "filename",
             "sharing_group_id": "0",
-            "timestamp": "1513936310",
             "to_ids": true,
             "type": "filename",
             "uuid": "5a3cd5b6-2850-435f-bd0d-4c62950d210f",
@@ -729,7 +733,6 @@
         "sharing_group_id": "0",
         "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
         "template_version": "8",
-        "timestamp": "1513936310",
         "uuid": "5a3cd5b6-9568-4342-b2ab-4c62950d210f"
       },
       {
@@ -4567,7 +4570,6 @@
     "published": false,
     "sharing_group_id": "0",
     "threat_level_id": "3",
-    "timestamp": "1513948642",
     "uuid": "5a3c2fcd-8328-42bb-a95e-4f4402de0b81"
   }
 }

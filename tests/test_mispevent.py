@@ -5,7 +5,7 @@ import unittest
 import json
 from io import BytesIO
 
-from pymisp import MISPEvent, MISPSighting
+from pymisp import MISPEvent, MISPSighting, MISPTag
 
 
 class TestMISPEvent(unittest.TestCase):
@@ -36,6 +36,17 @@ class TestMISPEvent(unittest.TestCase):
     def test_loadfile(self):
         self.mispevent.load_file('tests/mispevent_testfiles/event.json')
         with open('tests/mispevent_testfiles/event.json', 'r') as f:
+            ref_json = json.load(f)
+        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    def test_event_tag(self):
+        self.init_event()
+        self.mispevent.add_tag('bar')
+        self.mispevent.add_tag(name='baz')
+        new_tag = MISPTag()
+        new_tag.from_dict(name='foo')
+        self.mispevent.add_tag(new_tag)
+        with open('tests/mispevent_testfiles/event_tags.json', 'r') as f:
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
 
@@ -151,6 +162,76 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/def_param.json', 'r') as f:
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    def test_event_not_edited(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.assertFalse(self.mispevent.edited)
+
+    def test_event_edited(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.mispevent.info = 'blah'
+        self.assertTrue(self.mispevent.edited)
+
+    def test_event_tag_edited(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.assertFalse(self.mispevent.edited)
+        self.mispevent.add_tag('foo')
+        self.assertTrue(self.mispevent.edited)
+
+    def test_event_attribute_edited(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.mispevent.attributes[0].value = 'blah'
+        self.assertTrue(self.mispevent.attributes[0].edited)
+        self.assertFalse(self.mispevent.attributes[1].edited)
+        self.assertTrue(self.mispevent.edited)
+
+    def test_event_attribute_tag_edited(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.assertFalse(self.mispevent.edited)
+        self.mispevent.attributes[0].tags[0].name = 'blah'
+        self.assertTrue(self.mispevent.attributes[0].tags[0].edited)
+        self.assertFalse(self.mispevent.attributes[0].tags[1].edited)
+        self.assertTrue(self.mispevent.attributes[0].edited)
+        self.assertTrue(self.mispevent.edited)
+
+    def test_event_attribute_tag_edited_second(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.assertFalse(self.mispevent.edited)
+        self.mispevent.attributes[0].add_tag(name='blah')
+        self.assertTrue(self.mispevent.attributes[0].edited)
+        self.assertTrue(self.mispevent.edited)
+
+    def test_event_object_edited(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.assertFalse(self.mispevent.edited)
+        self.mispevent.objects[0].comment = 'blah'
+        self.assertTrue(self.mispevent.objects[0].edited)
+        self.assertFalse(self.mispevent.objects[1].edited)
+        self.assertTrue(self.mispevent.edited)
+
+    def test_event_object_attribute_edited(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.assertFalse(self.mispevent.edited)
+        self.mispevent.objects[0].attributes[0].comment = 'blah'
+        self.assertTrue(self.mispevent.objects[0].attributes[0].edited)
+        self.assertTrue(self.mispevent.objects[0].edited)
+        self.assertTrue(self.mispevent.edited)
+
+    def test_event_object_attribute_edited_tag(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        self.assertFalse(self.mispevent.edited)
+        self.mispevent.objects[0].attributes[0].add_tag('blah')
+        self.assertTrue(self.mispevent.objects[0].attributes[0].edited)
+        self.assertTrue(self.mispevent.objects[0].edited)
+        self.assertTrue(self.mispevent.edited)
+        with open('tests/mispevent_testfiles/existing_event_edited.json', 'r') as f:
+            ref_json = json.load(f)
+        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    def test_obj_by_id(self):
+        self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
+        misp_obj = self.mispevent.get_object_by_id(1556)
+        self.assertEqual(misp_obj.uuid, '5a3cd604-e11c-4de5-bbbf-c170950d210f')
 
 
 if __name__ == '__main__':

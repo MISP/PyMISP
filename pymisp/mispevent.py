@@ -667,7 +667,7 @@ class MISPEvent(AbstractMISP):
     def get_object_by_id(self, object_id):
         """Get an object by ID (the ID is the one set by the server when creating the new object)"""
         for obj in self.objects:
-            if hasattr(obj, 'id') and obj.id == object_id:
+            if hasattr(obj, 'id') and int(obj.id) == int(object_id):
                 return obj
         raise InvalidMISPObject('Object with {} does not exists in ths event'.format(object_id))
 

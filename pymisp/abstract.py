@@ -145,10 +145,11 @@ class AbstractMISP(collections.MutableMapping):
         for p in self.properties:
             if self.__edited:
                 break
-            if isinstance(p, AbstractMISP) and p.edited:
+            val = getattr(self, p)
+            if isinstance(val, AbstractMISP) and val.edited:
                 self.__edited = True
-            elif isinstance(p, list) and all(isinstance(a, AbstractMISP) for a in p):
-                if any(a.edited for a in p):
+            elif isinstance(val, list) and all(isinstance(a, AbstractMISP) for a in val):
+                if any(a.edited for a in val):
                     self.__edited = True
         return self.__edited
 
