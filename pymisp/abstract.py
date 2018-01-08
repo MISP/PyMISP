@@ -10,6 +10,9 @@ import collections
 import six  # Remove that import when discarding python2 support.
 import logging
 
+from .exceptions import PyMISPInvalidFormat
+
+
 logger = logging.getLogger('pymisp')
 
 if six.PY2:
@@ -48,6 +51,14 @@ class AbstractMISP(collections.MutableMapping):
         """Abstract class for all the MISP objects"""
         super(AbstractMISP, self).__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
+
+        # List of classes having tags
+        from .mispevent import MISPAttribute, MISPEvent
+        self.__has_tags = (MISPAttribute, MISPEvent)
+        if isinstance(self, self.__has_tags):
+            self.Tag = []
+            setattr(AbstractMISP, 'add_tag', AbstractMISP.__add_tag)
+            setattr(AbstractMISP, 'tags', property(AbstractMISP.__get_tags, AbstractMISP.__set_tags))
 
     @property
     def properties(self):
@@ -175,3 +186,46 @@ class AbstractMISP(collections.MutableMapping):
             return int(d.timestamp())
         else:
             return int((d - datetime.datetime.fromtimestamp(0, UTC())).total_seconds())
+
+    def __add_tag(self, tag=None, **kwargs):
+        """Add a tag to the attribute (by name or a MISPTag object)"""
+        if isinstance(tag, str):
+            misp_tag = MISPTag()
+            misp_tag.from_dict(name=tag)
+        elif isinstance(tag, MISPTag):
+            misp_tag = tag
+        elif isinstance(tag, dict):
+            misp_tag = MISPTag()
+            misp_tag.from_dict(**tag)
+        elif kwargs:
+            misp_tag = MISPTag()
+            misp_tag.from_dict(**kwargs)
+        else:
+            raise PyMISPInvalidFormat("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
+        self.Tag.append(misp_tag)
+        self.edited = True
+
+    def __get_tags(self):
+        """Returns a lost of tags associated to this Attribute"""
+        return self.Tag
+
+    def __set_tags(self, tags):
+        """Set a list of prepared MISPTag."""
+        if all(isinstance(x, MISPTag) for x in tags):
+            self.Tag = tags
+        else:
+            raise PyMISPInvalidFormat('All the attributes have to be of type MISPTag.')
+
+
+class MISPTag(AbstractMISP):
+    def __init__(self):
+        super(MISPTag, self).__init__()
+
+    def from_dict(self, name, **kwargs):
+        self.name = name
+        super(MISPTag, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        if hasattr(self, 'name'):
+            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)

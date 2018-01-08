@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 
@@ -43,4 +42,8 @@ class InvalidMISPObject(MISPObjectException):
 
 class UnknownMISPObjectTemplate(MISPObjectException):
     """Exception raised when the template is unknown"""
+    pass
+
+
+class PyMISPInvalidFormat(PyMISPError):
     pass

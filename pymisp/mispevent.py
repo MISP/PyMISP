@@ -115,19 +115,6 @@ class MISPAttribute(AbstractMISP):
         return None
 
     @property
-    def tags(self):
-        """Returns a lost of tags associated to this Attribute"""
-        return self.Tag
-
-    @tags.setter
-    def tags(self, tags):
-        """Set a list of prepared MISPTag."""
-        if all(isinstance(x, MISPTag) for x in tags):
-            self.Tag = tags
-        else:
-            raise PyMISPError('All the attributes have to be of type MISPTag.')
-
-    @property
     def shadow_attributes(self):
         return self.ShadowAttribute
 
@@ -142,24 +129,6 @@ class MISPAttribute(AbstractMISP):
     def delete(self):
         """Mark the attribute as deleted (soft delete)"""
         self.deleted = True
-
-    def add_tag(self, tag=None, **kwargs):
-        """Add a tag to the attribute (by name or a MISPTag object)"""
-        if isinstance(tag, str):
-            misp_tag = MISPTag()
-            misp_tag.from_dict(name=tag)
-        elif isinstance(tag, MISPTag):
-            misp_tag = tag
-        elif isinstance(tag, dict):
-            misp_tag = MISPTag()
-            misp_tag.from_dict(**tag)
-        elif kwargs:
-            misp_tag = MISPTag()
-            misp_tag.from_dict(**kwargs)
-        else:
-            raise PyMISPError("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
-        self.tags.append(misp_tag)
-        self.edited = True
 
     def add_proposal(self, shadow_attribute=None, **kwargs):
         """Alias for add_shadow_attribute"""
@@ -428,17 +397,6 @@ class MISPEvent(AbstractMISP):
         else:
             raise PyMISPError('All the attributes have to be of type MISPObject.')
 
-    @property
-    def tags(self):
-        return self.Tag
-
-    @tags.setter
-    def tags(self, tags):
-        if all(isinstance(x, MISPTag) for x in tags):
-            self.Tag = tags
-        else:
-            raise PyMISPError('All the attributes have to be of type MISPTag.')
-
     def load_file(self, event_path):
         """Load a JSON dump from a file on the disk"""
         if not os.path.exists(event_path):
@@ -581,24 +539,6 @@ class MISPEvent(AbstractMISP):
         else:
             raise PyMISPError("The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(shadow_attribute))
         self.shadow_attributes.append(misp_shadow_attribute)
-        self.edited = True
-
-    def add_tag(self, tag=None, **kwargs):
-        """Add a tag to the attribute (by name or a MISPTag object)"""
-        if isinstance(tag, str):
-            misp_tag = MISPTag()
-            misp_tag.from_dict(name=tag)
-        elif isinstance(tag, MISPTag):
-            misp_tag = tag
-        elif isinstance(tag, dict):
-            misp_tag = MISPTag()
-            misp_tag.from_dict(**tag)
-        elif kwargs:
-            misp_tag = MISPTag()
-            misp_tag.from_dict(**kwargs)
-        else:
-            raise PyMISPError("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
-        self.tags.append(misp_tag)
         self.edited = True
 
     def get_attribute_tag(self, attribute_identifier):
@@ -766,20 +706,6 @@ class MISPEvent(AbstractMISP):
     @deprecated
     def _json(self):  # pragma: no cover
         return self.to_dict()
-
-
-class MISPTag(AbstractMISP):
-    def __init__(self):
-        super(MISPTag, self).__init__()
-
-    def from_dict(self, name, **kwargs):
-        self.name = name
-        super(MISPTag, self).from_dict(**kwargs)
-
-    def __repr__(self):
-        if hasattr(self, 'name'):
-            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
 class MISPObjectReference(AbstractMISP):
@@ -992,36 +918,6 @@ class MISPObject(AbstractMISP):
                             relationship_type=relationship_type, comment=comment, **kwargs)
         self.ObjectReference.append(reference)
         self.edited = True
-
-    # Not supported yet - https://github.com/MISP/PyMISP/issues/168
-    # @property
-    # def tags(self):
-    #    return self.Tag
-
-    # @tags.setter
-    # def tags(self, tags):
-    #    if all(isinstance(x, MISPTag) for x in tags):
-    #        self.Tag = tags
-    #    else:
-    #        raise PyMISPError('All the attributes have to be of type MISPTag.')
-
-    # def add_tag(self, tag=None, **kwargs):
-    #    """Add a tag to the attribute (by name or a MISPTag object)"""
-    #    if isinstance(tag, str):
-    #        misp_tag = MISPTag()
-    #        misp_tag.from_dict(name=tag)
-    #    elif isinstance(tag, MISPTag):
-    #        misp_tag = tag
-    #    elif isinstance(tag, dict):
-    #        misp_tag = MISPTag()
-    #        misp_tag.from_dict(**tag)
-    #    elif kwargs:
-    #        misp_tag = MISPTag()
-    #        misp_tag.from_dict(**kwargs)
-    #    else:
-    #        raise PyMISPError("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
-    #    self.tags.append(misp_tag)
-    #    self.edited = True
 
     def get_attributes_by_relation(self, object_relation):
         '''Returns the list of attributes with the given object relation in the object'''
