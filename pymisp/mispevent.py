@@ -99,7 +99,6 @@ class MISPAttribute(AbstractMISP):
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
         self.__strict = strict
-        self.Tag = []
         self.ShadowAttribute = []
 
     @property
@@ -350,7 +349,6 @@ class MISPEvent(AbstractMISP):
             describe_types = t['result']
 
         self._types = describe_types['types']
-        self.Tag = []
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
@@ -840,7 +838,6 @@ class MISPObject(AbstractMISP):
         self.__fast_attribute_access = {}  # Hashtable object_relation: [attributes]
         self.ObjectReference = []
         self.Attribute = []
-        # self.Tag = []  See https://github.com/MISP/PyMISP/issues/168
         if isinstance(default_attributes_parameters, MISPAttribute):
             # Just make sure we're not modifying an existing MISPAttribute
             self._default_attributes_parameters = default_attributes_parameters.to_dict()
