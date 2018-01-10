@@ -2,6 +2,71 @@ Changelog
 =========
 
 
+v2.4.85.1 (2018-01-10)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Cleanup from last commit. [Raphaël Vinot]
+- Move MISPTag to Abstract MISP. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Fix tests (new template version) [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add test for loading existing malware sample from MISP. [Raphaël
+  Vinot]
+- Multiple changes. [Raphaël Vinot]
+
+  * Fix timestamp dump (properly enforce UTC)
+  * Properly handle proposals
+  * Add many getter/setter
+  * Add dedicated test cases for MISPEvent and other objects
+- Allow do pass a category in default_attributes_parameters for object.
+  [Raphaël Vinot]
+
+  fix #166
+- Default for sharing_group_id is 0. [Raphaël Vinot]
+- Add MISPSighting class. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Edited method works as expected, add tests. [Raphaël Vinot]
+- Forgotten test files in last commit... [Raphaël Vinot]
+- Disable_correlation from template not properly used. [Raphaël Vinot]
+- Don't remove the distribution and sharing_group_id from
+  default_attributes_parameters. [Raphaël Vinot]
+- The sharing_group_id isn't required. [Raphaël Vinot]
+- Last commit was broken... [Raphaël Vinot]
+- Properly set Tag to attributes within objects. [Raphaël Vinot]
+- Add method to add tags to objects. [Raphaël Vinot]
+
+  Fix #160
+- Typo in set_sightings. [Raphaël Vinot]
+
+  Fix #161
+
+Other
+~~~~~
+- Merge pull request #164 from MISP/refactor. [Raphaël Vinot]
+
+  chg: Multiple changes
+- Merge pull request #162 from AninaAntonie/patch-1. [Raphaël Vinot]
+
+  fix: set_sightings
+- Set_sightings. [AninaAntonie]
+
+  Maybe I didn't use it correctly but the method set_sightings didn't work for me. It's working now but I'm not sure whether sending a request for every sighting in the list is the best solution.
+- Merge pull request #165 from dadokkio/master. [Raphaël Vinot]
+
+  _default_attributes_parameters - if set - is a dict
+- _default_attributes_parameters - if set - is a dict. [Arcuri Davide]
+
+  Manage distribution and sharing_group_id as dict key like the other fields.
+  -- Not sure about default
+
+
 v2.4.85 (2017-12-22)
 --------------------
 
