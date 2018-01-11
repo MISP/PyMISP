@@ -814,9 +814,12 @@ class MISPObject(AbstractMISP):
         super(MISPObject, self).__init__(**kwargs)
         self.__strict = strict
         self.name = name
-        self.__misp_objects_path = os.path.join(
-            os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)),
-            'data', 'misp-objects', 'objects')
+        if kwargs.get('misp_objects_path', None):
+            self.__misp_objects_path = kwargs.get('misp_objects_path', None)
+        else:
+            self.__misp_objects_path = os.path.join(
+                os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)),
+                'data', 'misp-objects', 'objects')
         if os.path.exists(os.path.join(self.__misp_objects_path, self.name, 'definition.json')):
             self.__known_template = True
         else:
