@@ -3,6 +3,7 @@
 
 import unittest
 import json
+import sys
 from io import BytesIO
 
 from pymisp import MISPEvent, MISPSighting, MISPTag
@@ -240,7 +241,11 @@ class TestMISPEvent(unittest.TestCase):
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on required
             self.mispevent.to_json()
-        self.assertEqual(e.exception.message, '{\'member3\'} are required.')
+        if sys.version_info >= (3, ):
+            self.assertEqual(e.exception.message, '{\'member3\'} are required.')
+        else:
+            # Python2 bullshit
+            self.assertEqual(e.exception.message, 'set([u\'member3\']) are required.')
 
         self.mispevent.objects[0].add_attribute('member3', value='foo')
         with self.assertRaises(InvalidMISPObject) as e:
