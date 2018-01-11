@@ -10,7 +10,6 @@ from zipfile import ZipFile
 import hashlib
 import sys
 import uuid
-from collections import Counter
 
 from . import deprecated
 from .abstract import AbstractMISP
@@ -810,14 +809,22 @@ class MISPObject(AbstractMISP):
             In this case the ObjectReference needs to be pushed manually and cannot be in the JSON dump.
 
         :default_attributes_parameters: Used as template for the attributes if they are not overwritten in add_attribute
+
+        :misp_objects_path_custom: Path to custom object templates
         '''
         super(MISPObject, self).__init__(**kwargs)
         self.__strict = strict
         self.name = name
-        self.__misp_objects_path = os.path.join(
+        misp_objects_path = os.path.join(
             os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)),
             'data', 'misp-objects', 'objects')
-        if os.path.exists(os.path.join(self.__misp_objects_path, self.name, 'definition.json')):
+        misp_objects_path_custom = kwargs.get('misp_objects_path_custom')
+        if misp_objects_path_custom and os.path.exists(os.path.join(misp_objects_path_custom, self.name, 'definition.json')):
+            # Use the local object path by default if provided (allows to overwrite a default template)
+            template_path = os.path.join(misp_objects_path_custom, self.name, 'definition.json')
+            self.__known_template = True
+        elif os.path.exists(os.path.join(misp_objects_path, self.name, 'definition.json')):
+            template_path = os.path.join(misp_objects_path, self.name, 'definition.json')
             self.__known_template = True
         else:
             if self.__strict:
@@ -825,7 +832,7 @@ class MISPObject(AbstractMISP):
             else:
                 self.__known_template = False
         if self.__known_template:
-            with open(os.path.join(self.__misp_objects_path, self.name, 'definition.json'), 'r') as f:
+            with open(template_path, 'r') as f:
                 self.__definition = json.load(f)
             setattr(self, 'meta-category', self.__definition['meta-category'])
             self.template_uuid = self.__definition['uuid']
@@ -959,23 +966,21 @@ class MISPObject(AbstractMISP):
 
     def _validate(self):
         """Make sure the object we're creating has the required fields"""
-        all_object_relations = []
-        for a in self.attributes:
-            all_object_relations.append(a.object_relation)
-        count_relations = dict(Counter(all_object_relations))
-        for key, counter in count_relations.items():
-            if counter == 1:
-                continue
-            if not self.__definition['attributes'][key].get('multiple'):
-                raise InvalidMISPObject('Multiple occurrences of {} is not allowed'.format(key))
-        all_attribute_names = set(count_relations.keys())
-        if self.__definition.get('requiredOneOf'):
-            if not set(self.__definition['requiredOneOf']) & all_attribute_names:
-                raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self.__definition['requiredOneOf'])))
         if self.__definition.get('required'):
-            for r in self.__definition.get('required'):
-                if r not in all_attribute_names:
-                    raise InvalidMISPObject('{} is required'.format(r))
+            required_missing = set(self.__definition.get('required')) - set(self.__fast_attribute_access.keys())
+            if required_missing:
+                raise InvalidMISPObject('{} are required.'.format(required_missing))
+        if self.__definition.get('requiredOneOf'):
+            if not set(self.__definition['requiredOneOf']) & set(self.__fast_attribute_access.keys()):
+                # We ecpect at least one of the object_relation in requiredOneOf, and it isn't the case
+                raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self.__definition['requiredOneOf'])))
+        for rel, attrs in self.__fast_attribute_access.items():
+            if len(attrs) == 1:
+                # object_relation's here only once, everything's cool, moving on
+                continue
+            if not self.__definition['attributes'][rel].get('multiple'):
+                # object_relation's here more than once, but it isn't allowed in the template.
+                raise InvalidMISPObject('Multiple occurrences of {} is not allowed'.format(rel))
         return True
 
     def __repr__(self):
