@@ -1,0 +1,29 @@
+{
+  "requiredOneOf": [
+    "member1",
+    "member2"
+  ],
+  "required": [
+      "member3"
+  ],
+  "attributes": {
+    "member1": {
+      "description": "FirstMember",
+      "misp-attribute": "text"
+    },
+    "member2": {
+      "description": "SecondMember",
+      "misp-attribute": "text",
+      "multiple": true
+    },
+    "member3": {
+      "description": "Thirdmember",
+      "misp-attribute": "text"
+    }
+  },
+  "version": 1,
+  "description": "TestTemplate.",
+  "meta-category": "file",
+  "uuid": "4ec55cc6-9e49-4c64-b794-03c25c1a6589",
+  "name": "test_object_template"
+}
