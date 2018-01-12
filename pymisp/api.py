@@ -17,7 +17,7 @@ import zipfile
 from . import __version__, deprecated
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting
-from .abstract import MISPEncode
+from .abstract import AbstractMISP, MISPEncode
 
 logger = logging.getLogger('pymisp')
 
@@ -478,15 +478,18 @@ class PyMISP(object):
         else:
             url = urljoin(self.root_url, 'attributes/add/{}'.format(event_id))
             if isinstance(attributes, list):
-                values = []
-                for a in attributes:
-                    values.append(a['value'])
-                attributes[0]['value'] = values
-                data = attributes[0].to_json()
+                if all(isinstance(a, AbstractMISP) for a in attributes):
+                    data = attributes
+                else:
+                    values = []
+                    for a in attributes:
+                        values.append(a['value'])
+                    attributes[0]['value'] = values
+                    data = attributes[0].to_json()
             else:
                 data = attributes.to_json()
             # __prepare_request(...) returns a requests.Response Object
-            responses.append(self.__prepare_request('POST', url, data).json())
+            responses.append(self.__prepare_request('POST', url, json.dumps(data, cls=MISPEncode)).json())
         return responses
 
     def _extract_event_id(self, event):
