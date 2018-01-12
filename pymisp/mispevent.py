@@ -878,9 +878,24 @@ class MISPObject(AbstractMISP):
     def attributes(self):
         return self.Attribute
 
+    @attributes.setter
+    def attributes(self, attributes):
+        if all(isinstance(x, MISPObjectAttribute) for x in attributes):
+            self.Attribute = attributes
+            self.__fast_attribute_access = {}
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPObjectAttribute.')
+
     @property
     def references(self):
         return self.ObjectReference
+
+    @references.setter
+    def references(self, references):
+        if all(isinstance(x, MISPObjectReference) for x in references):
+            self.ObjectReference = references
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPObjectReference.')
 
     def from_dict(self, **kwargs):
         if self.__known_template:
@@ -925,11 +940,20 @@ class MISPObject(AbstractMISP):
 
     def get_attributes_by_relation(self, object_relation):
         '''Returns the list of attributes with the given object relation in the object'''
-        return self.__fast_attribute_access.get(object_relation, [])
+        return self._fast_attribute_access.get(object_relation, [])
+
+    @property
+    def _fast_attribute_access(self):
+        if not self.__fast_attribute_access:
+            for a in self.attributes:
+                if not self.__fast_attribute_access.get(a.object_relation):
+                    self.__fast_attribute_access[a.object_relation] = []
+                self.__fast_attribute_access[a.object_relation].append(a)
+        return self.__fast_attribute_access
 
     def has_attributes_by_relation(self, list_of_relations):
         '''True if all the relations in the list are defined in the object'''
-        return all(relation in self.__fast_attribute_access for relation in list_of_relations)
+        return all(relation in self._fast_attribute_access for relation in list_of_relations)
 
     def add_attribute(self, object_relation, **value):
         """Add an attribute. object_relation is required and the value key is a
@@ -949,8 +973,8 @@ class MISPObject(AbstractMISP):
         attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
         if not self.__fast_attribute_access.get(object_relation):
             self.__fast_attribute_access[object_relation] = []
-        self.Attribute.append(attribute)
         self.__fast_attribute_access[object_relation].append(attribute)
+        self.Attribute.append(attribute)
         self.edited = True
         return attribute
 
@@ -967,14 +991,14 @@ class MISPObject(AbstractMISP):
     def _validate(self):
         """Make sure the object we're creating has the required fields"""
         if self.__definition.get('required'):
-            required_missing = set(self.__definition.get('required')) - set(self.__fast_attribute_access.keys())
+            required_missing = set(self.__definition.get('required')) - set(self._fast_attribute_access.keys())
             if required_missing:
                 raise InvalidMISPObject('{} are required.'.format(required_missing))
         if self.__definition.get('requiredOneOf'):
-            if not set(self.__definition['requiredOneOf']) & set(self.__fast_attribute_access.keys()):
+            if not set(self.__definition['requiredOneOf']) & set(self._fast_attribute_access.keys()):
                 # We ecpect at least one of the object_relation in requiredOneOf, and it isn't the case
                 raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self.__definition['requiredOneOf'])))
-        for rel, attrs in self.__fast_attribute_access.items():
+        for rel, attrs in self._fast_attribute_access.items():
             if len(attrs) == 1:
                 # object_relation's here only once, everything's cool, moving on
                 continue

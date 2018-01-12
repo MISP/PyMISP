@@ -260,6 +260,12 @@ class TestMISPEvent(unittest.TestCase):
             self.mispevent.to_json()
         self.assertEqual(e.exception.message, 'Multiple occurrences of member1 is not allowed')
 
+        self.mispevent.objects[0].attributes = self.mispevent.objects[0].attributes[:2]
+        self.mispevent.objects[0].uuid = 'a'
+        with open('tests/mispevent_testfiles/misp_custom_obj.json', 'r') as f:
+            ref_json = json.load(f)
+        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+
 
 if __name__ == '__main__':
     unittest.main()
