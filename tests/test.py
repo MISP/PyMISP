@@ -54,7 +54,17 @@ class TestBasic(unittest.TestCase):
     def add_hashes(self, eventid):
         r = self.misp.get_event(eventid)
         event = r.json()
-        event = self.misp.add_hashes(event, 'Payload installation', 'dll_installer.dll', '0a209ac0de4ac033f31d6ba9191a8f7a', '1f0ae54ac3f10d533013f74f48849de4e65817a7', '003315b0aea2fcb9f77d29223dd8947d0e6792b3a0227e054be8eb2a11f443d9', 'Fanny modules', False, 2)
+        event = self.misp.add_hashes(event,
+                                     category='Payload installation',
+                                     filename='dll_installer.dll',
+                                     md5='0a209ac0de4ac033f31d6ba9191a8f7a',
+                                     sha1='1f0ae54ac3f10d533013f74f48849de4e65817a7',
+                                     sha256='003315b0aea2fcb9f77d29223dd8947d0e6792b3a0227e054be8eb2a11f443d9',
+                                     ssdeep=None,
+                                     comment='Fanny modules',
+                                     to_ids=False,
+                                     distribution=2,
+                                     proposal=False)
         self._clean_event(event)
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': u'3', u'analysis': u'0',
