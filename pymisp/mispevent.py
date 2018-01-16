@@ -203,6 +203,15 @@ class MISPAttribute(AbstractMISP):
                 self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), UTC())
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
+
+        if self.distribution == 4:
+            # The distribution is set to sharing group, a sharing_group_id is required.
+            if not hasattr(self, 'sharing_group_id'):
+                raise NewAttributeError('If the distribution is set to sharing group, a sharing group ID is required.')
+            elif not self.sharing_group_id:
+                # Cannot be None or 0 either.
+                raise NewAttributeError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
+
         if kwargs.get('Tag'):
             for tag in kwargs.pop('Tag'):
                 self.add_tag(tag)
