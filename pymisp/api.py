@@ -902,6 +902,11 @@ class PyMISP(object):
         query = {"to_ids": to_ids}
         return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
 
+    def change_comment(self, attribute_uuid, comment):
+        """Change the comment of attribute"""
+        query = {"comment": comment}
+        return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
+
     # ##############################
     # ###### Attribute update ######
     # ##############################
