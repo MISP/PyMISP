@@ -566,18 +566,18 @@ class PyMISP(object):
         """
         if isinstance(attachment, basestring) and os.path.isfile(attachment):
             # We have a file to open
-            if filename == None:
+            if filename is None:
                 filename = os.path.basename(attachment)
             with open(attachment, "rb") as f:
                 fileData = f.read()
         elif hasattr(attachment, "read"):
             # It's a file handle - we can read it but it has no filename
             fileData = attachment.read()
-            if filename == None:
+            if filename is None:
                 filename = 'attachment'
         elif isinstance(attachment, (tuple, list)):
             # tuple/list (filename, pseudofile)
-            if filename == None:
+            if filename is None:
                 filename = attachment[0]
             if hasattr(attachment[1], "read"):
                 # Pseudo file
@@ -586,7 +586,7 @@ class PyMISP(object):
                 fileData = attachment[1]
         else:
             # Plain file content, no filename
-            if filename == None:
+            if filename is None:
                 filename = 'attachment'
             fileData = attachment
 
