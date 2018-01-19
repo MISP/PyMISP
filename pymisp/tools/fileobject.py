@@ -8,7 +8,10 @@ from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import math
 from collections import Counter
-import warnings
+import logging
+
+logger = logging.getLogger('pymisp')
+
 
 try:
     import pydeep
@@ -25,11 +28,11 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath=None, pseudofile=None, filename=None):
+    def __init__(self, filepath=None, pseudofile=None, filename=None, standalone=True, **kwargs):
         if not HAS_PYDEEP:
-            warnings.warn("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_MAGIC:
-            warnings.warn("Please install python-magic: pip install python-magic.")
+            logger.warning("Please install python-magic: pip install python-magic.")
         if filename:
             # Useful in case the file is copied with a pre-defined name by a script but we want to keep the original name
             self.__filename = filename
@@ -48,11 +51,9 @@ class FileObject(AbstractMISPObjectGenerator):
             raise InvalidMISPObject('File buffer (BytesIO) or a path is required.')
         # PY3 way:
         # super().__init__('file')
-        super(FileObject, self).__init__('file')
+        super(FileObject, self).__init__('file', standalone=standalone, **kwargs)
         self.__data = self.__pseudofile.getvalue()
         self.generate_attributes()
-        # Mark as non_jsonable because we need to add them manually
-        self.update_not_jsonable('ObjectReference')
 
     def generate_attributes(self):
         self.add_attribute('filename', value=self.__filename)

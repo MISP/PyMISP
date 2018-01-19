@@ -1,0 +1,59 @@
+{
+  "Event": {
+    "Object": [
+      {
+        "Attribute": [
+          {
+            "Tag": [
+              {
+                "name": "blah"
+              }
+            ],
+            "category": "Payload delivery",
+            "disable_correlation": true,
+            "object_relation": "filename",
+            "to_ids": true,
+            "type": "filename",
+            "value": "bar"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "comment": "foo",
+            "object_uuid": "a",
+            "referenced_uuid": "b",
+            "relationship_type": "baz"
+          }
+        ],
+        "description": "File object describing a file with meta-information",
+        "distribution": 5,
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": 0,
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": 9,
+        "uuid": "a"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "External analysis",
+            "disable_correlation": false,
+            "object_relation": "url",
+            "to_ids": true,
+            "type": "url",
+            "value": "https://www.circl.lu"
+          }
+        ],
+        "description": "url object describes an url along with its normalized field (like extracted using faup parsing library) and its metadata.",
+        "distribution": 5,
+        "meta-category": "network",
+        "name": "url",
+        "sharing_group_id": 0,
+        "template_uuid": "60efb77b-40b5-4c46-871b-ed1ed999fce5",
+        "template_version": 5,
+        "uuid": "b"
+      }
+    ]
+  }
+}

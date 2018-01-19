@@ -1,0 +1,55 @@
+{
+  "Event": {
+    "Object": [
+      {
+        "Attribute": [
+          {
+            "category": "Attribution",
+            "disable_correlation": false,
+            "object_relation": "registrar",
+            "to_ids": false,
+            "type": "whois-registrar",
+            "value": "registar.example.com"
+          },
+          {
+            "category": "Network activity",
+            "disable_correlation": false,
+            "object_relation": "domain",
+            "to_ids": true,
+            "type": "domain",
+            "value": "domain.example.com"
+          },
+          {
+            "category": "Network activity",
+            "disable_correlation": true,
+            "object_relation": "nameserver",
+            "to_ids": false,
+            "type": "hostname",
+            "value": "ns1.example.com"
+          },
+          {
+            "category": "External analysis",
+            "disable_correlation": false,
+            "object_relation": "nameserver",
+            "to_ids": true,
+            "type": "hostname",
+            "value": "ns2.example.com"
+          }
+        ],
+        "description": "Whois records information for a domain name.",
+        "distribution": 5,
+        "meta-category": "network",
+        "name": "whois",
+        "sharing_group_id": 0,
+        "template_uuid": "429faea1-34ff-47af-8a00-7c62d3be5a6a",
+        "template_version": 7,
+        "uuid": "a"
+      }
+    ],
+    "analysis": "1",
+    "date": "2017-12-31",
+    "distribution": "1",
+    "info": "This is a test",
+    "threat_level_id": "1"
+  }
+}

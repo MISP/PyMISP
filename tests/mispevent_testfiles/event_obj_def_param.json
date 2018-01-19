@@ -1,0 +1,56 @@
+{
+  "Event": {
+    "Object": [
+      {
+        "Attribute": [
+          {
+            "Tag": [
+              {
+                "name": "blah"
+              }
+            ],
+            "category": "Payload delivery",
+            "disable_correlation": true,
+            "object_relation": "filename",
+            "to_ids": true,
+            "type": "filename",
+            "value": "bar"
+          }
+        ],
+        "description": "File object describing a file with meta-information",
+        "distribution": 5,
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": 0,
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": 9,
+        "uuid": "a"
+      },
+      {
+        "Attribute": [
+          {
+            "Tag": [
+              {
+                "name": "blah"
+              }
+            ],
+            "category": "Payload delivery",
+            "disable_correlation": true,
+            "object_relation": "filename",
+            "to_ids": true,
+            "type": "filename",
+            "value": "baz"
+          }
+        ],
+        "description": "File object describing a file with meta-information",
+        "distribution": 5,
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": 0,
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": 9,
+        "uuid": "b"
+      }
+    ]
+  }
+}

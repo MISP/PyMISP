@@ -2,6 +2,370 @@ Changelog
 =========
 
 
+v2.4.85.1 (2018-01-10)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Cleanup from last commit. [Raphaël Vinot]
+- Move MISPTag to Abstract MISP. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Fix tests (new template version) [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add test for loading existing malware sample from MISP. [Raphaël
+  Vinot]
+- Multiple changes. [Raphaël Vinot]
+
+  * Fix timestamp dump (properly enforce UTC)
+  * Properly handle proposals
+  * Add many getter/setter
+  * Add dedicated test cases for MISPEvent and other objects
+- Allow do pass a category in default_attributes_parameters for object.
+  [Raphaël Vinot]
+
+  fix #166
+- Default for sharing_group_id is 0. [Raphaël Vinot]
+- Add MISPSighting class. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Edited method works as expected, add tests. [Raphaël Vinot]
+- Forgotten test files in last commit... [Raphaël Vinot]
+- Disable_correlation from template not properly used. [Raphaël Vinot]
+- Don't remove the distribution and sharing_group_id from
+  default_attributes_parameters. [Raphaël Vinot]
+- The sharing_group_id isn't required. [Raphaël Vinot]
+- Last commit was broken... [Raphaël Vinot]
+- Properly set Tag to attributes within objects. [Raphaël Vinot]
+- Add method to add tags to objects. [Raphaël Vinot]
+
+  Fix #160
+- Typo in set_sightings. [Raphaël Vinot]
+
+  Fix #161
+
+Other
+~~~~~
+- Merge pull request #164 from MISP/refactor. [Raphaël Vinot]
+
+  chg: Multiple changes
+- Merge pull request #162 from AninaAntonie/patch-1. [Raphaël Vinot]
+
+  fix: set_sightings
+- Set_sightings. [AninaAntonie]
+
+  Maybe I didn't use it correctly but the method set_sightings didn't work for me. It's working now but I'm not sure whether sending a request for every sighting in the list is the best solution.
+- Merge pull request #165 from dadokkio/master. [Raphaël Vinot]
+
+  _default_attributes_parameters - if set - is a dict
+- _default_attributes_parameters - if set - is a dict. [Arcuri Davide]
+
+  Manage distribution and sharing_group_id as dict key like the other fields.
+  -- Not sure about default
+
+
+v2.4.85 (2017-12-22)
+--------------------
+
+New
+~~~
+- Add last field to get_csv. [Raphaël Vinot]
+- (hopefully) Cleverer handling of timestamps in the objects. [Raphaël
+  Vinot]
+
+  & some cleanup
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- Update documentation. [Raphaël Vinot]
+- Update documentation, cleanup. [Raphaël Vinot]
+- Bump describeTypes.json. [Raphaël Vinot]
+- Validate attributes in attributes.setter. [Raphaël Vinot]
+- Add get_attribute_tag method at MISPEvent level. [Raphaël Vinot]
+
+  Also add a MISPTag class for consistency.
+- Bump misp-objects. [Raphaël Vinot]
+- Bump describeTypes. [Raphaël Vinot]
+- Add __repr__ methods (fix last commit) [Raphaël Vinot]
+- Add __repr__ methods. [Raphaël Vinot]
+- Use new format for filtering. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump describeTypes. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly use the edited flag. [Raphaël Vinot]
+- Add setter for Attribute in MISPEvent. [Raphaël Vinot]
+- Forgotten calls to master class. [Raphaël Vinot]
+- Properly call datetime.datetime.utcfromtimestamp. [Raphaël Vinot]
+- Fix typo. [Raphaël Vinot]
+- Fix python2.7 support. [Raphaël Vinot]
+- Initialize default class parameters. [Raphaël Vinot]
+
+  Fix #155
+
+Other
+~~~~~
+- Merge branch 'cvandeplas-master' [Raphaël Vinot]
+- Merge branch 'master' of https://github.com/cvandeplas/PyMISP into
+  cvandeplas-master. [Raphaël Vinot]
+- Merge remote-tracking branch 'MISP/master' [Christophe Vandeplas]
+- Fix MISPObject missing distribution and sharing_group_id. [Christophe
+  Vandeplas]
+
+  - fix MISPObject missing distribution concept
+  - fix language typo paramaters => parameters
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #156 from cvandeplas/master. [Alexandre Dulaunoy]
+
+  document submodule downloading
+- Document submodule downloading. [Christophe Vandeplas]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #154 from wagner-certat/inc-meta. [Raphaël Vinot]
+
+  Include documentation and examples in source dist
+- Include documentation and examples in source dist. [Sebastian Wagner]
+
+
+v2.4.84 (2017-12-13)
+--------------------
+
+New
+~~~
+- Add methods to get taxonomy(ies) [Raphaël Vinot]
+
+  Thanks to @truckydev
+- Add method to get all the events modified in an interval. [Raphaël
+  Vinot]
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Make the library easier to use. [Raphaël Vinot]
+- Allow to pass a pseudofile to LIEF. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Update changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Disable pseudofile support in py2, skip tests. [Raphaël Vinot]
+- Typo in error output text description. [Eric Jaw]
+
+Other
+~~~~~
+- Merge pull request #151 from MISP/refactor. [Raphaël Vinot]
+
+  chg: Make the library easier to use
+- Merge pull request #150 from sdrees/first-friendly-contribution-
+  enhance-coverage. [Raphaël Vinot]
+
+  First friendly contribution enhance coverage
+- Further tests added (for public methods) [Stefan Hagen (Individual)]
+- Changed asserts from dict usecases to set comparison to workaround non
+  3.6 behavior. [Stefan Hagen (Individual)]
+- Merge branch 'master' of https://github.com/MISP/PyMISP into first-
+  friendly-contribution-enhance-coverage. [Stefan Hagen (Individual)]
+- Enhance coverage and fix en passant with focus on api. [Stefan Hagen
+  (Individual)]
+- Merge branch 'truckydev-get_last_modified_event' [Raphaël Vinot]
+- Merge branch 'get_last_modified_event' of
+  https://github.com/truckydev/PyMISP into truckydev-
+  get_last_modified_event. [Raphaël Vinot]
+- - Correction for 'last' param. 'last' gives the latest events that
+  have been published - add get_events_last_modified() this function
+  returns the modified events based on timestamp. [Tristan METAYER]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #149 from naisanza/master. [Raphaël Vinot]
+
+  fix: Typo in error output text description
+
+
+v2.4.83 (2017-12-06)
+--------------------
+
+New
+~~~
+- Add get CSV method. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Allow to pass a proxy to query VT. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump version to 2.4.83. [Raphaël Vinot]
+- Do not get the event from the server before publishing if
+  PyMISP.publish gets an ID. [Raphaël Vinot]
+- Add live tests for recommended pymisp version and describeTypes up-to-
+  date. [Raphaël Vinot]
+- Add a way to check if the ACL is up-to-date. [Raphaël Vinot]
+- Add validators for describeTypes on the live instance. [Raphaël Vinot]
+- Update PDF link to doc. [Raphaël Vinot]
+- Add example file to push OpenIOC file to MISP. [Raphaël Vinot]
+
+  chg: Add some imports in the tool's init file
+- Bump misp-objects. [Raphaël Vinot]
+- Change version number to master in the doc. [Raphaël Vinot]
+- Add new objects: MISPUser and MISPOrganisation. [Raphaël Vinot]
+- Add a generic MISP object generator. [Raphaël Vinot]
+- Allow to add multiple attribute of the same type. [Raphaël Vinot]
+- Add fast publish method. [Raphaël Vinot]
+
+  Fix #86
+- Improve documentation. [Raphaël Vinot]
+
+  Fix #121
+
+Fix
+~~~
+- Typo in the tests. [Raphaël Vinot]
+- Typo in live tests. [Raphaël Vinot]
+- Bump describeTypes.json. [Raphaël Vinot]
+
+  Add testing
+
+Other
+~~~~~
+- Merge pull request #147 from StrayLightning/master. [Raphaël Vinot]
+
+  Check explicitly for a 500 response from the server with no response content
+- Improve the exception message for a server 500+ response with no
+  response content. [StrayLightning]
+- Check for zero-length 500 response from the server and produce a
+  suitable error message. [StrayLightning]
+
+  In experimenting with PyMISP I am triggering problems on the server I
+  am using.  Occasionally the server will return a 500 response with a
+  message indicating an internal error, but more often than not it returns
+  a 500 response with no contents, and _check_response falls over itself,
+  generating hard-to-fathom exception from the json internals.
+
+  This commit hardens _check_response by detecting zero-length responses
+  and raising a suitable exception.
+
+  Also fix a missing bracket in one of the subsequent exception strings.
+- Merge pull request #146 from c-goes/lief_integrity_exception. [Raphaël
+  Vinot]
+
+  Make FileObject creation work if lief parsing fails
+- Make FileObject creation work if lief parsing fails. [c-goes]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #144 from c-goes/objects_delete. [Raphaël Vinot]
+
+  allow deletion of objects and object references
+- Allow deletion of objects and object references. [c-goes]
+- Update doc badge links. [Raphaël Vinot]
+- Merge pull request #143 from 3c7/feature/send_attributes. [Raphaël
+  Vinot]
+
+  Adding multiple named attributes (without proposal) require a single POST request now
+- Adding multiple named attributes require a single POST request now.
+  [3c7]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #142 from c-goes/master. [Raphaël Vinot]
+
+  replaced is_digit() with isdigit()
+- Fixed typo. [c-goes]
+- Merge remote-tracking branch 'upstream/master' [c-goes]
+- Merge pull request #141 from SteveClement/master. [Raphaël Vinot]
+
+  Remove CIRCL repo references from README.md & fix epydoc
+- - Remove CIRCL reference from README.md - Updated 2 bad indentations
+  where epydoc was Warning. [Steve Clement]
+- Merge remote-tracking branch 'upstream/master' [c-goes]
+- Merge branch 'master' of https://github.com/MISP/PyMISP into
+  messageidtype. [c-goes]
+- Added default_category for email-message-id. [c-goes]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge branch 'feature/feedgenerator_rework' [iglocska]
+- Merge branch 'master' of https://github.com/MISP/PyMISP into
+  feature/feedgenerator_rework. [iglocska]
+- Rework of the feed generator. [iglocska]
+
+  - use objects, attribute tags and object references correctly
+  - generate quickhashlist for fast lookups / future MISP caching mechanism
+  - saner structure (herp-a-derp)
+
+
+v2.4.82 (2017-11-09)
+--------------------
+
+New
+~~~
+- Proper debug system. [Raphaël Vinot]
+
+  Make it easy to investigate the json blobs sent to the server.
+
+Changes
+~~~~~~~
+- Bump PyMISP version. [Raphaël Vinot]
+- Bump CHANGELOG. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Update readme for new logging system. [Raphaël Vinot]
+- Small improvments in the logging system. [Raphaël Vinot]
+- Properly use python logging module. [Raphaël Vinot]
+- Update asciidoctor generator. [Raphaël Vinot]
+- Remove warning if PyMISP is too new. [Raphaël Vinot]
+- Add simple asciidoc generator for MISP event. [Raphaël Vinot]
+- Update changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Typo loger -> logger. [Raphaël Vinot]
+- Let load unknown object relations in known templates. [Raphaël Vinot]
+
+  This isn't recommended, but happens very often.
+- Allow to load non-malware ZIP files in MISP Event. [Raphaël Vinot]
+
+  Prior to his patch, any zip file loaded by MISP Event was unpacked and
+  processed as an excrypted malware from MISP.
+- Properly pass the distribution when uploading a sample. [Raphaël
+  Vinot]
+- Properly upload a sample in an existing event. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/PyMISP/issues/123
+- Properly set the distribution at event level. [Raphaël Vinot]
+
+  fix #120
+- Properly pop the distribution key. [Raphaël Vinot]
+- Update dependencies for VT generator. [Raphaël Vinot]
+
+Other
+~~~~~
+- Merge pull request #126 from CenturyLinkCIRT/master. [Raphaël Vinot]
+
+  Added vt_to_misp.py example and VTReportObject
+- Merge branch 'master' of https://github.com/MISP/PyMISP. [Thomas
+  Gardner]
+- Fix test suite. [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #122 from LDO-CERT/master. [Raphaël Vinot]
+
+  Created add_generic_object.py
+- Created add_generic_object.py. [garanews]
+
+  usage: add_generic_object.py [-h] -e EVENT -t TYPE -d DICT
+
+  Examples:
+  python3 add_generic_object.py -e 1683 -t email -d '{"subject":"The Pink Letter", "to":"jon@snow.org"}'
+  python3 add_generic_object.py -e 2343 -t person -d '{"first-name":"Daenerys", "last-name":"Targaryen", "place-of-birth":"Dragonstone"}'
+  python3 add_generic_object.py -e 3596 -t "domain|ip" -d '{"domain":"stormborn.org", "ip":"50.63.202.33"}'
+- Added vtreportobject and vt_to_misp example. [Thomas Gardner]
+- Created add_generic_object.py. [garanews]
+
+  usage: add_generic_object.py [-h] -e EVENT -t TYPE -d DICT
+
+  Examples:
+  python3 add_generic_object.py -e 1683 -t email -d '{"subject":"The Pink Letter", "to":"jon@snow.org"}'
+  python3 add_generic_object.py -e 2343 -t person -d '{"first-name":"Daenerys", "last-name":"Targaryen", "place-of-birth":"Dragonstone"}'
+  python3 add_generic_object.py -e 3596 -t "domain|ip" -d '{"domain":"stormborn.org", "ip":"50.63.202.33"}'
+
+
 v2.4.81.2 (2017-10-24)
 ----------------------
 

@@ -9,12 +9,11 @@ Welcome to PyMISP's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    README
    modules
-
-
+   tools
 
 Indices and tables
 ==================
@@ -22,4 +21,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

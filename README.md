@@ -1,7 +1,7 @@
 README
 ======
 
-[![Documentation Status](https://readthedocs.org/projects/pymisp/badge/?version=master)](http://pymisp.readthedocs.io/en/master/?badge=master)
+[![Documentation Status](https://readthedocs.org/projects/pymisp/badge/?version=latest)](http://pymisp.readthedocs.io/?badge=latest)
 [![Build Status](https://travis-ci.org/MISP/PyMISP.svg?branch=master)](https://travis-ci.org/MISP/PyMISP)
 [![Coverage Status](https://coveralls.io/repos/github/MISP/PyMISP/badge.svg?branch=master)](https://coveralls.io/github/MISP/PyMISP?branch=master)
 
@@ -24,7 +24,8 @@ pip3 install pymisp
 ## Install the latest version from repo
 
 ```
-git clone https://github.com/CIRCL/PyMISP.git && cd PyMISP
+git clone https://github.com/MISP/PyMISP.git && cd PyMISP
+git submodule update --init
 pip3 install -I .
 ```
 
@@ -50,14 +51,41 @@ cd examples
 python3 last.py -l 10
 ```
 
+## Debugging
+
+You have two options there:
+
+1. Pass `debug=True` to `PyMISP` and it will enable logging.DEBUG to stderr on the whole module
+
+2. Use the python logging module directly:
+
+```python
+
+import logging
+logger = logging.getLogger('pymisp')
+
+# Configure it as you whish, for example, enable DEBUG mode:
+logger.setLevel(logging.DEBUG)
+```
+
+Or if you want to write the debug output to a file instead of stderr:
+
+```python
+import pymisp
+import logging
+
+logger = logging.getLogger('pymisp')
+logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', format=pymisp.FORMAT)
+```
+
 ## Documentation
 
-[PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/master/pymisp.pdf).
+[PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/latest/pymisp.pdf).
 
 Documentation can be generated with epydoc:
 
 ```
-epydoc --url https://github.com/CIRCL/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
+epydoc --url https://github.com/MISP/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
 ```
 
 ## Everything is a Mutable Mapping

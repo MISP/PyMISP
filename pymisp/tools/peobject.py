@@ -6,8 +6,9 @@ from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 from datetime import datetime
-import warnings
+import logging
 
+logger = logging.getLogger('pymisp')
 
 try:
     import lief
@@ -24,9 +25,9 @@ except ImportError:
 
 class PEObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed=None, filepath=None, pseudofile=None):
+    def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
         if not HAS_PYDEEP:
-            warnings.warn("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_LIEF:
             raise ImportError('Please install lief, documentation here: https://github.com/lief-project/LIEF')
         if pseudofile:
@@ -46,10 +47,8 @@ class PEObject(AbstractMISPObjectGenerator):
                 raise InvalidMISPObject('Not a lief.PE.Binary: {}'.format(type(parsed)))
         # Python3 way
         # super().__init__('pe')
-        super(PEObject, self).__init__('pe')
+        super(PEObject, self).__init__('pe', standalone=standalone, **kwargs)
         self.generate_attributes()
-        # Mark as non_jsonable because we need to add them manually
-        self.update_not_jsonable('ObjectReference')
 
     def _is_exe(self):
         if not self._is_dll() and not self._is_driver():
@@ -105,7 +104,7 @@ class PEObject(AbstractMISPObjectGenerator):
         if self.__pe.sections:
             pos = 0
             for section in self.__pe.sections:
-                s = PESectionObject(section)
+                s = PESectionObject(section, self._standalone, default_attributes_parameters=self._default_attributes_parameters)
                 self.add_reference(s.uuid, 'included-in', 'Section {} of PE'.format(pos))
                 if ((self.__pe.entrypoint >= section.virtual_address) and
                         (self.__pe.entrypoint < (section.virtual_address + section.virtual_size))):
@@ -118,15 +117,13 @@ class PEObject(AbstractMISPObjectGenerator):
 
 class PESectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section):
+    def __init__(self, section, standalone=True, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
-        super(PESectionObject, self).__init__('pe-section')
+        super(PESectionObject, self).__init__('pe-section', standalone=standalone, **kwargs)
         self.__section = section
         self.__data = bytes(self.__section.content)
         self.generate_attributes()
-        # Mark as non_jsonable because we need to add them manually
-        self.update_not_jsonable('ObjectReference')
 
     def generate_attributes(self):
         self.add_attribute('name', value=self.__section.name)

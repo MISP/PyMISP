@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pymisp import PyMISP
+from pymisp import PyMISP, __version__
 from keys import url, key
 import time
 
@@ -12,6 +12,7 @@ class TestBasic(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
         self.misp = PyMISP(url, key, True, 'json')
+        self.live_describe_types = self.misp.get_live_describe_types()
 
     def _clean_event(self, event):
         event['Event'].pop('orgc_id', None)
@@ -53,7 +54,17 @@ class TestBasic(unittest.TestCase):
     def add_hashes(self, eventid):
         r = self.misp.get_event(eventid)
         event = r.json()
-        event = self.misp.add_hashes(event, 'Payload installation', 'dll_installer.dll', '0a209ac0de4ac033f31d6ba9191a8f7a', '1f0ae54ac3f10d533013f74f48849de4e65817a7', '003315b0aea2fcb9f77d29223dd8947d0e6792b3a0227e054be8eb2a11f443d9', 'Fanny modules', False, 2)
+        event = self.misp.add_hashes(event,
+                                     category='Payload installation',
+                                     filename='dll_installer.dll',
+                                     md5='0a209ac0de4ac033f31d6ba9191a8f7a',
+                                     sha1='1f0ae54ac3f10d533013f74f48849de4e65817a7',
+                                     sha256='003315b0aea2fcb9f77d29223dd8947d0e6792b3a0227e054be8eb2a11f443d9',
+                                     ssdeep=None,
+                                     comment='Fanny modules',
+                                     to_ids=False,
+                                     distribution=2,
+                                     proposal=False)
         self._clean_event(event)
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': u'3', u'analysis': u'0',
@@ -252,6 +263,48 @@ class TestBasic(unittest.TestCase):
 
     def test_create_organisation(self):
         self.add_organisation()
+
+    def test_describeTypes_sane_default(self):
+        sane_default = self.live_describe_types['sane_defaults']
+        self.assertEqual(sorted(sane_default.keys()), sorted(self.live_describe_types['types']))
+
+    def test_describeTypes_categories(self):
+        category_type_mappings = self.live_describe_types['category_type_mappings']
+        self.assertEqual(sorted(category_type_mappings.keys()), sorted(self.live_describe_types['categories']))
+
+    def test_describeTypes_types_in_categories(self):
+        category_type_mappings = self.live_describe_types['category_type_mappings']
+        for category, types in category_type_mappings.items():
+                existing_types = [t for t in types if t in self.live_describe_types['types']]
+                self.assertEqual(sorted(existing_types), sorted(types))
+
+    def test_describeTypes_types_have_category(self):
+        category_type_mappings = self.live_describe_types['category_type_mappings']
+        all_types = set()
+        for category, types in category_type_mappings.items():
+            all_types.update(types)
+        self.assertEqual(sorted(list(all_types)), sorted(self.live_describe_types['types']))
+
+    def test_describeTypes_sane_default_valid_category(self):
+        sane_default = self.live_describe_types['sane_defaults']
+        categories = self.live_describe_types['categories']
+        for t, sd in sane_default.items():
+            self.assertTrue(sd['to_ids'] in [0, 1])
+            self.assertTrue(sd['default_category'] in categories)
+
+    def test_describeTypes_uptodate(self):
+        self.assertEqual(self.live_describe_types, self.misp.get_local_describe_types())
+
+    def test_live_acl(self):
+        query_acl = self.misp.get_live_query_acl()
+        self.assertEqual(query_acl['response'], [])
+
+    def test_recommended_pymisp_version(self):
+        response = self.misp.get_recommended_api_version()
+        recommended_version_tup = tuple(int(x) for x in response['version'].split('.'))
+        pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))[:3]
+        self.assertEqual(recommended_version_tup, pymisp_version_tup)
+
 
 if __name__ == '__main__':
     unittest.main()

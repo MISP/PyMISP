@@ -30,7 +30,8 @@ setup(
     install_requires=['six', 'requests', 'python-dateutil', 'jsonschema', 'setuptools>=36.4'],
     extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
                     'neo': ['py2neo'],
-                    'openioc': ['beautifulsoup4']},
+                    'openioc': ['beautifulsoup4'],
+                    'virustotal': ['validators']},
     tests_require=[
         'jsonschema',
         'python-dateutil',

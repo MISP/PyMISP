@@ -1,0 +1,149 @@
+{
+  "Event": {
+    "Attribute": [
+      {
+        "ShadowAttribute": [
+          {
+            "Org": {
+              "id": "1",
+              "name": "CIRCL",
+              "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+            },
+            "category": "Artifacts dropped",
+            "comment": "",
+            "disable_correlation": false,
+            "event_id": "6676",
+            "event_uuid": "5a4cb19a-f550-437f-bd29-48ed950d210f",
+            "id": "3770",
+            "old_id": "811578",
+            "org_id": "1",
+            "proposal_to_delete": false,
+            "timestamp": "1514975846",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a4cb1c7-fa84-45fa-8d27-4822950d210f",
+            "value": "blah.exe.jpg"
+          }
+        ],
+        "category": "Artifacts dropped",
+        "comment": "",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "6676",
+        "id": "811578",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1514975687",
+        "to_ids": false,
+        "type": "filename",
+        "uuid": "5a4cb1c7-fa84-45fa-8d27-4822950d210f",
+        "value": "blah.exe"
+      }
+    ],
+    "Object": [
+      {
+        "Attribute": [
+          {
+            "ShadowAttribute": [
+              {
+                "Org": {
+                  "id": "1",
+                  "name": "CIRCL",
+                  "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+                },
+                "category": "Payload delivery",
+                "comment": "",
+                "disable_correlation": false,
+                "event_id": "6676",
+                "event_uuid": "5a4cb19a-f550-437f-bd29-48ed950d210f",
+                "id": "3771",
+                "old_id": "811579",
+                "org_id": "1",
+                "proposal_to_delete": false,
+                "timestamp": "1514976196",
+                "to_ids": true,
+                "type": "filename",
+                "uuid": "5a4cb2b8-4748-4c72-96e6-4588950d210f",
+                "value": "baz.png.exe"
+              }
+            ],
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "6676",
+            "id": "811579",
+            "object_id": "2278",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1514975928",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a4cb2b8-4748-4c72-96e6-4588950d210f",
+            "value": "baz.png"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "6676",
+            "id": "811580",
+            "object_id": "2278",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1514975928",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a4cb2b9-92b4-4d3a-82df-4e86950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "6676",
+        "id": "2278",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "7",
+        "timestamp": "1514975928",
+        "uuid": "5a4cb2b8-7958-4323-852c-4d2a950d210f"
+      }
+    ],
+    "Org": {
+      "id": "1",
+      "name": "CIRCL",
+      "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+    },
+    "Orgc": {
+      "id": "1",
+      "name": "CIRCL",
+      "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+    },
+    "analysis": "2",
+    "attribute_count": "3",
+    "date": "2018-01-03",
+    "disable_correlation": false,
+    "distribution": "0",
+    "event_creator_email": "raphael.vinot@circl.lu",
+    "id": "6676",
+    "info": "Test proposals / ShadowAttributes",
+    "locked": false,
+    "org_id": "1",
+    "orgc_id": "1",
+    "proposal_email_lock": true,
+    "publish_timestamp": "0",
+    "published": false,
+    "sharing_group_id": "0",
+    "threat_level_id": "1",
+    "timestamp": "1514975929",
+    "uuid": "5a4cb19a-f550-437f-bd29-48ed950d210f"
+  }
+}

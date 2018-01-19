@@ -5,7 +5,9 @@ from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
-import warnings
+import logging
+
+logger = logging.getLogger('pymisp')
 
 
 try:
@@ -23,9 +25,9 @@ except ImportError:
 
 class MachOObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed=None, filepath=None, pseudofile=None):
+    def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
         if not HAS_PYDEEP:
-            warnings.warn("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_LIEF:
             raise ImportError('Please install lief, documentation here: https://github.com/lief-project/LIEF')
         if pseudofile:
@@ -45,10 +47,8 @@ class MachOObject(AbstractMISPObjectGenerator):
                 raise InvalidMISPObject('Not a lief.MachO.Binary: {}'.format(type(parsed)))
         # Python3 way
         # super().__init__('elf')
-        super(MachOObject, self).__init__('macho')
+        super(MachOObject, self).__init__('macho', standalone=standalone, **kwargs)
         self.generate_attributes()
-        # Mark as non_jsonable because we need to add them manually
-        self.update_not_jsonable(['ObjectReference'])
 
     def generate_attributes(self):
         self.add_attribute('type', value=str(self.__macho.header.file_type).split('.')[1])
@@ -61,7 +61,7 @@ class MachOObject(AbstractMISPObjectGenerator):
         if self.__macho.sections:
             pos = 0
             for section in self.__macho.sections:
-                s = MachOSectionObject(section)
+                s = MachOSectionObject(section, self._standalone, default_attributes_parameters=self._default_attributes_parameters)
                 self.add_reference(s.uuid, 'included-in', 'Section {} of MachO'.format(pos))
                 pos += 1
                 self.sections.append(s)
@@ -70,15 +70,13 @@ class MachOObject(AbstractMISPObjectGenerator):
 
 class MachOSectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section):
+    def __init__(self, section, standalone=True, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
-        super(MachOSectionObject, self).__init__('macho-section')
+        super(MachOSectionObject, self).__init__('macho-section', standalone=standalone, **kwargs)
         self.__section = section
         self.__data = bytes(self.__section.content)
         self.generate_attributes()
-        # Mark as non_jsonable because we need to add them manually
-        self.update_not_jsonable(['ObjectReference'])
 
     def generate_attributes(self):
         self.add_attribute('name', value=self.__section.name)
