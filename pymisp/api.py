@@ -1218,9 +1218,9 @@ class PyMISP(object):
                 to_return.append(tag['name'])
             return to_return
 
-    def new_tag(self, name=None, colour="#00ace6", exportable=False):
+    def new_tag(self, name=None, colour="#00ace6", exportable=False, hide_tag=False):
         """Create a new tag"""
-        to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable}}
+        to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable, 'hide_tag': hide_tag}}
         url = urljoin(self.root_url, 'tags/add')
         response = self.__prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
