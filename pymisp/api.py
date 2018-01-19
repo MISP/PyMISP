@@ -557,24 +557,28 @@ class PyMISP(object):
         """Add filename(s)"""
         return self.add_named_attribute(event, 'filename', filename, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    def add_attachment(self, event, attachment, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+    def add_attachment(self, event, attachment, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False, filename=None, **kwargs):
         """Add an attachment to the MISP event
 
         :param event: The event to add an attachment to
         :param attachment: Either a file handle or a path to a file - will be uploaded
+        :param filename: Explicitly defined attachment filename
         """
         if isinstance(attachment, basestring) and os.path.isfile(attachment):
             # We have a file to open
-            filename = os.path.basename(attachment)
+            if filename = None:
+                filename = os.path.basename(attachment)
             with open(attachment, "rb") as f:
                 fileData = f.read()
         elif hasattr(attachment, "read"):
             # It's a file handle - we can read it but it has no filename
             fileData = attachment.read()
-            filename = 'attachment'
+            if filename = None:
+                filename = 'attachment'
         elif isinstance(attachment, (tuple, list)):
             # tuple/list (filename, pseudofile)
-            filename = attachment[0]
+            if filename = None:
+                filename = attachment[0]
             if hasattr(attachment[1], "read"):
                 # Pseudo file
                 fileData = attachment[1].read()
@@ -582,7 +586,8 @@ class PyMISP(object):
                 fileData = attachment[1]
         else:
             # Plain file content, no filename
-            filename = 'attachment'
+            if filename = None:
+                filename = 'attachment'
             fileData = attachment
 
         if not isinstance(fileData, bytes):
