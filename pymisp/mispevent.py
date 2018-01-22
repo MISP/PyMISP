@@ -10,6 +10,7 @@ from zipfile import ZipFile
 import hashlib
 import sys
 import uuid
+from collections import defaultdict
 
 from . import deprecated
 from .abstract import AbstractMISP
@@ -851,7 +852,7 @@ class MISPObject(AbstractMISP):
             # Then we have no meta-category, template_uuid, description and template_version
             pass
         self.uuid = str(uuid.uuid4())
-        self.__fast_attribute_access = {}  # Hashtable object_relation: [attributes]
+        self.__fast_attribute_access = defaultdict(list)  # Hashtable object_relation: [attributes]
         self.ObjectReference = []
         self.Attribute = []
         if isinstance(default_attributes_parameters, MISPAttribute):
@@ -891,7 +892,7 @@ class MISPObject(AbstractMISP):
     def attributes(self, attributes):
         if all(isinstance(x, MISPObjectAttribute) for x in attributes):
             self.Attribute = attributes
-            self.__fast_attribute_access = {}
+            self.__fast_attribute_access = defaultdict(list)
         else:
             raise PyMISPError('All the attributes have to be of type MISPObjectAttribute.')
 
@@ -955,8 +956,6 @@ class MISPObject(AbstractMISP):
     def _fast_attribute_access(self):
         if not self.__fast_attribute_access:
             for a in self.attributes:
-                if not self.__fast_attribute_access.get(a.object_relation):
-                    self.__fast_attribute_access[a.object_relation] = []
                 self.__fast_attribute_access[a.object_relation].append(a)
         return self.__fast_attribute_access
 
@@ -980,8 +979,6 @@ class MISPObject(AbstractMISP):
             attribute = MISPObjectAttribute({})
         # Overwrite the parameters of self._default_attributes_parameters with the ones of value
         attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
-        if not self.__fast_attribute_access.get(object_relation):
-            self.__fast_attribute_access[object_relation] = []
         self.__fast_attribute_access[object_relation].append(attribute)
         self.Attribute.append(attribute)
         self.edited = True
