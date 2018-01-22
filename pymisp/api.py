@@ -557,24 +557,28 @@ class PyMISP(object):
         """Add filename(s)"""
         return self.add_named_attribute(event, 'filename', filename, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    def add_attachment(self, event, attachment, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+    def add_attachment(self, event, attachment, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False, filename=None, **kwargs):
         """Add an attachment to the MISP event
 
         :param event: The event to add an attachment to
         :param attachment: Either a file handle or a path to a file - will be uploaded
+        :param filename: Explicitly defined attachment filename
         """
         if isinstance(attachment, basestring) and os.path.isfile(attachment):
             # We have a file to open
-            filename = os.path.basename(attachment)
+            if filename is None:
+                filename = os.path.basename(attachment)
             with open(attachment, "rb") as f:
                 fileData = f.read()
         elif hasattr(attachment, "read"):
             # It's a file handle - we can read it but it has no filename
             fileData = attachment.read()
-            filename = 'attachment'
+            if filename is None:
+                filename = 'attachment'
         elif isinstance(attachment, (tuple, list)):
             # tuple/list (filename, pseudofile)
-            filename = attachment[0]
+            if filename is None:
+                filename = attachment[0]
             if hasattr(attachment[1], "read"):
                 # Pseudo file
                 fileData = attachment[1].read()
@@ -582,7 +586,8 @@ class PyMISP(object):
                 fileData = attachment[1]
         else:
             # Plain file content, no filename
-            filename = 'attachment'
+            if filename is None:
+                filename = 'attachment'
             fileData = attachment
 
         if not isinstance(fileData, bytes):
@@ -902,6 +907,11 @@ class PyMISP(object):
         query = {"to_ids": to_ids}
         return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
 
+    def change_comment(self, attribute_uuid, comment):
+        """Change the comment of attribute"""
+        query = {"comment": comment}
+        return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
+
     # ##############################
     # ###### Attribute update ######
     # ##############################
@@ -1213,9 +1223,9 @@ class PyMISP(object):
                 to_return.append(tag['name'])
             return to_return
 
-    def new_tag(self, name=None, colour="#00ace6", exportable=False):
+    def new_tag(self, name=None, colour="#00ace6", exportable=False, hide_tag=False):
         """Create a new tag"""
-        to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable}}
+        to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable, 'hide_tag': hide_tag}}
         url = urljoin(self.root_url, 'tags/add')
         response = self.__prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
