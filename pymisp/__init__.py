@@ -1,12 +1,16 @@
 __version__ = '2.4.85.1'
-import sys
 import logging
 import functools
 import warnings
 
-logger = logging.getLogger(__name__)
 FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
-logging.basicConfig(stream=sys.stderr, level=logging.WARNING, format=FORMAT)
+formatter = logging.Formatter(FORMAT)
+default_handler = logging.StreamHandler()
+default_handler.setFormatter(formatter)
+
+logger = logging.getLogger(__name__)
+logger.addHandler(default_handler)
+logger.setLevel(logging.WARNING)
 
 
 def deprecated(func):
