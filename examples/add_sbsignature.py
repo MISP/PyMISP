@@ -11,7 +11,6 @@ a = [(x['name'], x['description']) for x in a["signatures"]]
 b = SBSignatureObject(a)
 
 
-template_id = [x['ObjectTemplate']['id'] for x in pymisp.get_object_templates_list(
-                ) if x['ObjectTemplate']['name'] == 'sb-signature'][0]
+template_id = [x['ObjectTemplate']['id'] for x in pymisp.get_object_templates_list() if x['ObjectTemplate']['name'] == 'sb-signature'][0]
 
 pymisp.add_object(234111, template_id, b)
