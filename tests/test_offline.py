@@ -63,6 +63,7 @@ class TestOffline(unittest.TestCase):
         m.register_uri('POST', self.domain + 'attributes/restSearch', json={})
         m.register_uri('POST', self.domain + 'attributes/downloadSample', json={})
         m.register_uri('GET', self.domain + 'tags', json={'Tag': 'foo'})
+        m.register_uri('POST', self.domain + 'events/upload_sample/1', json={})
 
     def test_getEvent(self, m):
         self.initURI(m)
@@ -438,6 +439,13 @@ class TestOffline(unittest.TestCase):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         self.assertEqual((False, None), pymisp.download_samples())
+
+
+    def test_sample_upload(self, m):
+        self.initURI(m)
+        pymisp = PyMISP(self.domain, self.key)
+        upload = pymisp.upload_sample("tmux", "tests/viper-test-files/test_files/tmux" , 1)
+
 
     def test_get_all_tags(self, m):
         self.initURI(m)
