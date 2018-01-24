@@ -26,7 +26,7 @@ install:
     - popd
 
 script:
-    - nosetests --with-coverage --cover-package=pymisp tests/test_*.py
+    - nosetests --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
 
 after_success:
     - codecov
