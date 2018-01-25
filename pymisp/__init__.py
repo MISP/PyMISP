@@ -39,6 +39,7 @@ try:
     from .tools import Neo4j  # noqa
     from .tools import stix  # noqa
     from .tools import openioc  # noqa
+    from .tools import load_warninglists  # noqa
     logger.debug('pymisp loaded properly')
 except ImportError as e:
     logger.warning('Unable to load pymisp properly: {}'.format(e))
