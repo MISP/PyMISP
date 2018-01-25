@@ -752,15 +752,19 @@ class MISPSighting(AbstractMISP):
     def __init__(self):
         super(MISPSighting, self).__init__()
 
-    def from_dict(self, value, source=None, type=None, timestamp=None, **kwargs):
+    def from_dict(self, value=None, uuid=None, id=None, source=None, type=None, timestamp=None, **kwargs):
         """Initialize the MISPSighting from a dictionary
-        :value: Value can either be the attribute's value (to update sighting on all the attributes with this value),
-                or an UUID in order to update the sightings of one particular attribute.
+        :value: Value of the attribute the sighting is related too. Pushing this object
+                will update the sighting count of each attriutes with thifs value on the instance
+        :uuid: UUID of the attribute to update
+        :id: ID of the attriute to update
         :source: Source of the sighting
         :type: Type of the sighting
         :timestamp: Timestamp associated to the sighting
         """
         self.value = value
+        self.uuid = uuid
+        self.id = id
         self.source = source
         self.type = type
         self.timestamp = timestamp
@@ -769,6 +773,10 @@ class MISPSighting(AbstractMISP):
     def __repr__(self):
         if hasattr(self, 'value'):
             return '<{self.__class__.__name__}(value={self.value})'.format(self=self)
+        if hasattr(self, 'id'):
+            return '<{self.__class__.__name__}(value={self.id})'.format(self=self)
+        if hasattr(self, 'uuid'):
+            return '<{self.__class__.__name__}(value={self.uuid})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 

@@ -1326,16 +1326,18 @@ class PyMISP(object):
             jdata = json.load(f)
             return self.set_sightings(jdata)
 
-    def sighting(self, value, source=None, type=None, timestamp=None, **kwargs):
+    def sighting(self, value=None, uuid=None, id=None, source=None, type=None, timestamp=None, **kwargs):
         """ Set a single sighting.
-        :value: Value can either be the attribute's value (to update sighting on all the attributes with this value),
-                or an UUID in order to update the sightings of one particular attribute.
+        :value: Value of the attribute the sighting is related too. Pushing this object
+                will update the sighting count of each attriutes with thifs value on the instance
+        :uuid: UUID of the attribute to update
+        :id: ID of the attriute to update
         :source: Source of the sighting
         :type: Type of the sighting
         :timestamp: Timestamp associated to the sighting
         """
         s = MISPSighting()
-        s.from_dict(value=value, source=source, type=type, timestamp=timestamp, **kwargs)
+        s.from_dict(value=value, uuid=uuid, id=id, source=source, type=type, timestamp=timestamp, **kwargs)
         return self.set_sightings(s)
 
     # ############## Sharing Groups ##################
