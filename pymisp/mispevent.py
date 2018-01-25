@@ -43,11 +43,13 @@ if six.PY2:
 try:
     from dateutil.parser import parse
 except ImportError:
+    logger.exception("Cannot import dateutil")
     pass
 
 try:
     import jsonschema
 except ImportError:
+    logger.exception("Cannot import jsonschema")
     pass
 
 try:
