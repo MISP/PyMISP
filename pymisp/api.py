@@ -1569,6 +1569,18 @@ class PyMISP(object):
         response = self.__prepare_request('GET', url)
         return self._check_response(response)
 
+    # ############## WarningLists ##################
+
+    def get_warninglists(self):
+        url = urljoin(self.root_url, '/warninglists')
+        response = self.__prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_warninglist(self, warninglist_id):
+        url = urljoin(self.root_url, '/warninglists/view/{}'.format(warninglist_id))
+        response = self.__prepare_request('GET', url)
+        return self._check_response(response)
+
     # ##############################################
     # ############### Non-JSON output ##############
     # ##############################################
