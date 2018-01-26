@@ -444,7 +444,7 @@ class TestOffline(unittest.TestCase):
         self.assertEqual((False, None), pymisp.download_samples())
 
     def test_sample_upload(self, m):
-        if sys.api_version <= (3, 4):
+        if sys.version_info <= (3, 4):
             return unittest.SkipTest()
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
