@@ -40,6 +40,7 @@ try:
     from .tools import stix  # noqa
     from .tools import openioc  # noqa
     from .tools import load_warninglists  # noqa
+    from .tools import ext_lookups  # noqa
     logger.debug('pymisp loaded properly')
 except ImportError as e:
     logger.warning('Unable to load pymisp properly: {}'.format(e))
