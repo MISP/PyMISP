@@ -6,6 +6,7 @@ import requests_mock
 import json
 import os
 import six
+import sys
 from io import BytesIO
 
 import pymisp as pm
@@ -443,6 +444,8 @@ class TestOffline(unittest.TestCase):
         self.assertEqual((False, None), pymisp.download_samples())
 
     def test_sample_upload(self, m):
+        if sys.api_version <= (3, 4):
+            return unittest.SkipTest()
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         upload = pymisp.upload_sample("tmux", "tests/viper-test-files/test_files/tmux" , 1)
