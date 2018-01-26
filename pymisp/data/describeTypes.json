@@ -584,6 +584,10 @@
       "cortex": {
         "default_category": "External analysis",
         "to_ids": 0
+      },
+      "boolean": {
+        "default_category": "Other",
+        "to_ids": 0
       }
     },
     "types": [
@@ -732,7 +736,8 @@
       "place-port-of-onward-foreign-destination",
       "passenger-name-record-locator-number",
       "mobile-application-id",
-      "cortex"
+      "cortex",
+      "boolean"
     ],
     "categories": [
       "Internal reference",
@@ -1129,7 +1134,8 @@
         "port",
         "float",
         "hex",
-        "phone-number"
+        "phone-number",
+        "boolean"
       ]
     }
   }
