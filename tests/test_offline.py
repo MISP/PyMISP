@@ -444,11 +444,11 @@ class TestOffline(unittest.TestCase):
         self.assertEqual((False, None), pymisp.download_samples())
 
     def test_sample_upload(self, m):
-        if sys.version_info <= (3, 4):
+        if (3, 0) < sys.version_info < (3, 5):
             return unittest.SkipTest()
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
-        upload = pymisp.upload_sample("tmux", "tests/viper-test-files/test_files/tmux" , 1)
+        upload = pymisp.upload_sample("tmux", "tests/viper-test-files/test_files/tmux", 1)
 
     def test_get_all_tags(self, m):
         self.initURI(m)
@@ -469,6 +469,7 @@ class TestOffline(unittest.TestCase):
         pymisp = PyMISP(self.domain, self.key)
         uuid = self.event["Event"]["uuid"]
         pymisp.untag(uuid, "foo")
+
 
 if __name__ == '__main__':
     unittest.main()
