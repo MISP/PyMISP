@@ -2,11 +2,106 @@ Changelog
 =========
 
 
+v2.4.87 (2018-01-28)
+--------------------
+
+New
+~~~
+- Add bindings for Galaxies and Taxonimies. [Raphaël Vinot]
+- Add bindings to PyMISPWarninglists. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Skip sample upload test on python 3.4. [Raphaël Vinot]
+- Re-enable python3.4 on travis... [Raphaël Vinot]
+- Bump misp-object & describeTypes. [Raphaël Vinot]
+- Cleanup new sbsignature generator. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Use defaultdict when possible. [Raphaël Vinot]
+- Raise an exception when distribution is sharing group, but the ID is
+  missing. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Improve Object Attribute editing. [Raphaël Vinot]
+- Allow to pass a directory with custom object templates. [Raphaël
+  Vinot]
+- Remove old warning. [Raphaël Vinot]
+
+Fix
+~~~
+- Only skip test for 3.0->3.5. [Raphaël Vinot]
+- Sys.api_version -> sys.version_info. [Raphaël Vinot]
+- Allow to pass value, UUID, or ID to a sighting. [Raphaël Vinot]
+- Do not use basicConfig in __init__ [Raphaël Vinot]
+
+  Fix #170
+- Add_hashes was broken. [Raphaël Vinot]
+
+  Fix #174
+- Make python2 happy. [Raphaël Vinot]
+- Download old samples was broken. [Raphaël Vinot]
+
+Other
+~~~~~
+- Revert "chg: Re-enable python3.4 on travis..." [Raphaël Vinot]
+
+  Lief doesn't support python 3.4
+
+  This reverts commit 35a8d92acecd7a313bedcf197539eaa82176bcc7.
+- Add: Allow to fetch warninglists. [Raphaël Vinot]
+
+  Fix #180
+- Merge pull request #181 from LOUISLCE/feat-add-tests. [Raphaël Vinot]
+
+  Add and refactor some tests
+- Add tag test. [Louis LCE]
+- Add a simple test for uploading samples. [Louis LCE]
+- Add warning when failing to import dependencies. [Louis LCE]
+- Improve and refactor attributes tests. [Louis LCE]
+- Merge branch 'LDO-CERT-master' [Raphaël Vinot]
+- Sb-signature library. [garanews]
+
+  Created sb-signature library with relative example for testing.
+  Thanks @dadokkio
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #178 from CenturyLinkCIRT/master. [Raphaël Vinot]
+
+  Change in add_attachment.  Allow explicit attachment naming.
+- Linting. [Kory Kyzar]
+- Bug fix. [Kory Kyzar]
+- Change in add_attachment.  Allow explicit attachment naming. [Kory
+  Kyzar]
+- Merge pull request #1 from MISP/master. [Kory Kyzar]
+
+  Syncing with upsteam
+- Merge pull request #177 from kirzaks/master. [Raphaël Vinot]
+
+  Change in new_tag function. Added attributie 'hide_tag'
+- Change in new_tag function. Added attributie 'hide_tag' [Armīns Palms]
+- Merge pull request #176 from kirzaks/master. [Raphaël Vinot]
+
+  Change the comment of attribute
+- Change the comment of attribute. [Armīns Palms]
+- Merge pull request #175 from LOUISLCE/fix-add-hashes-test. [Raphaël
+  Vinot]
+
+  Fix add_hashes online test function parameters
+- Fix add_hashes test function parameters. [Louis LCE]
+- Merge branch 'neok0-add-objects-template-file-path' [Raphaël Vinot]
+- Merge branch 'add-objects-template-file-path' of
+  https://github.com/neok0/PyMISP into neok0-add-objects-template-file-
+  path. [Raphaël Vinot]
+- Added misp object templates path argument. [Tobias Mainka]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Update settings.default.py. [Andras Iklody]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+
 v2.4.85.1 (2018-01-10)
 ----------------------
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Cleanup from last commit. [Raphaël Vinot]
