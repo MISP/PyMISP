@@ -815,9 +815,12 @@ class PyMISP(object):
 
     def _encode_file_to_upload(self, filepath_or_bytes):
         """Helper to encode a file to upload"""
-        if isinstance(filepath_or_bytes, basestring) and os.path.isfile(filepath_or_bytes):
-            with open(filepath_or_bytes, 'rb') as f:
-                binblob = f.read()
+        if isinstance(filepath_or_bytes, basestring):
+            if os.path.isfile(filepath_or_bytes):
+                with open(filepath_or_bytes, 'rb') as f:
+                    binblob = f.read()
+            else:
+                binblob = filepath_or_bytes.encode()
         else:
             binblob = filepath_or_bytes
         return base64.b64encode(binblob).decode()
@@ -1580,6 +1583,18 @@ class PyMISP(object):
 
     def get_warninglist(self, warninglist_id):
         url = urljoin(self.root_url, '/warninglists/view/{}'.format(warninglist_id))
+        response = self.__prepare_request('GET', url)
+        return self._check_response(response)
+
+    # ############## Galaxies/Clusters ##################
+
+    def get_galaxies(self):
+        url = urljoin(self.root_url, '/galaxies')
+        response = self.__prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_galaxy(self, galaxy_id):
+        url = urljoin(self.root_url, '/galaxies/view/{}'.format(galaxy_id))
         response = self.__prepare_request('GET', url)
         return self._check_response(response)
 
