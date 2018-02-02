@@ -129,6 +129,10 @@
         "default_category": "Payload installation",
         "to_ids": 1
       },
+      "gene": {
+        "default_category": "Artifacts dropped",
+        "to_ids": 0
+      },
       "cookie": {
         "default_category": "Network activity",
         "to_ids": 0
@@ -623,6 +627,7 @@
       "yara",
       "stix2-pattern",
       "sigma",
+      "gene",
       "cookie",
       "vulnerability",
       "attachment",
@@ -907,7 +912,8 @@
         "x509-fingerprint-md5",
         "x509-fingerprint-sha256",
         "other",
-        "cookie"
+        "cookie",
+        "gene"
       ],
       "Payload installation": [
         "md5",
