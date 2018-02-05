@@ -133,6 +133,10 @@
         "default_category": "Artifacts dropped",
         "to_ids": 0
       },
+      "identity-card-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
       "cookie": {
         "default_category": "Network activity",
         "to_ids": 0
@@ -628,6 +632,7 @@
       "stix2-pattern",
       "sigma",
       "gene",
+      "identity-card-number",
       "cookie",
       "vulnerability",
       "attachment",
@@ -1127,7 +1132,8 @@
         "comment",
         "text",
         "other",
-        "phone-number"
+        "phone-number",
+        "identity-card-number"
       ],
       "Other": [
         "comment",
