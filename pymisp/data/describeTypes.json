@@ -133,6 +133,10 @@
         "default_category": "Artifacts dropped",
         "to_ids": 0
       },
+      "mime-type": {
+        "default_category": "Artifacts dropped",
+        "to_ids": 0
+      },
       "identity-card-number": {
         "default_category": "Person",
         "to_ids": 0
@@ -632,6 +636,7 @@
       "stix2-pattern",
       "sigma",
       "gene",
+      "mime-type",
       "identity-card-number",
       "cookie",
       "vulnerability",
@@ -843,6 +848,7 @@
         "stix2-pattern",
         "yara",
         "sigma",
+        "mime-type",
         "attachment",
         "malware-sample",
         "link",
@@ -918,7 +924,8 @@
         "x509-fingerprint-sha256",
         "other",
         "cookie",
-        "gene"
+        "gene",
+        "mime-type"
       ],
       "Payload installation": [
         "md5",
@@ -967,7 +974,8 @@
         "x509-fingerprint-md5",
         "x509-fingerprint-sha256",
         "mobile-application-id",
-        "other"
+        "other",
+        "mime-type"
       ],
       "Persistence mechanism": [
         "filename",
