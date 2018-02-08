@@ -19,7 +19,7 @@ outputdir = 'output'
 # filters = {'tag':'tlp:white|feed-export|!privint','org':'CIRCL', 'published':1}
 # the above would generate a feed for all published events created by CIRCL,
 # tagged tlp:white and/or feed-export but exclude anything tagged privint
-filters = {}
+filters = {'published':'true'}
 
 
 # By default all attributes will be included in the feed generation
