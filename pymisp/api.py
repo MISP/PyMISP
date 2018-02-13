@@ -919,7 +919,7 @@ class PyMISP(object):
     # ###### Attribute update ######
     # ##############################
 
-    def freetext(self, event_id, string, adhereToWarninglists=False, distribution=None):
+    def freetext(self, event_id, string, adhereToWarninglists=False, distribution=None, returnMetaAttributes=False):
         """Pass a text to the freetext importer"""
         query = {"value": string}
         wl_params = [False, True, 'soft']
@@ -929,6 +929,8 @@ class PyMISP(object):
             query['adhereToWarninglists'] = adhereToWarninglists
         if distribution is not None:
             query['distribution'] = distribution
+        if returnMetaAttributes:
+            query['returnMetaAttributes'] = returnMetaAttributes
         return self.__query('freeTextImport/{}'.format(event_id), query, controller='events')
 
     # ##############################
