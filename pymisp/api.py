@@ -1736,6 +1736,52 @@ class PyMISP(object):
         # DEPRECATED
         return self.cache_feeds_all()
 
+    # ######################
+    # ### Sharing Groups ###
+    # ######################
+
+    def sharing_group_org_add(self, sharing_group, organisation, extend=False):
+        '''Add an organisation to a sharing group.
+        :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
+        :organisation: Organisation's local instance ID, or Organisation's global UUID, or Organisation's name as known to the curent instance
+        :extend: Allow the organisation to extend the group
+        '''
+        to_jsonify = {'sg_id': sharing_group, 'org_id': organisation, 'extend': extend}
+        url = urljoin(self.root_url, '/sharingGroups/addOrg')
+        response = self.__prepare_request('POST', url, json.dumps(to_jsonify))
+        return self._check_response(response)
+
+    def sharing_group_org_remove(self, sharing_group, organisation):
+        '''Remove an organisation from a sharing group.
+        :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
+        :organisation: Organisation's local instance ID, or Organisation's global UUID, or Organisation's name as known to the curent instance
+        '''
+        to_jsonify = {'sg_id': sharing_group, 'org_id': organisation}
+        url = urljoin(self.root_url, '/sharingGroups/removeOrg')
+        response = self.__prepare_request('POST', url, json.dumps(to_jsonify))
+        return self._check_response(response)
+
+    def sharing_group_server_add(self, sharing_group, server, all_orgs=False):
+        '''Add a server to a sharing group.
+        :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
+        :server: Server's local instance ID, or URL of the Server, or Server's name as known to the curent instance
+        :all_orgs: Add all the organisations of the server to the group
+        '''
+        to_jsonify = {'sg_id': sharing_group, 'server_id': server, 'all_orgs': all_orgs}
+        url = urljoin(self.root_url, '/sharingGroups/addServer')
+        response = self.__prepare_request('POST', url, json.dumps(to_jsonify))
+        return self._check_response(response)
+
+    def sharing_group_server_remove(self, sharing_group, server):
+        '''Remove a server from a sharing group.
+        :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
+        :server: Server's local instance ID, or URL of the Server, or Server's name as known to the curent instance
+        '''
+        to_jsonify = {'sg_id': sharing_group, 'server_id': server}
+        url = urljoin(self.root_url, '/sharingGroups/removeServer')
+        response = self.__prepare_request('POST', url, json.dumps(to_jsonify))
+        return self._check_response(response)
+
     # ###################
     # ###   Objects   ###
     # ###################
