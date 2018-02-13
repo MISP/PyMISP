@@ -2,6 +2,43 @@ Changelog
 =========
 
 
+v2.4.87.1 (2018-02-13)
+----------------------
+
+New
+~~~
+- APIs to manage sharing groups. [Raphaël Vinot]
+
+  Fix #185
+- ReturnMetaAttributes flag for freeTextImport API. [Raphaël Vinot]
+
+  Fix #188
+
+Changes
+~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump describeTypes (add mime) [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump describeType. [Raphaël Vinot]
+- Bump describeType. [Raphaël Vinot]
+
+Fix
+~~~
+- Encode string in _encode_file_to_upload. [Raphaël Vinot]
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #186 from cudeso/master. [Alexandre Dulaunoy]
+
+  Prevent unpublished events to be included in feed
+- Prevent unpublished events to be included in feed. [Koen Van Impe]
+
+  Change default proposed config
+
+
 v2.4.87 (2018-01-28)
 --------------------
 
@@ -12,6 +49,8 @@ New
 
 Changes
 ~~~~~~~
+- Version bump. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
 - Skip sample upload test on python 3.4. [Raphaël Vinot]
 - Re-enable python3.4 on travis... [Raphaël Vinot]
 - Bump misp-object & describeTypes. [Raphaël Vinot]
