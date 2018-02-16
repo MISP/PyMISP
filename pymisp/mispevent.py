@@ -569,13 +569,14 @@ class MISPEvent(AbstractMISP):
             :attribute_identifier: can be an ID, UUID, or the value.
         '''
         attributes = []
-        for a in self.attributes:
+        for a in self.attributes + [attribute for o in self.objects for attribute in o.attributes]:
             if ((hasattr(a, 'id') and a.id == attribute_identifier) or
                 (hasattr(a, 'uuid') and a.uuid == attribute_identifier) or
                 (hasattr(a, 'value') and attribute_identifier == a.value or
                  attribute_identifier in a.value.split('|'))):
                 a.add_tag(tag)
                 attributes.append(a)
+
         if not attributes:
             raise Exception('No attribute with identifier {} found.'.format(attribute_identifier))
         self.edited = True
