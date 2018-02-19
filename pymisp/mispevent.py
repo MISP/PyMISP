@@ -623,7 +623,7 @@ class MISPEvent(AbstractMISP):
     def get_object_by_uuid(self, object_uuid):
         """Get an object by UUID (UUID is set by the server when creating the new object)"""
         for obj in self.objects:
-            if hasattr(obj, 'id') and obj.uuid == object_uuid:
+            if hasattr(obj, 'uuid') and obj.uuid == object_uuid:
                 return obj
         raise InvalidMISPObject('Object with {} does not exist in this event'.format(object_uuid))
 
