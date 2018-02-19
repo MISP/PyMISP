@@ -618,7 +618,14 @@ class MISPEvent(AbstractMISP):
         for obj in self.objects:
             if hasattr(obj, 'id') and int(obj.id) == int(object_id):
                 return obj
-        raise InvalidMISPObject('Object with {} does not exists in ths event'.format(object_id))
+        raise InvalidMISPObject('Object with {} does not exist in this event'.format(object_id))
+
+    def get_object_by_uuid(self, object_uuid):
+        """Get an object by UUID (UUID is set by the server when creating the new object)"""
+        for obj in self.objects:
+            if hasattr(obj, 'uuid') and obj.uuid == object_uuid:
+                return obj
+        raise InvalidMISPObject('Object with {} does not exist in this event'.format(object_uuid))
 
     def add_object(self, obj=None, **kwargs):
         """Add an object to the Event, either by passing a MISPObject, or a dictionary"""
