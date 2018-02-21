@@ -1344,6 +1344,40 @@ class PyMISP(object):
         s = MISPSighting()
         s.from_dict(value=value, uuid=uuid, id=id, source=source, type=type, timestamp=timestamp, **kwargs)
         return self.set_sightings(s)
+    
+    def sighting_list(self, element_id, scope="attribute", org_id=False):
+        """Get the list of sighting.
+        :param element_id: could be an event id or attribute id
+        :type element_id: int
+        :param scope: could be attribute or event
+        :return: A json list of sighting corresponding to the search
+        :rtype: list
+        
+        :Example:
+ 
+        >>> misp.sighting_list(4731) # default search on attribute
+        [ ... ]
+        >>> misp.sighting_list(42, event) # return list of sighting for event 42
+        [ ... ]
+        >>> misp.sighting_list(element_id=42, org_id=2, scope=event) # return list of sighting for event 42 filtered with org id 2
+        """
+        if isinstance(element_id, int) is False:
+            raise Exception('Invalid parameter, element_id must be a number')
+        if scope not in ["attribute", "event"]:
+            raise Exception('scope parameter must be "attribute" or "event"')
+        if org_id is not False:
+            if isinstance(org_id, int) is False:
+                raise Exception('Invalid parameter, org_id must be a number')
+        else:
+            org_id = ""
+        uri = 'sightings/listSightings/{}/{}/{}'.format(
+            element_id,
+            scope,
+            org_id
+            )
+        url = urljoin(self.root_url, uri)
+        response = self.__prepare_request('POST', url)
+        return self._check_response(response)
 
     # ############## Sharing Groups ##################
 
