@@ -21,6 +21,7 @@ if __name__ == '__main__':
             fo, peo, seos = make_binary_objects(f)
         except Exception as e:
             traceback.print_exc()
+            continue
 
         if seos:
             for s in seos:
