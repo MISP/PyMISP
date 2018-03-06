@@ -345,6 +345,12 @@ class PyMISP(object):
         return self._check_response(response)
 
     def merge_event(self, previous_event_id, merge_event_id, delete = False):
+        """Merge Event
+        
+        :param previous_event_id: Previous event id
+        :param merge_event_id: Merge event id
+        :param delete: Option to delete previous event
+        """
         previous_event = self.get_event(previous_event_id)
         merge_event = self.get_event(merge_event_id)
         for attribute in previous_event['Event']['Attribute']:
