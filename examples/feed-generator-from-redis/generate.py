@@ -97,7 +97,7 @@ class RedisToMISPFeed:
 
             if flag_empty and self.flushing_next <= time.time():
                 self.flush_event()
-                flushing_next = time.time() + flushing_interval
+                flushing_next = time.time() + self.flushing_interval
 
             beautyful_sleep(5)
 
@@ -120,7 +120,6 @@ class RedisToMISPFeed:
         # sighting
         if key.endswith(self.SUFFIX_SIGH):
             pass
-            #r = self.pymisphelper.add_sighting_per_json(data)
 
         # attribute
         elif key.endswith(self.SUFFIX_ATTR):
@@ -138,16 +137,14 @@ class RedisToMISPFeed:
         else:
             raise NoValidKey("Can't define action to perform")
 
-        if r is not None and 'errors' in r:
-            self.save_error_to_redis(r, data)
 
     def add_hash(self, attr_type, attr_value):
          if ('|' in attr_type or attr_type == 'malware-sample'):
              split = attr_value.split('|')
-             self.attributeHashes.append([hashlib.md5(split[0].encode("utf-8")).hexdigest(), self.current_event_uuid])
-             self.attributeHashes.append([hashlib.md5(split[1].encode("utf-8")).hexdigest(), self.current_event_uuid])
+             self.attributeHashes.append([hashlib.md5(str(split[0]).encode("utf-8")).hexdigest(), self.current_event_uuid])
+             self.attributeHashes.append([hashlib.md5(str(split[1]).encode("utf-8")).hexdigest(), self.current_event_uuid])
          else:
-             self.attributeHashes.append([hashlib.md5(attr_value.encode("utf-8")).hexdigest(), self.current_event_uuid])
+             self.attributeHashes.append([hashlib.md5(str(attr_value).encode("utf-8")).hexdigest(), self.current_event_uuid])
 
     # Manifest
     def init_manifest(self):
@@ -159,7 +156,7 @@ class RedisToMISPFeed:
 
 
     def flush_event(self, new_event=None):
-        print('Writting event on disk')
+        print('Writting event on disk'+' '*20)
         self.print_processing()
         if new_event is not None:
             event_uuid = new_event['uuid']
@@ -171,10 +168,11 @@ class RedisToMISPFeed:
         eventFile = open(os.path.join(settings.outputdir, event_uuid + '.json'), 'w')
         eventFile.write(event.to_json())
         eventFile.close()
+
+        self.saveHashes()
         if self.allow_animation:
             self.evtObj.set()
             self.thr.join()
-        print('Event written')
 
     def saveManifest(self):
         try:
@@ -186,7 +184,7 @@ class RedisToMISPFeed:
             print(e)
             sys.exit('Could not create the manifest file.')
     
-    def saveHashes():
+    def saveHashes(self):
         if len(self.attributeHashes) == 0:
             return False
         try:
@@ -195,7 +193,7 @@ class RedisToMISPFeed:
                 hashFile.write('{},{}\n'.format(element[0], element[1]))
             hashFile.close()
             self.attributeHashes = []
-            print('Hash saved')
+            print('Hash saved' + ' '*30)
         except Exception as e:
             print(e)
             sys.exit('Could not create the quick hash lookup file.')

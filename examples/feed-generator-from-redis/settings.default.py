@@ -3,7 +3,8 @@ host='127.0.0.1'
 port=6379
 db=0
 ## The keynames to POP element from
-keyname_pop='misp_feed_generator_key'
+#keyname_pop='misp_feed_generator_key'
+keyname_pop=['cowrie']
 
 # The output dir for the feed. This will drop a lot of files, so make
 # sure that you use a directory dedicated to the feed
@@ -35,4 +36,4 @@ keyname_error='feed-generation-error'
 ## Display an animation while adding element to MISP
 allow_animation=True
 ## How frequent the event should be written on disk
-flushing_interval=60*5
+flushing_interval=2*5
