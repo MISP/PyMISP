@@ -10,11 +10,30 @@ import datetime, time
 import uuid
 import threading
 import redis
-from pymisp import MISPEvent, MISPAttribute
+
 from redis import StrictRedis as Redis
 import settings
 
+from pymisp import MISPEvent, MISPAttribute
+from pymisp.tools import GenericObjectGenerator
+
 evtObj=thr=None # animation thread
+
+def get_system_templates():
+    misp_objects_path = os.path.join(
+        os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)),
+        'data', 'misp-objects', 'objects')
+
+    templates = {}
+    for root, dirs, files in os.walk(misp_objects_path, topdown=False):
+        for def_file in files:
+            obj_name = root.split('/')[-1]
+            template_path = os.path.join(root, def_file)
+            with open(template_path, 'r') as f:
+                definition = json.load(f)
+                templates[obj_name] = definition
+    return templates
+
 
 def gen_uuid():
     return str(uuid.uuid4())
@@ -60,6 +79,9 @@ class RedisToMISPFeed:
         for k in settings.keyname_pop:
             for s in self.SUFFIX_LIST:
                 self.keynames.append(k+s)
+
+        # get all templates
+        self.sys_templates = get_system_templates()
 
         self.sleep = settings.sleep
         self.flushing_interval = settings.flushing_interval
@@ -130,9 +152,20 @@ class RedisToMISPFeed:
 
         # object
         elif key.endswith(self.SUFFIX_OBJ):
-            self.current_event.add_object(**data)
+            # create the MISP object
+            obj_name = data.pop('name')
+            misp_object = GenericObjectGenerator(obj_name)
+            for k, v in data.items():
+                if k not in self.sys_templates[obj_name]['attributes']: # attribute is not in the object template definition
+                    # add it with type text
+                    misp_object.add_attribute(k, **{'value': v, 'type': 'text'})
+                else:
+                    misp_object.add_attribute(k, **{'value': v})
+
+            self.current_event.add_object(misp_object)
             for attr_type, attr_value in data.items():
                 self.add_hash(attr_type, attr_value)
+
 
         else:
             raise NoValidKey("Can't define action to perform")

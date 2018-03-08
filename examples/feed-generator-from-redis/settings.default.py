@@ -26,14 +26,17 @@ published=False
 Tag=[{
         "colour": "#ffffff",
         "name": "tlp:white"
-    }]
+    },
+        "colour": "#ff00ff",
+        "name": "my:custom:feed"
+    ]
 
 # Others
 ## Redis pooling time
-sleep=1
+sleep=60
 ## The redis list keyname in which to put items that generated an error
 keyname_error='feed-generation-error'
 ## Display an animation while adding element to MISP
 allow_animation=True
 ## How frequent the event should be written on disk
-flushing_interval=2*5
+flushing_interval=5*60
