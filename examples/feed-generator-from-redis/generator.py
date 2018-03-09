@@ -42,8 +42,17 @@ def gen_uuid():
 
 
 class FeedGenerator:
+    def __init__(self, auto_flush=60*5):
+        """This object can be use to easily create a daily MISP-feed.
 
-    def __init__(self):
+        It handles the event creation, manifest file and cache file (hashes.csv).
+
+        Attributes:
+            auto_flush (int) : (In seconds) If a positive value for auto_flush
+                is provided the FeedGenerator will the current event when
+                possible if the last flushed time is greater than auto_flush.
+
+        """
         self.sys_templates = get_system_templates()
 
         self.manifest = {}
