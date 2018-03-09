@@ -35,9 +35,6 @@ class RedisToMISPFeed:
         self.db = settings.db
         self.serv = redis.StrictRedis(self.host, self.port, self.db, decode_responses=True)
 
-        self.flushing_interval = settings.flushing_interval
-        self.flushing_next = time.time() + self.flushing_interval
-
         self.generator = FeedGenerator()
 
         self.keynames = []
@@ -47,13 +44,11 @@ class RedisToMISPFeed:
 
         self.keynameError = settings.keyname_error
 
-        self.last_flush = datetime.datetime.now()
         self.update_last_action("Init system")
 
     def consume(self):
         self.update_last_action("Started consuming redis")
         while True:
-            flag_empty = True
             for key in self.keynames:
                 while True:
                     data = self.pop(key)
@@ -63,14 +58,6 @@ class RedisToMISPFeed:
                         self.perform_action(key, data)
                     except Exception as error:
                         self.save_error_to_redis(error, data)
-                    flag_empty = False
-
-            # Define when to write event on disk
-            if flag_empty and self.flushing_next <= time.time() and self.last_action_time>self.last_flush:
-                self.update_last_action('Flushed on disk')
-                self.generator.flush_event()
-                self.flushing_next = time.time() + self.flushing_interval
-                self.last_flush = datetime.datetime.now()
 
             beautyful_sleep(5, self.format_last_action())
 
@@ -122,17 +109,15 @@ class RedisToMISPFeed:
         self.last_action_time = datetime.datetime.now()
 
     def format_last_action(self):
-        temp = datetime.datetime.now() - self.last_flush
-        return "Last action: [{}] @ {}.\tLast flush: {} ago".format(
+        return "Last action: [{}] @ {}".format(
             self.last_action,
             self.last_action_time.isoformat().replace('T', ' '),
-            str(temp).split('.')[0]
         )
 
     def get_buffer_state(self):
         buffer_state = {'attribute': 0, 'object': 0, 'sighting': 0}
         for k in self.keynames:
-            _ , suffix = k.rsplit('_', 1)
+            _, suffix = k.rsplit('_', 1)
             buffer_state[suffix] += self.serv.llen(k)
         return buffer_state
 
@@ -141,6 +126,7 @@ class RedisToMISPFeed:
         to_push = {'error': str(error), 'item': str(item)}
         print('Error:', str(error), '\nOn adding:', item)
         self.serv.lpush(self.keynameError, to_push)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Pop item fom redis and add "

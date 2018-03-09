@@ -42,18 +42,17 @@ def gen_uuid():
 
 
 class FeedGenerator:
-    def __init__(self, auto_flush=60*5):
+    def __init__(self):
         """This object can be use to easily create a daily MISP-feed.
 
-        It handles the event creation, manifest file and cache file (hashes.csv).
-
-        Attributes:
-            auto_flush (int) : (In seconds) If a positive value for auto_flush
-                is provided the FeedGenerator will the current event when
-                possible if the last flushed time is greater than auto_flush.
+        It handles the event creation, manifest file and cache file
+        (hashes.csv).
 
         """
         self.sys_templates = get_system_templates()
+
+        self.flushing_interval = settings.flushing_interval
+        self.flushing_next = time.time() + self.flushing_interval
 
         self.manifest = {}
         self.attributeHashes = []
@@ -65,12 +64,14 @@ class FeedGenerator:
 
     def add_sighting_on_attribute(self, sight_type, attr_uuid, **data):
         self.update_daily_event_id()
+        self.after_addition()
         return False
 
     def add_attribute_to_event(self, attr_type, attr_value, **attr_data):
         self.update_daily_event_id()
         self.current_event.add_attribute(attr_type, attr_value, **attr_data)
         self._add_hash(attr_type, attr_value)
+        self.after_addition()
         return True
 
     def add_object_to_event(self, obj_name, **data):
@@ -93,7 +94,16 @@ class FeedGenerator:
         for attr_type, attr_value in data.items():
             self._add_hash(attr_type, attr_value)
 
+        self.after_addition()
         return True
+
+    def after_addition(self):
+        # Write event on disk
+        now = time.time()
+        if self.flushing_next <= now:
+            self.update_last_action('Flushed on disk')
+            self.flush_event()
+            self.flushing_next = now + self.flushing_interval
 
     # Cache
     def _add_hash(self, attr_type, attr_value):
@@ -177,11 +187,14 @@ class FeedGenerator:
                }
 
     def get_last_event_from_manifest(self):
-        """Retreive last event from the manifest, if the manifest doesn't
-        exists or if it is empty, initialize it.
+        """Retreive last event from the manifest.
+
+        If the manifest doesn't  exists or if it is empty, initialize it.
+
         """
         try:
-            with open(os.path.join(settings.outputdir, 'manifest.json'), 'r') as f:
+            manifest_path = os.path.join(settings.outputdir, 'manifest.json')
+            with open(manifest_path, 'r') as f:
                 man = json.load(f)
                 dated_events = []
                 for event_uuid, event_json in man.items():
