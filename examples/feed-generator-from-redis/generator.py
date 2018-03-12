@@ -42,6 +42,11 @@ def gen_uuid():
 
 
 class FeedGenerator:
+    """Helper object to create MISP feed.
+
+    Configuration taken from the file settings.py"""
+
+
     def __init__(self):
         """This object can be use to easily create a daily MISP-feed.
 
