@@ -2,7 +2,8 @@
 
 - ``generator.py`` exposes a class allowing to generate a MISP feed in real time.
 - ``fromredis.py`` uses ``generator.py`` to generate a MISP feed based on data stored in redis.
-- ``server.py`` is a simple script using *Flask_autoindex* to serve data to MISP
+- ``server.py`` is a simple script using *Flask_autoindex* to serve data to MISP.
+- ``MISPItemToRedis.py`` permits to push (in redis) items to be added in MISP by the ``fromredis.py`` script.
 
 
 # Installation
