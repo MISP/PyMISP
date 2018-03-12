@@ -114,13 +114,6 @@ class RedisToMISPFeed:
             self.last_action_time.isoformat().replace('T', ' '),
         )
 
-    def get_buffer_state(self):
-        buffer_state = {'attribute': 0, 'object': 0, 'sighting': 0}
-        for k in self.keynames:
-            _, suffix = k.rsplit('_', 1)
-            buffer_state[suffix] += self.serv.llen(k)
-        return buffer_state
-
 
     def save_error_to_redis(self, error, item):
         to_push = {'error': str(error), 'item': str(item)}
