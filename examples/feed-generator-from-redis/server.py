@@ -2,7 +2,7 @@
 
 import os.path
 from flask import Flask
-from flask.ext.autoindex import AutoIndex
+from flask_autoindex import AutoIndex
 from settings import outputdir
 
 app = Flask(__name__)

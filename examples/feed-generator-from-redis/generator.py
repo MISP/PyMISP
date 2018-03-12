@@ -9,7 +9,6 @@ import time
 import uuid
 
 from pymisp import MISPEvent
-from pymisp.tools import GenericObjectGenerator
 
 import settings
 
@@ -46,7 +45,6 @@ class FeedGenerator:
 
     Configuration taken from the file settings.py"""
 
-
     def __init__(self):
         """This object can be use to easily create a daily MISP-feed.
 
@@ -55,6 +53,7 @@ class FeedGenerator:
 
         """
         self.sys_templates = get_system_templates()
+        self.constructor_dict = settings.constructor_dict
 
         self.flushing_interval = settings.flushing_interval
         self.flushing_next = time.time() + self.flushing_interval
@@ -63,50 +62,63 @@ class FeedGenerator:
         self.attributeHashes = []
 
         self.daily_event_name = settings.daily_event_name + ' {}'
-        _, self.current_event_uuid, self.event_name = self.get_last_event_from_manifest()
-        self.current_date = datetime.date.today()
+        event_date_str, self.current_event_uuid, self.event_name = self.get_last_event_from_manifest()
+        temp = [int(x) for x in event_date_str.split('-')]
+        self.current_event_date = datetime.date(temp[0], temp[1], temp[2])
         self.current_event = self._get_event_from_id(self.current_event_uuid)
 
     def add_sighting_on_attribute(self, sight_type, attr_uuid, **data):
+        """Add a sighting on an attribute.
+
+        Not supported for the moment."""
         self.update_daily_event_id()
-        self.after_addition()
+        self._after_addition()
         return False
 
     def add_attribute_to_event(self, attr_type, attr_value, **attr_data):
+        """Add an attribute to the daily event"""
         self.update_daily_event_id()
         self.current_event.add_attribute(attr_type, attr_value, **attr_data)
         self._add_hash(attr_type, attr_value)
-        self.after_addition()
+        self._after_addition()
         return True
 
     def add_object_to_event(self, obj_name, **data):
+        """Add an object to the daily event"""
         self.update_daily_event_id()
-        # create the MISP object
-        misp_object = GenericObjectGenerator(obj_name)
         if obj_name not in self.sys_templates:
             print('Unkown object template')
             return False
 
-        for k, v in data.items():
-            # attribute is not in the object template definition
-            if k not in self.sys_templates[obj_name]['attributes']:
-                # add it with type text
-                misp_object.add_attribute(k, **{'value': v, 'type': 'text'})
-            else:
-                misp_object.add_attribute(k, **{'value': v})
+        #  Get MISP object constructor
+        obj_constr = self.constructor_dict.get(obj_name, None)
+        #  Constructor not known, using the generic one
+        if obj_constr is None:
+            obj_constr = self.constructor_dict.get('generic')
+            misp_object = obj_constr(obj_name)
+            #  Fill generic object
+            for k, v in data.items():
+                # attribute is not in the object template definition
+                if k not in self.sys_templates[obj_name]['attributes']:
+                    # add it with type text
+                    misp_object.add_attribute(k, **{'value': v, 'type': 'text'})
+                else:
+                    misp_object.add_attribute(k, **{'value': v})
+
+        else:
+            misp_object = obj_constr(data)
 
         self.current_event.add_object(misp_object)
         for attr_type, attr_value in data.items():
             self._add_hash(attr_type, attr_value)
 
-        self.after_addition()
+        self._after_addition()
         return True
 
-    def after_addition(self):
-        # Write event on disk
+    def _after_addition(self):
+        """Write event on disk"""
         now = time.time()
         if self.flushing_next <= now:
-            self.update_last_action('Flushed on disk')
             self.flush_event()
             self.flushing_next = now + self.flushing_interval
 
@@ -137,7 +149,7 @@ class FeedGenerator:
         self.create_daily_event()
 
     def flush_event(self, new_event=None):
-        print('Writting event on disk'+' '*20)
+        print('Writting event on disk'+' '*50)
         if new_event is not None:
             event_uuid = new_event['uuid']
             event = new_event
@@ -207,7 +219,8 @@ class FeedGenerator:
                     self.manifest[event_uuid] = event_json
                     dated_events.append([
                         event_json['date'],
-                        event_uuid, event_json['info']
+                        event_uuid,
+                        event_json['info']
                     ])
                 # Sort by date then by event name
                 dated_events.sort(key=lambda k: (k[0], k[2]), reverse=True)
@@ -219,10 +232,11 @@ class FeedGenerator:
 
     # DAILY
     def update_daily_event_id(self):
-        if self.current_date != datetime.date.today():  # create new event
+        if self.current_event_date != datetime.date.today():  # create new event
             # save current event on disk
             self.flush_event()
             self.current_event = self.create_daily_event()
+            self.current_event_date = datetime.date.today()
             self.current_event_uuid = self.current_event.get('uuid')
             self.event_name = self.current_event.info
 

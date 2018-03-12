@@ -25,7 +25,7 @@ outputdir = 'output'
 org_name='myOrg'
 ### Your organisation UUID
 org_uuid=''
-### The daily event name to be used in MISP. 
+### The daily event name to be used in MISP.
 ### (e.g. honeypot_1, will produce each day an event of the form honeypot_1 dd-mm-yyyy)
 daily_event_name='PyMISP default event name'
 
@@ -43,6 +43,15 @@ Tag=[
         "name": "my:custom:feed"
     }
 ]
+
+# MISP Object constructor
+from CowrieMISPObject import CowrieMISPObject
+from pymisp.tools import GenericObjectGenerator
+
+constructor_dict = {
+    'cowrie': CowrieMISPObject,
+    'generic': GenericObjectGenerator
+}
 
 # Others
 ## Redis pooling time
