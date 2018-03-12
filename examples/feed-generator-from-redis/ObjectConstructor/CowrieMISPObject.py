@@ -21,7 +21,7 @@ class CowrieMISPObject(AbstractMISPObjectGenerator):
         for object_relation, value in self._dico_val.items():
             if object_relation in skip_list or 'log_' in object_relation:
                 continue
-            # cast to datetime
+
             if object_relation == 'timestamp':
                 # Date already in ISO format, removing trailing Z
                 value = value.rstrip('Z')
