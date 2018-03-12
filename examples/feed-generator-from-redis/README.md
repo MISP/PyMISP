@@ -26,6 +26,11 @@ python3 server.py
 
 # Utilisation
 
+``` 
+# Activate virtualenv
+. ./serv-env/bin/activate
+```
+
 ### Adding items to MISP
 
 ```
@@ -42,21 +47,34 @@ python3 server.py
 >>> helper.push_sighting(uuid="5a9e9e26-fe40-4726-8563-5585950d210f")
 ```
 
-### Generator
+### Generate the feed
 
 ```
 # Create the FeedGenerator object using the configuration provided in the file settings.py
 # It will create daily event in which attributes and object will be added
-generator = FeedGenerator()
+>>> generator = FeedGenerator()
 
 # Add an attribute to the daily event
-attr_type = "ip-src"
-attr_value = "8.8.8.8"
-additional_data = {}
-generator.add_attribute_to_event(attr_type, attr_value, **additional_data)
+>>> attr_type = "ip-src"
+>>> attr_value = "8.8.8.8"
+>>> additional_data = {}
+>>> generator.add_attribute_to_event(attr_type, attr_value, **additional_data)
 
 # Add a cowrie object to the daily event
-obj_name = "cowrie"
-obj_data = { "session": "session_id", "username": "admin", "password": "admin", "protocol": "telnet" }
-generator.add_object_to_event(obj_name, **obj_data)
+>>> obj_name = "cowrie"
+>>> obj_data = { "session": "session_id", "username": "admin", "password": "admin", "protocol": "telnet" }
+>>> generator.add_object_to_event(obj_name, **obj_data)
+```
+
+### Consume stored data in redis
+
+```
+# Configuration provided in the file settings.py
+>>> python3 fromredis.py
+```
+
+### Serve data to MISP
+
+```
+>>> python3 server.py
 ```
