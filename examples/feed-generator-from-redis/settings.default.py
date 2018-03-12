@@ -45,7 +45,7 @@ Tag=[
 ]
 
 # MISP Object constructor
-from CowrieMISPObject import CowrieMISPObject
+from ObjectConstructor.CowrieMISPObject import CowrieMISPObject
 from pymisp.tools import GenericObjectGenerator
 
 constructor_dict = {
