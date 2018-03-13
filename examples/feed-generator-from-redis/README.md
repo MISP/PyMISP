@@ -1,4 +1,5 @@
-# What
+# Generic MISP feed generator
+## Description
 
 - ``generator.py`` exposes a class allowing to generate a MISP feed in real time, where each items can be added on daily generated events.
 - ``fromredis.py`` uses ``generator.py`` to generate a MISP feed based on data stored in redis.
@@ -6,7 +7,7 @@
 - ``MISPItemToRedis.py`` permits to push (in redis) items to be added in MISP by the ``fromredis.py`` script.
 
 
-# Installation
+## Installation
 
 ````
 #  Feed generator
@@ -24,7 +25,7 @@ python3 server.py
 ````
 
 
-# Usage
+## Usage
 
 ``` 
 # Activate virtualenv
