@@ -24,7 +24,7 @@ python3 server.py
 ````
 
 
-# Utilisation
+# Usage
 
 ``` 
 # Activate virtualenv
@@ -64,6 +64,9 @@ python3 server.py
 >>> obj_name = "cowrie"
 >>> obj_data = { "session": "session_id", "username": "admin", "password": "admin", "protocol": "telnet" }
 >>> generator.add_object_to_event(obj_name, **obj_data)
+
+# Immediatly write the event to the disk (Bypassing the default flushing behavior)
+>>> generator.flush_event()
 ```
 
 ### Consume stored data in redis
