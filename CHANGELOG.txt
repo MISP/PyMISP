@@ -12,6 +12,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 
 Fix
