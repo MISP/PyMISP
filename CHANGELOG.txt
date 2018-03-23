@@ -2,6 +2,105 @@ Changelog
 =========
 
 
+v2.4.89 (2018-03-23)
+--------------------
+
+New
+~~~
+- Add email object generator. [Raphaël Vinot]
+- Method to return an object by uuid. [chrisr3d]
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Test files. [Raphaël Vinot]
+- Do not try to upload objects in case make_binary_objects fails.
+  [Raphaël Vinot]
+
+  Fix #192
+- Typo. [chrisr3d]
+- Update reference test cases. [Raphaël Vinot]
+
+Other
+~~~~~
+- Update README.md. [Sami Mokaddem]
+
+  Replaced WHAT by Description
+- Update README.md. [Sami Mokaddem]
+
+  Added example of flush operation
+- Merge pull request #204 from mokaddem/redis-feed-generator. [Alexandre
+  Dulaunoy]
+
+  Realtime feed generator
+- Added more examples. [Sami Mokaddem]
+- Added usage in README. [Sami Mokaddem]
+- Added MISPItemToRedis and updated readme accordingly. [Sami Mokaddem]
+- Updated readme 2. [Sami Mokaddem]
+- Updated readme. [Sami Mokaddem]
+- Moved object constructor into their own folder. [Sami Mokaddem]
+- Feature: Added support of MISP object constructor instead of the
+  generic_generator. [Sami Mokaddem]
+- Added brief object description. [Sami Mokaddem]
+- Removed unused function. [Sami Mokaddem]
+- Generator handles file flushing itself. [Sami Mokaddem]
+- Added description of generator object. [Sami Mokaddem]
+- Updated README. [Sami Mokaddem]
+- Creation of the generator object which permit to easily add attributes
+  and objects to daily events, stored as a MISP feed. Plus, script
+  fromredis which pops queue element in redis to put them in the feed.
+  [Sami Mokaddem]
+- Added install script. [Sami Mokaddem]
+- Added support of MISP Object. [Sami Mokaddem]
+- Overhall seems to work, need testing. [Sami Mokaddem]
+- Init draft of redis to feed. [Sami Mokaddem]
+- Merge pull request #203 from weslambert/master. [Alexandre Dulaunoy]
+
+  fix typo(s)
+- Fix typo(s) [weslambert]
+- Merge pull request #198 from RichieB2B/client-cert. [Raphaël Vinot]
+
+  Point to right anchor for client side certificates
+- Point to right anchor for client side certificates. [Richard van den
+  Berg]
+- Merge pull request #197 from RichieB2B/misp2cef. [Raphaël Vinot]
+
+  Add misp2cef example
+- Add misp2cef example. [Richard van den Berg]
+- Merge pull request #196 from RichieB2B/ncsc-nl/from_dict. [Raphaël
+  Vinot]
+
+  Fix misp2clamav
+- Use from_dict. [Richard van den Berg]
+- Merge pull request #195 from ANSSI-BSOD/patch-1. [Raphaël Vinot]
+
+  add search on sighting
+- Add search on sighting. [ANSSI-BSO-D]
+
+  added the possibility to search sightings :
+  Here some example :
+  ```python
+  print(misp.sighting_list(424242))
+  ```
+  The answer will give a sighting list corresponding to the attribute 424242.
+  ```python
+  print(misp.sighting_list(element_id=42, org_id=2, scope=event))
+  ```
+  The return will be a sighting list of event 42 with a filter for organisation 2.
+- Merge pull request #189 from neok0/master. [Raphaël Vinot]
+
+  add attributes within objects as well, for tagging via value/id/uuid
+- Add attributes within objects as well, for tagging via value/id/uuid.
+  [Tobias Mainka]
+- Merge pull request #190 from chrisr3d/master. [Raphaël Vinot]
+
+  Method to return an object by uuid
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+
 v2.4.87.1 (2018-02-13)
 ----------------------
 
