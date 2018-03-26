@@ -14,7 +14,7 @@ try:
 except Exception:
     misp_url = 'URL'
     misp_key = 'AUTH_KEY'
-    misp_key = True
+    misp_verifycert = True
 
 
 def create_new_event():
