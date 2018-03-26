@@ -9,3 +9,5 @@ from .abstractgenerator import AbstractMISPObjectGenerator  # noqa
 from .genericgenerator import GenericObjectGenerator  # noqa
 from .openioc import load_openioc, load_openioc_file  # noqa
 from .sbsignatureobject import SBSignatureObject  # noqa
+from .emailobject import EMailObject  # noqa
+from .fail2banobject import Fail2BanObject  # noqa
