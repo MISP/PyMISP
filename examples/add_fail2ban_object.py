@@ -11,6 +11,7 @@ try:
 except Exception:
     misp_url = 'URL'
     misp_key = 'AUTH_KEY'
+    misp_key = True
 
 
 if __name__ == '__main__':
@@ -31,8 +32,9 @@ if __name__ == '__main__':
     response = pymisp.search(tags=args.tag, last=args.aggregation_period, published=False)
     me = MISPEvent()
     if 'response' in response and response['response']:
-        me.load(response['response'][1])
+        me.load(response['response'][0])
     else:
+        me.info = "Fail2Ban blocking"
         me.add_tag(args.tag)
     parameters = {'banned-ip': args.banned_ip, 'attack-type': args.attack_type, 'processing-timestamp': args.processing_timestamp}
     if args.failures:
