@@ -69,6 +69,10 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "email-body": {
+        "default_category": "Payload delivery",
+        "to_ids": 0
+      },
       "float": {
         "default_category": "Other",
         "to_ids": 0
@@ -117,9 +121,29 @@
         "default_category": "Payload installation",
         "to_ids": 1
       },
+      "stix2-pattern": {
+        "default_category": "Payload installation",
+        "to_ids": 1
+      },
       "sigma": {
         "default_category": "Payload installation",
         "to_ids": 1
+      },
+      "gene": {
+        "default_category": "Artifacts dropped",
+        "to_ids": 0
+      },
+      "mime-type": {
+        "default_category": "Artifacts dropped",
+        "to_ids": 0
+      },
+      "identity-card-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "cookie": {
+        "default_category": "Network activity",
+        "to_ids": 0
       },
       "vulnerability": {
         "default_category": "External analysis",
@@ -216,6 +240,10 @@
       "prtn": {
         "default_category": "Financial fraud",
         "to_ids": 1
+      },
+      "phone-number": {
+        "default_category": "Person",
+        "to_ids": 0
       },
       "threat-actor": {
         "default_category": "Attribution",
@@ -349,6 +377,10 @@
         "default_category": "Attribution",
         "to_ids": 0
       },
+      "whois-registrant-org": {
+        "default_category": "Attribution",
+        "to_ids": 0
+      },
       "whois-registrar": {
         "default_category": "Attribution",
         "to_ids": 0
@@ -358,6 +390,14 @@
         "to_ids": 0
       },
       "x509-fingerprint-sha1": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
+      "x509-fingerprint-md5": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
+      "x509-fingerprint-sha256": {
         "default_category": "Network activity",
         "to_ids": 1
       },
@@ -397,6 +437,14 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
+      "mac-address": {
+        "default_category": "Network activity",
+        "to_ids": 0
+      },
+      "mac-eui-64": {
+        "default_category": "Network activity",
+        "to_ids": 0
+      },
       "email-dst-display-name": {
         "default_category": "Payload delivery",
         "to_ids": 0
@@ -426,7 +474,7 @@
         "to_ids": 0
       },
       "email-message-id": {
-        "default_category": "",
+        "default_category": "Payload delivery",
         "to_ids": 0
       },
       "github-username": {
@@ -470,7 +518,7 @@
         "to_ids": 0
       },
       "gender": {
-        "default_category": "",
+        "default_category": "Person",
         "to_ids": 0
       },
       "passport-number": {
@@ -544,6 +592,14 @@
       "mobile-application-id": {
         "default_category": "Payload delivery",
         "to_ids": 1
+      },
+      "cortex": {
+        "default_category": "External analysis",
+        "to_ids": 0
+      },
+      "boolean": {
+        "default_category": "Other",
+        "to_ids": 0
       }
     },
     "types": [
@@ -564,6 +620,7 @@
       "email-dst",
       "email-subject",
       "email-attachment",
+      "email-body",
       "float",
       "url",
       "http-method",
@@ -576,7 +633,12 @@
       "pattern-in-traffic",
       "pattern-in-memory",
       "yara",
+      "stix2-pattern",
       "sigma",
+      "gene",
+      "mime-type",
+      "identity-card-number",
+      "cookie",
       "vulnerability",
       "attachment",
       "malware-sample",
@@ -601,6 +663,7 @@
       "bin",
       "cc-number",
       "prtn",
+      "phone-number",
       "threat-actor",
       "campaign-name",
       "campaign-id",
@@ -634,9 +697,12 @@
       "whois-registrant-email",
       "whois-registrant-phone",
       "whois-registrant-name",
+      "whois-registrant-org",
       "whois-registrar",
       "whois-creation-date",
       "x509-fingerprint-sha1",
+      "x509-fingerprint-md5",
+      "x509-fingerprint-sha256",
       "dns-soa-email",
       "size-in-bytes",
       "counter",
@@ -646,6 +712,8 @@
       "ip-dst|port",
       "ip-src|port",
       "hostname|port",
+      "mac-address",
+      "mac-eui-64",
       "email-dst-display-name",
       "email-src-display-name",
       "email-header",
@@ -682,7 +750,9 @@
       "place-port-of-clearance",
       "place-port-of-onward-foreign-destination",
       "passenger-name-record-locator-number",
-      "mobile-application-id"
+      "mobile-application-id",
+      "cortex",
+      "boolean"
     ],
     "categories": [
       "Internal reference",
@@ -757,6 +827,8 @@
         "filename|imphash",
         "filename|impfuzzy",
         "filename|pehash",
+        "mac-address",
+        "mac-eui-64",
         "ip-src",
         "ip-dst",
         "ip-dst|port",
@@ -767,13 +839,16 @@
         "email-dst",
         "email-subject",
         "email-attachment",
+        "email-body",
         "url",
         "user-agent",
         "AS",
         "pattern-in-file",
         "pattern-in-traffic",
+        "stix2-pattern",
         "yara",
         "sigma",
+        "mime-type",
         "attachment",
         "malware-sample",
         "link",
@@ -783,9 +858,9 @@
         "hex",
         "vulnerability",
         "x509-fingerprint-sha1",
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
         "other",
-        "ip-dst|port",
-        "ip-src|port",
         "hostname|port",
         "email-dst-display-name",
         "email-src-display-name",
@@ -795,7 +870,8 @@
         "email-mime-boundary",
         "email-thread-index",
         "email-message-id",
-        "mobile-application-id"
+        "mobile-application-id",
+        "whois-registrant-email"
       ],
       "Artifacts dropped": [
         "md5",
@@ -830,6 +906,7 @@
         "pattern-in-file",
         "pattern-in-memory",
         "pdb",
+        "stix2-pattern",
         "yara",
         "sigma",
         "attachment",
@@ -843,7 +920,12 @@
         "text",
         "hex",
         "x509-fingerprint-sha1",
-        "other"
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
+        "other",
+        "cookie",
+        "gene",
+        "mime-type"
       ],
       "Payload installation": [
         "md5",
@@ -878,6 +960,7 @@
         "pattern-in-file",
         "pattern-in-traffic",
         "pattern-in-memory",
+        "stix2-pattern",
         "yara",
         "sigma",
         "vulnerability",
@@ -888,8 +971,11 @@
         "text",
         "hex",
         "x509-fingerprint-sha1",
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
         "mobile-application-id",
-        "other"
+        "other",
+        "mime-type"
       ],
       "Persistence mechanism": [
         "filename",
@@ -905,9 +991,12 @@
         "ip-dst",
         "ip-dst|port",
         "ip-src|port",
+        "port",
         "hostname",
         "domain",
         "domain|ip",
+        "mac-address",
+        "mac-eui-64",
         "email-dst",
         "url",
         "uri",
@@ -916,13 +1005,15 @@
         "AS",
         "snort",
         "pattern-in-file",
+        "stix2-pattern",
         "pattern-in-traffic",
         "attachment",
         "comment",
         "text",
         "x509-fingerprint-sha1",
         "other",
-        "hex"
+        "hex",
+        "cookie"
       ],
       "Payload type": [
         "comment",
@@ -936,12 +1027,16 @@
         "whois-registrant-phone",
         "whois-registrant-email",
         "whois-registrant-name",
+        "whois-registrant-org",
         "whois-registrar",
         "whois-creation-date",
         "comment",
         "text",
         "x509-fingerprint-sha1",
-        "other"
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
+        "other",
+        "dns-soa-email"
       ],
       "External analysis": [
         "md5",
@@ -955,6 +1050,8 @@
         "ip-dst",
         "ip-dst|port",
         "ip-src|port",
+        "mac-address",
+        "mac-eui-64",
         "hostname",
         "domain",
         "domain|ip",
@@ -974,8 +1071,11 @@
         "comment",
         "text",
         "x509-fingerprint-sha1",
+        "x509-fingerprint-md5",
+        "x509-fingerprint-sha256",
         "github-repository",
-        "other"
+        "other",
+        "cortex"
       ],
       "Financial fraud": [
         "btc",
@@ -986,6 +1086,7 @@
         "bin",
         "cc-number",
         "prtn",
+        "phone-number",
         "comment",
         "text",
         "other",
@@ -996,7 +1097,6 @@
         "text",
         "attachment",
         "comment",
-        "text",
         "other",
         "hex"
       ],
@@ -1010,7 +1110,8 @@
         "email-dst",
         "comment",
         "text",
-        "other"
+        "other",
+        "whois-registrant-email"
       ],
       "Person": [
         "first-name",
@@ -1038,7 +1139,9 @@
         "passenger-name-record-locator-number",
         "comment",
         "text",
-        "other"
+        "other",
+        "phone-number",
+        "identity-card-number"
       ],
       "Other": [
         "comment",
@@ -1050,7 +1153,9 @@
         "cpe",
         "port",
         "float",
-        "hex"
+        "hex",
+        "phone-number",
+        "boolean"
       ]
     }
   }

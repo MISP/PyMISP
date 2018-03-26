@@ -1,0 +1,4575 @@
+{
+  "Event": {
+    "Attribute": [
+      {
+        "Tag": [
+          {
+            "colour": "#00223b",
+            "exportable": true,
+            "hide_tag": false,
+            "id": "101",
+            "name": "osint:source-type=\"blog-post\"",
+            "user_id": "0"
+          },
+          {
+            "colour": "#007cd6",
+            "exportable": true,
+            "hide_tag": false,
+            "id": "618",
+            "name": "osint:certainty=\"93\"",
+            "user_id": "0"
+          }
+        ],
+        "category": "External analysis",
+        "comment": "",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188757",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893921",
+        "to_ids": false,
+        "type": "link",
+        "uuid": "5a3c2fda-78f4-44b7-8366-46da02de0b81",
+        "value": "https://www.welivesecurity.com/2017/12/21/sednit-update-fancy-bear-spent-year/"
+      },
+      {
+        "Tag": [
+          {
+            "colour": "#00223b",
+            "exportable": true,
+            "hide_tag": false,
+            "id": "101",
+            "name": "osint:source-type=\"blog-post\"",
+            "user_id": "0"
+          },
+          {
+            "colour": "#007cd6",
+            "exportable": true,
+            "hide_tag": false,
+            "id": "618",
+            "name": "osint:certainty=\"93\"",
+            "user_id": "0"
+          }
+        ],
+        "category": "External analysis",
+        "comment": "",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188758",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893921",
+        "to_ids": false,
+        "type": "text",
+        "uuid": "5a3c2fee-7c8c-438a-8f7f-465402de0b81",
+        "value": "The Sednit group — also known as Strontium, APT28, Fancy Bear or Sofacy — is a group of attackers operating since 2004, if not earlier, and whose main objective is to steal confidential information from specific targets.\r\n\r\nThis article is a follow-up to ESET’s presentation at BlueHat in November 2017. Late in 2016 we published a white paper covering Sednit activity between 2014 and 2016. Since then, we have continued to actively track Sednit’s operations, and today we are publishing a brief overview of what our tracking uncovered in terms of the group’s activities and updates to their toolset. The first section covers the update of their attack methodology: namely, the ways in which this group tries to compromise their targets systems. The second section covers the evolution of their tools, with a particular emphasis on a detailed analysis of a new version of their flagship malware: Xagent."
+      },
+      {
+        "category": "Network activity",
+        "comment": "Xagent Samples",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188759",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893957",
+        "to_ids": true,
+        "type": "domain",
+        "uuid": "5a3c3045-ab0c-4d38-8efe-459002de0b81",
+        "value": "movieultimate.com"
+      },
+      {
+        "category": "Network activity",
+        "comment": "Xagent Samples",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188760",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893957",
+        "to_ids": true,
+        "type": "domain",
+        "uuid": "5a3c3045-61dc-495c-ae8a-471e02de0b81",
+        "value": "meteost.com"
+      },
+      {
+        "category": "Network activity",
+        "comment": "Xagent Samples",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188761",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893957",
+        "to_ids": true,
+        "type": "domain",
+        "uuid": "5a3c3045-e354-4978-a6b4-49ad02de0b81",
+        "value": "faststoragefiles.org"
+      },
+      {
+        "category": "Network activity",
+        "comment": "Xagent Samples",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188762",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893957",
+        "to_ids": true,
+        "type": "domain",
+        "uuid": "5a3c3045-968c-4572-9f64-491502de0b81",
+        "value": "nethostnet.com"
+      },
+      {
+        "category": "Network activity",
+        "comment": "Xagent Samples",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188763",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893957",
+        "to_ids": true,
+        "type": "domain",
+        "uuid": "5a3c3045-eb44-433f-a13a-44b902de0b81",
+        "value": "fsportal.net"
+      },
+      {
+        "category": "Network activity",
+        "comment": "Xagent Samples",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188764",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893957",
+        "to_ids": true,
+        "type": "domain",
+        "uuid": "5a3c3045-6a88-479d-b799-4d3d02de0b81",
+        "value": "fastdataexchange.org"
+      },
+      {
+        "category": "Network activity",
+        "comment": "Xagent Samples",
+        "deleted": false,
+        "disable_correlation": false,
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1188765",
+        "object_id": "0",
+        "sharing_group_id": "0",
+        "timestamp": "1513893957",
+        "to_ids": true,
+        "type": "domain",
+        "uuid": "5a3c3045-7480-4831-a5c4-48c802de0b81",
+        "value": "newfilmts.com"
+      }
+    ],
+    "Galaxy": [
+      {
+        "GalaxyCluster": [
+          {
+            "authors": [
+              "Alexandre Dulaunoy",
+              "Florian Roth",
+              "Thomas Schreck",
+              "Timo Steffens",
+              "Various"
+            ],
+            "description": "The Sofacy Group (also known as APT28, Pawn Storm, Fancy Bear and Sednit) is a cyber espionage group believed to have ties to the Russian government. Likely operating since 2007, the group is known to target government, military, and security organizations. It has been characterized as an advanced persistent threat.",
+            "galaxy_id": "366",
+            "id": "45563",
+            "meta": {
+              "country": [
+                "RU"
+              ],
+              "refs": [
+                "https://en.wikipedia.org/wiki/Sofacy_Group",
+                "https://aptnotes.malwareconfig.com/web/viewer.html?file=../APTnotes/2014/apt28.pdf",
+                "http://www.trendmicro.com/cloud-content/us/pdfs/security-intelligence/white-papers/wp-operation-pawn-storm.pdf",
+                "https://www2.fireeye.com/rs/848-DID-242/images/wp-mandiant-matryoshka-mining.pdf",
+                "https://www.crowdstrike.com/blog/bears-midst-intrusion-democratic-national-committee/",
+                "http://researchcenter.paloaltonetworks.com/2016/06/unit42-new-sofacy-attacks-against-us-government-agency/"
+              ],
+              "synonyms": [
+                "APT 28",
+                "APT28",
+                "Pawn Storm",
+                "Fancy Bear",
+                "Sednit",
+                "TsarTeam",
+                "TG-4127",
+                "Group-4127",
+                "STRONTIUM",
+                "TAG_0700",
+                "Swallowtail",
+                "IRON TWILIGHT",
+                "Group 74"
+              ]
+            },
+            "source": "MISP Project",
+            "tag_id": "1100",
+            "tag_name": "misp-galaxy:threat-actor=\"Sofacy\"",
+            "type": "threat-actor",
+            "uuid": "7cdff317-a673-4474-84ec-4f1754947823",
+            "value": "Sofacy",
+            "version": "30"
+          }
+        ],
+        "description": "Threat actors are characteristics of malicious actors (or adversaries) representing a cyber attack threat including presumed intent and historically observed behaviour.",
+        "icon": "user-secret",
+        "id": "366",
+        "name": "Threat Actor",
+        "type": "threat-actor",
+        "uuid": "698774c7-8022-42c4-917f-8d6e4f06ada3",
+        "version": "2"
+      },
+      {
+        "GalaxyCluster": [
+          {
+            "authors": [
+              "Kafeine",
+              "Will Metcalf",
+              "KahuSecurity"
+            ],
+            "description": "Sednit EK is the exploit kit used by APT28",
+            "galaxy_id": "370",
+            "id": "38813",
+            "meta": {
+              "refs": [
+                "http://www.welivesecurity.com/2014/10/08/sednit-espionage-group-now-using-custom-exploit-kit/",
+                "http://blog.trendmicro.com/trendlabs-security-intelligence/new-adobe-flash-zero-day-used-in-pawn-storm-campaign/"
+              ],
+              "status": [
+                "Active"
+              ]
+            },
+            "source": "MISP Project",
+            "tag_id": "3007",
+            "tag_name": "misp-galaxy:exploit-kit=\"Sednit EK\"",
+            "type": "exploit-kit",
+            "uuid": "454f4e78-bd7c-11e6-a4a6-cec0c932ce01",
+            "value": "Sednit EK",
+            "version": "5"
+          },
+          {
+            "authors": [
+              "Kafeine",
+              "Will Metcalf",
+              "KahuSecurity"
+            ],
+            "description": "DealersChoice is a Flash Player Exploit platform triggered by RTF",
+            "galaxy_id": "370",
+            "id": "38805",
+            "meta": {
+              "refs": [
+                "http://researchcenter.paloaltonetworks.com/2016/10/unit42-dealerschoice-sofacys-flash-player-exploit-platform/",
+                "http://blog.trendmicro.com/trendlabs-security-intelligence/pawn-storm-ramps-up-spear-phishing-before-zero-days-get-patched/"
+              ],
+              "status": [
+                "Active"
+              ],
+              "synonyms": [
+                "Sednit RTF EK"
+              ]
+            },
+            "source": "MISP Project",
+            "tag_id": "3015",
+            "tag_name": "misp-galaxy:exploit-kit=\"DealersChoice\"",
+            "type": "exploit-kit",
+            "uuid": "454f4e78-bd7c-11e6-a4a6-cec0c932ce01",
+            "value": "DealersChoice",
+            "version": "5"
+          }
+        ],
+        "description": "Exploit-Kit is an enumeration of some exploitation kits used by adversaries. The list includes document, browser and router exploit kits.It's not meant to be totally exhaustive but aim at covering the most seen in the past 5 years",
+        "icon": "internet-explorer",
+        "id": "370",
+        "name": "Exploit-Kit",
+        "type": "exploit-kit",
+        "uuid": "6ab240ec-bd79-11e6-a4a6-cec0c932ce01",
+        "version": "3"
+      },
+      {
+        "GalaxyCluster": [
+          {
+            "authors": [
+              "Alexandre Dulaunoy",
+              "Florian Roth",
+              "Timo Steffens",
+              "Christophe Vandeplas"
+            ],
+            "description": "backdoor",
+            "galaxy_id": "367",
+            "id": "46592",
+            "meta": {
+              "refs": [
+                "https://www2.fireeye.com/rs/848-DID-242/images/APT28-Center-of-Storm-2017.pdf"
+              ],
+              "synonyms": [
+                "Sednit",
+                "Seduploader",
+                "JHUHUGIT",
+                "Sofacy"
+              ],
+              "type": [
+                "Backdoor"
+              ]
+            },
+            "source": "MISP Project",
+            "tag_id": "2215",
+            "tag_name": "misp-galaxy:tool=\"GAMEFISH\"",
+            "type": "tool",
+            "uuid": "0d821b68-9d82-4c6d-86a6-1071a9e0f79f",
+            "value": "GAMEFISH",
+            "version": "45"
+          },
+          {
+            "authors": [
+              "Alexandre Dulaunoy",
+              "Florian Roth",
+              "Timo Steffens",
+              "Christophe Vandeplas"
+            ],
+            "description": "",
+            "galaxy_id": "367",
+            "id": "46670",
+            "meta": {
+              "synonyms": [
+                "XTunnel"
+              ]
+            },
+            "source": "MISP Project",
+            "tag_id": "1012",
+            "tag_name": "misp-galaxy:tool=\"X-Tunnel\"",
+            "type": "tool",
+            "uuid": "0d821b68-9d82-4c6d-86a6-1071a9e0f79f",
+            "value": "X-Tunnel",
+            "version": "45"
+          },
+          {
+            "authors": [
+              "Alexandre Dulaunoy",
+              "Florian Roth",
+              "Timo Steffens",
+              "Christophe Vandeplas"
+            ],
+            "description": "backdoor used by apt28\n\nSedreco serves as a spying backdoor; its functionalities can be extended with dynamically loaded plugins. It is made up of two distinct components: a dropper and the persistent payload installed by this dropper. We have not seen this component since April 2016.",
+            "galaxy_id": "367",
+            "id": "46591",
+            "meta": {
+              "possible_issues": [
+                "Report tells that is could be Xagent alias (Java Rat)"
+              ],
+              "refs": [
+                "https://www2.fireeye.com/rs/848-DID-242/images/APT28-Center-of-Storm-2017.pdf"
+              ],
+              "synonyms": [
+                "Sedreco",
+                "AZZY",
+                "ADVSTORESHELL",
+                "NETUI"
+              ],
+              "type": [
+                "Backdoor"
+              ]
+            },
+            "source": "MISP Project",
+            "tag_id": "3011",
+            "tag_name": "misp-galaxy:tool=\"EVILTOSS\"",
+            "type": "tool",
+            "uuid": "0d821b68-9d82-4c6d-86a6-1071a9e0f79f",
+            "value": "EVILTOSS",
+            "version": "45"
+          },
+          {
+            "authors": [
+              "Alexandre Dulaunoy",
+              "Florian Roth",
+              "Timo Steffens",
+              "Christophe Vandeplas"
+            ],
+            "description": "This backdoor component is known to have a modular structure featuring various espionage functionalities, such as key-logging, screen grabbing and file exfiltration. This component is available for Osx, Windows, Linux and iOS operating systems.\n\nXagent is a modular backdoor with spying functionalities such as keystroke logging and file exfiltration. Xagent is the group’s flagship backdoor and heavily used in their operations. Early versions for Linux and Windows were seen years ago, then in 2015 an iOS version came out. One year later, an Android version was discovered and finally, in the beginning of 2017, an Xagent sample for OS X was described.",
+            "galaxy_id": "367",
+            "id": "46669",
+            "meta": {
+              "refs": [
+                "http://blog.trendmicro.com/trendlabs-security-intelligence/pawn-storm-update-ios-espionage-app-found/",
+                "https://app.box.com/s/l7n781ig6n8wlf1aff5hgwbh4qoi5jqq",
+                "https://www.welivesecurity.com/2017/12/21/sednit-update-fancy-bear-spent-year/"
+              ],
+              "synonyms": [
+                "XAgent"
+              ],
+              "type": [
+                "Backdoor"
+              ]
+            },
+            "source": "MISP Project",
+            "tag_id": "1011",
+            "tag_name": "misp-galaxy:tool=\"X-Agent\"",
+            "type": "tool",
+            "uuid": "0d821b68-9d82-4c6d-86a6-1071a9e0f79f",
+            "value": "X-Agent",
+            "version": "45"
+          }
+        ],
+        "description": "Threat actors tools is an enumeration of tools used by adversaries. The list includes malware but also common software regularly used by the adversaries.",
+        "icon": "optin-monster",
+        "id": "367",
+        "name": "Tool",
+        "type": "tool",
+        "uuid": "9b8037f7-bc8f-4de1-a797-37266619bc0b",
+        "version": "2"
+      },
+      {
+        "GalaxyCluster": [
+          {
+            "authors": [
+              "MITRE"
+            ],
+            "description": "JHUHUGIT is malware used by APT28. It is based on Carberp source code and serves as reconnaissance malware.[[Citation: Kaspersky Sofacy]][[Citation: F-Secure Sofacy 2015]][[Citation: ESET Sednit Part 1]][[Citation: FireEye APT28 January 2017]]\n\nAliases: JHUHUGIT, Seduploader, JKEYSKW, Sednit, GAMEFISH",
+            "galaxy_id": "365",
+            "id": "41618",
+            "meta": {
+              "refs": [
+                "https://attack.mitre.org/wiki/Software/S0044",
+                "http://www.welivesecurity.com/wp-content/uploads/2016/10/eset-sednit-part1.pdf",
+                "https://www2.fireeye.com/rs/848-DID-242/images/APT28-Center-of-Storm-2017.pdf",
+                "https://labsblog.f-secure.com/2015/09/08/sofacy-recycles-carberp-and-metasploit-code/",
+                "https://securelist.com/blog/research/72924/sofacy-apt-hits-high-profile-targets-with-updated-toolset/"
+              ],
+              "synonyms": [
+                "JHUHUGIT",
+                "Seduploader",
+                "JKEYSKW",
+                "Sednit",
+                "GAMEFISH"
+              ],
+              "uuid": [
+                "8ae43c46-57ef-47d5-a77a-eebb35628db2"
+              ]
+            },
+            "source": "https://github.com/mitre/cti",
+            "tag_id": "3008",
+            "tag_name": "misp-galaxy:mitre-malware=\"JHUHUGIT\"",
+            "type": "mitre-malware",
+            "uuid": "d752161c-78f6-11e7-a0ea-bfa79b407ce4",
+            "value": "JHUHUGIT",
+            "version": "4"
+          },
+          {
+            "authors": [
+              "MITRE"
+            ],
+            "description": "XTunnel a VPN-like network proxy tool that can relay traffic between a C2 server and a victim. It was first seen in May 2013 and reportedly used by APT28 during the compromise of the Democratic National Committee.[[Citation: Crowdstrike DNC June 2016]][[Citation: Invincea XTunnel]][[Citation: ESET Sednit Part 2]]\n\nAliases: XTunnel, X-Tunnel, XAPS",
+            "galaxy_id": "365",
+            "id": "41543",
+            "meta": {
+              "refs": [
+                "https://attack.mitre.org/wiki/Software/S0117",
+                "http://www.welivesecurity.com/wp-content/uploads/2016/10/eset-sednit-part-2.pdf",
+                "https://www.invincea.com/2016/07/tunnel-of-gov-dnc-hack-and-the-russian-xtunnel/",
+                "https://www.crowdstrike.com/blog/bears-midst-intrusion-democratic-national-committee/"
+              ],
+              "synonyms": [
+                "XTunnel",
+                "X-Tunnel",
+                "XAPS"
+              ],
+              "uuid": [
+                "7343e208-7cab-45f2-a47b-41ba5e2f0fab"
+              ]
+            },
+            "source": "https://github.com/mitre/cti",
+            "tag_id": "3009",
+            "tag_name": "misp-galaxy:mitre-malware=\"XTunnel\"",
+            "type": "mitre-malware",
+            "uuid": "d752161c-78f6-11e7-a0ea-bfa79b407ce4",
+            "value": "XTunnel",
+            "version": "4"
+          },
+          {
+            "authors": [
+              "MITRE"
+            ],
+            "description": "ADVSTORESHELL is a spying backdoor that has been used by APT28 from at least 2012 to 2016. It is generally used for long-term espionage and is deployed on targets deemed interesting after a reconnaissance phase.[[Citation: Kaspersky Sofacy]][[Citation: ESET Sednit Part 2]]\n\nAliases: ADVSTORESHELL, NETUI, EVILTOSS, AZZY, Sedreco",
+            "galaxy_id": "365",
+            "id": "41582",
+            "meta": {
+              "refs": [
+                "https://attack.mitre.org/wiki/Software/S0045",
+                "http://www.welivesecurity.com/wp-content/uploads/2016/10/eset-sednit-part-2.pdf",
+                "https://securelist.com/blog/research/72924/sofacy-apt-hits-high-profile-targets-with-updated-toolset/"
+              ],
+              "synonyms": [
+                "ADVSTORESHELL",
+                "NETUI",
+                "EVILTOSS",
+                "AZZY",
+                "Sedreco"
+              ],
+              "uuid": [
+                "fb575479-14ef-41e9-bfab-0b7cf10bec73"
+              ]
+            },
+            "source": "https://github.com/mitre/cti",
+            "tag_id": "3010",
+            "tag_name": "misp-galaxy:mitre-malware=\"ADVSTORESHELL\"",
+            "type": "mitre-malware",
+            "uuid": "d752161c-78f6-11e7-a0ea-bfa79b407ce4",
+            "value": "ADVSTORESHELL",
+            "version": "4"
+          },
+          {
+            "authors": [
+              "MITRE"
+            ],
+            "description": "USBStealer is malware that has used by APT28 since at least 2005 to extract information from air-gapped networks. It does not have the capability to communicate over the Internet and has been used in conjunction with ADVSTORESHELL.[[Citation: ESET Sednit USBStealer 2014]][[Citation: Kaspersky Sofacy]]\n\nAliases: USBStealer, USB Stealer, Win32/USBStealer",
+            "galaxy_id": "365",
+            "id": "41549",
+            "meta": {
+              "refs": [
+                "https://attack.mitre.org/wiki/Software/S0136",
+                "http://www.welivesecurity.com/2014/11/11/sednit-espionage-group-attacking-air-gapped-networks/",
+                "https://securelist.com/blog/research/72924/sofacy-apt-hits-high-profile-targets-with-updated-toolset/"
+              ],
+              "synonyms": [
+                "USBStealer",
+                "USB Stealer",
+                "Win32/USBStealer"
+              ],
+              "uuid": [
+                "af2ad3b7-ab6a-4807-91fd-51bcaff9acbb"
+              ]
+            },
+            "source": "https://github.com/mitre/cti",
+            "tag_id": "3012",
+            "tag_name": "misp-galaxy:mitre-malware=\"USBStealer\"",
+            "type": "mitre-malware",
+            "uuid": "d752161c-78f6-11e7-a0ea-bfa79b407ce4",
+            "value": "USBStealer",
+            "version": "4"
+          },
+          {
+            "authors": [
+              "MITRE"
+            ],
+            "description": "is a trojan that has been used by APT28  on OS X and appears to be a port of their standard CHOPSTICK or XAgent trojan.[[Citation: XAgentOSX]]",
+            "galaxy_id": "365",
+            "id": "41551",
+            "meta": {
+              "refs": [
+                "https://attack.mitre.org/wiki/Software/S0161",
+                "https://researchcenter.paloaltonetworks.com/2017/02/unit42-xagentosx-sofacys-xagent-macos-tool/"
+              ],
+              "uuid": [
+                "5930509b-7793-4db9-bdfc-4edda7709d0d"
+              ]
+            },
+            "source": "https://github.com/mitre/cti",
+            "tag_id": "3013",
+            "tag_name": "misp-galaxy:mitre-malware=\"XAgentOSX\"",
+            "type": "mitre-malware",
+            "uuid": "d752161c-78f6-11e7-a0ea-bfa79b407ce4",
+            "value": "XAgentOSX",
+            "version": "4"
+          },
+          {
+            "authors": [
+              "MITRE"
+            ],
+            "description": "CHOPSTICK is malware family of modular backdoors used by APT28. It has been used from at least November 2012 to August 2016 and is usually dropped on victims as second-stage malware, though it has been used as first-stage malware in several cases.[[Citation: FireEye APT28]][[Citation: ESET Sednit Part 2]][[Citation: FireEye APT28 January 2017]]\n\nAliases: CHOPSTICK, SPLM, Xagent, X-Agent, webhp",
+            "galaxy_id": "365",
+            "id": "41559",
+            "meta": {
+              "refs": [
+                "https://attack.mitre.org/wiki/Software/S0023",
+                "https://www2.fireeye.com/rs/848-DID-242/images/APT28-Center-of-Storm-2017.pdf",
+                "http://www.welivesecurity.com/wp-content/uploads/2016/10/eset-sednit-part-2.pdf",
+                "https://www.fireeye.com/content/dam/fireeye-www/global/en/current-threats/pdfs/rpt-apt28.pdf"
+              ],
+              "synonyms": [
+                "CHOPSTICK",
+                "SPLM",
+                "Xagent",
+                "X-Agent",
+                "webhp"
+              ],
+              "uuid": [
+                "ccd61dfc-b03f-4689-8c18-7c97eab08472"
+              ]
+            },
+            "source": "https://github.com/mitre/cti",
+            "tag_id": "3014",
+            "tag_name": "misp-galaxy:mitre-malware=\"CHOPSTICK\"",
+            "type": "mitre-malware",
+            "uuid": "d752161c-78f6-11e7-a0ea-bfa79b407ce4",
+            "value": "CHOPSTICK",
+            "version": "4"
+          },
+          {
+            "authors": [
+              "MITRE"
+            ],
+            "description": "Downdelph is a first-stage downloader written in Delphi that has been used by APT28 in rare instances between 2013 and 2015.[[Citation: ESET Sednit Part 3]]\n\nAliases: Downdelph, Delphacy",
+            "galaxy_id": "365",
+            "id": "41504",
+            "meta": {
+              "refs": [
+                "https://attack.mitre.org/wiki/Software/S0134",
+                "http://www.welivesecurity.com/wp-content/uploads/2016/10/eset-sednit-part3.pdf"
+              ],
+              "synonyms": [
+                "Downdelph",
+                "Delphacy"
+              ],
+              "uuid": [
+                "08d20cd2-f084-45ee-8558-fa6ef5a18519"
+              ]
+            },
+            "source": "https://github.com/mitre/cti",
+            "tag_id": "3016",
+            "tag_name": "misp-galaxy:mitre-malware=\"Downdelph\"",
+            "type": "mitre-malware",
+            "uuid": "d752161c-78f6-11e7-a0ea-bfa79b407ce4",
+            "value": "Downdelph",
+            "version": "4"
+          }
+        ],
+        "description": "Name of ATT&CK software",
+        "icon": "optin-monster",
+        "id": "365",
+        "name": "Malware",
+        "type": "mitre-malware",
+        "uuid": "d752161c-78f6-11e7-a0ea-bfa79b407ce4",
+        "version": "4"
+      }
+    ],
+    "Object": [
+      {
+        "Attribute": [
+          {
+            "Tag": [
+              {
+                "name": "blah"
+              }
+            ],
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188944",
+            "object_id": "1555",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd5b6-2850-435f-bd0d-4c62950d210f",
+            "value": "Bulletin.doc"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188945",
+            "object_id": "1555",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936310",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd5b6-78a8-4e47-8333-4c62950d210f",
+            "value": "68064fc152e23d56e541714af52651cb4ba81aaf"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188946",
+            "object_id": "1555",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936310",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd5b6-23d8-43ba-8518-4c62950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Sednit.AX",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1555",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "uuid": "5a3cd5b6-9568-4342-b2ab-4c62950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188947",
+            "object_id": "1556",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936388",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd604-748c-4fc0-88bf-c170950d210f",
+            "value": "f3805382ae2e23ff1147301d131a06e00e4ff75f"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188948",
+            "object_id": "1556",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936388",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd604-6668-4469-a1c0-c170950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.CVE-2016-4117.A",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1556",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513936388",
+        "uuid": "5a3cd604-e11c-4de5-bbbf-c170950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188949",
+            "object_id": "1557",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513936531",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd693-dc40-445d-a4d7-4ae0950d210f",
+            "value": "OC_PSO_2017.doc"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188950",
+            "object_id": "1557",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936531",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd693-8ffc-4d95-b522-4e84950d210f",
+            "value": "512bdfe937314ac3f195c462c395feeb36932971"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188951",
+            "object_id": "1557",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936531",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd693-a8f0-4aea-a834-4097950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.Agent.NUB",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1557",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513936531",
+        "uuid": "5a3cd693-fd9c-4fcf-b69a-439c950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188952",
+            "object_id": "1558",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513936578",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd6c2-d31c-40cc-bcc1-4458950d210f",
+            "value": "NASAMS.doc"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188953",
+            "object_id": "1558",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936578",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd6c2-6a54-4b4c-8748-4c84950d210f",
+            "value": "30b3e8c0f3f3cf200daa21c267ffab3cad64e68b"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188954",
+            "object_id": "1558",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936578",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd6c2-1c68-45de-8325-464a950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.Agent.NTR",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1558",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513936578",
+        "uuid": "5a3cd6c2-d290-4787-910f-4e6d950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188955",
+            "object_id": "1559",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513936718",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd74e-584c-45b9-8557-486d950d210f",
+            "value": "Programm_Details.doc"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188956",
+            "object_id": "1559",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936718",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd74e-f334-4e6b-b37f-462f950d210f",
+            "value": "4173b29a251cd9c1cab135f67cb60acab4ace0c5"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188957",
+            "object_id": "1559",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936718",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd74e-5900-4fbf-85c6-4c81950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.Agent.NTO",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1559",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513936718",
+        "uuid": "5a3cd74e-1504-40ff-9a28-4501950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188958",
+            "object_id": "1560",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513936757",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd775-e8f4-465a-aca2-4c5a950d210f",
+            "value": "Operation_in_Mosul.rtf"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188959",
+            "object_id": "1560",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936757",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd775-1190-4db7-961a-4c5a950d210f",
+            "value": "12a37cfdd3f3671074dd5b0f354269cec028fb52"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188960",
+            "object_id": "1560",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936757",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd775-fa5c-4453-bcb0-4c5a950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.Agent.NTR",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1560",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513936757",
+        "uuid": "5a3cd775-e4cc-44bb-89b6-4c5a950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188961",
+            "object_id": "1561",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513936943",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd82f-b918-4520-ba8b-5165950d210f",
+            "value": "ARM-NATO_ENGLISH_30_NOV_2016.doc"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188962",
+            "object_id": "1561",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936943",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd82f-cae4-4209-9338-5165950d210f",
+            "value": "15201766bd964b7c405aeb11db81457220c31e46"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188963",
+            "object_id": "1561",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936943",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd82f-d91c-43af-8262-5165950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "SWF/Agent.L",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1561",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513936943",
+        "uuid": "5a3cd82f-2788-4561-bbeb-5165950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188964",
+            "object_id": "1562",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513936967",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd847-0aa0-4b5c-aa30-5165950d210f",
+            "value": "Olympic-Agenda-2020-20-20-Recommendations.doc"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188965",
+            "object_id": "1562",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936967",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd847-593c-4985-8756-5165950d210f",
+            "value": "8078e411fbe33864dfd8f87ad5105cc1fd26d62e"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188966",
+            "object_id": "1562",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936967",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd847-1324-4fad-af60-5165950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.Agent.BL",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1562",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513936967",
+        "uuid": "5a3cd847-b5a0-42f7-ac4b-5165950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188967",
+            "object_id": "1563",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513936993",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd861-9350-40c1-ac29-4771950d210f",
+            "value": "Merry_Christmas!.docx"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188968",
+            "object_id": "1563",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513936993",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd861-18ac-4cf0-b96f-4986950d210f",
+            "value": "33447383379ca99083442b852589111296f0c603"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188969",
+            "object_id": "1563",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513936993",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd861-cfbc-4096-baae-40e2950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.Agent.NUG",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1563",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513936993",
+        "uuid": "5a3cd861-65c0-4b69-9429-4f37950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188970",
+            "object_id": "1564",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513937021",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd87d-fa9c-41aa-897f-49a5950d210f",
+            "value": "Trump’s_Attack_on_Syria_English.docx"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188971",
+            "object_id": "1564",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937021",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd87d-c630-4487-8336-4615950d210f",
+            "value": "d5235d136cfcadbef431eea7253d80bde414db9d"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188972",
+            "object_id": "1564",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937021",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd87d-8c98-4660-9026-44de950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.Agent.NWZ",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1564",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937021",
+        "uuid": "5a3cd87d-f514-4071-a5f7-4ec2950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188973",
+            "object_id": "1565",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513937047",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd897-4cc0-48b0-bb2c-461f950d210f",
+            "value": "Hotel_Reservation_Form.doc"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188974",
+            "object_id": "1565",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937047",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd897-fa64-466c-9421-49c5950d210f",
+            "value": "f293a2bfb728060c54efeeb03c5323893b5c80df"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188975",
+            "object_id": "1565",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937047",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd897-f020-44cf-8dfc-4225950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Sednit.BN",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1565",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937046",
+        "uuid": "5a3cd896-f6cc-4e52-bcb2-442c950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188976",
+            "object_id": "1566",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513937070",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd8ae-7194-48fd-810e-4c5a950d210f",
+            "value": "SB_Doc_2017-3_Implementation_of_Key_Taskings_and_Next_Steps.doc"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188977",
+            "object_id": "1566",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937071",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd8af-f39c-443c-bcf1-4c5a950d210f",
+            "value": "bb10ed5d59672fbc6178e35d0feac0562513e9f0"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188978",
+            "object_id": "1566",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937071",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd8af-b3ec-478a-b585-4c5a950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Sednit.BN",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1566",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937070",
+        "uuid": "5a3cd8ae-54d0-46bb-adbb-4c5a950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188979",
+            "object_id": "1567",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937083",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd8bb-74d8-4d19-ae08-4043950d210f",
+            "value": "4873bafe44cff06845faa0ce7c270c4ce3c9f7b9"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188980",
+            "object_id": "1567",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937083",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd8bb-77bc-4cc4-887f-429d950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1567",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937083",
+        "uuid": "5a3cd8bb-a704-4f1d-a235-444e950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188981",
+            "object_id": "1568",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937097",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd8c9-4d2c-4145-a637-4f13950d210f",
+            "value": "169c8f3e3d22e192c108bc95164d362ce5437465"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188982",
+            "object_id": "1568",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937097",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd8c9-7ff0-42f7-ae80-4eb6950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1568",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937097",
+        "uuid": "5a3cd8c9-6568-406a-853c-4862950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188983",
+            "object_id": "1569",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937116",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd8dc-48c0-4ea0-a67d-4734950d210f",
+            "value": "cc7607015cd7a1a4452acd3d87adabdd7e005bd7"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188984",
+            "object_id": "1569",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937116",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd8dc-9ed8-4a4d-9ceb-4daa950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Sednit.BN",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1569",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937115",
+        "uuid": "5a3cd8db-2838-4466-a986-4afb950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188985",
+            "object_id": "1570",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513937147",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd8fb-1efc-4059-ae7a-42f5950d210f",
+            "value": "Caucasian_Eagle_ENG.docx"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188986",
+            "object_id": "1570",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937147",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd8fb-9cec-4a30-8b2f-4441950d210f",
+            "value": "5d2c7d87995cc5b8184baba2c7a1900a48b2f42d"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188987",
+            "object_id": "1570",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937147",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd8fb-e52c-489b-8da5-43d1950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "Win32/Exploit.Agent.NTM",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1570",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937147",
+        "uuid": "5a3cd8fb-cd14-4b00-9710-430c950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188988",
+            "object_id": "1571",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513937166",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd90e-5eb4-4069-b160-5276950d210f",
+            "value": "World War3.docx"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188989",
+            "object_id": "1571",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937166",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd90e-6d2c-4ffc-a699-5276950d210f",
+            "value": "7aada8bcc0d1ab8ffb1f0fae4757789c6f5546a3"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188990",
+            "object_id": "1571",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937166",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd90e-28e8-410e-8033-5276950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "SWF/Exploit.CVE-2017-11292.A",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1571",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937166",
+        "uuid": "5a3cd90e-538c-4b7e-95dc-5276950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188991",
+            "object_id": "1572",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513937191",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd927-e810-4d22-a0e4-4057950d210f",
+            "value": "SaberGuardian2017.docx"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188992",
+            "object_id": "1572",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937191",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd927-f284-43b9-83d1-473b950d210f",
+            "value": "68c2809560c7623d2307d8797691abf3eafe319a"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188993",
+            "object_id": "1572",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937191",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd927-b844-49f2-a1a9-4c85950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "VBA/DDE.E",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1572",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937191",
+        "uuid": "5a3cd927-e410-489c-abfc-4b63950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188994",
+            "object_id": "1573",
+            "object_relation": "filename",
+            "sharing_group_id": "0",
+            "timestamp": "1513937212",
+            "to_ids": true,
+            "type": "filename",
+            "uuid": "5a3cd93c-2438-4dda-823e-463d950d210f",
+            "value": "IsisAttackInNewYork.docx"
+          },
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188995",
+            "object_id": "1573",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937212",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cd93c-1ef0-4d81-9476-4655950d210f",
+            "value": "1c6c700ceebfbe799e115582665105caa03c5c9e"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188996",
+            "object_id": "1573",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937212",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cd93c-949c-40ac-9094-4a4a950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "comment": "VBA/DDE.L",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1573",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937212",
+        "uuid": "5a3cd93c-716c-4918-a00f-4671950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188997",
+            "object_id": "1574",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937559",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cda97-7e58-4642-aaf5-c5ed950d210f",
+            "value": "6f0fc0ebba3e4c8b26a69cdf519edf8d1aa2f4bb"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188998",
+            "object_id": "1574",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937559",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cda97-6020-423d-9d23-c5ed950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-ab0c-4d38-8efe-459002de0b81",
+              "value": "movieultimate.com"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "159",
+            "object_id": "1574",
+            "object_uuid": "5a3cda96-85c4-45a1-82ea-c5ed950d210f",
+            "referenced_id": "1188759",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-ab0c-4d38-8efe-459002de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513937826",
+            "uuid": "5a3cdba2-2fdc-4f9a-a4eb-4dae950d210f"
+          }
+        ],
+        "comment": "Win64/Sednit.Z",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1574",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513937826",
+        "uuid": "5a3cda96-85c4-45a1-82ea-c5ed950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1188999",
+            "object_id": "1575",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937864",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cdbc8-0aac-4d8a-8c1f-4c5a950d210f",
+            "value": "e19f753e514f6adec8f81bcdefb9117979e69627"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189000",
+            "object_id": "1575",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937864",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cdbc8-e204-4606-b9ea-4c5a950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-61dc-495c-ae8a-471e02de0b81",
+              "value": "meteost.com"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "160",
+            "object_id": "1575",
+            "object_uuid": "5a3cdbc7-dbec-4b8c-8ba3-4c5a950d210f",
+            "referenced_id": "1188760",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-61dc-495c-ae8a-471e02de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513938091",
+            "uuid": "5a3cdcab-8200-4c65-868e-42a9950d210f"
+          }
+        ],
+        "comment": "Win64/Sednit.Z",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1575",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513938091",
+        "uuid": "5a3cdbc7-dbec-4b8c-8ba3-4c5a950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189001",
+            "object_id": "1576",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937910",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cdbf6-eca0-4c09-9bd0-4c59950d210f",
+            "value": "961468ddd3d0fa25beb8210c81ba620f9170ed30"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189002",
+            "object_id": "1576",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937910",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cdbf6-acd8-4a36-a028-4c59950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-e354-4978-a6b4-49ad02de0b81",
+              "value": "faststoragefiles.org"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "164",
+            "object_id": "1576",
+            "object_uuid": "5a3cdbf6-f814-491f-9f93-4c59950d210f",
+            "referenced_id": "1188761",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-e354-4978-a6b4-49ad02de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513938210",
+            "uuid": "5a3cdd22-b7d8-4754-a108-4742950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BO",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1576",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513938210",
+        "uuid": "5a3cdbf6-f814-491f-9f93-4c59950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189003",
+            "object_id": "1577",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937929",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cdc09-b428-4c0b-9969-c5ed950d210f",
+            "value": "a0719b50265505c8432616c0a4e14ed206981e95"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189004",
+            "object_id": "1577",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937929",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cdc09-05d8-4356-ba52-c5ed950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-968c-4572-9f64-491502de0b81",
+              "value": "nethostnet.com"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "162",
+            "object_id": "1577",
+            "object_uuid": "5a3cdc09-6fbc-4ca1-bfaa-c5ed950d210f",
+            "referenced_id": "1188762",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-968c-4572-9f64-491502de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513938169",
+            "uuid": "5a3cdcf9-d5a4-4c8e-a201-45b1950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BO",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1577",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513938169",
+        "uuid": "5a3cdc09-6fbc-4ca1-bfaa-c5ed950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189005",
+            "object_id": "1578",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937953",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cdc21-a170-4637-b139-4812950d210f",
+            "value": "2cf6436b99d11d9d1e0c488af518e35162ecbc9c"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189006",
+            "object_id": "1578",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937953",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cdc21-3274-4800-9e91-41e2950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-e354-4978-a6b4-49ad02de0b81",
+              "value": "faststoragefiles.org"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "165",
+            "object_id": "1578",
+            "object_uuid": "5a3cdc21-856c-48bd-a757-4f4b950d210f",
+            "referenced_id": "1188761",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-e354-4978-a6b4-49ad02de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513938226",
+            "uuid": "5a3cdd32-3044-4895-8f18-4d06950d210f"
+          }
+        ],
+        "comment": "Win64/Sednit.Y",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1578",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513938226",
+        "uuid": "5a3cdc21-856c-48bd-a757-4f4b950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189007",
+            "object_id": "1579",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937975",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cdc37-cee0-43d0-9e20-4db6950d210f",
+            "value": "fec29b4f4dccc59770c65c128dfe4564d7c13d33"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189008",
+            "object_id": "1579",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937976",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cdc38-ac24-44be-a1ed-4935950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-eb44-433f-a13a-44b902de0b81",
+              "value": "fsportal.net"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "163",
+            "object_id": "1579",
+            "object_uuid": "5a3cdc37-89e8-4a2d-823a-4af8950d210f",
+            "referenced_id": "1188763",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-eb44-433f-a13a-44b902de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513938189",
+            "uuid": "5a3cdd0d-d990-42ba-830d-5156950d210f"
+          }
+        ],
+        "comment": "Win64/Sednit.Y",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1579",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513938190",
+        "uuid": "5a3cdc37-89e8-4a2d-823a-4af8950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189009",
+            "object_id": "1580",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513937992",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cdc48-c74c-4b6e-8202-5156950d210f",
+            "value": "57d7f3d31c491f8aef4665ca4dd905c3c8a98795"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189010",
+            "object_id": "1580",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513937992",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cdc48-55dc-420e-9b5d-5156950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-6a88-479d-b799-4d3d02de0b81",
+              "value": "fastdataexchange.org"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "161",
+            "object_id": "1580",
+            "object_uuid": "5a3cdc48-b9a0-4775-a03f-5156950d210f",
+            "referenced_id": "1188764",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-6a88-479d-b799-4d3d02de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513938129",
+            "uuid": "5a3cdcd1-c6cc-43d8-a2f4-4681950d210f"
+          }
+        ],
+        "comment": "Win64/Sednit.Z",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1580",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513938129",
+        "uuid": "5a3cdc48-b9a0-4775-a03f-5156950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189011",
+            "object_id": "1581",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513938011",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cdc5b-54a8-4e60-bc67-4c5a950d210f",
+            "value": "a3bf5b5cf5a5ef438a198a6f61f7225c0a4a7138"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189012",
+            "object_id": "1581",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513938011",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cdc5b-b390-4183-aec7-4c5a950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-7480-4831-a5c4-48c802de0b81",
+              "value": "newfilmts.com"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "168",
+            "object_id": "1581",
+            "object_uuid": "5a3cdc5a-8760-4efa-949a-4c5a950d210f",
+            "referenced_id": "1188765",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-7480-4831-a5c4-48c802de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513938280",
+            "uuid": "5a3cdd68-7968-40d1-a0a9-5156950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BO",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1581",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513938280",
+        "uuid": "5a3cdc5a-8760-4efa-949a-4c5a950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189013",
+            "object_id": "1582",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513938034",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3cdc72-ba30-4ecd-9d21-4654950d210f",
+            "value": "1958e722afd0dba266576922abc98aa505cf5f9a"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189014",
+            "object_id": "1582",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513938034",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3cdc72-0804-42c4-acfa-4ac5950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Attribute": {
+              "category": "Network activity",
+              "distribution": "5",
+              "sharing_group_id": "0",
+              "to_ids": true,
+              "type": "domain",
+              "uuid": "5a3c3045-7480-4831-a5c4-48c802de0b81",
+              "value": "newfilmts.com"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "167",
+            "object_id": "1582",
+            "object_uuid": "5a3cdc72-1538-4c66-af46-427b950d210f",
+            "referenced_id": "1188765",
+            "referenced_type": "0",
+            "referenced_uuid": "5a3c3045-7480-4831-a5c4-48c802de0b81",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513938264",
+            "uuid": "5a3cdd58-9800-4bae-837c-4f20950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BO",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1582",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513938264",
+        "uuid": "5a3cdc72-1538-4c66-af46-427b950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189015",
+            "object_id": "1583",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513939882",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce3aa-e104-481e-a7f4-4bc1950d210f",
+            "value": "9f6bed7d7f4728490117cbc85819c2e6c494251b"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189016",
+            "object_id": "1583",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513939882",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce3aa-74fc-48c7-af40-4c6a950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce58a-3198-4cb8-9d51-44e5950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "173",
+            "object_id": "1583",
+            "object_uuid": "5a3ce3a9-f070-4403-a1f6-4b8c950d210f",
+            "referenced_id": "1592",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce58a-3198-4cb8-9d51-44e5950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513947459",
+            "uuid": "5a3d0143-c300-4118-8afe-4a2d950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.AX\t",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1583",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513948642",
+        "uuid": "5a3ce3a9-f070-4403-a1f6-4b8c950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189017",
+            "object_id": "1584",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513939907",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce3c3-6d9c-48f4-93db-4a61950d210f",
+            "value": "4bc722a9b0492a50bd86a1341f02c74c0d773db7"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189018",
+            "object_id": "1584",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513939907",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce3c3-c38c-4e30-a904-4c8f950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce6ae-98d8-4270-b88f-47f2950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "188",
+            "object_id": "1584",
+            "object_uuid": "5a3ce3c3-34b4-4e1f-b238-4399950d210f",
+            "referenced_id": "1603",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce6ae-98d8-4270-b88f-47f2950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513948518",
+            "uuid": "5a3d0566-34fc-4a62-b2a5-4f91950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BS",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1584",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513948535",
+        "uuid": "5a3ce3c3-34b4-4e1f-b238-4399950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189019",
+            "object_id": "1585",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513939924",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce3d4-9168-4e23-8b64-485a950d210f",
+            "value": "ab354807e687993fbeb1b325eb6e4ab38d428a1e"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189020",
+            "object_id": "1585",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513939924",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce3d4-27e0-4366-943f-4b9a950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce6a1-3f1c-4d5d-bac7-406d950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "189",
+            "object_id": "1585",
+            "object_uuid": "5a3ce3d4-07bc-4af3-90fc-4798950d210f",
+            "referenced_id": "1602",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce6a1-3f1c-4d5d-bac7-406d950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513948528",
+            "uuid": "5a3d0570-a86c-4264-a43a-4125950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BS",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1585",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513948597",
+        "uuid": "5a3ce3d4-07bc-4af3-90fc-4798950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189021",
+            "object_id": "1586",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513939946",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce3ea-8dbc-4cf4-997f-448b950d210f",
+            "value": "9c47ca3883196b3a84d67676a804ff50e22b0a9f"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189022",
+            "object_id": "1586",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513939946",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce3ea-e714-444e-ad9b-40b0950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce68d-1940-4ea6-becd-44fe950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "190",
+            "object_id": "1586",
+            "object_uuid": "5a3ce3ea-580c-477c-9b73-4e57950d210f",
+            "referenced_id": "1601",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce68d-1940-4ea6-becd-44fe950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513948614",
+            "uuid": "5a3d05c6-0618-4520-9549-48a0950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BR",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1586",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513948626",
+        "uuid": "5a3ce3ea-580c-477c-9b73-4e57950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189023",
+            "object_id": "1587",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513939972",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce404-7bfc-4316-bd32-55ea950d210f",
+            "value": "8a68f26d01372114f660e32ac4c9117e5d0577f1"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189024",
+            "object_id": "1587",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513939972",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce404-7224-4525-922a-55ea950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce680-90d4-478d-95db-48a6950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "182",
+            "object_id": "1587",
+            "object_uuid": "5a3ce404-efc0-4f15-864e-55ea950d210f",
+            "referenced_id": "1600",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce680-90d4-478d-95db-48a6950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513948044",
+            "uuid": "5a3d038c-1cc8-4d9c-87ab-c5ed950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BN",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1587",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513948073",
+        "uuid": "5a3ce404-efc0-4f15-864e-55ea950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189025",
+            "object_id": "1588",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513939991",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce417-62a4-4d46-9a87-55ea950d210f",
+            "value": "476fc1d31722ac26b46154cbf0c631d60268b28a"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189026",
+            "object_id": "1588",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513939991",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce417-43f0-494d-ac2e-55ea950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce66e-70b4-47e7-b965-46f6950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "187",
+            "object_id": "1588",
+            "object_uuid": "5a3ce417-7cd4-4c36-8a73-55ea950d210f",
+            "referenced_id": "1599",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce66e-70b4-47e7-b965-46f6950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513948483",
+            "uuid": "5a3d0543-8f74-4086-aafc-418a950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BN",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1588",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513948498",
+        "uuid": "5a3ce417-7cd4-4c36-8a73-55ea950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189027",
+            "object_id": "1589",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513940012",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce42c-836c-49e7-a9f3-4a5f950d210f",
+            "value": "f9fd3f1d8da4ffd6a494228b934549d09e3c59d1"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189028",
+            "object_id": "1589",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513940012",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce42c-4c88-4940-94b8-4084950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce60a-6db8-4212-b194-4339950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "183",
+            "object_id": "1589",
+            "object_uuid": "5a3ce42b-2e0c-4a26-b6c8-47a3950d210f",
+            "referenced_id": "1594",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce60a-6db8-4212-b194-4339950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513948106",
+            "uuid": "5a3d03ca-2398-4060-b13c-404a950d210f"
+          },
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce61a-c1f0-4c7c-b815-4fa9950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "184",
+            "object_id": "1589",
+            "object_uuid": "5a3ce42b-2e0c-4a26-b6c8-47a3950d210f",
+            "referenced_id": "1595",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce61a-c1f0-4c7c-b815-4fa9950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513948117",
+            "uuid": "5a3d03d5-6d8c-4dfb-b193-4002950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BN",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1589",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513948128",
+        "uuid": "5a3ce42b-2e0c-4a26-b6c8-47a3950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189029",
+            "object_id": "1590",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513940027",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce43b-6738-4a14-a318-4d65950d210f",
+            "value": "e338d49c270baf64363879e5eecb8fa6bdde8ad9"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189030",
+            "object_id": "1590",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513940027",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce43b-3a10-4d78-9ee2-485c950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce5f8-3418-4f7b-ae41-4bca950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "186",
+            "object_id": "1590",
+            "object_uuid": "5a3ce43a-5478-4f65-95b2-4e1e950d210f",
+            "referenced_id": "1593",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce5f8-3418-4f7b-ae41-4bca950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513948320",
+            "uuid": "5a3d04a0-9d28-47c3-a12c-465b950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BG",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1590",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513948339",
+        "uuid": "5a3ce43a-5478-4f65-95b2-4e1e950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Payload delivery",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189031",
+            "object_id": "1591",
+            "object_relation": "sha1",
+            "sharing_group_id": "0",
+            "timestamp": "1513940042",
+            "to_ids": true,
+            "type": "sha1",
+            "uuid": "5a3ce44a-2ea4-4526-8bbc-c328950d210f",
+            "value": "6e167da3c5d887fa2e58da848a2245d11b6c5ad6"
+          },
+          {
+            "category": "Other",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": true,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189032",
+            "object_id": "1591",
+            "object_relation": "state",
+            "sharing_group_id": "0",
+            "timestamp": "1513940042",
+            "to_ids": false,
+            "type": "text",
+            "uuid": "5a3ce44a-5118-4142-97f0-c328950d210f",
+            "value": "Malicious"
+          }
+        ],
+        "ObjectReference": [
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce64e-8bf8-4dc6-be49-437f950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "170",
+            "object_id": "1591",
+            "object_uuid": "5a3ce44a-ce70-42b7-80b8-c328950d210f",
+            "referenced_id": "1597",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce64e-8bf8-4dc6-be49-437f950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513940734",
+            "uuid": "5a3ce6fe-b0c4-44df-a609-419a950d210f"
+          },
+          {
+            "Object": {
+              "distribution": "5",
+              "meta-category": "network",
+              "name": "domain-ip",
+              "sharing_group_id": "0",
+              "uuid": "5a3ce65c-fc40-4585-817e-4ca3950d210f"
+            },
+            "comment": "",
+            "deleted": false,
+            "event_id": "9747",
+            "id": "171",
+            "object_id": "1591",
+            "object_uuid": "5a3ce44a-ce70-42b7-80b8-c328950d210f",
+            "referenced_id": "1598",
+            "referenced_type": "1",
+            "referenced_uuid": "5a3ce65c-fc40-4585-817e-4ca3950d210f",
+            "relationship_type": "communicates-with",
+            "timestamp": "1513940753",
+            "uuid": "5a3ce711-a0dc-4dbe-b59e-495a950d210f"
+          }
+        ],
+        "comment": "Win32/Sednit.BG",
+        "deleted": false,
+        "description": "File object describing a file with meta-information",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1591",
+        "meta-category": "file",
+        "name": "file",
+        "sharing_group_id": "0",
+        "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
+        "template_version": "8",
+        "timestamp": "1513940753",
+        "uuid": "5a3ce44a-ce70-42b7-80b8-c328950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189033",
+            "object_id": "1592",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940362",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce58a-fcd8-48d5-8b4a-4fd9950d210f",
+            "value": "87.236.211.182"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189034",
+            "object_id": "1592",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940362",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce58a-6e14-48ea-9746-48f2950d210f",
+            "value": "servicecdp.com"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1592",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940362",
+        "uuid": "5a3ce58a-3198-4cb8-9d51-44e5950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189035",
+            "object_id": "1593",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940472",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce5f8-99b4-41a2-915a-4bf8950d210f",
+            "value": "95.215.45.43"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189036",
+            "object_id": "1593",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940472",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce5f8-62c8-4f04-89c2-4aeb950d210f",
+            "value": "wmdmediacodecs.com"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1593",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940472",
+        "uuid": "5a3ce5f8-3418-4f7b-ae41-4bca950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189037",
+            "object_id": "1594",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940490",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce60a-cc50-4553-bfff-4ea9950d210f",
+            "value": "89.45.67.144"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189038",
+            "object_id": "1594",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940491",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce60b-e648-4667-8432-4ba8950d210f",
+            "value": "mvband.net"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1594",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940490",
+        "uuid": "5a3ce60a-6db8-4212-b194-4339950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189039",
+            "object_id": "1595",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940506",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce61a-4458-4c36-866e-44e9950d210f",
+            "value": "89.33.246.117"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189040",
+            "object_id": "1595",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940506",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce61a-f820-4a43-b3d9-47e5950d210f",
+            "value": "mvtband.net"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1595",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940506",
+        "uuid": "5a3ce61a-c1f0-4c7c-b815-4fa9950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189041",
+            "object_id": "1596",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940542",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce63e-66d4-483f-bae6-44f6950d210f",
+            "value": "87.236.211.182"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189042",
+            "object_id": "1596",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940542",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce63e-0d88-405b-82a9-43b5950d210f",
+            "value": "servicecdp.com"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1596",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940542",
+        "uuid": "5a3ce63e-0240-46f5-b9ed-4759950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189043",
+            "object_id": "1597",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940558",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce64e-d7a8-4817-a132-4c72950d210f",
+            "value": "185.156.173.70"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189044",
+            "object_id": "1597",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940558",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce64e-243c-4931-b733-403c950d210f",
+            "value": "runvercheck.com"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1597",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940558",
+        "uuid": "5a3ce64e-8bf8-4dc6-be49-437f950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189045",
+            "object_id": "1598",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940572",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce65c-bf78-4b78-bafd-4cf6950d210f",
+            "value": "191.101.31.96"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189046",
+            "object_id": "1598",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940572",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce65c-8140-4146-a927-45e4950d210f",
+            "value": "remsupport.org"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1598",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940572",
+        "uuid": "5a3ce65c-fc40-4585-817e-4ca3950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189047",
+            "object_id": "1599",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940591",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce66f-150c-43ec-a3ff-4aa5950d210f",
+            "value": "89.187.150.44"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189048",
+            "object_id": "1599",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940591",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce66f-466c-478e-8064-4b42950d210f",
+            "value": "viters.org"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1599",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940590",
+        "uuid": "5a3ce66e-70b4-47e7-b965-46f6950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189049",
+            "object_id": "1600",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940608",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce680-7b04-466d-b187-4301950d210f",
+            "value": "146.185.253.132"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189050",
+            "object_id": "1600",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940608",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce680-12f4-4001-9f86-4aa4950d210f",
+            "value": "myinvestgroup.com"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1600",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940608",
+        "uuid": "5a3ce680-90d4-478d-95db-48a6950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189051",
+            "object_id": "1601",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940621",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce68d-0108-4557-8921-4377950d210f",
+            "value": "86.106.131.141"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189052",
+            "object_id": "1601",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940622",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce68e-54d0-4c67-8c4c-4dea950d210f",
+            "value": "space-delivery.com"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1601",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940621",
+        "uuid": "5a3ce68d-1940-4ea6-becd-44fe950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189054",
+            "object_id": "1602",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940642",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce6a2-4a38-4b90-8d74-4f10950d210f",
+            "value": "89.34.111.160"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189055",
+            "object_id": "1602",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940642",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce6a2-ffa4-4afb-89ab-42a6950d210f",
+            "value": "satellitedeluxpanorama.com"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1602",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940641",
+        "uuid": "5a3ce6a1-3f1c-4d5d-bac7-406d950d210f"
+      },
+      {
+        "Attribute": [
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189056",
+            "object_id": "1603",
+            "object_relation": "ip",
+            "sharing_group_id": "0",
+            "timestamp": "1513940654",
+            "to_ids": true,
+            "type": "ip-dst",
+            "uuid": "5a3ce6ae-601c-44b8-8eec-4a5f950d210f",
+            "value": "185.216.35.26"
+          },
+          {
+            "category": "Network activity",
+            "comment": "",
+            "deleted": false,
+            "disable_correlation": false,
+            "distribution": "5",
+            "event_id": "9747",
+            "id": "1189057",
+            "object_id": "1603",
+            "object_relation": "domain",
+            "sharing_group_id": "0",
+            "timestamp": "1513940654",
+            "to_ids": true,
+            "type": "domain",
+            "uuid": "5a3ce6ae-3b00-420a-82fd-45fb950d210f",
+            "value": "webviewres.net"
+          }
+        ],
+        "comment": "",
+        "deleted": false,
+        "description": "A domain and IP address seen as a tuple in a specific time frame.",
+        "distribution": "5",
+        "event_id": "9747",
+        "id": "1603",
+        "meta-category": "network",
+        "name": "domain-ip",
+        "sharing_group_id": "0",
+        "template_uuid": "43b3b146-77eb-4931-b4cc-b66c60f28734",
+        "template_version": "5",
+        "timestamp": "1513940654",
+        "uuid": "5a3ce6ae-98d8-4270-b88f-47f2950d210f"
+      }
+    ],
+    "Org": {
+      "id": "2",
+      "name": "CIRCL",
+      "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+    },
+    "Orgc": {
+      "id": "2",
+      "name": "CIRCL",
+      "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+    },
+    "RelatedEvent": [
+      {
+        "Event": {
+          "Org": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "Orgc": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "analysis": "2",
+          "date": "2017-12-14",
+          "distribution": "3",
+          "id": "9616",
+          "info": "OSINT - Attackers Deploy New ICS Attack Framework “TRITON” and Cause Operational Disruption to Critical Infrastructure",
+          "org_id": "2",
+          "orgc_id": "2",
+          "published": false,
+          "threat_level_id": "3",
+          "timestamp": "1513674510",
+          "uuid": "5a329d19-03e0-4eaa-8b4d-4310950d210f"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "Orgc": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "analysis": "2",
+          "date": "2017-12-07",
+          "distribution": "3",
+          "id": "9552",
+          "info": "OSINT - Master Channel: The Boleto Mestre Campaign Targets Brazil",
+          "org_id": "2",
+          "orgc_id": "2",
+          "published": false,
+          "threat_level_id": "3",
+          "timestamp": "1512657975",
+          "uuid": "5a2943a3-c574-44bb-8e68-45de950d210f"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "Orgc": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "analysis": "0",
+          "date": "2017-11-27",
+          "distribution": "3",
+          "id": "9513",
+          "info": "OSINT - Tizi: Detecting and blocking socially engineered spyware on Android",
+          "org_id": "2",
+          "orgc_id": "2",
+          "published": true,
+          "threat_level_id": "3",
+          "timestamp": "1512356440",
+          "uuid": "5a23a972-e6a0-4a05-b505-4e8f02de0b81"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "Orgc": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "analysis": "2",
+          "date": "2017-11-07",
+          "distribution": "3",
+          "id": "9309",
+          "info": "OSINT - Threat Group APT28 Slips Office Malware into Doc Citing NYC Terror Attack",
+          "org_id": "2",
+          "orgc_id": "2",
+          "published": true,
+          "threat_level_id": "3",
+          "timestamp": "1511385862",
+          "uuid": "5a021bc2-8e0c-4ac5-b048-cc3e02de0b81"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "291",
+            "name": "NCSC-NL",
+            "uuid": "5697b0c4-9474-4336-b675-28140a950b0b"
+          },
+          "Orgc": {
+            "id": "291",
+            "name": "NCSC-NL",
+            "uuid": "5697b0c4-9474-4336-b675-28140a950b0b"
+          },
+          "analysis": "2",
+          "date": "2017-10-23",
+          "distribution": "3",
+          "id": "9208",
+          "info": "Talos: “Cyber Conflict” Decoy Document Used In Real Cyber Conflict",
+          "org_id": "291",
+          "orgc_id": "291",
+          "published": true,
+          "threat_level_id": "2",
+          "timestamp": "1510088616",
+          "uuid": "59ed9c81-6484-47a9-aab4-191d0a950b0c"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "Orgc": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "analysis": "2",
+          "date": "2017-08-11",
+          "distribution": "3",
+          "id": "8798",
+          "info": "OSINT - APT28 Targets Hospitality Sector, Presents Threat to Travelers",
+          "org_id": "2",
+          "orgc_id": "2",
+          "published": true,
+          "threat_level_id": "3",
+          "timestamp": "1502460096",
+          "uuid": "598db7fd-47a8-45f8-9414-408b02de0b81"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "231",
+            "name": "kingfisherops.com",
+            "uuid": "566ff5f4-7020-4089-9003-4374950d210f"
+          },
+          "Orgc": {
+            "id": "204",
+            "name": "CERT-BUND",
+            "uuid": "56a64d7a-63dc-4471-bce9-4accc25ed029"
+          },
+          "analysis": "0",
+          "date": "2017-07-25",
+          "distribution": "3",
+          "id": "8750",
+          "info": "European Defence Agency lure drops mssuppa.dat",
+          "org_id": "231",
+          "orgc_id": "204",
+          "published": true,
+          "threat_level_id": "2",
+          "timestamp": "1500967989",
+          "uuid": "5976f294-a844-44fe-a4f0-6c67c25ed029"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "277",
+            "name": "inthreat.com",
+            "uuid": "5697b91d-2090-441f-b153-75e895ca48b7"
+          },
+          "Orgc": {
+            "id": "277",
+            "name": "inthreat.com",
+            "uuid": "5697b91d-2090-441f-b153-75e895ca48b7"
+          },
+          "analysis": "2",
+          "date": "2017-05-11",
+          "distribution": "3",
+          "id": "7820",
+          "info": "APT28-Sednit adds two zero-day exploits using ‘Trump’s attack on Syria’ as a decoy",
+          "org_id": "277",
+          "orgc_id": "277",
+          "published": true,
+          "threat_level_id": "2",
+          "timestamp": "1494824291",
+          "uuid": "59147a22-3100-4779-9377-360395ca48b7"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "Orgc": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "analysis": "2",
+          "date": "2017-05-09",
+          "distribution": "3",
+          "id": "7801",
+          "info": "OSINT - EPS Processing Zero-Days Exploited by Multiple Threat Actors",
+          "org_id": "2",
+          "orgc_id": "2",
+          "published": true,
+          "threat_level_id": "3",
+          "timestamp": "1494354378",
+          "uuid": "59120865-27e0-4e6d-9b74-4a9f950d210f"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "Orgc": {
+            "id": "2",
+            "name": "CIRCL",
+            "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+          },
+          "analysis": "0",
+          "date": "2016-12-29",
+          "distribution": "3",
+          "id": "5667",
+          "info": "OSINT - GRIZZLY STEPPE – Russian Malicious Cyber Activity",
+          "org_id": "2",
+          "orgc_id": "2",
+          "published": true,
+          "threat_level_id": "3",
+          "timestamp": "1494853878",
+          "uuid": "58658c15-54ac-43c3-9beb-414502de0b81"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "277",
+            "name": "inthreat.com",
+            "uuid": "5697b91d-2090-441f-b153-75e895ca48b7"
+          },
+          "Orgc": {
+            "id": "277",
+            "name": "inthreat.com",
+            "uuid": "5697b91d-2090-441f-b153-75e895ca48b7"
+          },
+          "analysis": "2",
+          "date": "2016-12-20",
+          "distribution": "1",
+          "id": "5616",
+          "info": "APT28-The Sofacy Group's DealersChoice Attacks Continue",
+          "org_id": "277",
+          "orgc_id": "277",
+          "published": true,
+          "threat_level_id": "2",
+          "timestamp": "1494829249",
+          "uuid": "58594faf-e98c-4c03-a58c-43cf95ca48b7"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "291",
+            "name": "NCSC-NL",
+            "uuid": "5697b0c4-9474-4336-b675-28140a950b0b"
+          },
+          "Orgc": {
+            "id": "291",
+            "name": "NCSC-NL",
+            "uuid": "5697b0c4-9474-4336-b675-28140a950b0b"
+          },
+          "analysis": "1",
+          "date": "2016-11-09",
+          "distribution": "3",
+          "id": "5348",
+          "info": "[APT-28/Sofacy]Pawn Storm Ramps Up [European Government] Spear-phishing Before Zero-Days Get Patched",
+          "org_id": "291",
+          "orgc_id": "291",
+          "published": true,
+          "threat_level_id": "1",
+          "timestamp": "1481709638",
+          "uuid": "582341ff-0830-4b32-aaba-08640a950b0c"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "74",
+            "name": "PwC.lu",
+            "uuid": "55f6ea61-4f74-40b6-a6df-4ff9950d210f"
+          },
+          "Orgc": {
+            "id": "325",
+            "name": "CUDESO",
+            "uuid": "56c42374-fdb8-4544-a218-41ffc0a8ab16"
+          },
+          "analysis": "2",
+          "date": "2016-11-09",
+          "distribution": "3",
+          "id": "5641",
+          "info": "Pawn Storm Ramps Up Spear-phishing Before Zero-Days Get Patched",
+          "org_id": "74",
+          "orgc_id": "325",
+          "published": true,
+          "threat_level_id": "2",
+          "timestamp": "1478712711",
+          "uuid": "58235d0e-34d4-41c1-9a2e-04dcc0a8ab16"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "335",
+            "name": "Orange CERT-CC",
+            "uuid": "5707ccb5-e330-4e25-a193-41d4950d210f"
+          },
+          "Orgc": {
+            "id": "335",
+            "name": "Orange CERT-CC",
+            "uuid": "5707ccb5-e330-4e25-a193-41d4950d210f"
+          },
+          "analysis": "0",
+          "date": "2016-10-18",
+          "distribution": "0",
+          "id": "5163",
+          "info": "Orange-CERT-CC Test #01",
+          "org_id": "335",
+          "orgc_id": "335",
+          "published": false,
+          "threat_level_id": "3",
+          "timestamp": "1476782422",
+          "uuid": "5805e8a5-611c-498b-839b-bd57950d210f"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "278",
+            "name": "TDC.dk",
+            "uuid": "56a5d575-2ff4-4738-a2ee-59be950d210f"
+          },
+          "Orgc": {
+            "id": "278",
+            "name": "TDC.dk",
+            "uuid": "56a5d575-2ff4-4738-a2ee-59be950d210f"
+          },
+          "analysis": "2",
+          "date": "2016-10-17",
+          "distribution": "3",
+          "id": "5165",
+          "info": "OSINT: ‘DealersChoice’ is Sofacy’s Flash Player Exploit Platform",
+          "org_id": "278",
+          "orgc_id": "278",
+          "published": true,
+          "threat_level_id": "1",
+          "timestamp": "1476789563",
+          "uuid": "580602f6-f8b8-4ac3-9813-7bf7bce2ab96"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "412",
+            "name": "TS",
+            "uuid": "57470e61-3384-491d-a56f-1bb75b86d7e5"
+          },
+          "Orgc": {
+            "id": "412",
+            "name": "TS",
+            "uuid": "57470e61-3384-491d-a56f-1bb75b86d7e5"
+          },
+          "analysis": "2",
+          "date": "2016-08-19",
+          "distribution": "1",
+          "id": "4710",
+          "info": "bullettin.doc sample, linked to APT28 campaign",
+          "org_id": "412",
+          "orgc_id": "412",
+          "published": true,
+          "threat_level_id": "1",
+          "timestamp": "1476776982",
+          "uuid": "57b7248f-283c-442e-8e02-2d0f5b86d7e5"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "277",
+            "name": "inthreat.com",
+            "uuid": "5697b91d-2090-441f-b153-75e895ca48b7"
+          },
+          "Orgc": {
+            "id": "277",
+            "name": "inthreat.com",
+            "uuid": "5697b91d-2090-441f-b153-75e895ca48b7"
+          },
+          "analysis": "2",
+          "date": "2016-06-20",
+          "distribution": "3",
+          "id": "4172",
+          "info": "APT28 and APT29 - Inside the DNC Breaches",
+          "org_id": "277",
+          "orgc_id": "277",
+          "published": true,
+          "threat_level_id": "2",
+          "timestamp": "1494829231",
+          "uuid": "5767c102-c170-4124-ae3d-7bef95ca48b7"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "347",
+            "name": "incibe.es",
+            "uuid": "5720623c-129c-4989-ae9d-4a11950d210f"
+          },
+          "Orgc": {
+            "id": "665",
+            "name": "INCIBE",
+            "uuid": "56fa4fe4-f528-4480-8332-1ba3c0a80a8c"
+          },
+          "analysis": "2",
+          "date": "2016-06-16",
+          "distribution": "3",
+          "id": "6131",
+          "info": "New Sofacy (APT28) attacks against a US Government Agency",
+          "org_id": "347",
+          "orgc_id": "665",
+          "published": true,
+          "threat_level_id": "1",
+          "timestamp": "1488792538",
+          "uuid": "5762a86a-e314-4e4e-ba5a-51c5c0a80a8e"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "26",
+            "name": "CthulhuSPRL.be",
+            "uuid": "55f6ea5f-fd34-43b8-ac1d-40cb950d210f"
+          },
+          "Orgc": {
+            "id": "26",
+            "name": "CthulhuSPRL.be",
+            "uuid": "55f6ea5f-fd34-43b8-ac1d-40cb950d210f"
+          },
+          "analysis": "2",
+          "date": "2016-06-15",
+          "distribution": "3",
+          "id": "3987",
+          "info": "OSINT New Sofacy Attacks Against US Government Agency by Palo Alto Unit 42",
+          "org_id": "26",
+          "orgc_id": "26",
+          "published": true,
+          "threat_level_id": "1",
+          "timestamp": "1466000907",
+          "uuid": "57613790-f6b4-4895-943f-4467950d210f"
+        }
+      },
+      {
+        "Event": {
+          "Org": {
+            "id": "278",
+            "name": "TDC.dk",
+            "uuid": "56a5d575-2ff4-4738-a2ee-59be950d210f"
+          },
+          "Orgc": {
+            "id": "325",
+            "name": "CUDESO",
+            "uuid": "56c42374-fdb8-4544-a218-41ffc0a8ab16"
+          },
+          "analysis": "2",
+          "date": "2016-06-14",
+          "distribution": "3",
+          "id": "4183",
+          "info": "New Sofacy Attacks Against US Government Agency",
+          "org_id": "278",
+          "orgc_id": "325",
+          "published": true,
+          "threat_level_id": "2",
+          "timestamp": "1467289109",
+          "uuid": "57607369-2490-444a-9034-049fc0a8ab16"
+        }
+      }
+    ],
+    "Tag": [
+      {
+        "colour": "#00d622",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "2",
+        "name": "tlp:white",
+        "user_id": "0"
+      },
+      {
+        "colour": "#ef0081",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "2986",
+        "name": "workflow:state=\"incomplete\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#810046",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "2979",
+        "name": "workflow:todo=\"create-missing-misp-galaxy-cluster-values\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#91004e",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "2980",
+        "name": "workflow:todo=\"create-missing-misp-galaxy-cluster\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#12e000",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "1100",
+        "name": "misp-galaxy:threat-actor=\"Sofacy\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3007",
+        "name": "misp-galaxy:exploit-kit=\"Sednit EK\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "2215",
+        "name": "misp-galaxy:tool=\"GAMEFISH\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3008",
+        "name": "misp-galaxy:mitre-malware=\"JHUHUGIT\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0c9900",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "1012",
+        "name": "misp-galaxy:tool=\"X-Tunnel\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3009",
+        "name": "misp-galaxy:mitre-malware=\"XTunnel\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3010",
+        "name": "misp-galaxy:mitre-malware=\"ADVSTORESHELL\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3011",
+        "name": "misp-galaxy:tool=\"EVILTOSS\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3012",
+        "name": "misp-galaxy:mitre-malware=\"USBStealer\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0c9800",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "1011",
+        "name": "misp-galaxy:tool=\"X-Agent\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3013",
+        "name": "misp-galaxy:mitre-malware=\"XAgentOSX\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3014",
+        "name": "misp-galaxy:mitre-malware=\"CHOPSTICK\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3015",
+        "name": "misp-galaxy:exploit-kit=\"DealersChoice\"",
+        "user_id": "0"
+      },
+      {
+        "colour": "#0088cc",
+        "exportable": true,
+        "hide_tag": false,
+        "id": "3016",
+        "name": "misp-galaxy:mitre-malware=\"Downdelph\"",
+        "user_id": "0"
+      }
+    ],
+    "analysis": "0",
+    "attribute_count": "122",
+    "date": "2017-12-21",
+    "disable_correlation": false,
+    "distribution": "3",
+    "event_creator_email": "alexandre.dulaunoy@circl.lu",
+    "id": "9747",
+    "info": "OSINT - Sednit update: How Fancy Bear Spent the Year",
+    "locked": false,
+    "org_id": "2",
+    "orgc_id": "2",
+    "proposal_email_lock": false,
+    "publish_timestamp": "0",
+    "published": false,
+    "sharing_group_id": "0",
+    "threat_level_id": "3",
+    "uuid": "5a3c2fcd-8328-42bb-a95e-4f4402de0b81"
+  }
+}

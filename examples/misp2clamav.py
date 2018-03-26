@@ -30,7 +30,7 @@ def find_hashes(htype):
         return
     for a in r['response']['Attribute']:
         attribute = MISPAttribute(mymisp.describe_types)
-        attribute.set_all_values(**a)
+        attribute.from_dict(**a)
         if '|' in attribute.type and '|' in attribute.value:
             c, value = attribute.value.split('|')
             comment = '{} - {}'.format(attribute.comment, c)

@@ -1,0 +1,40 @@
+{
+  "Event": {
+    "Object": [
+      {
+        "Attribute": [
+          {
+            "category": "Other",
+            "disable_correlation": false,
+            "object_relation": "member3",
+            "to_ids": false,
+            "type": "text",
+            "value": "foo"
+          },
+          {
+            "category": "Other",
+            "disable_correlation": false,
+            "object_relation": "member1",
+            "to_ids": false,
+            "type": "text",
+            "value": "bar"
+          }
+        ],
+        "description": "TestTemplate.",
+        "distribution": 5,
+        "meta-category": "file",
+        "misp_objects_path_custom": "tests/mispevent_testfiles",
+        "name": "test_object_template",
+        "sharing_group_id": 0,
+        "template_uuid": "4ec55cc6-9e49-4c64-b794-03c25c1a6589",
+        "template_version": 1,
+        "uuid": "a"
+      }
+    ],
+    "analysis": "1",
+    "date": "2017-12-31",
+    "distribution": "1",
+    "info": "This is a test",
+    "threat_level_id": "1"
+  }
+}

@@ -1,7 +1,46 @@
-__version__ = '2.4.71'
+__version__ = '2.4.89'
+import logging
+import functools
+import warnings
 
-from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey
-from .api import PyMISP
-from .mispevent import MISPEvent, MISPAttribute, EncodeUpdate, EncodeFull
-from .tools.neo4j import Neo4j
-from .tools import stix
+FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
+formatter = logging.Formatter(FORMAT)
+default_handler = logging.StreamHandler()
+default_handler.setFormatter(formatter)
+
+logger = logging.getLogger(__name__)
+logger.addHandler(default_handler)
+logger.setLevel(logging.WARNING)
+
+
+def deprecated(func):
+    '''This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used.'''
+
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.showwarning(
+            "Call to deprecated function {}.".format(func.__name__),
+            category=DeprecationWarning,
+            filename=func.__code__.co_filename,
+            lineno=func.__code__.co_firstlineno + 1
+        )
+        return func(*args, **kwargs)
+    return new_func
+
+
+try:
+    from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat  # noqa
+    from .api import PyMISP  # noqa
+    from .abstract import AbstractMISP, MISPEncode, MISPTag  # noqa
+    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting   # noqa
+    from .tools import AbstractMISPObjectGenerator  # noqa
+    from .tools import Neo4j  # noqa
+    from .tools import stix  # noqa
+    from .tools import openioc  # noqa
+    from .tools import load_warninglists  # noqa
+    from .tools import ext_lookups  # noqa
+    logger.debug('pymisp loaded properly')
+except ImportError as e:
+    logger.warning('Unable to load pymisp properly: {}'.format(e))

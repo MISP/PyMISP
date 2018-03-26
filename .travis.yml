@@ -2,25 +2,31 @@ language: python
 
 cache: pip
 
+addons:
+  apt:
+    sources: [ 'ubuntu-toolchain-r-test' ]
+    packages:
+      - libstdc++6
+      - libfuzzy-dev
+
 python:
     - "2.7"
-    - "3.4"
     - "3.5"
     - "3.5-dev"
     - "3.6"
     - "3.6-dev"
-    - "3.7-dev"
-    - "nightly"
 
 install:
-    - pip install -U nose
-    - pip install coveralls
-    - pip install codecov
-    - pip install requests-mock
-    - pip install .
+    - pip install -U nose pip setuptools
+    - pip install coveralls codecov requests-mock
+    - pip install git+https://github.com/kbandla/pydeep.git
+    - pip install .[fileobjects,neo,openioc,virustotal]
+    - pushd tests
+    - git clone https://github.com/viper-framework/viper-test-files.git
+    - popd
 
 script:
-    - nosetests --with-coverage --cover-package=pymisp tests/test_offline.py
+    - nosetests --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
 
 after_success:
     - codecov

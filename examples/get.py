@@ -39,7 +39,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.output is not None and os.path.exists(args.output):
-        print('Output file already exists, abord.')
+        print('Output file already exists, abort.')
         exit(0)
 
     misp = init(misp_url, misp_key)

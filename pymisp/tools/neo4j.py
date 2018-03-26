@@ -1,9 +1,8 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import glob
 import os
-from pymisp import MISPEvent
+from .. import MISPEvent
 
 try:
     from py2neo import authenticate, Graph, Node, Relationship
@@ -54,5 +53,5 @@ class Neo4j():
             av = Relationship(attr_node, "is", val)
             s = val | ev | av
             tx.merge(s)
-            #tx.graph.push(s)
+            # tx.graph.push(s)
         tx.commit()
