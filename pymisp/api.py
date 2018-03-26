@@ -953,7 +953,8 @@ class PyMISP(object):
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
-                     analysis=None, attribute=None, org=None, async_callback=None, normalize=False):
+                     analysis=None, attribute=None, org=None, async_callback=None, normalize=False,
+                     timestamp=None):
         """Search only at the index level. Use ! infront of value as NOT, default OR
         If using async, give a callback that takes 2 args, session and response:
         basic usage is
@@ -971,11 +972,12 @@ class PyMISP(object):
         :param org: Organisation(s) | str or list
         :param async_callback: Function to call when the request returns (if running async)
         :param normalize: Normalize output | True or False
+        :param timestamp: Interval since last update (in second, or 1d, 1h, ...)
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
                    'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
                    'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
-                   'org': org}
+                   'org': org, 'timestamp': timestamp}
         rule_levels = {'distribution': ["0", "1", "2", "3", "!0", "!1", "!2", "!3"],
                        'threatlevel': ["1", "2", "3", "4", "!1", "!2", "!3", "!4"],
                        'analysis': ["0", "1", "2", "!0", "!1", "!2"]}
@@ -1344,7 +1346,7 @@ class PyMISP(object):
         s = MISPSighting()
         s.from_dict(value=value, uuid=uuid, id=id, source=source, type=type, timestamp=timestamp, **kwargs)
         return self.set_sightings(s)
-    
+
     def sighting_list(self, element_id, scope="attribute", org_id=False):
         """Get the list of sighting.
         :param element_id: could be an event id or attribute id
@@ -1352,9 +1354,9 @@ class PyMISP(object):
         :param scope: could be attribute or event
         :return: A json list of sighting corresponding to the search
         :rtype: list
-        
+
         :Example:
- 
+
         >>> misp.sighting_list(4731) # default search on attribute
         [ ... ]
         >>> misp.sighting_list(42, event) # return list of sighting for event 42
@@ -1370,11 +1372,7 @@ class PyMISP(object):
                 raise Exception('Invalid parameter, org_id must be a number')
         else:
             org_id = ""
-        uri = 'sightings/listSightings/{}/{}/{}'.format(
-            element_id,
-            scope,
-            org_id
-            )
+        uri = 'sightings/listSightings/{}/{}/{}'.format(element_id, scope, org_id)
         url = urljoin(self.root_url, uri)
         response = self.__prepare_request('POST', url)
         return self._check_response(response)

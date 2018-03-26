@@ -452,7 +452,7 @@ class MISPEvent(AbstractMISP):
     def from_dict(self, **kwargs):
         # Required value
         self.info = kwargs.pop('info', None)
-        if not self.info:
+        if self.info is None:
             raise NewAttributeError('The info field of the new event is required.')
 
         # Default values for a valid event to send to a MISP instance

@@ -31,7 +31,8 @@ setup(
     extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
-                    'virustotal': ['validators']},
+                    'virustotal': ['validators'],
+                    'warninglists': ['pymispwarninglists']},
     tests_require=[
         'jsonschema',
         'python-dateutil',
