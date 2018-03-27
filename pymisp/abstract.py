@@ -95,7 +95,7 @@ class AbstractMISP(collections.MutableMapping):
 
     def from_json(self, json_string):
         """Load a JSON string"""
-        self.from_dict(json.loads(json_string))
+        self.from_dict(**json.loads(json_string))
 
     def to_dict(self):
         """Dump the lass to a dictionary.
