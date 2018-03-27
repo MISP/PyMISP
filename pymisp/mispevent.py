@@ -792,7 +792,7 @@ class MISPObjectAttribute(MISPAttribute):
 
     def __init__(self, definition):
         super(MISPObjectAttribute, self).__init__()
-        self.__definition = definition
+        self._definition = definition
 
     def from_dict(self, object_relation, value, **kwargs):
         self.object_relation = object_relation
@@ -801,16 +801,16 @@ class MISPObjectAttribute(MISPAttribute):
         # Get the misp attribute type from the definition
         self.type = kwargs.pop('type', None)
         if self.type is None:
-            self.type = self.__definition.get('misp-attribute')
+            self.type = self._definition.get('misp-attribute')
         self.disable_correlation = kwargs.pop('disable_correlation', None)
         if self.disable_correlation is None:
             # The correlation can be disabled by default in the object definition.
             # Use this value if it isn't overloaded by the object
-            self.disable_correlation = self.__definition.get('disable_correlation')
+            self.disable_correlation = self._definition.get('disable_correlation')
         self.to_ids = kwargs.pop('to_ids', None)
         if self.to_ids is None:
             # Same for the to_ids flag
-            self.to_ids = self.__definition.get('to_ids')
+            self.to_ids = self._definition.get('to_ids')
         super(MISPObjectAttribute, self).from_dict(**dict(self, **kwargs))
 
     def __repr__(self):
@@ -841,7 +841,7 @@ class MISPObject(AbstractMISP):
         :misp_objects_path_custom: Path to custom object templates
         '''
         super(MISPObject, self).__init__(**kwargs)
-        self.__strict = strict
+        self._strict = strict
         self.name = name
         misp_objects_path = os.path.join(
             os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)),
@@ -850,22 +850,22 @@ class MISPObject(AbstractMISP):
         if misp_objects_path_custom and os.path.exists(os.path.join(misp_objects_path_custom, self.name, 'definition.json')):
             # Use the local object path by default if provided (allows to overwrite a default template)
             template_path = os.path.join(misp_objects_path_custom, self.name, 'definition.json')
-            self.__known_template = True
+            self._known_template = True
         elif os.path.exists(os.path.join(misp_objects_path, self.name, 'definition.json')):
             template_path = os.path.join(misp_objects_path, self.name, 'definition.json')
-            self.__known_template = True
+            self._known_template = True
         else:
-            if self.__strict:
+            if self._strict:
                 raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
             else:
-                self.__known_template = False
-        if self.__known_template:
+                self._known_template = False
+        if self._known_template:
             with open(template_path, 'r') as f:
-                self.__definition = json.load(f)
-            setattr(self, 'meta-category', self.__definition['meta-category'])
-            self.template_uuid = self.__definition['uuid']
-            self.description = self.__definition['description']
-            self.template_version = self.__definition['version']
+                self._definition = json.load(f)
+            setattr(self, 'meta-category', self._definition['meta-category'])
+            self.template_uuid = self._definition['uuid']
+            self.description = self._definition['description']
+            self.template_version = self._definition['version']
         else:
             # Then we have no meta-category, template_uuid, description and template_version
             pass
@@ -926,17 +926,17 @@ class MISPObject(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPObjectReference.')
 
     def from_dict(self, **kwargs):
-        if self.__known_template:
+        if self._known_template:
             if kwargs.get('template_uuid') and kwargs['template_uuid'] != self.template_uuid:
-                if self.__strict:
+                if self._strict:
                     raise UnknownMISPObjectTemplate('UUID of the object is different from the one of the template.')
                 else:
-                    self.__known_template = False
+                    self._known_template = False
             if kwargs.get('template_version') and int(kwargs['template_version']) != self.template_version:
-                if self.__strict:
+                if self._strict:
                     raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
                 else:
-                    self.__known_template = False
+                    self._known_template = False
 
         if kwargs.get('Attribute'):
             for a in kwargs.pop('Attribute'):
@@ -986,9 +986,9 @@ class MISPObject(AbstractMISP):
         dictionary with all the keys supported by MISPAttribute"""
         if value.get('value') is None:
             return None
-        if self.__known_template:
-            if self.__definition['attributes'].get(object_relation):
-                attribute = MISPObjectAttribute(self.__definition['attributes'][object_relation])
+        if self._known_template:
+            if self._definition['attributes'].get(object_relation):
+                attribute = MISPObjectAttribute(self._definition['attributes'][object_relation])
             else:
                 # Woopsie, this object_relation is unknown, no sane defaults for you.
                 logger.warning("The template ({}) doesn't have the object_relation ({}) you're trying to add.".format(self.name, object_relation))
@@ -1003,30 +1003,30 @@ class MISPObject(AbstractMISP):
         return attribute
 
     def to_dict(self, strict=False):
-        if strict or self.__strict and self.__known_template:
+        if strict or self._strict and self._known_template:
             self._validate()
         return super(MISPObject, self).to_dict()
 
     def to_json(self, strict=False):
-        if strict or self.__strict and self.__known_template:
+        if strict or self._strict and self._known_template:
             self._validate()
         return super(MISPObject, self).to_json()
 
     def _validate(self):
         """Make sure the object we're creating has the required fields"""
-        if self.__definition.get('required'):
-            required_missing = set(self.__definition.get('required')) - set(self._fast_attribute_access.keys())
+        if self._definition.get('required'):
+            required_missing = set(self._definition.get('required')) - set(self._fast_attribute_access.keys())
             if required_missing:
                 raise InvalidMISPObject('{} are required.'.format(required_missing))
-        if self.__definition.get('requiredOneOf'):
-            if not set(self.__definition['requiredOneOf']) & set(self._fast_attribute_access.keys()):
+        if self._definition.get('requiredOneOf'):
+            if not set(self._definition['requiredOneOf']) & set(self._fast_attribute_access.keys()):
                 # We ecpect at least one of the object_relation in requiredOneOf, and it isn't the case
-                raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self.__definition['requiredOneOf'])))
+                raise InvalidMISPObject('At least one of the following attributes is required: {}'.format(', '.join(self._definition['requiredOneOf'])))
         for rel, attrs in self._fast_attribute_access.items():
             if len(attrs) == 1:
                 # object_relation's here only once, everything's cool, moving on
                 continue
-            if not self.__definition['attributes'][rel].get('multiple'):
+            if not self._definition['attributes'][rel].get('multiple'):
                 # object_relation's here more than once, but it isn't allowed in the template.
                 raise InvalidMISPObject('Multiple occurrences of {} is not allowed'.format(rel))
         return True

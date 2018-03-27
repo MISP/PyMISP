@@ -76,7 +76,8 @@ if __name__ == '__main__':
         parameters['logline'] = b64decode(args.logline).decode()
     if args.logfile:
         with open(args.logfile, 'rb') as f:
-            parameters['logfile'] = (os.path.basename(args.logfile), BytesIO(f.read()))
+            parameters['logfile'] = {'value': os.path.basename(args.logfile),
+                                     'data': BytesIO(f.read())}
     f2b = Fail2BanObject(parameters=parameters, standalone=False)
     if me:
         me.add_object(f2b)

@@ -39,6 +39,8 @@ class MISPEncode(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, AbstractMISP):
             return obj.jsonable()
+        elif isinstance(obj, datetime.datetime):
+            return obj.isoformat()
         return JSONEncoder.default(self, obj)
 
 
