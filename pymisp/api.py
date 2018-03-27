@@ -418,6 +418,12 @@ class PyMISP(object):
         e.threat_level_id = threat_level_id
         return self.update(e)
 
+    def change_analysis_status(self, event, analysis_status):
+        """Change the analysis status of an event"""
+        e = self._make_mispevent(event)
+        e.analysis = analysis_status
+        return self.update(e)
+
     def change_sharing_group(self, event, sharing_group_id):
         """Change the sharing group of an event"""
         e = self._make_mispevent(event)
