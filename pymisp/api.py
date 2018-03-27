@@ -507,7 +507,7 @@ class PyMISP(object):
                 event_id = event.id
             elif hasattr(event, 'uuid'):
                 event_id = event.uuid
-        elif isinstance(event, int):
+        elif isinstance(event, int) or (isinstance(event, str) and (event.isdigit() or self._valid_uuid(event))):
             event_id = event
         else:
             e = MISPEvent(describe_types=self.describe_types)

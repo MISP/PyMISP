@@ -16,14 +16,13 @@ def init(url, key):
     return PyMISP(url, key, True, 'json', debug=True)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Create an event on MISP.')
-    parser.add_argument("-e", "--event", type=int, help="The id of the event to update.")
+    parser = argparse.ArgumentParser(description='Add an attribute to an event')
+    parser.add_argument("-e", "--event", help="The id, uuid or json of the event to update.")
     parser.add_argument("-t", "--type", help="The type of the added attribute")
     parser.add_argument("-v", "--value", help="The value of the attribute")
     args = parser.parse_args()
 
     misp = init(misp_url, misp_key)
 
-    event = misp.get_event(args.event)
-    event = misp.add_named_attribute(event, args.type, args.value)
+    event = misp.add_named_attribute(args.event, args.type, args.value)
     print(event)
