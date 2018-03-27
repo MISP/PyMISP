@@ -32,3 +32,8 @@ class Fail2BanObject(AbstractMISPObjectGenerator):
             self.add_attribute('', value=self.__parameters['sensor'])
         if 'victim' in self.__parameters:
             self.add_attribute('victim', value=self.__parameters['victim'])
+        if 'logline' in self.__parameters:
+            self.add_attribute('logline', value=self.__parameters['logline'])
+        if 'logfile' in self.__parameters:
+            self.add_attribute('logfile', value=self.__parameters['logfile'][0],
+                               data=self.__parameters['logfile'][1])

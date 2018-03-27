@@ -5,6 +5,8 @@ from pymisp import PyMISP, MISPEvent
 from pymisp.tools import Fail2BanObject
 import argparse
 from base64 import b64decode
+from io import BytesIO
+import os
 from datetime import date, datetime
 from dateutil.parser import parse
 
@@ -36,6 +38,7 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--sensor", help="Sensor identifier.")
     parser.add_argument("-v", "--victim", help="Victim identifier.")
     parser.add_argument("-l", "--logline", help="Logline (base64 encoded).")
+    parser.add_argument("-F", "--logfile", help="Path to a logfile to attach.")
     parser.add_argument("-n", "--force_new", action='store_true', default=False, help="Force new MISP event.")
     parser.add_argument("-d", "--disable_new", action='store_true', default=False, help="Do not create a new Event.")
     args = parser.parse_args()
@@ -71,6 +74,9 @@ if __name__ == '__main__':
         parameters['victim'] = args.victim
     if args.logline:
         parameters['logline'] = b64decode(args.logline).decode()
+    if args.logfile:
+        with open(args.logfile, 'rb') as f:
+            parameters['logfile'] = (os.path.basename(args.logfile), BytesIO(f.read()))
     f2b = Fail2BanObject(parameters=parameters, standalone=False)
     if me:
         me.add_object(f2b)
