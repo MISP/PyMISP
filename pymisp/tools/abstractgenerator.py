@@ -15,7 +15,11 @@ class AbstractMISPObjectGenerator(MISPObject):
 
     def _detect_epoch(self, timestamp):
         try:
-            float(timestamp)
+            tmp = float(timestamp)
+            if tmp < 30000000:
+                # Assuming the user doesn't want to report anything before datetime(1970, 12, 14, 6, 20)
+                # The date is most probably in the format 20180301
+                return False
             return True
         except ValueError:
             return False
