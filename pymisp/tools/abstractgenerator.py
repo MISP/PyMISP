@@ -5,7 +5,7 @@ import abc
 import six
 from .. import MISPObject
 from ..exceptions import InvalidMISPObject
-from datetime import datetime
+from datetime import datetime, date
 from dateutil.parser import parse
 
 
@@ -13,14 +13,28 @@ from dateutil.parser import parse
 # Python3 way: class MISPObjectGenerator(metaclass=abc.ABCMeta):
 class AbstractMISPObjectGenerator(MISPObject):
 
+    def _detect_epoch(self, timestamp):
+        try:
+            float(timestamp)
+            return True
+        except ValueError:
+            return False
+
     def _sanitize_timestamp(self, timestamp):
         if not timestamp:
             return datetime.now()
+
+        if isinstance(timestamp, datetime):
+            return timestamp
+        elif isinstance(timestamp, date):
+            return datetime.combine(timestamp, datetime.min.time())
         elif isinstance(timestamp, dict):
             if not isinstance(timestamp['value'], datetime):
                 timestamp['value'] = parse(timestamp['value'])
             return timestamp
-        elif not isinstance(timestamp, datetime):
+        elif not isinstance(timestamp, datetime):  # Supported: float/int/string
+            if self._detect_epoch(timestamp):
+                return datetime.fromtimestamp(float(timestamp))
             return parse(timestamp)
         return timestamp
 
