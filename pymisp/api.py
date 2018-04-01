@@ -710,6 +710,10 @@ class PyMISP(object):
         """Add SNORT rule(s)"""
         return self.add_named_attribute(event, 'snort', snort, category, to_ids, comment, distribution, proposal, **kwargs)
 
+    def add_asn(self, event, asn, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add network ASN"""
+        return self.add_named_attribute(event, 'AS', asn, category, to_ids, comment, distribution, proposal, **kwargs)
+
     def add_net_other(self, event, netother, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add a free text entry"""
         return self.add_named_attribute(event, 'other', netother, category, to_ids, comment, distribution, proposal, **kwargs)
