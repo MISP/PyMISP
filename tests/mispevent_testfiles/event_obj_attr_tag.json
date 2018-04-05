@@ -37,7 +37,7 @@
       {
         "Attribute": [
           {
-            "category": "External analysis",
+            "category": "Network activity",
             "disable_correlation": false,
             "object_relation": "url",
             "to_ids": true,
