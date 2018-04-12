@@ -1069,6 +1069,7 @@ class PyMISP(object):
         :param published: return only published events
         :param to_ids: return only the attributes with the to_ids flag set
         :param deleted: also return the deleted attributes
+        :param event_timestamp: the timestamp of the last modification of the event (attributes controller only)). Can be a list (from->to)
         :param async_callback: The function to run when results are returned
         """
         query = {}
@@ -1122,6 +1123,8 @@ class PyMISP(object):
             query['searchall'] = kwargs.pop('searchall', None)
             query['metadata'] = kwargs.pop('metadata', None)
             query['published'] = kwargs.pop('published', None)
+        if controller == 'attributes':
+            query['event_timestamp'] = kwargs.pop('event_timestamp', None)
 
         # Cleanup
         query = {k: v for k, v in query.items() if v is not None}
