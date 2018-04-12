@@ -44,6 +44,7 @@ class TestBasic(unittest.TestCase):
                                u'attribute_count': u'0', 'disable_correlation': False, u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False,
                                u'distribution': u'0', u'event_creator_email': u'admin@admin.test', u'Attribute': [], u'proposal_email_lock': False,
+                               u'extends_uuid': '',
                                u'Object': [], u'Org': {u'name': u'ORGNAME'},
                                u'Orgc': {u'name': u'ORGNAME'},
                                u'Galaxy': [],
