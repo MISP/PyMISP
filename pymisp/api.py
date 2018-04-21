@@ -330,6 +330,20 @@ class PyMISP(object):
         response = self.__prepare_request('POST', url, event)
         return self._check_response(response)
 
+    def update_attribute(self, attribute_id, attribute):
+        """Update an attribute
+
+        :param attribute_id: Attribute id/uuid to update
+        :param attribute: Attribute as JSON object / string to add
+        """
+        url = urljoin(self.root_url, 'attributes/{}'.format(attribute_id))
+        if isinstance(attribute, MISPAttribute):
+            attribute = attribute.to_json()
+        elif not isinstance(attribute, basestring):
+            attribute = json.dumps(attribute)
+        response = self.__prepare_request('POST', url, attribute)
+        return self._check_response(response)
+
     def update_event(self, event_id, event):
         """Update an event
 
