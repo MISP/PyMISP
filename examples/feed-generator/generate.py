@@ -17,7 +17,8 @@ objectsFields = {
         'comment',
         'data',
         'timestamp',
-        'to_ids'
+        'to_ids',
+        'object_relation'
     },
     'Event': {
         'uuid',
