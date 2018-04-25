@@ -2,6 +2,105 @@ Changelog
 =========
 
 
+v2.4.90 (2018-04-25)
+--------------------
+
+New
+~~~
+- Add more feed management methods. [Raphaël Vinot]
+
+  Fix #221
+- Add update_attribute method. [Raphaël Vinot]
+- Add event_timestamp to REST search. [Raphaël Vinot]
+
+  Fix #220
+- Add helper for Geolocation object. [Raphaël Vinot]
+- Add helper for ASN object. [Raphaël Vinot]
+- More flexibility in <something> -> datetime. [Raphaël Vinot]
+- Add helper for DomainIP. [Raphaël Vinot]
+- Add preliminary fail2ban object. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add more examples. [Raphaël Vinot]
+- Remove useless timestamp cleanup. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Make object helpers more generic, cleanup. [Raphaël Vinot]
+- Update fail2ban helper & example. [Raphaël Vinot]
+- Bump misp-object. [Raphaël Vinot]
+
+Fix
+~~~
+- Use the recommended approach to add an attribute. [Raphaël Vinot]
+- Tests, new template version. [Raphaël Vinot]
+- New key - extends_uuid. [Raphaël Vinot]
+- Update test file accordingly to the default value. [Raphaël Vinot]
+- Geolocation object filename. [Raphaël Vinot]
+- Consider a timestamp < 30000000 as a date. [Raphaël Vinot]
+- Typo. [Raphaël Vinot]
+- AbstractMISP.from_dict() do not accept positional argument. [Sami
+  Mokaddem]
+- Typo. [Raphaël Vinot]
+- Properly create fail2ban object. [Raphaël Vinot]
+- Add Info field to the event. [Raphaël Vinot]
+- Disable email object for python <3.6. [Raphaël Vinot]
+
+Other
+~~~~~
+- Added missing field to feed generator. [Andras Iklody]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #219 from cipherlock/new-add-asn-function. [Raphaël
+  Vinot]
+
+  new:Add the ability to add an Autonomous System(AS) via the API
+- Add the ability to add an Autonomous System(AS) via the API. [Paul
+  Stark]
+- Merge pull request #218 from mokaddem/python3_shebang. [Raphaël Vinot]
+
+  Python3 shebang
+- Typo. [Sami Mokaddem]
+- Changed shebang to python3. [Sami Mokaddem]
+- Merge pull request #217 from 3c7/bugfix/url_default_category. [Raphaël
+  Vinot]
+
+  Update default category for url
+- Update default category for url as in
+  https://github.com/MISP/MISP/pull/3119. [Nils Kuhnert]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #215 from mokaddem/jupyter_notebook. [Raphaël
+  Vinot]
+
+  Jupyter notebook
+- Deleted remaining outputs. [Sami Mokaddem]
+- First jupyter notebook tutorial (1 iterations) [Sami Mokaddem]
+- Merge pull request #210 from mlodic/master. [Raphaël Vinot]
+
+  added change_analysis_status API
+- Added change_analysis_status API. [Matteo Lodi]
+- Merge pull request #205 from mokaddem/hotfix_from_dict. [Raphaël
+  Vinot]
+
+  fix: AbstractMISP.from_dict() do not accept positional argument
+- Merge pull request #212 from
+  aparriel/fix_add_named_attribute_regression. [Raphaël Vinot]
+
+  Fix add named attribute regression
+- Fix add_named_attribute regression, update add_named_attribute.py
+  example. [user]
+- Merge branch 'master' of https://github.com/MISP/PyMISP. [user]
+- Merge pull request #1 from aparriel/debug-fix. [aparriel]
+
+  Fix missing %s in logger.debug calls
+- Merge pull request #213 from P1sec/master. [Raphaël Vinot]
+
+  Example of specifying special attribute type in your search: here yara attribute
+- Example of specifying special attribute type in your search: here yara
+  attribute. [Philippe Langlois]
+
+
 v2.4.89 (2018-03-23)
 --------------------
 
@@ -12,6 +111,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump Changelog. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
