@@ -755,6 +755,12 @@ class MISPOrganisation(AbstractMISP):
         super(MISPOrganisation, self).__init__()
 
 
+class MISPFeed(AbstractMISP):
+
+    def __init__(self):
+        super(MISPFeed, self).__init__()
+
+
 class MISPSighting(AbstractMISP):
 
     def __init__(self):

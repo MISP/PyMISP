@@ -16,7 +16,7 @@ import zipfile
 
 from . import __version__, deprecated
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey
-from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting
+from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed
 from .abstract import AbstractMISP, MISPEncode
 
 logger = logging.getLogger('pymisp')
@@ -1742,21 +1742,49 @@ class PyMISP(object):
     # ########   Feed   #########
     # ###########################
 
-    def fetch_feed(self, feed_id):
-        """Fetch one single feed"""
-        url = urljoin(self.root_url, 'feeds/fetchFromFeed/{}'.format(feed_id))
-        response = self.__prepare_request('GET', url)
-        return self._check_response(response)
-
-    def view_feeds(self):
+    def get_feeds_list(self):
         """Get the content of all the feeds"""
         url = urljoin(self.root_url, 'feeds')
         response = self.__prepare_request('GET', url)
         return self._check_response(response)
 
-    def view_feed(self, feed_ids):
+    def get_feed(self, feed_ids):
         """Get the content of a single feed"""
         url = urljoin(self.root_url, 'feeds/view/{}'.format(feed_ids))
+        response = self.__prepare_request('GET', url)
+        return self._check_response(response)
+
+    def add_feed(self, source_format, url, name, input_source, provider, **kwargs):
+        """Delete a feed"""
+        url = urljoin(self.root_url, 'feeds/add')
+        new_feed = MISPFeed()
+        new_feed.from_dict(source_format=source_format, url=url, name=name,
+                           input_source=input_source, provider=provider)
+        response = self.__prepare_request('POST', url, new_feed.to_json())
+        return self._check_response(response)
+
+    def get_feed_fields_list(self):
+        url = urljoin(self.root_url, 'feeds/add/')
+        response = self.__prepare_request('GET', url)
+        return self._check_response(response)
+
+    def edit_feed(self, feed_id, **kwargs):
+        """Delete a feed"""
+        url = urljoin(self.root_url, 'feeds/edit/{}'.format(feed_id))
+        edit_feed = MISPFeed()
+        edit_feed.from_dict(**kwargs)
+        response = self.__prepare_request('POST', url, edit_feed.to_json())
+        return self._check_response(response)
+
+    def delete_feed(self, feed_id):
+        """Delete a feed"""
+        url = urljoin(self.root_url, 'feeds/delete/{}'.format(feed_id))
+        response = self.__prepare_request('GET', url)
+        return self._check_response(response)
+
+    def fetch_feed(self, feed_id):
+        """Fetch one single feed"""
+        url = urljoin(self.root_url, 'feeds/fetchFromFeed/{}'.format(feed_id))
         response = self.__prepare_request('GET', url)
         return self._check_response(response)
 
@@ -1790,9 +1818,19 @@ class PyMISP(object):
         response = self.__prepare_request('GET', url)
         return self._check_response(response)
 
+    @deprecated
+    def view_feed(self, feed_ids):
+        """Alias for get_feed"""
+        return self.get_feed(feed_ids)
+
+    @deprecated
+    def view_feeds(self):
+        """Alias for get_feeds_list"""
+        return self.get_feeds_list()
+
+    @deprecated
     def cache_all_feeds(self):
         """Alias for cache_feeds_all"""
-        # DEPRECATED
         return self.cache_feeds_all()
 
     # ######################
