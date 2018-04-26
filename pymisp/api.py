@@ -1754,31 +1754,31 @@ class PyMISP(object):
 
     def get_feeds_list(self):
         """Get the content of all the feeds"""
-        return self._rest_list('feed')
+        return self._rest_list('feeds')
 
     def get_feed(self, feed_id):
         """Get the content of a single feed"""
-        return self._rest_view('feed', feed_id)
+        return self._rest_view('feeds', feed_id)
 
     def add_feed(self, source_format, url, name, input_source, provider, **kwargs):
         """Delete a feed"""
         new_feed = MISPFeed()
         new_feed.from_dict(source_format=source_format, url=url, name=name,
                            input_source=input_source, provider=provider)
-        return self._rest_add('feed', new_feed)
+        return self._rest_add('feeds', new_feed)
 
     def get_feed_fields_list(self):
-        return self._rest_get_parameters('feed')
+        return self._rest_get_parameters('feeds')
 
     def edit_feed(self, feed_id, **kwargs):
         """Delete a feed"""
         edit_feed = MISPFeed()
         edit_feed.from_dict(**kwargs)
-        return self._rest_edit('feed', edit_feed)
+        return self._rest_edit('feeds', edit_feed)
 
     def delete_feed(self, feed_id):
         """Delete a feed"""
-        return self._rest_delete('feed', feed_id)
+        return self._rest_delete('feeds', feed_id)
 
     def fetch_feed(self, feed_id):
         """Fetch one single feed"""
