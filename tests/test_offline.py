@@ -279,16 +279,22 @@ class TestOffline(unittest.TestCase):
 
         if seos:
             for s in seos:
+                for a in s.attributes:
+                    del a.uuid
                 to_return['objects'].append(s)
                 if s.ObjectReference:
                     to_return['references'] += s.ObjectReference
 
         if peo:
+            for a in peo.attributes:
+                del a.uuid
             to_return['objects'].append(peo)
             if peo.ObjectReference:
                 to_return['references'] += peo.ObjectReference
 
         if fo:
+            for a in fo.attributes:
+                del a.uuid
             to_return['objects'].append(fo)
             if fo.ObjectReference:
                 to_return['references'] += fo.ObjectReference

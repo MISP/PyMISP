@@ -134,7 +134,7 @@ class MISPAttribute(AbstractMISP):
 
     def add_proposal(self, shadow_attribute=None, **kwargs):
         """Alias for add_shadow_attribute"""
-        self.add_shadow_attribute(shadow_attribute, **kwargs)
+        return self.add_shadow_attribute(shadow_attribute, **kwargs)
 
     def add_shadow_attribute(self, shadow_attribute=None, **kwargs):
         """Add a tag to the attribute (by name or a MISPTag object)"""
@@ -150,6 +150,7 @@ class MISPAttribute(AbstractMISP):
             raise PyMISPError("The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(shadow_attribute))
         self.shadow_attributes.append(misp_shadow_attribute)
         self.edited = True
+        return misp_shadow_attribute
 
     def from_dict(self, **kwargs):
         if kwargs.get('type') and kwargs.get('category'):
@@ -534,7 +535,7 @@ class MISPEvent(AbstractMISP):
 
     def add_proposal(self, shadow_attribute=None, **kwargs):
         """Alias for add_shadow_attribute"""
-        self.add_shadow_attribute(shadow_attribute, **kwargs)
+        return self.add_shadow_attribute(shadow_attribute, **kwargs)
 
     def add_shadow_attribute(self, shadow_attribute=None, **kwargs):
         """Add a tag to the attribute (by name or a MISPTag object)"""
@@ -550,6 +551,7 @@ class MISPEvent(AbstractMISP):
             raise PyMISPError("The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(shadow_attribute))
         self.shadow_attributes.append(misp_shadow_attribute)
         self.edited = True
+        return misp_shadow_attribute
 
     def get_attribute_tag(self, attribute_identifier):
         '''Return the tags associated to an attribute or an object attribute.
