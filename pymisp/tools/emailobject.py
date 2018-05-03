@@ -5,28 +5,46 @@ from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 import logging
-from email import message_from_bytes
+from email import message_from_bytes, policy
 
 logger = logging.getLogger('pymisp')
 
 
 class EMailObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath=None, pseudofile=None, standalone=True, **kwargs):
+    def __init__(self, filepath=None, pseudofile=None, attach_original_email=True, standalone=True, **kwargs):
         if filepath:
             with open(filepath, 'rb') as f:
-                pseudofile = BytesIO(f.read())
+                self.__pseudofile = BytesIO(f.read())
         elif pseudofile and isinstance(pseudofile, BytesIO):
-            pseudofile = pseudofile
+            self.__pseudofile = pseudofile
         else:
             raise InvalidMISPObject('File buffer (BytesIO) or a path is required.')
         # PY3 way:
         # super().__init__('file')
         super(EMailObject, self).__init__('email', standalone=standalone, **kwargs)
-        self.__email = message_from_bytes(pseudofile.getvalue())
+        self.__email = message_from_bytes(self.__pseudofile.getvalue(), policy=policy.default)
+        if attach_original_email:
+            self.add_attribute('eml', value='Full email', data=self.__pseudofile)
         self.generate_attributes()
 
+    @property
+    def email(self):
+        return self.__email
+
+    def force_eml(self, pseudofile):
+        self.eml.data = pseudofile
+
+    @property
+    def attachments(self):
+        to_return = []
+        for attachment in self.__email.iter_attachments():
+            to_return.append((attachment.get_filename(), BytesIO(attachment.get_content().as_bytes())))
+        return to_return
+
     def generate_attributes(self):
+        if self.__email.get_body():
+            self.add_attribute('email-body', value=self.__email.get_body().as_string())
         if 'Reply-To' in self.__email:
             self.add_attribute('reply-to', value=self.__email['Reply-To'])
         if 'Message-ID' in self.__email:
@@ -44,4 +62,5 @@ class EMailObject(AbstractMISPObjectGenerator):
                 self.add_attribute('from', value=e_from.strip())
         if 'Return-Path' in self.__email:
             self.add_attribute('return-path', value=self.__email['Return-Path'])
-        # TODO: self.add_attribute('attachment', value=)
+        if 'User-Agent' in self.__email:
+            self.add_attribute('user-agent', value=self.__email['User-Agent'])

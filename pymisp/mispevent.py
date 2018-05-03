@@ -101,6 +101,7 @@ class MISPAttribute(AbstractMISP):
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
         self.__strict = strict
+        self.uuid = str(uuid.uuid4())
         self.ShadowAttribute = []
 
     @property
@@ -605,14 +606,18 @@ class MISPEvent(AbstractMISP):
     def add_attribute(self, type, value, **kwargs):
         """Add an attribute. type and value are required but you can pass all
         other parameters supported by MISPAttribute"""
+        attr_list = []
         if isinstance(value, list):
-            for a in value:
-                self.add_attribute(type=type, value=a, **kwargs)
+            attr_list = [self.add_attribute(type=type, value=a, **kwargs) for a in value]
         else:
             attribute = MISPAttribute()
             attribute.from_dict(type=type, value=value, **kwargs)
             self.attributes.append(attribute)
         self.edited = True
+        if attr_list:
+            return attr_list
+        else:
+            return attribute
 
     def get_object_by_id(self, object_id):
         """Get an object by ID (the ID is the one set by the server when creating the new object)"""
