@@ -39,7 +39,7 @@ class EMailObject(AbstractMISPObjectGenerator):
     def attachments(self):
         to_return = []
         for attachment in self.__email.iter_attachments():
-            to_return.append((attachment.get_filename(), BytesIO(attachment.get_content().as_bytes())))
+            to_return.append((attachment.get_filename(), BytesIO(attachment.get_content())))
         return to_return
 
     def generate_attributes(self):
