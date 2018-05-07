@@ -25,15 +25,12 @@ class EMailObject(AbstractMISPObjectGenerator):
         super(EMailObject, self).__init__('email', standalone=standalone, **kwargs)
         self.__email = message_from_bytes(self.__pseudofile.getvalue(), policy=policy.default)
         if attach_original_email:
-            self.add_attribute('eml', value='Full email', data=self.__pseudofile)
+            self.add_attribute('eml', value='Full email.eml', data=self.__pseudofile)
         self.generate_attributes()
 
     @property
     def email(self):
         return self.__email
-
-    def force_eml(self, pseudofile):
-        self.eml.data = pseudofile
 
     @property
     def attachments(self):
