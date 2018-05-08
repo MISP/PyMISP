@@ -40,8 +40,8 @@ class EMailObject(AbstractMISPObjectGenerator):
         return to_return
 
     def generate_attributes(self):
-        if self.__email.get_body():
-            self.add_attribute('email-body', value=self.__email.get_body().as_string())
+        if self.__email.get_body(preferencelist=('html', 'plain')):
+            self.add_attribute('email-body', value=self.__email.get_body(preferencelist=('html', 'plain')).get_payload(decode=True).decode())
         if 'Reply-To' in self.__email:
             self.add_attribute('reply-to', value=self.__email['Reply-To'])
         if 'Message-ID' in self.__email:
