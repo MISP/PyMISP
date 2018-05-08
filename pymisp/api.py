@@ -16,7 +16,7 @@ import zipfile
 
 from . import __version__, deprecated
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey
-from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed
+from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject
 from .abstract import AbstractMISP, MISPEncode
 
 logger = logging.getLogger('pymisp')
@@ -1881,9 +1881,39 @@ class PyMISP(object):
     # ###   Objects   ###
     # ###################
 
-    def add_object(self, event_id, template_id, misp_object):
-        """Add an object"""
-        url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
+    def add_object(self, event_id, *args, **kwargs):
+        """Add an object
+        :param event_id: Event ID of the event to attach the object to
+        :param template_id: Template ID of the template related to that event (not required)
+        :param misp_object: MISPObject to attach
+        """
+        # NOTE: this slightly fucked up thing is due to the fact template_id was required, and was the 2nd parameter.
+        template_id = kwargs.get('template_id')
+        misp_object = kwargs.get('misp_object')
+        if isinstance(args[0], MISPObject):
+            misp_object = args[0]
+        else:
+            template_id = args[0]
+            misp_object = args[1]
+
+        if template_id is not None:
+            url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
+        else:
+            url = urljoin(self.root_url, 'objects/add/{}'.format(event_id))
+        response = self.__prepare_request('POST', url, misp_object.to_json())
+        return self._check_response(response)
+
+    def edit_object(self, misp_object, object_id=None):
+        """Edit an existing object"""
+        if object_id:
+            param = object_id
+        elif hasattr(misp_object, 'uuid'):
+            param = misp_object.uuid
+        elif hasattr(misp_object, 'id'):
+            param = misp_object.id
+        else:
+            raise PyMISPError('In order to update an object, you have to provide an object ID (either in the misp_object, or as a parameter)')
+        url = urljoin(self.root_url, 'objects/edit/{}'.format(param))
         response = self.__prepare_request('POST', url, misp_object.to_json())
         return self._check_response(response)
 
