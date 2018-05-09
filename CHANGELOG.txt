@@ -2,6 +2,29 @@ Changelog
 =========
 
 
+v2.4.90.1 (2018-05-09)
+----------------------
+
+New
+~~~
+- Properly implement the Email object creator. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Version bump. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Normalize the RestResponse calls. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly get and decode the body of the email. [Raphaël Vinot]
+- Provide the extension of the EML file to attach. [Raphaël Vinot]
+- Properly handle attachments. [Raphaël Vinot]
+- Test cases & attributes automatically getting an UUID. [Raphaël Vinot]
+- Typo in the *feed methods. [Raphaël Vinot]
+
+
 v2.4.90 (2018-04-25)
 --------------------
 
@@ -22,6 +45,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Add more examples. [Raphaël Vinot]
