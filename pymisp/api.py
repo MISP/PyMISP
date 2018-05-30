@@ -488,7 +488,7 @@ class PyMISP(object):
         if not event_id:
             raise PyMISPError("Unable to find the ID of the event to update.")
         if not attributes:
-            return {'error': 'No attributes.'}
+            return [{'error': 'No attributes.'}]
 
         # Propals need to be posted in single requests
         if proposal:
