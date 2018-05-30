@@ -509,7 +509,12 @@ class PyMISP(object):
             else:
                 data = attributes.to_json()
             # __prepare_request(...) returns a requests.Response Object
-            responses.append(self.__prepare_request('POST', url, json.dumps(data, cls=MISPEncode)).json())
+            resp = self.__prepare_request('POST', url, json.dumps(data, cls=MISPEncode))
+            try:
+                responses.append(resp.json())
+            except Exception:
+                # The response isn't a json object, appending the text.
+                responses.append(resp.text)
         return responses
 
     def _extract_event_id(self, event):
