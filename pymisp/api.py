@@ -1077,7 +1077,7 @@ class PyMISP(object):
         :param date_from: First date
         :param date_to: Last date
         :param last: Last published events (for example 5d or 12h or 30m)
-        :param eventid: Last date
+        :param eventid: Evend ID(s) | str or list
         :param withAttachments: return events with or without the attachments
         :param uuid: search by uuid
         :param publish_timestamp: the publish timestamp
