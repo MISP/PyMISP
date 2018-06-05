@@ -2,6 +2,37 @@ Changelog
 =========
 
 
+v2.4.92 (2018-06-05)
+--------------------
+
+New
+~~~
+- Add edit_object, simplify add_object. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Correct docstring of search method. [iso]
+- Response data type mismatch in _send_attributes() [Raphaël Vinot]
+
+  Fix #206
+- Decoding issue. [Raphaël Vinot]
+
+Other
+~~~~~
+- Merge pull request #232 from 0xiso/fix-docstring. [Alexandre Dulaunoy]
+
+  fix: Correct docstring of search method
+- Fix issue when adding multiple attributes and the instance is too
+  slow. [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+
 v2.4.90.1 (2018-05-09)
 ----------------------
 
@@ -11,6 +42,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Version bump. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
@@ -18,6 +50,7 @@ Changes
 
 Fix
 ~~~
+- Wrong version. [Raphaël Vinot]
 - Properly get and decode the body of the email. [Raphaël Vinot]
 - Provide the extension of the EML file to attach. [Raphaël Vinot]
 - Properly handle attachments. [Raphaël Vinot]
