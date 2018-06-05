@@ -1895,11 +1895,12 @@ class PyMISP(object):
         # NOTE: this slightly fucked up thing is due to the fact template_id was required, and was the 2nd parameter.
         template_id = kwargs.get('template_id')
         misp_object = kwargs.get('misp_object')
-        if isinstance(args[0], MISPObject):
-            misp_object = args[0]
-        else:
-            template_id = args[0]
-            misp_object = args[1]
+        if args:
+            if isinstance(args[0], MISPObject):
+                misp_object = args[0]
+            else:
+                template_id = args[0]
+                misp_object = args[1]
 
         if template_id is not None:
             url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
