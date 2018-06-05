@@ -1,4 +1,4 @@
-__version__ = '2.4.92'
+__version__ = '2.4.92.1'
 import logging
 import functools
 import warnings
