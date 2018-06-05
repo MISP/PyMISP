@@ -2,6 +2,14 @@ Changelog
 =========
 
 
+v2.4.92.1 (2018-06-05)
+----------------------
+
+Fix
+~~~
+- Index out of range in add_object. [Raphaël Vinot]
+
+
 v2.4.92 (2018-06-05)
 --------------------
 
@@ -11,6 +19,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
