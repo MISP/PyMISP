@@ -43,6 +43,15 @@ try:
 except ImportError:
     ASYNC_OK = False
 
+everything_broken = '''Unknown error: the response is not in JSON.
+Something is broken server-side, please send us everything that follows (careful with the auth key):
+Request headers:
+{}
+Request body:
+{}
+Response (if any):
+{}'''
+
 
 class PyMISP(object):
     """Python API for MISP
@@ -206,31 +215,33 @@ class PyMISP(object):
 
     def _check_response(self, response):
         """Check if the response from the server is not an unexpected error"""
-        errors = []
-        if response.status_code >= 500:
-            if len(response.content) == 0:
-                raise PyMISPError('Something bad happened on the server-side, but there was no response content to be decoded')
-            else:
-                errors.append(response.json())
-                logger.critical('Something bad happened on the server-side: {}'.format(response.json()))
         try:
-            to_return = response.json()
+            json_response = response.json()
         except ValueError:
             # It the server didn't return a JSON blob, we've a problem.
-            raise PyMISPError('Unknown error (something is very broken server-side: {})'.format(response.text))
+            raise PyMISPError(everything_broken.format(response.request.headers, response.request.body, response.text))
 
+        errors = []
+
+        if response.status_code >= 500:
+            errors.append('500 exception: {}'.format(json_response))
+            logger.critical(everything_broken.format(response.request.headers, response.request.body, json_response))
+
+        to_return = json_response
         if isinstance(to_return, (list, str)):
+            # FIXME: This case look like a bug.
             to_return = {'response': to_return}
-        if to_return.get('error'):
-            if not isinstance(to_return['error'], list):
-                errors.append(to_return['error'])
-            else:
-                errors += to_return['error']
-        if to_return.get('errors'):
-            if not isinstance(to_return['errors'], list):
-                errors.append(to_return['errors'])
-            else:
-                errors += to_return['errors']
+        else:
+            if to_return.get('error'):
+                if not isinstance(to_return['error'], list):
+                    errors.append(to_return['error'])
+                else:
+                    errors += to_return['error']
+            if to_return.get('errors'):
+                if not isinstance(to_return['errors'], list):
+                    errors.append(to_return['errors'])
+                else:
+                    errors += to_return['errors']
 
         if 400 <= response.status_code < 500:
             if not errors and to_return.get('message'):
