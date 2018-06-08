@@ -1210,7 +1210,7 @@ class PyMISP(object):
             zipped = BytesIO(decoded)
             try:
                 archive = zipfile.ZipFile(zipped)
-                if f.get('md5') and f['md5'] in archive.infolist():
+                if f.get('md5') and f['md5'] in archive.namelist():
                     # New format
                     unzipped = BytesIO(archive.open(f['md5'], pwd=b'infected').read())
                 else:
