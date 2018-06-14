@@ -1194,7 +1194,7 @@ class PyMISP(object):
         rules = '\n\n'.join([a['value'] for a in result['response']['Attribute']])
         return True, rules
 
-    def download_samples(self, sample_hash=None, event_id=None, all_samples=False):
+    def download_samples(self, sample_hash=None, event_id=None, all_samples=False, unzip=True):
         """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch"""
         url = urljoin(self.root_url, 'attributes/downloadSample')
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
@@ -1208,19 +1208,21 @@ class PyMISP(object):
         for f in result['result']:
             decoded = base64.b64decode(f['base64'])
             zipped = BytesIO(decoded)
-            try:
-                archive = zipfile.ZipFile(zipped)
-                if f.get('md5') and f['md5'] in archive.infolist():
-                    # New format
-                    unzipped = BytesIO(archive.open(f['md5'], pwd=b'infected').read())
-                else:
-                    # Old format
-                    unzipped = BytesIO(archive.open(f['filename'], pwd=b'infected').read())
-                details.append([f['event_id'], f['filename'], unzipped])
-            except zipfile.BadZipfile:
-                # In case the sample isn't zipped
-                details.append([f['event_id'], f['filename'], zipped])
-
+            if unzip:
+                try:
+                    archive = zipfile.ZipFile(zipped)
+                    if f.get('md5') and f['md5'] in archive.namelist():
+                        # New format
+                        unzipped = BytesIO(archive.open(f['md5'], pwd=b'infected').read())
+                    else:
+                        # Old format
+                        unzipped = BytesIO(archive.open(f['filename'], pwd=b'infected').read())
+                    details.append([f['event_id'], f['filename'], unzipped])
+                except zipfile.BadZipfile:
+                    # In case the sample isn't zipped
+                    details.append([f['event_id'], f['filename'], zipped])
+            else:
+                details.append([f['event_id'], "{0}.zip".format(f['filename']), zipped])
         return True, details
 
     def download_last(self, last):
