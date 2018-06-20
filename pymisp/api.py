@@ -816,6 +816,20 @@ class PyMISP(object):
         """Add an internal reference (type other)"""
         return self.add_named_attribute(event, 'other', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
+    # ##### Other attributes #####
+
+    def add_other_comment(self, event, reference, category='Other', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add other comment"""
+        return self.add_named_attribute(event, 'comment', reference, category, to_ids, comment, distribution, proposal, **kwargs)
+
+    def add_other_counter(self, event, reference, category='Other', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add other counter"""
+        return self.add_named_attribute(event, 'counter', reference, category, to_ids, comment, distribution, proposal, **kwargs)
+
+    def add_other_text(self, event, reference, category='Other', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add other text"""
+        return self.add_named_attribute(event, 'text', reference, category, to_ids, comment, distribution, proposal, **kwargs)
+
     # ##################################################
     # ######### Upload samples through the API #########
     # ##################################################
