@@ -7,3 +7,4 @@ examples/feed-generator/output/*.json
 build/*
 dist/*
 pymisp.egg-info/*
+.idea
