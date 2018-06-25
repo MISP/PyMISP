@@ -674,6 +674,7 @@ class MISPEvent(AbstractMISP):
             raise InvalidMISPObject("An object to add to an existing Event needs to be either a MISPObject, or a plain python dictionary")
         self.Object.append(misp_obj)
         self.edited = True
+        return misp_obj
 
     def __repr__(self):
         if hasattr(self, 'info'):
