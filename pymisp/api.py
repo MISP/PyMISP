@@ -1161,12 +1161,12 @@ class PyMISP(object):
         query['enforceWarninglist'] = kwargs.pop('enforceWarninglist', None)
         query['to_ids'] = kwargs.pop('to_ids', None)
         query['deleted'] = kwargs.pop('deleted', None)
+        query['published'] = kwargs.pop('published', None)
 
         if controller == 'events':
             # Event search only:
             query['searchall'] = kwargs.pop('searchall', None)
             query['metadata'] = kwargs.pop('metadata', None)
-            query['published'] = kwargs.pop('published', None)
         if controller == 'attributes':
             query['event_timestamp'] = kwargs.pop('event_timestamp', None)
 
