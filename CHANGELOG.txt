@@ -17,6 +17,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog & version. [Raphaël Vinot]
 - Moar jupyter. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Add full example. [Raphaël Vinot]
@@ -27,6 +28,12 @@ Changes
 
 Other
 ~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #247 from neok0/master. [Raphaël Vinot]
+
+  enabled published search parameter for attributes controler
+- Enabled published search parameter for attributes controler. [Tobias
+  Mainka]
 - Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
 - Merge pull request #241 from cipherlock/master. [Raphaël Vinot]
 
