@@ -2,8 +2,61 @@ Changelog
 =========
 
 
+v2.4.93 (2018-07-01)
+--------------------
+
+New
+~~~
+- Add many comments in the jupyter notebook. [Raphaël Vinot]
+- Return the new object in `add_object` [Raphaël Vinot]
+- Add the ability to add Other attributes via the API. [Paul Stark]
+- Tuto for MISPEvent. [Raphaël Vinot]
+- Load Org and Orgc as MISPOrganisation. [Raphaël Vinot]
+
+  Related to #239
+
+Changes
+~~~~~~~
+- Bump changelog & version. [Raphaël Vinot]
+- Moar jupyter. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add full example. [Raphaël Vinot]
+- Add few more calls. [Raphaël Vinot]
+- Fix sample retrieval from new-style zips. [Xavier Mehrenberger]
+- Bump misp-objects. [Raphaël Vinot]
+- Raise an exception if the response is not in JSON. [Raphaël Vinot]
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #247 from neok0/master. [Raphaël Vinot]
+
+  enabled published search parameter for attributes controler
+- Enabled published search parameter for attributes controler. [Tobias
+  Mainka]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #241 from cipherlock/master. [Raphaël Vinot]
+
+  new:Add the ability to add Other attributes via the API
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #238 from SHSauler/patch-3. [Raphaël Vinot]
+
+  Added download_samples(..., unzip=True)
+- Added unzip-flag. [Steffen Sauler]
+
+  added: download_samples(..., unzip=True)
+- Merge pull request #235 from Lastpixl/master. [Raphaël Vinot]
+
+  chg: fix sample retrieval from new-style zips
+
+
 v2.4.92.1 (2018-06-05)
 ----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 
 Fix
 ~~~

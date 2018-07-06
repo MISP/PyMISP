@@ -674,6 +674,7 @@ class MISPEvent(AbstractMISP):
             raise InvalidMISPObject("An object to add to an existing Event needs to be either a MISPObject, or a plain python dictionary")
         self.Object.append(misp_obj)
         self.edited = True
+        return misp_obj
 
     def __repr__(self):
         if hasattr(self, 'info'):
@@ -845,6 +846,8 @@ class MISPObjectAttribute(MISPAttribute):
         if self.to_ids is None:
             # Same for the to_ids flag
             self.to_ids = self._definition.get('to_ids')
+        if not self.type:
+            raise NewAttributeError("The type of the attribute is required. Is the object template missing?")
         super(MISPObjectAttribute, self).from_dict(**dict(self, **kwargs))
 
     def __repr__(self):
