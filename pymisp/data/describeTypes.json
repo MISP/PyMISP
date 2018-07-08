@@ -213,6 +213,10 @@
         "default_category": "Financial fraud",
         "to_ids": 1
       },
+      "xmr": {
+        "default_category": "Financial fraud",
+        "to_ids": 1
+      },
       "iban": {
         "default_category": "Financial fraud",
         "to_ids": 1
@@ -656,6 +660,7 @@
       "target-location",
       "target-external",
       "btc",
+      "xmr",
       "iban",
       "bic",
       "bank-account-nr",
@@ -1079,6 +1084,7 @@
       ],
       "Financial fraud": [
         "btc",
+        "xmr",
         "iban",
         "bic",
         "bank-account-nr",
