@@ -1043,9 +1043,11 @@ class PyMISP(object):
             if allowed.get(rule) is None:
                 continue
             param = allowed[rule]
+            if isinstance(param, bool):
+                param = int(param)
             if not isinstance(param, list):
                 param = [param]
-            param = [x for x in map(str, param)]
+            # param = [x for x in map(str, param)]
             if rule in rule_levels:
                 if not set(param).issubset(rule_levels[rule]):
                     raise SearchError('Values in your {} are invalid, has to be in {}'.format(rule, ', '.join(str(x) for x in rule_levels[rule])))
