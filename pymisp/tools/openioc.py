@@ -138,7 +138,7 @@ iocMispCompositeMapping = {
     'FileItem/FileName|FileItem/Sha1sum': {'type': 'filename|sha1'},
     'FileItem/FileName|FileItem/Sha256sum': {'type': 'filename|sha256'},
     'Network/DNS|PortItem/remoteIP': {'type': 'domain|ip'},
-    'PortItem/remoteIP|PortItem/remotePort': {'comment': 'ip-dst|port'},
+    'PortItem/remoteIP|PortItem/remotePort': {'type': 'ip-dst|port'},
     'RegistryItem/Path|RegistryItem/Value': {'type': 'regkey|value'},
     'RegistryItem/KeyPath|RegistryItem/Value': {'type': 'regkey|value'},
     'RegistryItem/Path|RegistryItem/Text': {'type': 'regkey|value'}
