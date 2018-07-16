@@ -1185,7 +1185,7 @@ class PyMISP(object):
 
         :param attribute_id: Attribute ID to fetched
         """
-        url = urljoin(self.root_url, 'attributes/downloadAttachment/download/{}'.format(attribute_id))
+        url = urljoin(self.root_url, 'attributes/download/{}'.format(attribute_id))
         response = self.__prepare_request('GET', url)
         try:
             response.json()
