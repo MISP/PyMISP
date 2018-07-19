@@ -17,7 +17,8 @@ def dirty_cleanup(value):
                      ('“', '"'),
                      ('″', '"'),
                      ('`', "'"),
-                     ('\r', '')
+                     ('\r', ''),
+                     ('Rule ', 'rule ')  # some people write this with the wrong case
                      # ('$ ', '$'),    # this breaks rules
                      # ('\t\t', '\n'), # this breaks rules
                      )
@@ -49,6 +50,10 @@ if 'response' in result and 'Attribute' in result['response']:
             attr_cnt_changed += 1
         if 'global rule' in value:  # refuse any global rules as they might disable everything
             continue
+        if 'private rule' in value:  # private rules need some more rewriting
+            priv_rules = re.findall('private rule (\w+)', value, flags=re.MULTILINE)
+            for priv_rule in priv_rules:
+                value = re.sub(priv_rule, 'misp_e{}_{}'.format(event_id, priv_rule), value, flags=re.MULTILINE)
 
         # compile the yara rule to confirm it's validity
         # if valid, ignore duplicate rules
