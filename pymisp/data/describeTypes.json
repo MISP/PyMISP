@@ -1018,7 +1018,8 @@
         "x509-fingerprint-sha1",
         "other",
         "hex",
-        "cookie"
+        "cookie",
+        "hostname|port"
       ],
       "Payload type": [
         "comment",
