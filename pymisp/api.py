@@ -126,7 +126,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def get_local_describe_types(self):
-        with open(os.path.join(self.resources_path, 'describeTypes.json'), 'r') as f:
+        with open(os.path.join(self.resources_path, 'describeTypes.json'), 'rb') as f:
             describe_types = json.load(f)
         return describe_types['result']
 
@@ -1390,7 +1390,7 @@ class PyMISP(object):
 
     def sighting_per_json(self, json_file):
         """Push a sighting (JSON file)"""
-        with open(json_file, 'r') as f:
+        with open(json_file, 'rb') as f:
             jdata = json.load(f)
             return self.set_sightings(jdata)
 
@@ -1460,7 +1460,7 @@ class PyMISP(object):
         return self._rest_add('admin/users', new_user)
 
     def add_user_json(self, json_file):
-        with open(json_file, 'r') as f:
+        with open(json_file, 'rb') as f:
             jdata = json.load(f)
         new_user = MISPUser()
         new_user.from_dict(**jdata)
@@ -1475,7 +1475,7 @@ class PyMISP(object):
         return self._rest_edit('admin/users', edit_user, user_id)
 
     def edit_user_json(self, json_file, user_id):
-        with open(json_file, 'r') as f:
+        with open(json_file, 'rb') as f:
             jdata = json.load(f)
         new_user = MISPUser()
         new_user.from_dict(**jdata)
@@ -1505,7 +1505,7 @@ class PyMISP(object):
         return self._rest_add('admin/organisations', new_org)
 
     def add_organisation_json(self, json_file):
-        with open(json_file, 'r') as f:
+        with open(json_file, 'rb') as f:
             jdata = json.load(f)
         new_org = MISPOrganisation()
         new_org.from_dict(**jdata)
@@ -1520,7 +1520,7 @@ class PyMISP(object):
         return self._rest_edit('admin/organisations', edit_org, org_id)
 
     def edit_organisation_json(self, json_file, org_id):
-        with open(json_file, 'r') as f:
+        with open(json_file, 'rb') as f:
             jdata = json.load(f)
         edit_org = MISPOrganisation()
         edit_org.from_dict(**jdata)
@@ -1594,7 +1594,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def add_server_json(self, json_file):
-        with open(json_file, 'r') as f:
+        with open(json_file, 'rb') as f:
             jdata = json.load(f)
         url = urljoin(self.root_url, 'servers/add')
         response = self.__prepare_request('POST', url, json.dumps(jdata))
@@ -1611,7 +1611,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def edit_server_json(self, json_file, server_id):
-        with open(json_file, 'r') as f:
+        with open(json_file, 'rb') as f:
             jdata = json.load(f)
         url = urljoin(self.root_url, 'servers/edit/{}'.format(server_id))
         response = self.__prepare_request('POST', url, json.dumps(jdata))

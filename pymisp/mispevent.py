@@ -93,7 +93,7 @@ class MISPAttribute(AbstractMISP):
         super(MISPAttribute, self).__init__()
         if not describe_types:
             ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'r') as f:
+            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
                 t = json.load(f)
             describe_types = t['result']
         self.__categories = describe_types['categories']
@@ -351,13 +351,13 @@ class MISPEvent(AbstractMISP):
         super(MISPEvent, self).__init__()
         ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
-            with open(os.path.join(ressources_path, 'schema.json'), 'r') as f:
+            with open(os.path.join(ressources_path, 'schema.json'), 'rb') as f:
                 self.__json_schema = json.load(f)
         else:
-            with open(os.path.join(ressources_path, 'schema-lax.json'), 'r') as f:
+            with open(os.path.join(ressources_path, 'schema-lax.json'), 'rb') as f:
                 self.__json_schema = json.load(f)
         if not describe_types:
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'r') as f:
+            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
                 t = json.load(f)
             describe_types = t['result']
 
@@ -427,7 +427,7 @@ class MISPEvent(AbstractMISP):
         """Load a JSON dump from a file on the disk"""
         if not os.path.exists(event_path):
             raise PyMISPError('Invalid path, unable to load the event.')
-        with open(event_path, 'r') as f:
+        with open(event_path, 'rb') as f:
             self.load(f)
 
     def load(self, json_event):
@@ -897,7 +897,7 @@ class MISPObject(AbstractMISP):
             else:
                 self._known_template = False
         if self._known_template:
-            with open(template_path, 'r') as f:
+            with open(template_path, 'rb') as f:
                 self._definition = json.load(f)
             setattr(self, 'meta-category', self._definition['meta-category'])
             self.template_uuid = self._definition['uuid']
