@@ -995,8 +995,8 @@ class PyMISP(object):
         """Helper to prepare a search query"""
         if query.get('error') is not None:
             return query
-        if controller not in ['events', 'attributes']:
-            raise Exception('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes'])))
+        if controller not in ['events', 'attributes', 'objects']:
+            raise ValueError('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes', 'objects'])))
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
 
         if ASYNC_OK and async_callback:

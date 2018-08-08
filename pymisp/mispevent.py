@@ -435,7 +435,7 @@ class MISPEvent(AbstractMISP):
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
             json_event = json_event.read()
-        if isinstance(json_event, basestring):
+        if isinstance(json_event, (basestring, bytes)):
             json_event = json.loads(json_event)
         if json_event.get('response'):
             event = json_event.get('response')[0]
