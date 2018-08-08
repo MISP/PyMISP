@@ -102,7 +102,7 @@ class MISPAttribute(AbstractMISP):
             ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
             with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
                 if OLD_PY3:
-                    t = json.loads(f.read())
+                    t = json.loads(f.read().decode())
                 else:
                     t = json.load(f)
             describe_types = t['result']
@@ -363,19 +363,19 @@ class MISPEvent(AbstractMISP):
         if strict_validation:
             with open(os.path.join(ressources_path, 'schema.json'), 'rb') as f:
                 if OLD_PY3:
-                    self.__json_schema = json.loads(f.read())
+                    self.__json_schema = json.loads(f.read().decode())
                 else:
                     self.__json_schema = json.load(f)
         else:
             with open(os.path.join(ressources_path, 'schema-lax.json'), 'rb') as f:
                 if OLD_PY3:
-                    self.__json_schema = json.loads(f.read())
+                    self.__json_schema = json.loads(f.read().decode())
                 else:
                     self.__json_schema = json.load(f)
         if not describe_types:
             with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
                 if OLD_PY3:
-                    t = json.loads(f.read())
+                    t = json.loads(f.read().decode())
                 else:
                     t = json.load(f)
             describe_types = t['result']
@@ -455,6 +455,8 @@ class MISPEvent(AbstractMISP):
             # python2 and python3 compatible to find if we have a file
             json_event = json_event.read()
         if isinstance(json_event, (basestring, bytes)):
+            if OLD_PY3 and isinstance(json_event, bytes):
+                json_event = json_event.decode()
             json_event = json.loads(json_event)
         if json_event.get('response'):
             event = json_event.get('response')[0]
@@ -918,7 +920,7 @@ class MISPObject(AbstractMISP):
         if self._known_template:
             with open(template_path, 'rb') as f:
                 if OLD_PY3:
-                    self._definition = json.loads(f.read())
+                    self._definition = json.loads(f.read().decode())
                 else:
                     self._definition = json.load(f)
             setattr(self, 'meta-category', self._definition['meta-category'])
