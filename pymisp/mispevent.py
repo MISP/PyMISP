@@ -23,7 +23,7 @@ logger = logging.getLogger('pymisp')
 
 
 if six.PY2:
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
     # This is required because Python 2 is a pain.
     from datetime import tzinfo, timedelta
@@ -39,6 +39,13 @@ if six.PY2:
 
         def dst(self, dt):
             return timedelta(0)
+
+
+if (3, 0) <= sys.version_info < (3, 6):
+    OLD_PY3 = True
+else:
+    OLD_PY3 = False
+
 
 try:
     from dateutil.parser import parse
@@ -94,7 +101,10 @@ class MISPAttribute(AbstractMISP):
         if not describe_types:
             ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
             with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-                t = json.load(f)
+                if OLD_PY3:
+                    t = json.loads(f.read())
+                else:
+                    t = json.load(f)
             describe_types = t['result']
         self.__categories = describe_types['categories']
         self._types = describe_types['types']
@@ -352,13 +362,22 @@ class MISPEvent(AbstractMISP):
         ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
             with open(os.path.join(ressources_path, 'schema.json'), 'rb') as f:
-                self.__json_schema = json.load(f)
+                if OLD_PY3:
+                    self.__json_schema = json.loads(f.read())
+                else:
+                    self.__json_schema = json.load(f)
         else:
             with open(os.path.join(ressources_path, 'schema-lax.json'), 'rb') as f:
-                self.__json_schema = json.load(f)
+                if OLD_PY3:
+                    self.__json_schema = json.loads(f.read())
+                else:
+                    self.__json_schema = json.load(f)
         if not describe_types:
             with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-                t = json.load(f)
+                if OLD_PY3:
+                    t = json.loads(f.read())
+                else:
+                    t = json.load(f)
             describe_types = t['result']
 
         self._types = describe_types['types']
@@ -898,7 +917,10 @@ class MISPObject(AbstractMISP):
                 self._known_template = False
         if self._known_template:
             with open(template_path, 'rb') as f:
-                self._definition = json.load(f)
+                if OLD_PY3:
+                    self._definition = json.loads(f.read())
+                else:
+                    self._definition = json.load(f)
             setattr(self, 'meta-category', self._definition['meta-category'])
             self.template_uuid = self._definition['uuid']
             self.description = self._definition['description']

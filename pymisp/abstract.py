@@ -16,7 +16,7 @@ from .exceptions import PyMISPInvalidFormat
 logger = logging.getLogger('pymisp')
 
 if six.PY2:
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
     # This is required because Python 2 is a pain.
     from datetime import tzinfo, timedelta
