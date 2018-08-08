@@ -369,6 +369,21 @@ class PyMISP(object):
         response = self.__prepare_request('POST', url, event)
         return self._check_response(response)
 
+    def merge_event(self, previous_event_id, merge_event_id, delete = False):
+        """Merge Event
+        
+        :param previous_event_id: Previous event id
+        :param merge_event_id: Merge event id
+        :param delete: Option to delete previous event
+        """
+        previous_event = self.get_event(previous_event_id)
+        merge_event = self.get_event(merge_event_id)
+        for attribute in previous_event['Event']['Attribute']:
+                response = self.add_named_attribute(merge_event, type_value = attribute['type'], value = attribute['value'], category = attribute['category'], to_ids=attribute['to_ids'], comment=attribute['comment'], distribution=attribute['distribution'])
+        if delete:
+                self.delete_event(event_id = previous_event_id)
+        return True
+
     def delete_event(self, event_id):
         """Delete an event
 
