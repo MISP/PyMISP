@@ -767,6 +767,10 @@ class PyMISP(object):
         """Add an email atachment"""
         return self.add_named_attribute(event, 'email-attachment', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
+    def add_email_header(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add an email header"""
+        return self.add_named_attribute(event, 'email-header', email, category, to_ids, comment, distribution, proposal, **kwargs)
+
     # ##### Target attributes #####
 
     def add_target_email(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
