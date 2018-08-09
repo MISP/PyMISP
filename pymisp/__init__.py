@@ -2,6 +2,7 @@ __version__ = '2.4.93'
 import logging
 import functools
 import warnings
+import sys
 
 FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
 formatter = logging.Formatter(FORMAT)
@@ -31,9 +32,9 @@ def deprecated(func):
 
 
 try:
-    from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat  # noqa
+    from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError  # noqa
     from .api import PyMISP  # noqa
-    from .abstract import AbstractMISP, MISPEncode, MISPTag  # noqa
+    from .abstract import AbstractMISP, MISPEncode, MISPTag, Distribution, ThreatLevel, Analysis  # noqa
     from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting   # noqa
     from .tools import AbstractMISPObjectGenerator  # noqa
     from .tools import Neo4j  # noqa
@@ -41,6 +42,8 @@ try:
     from .tools import openioc  # noqa
     from .tools import load_warninglists  # noqa
     from .tools import ext_lookups  # noqa
+    if sys.version_info >= (3, 6):
+        from .aping import ExpandedPyMISP  # noqa
     logger.debug('pymisp loaded properly')
 except ImportError as e:
     logger.warning('Unable to load pymisp properly: {}'.format(e))

@@ -122,7 +122,7 @@ class PyMISP(object):
 
     def get_live_query_acl(self):
         """This should return an empty list, unless the ACL is outdated."""
-        response = self.__prepare_request('GET', urljoin(self.root_url, 'events/queryACL.json'))
+        response = self._prepare_request('GET', urljoin(self.root_url, 'events/queryACL.json'))
         return self._check_response(response)
 
     def get_local_describe_types(self):
@@ -131,7 +131,7 @@ class PyMISP(object):
         return describe_types['result']
 
     def get_live_describe_types(self):
-        response = self.__prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
+        response = self._prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
         describe_types = self._check_response(response)
         if describe_types.get('error'):
             for e in describe_types.get('error'):
@@ -141,8 +141,8 @@ class PyMISP(object):
             raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
         return describe_types
 
-    def __prepare_request(self, request_type, url, data=None,
-                          background_callback=None, output_type='json'):
+    def _prepare_request(self, request_type, url, data=None,
+                         background_callback=None, output_type='json'):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug('{} - {}'.format(request_type, url))
             if data is not None:
@@ -152,21 +152,22 @@ class PyMISP(object):
         else:
             req = requests.Request(request_type, url, data=data)
         if self.asynch and background_callback is not None:
-            s = FuturesSession()
+            local_session = FuturesSession
         else:
-            s = requests.Session()
-        prepped = s.prepare_request(req)
-        prepped.headers.update(
-            {'Authorization': self.key,
-             'Accept': 'application/{}'.format(output_type),
-             'content-type': 'application/{}'.format(output_type),
-             'User-Agent': 'PyMISP {} - Python {}.{}.{}'.format(__version__, *sys.version_info)})
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(prepped.headers)
-        if self.asynch and background_callback is not None:
-            return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert, background_callback=background_callback)
-        else:
-            return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert)
+            local_session = requests.Session
+        with local_session() as s:
+            prepped = s.prepare_request(req)
+            prepped.headers.update(
+                {'Authorization': self.key,
+                 'Accept': 'application/{}'.format(output_type),
+                 'content-type': 'application/{}'.format(output_type),
+                 'User-Agent': 'PyMISP {} - Python {}.{}.{}'.format(__version__, *sys.version_info)})
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(prepped.headers)
+            if self.asynch and background_callback is not None:
+                return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert, background_callback=background_callback)
+            else:
+                return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert)
 
     # #####################
     # ### Core helpers ####
@@ -314,9 +315,9 @@ class PyMISP(object):
         """
         url = urljoin(self.root_url, 'events/index')
         if filters is None:
-            response = self.__prepare_request('GET', url)
+            response = self._prepare_request('GET', url)
         else:
-            response = self.__prepare_request('POST', url, json.dumps(filters))
+            response = self._prepare_request('POST', url, json.dumps(filters))
         return self._check_response(response)
 
     def get_event(self, event_id):
@@ -325,7 +326,7 @@ class PyMISP(object):
         :param event_id: Event id to get
         """
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def add_event(self, event):
@@ -338,7 +339,7 @@ class PyMISP(object):
             event = event.to_json()
         elif not isinstance(event, basestring):
             event = json.dumps(event)
-        response = self.__prepare_request('POST', url, event)
+        response = self._prepare_request('POST', url, event)
         return self._check_response(response)
 
     def update_attribute(self, attribute_id, attribute):
@@ -352,7 +353,7 @@ class PyMISP(object):
             attribute = attribute.to_json()
         elif not isinstance(attribute, basestring):
             attribute = json.dumps(attribute)
-        response = self.__prepare_request('POST', url, attribute)
+        response = self._prepare_request('POST', url, attribute)
         return self._check_response(response)
 
     def update_event(self, event_id, event):
@@ -366,7 +367,7 @@ class PyMISP(object):
             event = event.to_json()
         elif not isinstance(event, basestring):
             event = json.dumps(event)
-        response = self.__prepare_request('POST', url, event)
+        response = self._prepare_request('POST', url, event)
         return self._check_response(response)
 
     def delete_event(self, event_id):
@@ -375,7 +376,7 @@ class PyMISP(object):
         :param event_id: Event id to delete
         """
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
-        response = self.__prepare_request('DELETE', url)
+        response = self._prepare_request('DELETE', url)
         return self._check_response(response)
 
     def delete_attribute(self, attribute_id, hard_delete=False):
@@ -384,13 +385,13 @@ class PyMISP(object):
             url = urljoin(self.root_url, 'attributes/delete/{}/1'.format(attribute_id))
         else:
             url = urljoin(self.root_url, 'attributes/delete/{}'.format(attribute_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def pushEventToZMQ(self, event_id):
         """Force push an event on ZMQ"""
         url = urljoin(self.root_url, 'events/pushEventToZMQ/{}.json'.format(event_id))
-        response = self.__prepare_request('POST', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     # ##############################################
@@ -419,7 +420,7 @@ class PyMISP(object):
             url = urljoin(self.root_url, 'events/publish/{}'.format(event_id))
         else:
             url = urljoin(self.root_url, 'events/alert/{}'.format(event_id))
-        response = self.__prepare_request('POST', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def publish(self, event, alert=True):
@@ -467,7 +468,7 @@ class PyMISP(object):
             raise PyMISPError('Invalid UUID')
         url = urljoin(self.root_url, 'tags/attachTagToObject')
         to_post = {'uuid': uuid, 'tag': tag}
-        response = self.__prepare_request('POST', url, json.dumps(to_post))
+        response = self._prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
 
     def untag(self, uuid, tag):
@@ -476,7 +477,7 @@ class PyMISP(object):
             raise PyMISPError('Invalid UUID')
         url = urljoin(self.root_url, 'tags/removeTagFromObject')
         to_post = {'uuid': uuid, 'tag': tag}
-        response = self.__prepare_request('POST', url, json.dumps(to_post))
+        response = self._prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
 
     # ##### File attributes #####
@@ -519,8 +520,8 @@ class PyMISP(object):
                     data = attributes[0].to_json()
             else:
                 data = attributes.to_json()
-            # __prepare_request(...) returns a requests.Response Object
-            resp = self.__prepare_request('POST', url, json.dumps(data, cls=MISPEncode))
+            # _prepare_request(...) returns a requests.Response Object
+            resp = self._prepare_request('POST', url, json.dumps(data, cls=MISPEncode))
             try:
                 responses.append(resp.json())
             except Exception:
@@ -908,7 +909,7 @@ class PyMISP(object):
             url = urljoin(self.root_url, 'events/upload_sample')
         else:
             url = urljoin(self.root_url, 'events/upload_sample/{}'.format(event_id))
-        response = self.__prepare_request('POST', url, json.dumps(to_post))
+        response = self._prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
 
     # ############################
@@ -920,11 +921,11 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
-            response = self.__prepare_request('POST', url, json.dumps(query, cls=MISPEncode))
+            response = self._prepare_request('POST', url, json.dumps(query, cls=MISPEncode))
         elif path == 'view':
-            response = self.__prepare_request('GET', url)
+            response = self._prepare_request('GET', url)
         else:  # accept or discard
-            response = self.__prepare_request('POST', url)
+            response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def proposal_view(self, event_id=None, proposal_id=None):
@@ -1000,9 +1001,9 @@ class PyMISP(object):
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
 
         if ASYNC_OK and async_callback:
-            response = self.__prepare_request('POST', url, json.dumps(query), async_callback)
+            response = self._prepare_request('POST', url, json.dumps(query), async_callback)
         else:
-            response = self.__prepare_request('POST', url, json.dumps(query))
+            response = self._prepare_request('POST', url, json.dumps(query))
             return self._check_response(response)
 
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
@@ -1055,9 +1056,9 @@ class PyMISP(object):
         url = urljoin(self.root_url, buildup_url)
 
         if self.asynch and async_callback:
-            response = self.__prepare_request('POST', url, json.dumps(to_post), async_callback)
+            response = self._prepare_request('POST', url, json.dumps(to_post), async_callback)
         else:
-            response = self.__prepare_request('POST', url, json.dumps(to_post))
+            response = self._prepare_request('POST', url, json.dumps(to_post))
             res = self._check_response(response)
             if normalize:
                 to_return = {'response': []}
@@ -1188,7 +1189,7 @@ class PyMISP(object):
         :param attribute_id: Attribute ID to fetched
         """
         url = urljoin(self.root_url, 'attributes/download/{}'.format(attribute_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         try:
             response.json()
             # The query fails, response contains a json blob
@@ -1201,7 +1202,7 @@ class PyMISP(object):
         """Get the yara rules from an event"""
         url = urljoin(self.root_url, 'attributes/restSearch')
         to_post = {'request': {'eventid': event_id, 'type': 'yara'}}
-        response = self.__prepare_request('POST', url, data=json.dumps(to_post))
+        response = self._prepare_request('POST', url, data=json.dumps(to_post))
         result = self._check_response(response)
         if result.get('error') is not None:
             return False, result.get('error')
@@ -1214,7 +1215,7 @@ class PyMISP(object):
         """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch"""
         url = urljoin(self.root_url, 'attributes/downloadSample')
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
-        response = self.__prepare_request('POST', url, data=json.dumps(to_post))
+        response = self._prepare_request('POST', url, data=json.dumps(to_post))
         result = self._check_response(response)
         if result.get('error') is not None:
             return False, result.get('error')
@@ -1281,7 +1282,7 @@ class PyMISP(object):
     def get_all_tags(self, quiet=False):
         """Get all the tags used on the instance"""
         url = urljoin(self.root_url, 'tags')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         r = self._check_response(response)
         if not quiet or r.get('errors'):
             return r
@@ -1295,7 +1296,7 @@ class PyMISP(object):
         """Create a new tag"""
         to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable, 'hide_tag': hide_tag}}
         url = urljoin(self.root_url, 'tags/add')
-        response = self.__prepare_request('POST', url, json.dumps(to_post))
+        response = self._prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
 
     # ########## Version ##########
@@ -1316,13 +1317,13 @@ class PyMISP(object):
     def get_recommended_api_version(self):
         """Returns the recommended API version from the server"""
         url = urljoin(self.root_url, 'servers/getPyMISPVersion.json')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_version(self):
         """Returns the version of the instance."""
         url = urljoin(self.root_url, 'servers/getVersion.json')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_version_master(self):
@@ -1344,7 +1345,7 @@ class PyMISP(object):
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}/{}'.format(context, percentage))
         else:
             url = urljoin(self.root_url, 'attributes/attributeStatistics/{}'.format(context))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_tags_statistics(self, percentage=None, name_sort=None):
@@ -1358,7 +1359,7 @@ class PyMISP(object):
         else:
             name_sort = 'false'
         url = urljoin(self.root_url, 'tags/tagStatistics/{}/{}'.format(percentage, name_sort))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     # ############## Sightings ##################
@@ -1366,13 +1367,13 @@ class PyMISP(object):
     def sighting_per_id(self, attribute_id):
         """Add a sighting to an attribute (by attribute ID)"""
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_id))
-        response = self.__prepare_request('POST', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def sighting_per_uuid(self, attribute_uuid):
         """Add a sighting to an attribute (by attribute UUID)"""
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_uuid))
-        response = self.__prepare_request('POST', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def set_sightings(self, sightings):
@@ -1385,7 +1386,7 @@ class PyMISP(object):
             elif isinstance(sighting, dict):
                 to_post = json.dumps(sighting)
             url = urljoin(self.root_url, 'sightings/add/')
-            response = self.__prepare_request('POST', url, to_post)
+            response = self._prepare_request('POST', url, to_post)
         return self._check_response(response)
 
     def sighting_per_json(self, json_file):
@@ -1435,7 +1436,7 @@ class PyMISP(object):
             org_id = ""
         uri = 'sightings/listSightings/{}/{}/{}'.format(element_id, scope, org_id)
         url = urljoin(self.root_url, uri)
-        response = self.__prepare_request('POST', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     # ############## Sharing Groups ##################
@@ -1443,7 +1444,7 @@ class PyMISP(object):
     def get_sharing_groups(self):
         """Get the existing sharing groups"""
         url = urljoin(self.root_url, 'sharing_groups.json')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)['response']
 
     # ############## Users ##################
@@ -1590,14 +1591,14 @@ class PyMISP(object):
                                                  push, pull, self_signed, push_rules, pull_rules, submitted_cert,
                                                  submitted_client_cert, None, None)
         url = urljoin(self.root_url, 'servers/add')
-        response = self.__prepare_request('POST', url, json.dumps(new_server))
+        response = self._prepare_request('POST', url, json.dumps(new_server))
         return self._check_response(response)
 
     def add_server_json(self, json_file):
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
         url = urljoin(self.root_url, 'servers/add')
-        response = self.__prepare_request('POST', url, json.dumps(jdata))
+        response = self._prepare_request('POST', url, json.dumps(jdata))
         return self._check_response(response)
 
     def edit_server(self, server_id, url=None, name=None, authkey=None, organisation=None, internal=None, push=False,
@@ -1607,14 +1608,14 @@ class PyMISP(object):
                                                  push, pull, self_signed, push_rules, pull_rules, submitted_cert,
                                                  submitted_client_cert, delete_cert, delete_client_cert)
         url = urljoin(self.root_url, 'servers/edit/{}'.format(server_id))
-        response = self.__prepare_request('POST', url, json.dumps(new_server))
+        response = self._prepare_request('POST', url, json.dumps(new_server))
         return self._check_response(response)
 
     def edit_server_json(self, json_file, server_id):
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
         url = urljoin(self.root_url, 'servers/edit/{}'.format(server_id))
-        response = self.__prepare_request('POST', url, json.dumps(jdata))
+        response = self._prepare_request('POST', url, json.dumps(jdata))
         return self._check_response(response)
 
     # ############## Roles ##################
@@ -1622,7 +1623,7 @@ class PyMISP(object):
     def get_roles_list(self):
         """Get the list of existing roles"""
         url = urljoin(self.root_url, '/roles')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)['response']
 
     # ############## Tags ##################
@@ -1630,43 +1631,43 @@ class PyMISP(object):
     def get_tags_list(self):
         """Get the list of existing tags"""
         url = urljoin(self.root_url, '/tags')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)['Tag']
 
     # ############## Taxonomies ##################
 
     def get_taxonomies_list(self):
         url = urljoin(self.root_url, '/taxonomies')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_taxonomy(self, taxonomy_id):
         url = urljoin(self.root_url, '/taxonomies/view/{}'.format(taxonomy_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     # ############## WarningLists ##################
 
     def get_warninglists(self):
         url = urljoin(self.root_url, '/warninglists')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_warninglist(self, warninglist_id):
         url = urljoin(self.root_url, '/warninglists/view/{}'.format(warninglist_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     # ############## Galaxies/Clusters ##################
 
     def get_galaxies(self):
         url = urljoin(self.root_url, '/galaxies')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_galaxy(self, galaxy_id):
         url = urljoin(self.root_url, '/galaxies/view/{}'.format(galaxy_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     # ##############################################
@@ -1678,7 +1679,7 @@ class PyMISP(object):
     def download_all_suricata(self):
         """Download all suricata rules events."""
         url = urljoin(self.root_url, 'events/nids/suricata/download')
-        response = self.__prepare_request('GET', url, output_type='rules')
+        response = self._prepare_request('GET', url, output_type='rules')
         return response
 
     def download_suricata_rule_event(self, event_id):
@@ -1687,7 +1688,7 @@ class PyMISP(object):
         :param event_id: ID of the event to download (same as get)
         """
         url = urljoin(self.root_url, 'events/nids/suricata/download/{}'.format(event_id))
-        response = self.__prepare_request('GET', url, output_type='rules')
+        response = self._prepare_request('GET', url, output_type='rules')
         return response
 
     # ############## Text ###############
@@ -1695,7 +1696,7 @@ class PyMISP(object):
     def get_all_attributes_txt(self, type_attr, tags=False, eventId=False, allowNonIDS=False, date_from=False, date_to=False, last=False, enforceWarninglist=False, allowNotPublished=False):
         """Get all attributes from a specific type as plain text. Only published and IDS flagged attributes are exported, except if stated otherwise."""
         url = urljoin(self.root_url, 'attributes/text/download/%s/%s/%s/%s/%s/%s/%s/%s/%s' % (type_attr, tags, eventId, allowNonIDS, date_from, date_to, last, enforceWarninglist, allowNotPublished))
-        response = self.__prepare_request('GET', url, output_type='txt')
+        response = self._prepare_request('GET', url, output_type='txt')
         return response
 
     # ############## STIX ##############
@@ -1708,7 +1709,7 @@ class PyMISP(object):
         url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
             event_id, with_attachments, tags, from_date, to_date))
         logger.debug("Getting STIX event from %s", url)
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_stix(self, **kwargs):
@@ -1743,9 +1744,9 @@ class PyMISP(object):
         if last:
             to_post['last'] = last
         if to_post:
-            response = self.__prepare_request('POST', url, json.dumps(to_post), output_type='json')
+            response = self._prepare_request('POST', url, json.dumps(to_post), output_type='json')
         else:
-            response = self.__prepare_request('POST', url, output_type='json')
+            response = self._prepare_request('POST', url, output_type='json')
         return response.text
 
     # #######################################
@@ -1754,32 +1755,32 @@ class PyMISP(object):
 
     def _rest_list(self, urlpath):
         url = urljoin(self.root_url, urlpath)
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def _rest_get_parameters(self, urlpath):
         url = urljoin(self.root_url, '{}/add'.format(urlpath))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def _rest_view(self, urlpath, rest_id):
         url = urljoin(self.root_url, '{}/view/{}'.format(urlpath, rest_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def _rest_add(self, urlpath, obj):
         url = urljoin(self.root_url, '{}/add'.format(urlpath))
-        response = self.__prepare_request('POST', url, obj.to_json())
+        response = self._prepare_request('POST', url, obj.to_json())
         return self._check_response(response)
 
     def _rest_edit(self, urlpath, obj, rest_id):
         url = urljoin(self.root_url, '{}/edit/{}'.format(urlpath, rest_id))
-        response = self.__prepare_request('POST', url, obj.to_json())
+        response = self._prepare_request('POST', url, obj.to_json())
         return self._check_response(response)
 
     def _rest_delete(self, urlpath, rest_id):
         url = urljoin(self.root_url, '{}/delete/{}'.format(urlpath, rest_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     # ###########################
@@ -1817,37 +1818,37 @@ class PyMISP(object):
     def fetch_feed(self, feed_id):
         """Fetch one single feed"""
         url = urljoin(self.root_url, 'feeds/fetchFromFeed/{}'.format(feed_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def cache_feeds_all(self):
         """ Cache all the feeds"""
         url = urljoin(self.root_url, 'feeds/cacheFeeds/all')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def cache_feed(self, feed_id):
         """Cache a specific feed"""
         url = urljoin(self.root_url, 'feeds/cacheFeeds/{}'.format(feed_id))
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def cache_feeds_freetext(self):
         """Cache all the freetext feeds"""
         url = urljoin(self.root_url, 'feeds/cacheFeeds/freetext')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def cache_feeds_misp(self):
         """Cache all the MISP feeds"""
         url = urljoin(self.root_url, 'feeds/cacheFeeds/misp')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def compare_feeds(self):
         """Generate the comparison matrix for all the MISP feeds"""
         url = urljoin(self.root_url, 'feeds/compareFeeds')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     @deprecated
@@ -1877,7 +1878,7 @@ class PyMISP(object):
         '''
         to_jsonify = {'sg_id': sharing_group, 'org_id': organisation, 'extend': extend}
         url = urljoin(self.root_url, '/sharingGroups/addOrg')
-        response = self.__prepare_request('POST', url, json.dumps(to_jsonify))
+        response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
     def sharing_group_org_remove(self, sharing_group, organisation):
@@ -1887,7 +1888,7 @@ class PyMISP(object):
         '''
         to_jsonify = {'sg_id': sharing_group, 'org_id': organisation}
         url = urljoin(self.root_url, '/sharingGroups/removeOrg')
-        response = self.__prepare_request('POST', url, json.dumps(to_jsonify))
+        response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
     def sharing_group_server_add(self, sharing_group, server, all_orgs=False):
@@ -1898,7 +1899,7 @@ class PyMISP(object):
         '''
         to_jsonify = {'sg_id': sharing_group, 'server_id': server, 'all_orgs': all_orgs}
         url = urljoin(self.root_url, '/sharingGroups/addServer')
-        response = self.__prepare_request('POST', url, json.dumps(to_jsonify))
+        response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
     def sharing_group_server_remove(self, sharing_group, server):
@@ -1908,7 +1909,7 @@ class PyMISP(object):
         '''
         to_jsonify = {'sg_id': sharing_group, 'server_id': server}
         url = urljoin(self.root_url, '/sharingGroups/removeServer')
-        response = self.__prepare_request('POST', url, json.dumps(to_jsonify))
+        response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
     # ###################
@@ -1935,7 +1936,7 @@ class PyMISP(object):
             url = urljoin(self.root_url, 'objects/add/{}/{}'.format(event_id, template_id))
         else:
             url = urljoin(self.root_url, 'objects/add/{}'.format(event_id))
-        response = self.__prepare_request('POST', url, misp_object.to_json())
+        response = self._prepare_request('POST', url, misp_object.to_json())
         return self._check_response(response)
 
     def edit_object(self, misp_object, object_id=None):
@@ -1949,31 +1950,31 @@ class PyMISP(object):
         else:
             raise PyMISPError('In order to update an object, you have to provide an object ID (either in the misp_object, or as a parameter)')
         url = urljoin(self.root_url, 'objects/edit/{}'.format(param))
-        response = self.__prepare_request('POST', url, misp_object.to_json())
+        response = self._prepare_request('POST', url, misp_object.to_json())
         return self._check_response(response)
 
     def delete_object(self, id):
         """Deletes an object"""
         url = urljoin(self.root_url, 'objects/delete/{}'.format(id))
-        response = self.__prepare_request('POST', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def add_object_reference(self, misp_object_reference):
         """Add a reference to an object"""
         url = urljoin(self.root_url, 'object_references/add')
-        response = self.__prepare_request('POST', url, misp_object_reference.to_json())
+        response = self._prepare_request('POST', url, misp_object_reference.to_json())
         return self._check_response(response)
 
     def delete_object_reference(self, id):
         """Deletes a reference to an object"""
         url = urljoin(self.root_url, 'object_references/delete/{}'.format(id))
-        response = self.__prepare_request('POST', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def get_object_templates_list(self):
         """Returns the list of Object templates available on the MISP instance"""
         url = urljoin(self.root_url, 'objectTemplates')
-        response = self.__prepare_request('GET', url)
+        response = self._prepare_request('GET', url)
         return self._check_response(response)['response']
 
     def get_object_template_id(self, object_uuid):
@@ -2000,7 +2001,7 @@ class PyMISP(object):
             to_post = {'request': {'Event': {'id': event['id'], 'tag': tag}}}
             path = 'events/addTag'
         url = urljoin(self.root_url, path)
-        response = self.__prepare_request('POST', url, json.dumps(to_post))
+        response = self._prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
 
     @deprecated
@@ -2012,5 +2013,5 @@ class PyMISP(object):
             to_post = {'request': {'Event': {'id': event['Event']['id'], 'tag': tag}}}
             path = 'events/removeTag'
         url = urljoin(self.root_url, path)
-        response = self.__prepare_request('POST', url, json.dumps(to_post))
+        response = self._prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)

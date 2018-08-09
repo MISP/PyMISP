@@ -798,11 +798,21 @@ class MISPUser(AbstractMISP):
     def __init__(self):
         super(MISPUser, self).__init__()
 
+    def from_dict(self, **kwargs):
+        if kwargs.get('User'):
+            kwargs = kwargs.get('User')
+        super(MISPUser, self).from_dict(**kwargs)
+
 
 class MISPOrganisation(AbstractMISP):
 
     def __init__(self):
         super(MISPOrganisation, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Organisation'):
+            kwargs = kwargs.get('Organisation')
+        super(MISPOrganisation, self).from_dict(**kwargs)
 
 
 class MISPFeed(AbstractMISP):

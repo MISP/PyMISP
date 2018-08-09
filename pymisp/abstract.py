@@ -9,6 +9,7 @@ from json import JSONEncoder
 import collections
 import six  # Remove that import when discarding python2 support.
 import logging
+from enum import Enum
 
 from .exceptions import PyMISPInvalidFormat
 
@@ -34,6 +35,28 @@ if six.PY2:
             return timedelta(0)
 
 
+class Distribution(Enum):
+    your_organisation_only = 0
+    this_community_only = 1
+    connected_communities = 2
+    all_communities = 3
+    sharing_group = 4
+    inherit = 5
+
+
+class ThreatLevel(Enum):
+    high = 1
+    medium = 2
+    low = 3
+    undefined = 4
+
+
+class Analysis(Enum):
+    initial = 0
+    ongoing = 1
+    completed = 2
+
+
 class MISPEncode(JSONEncoder):
 
     def default(self, obj):
@@ -41,6 +64,8 @@ class MISPEncode(JSONEncoder):
             return obj.jsonable()
         elif isinstance(obj, datetime.datetime):
             return obj.isoformat()
+        elif isinstance(obj, Enum):
+            return obj.value
         return JSONEncoder.default(self, obj)
 
 

@@ -47,3 +47,6 @@ class UnknownMISPObjectTemplate(MISPObjectException):
 
 class PyMISPInvalidFormat(PyMISPError):
     pass
+
+class MISPServerError(PyMISPError):
+    pass
