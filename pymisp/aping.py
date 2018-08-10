@@ -79,6 +79,7 @@ class ExpandedPyMISP(PyMISP):
     # TODO: Make that thing async & test it.
     def search(self, controller: str='events', return_format: str='json',
                value: Optional[SearchParameterTypes]=None,
+               eventinfo: Optional[str]=None,
                type_attribute: Optional[SearchParameterTypes]=None,
                category: Optional[SearchParameterTypes]=None,
                org: Optional[SearchParameterTypes]=None,
@@ -106,6 +107,8 @@ class ExpandedPyMISP(PyMISP):
             query['returnFormat'] = return_format
         if value is not None:
             query['value'] = value
+        if eventinfo is not None:
+            query['eventinfo'] = eventinfo
         if type_attribute is not None:
             query['type'] = type_attribute
         if category is not None:
@@ -128,8 +131,6 @@ class ExpandedPyMISP(PyMISP):
             query['uuid'] = uuid
         if published is not None:
             query['published'] = published
-        if searchall is not None:
-            query['searchall'] = searchall
         if enforce_warninglist is not None:
             query['enforceWarninglist'] = enforce_warninglist
         if enforceWarninglist is not None:

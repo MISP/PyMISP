@@ -357,8 +357,8 @@ class MISPAttribute(AbstractMISP):
 
 class MISPEvent(AbstractMISP):
 
-    def __init__(self, describe_types=None, strict_validation=False):
-        super(MISPEvent, self).__init__()
+    def __init__(self, describe_types=None, strict_validation=False, **kwargs):
+        super(MISPEvent, self).__init__(**kwargs)
         ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
             with open(os.path.join(ressources_path, 'schema.json'), 'rb') as f:

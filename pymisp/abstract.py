@@ -79,6 +79,12 @@ class AbstractMISP(collections.MutableMapping):
         super(AbstractMISP, self).__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
 
+        if kwargs.get('force_timestamps') is not None:
+            # Ignore the edited objects and keep the timestamps.
+            self.__force_timestamps = True
+        else:
+            self.__force_timestamps = False
+
         # List of classes having tags
         from .mispevent import MISPAttribute, MISPEvent
         self.__has_tags = (MISPAttribute, MISPEvent)
@@ -136,7 +142,7 @@ class AbstractMISP(collections.MutableMapping):
             elif isinstance(val, list) and len(val) == 0:
                 continue
             if attribute == 'timestamp':
-                if self.edited:
+                if not self.__force_timestamps and self.edited:
                     # In order to be accepted by MISP, the timestamp of an object
                     # needs to be either newer, or None.
                     # If the current object is marked as edited, the easiest is to
