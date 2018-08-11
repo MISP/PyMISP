@@ -10,7 +10,8 @@ import time
 
 try:
     from keys import url, key
-except ImportError:
+except ImportError as e:
+    print(e)
     url = 'http://localhost:8080'
     key = 'fk5BodCZw8owbscW8pQ4ykMASLeJ4NYhuAbshNjo'
 
