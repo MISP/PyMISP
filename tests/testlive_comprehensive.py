@@ -314,3 +314,7 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(response, [])
         # Delete event
         self.admin_misp_connector.delete_event(c_me.id)
+
+
+if __name__ == '__main__':
+    unittest.main()
