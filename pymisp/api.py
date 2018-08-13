@@ -1366,6 +1366,15 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
+    def get_users_statistics(self, context='data'):
+        """Get users statistics from the MISP instance"""
+        availables_contexts = ['data', 'orgs', 'users', 'tags', 'attributehistogram', 'sightings', 'attackMatrix']
+        if context not in availables_contexts:
+            context = 'data'
+        url = urljoin(self.root_url, 'users/statistics/{}.json'.format(context))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
     # ############## Sightings ##################
 
     def sighting_per_id(self, attribute_id):
