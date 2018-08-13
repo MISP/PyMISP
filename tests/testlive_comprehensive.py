@@ -224,6 +224,10 @@ class TestComprehensive(unittest.TestCase):
             # Test invalid query
             response = pub_misp_connector.search(publish_timestamp='5x')
             self.assertEqual(len(response), 0)
+            response = pub_misp_connector.search(publish_timestamp='ad')
+            self.assertEqual(len(response), 0)
+            response = pub_misp_connector.search(publish_timestamp='aaad')
+            self.assertEqual(len(response), 0)
             # Search as user
             # # Test - last 4 min
             response = pub_misp_connector.search(publish_timestamp='5s')
