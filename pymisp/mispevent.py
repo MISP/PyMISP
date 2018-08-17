@@ -163,6 +163,8 @@ class MISPAttribute(AbstractMISP):
         return misp_shadow_attribute
 
     def from_dict(self, **kwargs):
+        if kwargs.get('Attribute'):
+            kwargs = kwargs.get('Attribute')
         if kwargs.get('type') and kwargs.get('category'):
             if kwargs['type'] not in self.__category_type_mapping[kwargs['category']]:
                 if self.__strict:

@@ -3,7 +3,7 @@
 
 import unittest
 
-from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis
+from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPAttribute
 from datetime import datetime, timedelta
 
 import time
@@ -85,37 +85,41 @@ class TestComprehensive(unittest.TestCase):
 
     def test_search_value_attribute(self):
         me = self.create_event_org_only()
-        # Create event
-        created_event = self.admin_misp_connector.add_event(me)
-        c_me = MISPEvent()
-        c_me.load(created_event)
-        # Search as admin
-        response = self.admin_misp_connector.search(controller='attributes', value=me.attributes[0].value)
-        self.assertEqual(len(response), 1)
-        # Connect as user
-        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
-        # Search as user
-        response = user_misp_connector.search(controller='attributes', value=me.attributes[0].value)
-        self.assertEqual(response, [])
-        # Delete event
-        self.admin_misp_connector.delete_event(c_me.id)
+        try:
+            # Create event
+            created_event = self.admin_misp_connector.add_event(me)
+            c_me = MISPEvent()
+            c_me.load(created_event)
+            # Search as admin
+            response = self.admin_misp_connector.search(controller='attributes', value=me.attributes[0].value)
+            self.assertEqual(len(response), 1)
+            # Connect as user
+            user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
+            # Search as user
+            response = user_misp_connector.search(controller='attributes', value=me.attributes[0].value)
+            self.assertEqual(response, [])
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(c_me.id)
 
     def test_search_tag_event(self):
         me = self.create_event_with_tags()
-        # Create event
-        created_event = self.admin_misp_connector.add_event(me)
-        c_me = MISPEvent()
-        c_me.load(created_event)
-        # Search as admin
-        response = self.admin_misp_connector.search(tags='tlp:white___test')
-        self.assertEqual(len(response), 1)
-        # Connect as user
-        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
-        # Search as user
-        response = user_misp_connector.search(value='tlp:white___test')
-        self.assertEqual(response, [])
-        # Delete event
-        self.admin_misp_connector.delete_event(c_me.id)
+        try:
+            # Create event
+            created_event = self.admin_misp_connector.add_event(me)
+            c_me = MISPEvent()
+            c_me.load(created_event)
+            # Search as admin
+            response = self.admin_misp_connector.search(tags='tlp:white___test')
+            self.assertEqual(len(response), 1)
+            # Connect as user
+            user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
+            # Search as user
+            response = user_misp_connector.search(value='tlp:white___test')
+            self.assertEqual(response, [])
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(c_me.id)
 
     @unittest.skip("currently failing")
     def test_search_tag_event_fancy(self):
@@ -297,6 +301,27 @@ class TestComprehensive(unittest.TestCase):
             response = user_misp_connector.search(timestamp=timeframe, eventinfo='%bar blah%')
             self.assertEqual(len(response), 1)
 
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first_to_delete.id)
+
+    def test_edit_attribute(self):
+        first = self.create_event_org_only()
+        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey, debug=False)
+        try:
+            first.attributes[0].comment = 'This is the original comment'
+            first_created_event = user_misp_connector.add_event(first)
+            first_to_delete = MISPEvent()
+            first_to_delete.load(first_created_event)
+            first_to_delete.attributes[0].comment = 'This is the modified comment'
+            response = user_misp_connector.update_attribute(first_to_delete.attributes[0].id, first_to_delete.attributes[0])
+            tmp_attr = MISPAttribute()
+            tmp_attr.from_dict(**response)
+            self.assertEqual(tmp_attr.comment, 'This is the modified comment')
+            response = user_misp_connector.change_comment(first_to_delete.attributes[0].uuid, 'This is the modified comment, again')
+            tmp_attr = MISPAttribute()
+            tmp_attr.from_dict(**response)
+            self.assertEqual(tmp_attr.comment, 'This is the modified comment, again')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first_to_delete.id)
