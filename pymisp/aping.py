@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .exceptions import MISPServerError
-from .api import PyMISP, everything_broken
+from .api import PyMISP, everything_broken, MISPEvent, MISPAttribute
 from typing import TypeVar, Optional, Tuple, List, Dict
 from datetime import date, datetime
 import json
@@ -64,16 +64,18 @@ class ExpandedPyMISP(PyMISP):
             return {'errors': [(response.status_code, error_message)]}
 
         # At this point, we had no error.
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(response)
 
         try:
             response = response.json()
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(response)
             if response.get('response') is not None:
                 # Cleanup.
                 return response.get('response')
             return response
         except Exception:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(response.text)
             return response.text
 
     # TODO: Make that thing async & test it.
@@ -151,4 +153,25 @@ class ExpandedPyMISP(PyMISP):
 
         url = urljoin(self.root_url, f'{controller}/restSearch')
         response = self._prepare_request('POST', url, data=json.dumps(query))
-        return self._check_response(response)
+        normalized_response = self._check_response(response)
+        if isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
+                                                    normalized_response.get('errors')):
+            return normalized_response
+        # The response is in json, we can confert it to a list of pythonic MISP objects
+        to_return = []
+        if controller == 'events':
+            for e in normalized_response:
+                me = MISPEvent()
+                me.load(e)
+                to_return.append(me)
+        elif controller == 'attributes':
+            print(normalized_response)
+            # FIXME: if the query doesn't match, the request returns an empty list, and not a dictionary;
+            if normalized_response:
+                for a in normalized_response.get('Attribute'):
+                    ma = MISPAttribute()
+                    ma.from_dict(**a)
+                    to_return.append(ma)
+        elif controller == 'objects':
+            raise Exception('Not implemented yet')
+        return to_return

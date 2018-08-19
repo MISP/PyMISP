@@ -83,16 +83,85 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(c_me.id)
 
-    def test_search_value_attribute(self):
+    def test_search_event_type(self):
         me = self.create_event_org_only()
+        me.add_attribute('ip-src', '8.8.8.8')
+        second = self.create_event_org_only()
+        second.add_attribute('ip-dst', '9.9.9.9')
+        third = self.create_event_org_only()
         try:
             # Create event
             created_event = self.admin_misp_connector.add_event(me)
             c_me = MISPEvent()
             c_me.load(created_event)
+            created_event = self.admin_misp_connector.add_event(second)
+            second_me = MISPEvent()
+            second_me.load(created_event)
+            created_event = self.admin_misp_connector.add_event(third)
+            third_me = MISPEvent()
+            third_me.load(created_event)
+            # Search as admin
+            response = self.admin_misp_connector.search(timestamp=c_me.timestamp.timestamp())
+            self.assertEqual(len(response), 3)
+            attrubutes_types_search = self.admin_misp_connector.build_complex_query(or_parameters=['ip-src', 'ip-dst'])
+            response = self.admin_misp_connector.search(controller='events', timestamp=c_me.timestamp.timestamp(),
+                                                        type_attribute=attrubutes_types_search)
+            # print(response)
+            self.assertEqual(len(response), 2)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(c_me.id)
+            self.admin_misp_connector.delete_event(second_me.id)
+            self.admin_misp_connector.delete_event(third_me.id)
+
+    def test_search_attribute_type(self):
+        me = self.create_event_org_only()
+        me.add_attribute('ip-src', '8.8.8.8')
+        second = self.create_event_org_only()
+        second.add_attribute('ip-dst', '9.9.9.9')
+        third = self.create_event_org_only()
+        try:
+            # Create event
+            created_event = self.admin_misp_connector.add_event(me)
+            c_me = MISPEvent()
+            c_me.load(created_event)
+            created_event = self.admin_misp_connector.add_event(second)
+            second_me = MISPEvent()
+            second_me.load(created_event)
+            created_event = self.admin_misp_connector.add_event(third)
+            third_me = MISPEvent()
+            third_me.load(created_event)
+            # Search as admin
+            response = self.admin_misp_connector.search(controller='attributes', timestamp=c_me.timestamp.timestamp())
+            self.assertEqual(len(response), 5)
+            attrubutes_types_search = self.admin_misp_connector.build_complex_query(or_parameters=['ip-src', 'ip-dst'])
+            response = self.admin_misp_connector.search(controller='attributes', timestamp=c_me.timestamp.timestamp(),
+                                                        type_attribute=attrubutes_types_search)
+            # print(response)
+            self.assertEqual(len(response), 2)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(c_me.id)
+            self.admin_misp_connector.delete_event(second_me.id)
+            self.admin_misp_connector.delete_event(third_me.id)
+
+    def test_search_value_attribute(self):
+        me = self.create_event_org_only()
+        me.add_attribute('text', str(uuid4()))
+        second = self.create_event_org_only()
+        second.add_attribute('text', me.attributes[0].value)
+        try:
+            # Create event
+            created_event = self.admin_misp_connector.add_event(me)
+            c_me = MISPEvent()
+            c_me.load(created_event)
+            created_event = self.admin_misp_connector.add_event(second)
+            second_me = MISPEvent()
+            second_me.load(created_event)
             # Search as admin
             response = self.admin_misp_connector.search(controller='attributes', value=me.attributes[0].value)
             self.assertEqual(len(response), 1)
+
             # Connect as user
             user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
             # Search as user
@@ -101,6 +170,7 @@ class TestComprehensive(unittest.TestCase):
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(c_me.id)
+            self.admin_misp_connector.delete_event(second_me.id)
 
     def test_search_tag_event(self):
         me = self.create_event_with_tags()
@@ -132,12 +202,10 @@ class TestComprehensive(unittest.TestCase):
         to_delete.load(created_event)
         complex_query = user_misp_connector.build_complex_query(or_parameters=['tlp:white___test'], not_parameters=['tlp:amber___test'])
         # Search as user
-        response = user_misp_connector.search(tags=complex_query)
-        for e in response:
-            to_validate = MISPEvent()
-            to_validate.load(e)
+        events = user_misp_connector.search(tags=complex_query)
+        for e in events:
             # FIXME Expected event without the tlp:amber attribute, broken for now
-            for a in to_validate.attributes:
+            for a in e.attributes:
                 print([t for t in a.tags if t.name == 'tlp:amber___test'])
                 # self.assertEqual([t for t in a.tags if t.name == 'tlp:amber___test'], [])
         # Delete event
@@ -165,22 +233,19 @@ class TestComprehensive(unittest.TestCase):
             # # Test - last 4 min
             response = user_misp_connector.search(timestamp='4m')
             self.assertEqual(len(response), 1)
-            received_event = MISPEvent()
-            received_event.load(response[0])
+            received_event = response[0]
             self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
-            # # Test 5 sec before timestamp of 2nd event
-            response = user_misp_connector.search(timestamp=(event_creation_timestamp_second.timestamp()))
+            # # Test timestamp of 2nd event
+            response = user_misp_connector.search(timestamp=event_creation_timestamp_second.timestamp())
             self.assertEqual(len(response), 1)
-            received_event = MISPEvent()
-            received_event.load(response[0])
+            received_event = response[0]
             self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
             # # Test interval -6 min -> -4 min
             response = user_misp_connector.search(timestamp=['6m', '4m'])
             self.assertEqual(len(response), 1)
-            received_event = MISPEvent()
-            received_event.load(response[0])
+            received_event = response[0]
             self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_first.timestamp()))
         finally:
             # Delete event
@@ -236,20 +301,14 @@ class TestComprehensive(unittest.TestCase):
             # # Test - last 4 min
             response = pub_misp_connector.search(publish_timestamp='5s')
             self.assertEqual(len(response), 1)
-            received_event = MISPEvent()
-            received_event.load(response[0])
 
             # # Test 5 sec before timestamp of 2nd event
             response = pub_misp_connector.search(publish_timestamp=(second_to_delete.publish_timestamp.timestamp()))
             self.assertEqual(len(response), 1)
-            received_event = MISPEvent()
-            received_event.load(response[0])
 
             # # Test interval -6 min -> -4 min
             response = pub_misp_connector.search(publish_timestamp=[first_to_delete.publish_timestamp.timestamp() - 5, second_to_delete.publish_timestamp.timestamp() - 5])
             self.assertEqual(len(response), 1)
-            received_event = MISPEvent()
-            received_event.load(response[0])
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first_to_delete.id)
@@ -276,13 +335,11 @@ class TestComprehensive(unittest.TestCase):
             # Test return content
             response = user_misp_connector.search(timestamp=timeframe, metadata=False)
             self.assertEqual(len(response), 1)
-            t = MISPEvent()
-            t.load(response[0])
+            t = response[0]
             self.assertEqual(len(t.attributes), 1)
             response = user_misp_connector.search(timestamp=timeframe, metadata=True)
             self.assertEqual(len(response), 1)
-            t = MISPEvent()
-            t.load(response[0])
+            t = response[0]
             self.assertEqual(len(t.attributes), 0)
             # other things
             response = user_misp_connector.search(timestamp=timeframe, published=True)
