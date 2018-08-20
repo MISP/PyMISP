@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .exceptions import MISPServerError, NewEventError
+from .exceptions import MISPServerError, NewEventError, UpdateEventError, UpdateAttributeError
 from .api import PyMISP, everything_broken, MISPEvent, MISPAttribute
 from typing import TypeVar, Optional, Tuple, List, Dict
 from datetime import date, datetime
@@ -85,6 +85,22 @@ class ExpandedPyMISP(PyMISP):
         e = MISPEvent()
         e.load(created_event)
         return e
+
+    def update_event(self, event: MISPEvent):
+        updated_event = super().update_event(event.uuid, event)
+        if isinstance(updated_event, str):
+            raise UpdateEventError(f'Unexpected response from server: {updated_event}')
+        e = MISPEvent()
+        e.load(updated_event)
+        return e
+
+    def update_attribute(self, attribute: MISPAttribute):
+        updated_attribute = super().update_attribute(attribute.uuid, attribute)
+        if isinstance(updated_attribute, str):
+            raise UpdateAttributeError(f'Unexpected response from server: {updated_attribute}')
+        a = MISPAttribute()
+        a.from_dict(**updated_attribute)
+        return a
 
     # TODO: Make that thing async & test it.
     def search(self, controller: str='events', return_format: str='json',

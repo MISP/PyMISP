@@ -49,20 +49,12 @@ class TestComprehensive(unittest.TestCase):
         # Delete org
         cls.admin_misp_connector.delete_organisation(org_id=cls.test_org.id)
 
-    def create_event_org_only(self, force_timestamps=False):
+    def create_simple_event(self, force_timestamps=False):
         mispevent = MISPEvent(force_timestamps=force_timestamps)
-        mispevent.info = 'This is a test'
+        mispevent.info = 'This is a super simple test'
         mispevent.distribution = Distribution.your_organisation_only
         mispevent.threat_level_id = ThreatLevel.low
         mispevent.analysis = Analysis.completed
-        mispevent.set_date("2017-12-31")  # test the set date method
-        mispevent.add_attribute('text', str(uuid4()))
-        return mispevent
-
-    def create_event_with_tags(self):
-        mispevent = self.create_event_org_only()
-        mispevent.add_tag('tlp:white___test')
-        mispevent.attributes[0].add_tag('tlp:amber___test')
         mispevent.add_attribute('text', str(uuid4()))
         return mispevent
 
@@ -255,182 +247,189 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second.id)
             self.admin_misp_connector.delete_event(third.id)
 
-    @unittest.skip("temp")
     def test_search_timestamp_event(self):
         # Creating event 1 - timestamp 5 min ago
-        first = self.create_event_org_only(force_timestamps=True)
+        first = self.create_simple_event(force_timestamps=True)
         event_creation_timestamp_first = datetime.now() - timedelta(minutes=5)
         first.timestamp = event_creation_timestamp_first
         # Creating event 2 - timestamp 2 min ago
-        second = self.create_event_org_only(force_timestamps=True)
+        second = self.create_simple_event(force_timestamps=True)
         event_creation_timestamp_second = datetime.now() - timedelta(minutes=2)
         second.timestamp = event_creation_timestamp_second
-        # Connect as user
-        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
-        first_created_event = user_misp_connector.add_event(first)
-        first_to_delete = MISPEvent()
-        first_to_delete.load(first_created_event)
-        second_created_event = user_misp_connector.add_event(second)
-        second_to_delete = MISPEvent()
-        second_to_delete.load(second_created_event)
         try:
+            first = self.user_misp_connector.add_event(first)
+            second = self.user_misp_connector.add_event(second)
             # Search as user
             # # Test - last 4 min
-            response = user_misp_connector.search(timestamp='4m')
+            response = self.user_misp_connector.search(timestamp='4m')
             self.assertEqual(len(response), 1)
             received_event = response[0]
             self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
             # # Test timestamp of 2nd event
-            response = user_misp_connector.search(timestamp=event_creation_timestamp_second.timestamp())
+            response = self.user_misp_connector.search(timestamp=event_creation_timestamp_second.timestamp())
             self.assertEqual(len(response), 1)
             received_event = response[0]
             self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
             # # Test interval -6 min -> -4 min
-            response = user_misp_connector.search(timestamp=['6m', '4m'])
+            response = self.user_misp_connector.search(timestamp=['6m', '4m'])
             self.assertEqual(len(response), 1)
             received_event = response[0]
             self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_first.timestamp()))
         finally:
             # Delete event
-            self.admin_misp_connector.delete_event(first_to_delete.id)
-            self.admin_misp_connector.delete_event(second_to_delete.id)
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
 
-    @unittest.skip("temp")
-    def test_user_perms(self):
-        first = self.create_event_org_only()
-        first.publish()
-        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
+    def test_search_timestamp_atttibute(self):
+        # Creating event 1 - timestamp 5 min ago
+        first = self.create_simple_event(force_timestamps=True)
+        event_creation_timestamp_first = datetime.now() - timedelta(minutes=5)
+        first.timestamp = event_creation_timestamp_first
+        first.attributes[0].timestamp = event_creation_timestamp_first
+        # Creating event 2 - timestamp 2 min ago
+        second = self.create_simple_event(force_timestamps=True)
+        event_creation_timestamp_second = datetime.now() - timedelta(minutes=2)
+        second.timestamp = event_creation_timestamp_second
+        second.attributes[0].timestamp = event_creation_timestamp_second
         try:
-            # Add event as user, no publish rights
-            first_created_event = user_misp_connector.add_event(first)
-            first_to_delete = MISPEvent()
-            first_to_delete.load(first_created_event)
-            self.assertFalse(first_to_delete.published)
-            # Add event as publisher
-            first_to_delete.publish()
-            publisher_misp_connector = ExpandedPyMISP(url, self.test_pub.authkey)
-            first_created_event = publisher_misp_connector.update(first_to_delete)
-            first_to_delete = MISPEvent()
-            first_to_delete.load(first_created_event)
-            self.assertTrue(first_to_delete.published)
-        finally:
-            # Delete event
-            self.admin_misp_connector.delete_event(first_to_delete.id)
-
-    @unittest.skip("Uncomment when adding new tests, it has a 10s sleep")
-    def test_search_publish_timestamp_event(self):
-        # Creating event 1
-        first = self.create_event_org_only()
-        first.publish()
-        # Creating event 2
-        second = self.create_event_org_only()
-        second.publish()
-        # Connect as user
-        pub_misp_connector = ExpandedPyMISP(url, self.test_pub.authkey)
-        first_created_event = pub_misp_connector.add_event(first)
-        first_to_delete = MISPEvent()
-        first_to_delete.load(first_created_event)
-        time.sleep(10)
-        second_created_event = pub_misp_connector.add_event(second)
-        second_to_delete = MISPEvent()
-        second_to_delete.load(second_created_event)
-        try:
-            # Test invalid query
-            response = pub_misp_connector.search(publish_timestamp='5x')
-            self.assertEqual(len(response), 0)
-            response = pub_misp_connector.search(publish_timestamp='ad')
-            self.assertEqual(len(response), 0)
-            response = pub_misp_connector.search(publish_timestamp='aaad')
-            self.assertEqual(len(response), 0)
+            first = self.user_misp_connector.add_event(first)
+            second = self.user_misp_connector.add_event(second)
             # Search as user
             # # Test - last 4 min
-            response = pub_misp_connector.search(publish_timestamp='5s')
+            response = self.user_misp_connector.search(controller='attributes', timestamp='4m')
             self.assertEqual(len(response), 1)
+            received_event = response[0]
+            self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
-            # # Test 5 sec before timestamp of 2nd event
-            response = pub_misp_connector.search(publish_timestamp=(second_to_delete.publish_timestamp.timestamp()))
+            # # Test timestamp of 2nd event
+            response = self.user_misp_connector.search(controller='attributes', timestamp=event_creation_timestamp_second.timestamp())
             self.assertEqual(len(response), 1)
+            received_event = response[0]
+            self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
             # # Test interval -6 min -> -4 min
-            response = pub_misp_connector.search(publish_timestamp=[first_to_delete.publish_timestamp.timestamp() - 5, second_to_delete.publish_timestamp.timestamp() - 5])
+            response = self.user_misp_connector.search(controller='attributes', timestamp=['6m', '4m'])
+            self.assertEqual(len(response), 1)
+            received_event = response[0]
+            self.assertEqual(received_event.timestamp.timestamp(), int(event_creation_timestamp_first.timestamp()))
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+
+    def test_user_perms(self):
+        try:
+            first = self.create_simple_event(force_timestamps=True)
+            first.publish()
+            # Add event as user, no publish rights
+            first = self.user_misp_connector.add_event(first)
+            self.assertFalse(first.published)
+            # Add event as publisher
+            first.publish()
+            first = self.pub_misp_connector.update_event(first)
+            self.assertTrue(first.published)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
+    # @unittest.skip("Uncomment when adding new tests, it has a 10s sleep")
+    def test_search_publish_timestamp(self):
+        # Creating event 1
+        first = self.create_simple_event()
+        first.publish()
+        # Creating event 2
+        second = self.create_simple_event()
+        second.publish()
+        try:
+            first = self.pub_misp_connector.add_event(first)
+            time.sleep(10)
+            second = self.pub_misp_connector.add_event(second)
+            # Test invalid query
+            response = self.pub_misp_connector.search(publish_timestamp='5x')
+            self.assertEqual(len(response), 0)
+            response = self.pub_misp_connector.search(publish_timestamp='ad')
+            self.assertEqual(len(response), 0)
+            response = self.pub_misp_connector.search(publish_timestamp='aaad')
+            self.assertEqual(len(response), 0)
+            # Test - last 4 min
+            response = self.pub_misp_connector.search(publish_timestamp='5s')
+            self.assertEqual(len(response), 1)
+
+            # Test 5 sec before timestamp of 2nd event
+            response = self.pub_misp_connector.search(publish_timestamp=(second.publish_timestamp.timestamp()))
+            self.assertEqual(len(response), 1)
+
+            # Test interval -6 min -> -4 min
+            response = self.pub_misp_connector.search(publish_timestamp=[first.publish_timestamp.timestamp() - 5,
+                                                                         second.publish_timestamp.timestamp() - 5])
             self.assertEqual(len(response), 1)
         finally:
             # Delete event
-            self.admin_misp_connector.delete_event(first_to_delete.id)
-            self.admin_misp_connector.delete_event(second_to_delete.id)
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
 
-    @unittest.skip("temp")
-    def test_simple(self):
-        event = self.create_event_org_only()
-        event.info = 'foo bar blah'
-        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
-        first_created_event = user_misp_connector.add_event(event)
-        first_to_delete = MISPEvent()
-        first_to_delete.load(first_created_event)
-        timeframe = [first_to_delete.timestamp.timestamp() - 5, first_to_delete.timestamp.timestamp() + 5]
+    def test_simple_event(self):
+        first = self.create_simple_event()
+        first.info = 'foo bar blah'
         try:
+            first = self.user_misp_connector.add_event(first)
+            timeframe = [first.timestamp.timestamp() - 5, first.timestamp.timestamp() + 5]
             # Search event we just created in multiple ways. Make sure it doesn't catchi it when it shouldn't
-            response = user_misp_connector.search(timestamp=timeframe)
+            response = self.user_misp_connector.search(timestamp=timeframe)
             self.assertEqual(len(response), 1)
-            response = user_misp_connector.search(timestamp=timeframe, value='nothere')
+            response = self.user_misp_connector.search(timestamp=timeframe, value='nothere')
             self.assertEqual(len(response), 0)
-            response = user_misp_connector.search(timestamp=timeframe, value=first_to_delete.attributes[0].value)
+            response = self.user_misp_connector.search(timestamp=timeframe, value=first.attributes[0].value)
             self.assertEqual(len(response), 1)
-            response = user_misp_connector.search(timestamp=[first_to_delete.timestamp.timestamp() - 50, first_to_delete.timestamp.timestamp() - 10], value=first_to_delete.attributes[0].value)
+            response = self.user_misp_connector.search(timestamp=[first.timestamp.timestamp() - 50,
+                                                                  first.timestamp.timestamp() - 10],
+                                                       value=first.attributes[0].value)
             self.assertEqual(len(response), 0)
             # Test return content
-            response = user_misp_connector.search(timestamp=timeframe, metadata=False)
+            response = self.user_misp_connector.search(timestamp=timeframe, metadata=False)
             self.assertEqual(len(response), 1)
             t = response[0]
             self.assertEqual(len(t.attributes), 1)
-            response = user_misp_connector.search(timestamp=timeframe, metadata=True)
+            response = self.user_misp_connector.search(timestamp=timeframe, metadata=True)
             self.assertEqual(len(response), 1)
             t = response[0]
             self.assertEqual(len(t.attributes), 0)
             # other things
-            response = user_misp_connector.search(timestamp=timeframe, published=True)
+            response = self.user_misp_connector.search(timestamp=timeframe, published=True)
             self.assertEqual(len(response), 0)
-            response = user_misp_connector.search(timestamp=timeframe, published=False)
+            response = self.user_misp_connector.search(timestamp=timeframe, published=False)
             self.assertEqual(len(response), 1)
-            response = user_misp_connector.search(eventid=first_to_delete.id)
+            response = self.user_misp_connector.search(eventid=first.id)
             self.assertEqual(len(response), 1)
-            response = user_misp_connector.search(uuid=first_to_delete.uuid)
+            response = self.user_misp_connector.search(uuid=first.uuid)
             self.assertEqual(len(response), 1)
-            response = user_misp_connector.search(org=first_to_delete.orgc_id)
+            response = self.user_misp_connector.search(org=first.orgc_id)
             self.assertEqual(len(response), 1)
             # test like search
-            response = user_misp_connector.search(timestamp=timeframe, value='%{}%'.format(first_to_delete.attributes[0].value.split('-')[2]))
+            response = self.user_misp_connector.search(timestamp=timeframe, value='%{}%'.format(first.attributes[0].value.split('-')[2]))
             self.assertEqual(len(response), 1)
-            response = user_misp_connector.search(timestamp=timeframe, eventinfo='%bar blah%')
+            response = self.user_misp_connector.search(timestamp=timeframe, eventinfo='%bar blah%')
             self.assertEqual(len(response), 1)
 
         finally:
             # Delete event
-            self.admin_misp_connector.delete_event(first_to_delete.id)
+            self.admin_misp_connector.delete_event(first.id)
 
-    @unittest.skip("temp")
     def test_edit_attribute(self):
-        first = self.create_event_org_only()
-        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey, debug=False)
+        first = self.create_simple_event()
         try:
             first.attributes[0].comment = 'This is the original comment'
-            first_created_event = user_misp_connector.add_event(first)
-            first_to_delete = MISPEvent()
-            first_to_delete.load(first_created_event)
-            first_to_delete.attributes[0].comment = 'This is the modified comment'
-            response = user_misp_connector.update_attribute(first_to_delete.attributes[0].id, first_to_delete.attributes[0])
-            tmp_attr = MISPAttribute()
-            tmp_attr.from_dict(**response)
-            self.assertEqual(tmp_attr.comment, 'This is the modified comment')
-            response = user_misp_connector.change_comment(first_to_delete.attributes[0].uuid, 'This is the modified comment, again')
-            tmp_attr = MISPAttribute()
-            tmp_attr.from_dict(**response)
-            self.assertEqual(tmp_attr.comment, 'This is the modified comment, again')
+            first = self.user_misp_connector.add_event(first)
+            first.attributes[0].comment = 'This is the modified comment'
+            attribute = self.user_misp_connector.update_attribute(first.attributes[0])
+            self.assertEqual(attribute.comment, 'This is the modified comment')
+            attribute = self.user_misp_connector.change_comment(first.attributes[0].uuid, 'This is the modified comment, again')
+            self.assertEqual(attribute['Attribute']['comment'], 'This is the modified comment, again')
         finally:
             # Delete event
-            self.admin_misp_connector.delete_event(first_to_delete.id)
+            self.admin_misp_connector.delete_event(first.id)
 
 
 if __name__ == '__main__':

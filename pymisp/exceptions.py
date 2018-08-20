@@ -11,7 +11,15 @@ class NewEventError(PyMISPError):
     pass
 
 
+class UpdateEventError(PyMISPError):
+    pass
+
+
 class NewAttributeError(PyMISPError):
+    pass
+
+
+class UpdateAttributeError(PyMISPError):
     pass
 
 
@@ -47,6 +55,7 @@ class UnknownMISPObjectTemplate(MISPObjectException):
 
 class PyMISPInvalidFormat(PyMISPError):
     pass
+
 
 class MISPServerError(PyMISPError):
     pass
