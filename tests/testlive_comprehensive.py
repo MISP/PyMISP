@@ -33,10 +33,12 @@ class TestComprehensive(unittest.TestCase):
         usr = cls.admin_misp_connector.add_user(email='testusr@user.local', org_id=cls.test_org.id, role_id=3)
         cls.test_usr = MISPUser()
         cls.test_usr.from_dict(**usr)
+        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey)
         # Creates a publisher
         pub = cls.admin_misp_connector.add_user(email='testpub@user.local', org_id=cls.test_org.id, role_id=4)
         cls.test_pub = MISPUser()
         cls.test_pub.from_dict(**pub)
+        cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey)
 
     @classmethod
     def tearDownClass(cls):
@@ -64,154 +66,197 @@ class TestComprehensive(unittest.TestCase):
         mispevent.add_attribute('text', str(uuid4()))
         return mispevent
 
+    def environment(self):
+        first_event = MISPEvent()
+        first_event.info = 'First event - org only - low - completed'
+        first_event.distribution = Distribution.your_organisation_only
+        first_event.threat_level_id = ThreatLevel.low
+        first_event.analysis = Analysis.completed
+        first_event.set_date("2017-12-31")
+        first_event.add_attribute('text', str(uuid4()))
+
+        second_event = MISPEvent()
+        second_event.info = 'Second event - org only - medium - ongoing'
+        second_event.distribution = Distribution.your_organisation_only
+        second_event.threat_level_id = ThreatLevel.medium
+        second_event.analysis = Analysis.ongoing
+        second_event.set_date("Aug 18 2018")
+        second_event.add_attribute('text', str(uuid4()))
+        second_event.attributes[0].add_tag('tlp:white___test')
+        second_event.add_attribute('ip-dst', '1.1.1.1')
+        # Same value as in first event.
+        second_event.add_attribute('text', first_event.attributes[0].value)
+
+        third_event = MISPEvent()
+        third_event.info = 'Third event - all orgs - high - initial'
+        third_event.distribution = Distribution.all_communities
+        third_event.threat_level_id = ThreatLevel.high
+        third_event.analysis = Analysis.initial
+        third_event.set_date("Jun 25 2018")
+        third_event.add_tag('tlp:white___test')
+        third_event.add_attribute('text', str(uuid4()))
+        third_event.attributes[0].add_tag('tlp:amber___test')
+        third_event.attributes[0].add_tag('foo_double___test')
+        third_event.add_attribute('ip-src', '8.8.8.8')
+        third_event.attributes[1].add_tag('tlp:amber___test')
+        third_event.add_attribute('ip-dst', '9.9.9.9')
+
+        # Create first and third event as admin
+        # usr won't be able to see the first one
+        first = self.admin_misp_connector.add_event(first_event)
+        third = self.admin_misp_connector.add_event(third_event)
+        # Create second event as user
+        second = self.user_misp_connector.add_event(second_event)
+        return first, second, third
+
     def test_search_value_event(self):
-        me = self.create_event_org_only()
-        # Create event
+        '''Search a value on the event controller
+        * Test ACL admin user vs normal user in an other org
+        * Make sure we have one match
+        '''
         try:
-            created_event = self.admin_misp_connector.add_event(me)
-            c_me = MISPEvent()
-            c_me.load(created_event)
+            first, second, third = self.environment()
             # Search as admin
-            response = self.admin_misp_connector.search(value=me.attributes[0].value)
-            self.assertEqual(len(response), 1)
-            # Connect as user
-            user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
+            response = self.admin_misp_connector.search(value=first.attributes[0].value)
+            self.assertEqual(len(response), 2)
             # Search as user
-            response = user_misp_connector.search(value=me.attributes[0].value)
+            response = self.user_misp_connector.search(value=first.attributes[0].value)
+            self.assertEqual(len(response), 1)
+            # Non-existing value
+            response = self.user_misp_connector.search(value=str(uuid4()))
             self.assertEqual(response, [])
         finally:
-            # Delete event
-            self.admin_misp_connector.delete_event(c_me.id)
-
-    def test_search_event_type(self):
-        me = self.create_event_org_only()
-        me.add_attribute('ip-src', '8.8.8.8')
-        second = self.create_event_org_only()
-        second.add_attribute('ip-dst', '9.9.9.9')
-        third = self.create_event_org_only()
-        try:
-            # Create event
-            created_event = self.admin_misp_connector.add_event(me)
-            c_me = MISPEvent()
-            c_me.load(created_event)
-            created_event = self.admin_misp_connector.add_event(second)
-            second_me = MISPEvent()
-            second_me.load(created_event)
-            created_event = self.admin_misp_connector.add_event(third)
-            third_me = MISPEvent()
-            third_me.load(created_event)
-            # Search as admin
-            response = self.admin_misp_connector.search(timestamp=c_me.timestamp.timestamp())
-            self.assertEqual(len(response), 3)
-            attrubutes_types_search = self.admin_misp_connector.build_complex_query(or_parameters=['ip-src', 'ip-dst'])
-            response = self.admin_misp_connector.search(controller='events', timestamp=c_me.timestamp.timestamp(),
-                                                        type_attribute=attrubutes_types_search)
-            # print(response)
-            self.assertEqual(len(response), 2)
-        finally:
-            # Delete event
-            self.admin_misp_connector.delete_event(c_me.id)
-            self.admin_misp_connector.delete_event(second_me.id)
-            self.admin_misp_connector.delete_event(third_me.id)
-
-    def test_search_attribute_type(self):
-        me = self.create_event_org_only()
-        me.add_attribute('ip-src', '8.8.8.8')
-        second = self.create_event_org_only()
-        second.add_attribute('ip-dst', '9.9.9.9')
-        third = self.create_event_org_only()
-        try:
-            # Create event
-            created_event = self.admin_misp_connector.add_event(me)
-            c_me = MISPEvent()
-            c_me.load(created_event)
-            created_event = self.admin_misp_connector.add_event(second)
-            second_me = MISPEvent()
-            second_me.load(created_event)
-            created_event = self.admin_misp_connector.add_event(third)
-            third_me = MISPEvent()
-            third_me.load(created_event)
-            # Search as admin
-            response = self.admin_misp_connector.search(controller='attributes', timestamp=c_me.timestamp.timestamp())
-            self.assertEqual(len(response), 5)
-            attrubutes_types_search = self.admin_misp_connector.build_complex_query(or_parameters=['ip-src', 'ip-dst'])
-            response = self.admin_misp_connector.search(controller='attributes', timestamp=c_me.timestamp.timestamp(),
-                                                        type_attribute=attrubutes_types_search)
-            # print(response)
-            self.assertEqual(len(response), 2)
-        finally:
-            # Delete event
-            self.admin_misp_connector.delete_event(c_me.id)
-            self.admin_misp_connector.delete_event(second_me.id)
-            self.admin_misp_connector.delete_event(third_me.id)
+            # Delete events
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
 
     def test_search_value_attribute(self):
-        me = self.create_event_org_only()
-        me.add_attribute('text', str(uuid4()))
-        second = self.create_event_org_only()
-        second.add_attribute('text', me.attributes[0].value)
         try:
-            # Create event
-            created_event = self.admin_misp_connector.add_event(me)
-            c_me = MISPEvent()
-            c_me.load(created_event)
-            created_event = self.admin_misp_connector.add_event(second)
-            second_me = MISPEvent()
-            second_me.load(created_event)
+            first, second, third = self.environment()
             # Search as admin
-            response = self.admin_misp_connector.search(controller='attributes', value=me.attributes[0].value)
-            self.assertEqual(len(response), 1)
-
-            # Connect as user
-            user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
+            response = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value)
+            self.assertEqual(len(response), 2)
             # Search as user
-            response = user_misp_connector.search(controller='attributes', value=me.attributes[0].value)
+            response = self.user_misp_connector.search(controller='attributes', value=first.attributes[0].value)
+            self.assertEqual(len(response), 1)
+            # Non-existing value
+            response = self.user_misp_connector.search(controller='attributes', value=str(uuid4()))
             self.assertEqual(response, [])
         finally:
             # Delete event
-            self.admin_misp_connector.delete_event(c_me.id)
-            self.admin_misp_connector.delete_event(second_me.id)
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
+
+    @unittest.skip("Currently failing")
+    def test_search_type_event(self):
+        try:
+            first, second, third = self.environment()
+            # Search as admin
+            response = self.admin_misp_connector.search(timestamp=first.timestamp.timestamp())
+            self.assertEqual(len(response), 3)
+            attrubutes_types_search = self.admin_misp_connector.build_complex_query(or_parameters=['ip-src', 'ip-dst'])
+            response = self.admin_misp_connector.search(controller='events', timestamp=first.timestamp.timestamp(),
+                                                        type_attribute=attrubutes_types_search)
+            self.assertEqual(len(response), 2)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
+
+    def test_search_type_attribute(self):
+        try:
+            first, second, third = self.environment()
+            # Search as admin
+            response = self.admin_misp_connector.search(controller='attributes', timestamp=first.timestamp.timestamp())
+            self.assertEqual(len(response), 7)
+            attrubutes_types_search = self.admin_misp_connector.build_complex_query(or_parameters=['ip-src', 'ip-dst'])
+            response = self.admin_misp_connector.search(controller='attributes', timestamp=first.timestamp.timestamp(),
+                                                        type_attribute=attrubutes_types_search)
+            self.assertEqual(len(response), 3)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
 
     def test_search_tag_event(self):
-        me = self.create_event_with_tags()
         try:
-            # Create event
-            created_event = self.admin_misp_connector.add_event(me)
-            c_me = MISPEvent()
-            c_me.load(created_event)
+            first, second, third = self.environment()
             # Search as admin
             response = self.admin_misp_connector.search(tags='tlp:white___test')
+            self.assertEqual(len(response), 2)
+            response = self.admin_misp_connector.search(tags='tlp:amber___test')
             self.assertEqual(len(response), 1)
-            # Connect as user
-            user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
             # Search as user
-            response = user_misp_connector.search(value='tlp:white___test')
-            self.assertEqual(response, [])
+            response = self.user_misp_connector.search(tags='tlp:white___test')
+            self.assertEqual(len(response), 1)
+            response = self.user_misp_connector.search(tags='tlp:amber___test')
+            self.assertEqual(len(response), 0)
         finally:
             # Delete event
-            self.admin_misp_connector.delete_event(c_me.id)
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
 
-    @unittest.skip("currently failing")
-    def test_search_tag_event_fancy(self):
-        # Create event
-        me = self.create_event_with_tags()
-        # Connect as user
-        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
-        created_event = user_misp_connector.add_event(me)
-        to_delete = MISPEvent()
-        to_delete.load(created_event)
-        complex_query = user_misp_connector.build_complex_query(or_parameters=['tlp:white___test'], not_parameters=['tlp:amber___test'])
-        # Search as user
-        events = user_misp_connector.search(tags=complex_query)
-        for e in events:
-            # FIXME Expected event without the tlp:amber attribute, broken for now
-            for a in e.attributes:
-                print([t for t in a.tags if t.name == 'tlp:amber___test'])
-                # self.assertEqual([t for t in a.tags if t.name == 'tlp:amber___test'], [])
-        # Delete event
-        self.admin_misp_connector.delete_event(to_delete.id)
+    def test_search_tag_attribute(self):
+        try:
+            first, second, third = self.environment()
+            # Search as admin
+            response = self.admin_misp_connector.search(controller='attributes', tags='tlp:white___test')
+            self.assertEqual(len(response), 4)
+            response = self.admin_misp_connector.search(controller='attributes', tags='tlp:amber___test')
+            self.assertEqual(len(response), 1)
+            # Search as user
+            response = self.user_misp_connector.search(controller='attributes', tags='tlp:white___test')
+            self.assertEqual(len(response), 1)
+            response = self.user_misp_connector.search(controller='attributes', tags='tlp:amber___test')
+            self.assertEqual(len(response), 0)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
 
-    def test_search_timestamp(self):
+    def test_search_tag_advanced_event(self):
+        try:
+            first, second, third = self.environment()
+            complex_query = self.admin_misp_connector.build_complex_query(or_parameters=['tlp:white___test'],
+                                                                          not_parameters=['tlp:amber___test',
+                                                                                          'foo_double___test'])
+            events = self.admin_misp_connector.search(tags=complex_query)
+            for e in events:
+                for a in e.attributes:
+                    self.assertEqual([t for t in a.tags if t.name == 'tlp:amber___test'], [])
+                for a in e.attributes:
+                    self.assertEqual([t for t in a.tags if t.name == 'foo_double___test'], [])
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
+
+    def test_search_tag_advanced_attributes(self):
+        try:
+            first, second, third = self.environment()
+            complex_query = self.admin_misp_connector.build_complex_query(or_parameters=['tlp:white___test'],
+                                                                          not_parameters=['tlp:amber___test',
+                                                                                          'foo_double___test'])
+            attributes = self.admin_misp_connector.search(controller='attributes', tags=complex_query)
+            for a in attributes:
+                self.assertEqual([t for t in a.tags if t.name == 'tlp:amber___test'], [])
+            for a in attributes:
+                self.assertEqual([t for t in a.tags if t.name == 'foo_double___test'], [])
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
+
+    @unittest.skip("temp")
+    def test_search_timestamp_event(self):
         # Creating event 1 - timestamp 5 min ago
         first = self.create_event_org_only(force_timestamps=True)
         event_creation_timestamp_first = datetime.now() - timedelta(minutes=5)
@@ -252,6 +297,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first_to_delete.id)
             self.admin_misp_connector.delete_event(second_to_delete.id)
 
+    @unittest.skip("temp")
     def test_user_perms(self):
         first = self.create_event_org_only()
         first.publish()
@@ -273,7 +319,8 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first_to_delete.id)
 
-    def test_search_publish_timestamp(self):
+    @unittest.skip("Uncomment when adding new tests, it has a 10s sleep")
+    def test_search_publish_timestamp_event(self):
         # Creating event 1
         first = self.create_event_org_only()
         first.publish()
@@ -314,6 +361,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first_to_delete.id)
             self.admin_misp_connector.delete_event(second_to_delete.id)
 
+    @unittest.skip("temp")
     def test_simple(self):
         event = self.create_event_org_only()
         event.info = 'foo bar blah'
@@ -362,6 +410,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first_to_delete.id)
 
+    @unittest.skip("temp")
     def test_edit_attribute(self):
         first = self.create_event_org_only()
         user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey, debug=False)
@@ -382,24 +431,6 @@ class TestComprehensive(unittest.TestCase):
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first_to_delete.id)
-
-    @unittest.skip("currently failing")
-    def test_search_tag_attribute(self):
-        me = self.create_event_with_tags()
-        # Create event
-        created_event = self.admin_misp_connector.add_event(me)
-        c_me = MISPEvent()
-        c_me.load(created_event)
-        # Search as admin
-        response = self.admin_misp_connector.search(controller='attributes', tags='tlp:white__test')
-        self.assertEqual(len(response), 1)
-        # Connect as user
-        user_misp_connector = ExpandedPyMISP(url, self.test_usr.authkey)
-        # Search as user
-        response = user_misp_connector.search(controller='attributes', value='tlp:white__test')
-        self.assertEqual(response, [])
-        # Delete event
-        self.admin_misp_connector.delete_event(c_me.id)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .exceptions import MISPServerError
+from .exceptions import MISPServerError, NewEventError
 from .api import PyMISP, everything_broken, MISPEvent, MISPAttribute
 from typing import TypeVar, Optional, Tuple, List, Dict
 from datetime import date, datetime
@@ -77,6 +77,14 @@ class ExpandedPyMISP(PyMISP):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(response.text)
             return response.text
+
+    def add_event(self, event: MISPEvent):
+        created_event = super().add_event(event)
+        if isinstance(created_event, str):
+            raise NewEventError(f'Unexpected response from server: {created_event}')
+        e = MISPEvent()
+        e.load(created_event)
+        return e
 
     # TODO: Make that thing async & test it.
     def search(self, controller: str='events', return_format: str='json',
@@ -165,7 +173,6 @@ class ExpandedPyMISP(PyMISP):
                 me.load(e)
                 to_return.append(me)
         elif controller == 'attributes':
-            print(normalized_response)
             # FIXME: if the query doesn't match, the request returns an empty list, and not a dictionary;
             if normalized_response:
                 for a in normalized_response.get('Attribute'):
