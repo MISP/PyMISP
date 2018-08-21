@@ -163,9 +163,9 @@ class TestComprehensive(unittest.TestCase):
             attributes_types_search = self.admin_misp_connector.build_complex_query(or_parameters=['ip-src', 'ip-dst'])
             events = self.admin_misp_connector.search(timestamp=first.timestamp.timestamp(),
                                                       type_attribute=attributes_types_search)
-            self.assertEqual(len(events), 1)
+            self.assertEqual(len(events), 2)
             for e in events:
-                self.assertIn(e.id, [third.id])
+                self.assertIn(e.id, [second.id, third.id])
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
