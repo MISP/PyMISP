@@ -68,6 +68,8 @@ class TestComprehensive(unittest.TestCase):
         first_event.add_attribute('text', str(uuid4()))
         first_event.attributes[0].add_tag('admin_only')
         first_event.attributes[0].add_tag('tlp:white___test')
+        first_event.add_attribute('text', str(uuid4()))
+        first_event.attributes[1].add_tag('unique___test')
 
         second_event = MISPEvent()
         second_event.info = 'Second event - org only - medium - ongoing'
@@ -178,7 +180,7 @@ class TestComprehensive(unittest.TestCase):
             # Search as admin
             attributes = self.admin_misp_connector.search(controller='attributes',
                                                           timestamp=first.timestamp.timestamp())
-            self.assertEqual(len(attributes), 7)
+            self.assertEqual(len(attributes), 8)
             for a in attributes:
                 self.assertIn(a.event_id, [first.id, second.id, third.id])
             # Search as user
@@ -266,9 +268,10 @@ class TestComprehensive(unittest.TestCase):
                 for a in e.attributes:
                     self.assertEqual([t for t in a.tags if t.name == 'foo_double___test'], [])
 
-            complex_query = self.admin_misp_connector.build_complex_query(not_parameters=['tlp:white___test'])
+            complex_query = self.admin_misp_connector.build_complex_query(or_parameters=['unique___test'],
+                                                                          not_parameters=['tlp:white___test'])
             events = self.admin_misp_connector.search(tags=complex_query)
-            self.assertEqual(len(events), 2)
+            self.assertEqual(len(events), 1)
             for e in events:
                 self.assertIn(e.id, [first.id, second.id])
                 for a in e.attributes:
