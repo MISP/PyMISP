@@ -1535,7 +1535,23 @@ class PyMISP(object):
         return self._rest_delete('admin/organisations', org_id)
 
     # ############## Servers ##################
-
+    def get_servers_list(self):
+        return self._rest_list('servers/getServersList')
+ 
+    def pull_from_server(self, server_id, technique='update'):
+        if server_id is None:
+            raise PyMISPError('Need a valis server id')
+        try:
+            server_id = int(server_id)
+        except ValueError:
+            raise PyMISPError('server id should be passed as integer')
+        if technique not in ['update','full']:
+            raise PyMISPError('technique accepted values are [update|full]')
+ 
+        url = urljoin(self.root_url, 'servers/batchPull/{}/{}'.format(server_id, technique))
+        response = self.__prepare_request('GET', url)
+        return self._check_response(response)
+    
     def _set_server_organisation(self, server, organisation):
         if organisation is None:
             raise PyMISPError('Need a valid organisation as argument, create it before if needed')
