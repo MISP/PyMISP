@@ -22,11 +22,10 @@ def search(m, quiet, url, controller, out=None, **kwargs):
     else:
         with open(out, 'w') as f:
             f.write(json.dumps(result['response']))
-                
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get all the events matching a value for a given param.')
-    parser.add_argument("-p", "--param", required=True, help="Parameter to search (e.g. category, org, etc.)")
+    parser.add_argument("-p", "--param", required=True, help="Parameter to search (e.g. category, org, values, type_attribute, etc.)")
     parser.add_argument("-s", "--search", required=True, help="String to search.")
     parser.add_argument("-a", "--attributes", action='store_true', help="Search attributes instead of events")
     parser.add_argument("-q", "--quiet", action='store_true', help="Only display URLs to MISP")
