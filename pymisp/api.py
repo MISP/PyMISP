@@ -1622,6 +1622,25 @@ class PyMISP(object):
         response = self._prepare_request('POST', url, json.dumps(jdata))
         return self._check_response(response)
 
+    def server_pull(self, server_id, event_id=None):
+        url = urljoin(self.root_url, 'servers/pull/{}'.format(server_id))
+        if event_id is not None:
+            url += '/{}'.format(event_id)
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def server_push(self, server_id, event_id=None):
+        url = urljoin(self.root_url, 'servers/push/{}'.format(server_id))
+        if event_id is not None:
+            url += '/{}'.format(event_id)
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def servers_index(self):
+        url = urljoin(self.root_url, 'servers/index')
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
     # ############## Roles ##################
 
     def get_roles_list(self):
