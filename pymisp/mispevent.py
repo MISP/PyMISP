@@ -247,7 +247,6 @@ class MISPAttribute(AbstractMISP):
         to_return = super(MISPAttribute, self).to_dict()
         if to_return.get('data'):
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
-        to_return = _int_to_str(to_return)
         return to_return
 
     def _prepare_new_malware_sample(self):
@@ -573,9 +572,7 @@ class MISPEvent(AbstractMISP):
         if to_return.get('publish_timestamp'):
             to_return['publish_timestamp'] = self._datetime_to_timestamp(self.publish_timestamp)
 
-        to_return = _int_to_str(to_return)
-        to_return = {'Event': to_return}
-        return to_return
+        return {'Event': _int_to_str(to_return)}
 
     def add_proposal(self, shadow_attribute=None, **kwargs):
         """Alias for add_shadow_attribute"""

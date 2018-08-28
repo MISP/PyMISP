@@ -57,6 +57,14 @@ class Analysis(Enum):
     completed = 2
 
 
+def _int_to_str(d):
+    # transform all integer back to string
+    for k, v in d.items():
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            d[k] = str(v)
+    return d
+
+
 class MISPEncode(JSONEncoder):
 
     def default(self, obj):
@@ -151,6 +159,7 @@ class AbstractMISP(collections.MutableMapping):
                 else:
                     val = self._datetime_to_timestamp(val)
             to_return[attribute] = val
+        to_return = _int_to_str(to_return)
         return to_return
 
     def jsonable(self):
@@ -214,7 +223,7 @@ class AbstractMISP(collections.MutableMapping):
         """Convert a datetime.datetime object to a timestamp (int)"""
         if isinstance(d, (int, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
             # Assume we already have a timestamp
-            return d
+            return int(d)
         if sys.version_info >= (3, 3):
             return int(d.timestamp())
         else:
