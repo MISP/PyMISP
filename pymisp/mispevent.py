@@ -1011,6 +1011,11 @@ class MISPObject(AbstractMISP):
                 else:
                     self._known_template = False
 
+        if kwargs.get('timestamp'):
+            if sys.version_info >= (3, 3):
+                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), datetime.timezone.utc)
+            else:
+                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), UTC())
         if kwargs.get('Attribute'):
             for a in kwargs.pop('Attribute'):
                 self.add_attribute(**a)

@@ -189,12 +189,10 @@ class ExpandedPyMISP(PyMISP):
                 me.load(e)
                 to_return.append(me)
         elif controller == 'attributes':
-            # FIXME: if the query doesn't match, the request returns an empty list, and not a dictionary;
-            if normalized_response:
-                for a in normalized_response.get('Attribute'):
-                    ma = MISPAttribute()
-                    ma.from_dict(**a)
-                    to_return.append(ma)
+            for a in normalized_response.get('Attribute'):
+                ma = MISPAttribute()
+                ma.from_dict(**a)
+                to_return.append(ma)
         elif controller == 'objects':
             raise Exception('Not implemented yet')
         return to_return

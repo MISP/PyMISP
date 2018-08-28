@@ -36,6 +36,10 @@ try:
 except ImportError:
     HAVE_REQUESTS = False
 
+if (3, 0) <= sys.version_info < (3, 6):
+    OLD_PY3 = True
+else:
+    OLD_PY3 = False
 
 try:
     from requests_futures.sessions import FuturesSession
@@ -127,7 +131,10 @@ class PyMISP(object):
 
     def get_local_describe_types(self):
         with open(os.path.join(self.resources_path, 'describeTypes.json'), 'rb') as f:
-            describe_types = json.load(f)
+            if OLD_PY3:
+                describe_types = json.loads(f.read().decode())
+            else:
+                describe_types = json.load(f)
         return describe_types['result']
 
     def get_live_describe_types(self):
