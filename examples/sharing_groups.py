@@ -21,5 +21,5 @@ if __name__ == '__main__':
     misp = init(misp_url, misp_key)
 
     sharing_groups = misp.get_sharing_groups()
-    print sharing_groups
+    print (sharing_groups)
 
