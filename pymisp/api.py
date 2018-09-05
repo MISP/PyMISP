@@ -1223,7 +1223,15 @@ class PyMISP(object):
         return True, rules
 
     def download_samples(self, sample_hash=None, event_id=None, all_samples=False, unzip=True):
-        """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch"""
+        """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch
+        
+        :param sample_hash: hash of sample
+        :param event_id: ID of event
+        :param all_samples: download all samples
+        :param unzip: whether to unzip or keep zipped
+        :return: A tuple with (success, [[event_id, sample_hash, sample_as_bytesio], [event_id,...]])
+                 In case of legacy sample, the sample_hash will be replaced by the zip's filename
+        """
         url = urljoin(self.root_url, 'attributes/downloadSample')
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
         response = self._prepare_request('POST', url, data=json.dumps(to_post))
@@ -1242,10 +1250,11 @@ class PyMISP(object):
                     if f.get('md5') and f['md5'] in archive.namelist():
                         # New format
                         unzipped = BytesIO(archive.open(f['md5'], pwd=b'infected').read())
+                        details.append([f['event_id'], f['md5'], unzipped])
                     else:
                         # Old format
                         unzipped = BytesIO(archive.open(f['filename'], pwd=b'infected').read())
-                    details.append([f['event_id'], f['filename'], unzipped])
+                        details.append([f['event_id'], f['filename'], unzipped])
                 except zipfile.BadZipfile:
                     # In case the sample isn't zipped
                     details.append([f['event_id'], f['filename'], zipped])
