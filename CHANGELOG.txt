@@ -2,6 +2,97 @@ Changelog
 =========
 
 
+v2.4.95 (2018-09-06)
+--------------------
+
+New
+~~~
+- Add helpers for new server related APIs. [Raphaël Vinot]
+
+  Fix #266
+- [test] Attribute modification. [Raphaël Vinot]
+- More test cases, bug fixes. [Raphaël Vinot]
+- Reworking the REST API (WiP) [Raphaël Vinot]
+- Add Jupyter for search. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- [data-model] updated describeTypes file. [Alexandre Dulaunoy]
+- Fix testing. [Raphaël Vinot]
+- More testing improvments. [Raphaël Vinot]
+- Finish rewrite testing. [Raphaël Vinot]
+- Rework test cases. [Raphaël Vinot]
+- Add more test cases. [Raphaël Vinot]
+- Make it possible to run the tests manually. [Raphaël Vinot]
+- Print error message. [Raphaël Vinot]
+- Remove tests on python 3.5. [Raphaël Vinot]
+- Added email-header attribute. [Tom King]
+- Updated types/categories mapping. [Christophe Vandeplas]
+- Open all json files as bytes before loading in json. [Raphaël Vinot]
+- [MISP] update to the latest version of the describeTypes. [Alexandre
+  Dulaunoy]
+- Bump misp-objects. [Raphaël Vinot]
+- Add travis tests on python 3.7. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add comments. [Raphaël Vinot]
+
+  Fix #242
+- Bump misp-objects. [Raphaël Vinot]
+- [PyMISP] describeTypes.json updated to add XMR type. [Alexandre
+  Dulaunoy]
+
+Fix
+~~~
+- Normalizing the outputs. [Raphaël Vinot]
+- Jerry rig support for old python. [Raphaël Vinot]
+- Format of the describeTypes. [Alexandre Dulaunoy]
+- [search.py] more example of query type added. [Alexandre Dulaunoy]
+- Tests are passing fine now. [Raphaël Vinot]
+- Properly validate the last-type search query. [Raphaël Vinot]
+- Live test failing on list order. [Raphaël Vinot]
+- Add dependency. [Raphaël Vinot]
+- Py3.5 compat, take 2. [Raphaël Vinot]
+- Py3.5 compat. [Raphaël Vinot]
+- Opening the json blobs as bytes was buggy. [Raphaël Vinot]
+- One more failing test. [Raphaël Vinot]
+- Tests were failing. [Raphaël Vinot]
+- Allow boolean parameters in search_index. [Raphaël Vinot]
+- Typo in OpenIOC script. [Raphaël Vinot]
+
+  Fix #237
+- Bad URL in get_attachment. [Raphaël Vinot]
+
+  Fix #240
+- Improve error message in case the object template is unknown. [Raphaël
+  Vinot]
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #271 from SHSauler/patch-4. [Raphaël Vinot]
+
+  Fix #270 uniquely identifying sample
+- Fix #270 uniquely identifying sample. [Steffen Sauler]
+- Fix print. [Deborah Servili]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Alexandre Dulaunoy]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #251 from tomking2/master. [Alexandre Dulaunoy]
+
+  chg: Added email-header attribute
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Revert "chg: Add travis tests on python 3.7" [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #252 from cvandeplas/master. [Christophe Vandeplas]
+
+  yara_dump - fixed private rules causing issues
+- Yara_dump - fixed private rules causing issues. [Christophe Vandeplas]
+
+
 v2.4.93 (2018-07-01)
 --------------------
 
@@ -17,6 +108,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog, again. [Raphaël Vinot]
 - Bump changelog & version. [Raphaël Vinot]
 - Moar jupyter. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
