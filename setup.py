@@ -26,8 +26,7 @@ setup(
         'Topic :: Security',
         'Topic :: Internet',
     ],
-    test_suite="tests.test_offline",
-    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema', 'setuptools>=36.4', 'python-dateutil'],
+    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema', 'setuptools>=36.4', 'python-dateutil', 'enum;python_version<"3.4"'],
     extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
@@ -39,6 +38,7 @@ setup(
         'requests-mock',
         'six'
     ],
+    test_suite="tests.test_offline",
     include_package_data=True,
     package_data={'pymisp': ['data/*.json',
                              'data/misp-objects/schema_objects.json',
