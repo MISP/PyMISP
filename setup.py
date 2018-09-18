@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from os import path
+
 from setuptools import setup
+
 import pymisp
 
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), 'r') as f:
+    long_description = f.read()
 
 setup(
     name='pymisp',
@@ -11,7 +17,14 @@ setup(
     author_email='raphael.vinot@circl.lu',
     maintainer='Raphaël Vinot',
     url='https://github.com/MISP/PyMISP',
+    project_urls={
+        'Documentation': 'http://pymisp.readthedocs.io',
+        'Source': 'https://github.com/MISP/PyMISP',
+        'Tracker': 'https://github.com/MISP/PyMISP/issues',
+    },
     description='Python API for MISP.',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=['pymisp', 'pymisp.tools'],
     classifiers=[
         'License :: OSI Approved :: BSD License',
