@@ -487,6 +487,21 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
 
+    def test_get_csv(self):
+        first = self.create_simple_event()
+        try:
+            first.attributes[0].comment = 'This is the original comment'
+            first = self.user_misp_connector.add_event(first)
+
+            response = self.user_misp_connector.fast_publish(first.id, alert=False)
+            self.assertEqual(response['errors'][0][1]['message'], 'You do not have permission to use this functionality.')
+            self.admin_misp_connector.fast_publish(first.id, alert=False)
+            csv = self.user_misp_connector.get_csv(publish_timestamp=first.timestamp.timestamp() - 5, pythonify=True)
+            self.assertEqual(csv[0]['value'], first.attributes[0].value)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
 
 if __name__ == '__main__':
     unittest.main()
