@@ -256,11 +256,11 @@ class MISPAttribute(AbstractMISP):
         else:
             # Assuming the user only passed the filename
             self.malware_filename = self.value
-        m = hashlib.md5()
-        m.update(self.data.getvalue())
+        # m = hashlib.md5()
+        # m.update(self.data.getvalue())
         self.value = self.malware_filename
-        md5 = m.hexdigest()
-        self.value = '{}|{}'.format(self.malware_filename, md5)
+        # md5 = m.hexdigest()
+        # self.value = '{}|{}'.format(self.malware_filename, md5)
         self._malware_binary = self.data
         self.encrypt = True
 
