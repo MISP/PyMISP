@@ -301,6 +301,12 @@ class ExpandedPyMISP(PyMISP):
         :param pythonify: Returns a list of dictionaries instead of the plain CSV
         '''
 
+        # Deprecated stuff / synonyms
+        if includeContext is not None:
+            include_context = includeContext
+        if enforceWarninglist is not None:
+            enforce_warninglist = enforceWarninglist
+
         # Add all the parameters in kwargs are aimed at modules, or other 3rd party components, and cannot be sanitized.
         # They are passed as-is.
         query = kwargs
@@ -316,8 +322,6 @@ class ExpandedPyMISP(PyMISP):
             query['type'] = type_attribute
         if include_context is not None:
             query['includeContext'] = include_context
-        if includeContext is not None:
-            query['includeContext'] = includeContext
         if date_from is not None:
             query['from'] = self.make_timestamp(date_from)
         if date_to is not None:
@@ -331,9 +335,6 @@ class ExpandedPyMISP(PyMISP):
             query['headerless'] = headerless
         if enforce_warninglist is not None:
             query['enforceWarninglist'] = enforce_warninglist
-        if enforceWarninglist is not None:
-            # Alias for enforce_warninglist
-            query['enforceWarninglist'] = enforceWarninglist
 
         url = urljoin(self.root_url, '/events/csv/download/')
         response = self._prepare_request('POST', url, data=json.dumps(query))
