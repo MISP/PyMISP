@@ -560,11 +560,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(events[0].attributes), 2)
 
             # include_event_uuid
-            events = self.user_misp_connector.search(eventid=second.id, include_event_uuid=True, pythonify=True)
-            # FIXME: doesn't seem to return the event UUID.
-            # print(events[0].attributes[0].to_json())
-            # print(second.uuid)
-            # self.assertEqual(events[0].attributes[0].event_uuid, second.uuid)
+            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, include_event_uuid=True, pythonify=True)
+            self.assertEqual(attributes[0].event_uuid, second.uuid)
 
             # event_timestamp
             second.add_attribute('ip-src', '8.8.8.9')
