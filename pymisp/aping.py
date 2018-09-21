@@ -35,6 +35,18 @@ class ExpandedPyMISP(PyMISP):
             to_return['OR'] = or_parameters
         return to_return
 
+    def toggle_warninglist(self, warninglist_id: int, force_enable: bool=None):
+        '''Toggle (enable/disable) the status of a warninglist by ID.
+        :param warninglist_id: ID of the WarningList
+        :param force_enable: Force the warning list in the enabled state (does nothing is already enabled)
+        '''
+        query = {'id': warninglist_id}
+        if force_enable is not None:
+            query['enabled'] = force_enable
+        url = urljoin(self.root_url, '/warninglists/toggleEnable')
+        response = self._prepare_request('POST', url, json.dumps(query))
+        return self._check_response(response)
+
     def make_timestamp(self, value: DateTypes):
         if isinstance(value, datetime):
             return datetime.timestamp()
