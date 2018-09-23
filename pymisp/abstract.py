@@ -244,8 +244,9 @@ class AbstractMISP(collections.MutableMapping):
             misp_tag.from_dict(**kwargs)
         else:
             raise PyMISPInvalidFormat("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
-        self.Tag.append(misp_tag)
-        self.edited = True
+        if misp_tag not in self.tags:
+            self.Tag.append(misp_tag)
+            self.edited = True
 
     def __get_tags(self):
         """Returns a lost of tags associated to this Attribute"""
@@ -257,6 +258,14 @@ class AbstractMISP(collections.MutableMapping):
             self.Tag = tags
         else:
             raise PyMISPInvalidFormat('All the attributes have to be of type MISPTag.')
+
+    def __eq__(self, other):
+        if isinstance(other, AbstractMISP):
+            return self.to_dict() == other.to_dict()
+        elif isinstance(other, dict):
+            return self.to_dict() == other
+        else:
+            return False
 
 
 class MISPTag(AbstractMISP):

@@ -7,7 +7,6 @@ import os
 import base64
 from io import BytesIO
 from zipfile import ZipFile
-import hashlib
 import sys
 import uuid
 from collections import defaultdict
@@ -450,7 +449,7 @@ class MISPEvent(AbstractMISP):
         with open(event_path, 'rb') as f:
             self.load(f)
 
-    def load(self, json_event):
+    def load(self, json_event, validate=False):
         """Load a JSON dump from a pseudo file or a JSON string"""
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
@@ -470,9 +469,10 @@ class MISPEvent(AbstractMISP):
                 'attribute_count' in event.get('Event') and
                 event.get('Event').get('attribute_count') is None):
             event['Event']['attribute_count'] = '0'
-        jsonschema.validate(event, self.__json_schema)
         e = event.get('Event')
         self.from_dict(**e)
+        if validate:
+            jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
 
     def set_date(self, date, ignore_invalid=False):
         """Set a date for the event (string, datetime, or date object)"""

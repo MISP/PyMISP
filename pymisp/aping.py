@@ -169,7 +169,7 @@ class ExpandedPyMISP(PyMISP):
         :param eventinfo: Search in the eventinfo field
         :param searchall: Set to run a full text search on the whole database (slow)
         :param sg_reference_only: Only return a reference to the sharing groups the responses are sharing in (avoid leaking org names)
-        :param pythonify: Returns a list of PyMISP Objects the the plain json output
+        :param pythonify: Returns a list of PyMISP Objects the the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
 
