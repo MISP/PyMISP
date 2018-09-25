@@ -35,12 +35,22 @@ class ExpandedPyMISP(PyMISP):
             to_return['OR'] = or_parameters
         return to_return
 
-    def toggle_warninglist(self, warninglist_id: int, force_enable: bool=None):
+    def toggle_warninglist(self, warninglist_id: List[int]=None, warninglist_name: List[str]=None, force_enable: bool=None):
         '''Toggle (enable/disable) the status of a warninglist by ID.
         :param warninglist_id: ID of the WarningList
         :param force_enable: Force the warning list in the enabled state (does nothing is already enabled)
         '''
-        query = {'id': warninglist_id}
+        if warninglist_id is None and warninglist_name is None:
+            raise Exception('Either warninglist_id or warninglist_name is required.')
+        query = {}
+        if warninglist_id is not None:
+            if not isinstance(warninglist_id, list):
+                warninglist_id = [warninglist_id]
+            query['id'] = warninglist_id
+        if warninglist_name is not None:
+            if not isinstance(warninglist_name, list):
+                warninglist_name = [warninglist_name]
+            query['name'] = warninglist_name
         if force_enable is not None:
             query['enabled'] = force_enable
         url = urljoin(self.root_url, '/warninglists/toggleEnable')

@@ -580,29 +580,28 @@ class TestComprehensive(unittest.TestCase):
             # self.assertEqual(len(events), 1)
 
             # warninglist
-            # FIXME: the warning lists ID aren't deterministic
-            if local:
-                response = self.admin_misp_connector.toggle_warninglist('17', force_enable=True)  # enable ipv4 DNS.
-                self.assertDictEqual(response, {'saved': True, 'success': '1 warninglist(s) enabled'})
-                second.add_attribute('ip-src', '9.9.9.9')
-                second = self.user_misp_connector.update_event(second)
+            response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%', force_enable=True)  # enable ipv4 DNS.
+            # response = self.admin_misp_connector.toggle_warninglist(warninglist_id=[17], force_enable=True)  # enable ipv4 DNS.
+            self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) enabled'})
+            second.add_attribute('ip-src', '9.9.9.9')
+            second = self.user_misp_connector.update_event(second)
 
-                events = self.user_misp_connector.search(eventid=second.id, pythonify=True)
-                self.assertEqual(len(events), 1)
-                self.assertEqual(events[0].id, second.id)
-                self.assertEqual(len(events[0].attributes), 3)
+            events = self.user_misp_connector.search(eventid=second.id, pythonify=True)
+            self.assertEqual(len(events), 1)
+            self.assertEqual(events[0].id, second.id)
+            self.assertEqual(len(events[0].attributes), 3)
 
-                events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=False, pythonify=True)
-                self.assertEqual(len(events), 1)
-                self.assertEqual(events[0].id, second.id)
-                self.assertEqual(len(events[0].attributes), 3)
+            events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=False, pythonify=True)
+            self.assertEqual(len(events), 1)
+            self.assertEqual(events[0].id, second.id)
+            self.assertEqual(len(events[0].attributes), 3)
 
-                events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True, pythonify=True)
-                self.assertEqual(len(events), 1)
-                self.assertEqual(events[0].id, second.id)
-                self.assertEqual(len(events[0].attributes), 2)
-                response = self.admin_misp_connector.toggle_warninglist('17')  # disable ipv4 DNS.
-                self.assertDictEqual(response, {'saved': True, 'success': '1 warninglist(s) disabled'})
+            events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True, pythonify=True)
+            self.assertEqual(len(events), 1)
+            self.assertEqual(events[0].id, second.id)
+            self.assertEqual(len(events[0].attributes), 2)
+            response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%')  # disable ipv4 DNS.
+            self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
 
             time.sleep(1)
             # attachments
