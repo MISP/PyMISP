@@ -1224,7 +1224,7 @@ class PyMISP(object):
 
     def download_samples(self, sample_hash=None, event_id=None, all_samples=False, unzip=True):
         """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch
-        
+
         :param sample_hash: hash of sample
         :param event_id: ID of event
         :param all_samples: download all samples
@@ -1695,6 +1695,11 @@ class PyMISP(object):
     def get_warninglist(self, warninglist_id):
         url = urljoin(self.root_url, '/warninglists/view/{}'.format(warninglist_id))
         response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def update_warninglists(self):
+        url = urljoin(self.root_url, '/warninglists/update')
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     # ############## Galaxies/Clusters ##################
