@@ -581,21 +581,21 @@ class TestComprehensive(unittest.TestCase):
 
             # warninglist
             self.admin_misp_connector.update_warninglists()
-            time.sleep(5)
             response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%', force_enable=True)  # enable ipv4 DNS.
             self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) enabled'})
+            second.add_attribute('ip-src', '1.11.71.4')
             second.add_attribute('ip-src', '9.9.9.9')
             second = self.user_misp_connector.update_event(second)
 
             events = self.user_misp_connector.search(eventid=second.id, pythonify=True)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
-            self.assertEqual(len(events[0].attributes), 3)
+            self.assertEqual(len(events[0].attributes), 4)
 
             events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=False, pythonify=True)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
-            self.assertEqual(len(events[0].attributes), 3)
+            self.assertEqual(len(events[0].attributes), 4)
 
             events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True, pythonify=True)
             self.assertEqual(len(events), 1)
@@ -604,7 +604,8 @@ class TestComprehensive(unittest.TestCase):
             response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%')  # disable ipv4 DNS.
             self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
 
-            time.sleep(1)
+            time.sleep(1)  # make sure the next attribute is added one at least one second later
+
             # attachments
             with open('tests/testlive_comprehensive.py', 'rb') as f:
                 first.add_attribute('malware-sample', value='testfile.py', data=BytesIO(f.read()))
