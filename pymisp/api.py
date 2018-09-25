@@ -1702,6 +1702,11 @@ class PyMISP(object):
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
+    def update_noticelists(self):
+        url = urljoin(self.root_url, '/noticelists/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
     # ############## Galaxies/Clusters ##################
 
     def get_galaxies(self):
@@ -2028,6 +2033,11 @@ class PyMISP(object):
             if t['ObjectTemplate']['uuid'] == object_uuid:
                 return t['ObjectTemplate']['id']
         raise Exception('Unable to find template uuid {} on the MISP instance'.format(object_uuid))
+
+    def update_object_templates(self):
+        url = urljoin(self.root_url, '/objectTemplates/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
 
     # ###########################
     # ####### Deprecated ########
