@@ -581,6 +581,7 @@ class TestComprehensive(unittest.TestCase):
 
             # warninglist
             self.admin_misp_connector.update_warninglists()
+            time.sleep(5)
             response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%', force_enable=True)  # enable ipv4 DNS.
             self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) enabled'})
             second.add_attribute('ip-src', '9.9.9.9')
