@@ -512,9 +512,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
             events = self.user_misp_connector.search(timestamp=timeframe, eventinfo='%bar blah%', pythonify=True)
-            # FIXME: should return one event
-            # self.assertEqual(len(events), 1)
-            # self.assertEqual(events[0].id, first.id)
+            self.assertEqual(len(events), 1)
+            self.assertEqual(events[0].id, first.id)
 
             # quickfilter
             events = self.user_misp_connector.search(timestamp=timeframe, quickfilter='bar', pythonify=True)
@@ -541,15 +540,13 @@ class TestComprehensive(unittest.TestCase):
             events = self.user_misp_connector.search(timestamp=timeframe, to_ids='0', pythonify=True)
             self.assertEqual(len(events), 2)
             events = self.user_misp_connector.search(timestamp=timeframe, to_ids='1', pythonify=True)
-            self.assertEqual(len(events), 2)
-            self.assertEqual(len(events[0].attributes), 0)
-            self.assertEqual(events[1].id, second.id)
-            self.assertEqual(len(events[1].attributes), 1)
+            self.assertEqual(len(events), 1)
+            self.assertEqual(events[0].id, second.id)
+            self.assertEqual(len(events[0].attributes), 1)
             events = self.user_misp_connector.search(timestamp=timeframe, to_ids='exclude', pythonify=True)
             self.assertEqual(len(events), 2)
-            # FIXME: exclude == 1
-            # self.assertEqual(len(events[0].attributes), 1)
-            # self.assertEqual(len(events[1].attributes), 1)
+            self.assertEqual(len(events[0].attributes), 1)
+            self.assertEqual(len(events[1].attributes), 1)
 
             # deleted
             second.attributes[1].delete()
@@ -566,9 +563,8 @@ class TestComprehensive(unittest.TestCase):
             # event_timestamp
             second.add_attribute('ip-src', '8.8.8.9')
             second = self.user_misp_connector.update_event(second)
-            # FIXME: returns everything
-            # events = self.user_misp_connector.search(event_timestamp=second.timestamp.timestamp(), pythonify=True)
-            # self.assertEqual(len(events), 1)
+            events = self.user_misp_connector.search(event_timestamp=second.timestamp.timestamp(), pythonify=True)
+            self.assertEqual(len(events), 1)
 
             # searchall
             # FIXME: searchall doesn't seem to do anything
