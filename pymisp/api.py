@@ -1685,6 +1685,11 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
+    def update_taxonomies(self):
+        url = urljoin(self.root_url, '/taxonomies/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
     # ############## WarningLists ##################
 
     def get_warninglists(self):
@@ -1717,6 +1722,11 @@ class PyMISP(object):
     def get_galaxy(self, galaxy_id):
         url = urljoin(self.root_url, '/galaxies/view/{}'.format(galaxy_id))
         response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def update_galaxies(self):
+        url = urljoin(self.root_url, '/galaxies/update')
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     # ##############################################
