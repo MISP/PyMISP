@@ -847,7 +847,7 @@ class PyMISP(object):
     # ##################################################
 
     def _prepare_upload(self, event_id, distribution, to_ids, category, comment, info,
-                        analysis, threat_level_id):
+                        analysis, threat_level_id, advanced_extraction):
         """Helper to prepare a sample to upload"""
         to_post = {'request': {}}
 
@@ -877,6 +877,7 @@ class PyMISP(object):
         to_post['request']['category'] = category
 
         to_post['request']['comment'] = comment
+        to_post['request']['advanced'] = 1 if advanced_extraction else 0
         return to_post, event_id
 
     def _encode_file_to_upload(self, filepath_or_bytes):
@@ -893,19 +894,21 @@ class PyMISP(object):
 
     def upload_sample(self, filename, filepath_or_bytes, event_id, distribution=None,
                       to_ids=True, category=None, comment=None, info=None,
-                      analysis=None, threat_level_id=None):
+                      analysis=None, threat_level_id=None, advanced_extraction=False):
         """Upload a sample"""
         to_post, event_id = self._prepare_upload(event_id, distribution, to_ids, category,
-                                                 comment, info, analysis, threat_level_id)
+                                                 comment, info, analysis, threat_level_id,
+                                                 advanced_extraction)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath_or_bytes)}]
         return self._upload_sample(to_post, event_id)
 
     def upload_samplelist(self, filepaths, event_id, distribution=None,
                           to_ids=True, category=None, comment=None, info=None,
-                          analysis=None, threat_level_id=None):
+                          analysis=None, threat_level_id=None, advanced_extraction=False):
         """Upload a list of samples"""
         to_post, event_id = self._prepare_upload(event_id, distribution, to_ids, category,
-                                                 comment, info, analysis, threat_level_id)
+                                                 comment, info, analysis, threat_level_id,
+                                                 advanced_extraction)
         files = []
         for path in filepaths:
             if not os.path.isfile(path):
