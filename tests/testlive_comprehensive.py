@@ -733,9 +733,9 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.get_event(second.id)
             self.assertEqual(len(second.objects), 1)
             self.assertEqual(second.objects[0].name, 'file')
+            third = self.user_misp_connector.add_event(third)
             if not travis_run:
                 # Advanced, executable
-                third = self.user_misp_connector.add_event(third)
                 with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
                     response = self.user_misp_connector.upload_sample(filename='whoami.exe', filepath_or_bytes=f.read(),
                                                                       event_id=third.id, advanced_extraction=True)
@@ -766,10 +766,11 @@ class TestComprehensive(unittest.TestCase):
         self.admin_misp_connector.update_noticelists()
         r = self.admin_misp_connector.update_noticelists()
         self.assertEqual(r['name'], 'All noticelists are up to date already.')
-        # galaxies
-        self.admin_misp_connector.update_galaxies()
-        r = self.admin_misp_connector.update_galaxies()
-        self.assertEqual(r['name'], 'Galaxies updated.')
+        if not travis_run:
+            # galaxies
+            self.admin_misp_connector.update_galaxies()
+            r = self.admin_misp_connector.update_galaxies()
+            self.assertEqual(r['name'], 'Galaxies updated.')
 
     @unittest.skip("Currently failing")
     def test_search_type_event_csv(self):
