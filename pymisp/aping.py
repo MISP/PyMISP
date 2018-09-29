@@ -92,7 +92,7 @@ class ExpandedPyMISP(PyMISP):
             response = response.json()
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(response)
-            if response.get('response') is not None:
+            if isinstance(response, dict) and response.get('response') is not None:
                 # Cleanup.
                 return response.get('response')
             return response

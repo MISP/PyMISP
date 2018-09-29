@@ -748,6 +748,28 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second.id)
             self.admin_misp_connector.delete_event(third.id)
 
+    def test_update_modules(self):
+        # warninglist
+        self.admin_misp_connector.update_warninglists()
+        r = self.admin_misp_connector.update_warninglists()
+        self.assertEqual(r['name'], 'All warninglists are up to date already.')
+        # taxonomies
+        self.admin_misp_connector.update_taxonomies()
+        r = self.admin_misp_connector.update_taxonomies()
+        self.assertEqual(r['name'], 'All taxonomy libraries are up to date already.')
+        # object templates
+        self.admin_misp_connector.update_object_templates()
+        r = self.admin_misp_connector.update_object_templates()
+        self.assertEqual(type(r), list)
+        # notice lists
+        self.admin_misp_connector.update_noticelists()
+        r = self.admin_misp_connector.update_noticelists()
+        self.assertEqual(r['name'], 'All noticelists are up to date already.')
+        # galaxies
+        self.admin_misp_connector.update_galaxies()
+        r = self.admin_misp_connector.update_galaxies()
+        self.assertEqual(r['name'], 'Galaxies updated.')
+
     @unittest.skip("Currently failing")
     def test_search_type_event_csv(self):
         try:
