@@ -101,6 +101,12 @@ class ExpandedPyMISP(PyMISP):
                 logger.debug(response.text)
             return response.text
 
+    def get_event(self, event_id: int):
+        event = super().get_event(event_id)
+        e = MISPEvent()
+        e.load(event)
+        return e
+
     def add_event(self, event: MISPEvent):
         created_event = super().add_event(event)
         if isinstance(created_event, str):

@@ -516,7 +516,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events[0].id, first.id)
 
             # quickfilter
-            events = self.user_misp_connector.search(timestamp=timeframe, quickfilter='bar', pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, quickfilter='%bar%', pythonify=True)
             # FIXME: should return one event
             # self.assertEqual(len(events), 1)
             # self.assertEqual(events[0].id, second.id)
@@ -570,7 +570,7 @@ class TestComprehensive(unittest.TestCase):
             # FIXME: searchall doesn't seem to do anything
             # second.add_attribute('text', 'This is a test for the full text search', comment='Test stuff comment')
             # second = self.user_misp_connector.update_event(second)
-            # events = self.user_misp_connector.search(value='This is a test for the full text search', searchall=True, pythonify=True)
+            # events = self.user_misp_connector.search(value='%for the full text%', searchall=True, pythonify=True)
             # self.assertEqual(len(events), 1)
             # events = self.user_misp_connector.search(value='stuff', searchall=True, pythonify=True)
             # self.assertEqual(len(events), 1)
@@ -709,6 +709,44 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
             self.admin_misp_connector.delete_event(second.id)
+
+    def test_upload_sample(self):
+        first = self.create_simple_event()
+        second = self.create_simple_event()
+        third = self.create_simple_event()
+        try:
+            # Simple, not executable
+            first = self.user_misp_connector.add_event(first)
+            with open('tests/testlive_comprehensive.py', 'rb') as f:
+                response = self.user_misp_connector.upload_sample(filename='testfile.py', filepath_or_bytes=f.read(),
+                                                                  event_id=first.id)
+            self.assertEqual(response['message'], 'Success, saved all attributes.')
+            first = self.user_misp_connector.get_event(first.id)
+            self.assertEqual(len(first.objects), 1)
+            self.assertEqual(first.objects[0].name, 'file')
+            # Simple, executable
+            second = self.user_misp_connector.add_event(second)
+            with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
+                response = self.user_misp_connector.upload_sample(filename='whoami.exe', filepath_or_bytes=f.read(),
+                                                                  event_id=second.id)
+            self.assertEqual(response['message'], 'Success, saved all attributes.')
+            second = self.user_misp_connector.get_event(second.id)
+            self.assertEqual(len(second.objects), 1)
+            self.assertEqual(second.objects[0].name, 'file')
+            # Advanced, executable
+            third = self.user_misp_connector.add_event(third)
+            with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
+                response = self.user_misp_connector.upload_sample(filename='whoami.exe', filepath_or_bytes=f.read(),
+                                                                  event_id=third.id, advanced_extraction=True)
+            self.assertEqual(response['message'], 'Success, saved all attributes.')
+            third = self.user_misp_connector.get_event(third.id)
+            self.assertEqual(len(third.objects), 7)
+            self.assertEqual(third.objects[0].name, 'pe-section')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+            self.admin_misp_connector.delete_event(third.id)
 
     @unittest.skip("Currently failing")
     def test_search_type_event_csv(self):
