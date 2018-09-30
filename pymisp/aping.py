@@ -153,9 +153,9 @@ class ExpandedPyMISP(PyMISP):
                deleted: Optional[str]=None,
                include_event_uuid: Optional[str]=None, includeEventUuid: Optional[str]=None,
                event_timestamp: Optional[DateTypes]=None,
+               sg_reference_only: Optional[bool]=None,
                eventinfo: Optional[str]=None,
                searchall: Optional[bool]=None,
-               sg_reference_only: Optional[bool]=None,
                pythonify: Optional[bool]=False,
                **kwargs):
         '''
@@ -182,9 +182,9 @@ class ExpandedPyMISP(PyMISP):
         :param deleted: If this parameter is set to 1, it will return soft-deleted attributes along with active ones. By using "only" as a parameter it will limit the returned data set to soft-deleted data only.
         :param include_event_uuid: Instead of just including the event ID, also include the event UUID in each of the attributes.
         :param event_timestamp: Only return attributes from events that have received a modification after the given timestamp.
-        :param eventinfo: Search in the eventinfo field
-        :param searchall: Set to run a full text search on the whole database (slow)
-        :param sg_reference_only: Only return a reference to the sharing groups the responses are sharing in (avoid leaking org names)
+        :param sg_reference_only: If this flag is set, sharing group objects will not be included, instead only the sharing group ID is set.
+        :param eventinfo: Filter on the event's info field.
+        :param searchall: Search for a full or a substring (delimited by % for substrings) in the event info, event tags, attribute tags, attribute values or attribute comment fields.
         :param pythonify: Returns a list of PyMISP Objects the the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
@@ -267,12 +267,12 @@ class ExpandedPyMISP(PyMISP):
                 query['event_timestamp'] = (self.make_timestamp(event_timestamp[0]), self.make_timestamp(event_timestamp[1]))
             else:
                 query['event_timestamp'] = self.make_timestamp(event_timestamp)
+        if sg_reference_only is not None:
+            query['sgReferenceOnly'] = sg_reference_only
         if eventinfo is not None:
             query['eventinfo'] = eventinfo
         if searchall is not None:
             query['searchall'] = searchall
-        if sg_reference_only is not None:
-            query['sgReferenceOnly'] = sg_reference_only
 
         url = urljoin(self.root_url, f'{controller}/restSearch')
         response = self._prepare_request('POST', url, data=json.dumps(query))
