@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from pymisp import PyMISP, __version__
-from keys import url, key
+try:
+    from keys import url, key
+except ImportError as e:
+    print(e)
+    url = 'http://localhost:8080'
+    key = 'fk5BodCZw8owbscW8pQ4ykMASLeJ4NYhuAbshNjo'
+
 import time
 
 import unittest

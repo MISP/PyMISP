@@ -847,7 +847,7 @@ class PyMISP(object):
     # ##################################################
 
     def _prepare_upload(self, event_id, distribution, to_ids, category, comment, info,
-                        analysis, threat_level_id):
+                        analysis, threat_level_id, advanced_extraction):
         """Helper to prepare a sample to upload"""
         to_post = {'request': {}}
 
@@ -877,6 +877,7 @@ class PyMISP(object):
         to_post['request']['category'] = category
 
         to_post['request']['comment'] = comment
+        to_post['request']['advanced'] = 1 if advanced_extraction else 0
         return to_post, event_id
 
     def _encode_file_to_upload(self, filepath_or_bytes):
@@ -893,19 +894,21 @@ class PyMISP(object):
 
     def upload_sample(self, filename, filepath_or_bytes, event_id, distribution=None,
                       to_ids=True, category=None, comment=None, info=None,
-                      analysis=None, threat_level_id=None):
+                      analysis=None, threat_level_id=None, advanced_extraction=False):
         """Upload a sample"""
         to_post, event_id = self._prepare_upload(event_id, distribution, to_ids, category,
-                                                 comment, info, analysis, threat_level_id)
+                                                 comment, info, analysis, threat_level_id,
+                                                 advanced_extraction)
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath_or_bytes)}]
         return self._upload_sample(to_post, event_id)
 
     def upload_samplelist(self, filepaths, event_id, distribution=None,
                           to_ids=True, category=None, comment=None, info=None,
-                          analysis=None, threat_level_id=None):
+                          analysis=None, threat_level_id=None, advanced_extraction=False):
         """Upload a list of samples"""
         to_post, event_id = self._prepare_upload(event_id, distribution, to_ids, category,
-                                                 comment, info, analysis, threat_level_id)
+                                                 comment, info, analysis, threat_level_id,
+                                                 advanced_extraction)
         files = []
         for path in filepaths:
             if not os.path.isfile(path):
@@ -1223,7 +1226,15 @@ class PyMISP(object):
         return True, rules
 
     def download_samples(self, sample_hash=None, event_id=None, all_samples=False, unzip=True):
-        """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch"""
+        """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch
+
+        :param sample_hash: hash of sample
+        :param event_id: ID of event
+        :param all_samples: download all samples
+        :param unzip: whether to unzip or keep zipped
+        :return: A tuple with (success, [[event_id, sample_hash, sample_as_bytesio], [event_id,...]])
+                 In case of legacy sample, the sample_hash will be replaced by the zip's filename
+        """
         url = urljoin(self.root_url, 'attributes/downloadSample')
         to_post = {'request': {'hash': sample_hash, 'eventID': event_id, 'allSamples': all_samples}}
         response = self._prepare_request('POST', url, data=json.dumps(to_post))
@@ -1242,10 +1253,11 @@ class PyMISP(object):
                     if f.get('md5') and f['md5'] in archive.namelist():
                         # New format
                         unzipped = BytesIO(archive.open(f['md5'], pwd=b'infected').read())
+                        details.append([f['event_id'], f['md5'], unzipped])
                     else:
                         # Old format
                         unzipped = BytesIO(archive.open(f['filename'], pwd=b'infected').read())
-                    details.append([f['event_id'], f['filename'], unzipped])
+                        details.append([f['event_id'], f['filename'], unzipped])
                 except zipfile.BadZipfile:
                     # In case the sample isn't zipped
                     details.append([f['event_id'], f['filename'], zipped])
@@ -1676,6 +1688,11 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
+    def update_taxonomies(self):
+        url = urljoin(self.root_url, '/taxonomies/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
     # ############## WarningLists ##################
 
     def get_warninglists(self):
@@ -1688,6 +1705,16 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
+    def update_warninglists(self):
+        url = urljoin(self.root_url, '/warninglists/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
+    def update_noticelists(self):
+        url = urljoin(self.root_url, '/noticelists/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
     # ############## Galaxies/Clusters ##################
 
     def get_galaxies(self):
@@ -1698,6 +1725,11 @@ class PyMISP(object):
     def get_galaxy(self, galaxy_id):
         url = urljoin(self.root_url, '/galaxies/view/{}'.format(galaxy_id))
         response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def update_galaxies(self):
+        url = urljoin(self.root_url, '/galaxies/update')
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     # ##############################################
@@ -2014,6 +2046,11 @@ class PyMISP(object):
             if t['ObjectTemplate']['uuid'] == object_uuid:
                 return t['ObjectTemplate']['id']
         raise Exception('Unable to find template uuid {} on the MISP instance'.format(object_uuid))
+
+    def update_object_templates(self):
+        url = urljoin(self.root_url, '/objectTemplates/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
 
     # ###########################
     # ####### Deprecated ########

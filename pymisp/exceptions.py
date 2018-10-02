@@ -59,3 +59,11 @@ class PyMISPInvalidFormat(PyMISPError):
 
 class MISPServerError(PyMISPError):
     pass
+
+
+class PyMISPNotImplementedYet(PyMISPError):
+    pass
+
+
+class PyMISPUnexpectedResponse(PyMISPError):
+        pass

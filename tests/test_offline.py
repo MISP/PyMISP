@@ -166,18 +166,18 @@ class TestOffline(unittest.TestCase):
             Regression tests for #174
         """
         hashes_fname = mock.add_hashes(event,
-                         md5='68b329da9893e34099c7d8ad5cb9c940',
-                         sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
-                         sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b',
-                         filename='foobar.exe')
+                                       md5='68b329da9893e34099c7d8ad5cb9c940',
+                                       sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
+                                       sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b',
+                                       filename='foobar.exe')
         self.assertEqual(3, len(hashes_fname))
         for attr in hashes_fname:
             self.assertTrue(isinstance(attr, pm.mispevent.MISPAttribute))
             self.assertIn("filename|", attr["type"])
 
         hashes_only = mock.add_hashes(event, md5='68b329da9893e34099c7d8ad5cb9c940',
-                         sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
-                         sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b')
+                                      sha1='adc83b19e793491b1c6ea0fd8b46cd9f32e592fc',
+                                      sha256='01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b')
         self.assertEqual(3, len(hashes_only))
         for attr in hashes_only:
             self.assertTrue(isinstance(attr, pm.mispevent.MISPAttribute))
@@ -203,7 +203,6 @@ class TestOffline(unittest.TestCase):
         self.assertEqual(len(key), 1)
         self.assertEqual(key[0]["type"], "regkey|value")
         self.assertIn("foobar|foobar", key[0]["value"])
-
 
     def test_addAttributes(self, m):
         self.initURI(m)
@@ -364,7 +363,7 @@ class TestOffline(unittest.TestCase):
     def test_flatten_error_messages_singular(self, m):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
-        error = pymisp.get(1)
+        pymisp.get(1)
         response = self.auth_error_msg
         response['error'] = ['foo', 'bar', 'baz']
         messages = pymisp.flatten_error_messages(response)
@@ -405,7 +404,7 @@ class TestOffline(unittest.TestCase):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         try:
-            _ = pymisp.change_toids(self.key, 42)
+            pymisp.change_toids(self.key, 42)
             self.assertFalse('Exception required for off domain value')
         except Exception:
             pass
@@ -434,7 +433,7 @@ class TestOffline(unittest.TestCase):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         try:
-            _ = pymisp.freetext(1, None, adhereToWarninglists='hard')
+            pymisp.freetext(1, None, adhereToWarninglists='hard')
             self.assertFalse('Exception required for off domain value')
         except Exception:
             pass
@@ -452,9 +451,9 @@ class TestOffline(unittest.TestCase):
     def test_sample_upload(self, m):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
-        upload = pymisp.upload_sample("tmux", "tests/viper-test-files/test_files/tmux", 1)
-        upload = pymisp.upload_sample("tmux", "non_existing_file", 1)
-        upload = pymisp.upload_sample("tmux", b"binblob", 1)
+        pymisp.upload_sample("tmux", "tests/viper-test-files/test_files/tmux", 1)
+        pymisp.upload_sample("tmux", "non_existing_file", 1)
+        pymisp.upload_sample("tmux", b"binblob", 1)
 
     def test_get_all_tags(self, m):
         self.initURI(m)
