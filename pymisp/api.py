@@ -401,6 +401,11 @@ class PyMISP(object):
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
+    def direct_call(self, url, data):
+        '''Very lightweight call that posts a data blob (python dictionary) on the URL'''
+        response = self._prepare_request('POST', url, data)
+        return self._check_response(response)
+
     # ##############################################
     # ############### Event handling ###############
     # ##############################################
