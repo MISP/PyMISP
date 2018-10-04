@@ -1767,6 +1767,7 @@ class PyMISP(object):
 
     def disable_taxonomy(self, taxonomy_id):
         """Disable a taxonomy by id."""
+        self.disable_taxonomy_tags(taxonomy_id)
         url = urljoin(self.root_url, '/taxonomies/disable/{}'.format(taxonomy_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
@@ -1779,9 +1780,11 @@ class PyMISP(object):
 
     def enable_taxonomy_tags(self, taxonomy_id):
         """Enable all the tags of a taxonomy by id."""
-        url = urljoin(self.root_url, '/taxonomies/addTag/{}'.format(taxonomy_id))
-        response = self._prepare_request('POST', url)
-        return self._check_response(response)
+        enabled = self.get_taxonomy(taxonomy_id)['Taxonomy']['enabled']
+        if enabled:
+            url = urljoin(self.root_url, '/taxonomies/addTag/{}'.format(taxonomy_id))
+            response = self._prepare_request('POST', url)
+            return self._check_response(response)
 
     def disable_taxonomy_tags(self, taxonomy_id):
         """Disable all the tags of a taxonomy by id."""
@@ -1834,6 +1837,7 @@ class PyMISP(object):
         """Get a noticelist by id."""
         url = urljoin(self.root_url, '/noticelists/view/{}'.format(noticelist_id))
         response = self._prepare_request('GET', url)
+        return self._check_response(response)
 
     def update_noticelists(self):
         """Update all the noticelists."""
