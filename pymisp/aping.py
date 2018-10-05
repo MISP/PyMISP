@@ -40,22 +40,7 @@ class ExpandedPyMISP(PyMISP):
         :param warninglist_id: ID of the WarningList
         :param force_enable: Force the warning list in the enabled state (does nothing is already enabled)
         '''
-        if warninglist_id is None and warninglist_name is None:
-            raise Exception('Either warninglist_id or warninglist_name is required.')
-        query = {}
-        if warninglist_id is not None:
-            if not isinstance(warninglist_id, list):
-                warninglist_id = [warninglist_id]
-            query['id'] = warninglist_id
-        if warninglist_name is not None:
-            if not isinstance(warninglist_name, list):
-                warninglist_name = [warninglist_name]
-            query['name'] = warninglist_name
-        if force_enable is not None:
-            query['enabled'] = force_enable
-        url = urljoin(self.root_url, '/warninglists/toggleEnable')
-        response = self._prepare_request('POST', url, json.dumps(query))
-        return self._check_response(response)
+        return super().toggle_warninglist(warninglist_id, warninglist_name, force_enable)
 
     def make_timestamp(self, value: DateTypes):
         if isinstance(value, datetime):
