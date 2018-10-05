@@ -750,27 +750,106 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(third.id)
 
     def test_update_modules(self):
-        # warninglist
-        self.admin_misp_connector.update_warninglists()
-        r = self.admin_misp_connector.update_warninglists()
-        self.assertEqual(r['name'], 'All warninglists are up to date already.')
-        # taxonomies
-        self.admin_misp_connector.update_taxonomies()
-        r = self.admin_misp_connector.update_taxonomies()
-        self.assertEqual(r['name'], 'All taxonomy libraries are up to date already.')
         # object templates
         self.admin_misp_connector.update_object_templates()
         r = self.admin_misp_connector.update_object_templates()
         self.assertEqual(type(r), list)
-        # notice lists
+
+    def test_tags(self):
+        # Get list
+        tags = self.admin_misp_connector.get_tags_list()
+        self.assertTrue(isinstance(tags, list))
+        # Get tag
+        for tag in tags:
+            if not tag['hide_tag']:
+                break
+        tag = self.admin_misp_connector.get_tag(tags[0]['id'])
+        self.assertTrue('name' in tag)
+        self.admin_misp_connector.disable_tag(tag['id'])
+        # FIXME: returns the tag with ID 1
+        self.admin_misp_connector.enable_tag(tag['id'])
+        # FIXME: returns the tag with ID 1
+
+    def test_taxonomies(self):
+        # Make sure we're up-to-date
+        self.admin_misp_connector.update_taxonomies()
+        r = self.admin_misp_connector.update_taxonomies()
+        self.assertEqual(r['name'], 'All taxonomy libraries are up to date already.')
+        # Get list
+        taxonomies = self.admin_misp_connector.get_taxonomies_list()
+        self.assertTrue(isinstance(taxonomies, list))
+        list_name_test = 'tlp'
+        for tax in taxonomies:
+            if tax['Taxonomy']['namespace'] == list_name_test:
+                break
+        r = self.admin_misp_connector.get_taxonomy(tax['Taxonomy']['id'])
+        self.assertEqual(r['Taxonomy']['namespace'], list_name_test)
+        self.assertTrue('enabled' in r['Taxonomy'])
+        r = self.admin_misp_connector.enable_taxonomy(tax['Taxonomy']['id'])
+        self.assertEqual(r['message'], 'Taxonomy enabled')
+        r = self.admin_misp_connector.disable_taxonomy(tax['Taxonomy']['id'])
+        self.assertEqual(r['message'], 'Taxonomy disabled')
+
+    def test_warninglists(self):
+        # Make sure we're up-to-date
+        self.admin_misp_connector.update_warninglists()
+        r = self.admin_misp_connector.update_warninglists()
+        self.assertEqual(r['name'], 'All warninglists are up to date already.')
+        # Get list
+        r = self.admin_misp_connector.get_warninglists()
+        # FIXME It returns Warninglists object instead of a list of warning lists directly. This is inconsistent.
+        warninglists = r['Warninglists']
+        self.assertTrue(isinstance(warninglists, list))
+        list_name_test = 'List of known hashes with common false-positives (based on Florian Roth input list)'
+        for wl in warninglists:
+            if wl['Warninglist']['name'] == list_name_test:
+                break
+        testwl = wl['Warninglist']
+        r = self.admin_misp_connector.get_warninglist(testwl['id'])
+        self.assertEqual(r['Warninglist']['name'], list_name_test)
+        self.assertTrue('WarninglistEntry' in r['Warninglist'])
+        r = self.admin_misp_connector.enable_warninglist(testwl['id'])
+        self.assertEqual(r['success'], '1 warninglist(s) enabled')
+        r = self.admin_misp_connector.disable_warninglist(testwl['id'])
+        self.assertEqual(r['success'], '1 warninglist(s) disabled')
+
+    def test_noticelists(self):
+        # Make sure we're up-to-date
         self.admin_misp_connector.update_noticelists()
         r = self.admin_misp_connector.update_noticelists()
         self.assertEqual(r['name'], 'All noticelists are up to date already.')
+        # Get list
+        noticelists = self.admin_misp_connector.get_noticelists()
+        self.assertTrue(isinstance(noticelists, list))
+        list_name_test = 'gdpr'
+        for nl in noticelists:
+            if nl['Noticelist']['name'] == list_name_test:
+                break
+        testnl = nl
+        r = self.admin_misp_connector.get_noticelist(testnl['Noticelist']['id'])
+        self.assertEqual(r['Noticelist']['name'], list_name_test)
+        self.assertTrue('NoticelistEntry' in r['Noticelist'])
+        r = self.admin_misp_connector.enable_noticelist(testnl['Noticelist']['id'])
+        self.assertTrue(r['Noticelist']['enabled'])
+        r = self.admin_misp_connector.disable_noticelist(testnl['Noticelist']['id'])
+        self.assertFalse(r['Noticelist']['enabled'])
+
+    def test_galaxies(self):
         if not travis_run:
-            # galaxies
+            # Make sure we're up-to-date
             self.admin_misp_connector.update_galaxies()
             r = self.admin_misp_connector.update_galaxies()
             self.assertEqual(r['name'], 'Galaxies updated.')
+            # Get list
+            galaxies = self.admin_misp_connector.get_galaxies()
+            self.assertTrue(isinstance(galaxies, list))
+            list_name_test = 'Mobile Attack - Attack Pattern'
+            for galaxy in galaxies:
+                if galaxy['Galaxy']['name'] == list_name_test:
+                    break
+            r = self.admin_misp_connector.get_galaxy(galaxy['Galaxy']['id'])
+            self.assertEqual(r['Galaxy']['name'], list_name_test)
+            self.assertTrue('GalaxyCluster' in r)
 
     @unittest.skip("Currently failing")
     def test_search_type_event_csv(self):

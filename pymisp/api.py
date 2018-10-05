@@ -1712,11 +1712,11 @@ class PyMISP(object):
         return {'Tag': tag}
 
     def edit_tag(self, tag_id, name=None, colour=None, exportable=None, hide_tag=None, org_id=None, count=None,
-                    user_id=None, numerical_value=None, attribute_count=None):
+                 user_id=None, numerical_value=None, attribute_count=None):
         """Edit only the provided parameters of a tag."""
         old_tag = self.get_tag(tag_id)
         new_tag = self._set_tag_parameters(name, colour, exportable, hide_tag, org_id, count, user_id,
-                                            numerical_value, attribute_count, old_tag)
+                                           numerical_value, attribute_count, old_tag)
         url = urljoin(self.root_url, '/tags/edit/{}'.format(tag_id))
         response = self._prepare_request('POST', url, json.dumps(new_tag))
         return self._check_response(response)
@@ -1792,7 +1792,6 @@ class PyMISP(object):
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-
     # ############## WarningLists ##################
 
     def get_warninglists(self):
@@ -1813,17 +1812,35 @@ class PyMISP(object):
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
+    def toggle_warninglist(self, warninglist_id=None, warninglist_name=None, force_enable=None):
+        '''Toggle (enable/disable) the status of a warninglist by ID.
+        :param warninglist_id: ID of the WarningList
+        :param force_enable: Force the warning list in the enabled state (does nothing if already enabled)
+        '''
+        if warninglist_id is None and warninglist_name is None:
+            raise Exception('Either warninglist_id or warninglist_name is required.')
+        query = {}
+        if warninglist_id is not None:
+            if not isinstance(warninglist_id, list):
+                warninglist_id = [warninglist_id]
+            query['id'] = warninglist_id
+        if warninglist_name is not None:
+            if not isinstance(warninglist_name, list):
+                warninglist_name = [warninglist_name]
+            query['name'] = warninglist_name
+        if force_enable is not None:
+            query['enabled'] = force_enable
+        url = urljoin(self.root_url, '/warninglists/toggleEnable')
+        response = self._prepare_request('POST', url, json.dumps(query))
+        return self._check_response(response)
+
     def enable_warninglist(self, warninglist_id):
         """Enable a warninglist by id."""
-        url = urljoin(self.root_url, '/warninglists/enableWarninglist/{}/true'.format(warninglist_id))
-        response = self._prepare_request('POST', url)
-        return self._check_response(response)
+        return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=True)
 
     def disable_warninglist(self, warninglist_id):
         """Disable a warninglist by id."""
-        url = urljoin(self.root_url, '/warninglists/enableWarninglist/{}'.format(warninglist_id))
-        response = self._prepare_request('POST', url)
-        return self._check_response(response)
+        return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=False)
 
     # ############## NoticeLists ##################
 
