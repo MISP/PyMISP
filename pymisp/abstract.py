@@ -9,6 +9,7 @@ from json import JSONEncoder
 import collections
 import six  # Remove that import when discarding python2 support.
 import logging
+from enum import Enum
 
 from .exceptions import PyMISPInvalidFormat
 
@@ -16,7 +17,7 @@ from .exceptions import PyMISPInvalidFormat
 logger = logging.getLogger('pymisp')
 
 if six.PY2:
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
     # This is required because Python 2 is a pain.
     from datetime import tzinfo, timedelta
@@ -34,6 +35,36 @@ if six.PY2:
             return timedelta(0)
 
 
+class Distribution(Enum):
+    your_organisation_only = 0
+    this_community_only = 1
+    connected_communities = 2
+    all_communities = 3
+    sharing_group = 4
+    inherit = 5
+
+
+class ThreatLevel(Enum):
+    high = 1
+    medium = 2
+    low = 3
+    undefined = 4
+
+
+class Analysis(Enum):
+    initial = 0
+    ongoing = 1
+    completed = 2
+
+
+def _int_to_str(d):
+    # transform all integer back to string
+    for k, v in d.items():
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            d[k] = str(v)
+    return d
+
+
 class MISPEncode(JSONEncoder):
 
     def default(self, obj):
@@ -41,6 +72,8 @@ class MISPEncode(JSONEncoder):
             return obj.jsonable()
         elif isinstance(obj, datetime.datetime):
             return obj.isoformat()
+        elif isinstance(obj, Enum):
+            return obj.value
         return JSONEncoder.default(self, obj)
 
 
@@ -53,6 +86,12 @@ class AbstractMISP(collections.MutableMapping):
         """Abstract class for all the MISP objects"""
         super(AbstractMISP, self).__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
+
+        if kwargs.get('force_timestamps') is not None:
+            # Ignore the edited objects and keep the timestamps.
+            self.__force_timestamps = True
+        else:
+            self.__force_timestamps = False
 
         # List of classes having tags
         from .mispevent import MISPAttribute, MISPEvent
@@ -111,7 +150,7 @@ class AbstractMISP(collections.MutableMapping):
             elif isinstance(val, list) and len(val) == 0:
                 continue
             if attribute == 'timestamp':
-                if self.edited:
+                if not self.__force_timestamps and self.edited:
                     # In order to be accepted by MISP, the timestamp of an object
                     # needs to be either newer, or None.
                     # If the current object is marked as edited, the easiest is to
@@ -120,6 +159,7 @@ class AbstractMISP(collections.MutableMapping):
                 else:
                     val = self._datetime_to_timestamp(val)
             to_return[attribute] = val
+        to_return = _int_to_str(to_return)
         return to_return
 
     def jsonable(self):
@@ -183,7 +223,7 @@ class AbstractMISP(collections.MutableMapping):
         """Convert a datetime.datetime object to a timestamp (int)"""
         if isinstance(d, (int, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
             # Assume we already have a timestamp
-            return d
+            return int(d)
         if sys.version_info >= (3, 3):
             return int(d.timestamp())
         else:
@@ -204,8 +244,9 @@ class AbstractMISP(collections.MutableMapping):
             misp_tag.from_dict(**kwargs)
         else:
             raise PyMISPInvalidFormat("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
-        self.Tag.append(misp_tag)
-        self.edited = True
+        if misp_tag not in self.tags:
+            self.Tag.append(misp_tag)
+            self.edited = True
 
     def __get_tags(self):
         """Returns a lost of tags associated to this Attribute"""
@@ -217,6 +258,14 @@ class AbstractMISP(collections.MutableMapping):
             self.Tag = tags
         else:
             raise PyMISPInvalidFormat('All the attributes have to be of type MISPTag.')
+
+    def __eq__(self, other):
+        if isinstance(other, AbstractMISP):
+            return self.to_dict() == other.to_dict()
+        elif isinstance(other, dict):
+            return self.to_dict() == other
+        else:
+            return False
 
 
 class MISPTag(AbstractMISP):

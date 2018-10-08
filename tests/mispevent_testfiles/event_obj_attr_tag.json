@@ -26,12 +26,12 @@
           }
         ],
         "description": "File object describing a file with meta-information",
-        "distribution": 5,
+        "distribution": "5",
         "meta-category": "file",
         "name": "file",
-        "sharing_group_id": 0,
+        "sharing_group_id": "0",
         "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
-        "template_version": 11,
+        "template_version": "13",
         "uuid": "a"
       },
       {
@@ -46,12 +46,12 @@
           }
         ],
         "description": "url object describes an url along with its normalized field (like extracted using faup parsing library) and its metadata.",
-        "distribution": 5,
+        "distribution": "5",
         "meta-category": "network",
         "name": "url",
-        "sharing_group_id": 0,
+        "sharing_group_id": "0",
         "template_uuid": "60efb77b-40b5-4c46-871b-ed1ed999fce5",
-        "template_version": 6,
+        "template_version": "6",
         "uuid": "b"
       }
     ]

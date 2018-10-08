@@ -21,13 +21,13 @@
           }
         ],
         "description": "TestTemplate.",
-        "distribution": 5,
+        "distribution": "5",
         "meta-category": "file",
         "misp_objects_path_custom": "tests/mispevent_testfiles",
         "name": "test_object_template",
-        "sharing_group_id": 0,
+        "sharing_group_id": "0",
         "template_uuid": "4ec55cc6-9e49-4c64-b794-03c25c1a6589",
-        "template_version": 1,
+        "template_version": "1",
         "uuid": "a"
       }
     ],

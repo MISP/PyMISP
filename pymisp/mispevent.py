@@ -7,7 +7,6 @@ import os
 import base64
 from io import BytesIO
 from zipfile import ZipFile
-import hashlib
 import sys
 import uuid
 from collections import defaultdict
@@ -23,7 +22,7 @@ logger = logging.getLogger('pymisp')
 
 
 if six.PY2:
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
     # This is required because Python 2 is a pain.
     from datetime import tzinfo, timedelta
@@ -39,6 +38,13 @@ if six.PY2:
 
         def dst(self, dt):
             return timedelta(0)
+
+
+if (3, 0) <= sys.version_info < (3, 6):
+    OLD_PY3 = True
+else:
+    OLD_PY3 = False
+
 
 try:
     from dateutil.parser import parse
@@ -93,8 +99,11 @@ class MISPAttribute(AbstractMISP):
         super(MISPAttribute, self).__init__()
         if not describe_types:
             ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'r') as f:
-                t = json.load(f)
+            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
+                if OLD_PY3:
+                    t = json.loads(f.read().decode())
+                else:
+                    t = json.load(f)
             describe_types = t['result']
         self.__categories = describe_types['categories']
         self._types = describe_types['types']
@@ -153,6 +162,8 @@ class MISPAttribute(AbstractMISP):
         return misp_shadow_attribute
 
     def from_dict(self, **kwargs):
+        if kwargs.get('Attribute'):
+            kwargs = kwargs.get('Attribute')
         if kwargs.get('type') and kwargs.get('category'):
             if kwargs['type'] not in self.__category_type_mapping[kwargs['category']]:
                 if self.__strict:
@@ -235,7 +246,6 @@ class MISPAttribute(AbstractMISP):
         to_return = super(MISPAttribute, self).to_dict()
         if to_return.get('data'):
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
-        to_return = _int_to_str(to_return)
         return to_return
 
     def _prepare_new_malware_sample(self):
@@ -245,11 +255,11 @@ class MISPAttribute(AbstractMISP):
         else:
             # Assuming the user only passed the filename
             self.malware_filename = self.value
-        m = hashlib.md5()
-        m.update(self.data.getvalue())
+        # m = hashlib.md5()
+        # m.update(self.data.getvalue())
         self.value = self.malware_filename
-        md5 = m.hexdigest()
-        self.value = '{}|{}'.format(self.malware_filename, md5)
+        # md5 = m.hexdigest()
+        # self.value = '{}|{}'.format(self.malware_filename, md5)
         self._malware_binary = self.data
         self.encrypt = True
 
@@ -347,18 +357,27 @@ class MISPAttribute(AbstractMISP):
 
 class MISPEvent(AbstractMISP):
 
-    def __init__(self, describe_types=None, strict_validation=False):
-        super(MISPEvent, self).__init__()
+    def __init__(self, describe_types=None, strict_validation=False, **kwargs):
+        super(MISPEvent, self).__init__(**kwargs)
         ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
-            with open(os.path.join(ressources_path, 'schema.json'), 'r') as f:
-                self.__json_schema = json.load(f)
+            with open(os.path.join(ressources_path, 'schema.json'), 'rb') as f:
+                if OLD_PY3:
+                    self.__json_schema = json.loads(f.read().decode())
+                else:
+                    self.__json_schema = json.load(f)
         else:
-            with open(os.path.join(ressources_path, 'schema-lax.json'), 'r') as f:
-                self.__json_schema = json.load(f)
+            with open(os.path.join(ressources_path, 'schema-lax.json'), 'rb') as f:
+                if OLD_PY3:
+                    self.__json_schema = json.loads(f.read().decode())
+                else:
+                    self.__json_schema = json.load(f)
         if not describe_types:
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'r') as f:
-                t = json.load(f)
+            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
+                if OLD_PY3:
+                    t = json.loads(f.read().decode())
+                else:
+                    t = json.load(f)
             describe_types = t['result']
 
         self._types = describe_types['types']
@@ -427,15 +446,17 @@ class MISPEvent(AbstractMISP):
         """Load a JSON dump from a file on the disk"""
         if not os.path.exists(event_path):
             raise PyMISPError('Invalid path, unable to load the event.')
-        with open(event_path, 'r') as f:
+        with open(event_path, 'rb') as f:
             self.load(f)
 
-    def load(self, json_event):
+    def load(self, json_event, validate=False):
         """Load a JSON dump from a pseudo file or a JSON string"""
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
             json_event = json_event.read()
-        if isinstance(json_event, basestring):
+        if isinstance(json_event, (basestring, bytes)):
+            if OLD_PY3 and isinstance(json_event, bytes):
+                json_event = json_event.decode()
             json_event = json.loads(json_event)
         if json_event.get('response'):
             event = json_event.get('response')[0]
@@ -448,9 +469,10 @@ class MISPEvent(AbstractMISP):
                 'attribute_count' in event.get('Event') and
                 event.get('Event').get('attribute_count') is None):
             event['Event']['attribute_count'] = '0'
-        jsonschema.validate(event, self.__json_schema)
         e = event.get('Event')
         self.from_dict(**e)
+        if validate:
+            jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
 
     def set_date(self, date, ignore_invalid=False):
         """Set a date for the event (string, datetime, or date object)"""
@@ -550,9 +572,7 @@ class MISPEvent(AbstractMISP):
         if to_return.get('publish_timestamp'):
             to_return['publish_timestamp'] = self._datetime_to_timestamp(self.publish_timestamp)
 
-        to_return = _int_to_str(to_return)
-        to_return = {'Event': to_return}
-        return to_return
+        return {'Event': _int_to_str(to_return)}
 
     def add_proposal(self, shadow_attribute=None, **kwargs):
         """Alias for add_shadow_attribute"""
@@ -777,11 +797,21 @@ class MISPUser(AbstractMISP):
     def __init__(self):
         super(MISPUser, self).__init__()
 
+    def from_dict(self, **kwargs):
+        if kwargs.get('User'):
+            kwargs = kwargs.get('User')
+        super(MISPUser, self).from_dict(**kwargs)
+
 
 class MISPOrganisation(AbstractMISP):
 
     def __init__(self):
         super(MISPOrganisation, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Organisation'):
+            kwargs = kwargs.get('Organisation')
+        super(MISPOrganisation, self).from_dict(**kwargs)
 
 
 class MISPFeed(AbstractMISP):
@@ -897,8 +927,11 @@ class MISPObject(AbstractMISP):
             else:
                 self._known_template = False
         if self._known_template:
-            with open(template_path, 'r') as f:
-                self._definition = json.load(f)
+            with open(template_path, 'rb') as f:
+                if OLD_PY3:
+                    self._definition = json.loads(f.read().decode())
+                else:
+                    self._definition = json.load(f)
             setattr(self, 'meta-category', self._definition['meta-category'])
             self.template_uuid = self._definition['uuid']
             self.description = self._definition['description']
@@ -975,6 +1008,11 @@ class MISPObject(AbstractMISP):
                 else:
                     self._known_template = False
 
+        if kwargs.get('timestamp'):
+            if sys.version_info >= (3, 3):
+                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), datetime.timezone.utc)
+            else:
+                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), UTC())
         if kwargs.get('Attribute'):
             for a in kwargs.pop('Attribute'):
                 self.add_attribute(**a)

@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from pymisp import PyMISP, __version__
-from keys import url, key
+try:
+    from keys import url, key
+except ImportError as e:
+    print(e)
+    url = 'http://localhost:8080'
+    key = 'fk5BodCZw8owbscW8pQ4ykMASLeJ4NYhuAbshNjo'
+
 import time
 
 import unittest
@@ -294,7 +300,12 @@ class TestBasic(unittest.TestCase):
             self.assertTrue(sd['default_category'] in categories)
 
     def test_describeTypes_uptodate(self):
-        self.assertEqual(self.live_describe_types, self.misp.get_local_describe_types())
+        local_describe = self.misp.get_local_describe_types()
+        for temp_key in local_describe.keys():
+            if isinstance(local_describe[temp_key], list):
+                self.assertEqual(sorted(self.live_describe_types[temp_key]), sorted(local_describe[temp_key]))
+            else:
+                self.assertEqual(self.live_describe_types[temp_key], local_describe[temp_key])
 
     def test_live_acl(self):
         query_acl = self.misp.get_live_query_acl()
