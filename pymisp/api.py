@@ -401,12 +401,15 @@ class PyMISP(object):
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    def direct_call(self, url, data):
+    def direct_call(self, url, data=None):
         '''Very lightweight call that posts a data blob (python dictionary or json string) on the URL'''
         url = urljoin(self.root_url, url)
-        if isinstance(data, dict):
-            data = json.dumps(data)
-        response = self._prepare_request('POST', url, data)
+        if not data:
+            response = self._prepare_request('GET', url)
+        else:
+            if isinstance(data, dict):
+                data = json.dumps(data)
+            response = self._prepare_request('POST', url, data)
         return self._check_response(response)
 
     # ##############################################
