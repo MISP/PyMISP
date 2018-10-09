@@ -403,7 +403,8 @@ class PyMISP(object):
 
     def direct_call(self, url, data):
         '''Very lightweight call that posts a data blob (python dictionary) on the URL'''
-        response = self._prepare_request('POST', url, data)
+        url = urljoin(self.root_url, url)
+        response = self._prepare_request('POST', url, json.dumps(data))
         return self._check_response(response)
 
     # ##############################################
