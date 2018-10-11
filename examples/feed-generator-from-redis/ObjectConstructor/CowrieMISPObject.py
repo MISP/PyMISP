@@ -17,9 +17,9 @@ class CowrieMISPObject(AbstractMISPObjectGenerator):
         self.generate_attributes()
 
     def generate_attributes(self):
-        skip_list = ['time', 'duration', 'isError', 'ttylog']
+        valid_object_attributes = self._definition['attributes'].keys()
         for object_relation, value in self._dico_val.items():
-            if object_relation in skip_list or 'log_' in object_relation:
+            if object_relation not in valid_object_attributes:
                 continue
 
             if object_relation == 'timestamp':
@@ -29,4 +29,7 @@ class CowrieMISPObject(AbstractMISPObjectGenerator):
             if isinstance(value, dict):
                 self.add_attribute(object_relation, **value)
             else:
+                # uniformize value, sometimes empty array
+                if len(value) == 0:
+                    value = ''
                 self.add_attribute(object_relation, value=value)
