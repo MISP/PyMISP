@@ -4,10 +4,15 @@ host='127.0.0.1'
 port=6379
 db=0
 ## The keynames to POP element from
-#keyname_pop='misp_feed_generator_key'
 keyname_pop=['cowrie']
 
 # OTHERS
+## If key prefix not provided, data will be added as either object, attribute or sighting
+fallback_MISP_type = 'object'
+### How to handle the fallback
+fallback_object_template_name = 'cowrie' # MISP-Object only
+fallback_attribute_category = 'comment'  # MISP-Attribute only
+
 ## How frequent the event should be written on disk
 flushing_interval=5*60
 ## The redis list keyname in which to put items that generated an error
