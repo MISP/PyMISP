@@ -30,6 +30,6 @@ class CowrieMISPObject(AbstractMISPObjectGenerator):
                 self.add_attribute(object_relation, **value)
             else:
                 # uniformize value, sometimes empty array
-                if len(value) == 0:
+                if isinstance(value, list) and len(value) == 0:
                     value = ''
                 self.add_attribute(object_relation, value=value)
