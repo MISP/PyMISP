@@ -2,6 +2,97 @@ Changelog
 =========
 
 
+v2.4.96 (2018-10-12)
+--------------------
+
+New
+~~~
+- [freedFromRedis] try to create an object/attribute out of the incoming
+  data even if not added with the helper. [Sami Mokaddem]
+- Direct_call without data means GET. [Raphaël Vinot]
+- Add direct call to just post data on a URL. [Raphaël Vinot]
+- Tests for update modules. [Raphaël Vinot]
+- Tests for upload_sample. [Raphaël Vinot]
+- Add more test cases. [Raphaël Vinot]
+- Update warninglists. [Raphaël Vinot]
+- Add test for warninglists. [Raphaël Vinot]
+- Toggle warning list, add test case. [Raphaël Vinot]
+- Add lots of test cases, find lots of bugs. [Raphaël Vinot]
+- Use new CSV interface, add test cases. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Allow to pass a json string to direct_call. [Raphaël Vinot]
+- More test cases. [Raphaël Vinot]
+- Update order parameters & doc. [Raphaël Vinot]
+- Add an extra IP from the warninglists. [Raphaël Vinot]
+- Test for event UUID in attribute. [Raphaël Vinot]
+
+Fix
+~~~
+- Prevent checking length on a integer. [Sami Mokaddem]
+- Direct call & add example. [Raphaël Vinot]
+- Disable test for travis, take 2. [Raphaël Vinot]
+- Disable test for travis. [Raphaël Vinot]
+- Skip tests that fail on travis for no reason... [Raphaël Vinot]
+- Tentative to fix tests on travis. [Raphaël Vinot]
+- Disable test warning lists. Enabling is not deterministic. [Raphaël
+  Vinot]
+- Use proper dependency (enum34) [Raphaël Vinot]
+- Make travis happy again. [Raphaël Vinot]
+- Python2 support. [Raphaël Vinot]
+
+  Fix #274
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #284 from mokaddem/fixFeedGenerator. [Sami
+  Mokaddem]
+
+  fix: prevent checking length on a integer
+- Merge pull request #283 from mokaddem/updateFromRedis. [Raphaël Vinot]
+
+  new: [freedFromRedis] try to create an object/attribute out of the in…
+- Merge branch 'IFX-CDC-master' [Raphaël Vinot]
+- Fixed leaked taxonomy tags problem. [netjinho]
+- Added some getters and setters for taxonomies, warninglists,
+  noticelists and tags & documentation. [netjinho]
+- Merge branch 'netjinho-master' [Raphaël Vinot]
+- Merge branch 'master' of https://github.com/netjinho/PyMISP into
+  netjinho-master. [Raphaël Vinot]
+- Added update_galaxies and update_taxonomies. [netjinho]
+- Merge branch 'DragonDev1906-master' [Raphaël Vinot]
+- Merge branch 'master' of
+  https://github.com/DragonDev1906/PyMISP_upload_sample into
+  DragonDev1906-master. [Raphaël Vinot]
+- Add: Advanced Extraction to upload_sample. [root]
+- Add: update noticelists and object templates. [Raphaël Vinot]
+- Add: Add __eq__ to AbstractMISP. [Raphaël Vinot]
+
+  Allow to discard duplicate tags.
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Add: more test cases. [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #277 from GOVCERT-LU/pypi_fixes. [Raphaël Vinot]
+
+  - Add description from README.md as long-description -> displayed on …
+- Fix invalid py2 keyword. [Georges Toth]
+- - Add description from README.md as long-description -> displayed on
+  pypi. - Add project related URLs to be displayed on pypi. [Georges
+  Toth]
+
+
+v2.4.95.1 (2018-09-06)
+----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+
+
 v2.4.95 (2018-09-06)
 --------------------
 
