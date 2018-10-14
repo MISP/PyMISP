@@ -6,12 +6,12 @@
 
 import sys
 from pymisp import PyMISP, MISPAttribute
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 
 
 def init_misp():
     global mymisp
-    mymisp = PyMISP(misp_url, misp_key)
+    mymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
 
 def echeck(r):

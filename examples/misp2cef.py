@@ -7,7 +7,7 @@
 import sys
 import datetime
 from pymisp import PyMISP, MISPAttribute
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 
 cefconfig  = {"Default_Severity":1, "Device_Vendor":"MISP", "Device_Product":"MISP", "Device_Version":1}
 
@@ -45,7 +45,7 @@ def make_cef(event):
 
 def init_misp():
   global mymisp
-  mymisp = PyMISP(misp_url, misp_key)
+  mymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
 
 def echeck(r):
