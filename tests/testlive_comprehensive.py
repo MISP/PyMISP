@@ -602,6 +602,15 @@ class TestComprehensive(unittest.TestCase):
                 response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%')  # disable ipv4 DNS.
                 self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
 
+            # Page / limit
+            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=1, limit=3, pythonify=True)
+            print(attributes)
+            self.assertEqual(len(attributes), 3)
+
+            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=2, limit=3, pythonify=True)
+            print(attributes)
+            self.assertEqual(len(attributes), 1)
+
             time.sleep(1)  # make sure the next attribute is added one at least one second later
 
             # attachments
