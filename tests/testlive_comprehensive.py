@@ -604,11 +604,9 @@ class TestComprehensive(unittest.TestCase):
 
             # Page / limit
             attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=1, limit=3, pythonify=True)
-            print(attributes)
             self.assertEqual(len(attributes), 3)
 
             attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=2, limit=3, pythonify=True)
-            print(attributes)
             self.assertEqual(len(attributes), 1)
 
             time.sleep(1)  # make sure the next attribute is added one at least one second later
@@ -711,6 +709,69 @@ class TestComprehensive(unittest.TestCase):
 
             # headerless
             csv = self.user_misp_connector.get_csv(date_from='2018-09-01', date_to='2018-09-02', headerless=True)
+            # FIXME: The header is here.
+            # print(csv)
+
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+
+    def test_search_csv(self):
+        first = self.create_simple_event()
+        first.attributes[0].comment = 'This is the original comment'
+        second = self.create_simple_event()
+        second.info = 'foo blah'
+        second.set_date('2018-09-01')
+        second.add_attribute('ip-src', '8.8.8.8')
+        try:
+            second = self.user_misp_connector.add_event(second)
+            first = self.user_misp_connector.add_event(first)
+
+            response = self.user_misp_connector.fast_publish(first.id, alert=False)
+            self.assertEqual(response['errors'][0][1]['message'], 'You do not have permission to use this functionality.')
+
+            # Default search, attribute with to_ids == True
+            first.attributes[0].to_ids = True
+            first = self.user_misp_connector.update_event(first)
+            self.admin_misp_connector.fast_publish(first.id, alert=False)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), pythonify=True)
+            self.assertEqual(len(csv), 1)
+            self.assertEqual(csv[0]['value'], first.attributes[0].value)
+
+            # eventid
+            csv = self.user_misp_connector.search(return_format='csv', eventid=first.id, pythonify=True)
+            self.assertEqual(len(csv), 1)
+            self.assertEqual(csv[0]['value'], first.attributes[0].value)
+
+            # category
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), category='Other', pythonify=True)
+            self.assertEqual(len(csv), 1)
+            self.assertEqual(csv[0]['value'], first.attributes[0].value)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), category='Person', pythonify=True)
+            self.assertEqual(len(csv), 0)
+
+            # type_attribute
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), type_attribute='text', pythonify=True)
+            self.assertEqual(len(csv), 1)
+            self.assertEqual(csv[0]['value'], first.attributes[0].value)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), type_attribute='ip-src', pythonify=True)
+            self.assertEqual(len(csv), 0)
+
+            # context
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), include_context=True, pythonify=True)
+            self.assertEqual(len(csv), 1)
+            self.assertTrue('event_info' in csv[0])
+
+            # date_from date_to
+            csv = self.user_misp_connector.search(return_format='csv', date_from=date.today().isoformat(), pythonify=True)
+            self.assertEqual(len(csv), 1)
+            self.assertEqual(csv[0]['value'], first.attributes[0].value)
+            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', pythonify=True)
+            self.assertEqual(len(csv), 2)
+
+            # headerless
+            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', headerless=True)
             # FIXME: The header is here.
             # print(csv)
 

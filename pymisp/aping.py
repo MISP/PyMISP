@@ -141,6 +141,7 @@ class ExpandedPyMISP(PyMISP):
                sg_reference_only: Optional[bool]=None,
                eventinfo: Optional[str]=None,
                searchall: Optional[bool]=None,
+               include_context: Optional[bool]=None, includeContext: Optional[bool]=None,
                pythonify: Optional[bool]=False,
                **kwargs):
         '''
@@ -172,6 +173,7 @@ class ExpandedPyMISP(PyMISP):
         :param sg_reference_only: If this flag is set, sharing group objects will not be included, instead only the sharing group ID is set.
         :param eventinfo: Filter on the event's info field.
         :param searchall: Search for a full or a substring (delimited by % for substrings) in the event info, event tags, attribute tags, attribute values or attribute comment fields.
+        :param include_context: [CSV Only] Include the event data with each attribute.
         :param pythonify: Returns a list of PyMISP Objects the the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
@@ -180,6 +182,7 @@ class ExpandedPyMISP(PyMISP):
         :param last: synonym for publish_timestamp
         :param enforceWarninglist: synonym for enforce_warninglist
         :param includeEventUuid: synonym for include_event_uuid
+        :param includeContext: synonym for include_context
 
         '''
 
@@ -197,6 +200,8 @@ class ExpandedPyMISP(PyMISP):
             enforce_warninglist = enforceWarninglist
         if includeEventUuid is not None:
             include_event_uuid = includeEventUuid
+        if includeContext is not None:
+            include_context = includeContext
 
         # Add all the parameters in kwargs are aimed at modules, or other 3rd party components, and cannot be sanitized.
         # They are passed as-is.
@@ -266,12 +271,16 @@ class ExpandedPyMISP(PyMISP):
             query['eventinfo'] = eventinfo
         if searchall is not None:
             query['searchall'] = searchall
+        if include_context is not None:
+            query['includeContext'] = include_context
 
         url = urljoin(self.root_url, f'{controller}/restSearch')
         response = self._prepare_request('POST', url, data=json.dumps(query))
         normalized_response = self._check_response(response)
-        if isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
-                                                    normalized_response.get('errors')):
+        if return_format == 'csv' and pythonify:
+            return self._csv_to_dict(normalized_response)
+        elif isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
+                                                      normalized_response.get('errors')):
             return normalized_response
         elif return_format == 'json' and pythonify:
             # The response is in json, we can convert it to a list of pythonic MISP objects
@@ -362,14 +371,7 @@ class ExpandedPyMISP(PyMISP):
         normalized_response = self._check_response(response)
         if isinstance(normalized_response, str):
             if pythonify and not headerless:
-                # Make it a list of dict
-                fieldnames, lines = normalized_response.split('\n', 1)
-                fieldnames = fieldnames.split(',')
-                to_return = []
-                for line in csv.reader(lines.split('\n')):
-                    if line:
-                        to_return.append({fname: value for fname, value in zip(fieldnames, line)})
-                return to_return
+                return self._csv_to_dict(normalized_response)
 
             return normalized_response
         elif isinstance(normalized_response, dict):
@@ -379,3 +381,13 @@ class ExpandedPyMISP(PyMISP):
         else:
             # Should not happen...
             raise PyMISPUnexpectedResponse(f'The server should have returned a CSV file as text. instead it returned:\n{normalized_response}')
+
+    def _csv_to_dict(self, csv_content):
+        '''Makes a list of dict out of a csv file (requires headers)'''
+        fieldnames, lines = csv_content.split('\n', 1)
+        fieldnames = fieldnames.split(',')
+        to_return = []
+        for line in csv.reader(lines.split('\n')):
+            if line:
+                to_return.append({fname: value for fname, value in zip(fieldnames, line)})
+        return to_return
