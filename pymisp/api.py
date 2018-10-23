@@ -1021,8 +1021,8 @@ class PyMISP(object):
         """Helper to prepare a search query"""
         if query.get('error') is not None:
             return query
-        if controller not in ['events', 'attributes', 'objects']:
-            raise ValueError('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes', 'objects'])))
+        if controller not in ['events', 'attributes', 'objects', 'sightings']:
+            raise ValueError('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes', 'objects', 'sightings'])))
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
 
         if ASYNC_OK and async_callback:
@@ -1434,7 +1434,7 @@ class PyMISP(object):
         :value: Value of the attribute the sighting is related too. Pushing this object
                 will update the sighting count of each attriutes with thifs value on the instance
         :uuid: UUID of the attribute to update
-        :id: ID of the attriute to update
+        :id: ID of the attribute to update
         :source: Source of the sighting
         :type: Type of the sighting
         :timestamp: Timestamp associated to the sighting
@@ -1472,6 +1472,53 @@ class PyMISP(object):
         url = urljoin(self.root_url, uri)
         response = self._prepare_request('POST', url)
         return self._check_response(response)
+
+    def sighting_search(self, context='', async_callback=None, **kwargs):
+        """Search sightings via the REST API
+        :context: The context of the search, could be attribute, event or False
+        :param id: ID of the attribute or event if context is specified
+        :param type: Type of the sighting
+        :param from: From date
+        :param to: To date
+        :param last: Last published sighting (e.g. 5m, 3h, 7d)
+        :param org_id: The org_id
+        :param source: The source of the sighting
+        :param includeAttribute: Should the result include attribute data
+        :param includeEvent: Should the result include event data
+        :param async_callback: The function to run when results are returned
+
+        :Example:
+
+        >>> misp.sighting_search({'last': '30d'}) # search sightings for the last 30 days on the instance
+        [ ... ]
+        >>> misp.sighting_search('attribute', {'id': 6, 'includeAttribute': 1}) # return list of sighting for attribute 6 along with the attribute itself
+        [ ... ]
+        >>> misp.sighting_search('event', {'id': 17, 'includeEvent': 1, 'org_id': 2}) # return list of sighting for event 17 filtered with org id 2
+        """
+        if context not in ['', 'attribute', 'event']:
+            raise Exception('Context parameter must be empty, "attribute" or "event"')
+        query = {}
+        # Sighting: array('id', 'type', 'from', 'to', 'last', 'org_id', 'includeAttribute', 'includeEvent');
+        query['returnFormat'] = kwargs.pop('returnFormat', 'json')
+        query['id'] = kwargs.pop('id', None)
+        query['type'] = kwargs.pop('type', None)
+        query['from'] = kwargs.pop('from', None)
+        query['to'] = kwargs.pop('to', None)
+        query['last'] = kwargs.pop('last', None)
+        query['org_id'] = kwargs.pop('org_id', None)
+        query['source'] = kwargs.pop('source', None)
+        query['includeAttribute'] = kwargs.pop('includeAttribute', None)
+        query['includeEvent'] = kwargs.pop('includeEvent', None)
+        
+        # Cleanup
+        query = {k: v for k, v in query.items() if v is not None}
+
+        if kwargs:
+            raise SearchError('Unused parameter: {}'.format(', '.join(kwargs.keys())))
+
+        # Create a session, make it async if and only if we have a callback
+        controller = 'sightings'
+        return self.__query('restSearch/'+context, query, controller, async_callback)
 
     # ############## Sharing Groups ##################
 
