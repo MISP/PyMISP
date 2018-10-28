@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
 from io import open
 
 def init(url, key):
-    return PyMISP(url, key, True, 'json', debug=True)
+    return PyMISP(url, key, misp_verifycert, 'json', debug=True)
 
 def up_event(m, event, content):
     with open(content, 'r') as f:
