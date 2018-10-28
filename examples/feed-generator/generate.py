@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -79,14 +79,16 @@ valid_attribute_distributions = []
 
 attributeHashes = []
 
+
 def init():
     # If we have an old settings.py file then this variable won't exist
     global valid_attribute_distributions
     try:
         valid_attribute_distributions = valid_attribute_distribution_levels
-    except:
+    except Exception:
         valid_attribute_distributions = ['0', '1', '2', '3', '4', '5']
     return PyMISP(url, key, ssl)
+
 
 def recursiveExtract(container, containerType, leaf, eventUuid):
     temp = {}
@@ -118,8 +120,8 @@ def recursiveExtract(container, containerType, leaf, eventUuid):
                         temp[childType].append(processed)
     return temp
 
+
 def saveEvent(misp, uuid):
-    result = {}
     event = misp.get_event(uuid)
     if not event.get('Event'):
         print('Error while fetching event: {}'.format(event['message']))
@@ -130,10 +132,12 @@ def saveEvent(misp, uuid):
     eventFile.write(event)
     eventFile.close()
 
+
 def __blockByDistribution(element):
     if element['distribution'] not in valid_attribute_distributions:
         return True
     return False
+
 
 def saveHashes():
     if not attributeHashes:
@@ -146,7 +150,6 @@ def saveHashes():
     except Exception as e:
         print(e)
         sys.exit('Could not create the quick hash lookup file.')
-
 
 
 def saveManifest(manifest):
