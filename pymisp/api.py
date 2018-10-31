@@ -1473,43 +1473,43 @@ class PyMISP(object):
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    def sighting_search(self, context='', async_callback=None, **kwargs):
+    def search_sightings(self, context='', async_callback=None, **kwargs):
         """Search sightings via the REST API
         :context: The context of the search, could be attribute, event or False
-        :param id: ID of the attribute or event if context is specified
-        :param type: Type of the sighting
-        :param from: From date
-        :param to: To date
-        :param last: Last published sighting (e.g. 5m, 3h, 7d)
+        :param context_id: ID of the attribute or event if context is specified
+        :param type_sighting: Type of the sighting
+        :param date_from: From date
+        :param date_to: To date
+        :param publish_timestamp: Last published sighting (e.g. 5m, 3h, 7d)
         :param org_id: The org_id
         :param source: The source of the sighting
-        :param includeAttribute: Should the result include attribute data
-        :param includeEvent: Should the result include event data
+        :param include_attribute: Should the result include attribute data
+        :param include_event: Should the result include event data
         :param async_callback: The function to run when results are returned
 
         :Example:
 
-        >>> misp.sighting_search({'last': '30d'}) # search sightings for the last 30 days on the instance
+        >>> misp.search_sightings({'publish_timestamp': '30d'}) # search sightings for the last 30 days on the instance
         [ ... ]
-        >>> misp.sighting_search('attribute', {'id': 6, 'includeAttribute': 1}) # return list of sighting for attribute 6 along with the attribute itself
+        >>> misp.search_sightings('attribute', {'id': 6, 'include_attribute': 1}) # return list of sighting for attribute 6 along with the attribute itself
         [ ... ]
-        >>> misp.sighting_search('event', {'id': 17, 'includeEvent': 1, 'org_id': 2}) # return list of sighting for event 17 filtered with org id 2
+        >>> misp.search_sightings('event', {'id': 17, 'include_event': 1, 'org_id': 2}) # return list of sighting for event 17 filtered with org id 2
         """
         if context not in ['', 'attribute', 'event']:
             raise Exception('Context parameter must be empty, "attribute" or "event"')
         query = {}
         # Sighting: array('id', 'type', 'from', 'to', 'last', 'org_id', 'includeAttribute', 'includeEvent');
         query['returnFormat'] = kwargs.pop('returnFormat', 'json')
-        query['id'] = kwargs.pop('id', None)
-        query['type'] = kwargs.pop('type', None)
-        query['from'] = kwargs.pop('from', None)
-        query['to'] = kwargs.pop('to', None)
-        query['last'] = kwargs.pop('last', None)
+        query['id'] = kwargs.pop('context_id', None)
+        query['type'] = kwargs.pop('type_sighting', None)
+        query['from'] = kwargs.pop('date_from', None)
+        query['to'] = kwargs.pop('date_to', None)
+        query['last'] = kwargs.pop('publish_timestamp', None)
         query['org_id'] = kwargs.pop('org_id', None)
         query['source'] = kwargs.pop('source', None)
-        query['includeAttribute'] = kwargs.pop('includeAttribute', None)
-        query['includeEvent'] = kwargs.pop('includeEvent', None)
-        
+        query['includeAttribute'] = kwargs.pop('include_attribute', None)
+        query['includeEvent'] = kwargs.pop('include_event', None)
+
         # Cleanup
         query = {k: v for k, v in query.items() if v is not None}
 
@@ -1518,7 +1518,7 @@ class PyMISP(object):
 
         # Create a session, make it async if and only if we have a callback
         controller = 'sightings'
-        return self.__query('restSearch/'+context, query, controller, async_callback)
+        return self.__query('restSearch/' + context, query, controller, async_callback)
 
     # ############## Sharing Groups ##################
 
