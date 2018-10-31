@@ -836,8 +836,10 @@ class TestComprehensive(unittest.TestCase):
 
     def test_taxonomies(self):
         # Make sure we're up-to-date
-        self.admin_misp_connector.update_taxonomies()
         r = self.admin_misp_connector.update_taxonomies()
+        print(r)
+        r = self.admin_misp_connector.update_taxonomies()
+        print(r)
         self.assertEqual(r['name'], 'All taxonomy libraries are up to date already.')
         # Get list
         taxonomies = self.admin_misp_connector.get_taxonomies_list()
