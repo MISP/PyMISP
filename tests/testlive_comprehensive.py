@@ -18,7 +18,7 @@ except ImportError as e:
 
 from uuid import uuid4
 
-travis_run = False
+travis_run = True
 
 
 class TestComprehensive(unittest.TestCase):
@@ -563,6 +563,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(attributes[0].event_uuid, second.uuid)
 
             # event_timestamp
+            time.sleep(1)
             second.add_attribute('ip-src', '8.8.8.9')
             second = self.user_misp_connector.update_event(second)
             events = self.user_misp_connector.search(event_timestamp=second.timestamp.timestamp(), pythonify=True)
@@ -836,10 +837,8 @@ class TestComprehensive(unittest.TestCase):
 
     def test_taxonomies(self):
         # Make sure we're up-to-date
+        self.admin_misp_connector.update_taxonomies()
         r = self.admin_misp_connector.update_taxonomies()
-        print(r)
-        r = self.admin_misp_connector.update_taxonomies()
-        print(r)
         self.assertEqual(r['name'], 'All taxonomy libraries are up to date already.')
         # Get list
         taxonomies = self.admin_misp_connector.get_taxonomies_list()
