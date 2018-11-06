@@ -4,7 +4,7 @@
 from pymisp import PyMISP
 from pymisp.tools import load_warninglists
 import argparse
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 
 
 if __name__ == '__main__':
@@ -18,5 +18,5 @@ if __name__ == '__main__':
     if args.package:
         print(load_warninglists.from_package())
     elif args.remote:
-        pm = PyMISP(misp_url, misp_key)
+        pm = PyMISP(misp_url, misp_key, misp_verifycert)
         print(load_warninglists.from_instance(pm))

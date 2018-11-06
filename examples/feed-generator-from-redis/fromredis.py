@@ -27,7 +27,8 @@ class RedisToMISPFeed:
     SUFFIX_SIGH = '_sighting'
     SUFFIX_ATTR = '_attribute'
     SUFFIX_OBJ = '_object'
-    SUFFIX_LIST = [SUFFIX_SIGH, SUFFIX_ATTR, SUFFIX_OBJ]
+    SUFFIX_NO = ''
+    SUFFIX_LIST = [SUFFIX_SIGH, SUFFIX_ATTR, SUFFIX_OBJ, SUFFIX_NO]
 
     def __init__(self):
         self.host = settings.host
@@ -100,8 +101,33 @@ class RedisToMISPFeed:
                 self.update_last_action("Error while adding object")
 
         else:
-            # Suffix not valid
-            self.update_last_action("Redis key suffix not supported")
+            # Suffix not provided, try to add anyway
+            if settings.fallback_MISP_type == 'attribute':
+                new_key = key + self.SUFFIX_ATTR
+                # Add atribute type from the config
+                if 'type' not in data and settings.fallback_attribute_type:
+                    data['type'] = settings.fallback_attribute_type
+                else:
+                    new_key = None
+
+            elif settings.fallback_MISP_type == 'object':
+                new_key = key + self.SUFFIX_OBJ
+                # Add object template name from the config
+                if 'name' not in data and settings.fallback_object_template_name:
+                    data['name'] = settings.fallback_object_template_name
+                else:
+                    new_key = None
+
+            elif settings.fallback_MISP_type == 'sighting':
+                new_key = key + self.SUFFIX_SIGH
+
+            else:
+                new_key = None
+
+            if new_key is None:
+                self.update_last_action("Redis key suffix not supported and automatic not configured")
+            else:
+                self.perform_action(new_key, data)
 
     # OTHERS
     def update_last_action(self, action):

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .exceptions import MISPServerError, NewEventError, UpdateEventError, UpdateAttributeError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse
-from .api import PyMISP, everything_broken, MISPEvent, MISPAttribute
+from .exceptions import MISPServerError, NewEventError, UpdateEventError, UpdateAttributeError, PyMISPNotImplementedYet
+from .api import PyMISP, everything_broken, MISPEvent, MISPAttribute, MISPSighting
 from typing import TypeVar, Optional, Tuple, List, Dict
 from datetime import date, datetime
 import json
@@ -116,8 +116,94 @@ class ExpandedPyMISP(PyMISP):
         a.from_dict(**updated_attribute)
         return a
 
-    # TODO: Make that thing async & test it.
+    def search_sightings(self, context: Optional[str]=None,
+                         context_id: Optional[SearchType]=None,
+                         type_sighting: Optional[str]=None,
+                         date_from: Optional[DateTypes]=None,
+                         date_to: Optional[DateTypes]=None,
+                         publish_timestamp: Optional[DateInterval]=None, last: Optional[DateInterval]=None,
+                         org: Optional[SearchType]=None,
+                         source: Optional[str]=None,
+                         include_attribute: Optional[bool]=None,
+                         include_event_meta: Optional[bool]=None,
+                         pythonify: Optional[bool]=False
+                         ):
+        '''Search sightings
+
+        :param context: The context of the search. Can be either "attribute", "event", or nothing (will then match on events and attributes).
+        :param context_id: Only relevant if context is either "attribute" or "event". Then it is the relevant ID.
+        :param type_sighting: Type of sighting
+        :param date_from: Events with the date set to a date after the one specified. This filter will use the date of the event.
+        :param date_to: Events with the date set to a date before the one specified. This filter will use the date of the event.
+        :param publish_timestamp: Restrict the results by the last publish timestamp (newer than).
+        :param org: Search by the creator organisation by supplying the organisation identifier.
+        :param source: Source of the sighting
+        :param include_attribute: Include the attribute.
+        :param include_event_meta: Include the meta information of the event.
+
+        Deprecated:
+
+        :param last: synonym for publish_timestamp
+
+        :Example:
+
+        >>> misp.search_sightings(publish_timestamp='30d') # search sightings for the last 30 days on the instance
+        [ ... ]
+        >>> misp.search_sightings(context='attribute', context_id=6, include_attribute=True) # return list of sighting for attribute 6 along with the attribute itself
+        [ ... ]
+        >>> misp.search_sightings(context='event', context_id=17, include_event_meta=True, org=2) # return list of sighting for event 17 filtered with org id 2
+        '''
+        query = {'returnFormat': 'json'}
+        if context is not None:
+            if context not in ['attribute', 'event']:
+                raise ValueError('context has to be in {}'.format(', '.join(['attribute', 'event'])))
+            url_path = f'sightings/restSearch/{context}'
+        else:
+            url_path = 'sightings/restSearch'
+        query['id'] = context_id
+        query['type'] = type_sighting
+        query['from'] = date_from
+        query['to'] = date_to
+        query['last'] = publish_timestamp
+        query['org_id'] = org
+        query['source'] = source
+        query['includeAttribute'] = include_attribute
+        query['includeEvent'] = include_event_meta
+
+        url = urljoin(self.root_url, url_path)
+        # Remove None values.
+        # TODO: put that in self._prepare_request
+        query = {k: v for k, v in query.items() if v is not None}
+        response = self._prepare_request('POST', url, data=json.dumps(query))
+        normalized_response = self._check_response(response)
+        if isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
+                                                    normalized_response.get('errors')):
+            return normalized_response
+        elif pythonify:
+            to_return = []
+            for s in normalized_response:
+                entries = {}
+                s_data = s['Sighting']
+                if include_event_meta:
+                    e = s_data.pop('Event')
+                    me = MISPEvent()
+                    me.from_dict(**e)
+                    entries['event'] = me
+                if include_attribute:
+                    a = s_data.pop('Attribute')
+                    ma = MISPAttribute()
+                    ma.from_dict(**a)
+                    entries['attribute'] = ma
+                ms = MISPSighting()
+                ms.from_dict(**s_data)
+                entries['sighting'] = ms
+                to_return.append(entries)
+            return to_return
+        else:
+            return normalized_response
+
     def search(self, controller: str='events', return_format: str='json',
+               limit: Optional[int]=None, page: Optional[int]=None,
                value: Optional[SearchParameterTypes]=None,
                type_attribute: Optional[SearchParameterTypes]=None,
                category: Optional[SearchParameterTypes]=None,
@@ -141,18 +227,22 @@ class ExpandedPyMISP(PyMISP):
                sg_reference_only: Optional[bool]=None,
                eventinfo: Optional[str]=None,
                searchall: Optional[bool]=None,
+               requested_attributes: Optional[str]=None,
+               include_context: Optional[bool]=None, includeContext: Optional[bool]=None,
+               headerless: Optional[bool]=None,
                pythonify: Optional[bool]=False,
                **kwargs):
-        '''
-        Search in the MISP instance
+        '''Search in the MISP instance
 
         :param returnFormat: Set the return format of the search (Currently supported: json, xml, openioc, suricata, snort - more formats are being moved to restSearch with the goal being that all searches happen through this API). Can be passed as the first parameter after restSearch or via the JSON payload.
+        :param limit: Limit the number of results returned, depending on the scope (for example 10 attributes or 10 full events).
+        :param page: If a limit is set, sets the page to be returned. page 3, limit 100 will return records 201->300).
         :param value: Search for the given value in the attributes' value field.
         :param type_attribute: The attribute type, any valid MISP attribute type is accepted.
         :param category: The attribute category, any valid MISP attribute category is accepted.
         :param org: Search by the creator organisation by supplying the organisation identifier.
         :param tags: Tags to search or to exclude. You can pass a list, or the output of `build_complex_query`
-        :param quickfilter: If set it makes the search ignore all of the other arguments, except for the auth key and value. MISP will return all events that have a sub-string match on value in the event info, event orgc, or any of the attribute value fields, or in the attribute comment.
+        :param quickfilter: Enabling this (by passing "1" as the argument) will make the search ignore all of the other arguments, except for the auth key and value. MISP will return an xml / json (depending on the header sent) of all events that have a sub-string match on value in the event info, event orgc, or any of the attribute value1 / value2 fields, or in the attribute comment.
         :param date_from: Events with the date set to a date after the one specified. This filter will use the date of the event.
         :param date_to: Events with the date set to a date before the one specified. This filter will use the date of the event.
         :param eventid: The events that should be included / excluded from the search
@@ -170,6 +260,9 @@ class ExpandedPyMISP(PyMISP):
         :param sg_reference_only: If this flag is set, sharing group objects will not be included, instead only the sharing group ID is set.
         :param eventinfo: Filter on the event's info field.
         :param searchall: Search for a full or a substring (delimited by % for substrings) in the event info, event tags, attribute tags, attribute values or attribute comment fields.
+        :param requested_attributes: [CSV only] Select the fields that you wish to include in the CSV export. By setting event level fields additionally, includeContext is not required to get event metadata.
+        :param include_context: [CSV Only] Include the event data with each attribute.
+        :param headerless: [CSV Only] The CSV created when this setting is set to true will not contain the header row.
         :param pythonify: Returns a list of PyMISP Objects the the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
@@ -178,10 +271,13 @@ class ExpandedPyMISP(PyMISP):
         :param last: synonym for publish_timestamp
         :param enforceWarninglist: synonym for enforce_warninglist
         :param includeEventUuid: synonym for include_event_uuid
+        :param includeContext: synonym for include_context
 
         '''
 
-        if controller not in ['events', 'attributes', 'objects']:
+        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache']
+
+        if controller not in ['events', 'attributes', 'objects', 'sightings']:
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
 
         # Deprecated stuff / synonyms
@@ -193,38 +289,31 @@ class ExpandedPyMISP(PyMISP):
             enforce_warninglist = enforceWarninglist
         if includeEventUuid is not None:
             include_event_uuid = includeEventUuid
+        if includeContext is not None:
+            include_context = includeContext
 
         # Add all the parameters in kwargs are aimed at modules, or other 3rd party components, and cannot be sanitized.
         # They are passed as-is.
         query = kwargs
-        if return_format is not None:
-            if return_format not in ['json', 'xml', 'openioc', 'suricata', 'snort']:
-                raise ValueError('return_format has to be in {}'.format(', '.join(['json', 'xml', 'openioc', 'suricata', 'snort'])))
-            query['returnFormat'] = return_format
-        if value is not None:
-            query['value'] = value
-        if type_attribute is not None:
-            query['type'] = type_attribute
-        if category is not None:
-            query['category'] = category
-        if org is not None:
-            query['org'] = org
-        if tags is not None:
-            query['tags'] = tags
-        if quickfilter is not None:
-            query['quickfilter'] = quickfilter
-        if date_from is not None:
-            query['from'] = self.make_timestamp(date_from)
-        if date_to is not None:
-            query['to'] = self.make_timestamp(date_to)
-        if eventid is not None:
-            query['eventid'] = eventid
-        if with_attachments is not None:
-            query['withAttachments'] = with_attachments
-        if metadata is not None:
-            query['metadata'] = metadata
-        if uuid is not None:
-            query['uuid'] = uuid
+
+        if return_format not in return_formats:
+            raise ValueError('return_format has to be in {}'.format(', '.join(return_formats)))
+        query['returnFormat'] = return_format
+
+        query['page'] = page
+        query['limit'] = limit
+        query['value'] = value
+        query['type'] = type_attribute
+        query['category'] = category
+        query['org'] = org
+        query['tags'] = tags
+        query['quickfilter'] = quickfilter
+        query['from'] = self.make_timestamp(date_from)
+        query['to'] = self.make_timestamp(date_to)
+        query['eventid'] = eventid
+        query['withAttachments'] = with_attachments
+        query['metadata'] = metadata
+        query['uuid'] = uuid
         if publish_timestamp is not None:
             if isinstance(publish_timestamp, (list, tuple)):
                 query['publish_timestamp'] = (self.make_timestamp(publish_timestamp[0]), self.make_timestamp(publish_timestamp[1]))
@@ -235,35 +324,36 @@ class ExpandedPyMISP(PyMISP):
                 query['timestamp'] = (self.make_timestamp(timestamp[0]), self.make_timestamp(timestamp[1]))
             else:
                 query['timestamp'] = self.make_timestamp(timestamp)
-        if published is not None:
-            query['published'] = published
-        if enforce_warninglist is not None:
-            query['enforceWarninglist'] = enforce_warninglist
+        query['published'] = published
+        query['enforceWarninglist'] = enforce_warninglist
         if to_ids is not None:
             if str(to_ids) not in ['0', '1', 'exclude']:
                 raise ValueError('to_ids has to be in {}'.format(', '.join(['0', '1', 'exclude'])))
             query['to_ids'] = to_ids
-        if deleted is not None:
-            query['deleted'] = deleted
-        if include_event_uuid is not None:
-            query['includeEventUuid'] = include_event_uuid
+        query['deleted'] = deleted
+        query['includeEventUuid'] = include_event_uuid
         if event_timestamp is not None:
             if isinstance(event_timestamp, (list, tuple)):
                 query['event_timestamp'] = (self.make_timestamp(event_timestamp[0]), self.make_timestamp(event_timestamp[1]))
             else:
                 query['event_timestamp'] = self.make_timestamp(event_timestamp)
-        if sg_reference_only is not None:
-            query['sgReferenceOnly'] = sg_reference_only
-        if eventinfo is not None:
-            query['eventinfo'] = eventinfo
-        if searchall is not None:
-            query['searchall'] = searchall
+        query['sgReferenceOnly'] = sg_reference_only
+        query['eventinfo'] = eventinfo
+        query['searchall'] = searchall
+        query['requested_attributes'] = requested_attributes
+        query['includeContext'] = include_context
+        query['headerless'] = headerless
 
         url = urljoin(self.root_url, f'{controller}/restSearch')
+        # Remove None values.
+        # TODO: put that in self._prepare_request
+        query = {k: v for k, v in query.items() if v is not None}
         response = self._prepare_request('POST', url, data=json.dumps(query))
         normalized_response = self._check_response(response)
-        if isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
-                                                    normalized_response.get('errors')):
+        if return_format == 'csv' and pythonify and not headerless:
+            return self._csv_to_dict(normalized_response)
+        elif isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
+                                                      normalized_response.get('errors')):
             return normalized_response
         elif return_format == 'json' and pythonify:
             # The response is in json, we can convert it to a list of pythonic MISP objects
@@ -284,90 +374,12 @@ class ExpandedPyMISP(PyMISP):
         else:
             return normalized_response
 
-    def get_csv(self,
-                eventid: Optional[SearchType]=None,
-                ignore: Optional[bool]=None,
-                tags: Optional[SearchParameterTypes]=None,
-                category: Optional[SearchParameterTypes]=None,
-                type_attribute: Optional[SearchParameterTypes]=None,
-                include_context: Optional[bool]=None, includeContext: Optional[bool]=None,
-                date_from: Optional[DateTypes]=None, date_to: Optional[DateTypes]=None,
-                publish_timestamp: Optional[DateInterval]=None,  # converted internally to last (consistent with search)
-                headerless: Optional[bool]=None,
-                enforce_warninglist: Optional[bool]=None, enforceWarninglist: Optional[bool]=None,
-                pythonify: Optional[bool]=False,
-                **kwargs):
-        '''
-        Get MISP data in CSV format.
-
-        :param eventid: Restrict the download to a single event
-        :param ignore: If true, the response includes attributes without the to_ids flag
-        :param tags: Tags to search or to exclude. You can pass a list, or the output of `build_complex_query`
-        :param category: The attribute category, any valid MISP attribute category is accepted.
-        :param type_attribute: The attribute type, any valid MISP attribute type is accepted.
-        :param include_context: Include the event data with each attribute.
-        :param date_from: Events with the date set to a date after the one specified. This filter will use the date of the event.
-        :param date_to: Events with the date set to a date before the one specified. This filter will use the date of the event.
-        :param publish_timestamp: Events published within the last x amount of time. This filter will use the published timestamp of the event.
-        :param headerless: The CSV created when this setting is set to true will not contain the header row.
-        :param enforceWarninglist: All attributes that have a hit on a warninglist will be excluded.
-        :param pythonify: Returns a list of dictionaries instead of the plain CSV
-        '''
-
-        # Deprecated stuff / synonyms
-        if includeContext is not None:
-            include_context = includeContext
-        if enforceWarninglist is not None:
-            enforce_warninglist = enforceWarninglist
-
-        # Add all the parameters in kwargs are aimed at modules, or other 3rd party components, and cannot be sanitized.
-        # They are passed as-is.
-        query = kwargs
-        if eventid is not None:
-            query['eventid'] = eventid
-        if ignore is not None:
-            query['ignore'] = ignore
-        if tags is not None:
-            query['tags'] = tags
-        if category is not None:
-            query['category'] = category
-        if type_attribute is not None:
-            query['type'] = type_attribute
-        if include_context is not None:
-            query['includeContext'] = include_context
-        if date_from is not None:
-            query['from'] = self.make_timestamp(date_from)
-        if date_to is not None:
-            query['to'] = self.make_timestamp(date_to)
-        if publish_timestamp is not None:
-            if isinstance(publish_timestamp, (list, tuple)):
-                query['last'] = (self.make_timestamp(publish_timestamp[0]), self.make_timestamp(publish_timestamp[1]))
-            else:
-                query['last'] = self.make_timestamp(publish_timestamp)
-        if headerless is not None:
-            query['headerless'] = headerless
-        if enforce_warninglist is not None:
-            query['enforceWarninglist'] = enforce_warninglist
-
-        url = urljoin(self.root_url, '/events/csv/download/')
-        response = self._prepare_request('POST', url, data=json.dumps(query))
-        normalized_response = self._check_response(response)
-        if isinstance(normalized_response, str):
-            if pythonify and not headerless:
-                # Make it a list of dict
-                fieldnames, lines = normalized_response.split('\n', 1)
-                fieldnames = fieldnames.split(',')
-                to_return = []
-                for line in csv.reader(lines.split('\n')):
-                    if line:
-                        to_return.append({fname: value for fname, value in zip(fieldnames, line)})
-                return to_return
-
-            return normalized_response
-        elif isinstance(normalized_response, dict):
-            # The server returned a dictionary, it contains the error message.
-            logger.critical(f'The server should have returned a CSV file as text. instead it returned an error message:\n{normalized_response}')
-            return normalized_response
-        else:
-            # Should not happen...
-            raise PyMISPUnexpectedResponse(f'The server should have returned a CSV file as text. instead it returned:\n{normalized_response}')
+    def _csv_to_dict(self, csv_content):
+        '''Makes a list of dict out of a csv file (requires headers)'''
+        fieldnames, lines = csv_content.split('\n', 1)
+        fieldnames = fieldnames.split(',')
+        to_return = []
+        for line in csv.reader(lines.split('\n')):
+            if line:
+                to_return.append({fname: value for fname, value in zip(fieldnames, line)})
+        return to_return

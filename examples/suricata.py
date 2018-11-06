@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
 
 def init(url, key):
-    return PyMISP(url, key, True)
+    return PyMISP(url, key, misp_verifycert)
 
 
 def fetch(m, all_events, event):

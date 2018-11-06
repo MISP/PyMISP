@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
 # For python2 & 3 compat, a bit dirty, but it seems to be the least bad one
@@ -13,7 +13,7 @@ except NameError:
 
 
 def init(url, key):
-    return PyMISP(url, key, True, 'json')
+    return PyMISP(url, key, misp_verifycert, 'json')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Delete the user with the given id. Keep in mind that disabling users (by setting the disabled flag via an edit) is always prefered to keep user associations to events intact.')
