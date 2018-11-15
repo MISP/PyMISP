@@ -468,6 +468,12 @@ class PyMISP(object):
         e.analysis = analysis_status
         return self.update(e)
 
+    def change_distribution(self, event, distribution):
+        """Change the distribution of an event"""
+        e = self._make_mispevent(event)
+        e.distribution = distribution
+        return self.update(e)
+
     def change_sharing_group(self, event, sharing_group_id):
         """Change the sharing group of an event"""
         e = self._make_mispevent(event)
@@ -1054,8 +1060,8 @@ class PyMISP(object):
         :param normalize: Normalize output | True or False
         :param timestamp: Interval since last update (in second, or 1d, 1h, ...)
         """
-        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
-                   'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
+        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'dateuntil': dateuntil,
+                   'datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
                    'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
                    'org': org, 'timestamp': timestamp}
         rule_levels = {'distribution': ["0", "1", "2", "3", "!0", "!1", "!2", "!3"],
