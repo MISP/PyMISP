@@ -44,12 +44,21 @@ vim keys.py
 The API key of MISP is available in the Automation section of the MISP web interface.
 
 To test if your URL and API keys are correct, you can test with examples/last.py to
-fetch the last 10 events published.
+fetch the events published in the last 10 hours.
 
 ```
 cd examples
-python3 last.py -l 10
+python3 last.py -l 10h
 ```
+
+Other examples:
+```
+python3 last.py -l 1w  # 1 week
+python3 last.py -l 5d  # 5 days
+python3 last.py -l 45m # 45 minutes
+
+```
+
 
 ## Debugging
 
