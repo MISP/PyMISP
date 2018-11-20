@@ -383,3 +383,41 @@ class ExpandedPyMISP(PyMISP):
             if line:
                 to_return.append({fname: value for fname, value in zip(fieldnames, line)})
         return to_return
+
+    def search_logs(self, limit: Optional[int]=None, page: Optional[int]=None,
+                    log_id: Optional[int]=None, title: Optional[str]=None,
+                    created: Optional[DateTypes]=None, model: Optional[str]=None,
+                    action: Optional[str]=None, user_id: Optional[int]=None,
+                    change: Optional[str]=None, email: Optional[str]=None,
+                    org: Optional[str]=None, description: Optional[str]=None,
+                    ip: Optional[str]=None):
+        '''Search in logs
+
+        Note: to run substring queries simply append/prepend/encapsulate the search term with %
+
+        :param limit: Limit the number of results returned, depending on the scope (for example 10 attributes or 10 full events).
+        :param page: If a limit is set, sets the page to be returned. page 3, limit 100 will return records 201->300).
+        :param log_id: Log ID
+        :param title: Log Title
+        :param created: Creation timestamp
+        :param model: Model name that generated the log entry
+        :param action: The thing that was done
+        :param user_id: ID of the user doing the action
+        :param change: Change that occured
+        :param email: Email of the user
+        :param org: Organisation of the User doing the action
+        :param description: Description of the action
+        :param ip: Origination IP of the User doing the action
+        '''
+        query = locals()
+        query.pop('self')
+        if log_id is not None:
+            query['id'] = query.pop('log_id')
+
+        url = urljoin(self.root_url, 'admin/logs/index')
+        # Remove None values.
+        # TODO: put that in self._prepare_request
+        query = {k: v for k, v in query.items() if v is not None}
+        response = self._prepare_request('POST', url, data=json.dumps(query))
+        normalized_response = self._check_response(response)
+        return normalized_response

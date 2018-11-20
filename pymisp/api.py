@@ -1730,7 +1730,7 @@ class PyMISP(object):
         """Get the list of existing roles"""
         url = urljoin(self.root_url, '/roles')
         response = self._prepare_request('GET', url)
-        return self._check_response(response)['response']
+        return self._check_response(response)
 
     # ############## Tags ##################
 
