@@ -209,7 +209,7 @@ class ExpandedPyMISP(PyMISP):
                category: Optional[SearchParameterTypes]=None,
                org: Optional[SearchParameterTypes]=None,
                tags: Optional[SearchParameterTypes]=None,
-               quickfilter: Optional[bool]=None,
+               quick_filter: Optional[bool]=None, quickFilter: Optional[bool]=None,
                date_from: Optional[DateTypes]=None,
                date_to: Optional[DateTypes]=None,
                eventid: Optional[SearchType]=None,
@@ -242,7 +242,7 @@ class ExpandedPyMISP(PyMISP):
         :param category: The attribute category, any valid MISP attribute category is accepted.
         :param org: Search by the creator organisation by supplying the organisation identifier.
         :param tags: Tags to search or to exclude. You can pass a list, or the output of `build_complex_query`
-        :param quickfilter: Enabling this (by passing "1" as the argument) will make the search ignore all of the other arguments, except for the auth key and value. MISP will return an xml / json (depending on the header sent) of all events that have a sub-string match on value in the event info, event orgc, or any of the attribute value1 / value2 fields, or in the attribute comment.
+        :param quick_filter: The string passed to this field will ignore all of the other arguments. MISP will return an xml / json (depending on the header sent) of all events that have a sub-string match on value in the event info, event orgc, or any of the attribute value1 / value2 fields, or in the attribute comment.
         :param date_from: Events with the date set to a date after the one specified. This filter will use the date of the event.
         :param date_to: Events with the date set to a date before the one specified. This filter will use the date of the event.
         :param eventid: The events that should be included / excluded from the search
@@ -267,6 +267,7 @@ class ExpandedPyMISP(PyMISP):
 
         Deprecated:
 
+        :param quickFilter: synponym for quick_filter
         :param withAttachments: synonym for with_attachments
         :param last: synonym for publish_timestamp
         :param enforceWarninglist: synonym for enforce_warninglist
@@ -281,6 +282,8 @@ class ExpandedPyMISP(PyMISP):
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
 
         # Deprecated stuff / synonyms
+        if quickFilter is not None:
+            quick_filter = quickFilter
         if withAttachments is not None:
             with_attachments = withAttachments
         if last is not None:
@@ -307,7 +310,7 @@ class ExpandedPyMISP(PyMISP):
         query['category'] = category
         query['org'] = org
         query['tags'] = tags
-        query['quickfilter'] = quickfilter
+        query['quickFilter'] = quick_filter
         query['from'] = self.make_timestamp(date_from)
         query['to'] = self.make_timestamp(date_to)
         query['eventid'] = eventid
