@@ -209,7 +209,7 @@ class ExpandedPyMISP(PyMISP):
                category: Optional[SearchParameterTypes]=None,
                org: Optional[SearchParameterTypes]=None,
                tags: Optional[SearchParameterTypes]=None,
-               quick_filter: Optional[bool]=None, quickFilter: Optional[bool]=None,
+               quick_filter: Optional[str]=None, quickFilter: Optional[str]=None,
                date_from: Optional[DateTypes]=None,
                date_to: Optional[DateTypes]=None,
                eventid: Optional[SearchType]=None,
