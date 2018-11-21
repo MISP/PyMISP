@@ -920,8 +920,9 @@ class TestComprehensive(unittest.TestCase):
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
-            r = self.admin_misp_connector.pushEventToZMQ(first.id)
-            self.assertEqual(r['message'], 'Event published to ZMQ')
+            if not travis_run:
+                r = self.admin_misp_connector.pushEventToZMQ(first.id)
+                self.assertEqual(r['message'], 'Event published to ZMQ')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
