@@ -1730,7 +1730,7 @@ class PyMISP(object):
         """Get the list of existing roles"""
         url = urljoin(self.root_url, '/roles')
         response = self._prepare_request('GET', url)
-        return self._check_response(response)['response']
+        return self._check_response(response)
 
     # ############## Tags ##################
 
@@ -2258,7 +2258,7 @@ class PyMISP(object):
         """Returns the list of Object templates available on the MISP instance"""
         url = urljoin(self.root_url, 'objectTemplates')
         response = self._prepare_request('GET', url)
-        return self._check_response(response)['response']
+        return self._check_response(response)
 
     def get_object_template_id(self, object_uuid):
         """Gets the template ID corresponting the UUID passed as parameter"""
