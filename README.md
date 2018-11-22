@@ -26,7 +26,25 @@ pip3 install pymisp
 ```
 git clone https://github.com/MISP/PyMISP.git && cd PyMISP
 git submodule update --init
-pip3 install -I .
+pip3 install -I .[fileobjects,neo,openioc,virustotal]
+```
+
+## Running the tests
+
+```bash
+pip3 install -U nose pip setuptools coveralls codecov requests-mock
+pip3 install git+https://github.com/kbandla/pydeep.git
+
+git clone https://github.com/viper-framework/viper-test-files.git tests/viper-test-files
+nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
+```
+
+If you have a MISP instance to test against, you can also run the live ones:
+
+**Note**: You need to update the key in `tests/testlive_comprehensive.py` to the automation key of your admin account.
+
+```bash
+nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py
 ```
 
 ## Samples and how to use PyMISP
