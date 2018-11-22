@@ -14,11 +14,11 @@ try:
 except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
-    key = 'y0rs3LNOP0Y3v6dfSMMdhxj5Oxx9MfaInpRP2pBC'
+    key = 'BSip0zVadeFDeolkX2g7MHx8mrlr0uE04hh6CQj0'
 
 from uuid import uuid4
 
-travis_run = True
+travis_run = False
 
 
 class TestComprehensive(unittest.TestCase):

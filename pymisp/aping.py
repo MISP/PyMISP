@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from .exceptions import MISPServerError, NewEventError, UpdateEventError, UpdateAttributeError, PyMISPNotImplementedYet
-from .api import PyMISP, everything_broken, MISPEvent, MISPAttribute, MISPSighting
+from .api import PyMISP, everything_broken
+from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog
 from typing import TypeVar, Optional, Tuple, List, Dict
 from datetime import date, datetime
 import json
@@ -263,7 +264,7 @@ class ExpandedPyMISP(PyMISP):
         :param requested_attributes: [CSV only] Select the fields that you wish to include in the CSV export. By setting event level fields additionally, includeContext is not required to get event metadata.
         :param include_context: [CSV Only] Include the event data with each attribute.
         :param headerless: [CSV Only] The CSV created when this setting is set to true will not contain the header row.
-        :param pythonify: Returns a list of PyMISP Objects the the plain json output. Warning: it might use a lot of RAM
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
 
@@ -346,7 +347,6 @@ class ExpandedPyMISP(PyMISP):
         query['requested_attributes'] = requested_attributes
         query['includeContext'] = include_context
         query['headerless'] = headerless
-
         url = urljoin(self.root_url, f'{controller}/restSearch')
         # Remove None values.
         # TODO: put that in self._prepare_request
@@ -393,7 +393,7 @@ class ExpandedPyMISP(PyMISP):
                     action: Optional[str]=None, user_id: Optional[int]=None,
                     change: Optional[str]=None, email: Optional[str]=None,
                     org: Optional[str]=None, description: Optional[str]=None,
-                    ip: Optional[str]=None):
+                    ip: Optional[str]=None, pythonify: Optional[bool]=False):
         '''Search in logs
 
         Note: to run substring queries simply append/prepend/encapsulate the search term with %
@@ -411,9 +411,11 @@ class ExpandedPyMISP(PyMISP):
         :param org: Organisation of the User doing the action
         :param description: Description of the action
         :param ip: Origination IP of the User doing the action
+        :param pythonify: Returns a list of PyMISP Objects instead or the plain json output. Warning: it might use a lot of RAM
         '''
         query = locals()
         query.pop('self')
+        query.pop('pythonify')
         if log_id is not None:
             query['id'] = query.pop('log_id')
 
@@ -423,4 +425,69 @@ class ExpandedPyMISP(PyMISP):
         query = {k: v for k, v in query.items() if v is not None}
         response = self._prepare_request('POST', url, data=json.dumps(query))
         normalized_response = self._check_response(response)
-        return normalized_response
+        if not pythonify:
+            return normalized_response
+
+        to_return = []
+        for l in normalized_response:
+            ml = MISPLog()
+            ml.from_dict(**l['Log'])
+            to_return.append(ml)
+        return to_return
+
+    def search_index(self, published: Optional[bool]=None, eventid: Optional[SearchType]=None,
+                     tags: Optional[SearchParameterTypes]=None,
+                     date_from: Optional[DateTypes]=None,
+                     date_to: Optional[DateTypes]=None,
+                     eventinfo: Optional[str]=None,
+                     threatlevel: Optional[List[SearchType]]=None,
+                     distribution: Optional[List[SearchType]]=None,
+                     analysis: Optional[List[SearchType]]=None,
+                     org: Optional[SearchParameterTypes]=None,
+                     timestamp: Optional[DateInterval]=None,
+                     pythonify: Optional[bool]=None):
+        """Search only at the index level. Using ! in front of a value means NOT (default is OR)
+
+        :param published: Set whether published or unpublished events should be returned. Do not set the parameter if you want both.
+        :param eventid: The events that should be included / excluded from the search
+        :param tags: Tags to search or to exclude. You can pass a list, or the output of `build_complex_query`
+        :param date_from: Events with the date set to a date after the one specified. This filter will use the date of the event.
+        :param date_to: Events with the date set to a date before the one specified. This filter will use the date of the event.
+        :param eventinfo: Filter on the event's info field.
+        :param threatlevel: Threat level(s) (1,2,3,4) | list
+        :param distribution: Distribution level(s) (0,1,2,3) | list
+        :param analysis: Analysis level(s) (0,1,2) | list
+        :param org: Search by the creator organisation by supplying the organisation identifier.
+        :param timestamp: Restrict the results by the timestamp (last edit). Any event with a timestamp newer than the given timestamp will be returned. In case you are dealing with /attributes as scope, the attribute's timestamp will be used for the lookup.
+        :param pythonify: Returns a list of PyMISP Objects instead or the plain json output. Warning: it might use a lot of RAM
+        """
+        query = locals()
+        query.pop('self')
+        query.pop('pythonify')
+        if query.get('date_from'):
+            query['datefrom'] = self.make_timestamp(query.pop('date_from'))
+        if query.get('date_to'):
+            query['dateuntil'] = self.make_timestamp(query.pop('date_to'))
+
+        if query.get('timestamp') is not None:
+            timestamp = query.pop('timestamp')
+            if isinstance(timestamp, (list, tuple)):
+                query['timestamp'] = (self.make_timestamp(timestamp[0]), self.make_timestamp(timestamp[1]))
+            else:
+                query['timestamp'] = self.make_timestamp(timestamp)
+
+        url = urljoin(self.root_url, 'events/index')
+        # Remove None values.
+        # TODO: put that in self._prepare_request
+        query = {k: v for k, v in query.items() if v is not None}
+        response = self._prepare_request('POST', url, data=json.dumps(query))
+        normalized_response = self._check_response(response)
+
+        if not pythonify:
+            return normalized_response
+        to_return = []
+        for e_meta in normalized_response:
+            me = MISPEvent()
+            me.from_dict(**e_meta)
+            to_return.append(me)
+        return to_return
