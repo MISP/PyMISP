@@ -18,7 +18,7 @@ except ImportError as e:
 
 from uuid import uuid4
 
-travis_run = False
+travis_run = True
 
 
 class TestComprehensive(unittest.TestCase):
