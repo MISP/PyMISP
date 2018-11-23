@@ -29,6 +29,18 @@ git submodule update --init
 pip3 install -I .[fileobjects,neo,openioc,virustotal]
 ```
 
+## Installing it with virtualenv
+
+It is recommended to use virtualenv to not polute your OS python envirenment.
+```
+pip3 install virtualenv
+git clone https://github.com/MISP/PyMISP.git && cd PyMISP
+python3 -m venv ./
+source venv/bin/activate
+git submodule update --init
+pip3 install -I .[fileobjects,neo,openioc,virustotal]
+```
+
 ## Running the tests
 
 ```bash
