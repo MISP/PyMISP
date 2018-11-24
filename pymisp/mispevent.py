@@ -820,6 +820,15 @@ class MISPFeed(AbstractMISP):
         super(MISPFeed, self).__init__()
 
 
+class MISPLog(AbstractMISP):
+
+    def __init__(self):
+        super(MISPLog, self).__init__()
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}({self.model}, {self.action}, {self.title})'.format(self=self)
+
+
 class MISPSighting(AbstractMISP):
 
     def __init__(self):

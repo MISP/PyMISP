@@ -1532,7 +1532,7 @@ class PyMISP(object):
         """Get the existing sharing groups"""
         url = urljoin(self.root_url, 'sharing_groups.json')
         response = self._prepare_request('GET', url)
-        return self._check_response(response)['response']
+        return self._check_response(response)
 
     # ############## Users ##################
 

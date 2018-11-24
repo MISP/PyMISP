@@ -14,7 +14,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
-    key = 'y0rs3LNOP0Y3v6dfSMMdhxj5Oxx9MfaInpRP2pBC'
+    key = 'BSip0zVadeFDeolkX2g7MHx8mrlr0uE04hh6CQj0'
 
 from uuid import uuid4
 
@@ -920,8 +920,9 @@ class TestComprehensive(unittest.TestCase):
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
-            r = self.admin_misp_connector.pushEventToZMQ(first.id)
-            self.assertEqual(r['message'], 'Event published to ZMQ')
+            if not travis_run:
+                r = self.admin_misp_connector.pushEventToZMQ(first.id)
+                self.assertEqual(r['message'], 'Event published to ZMQ')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
