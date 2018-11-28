@@ -859,6 +859,12 @@ class PyMISP(object):
         """Add other text"""
         return self.add_named_attribute(event, 'text', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
+    # ##### Payload delivery attributes #####
+
+    def add_payload_other(self, event, reference, category="Payload delivery", to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
+        """Add payload other"""
+        return self.add_named_attribute(event, 'other', reference, category, to_ids, comment, distribution, proposal, **kwargs)
+
     # ##################################################
     # ######### Upload samples through the API #########
     # ##################################################
