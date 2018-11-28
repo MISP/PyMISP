@@ -97,6 +97,8 @@ class ExpandedPyMISP(PyMISP):
         created_event = super().add_event(event)
         if isinstance(created_event, str):
             raise NewEventError(f'Unexpected response from server: {created_event}')
+        elif 'errors' in created_event:
+            return created_event
         e = MISPEvent()
         e.load(created_event)
         return e
@@ -105,6 +107,8 @@ class ExpandedPyMISP(PyMISP):
         updated_event = super().update_event(event.uuid, event)
         if isinstance(updated_event, str):
             raise UpdateEventError(f'Unexpected response from server: {updated_event}')
+        elif 'errors' in updated_event:
+            return updated_event
         e = MISPEvent()
         e.load(updated_event)
         return e
@@ -113,6 +117,8 @@ class ExpandedPyMISP(PyMISP):
         updated_attribute = super().update_attribute(attribute.uuid, attribute)
         if isinstance(updated_attribute, str):
             raise UpdateAttributeError(f'Unexpected response from server: {updated_attribute}')
+        elif 'errors' in updated_attribute:
+            return updated_attribute
         a = MISPAttribute()
         a.from_dict(**updated_attribute)
         return a

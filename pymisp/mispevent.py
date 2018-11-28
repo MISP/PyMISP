@@ -469,8 +469,7 @@ class MISPEvent(AbstractMISP):
                 'attribute_count' in event.get('Event') and
                 event.get('Event').get('attribute_count') is None):
             event['Event']['attribute_count'] = '0'
-        e = event.get('Event')
-        self.from_dict(**e)
+        self.from_dict(**event['Event'])
         if validate:
             jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
 
