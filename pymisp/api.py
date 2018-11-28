@@ -1148,6 +1148,7 @@ class PyMISP(object):
         :param to_ids: return only the attributes with the to_ids flag set
         :param deleted: also return the deleted attributes
         :param event_timestamp: the timestamp of the last modification of the event (attributes controller only)). Can be a list (from->to)
+        :param includeProposals: return shadow attributes if True
         :param async_callback: The function to run when results are returned
         """
         query = {}
@@ -1203,6 +1204,7 @@ class PyMISP(object):
             query['metadata'] = kwargs.pop('metadata', None)
         if controller == 'attributes':
             query['event_timestamp'] = kwargs.pop('event_timestamp', None)
+            query['includeProposals'] = kwargs.pop('includeProposals', None)
 
         # Cleanup
         query = {k: v for k, v in query.items() if v is not None}
