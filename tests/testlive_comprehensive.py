@@ -11,14 +11,14 @@ import time
 
 try:
     from keys import url, key
+    travis_run = True
 except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
     key = 'LBelWqKY9SQyG0huZzAMqiEBl6FODxpgRRXMsZFu'
+    travis_run = False
 
 from uuid import uuid4
-
-travis_run = True
 
 
 class TestComprehensive(unittest.TestCase):
@@ -441,6 +441,8 @@ class TestComprehensive(unittest.TestCase):
 
     def test_default_distribution(self):
         '''The default distributions on the VM are This community only for the events and Inherit from event for attr/obj)'''
+        if travis_run:
+            return
         first = self.create_simple_event()
         del first.distribution
         o = first.add_object(name='file')
@@ -560,7 +562,7 @@ class TestComprehensive(unittest.TestCase):
 
             # quickfilter
             events = self.user_misp_connector.search(timestamp=timeframe,
-                                                     quickfilter='%bar%', pythonify=True)
+                                                     quickfilter='%foo blah%', pythonify=True)
             # FIXME: should return one event
             # print(events)
             # self.assertEqual(len(events), 1)
