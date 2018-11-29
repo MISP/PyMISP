@@ -1016,6 +1016,12 @@ class MISPObject(AbstractMISP):
                 else:
                     self._known_template = False
 
+        if 'distribution' in kwargs and kwargs['distribution'] is not None:
+            self.distribution = kwargs.pop('distribution')
+            self.distribution = int(self.distribution)
+            if self.distribution not in [0, 1, 2, 3, 4, 5]:
+                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
+
         if kwargs.get('timestamp'):
             if sys.version_info >= (3, 3):
                 self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), datetime.timezone.utc)
