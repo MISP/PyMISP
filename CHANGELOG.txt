@@ -21,6 +21,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects & describeTypes. [Raphaël Vinot]
 - Bump Changelog. [Raphaël Vinot]
@@ -60,6 +61,15 @@ Fix
 
 Other
 ~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #310 from DragonDev1906/master. [Raphaël Vinot]
+
+  Added get_object & get_attribute (by ID)
+- Dded get_object & get_attribute. [DragonDev1906]
+- Merge pull request #307 from garanews/patch-1. [Raphaël Vinot]
+
+  fix for last pymisp version
+- Fix for last pymisp version. [garanews]
 - Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
 - Merge pull request #305 from dawid-
   czarnecki/feature/include_proposals. [Raphaël Vinot]
