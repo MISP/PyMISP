@@ -336,6 +336,24 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
+    def get_object(self, obj_id):
+        """Get an object
+
+        :param obj_id: Object id to get
+        """
+        url = urljoin(self.root_url, 'objects/view/{}'.format(obj_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_attribute(self, att_id):
+        """Get an attribute
+
+        :param att_id: Attribute id to get
+        """
+        url = urljoin(self.root_url, 'attributes/view/{}'.format(att_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
     def add_event(self, event):
         """Add a new event
 
