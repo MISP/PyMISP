@@ -2,11 +2,12 @@ Changelog
 =========
 
 
-v2.4.98 (2018-12-03)
+v2.4.99 (2018-12-06)
 --------------------
 
 New
 ~~~
+- Auto generate doc for PyMISPExpanded. [Raphaël Vinot]
 - Search_index in ExpandedPyMISP, cleanup, update jupyter. [Raphaël
   Vinot]
 - Add log search. [Raphaël Vinot]
@@ -20,6 +21,9 @@ New
 
 Changes
 ~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects & describeTypes. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
 - Version bump. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Add test cases for default distribution levels. [Raphaël Vinot]
@@ -38,6 +42,7 @@ Changes
 
 Fix
 ~~~
+- Auto generate doc for PyMISPExpanded. [Raphaël Vinot]
 - Test failing on travis... [Raphaël Vinot]
 - Properly handle errors on event creation/update. [Raphaël Vinot]
 - Test case. [Raphaël Vinot]
@@ -52,10 +57,10 @@ Fix
   align python path to readme specifying python3
 - Feed-generator gitignore. [Christophe Vandeplas]
 - Test cases. [Raphaël Vinot]
-- Test cases sample files. [Raphaël Vinot]
 
 Other
 ~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
 - Merge pull request #305 from dawid-
   czarnecki/feature/include_proposals. [Raphaël Vinot]
 
@@ -115,6 +120,7 @@ Changes
 
 Fix
 ~~~
+- Test cases sample files. [Raphaël Vinot]
 - Prevent checking length on a integer. [Sami Mokaddem]
 - Direct call & add example. [Raphaël Vinot]
 - Disable test for travis, take 2. [Raphaël Vinot]
