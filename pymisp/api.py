@@ -2282,11 +2282,9 @@ class PyMISP(object):
 
     def get_object_template_id(self, object_uuid):
         """Gets the template ID corresponting the UUID passed as parameter"""
-        templates = self.get_object_templates_list()
-        for t in templates:
-            if t['ObjectTemplate']['uuid'] == object_uuid:
-                return t['ObjectTemplate']['id']
-        raise Exception('Unable to find template uuid {} on the MISP instance'.format(object_uuid))
+        url = urljoin(self.root_url, 'objectTemplates/view/{}'.format(object_uuid))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
 
     def update_object_templates(self):
         url = urljoin(self.root_url, '/objectTemplates/update')
