@@ -469,8 +469,7 @@ class MISPEvent(AbstractMISP):
                 'attribute_count' in event.get('Event') and
                 event.get('Event').get('attribute_count') is None):
             event['Event']['attribute_count'] = '0'
-        e = event.get('Event')
-        self.from_dict(**e)
+        self.from_dict(**event['Event'])
         if validate:
             jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
 
@@ -820,6 +819,15 @@ class MISPFeed(AbstractMISP):
         super(MISPFeed, self).__init__()
 
 
+class MISPLog(AbstractMISP):
+
+    def __init__(self):
+        super(MISPLog, self).__init__()
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}({self.model}, {self.action}, {self.title})'.format(self=self)
+
+
 class MISPSighting(AbstractMISP):
 
     def __init__(self):
@@ -1007,6 +1015,12 @@ class MISPObject(AbstractMISP):
                     raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
                 else:
                     self._known_template = False
+
+        if 'distribution' in kwargs and kwargs['distribution'] is not None:
+            self.distribution = kwargs.pop('distribution')
+            self.distribution = int(self.distribution)
+            if self.distribution not in [0, 1, 2, 3, 4, 5]:
+                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
 
         if kwargs.get('timestamp'):
             if sys.version_info >= (3, 3):

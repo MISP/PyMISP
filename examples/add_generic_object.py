@@ -20,10 +20,17 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
+    template = pymisp.get_object_templates_list()
+    if 'response' in template.keys():
+        template = template['response']
     try:
-        template_id = [x['ObjectTemplate']['id'] for x in pymisp.get_object_templates_list() if x['ObjectTemplate']['name'] == args.type][0]
+        template_ids = [x['ObjectTemplate']['id'] for x in template if x['ObjectTemplate']['name'] == args.type]
+        if len(template_ids) > 0:
+            template_id = template_ids[0]
+        else:
+            raise IndexError
     except IndexError:
-        valid_types = ", ".join([x['ObjectTemplate']['name'] for x in pymisp.get_object_templates_list()])
+        valid_types = ", ".join([x['ObjectTemplate']['name'] for x in template])
         print ("Template for type %s not found! Valid types are: %s" % (args.type, valid_types))
         exit()
 

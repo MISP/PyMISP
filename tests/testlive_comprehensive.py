@@ -3,7 +3,7 @@
 
 import unittest
 
-from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis
+from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
 from datetime import datetime, timedelta, date
 from io import BytesIO
 
@@ -11,14 +11,14 @@ import time
 
 try:
     from keys import url, key
+    travis_run = True
 except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
-    key = 'y0rs3LNOP0Y3v6dfSMMdhxj5Oxx9MfaInpRP2pBC'
+    key = 'LBelWqKY9SQyG0huZzAMqiEBl6FODxpgRRXMsZFu'
+    travis_run = False
 
 from uuid import uuid4
-
-travis_run = True
 
 
 class TestComprehensive(unittest.TestCase):
@@ -439,6 +439,51 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first.id)
             self.admin_misp_connector.delete_event(second.id)
 
+    def test_default_distribution(self):
+        '''The default distributions on the VM are This community only for the events and Inherit from event for attr/obj)'''
+        if travis_run:
+            return
+        first = self.create_simple_event()
+        del first.distribution
+        o = first.add_object(name='file')
+        o.add_attribute('filename', value='foo.exe')
+        try:
+            # Event create
+            first = self.user_misp_connector.add_event(first)
+            self.assertEqual(first.distribution, Distribution.this_community_only.value)
+            self.assertEqual(first.attributes[0].distribution, Distribution.inherit.value)
+            self.assertEqual(first.objects[0].distribution, Distribution.inherit.value)
+            self.assertEqual(first.objects[0].attributes[0].distribution, Distribution.inherit.value)
+            # Event edit
+            first.add_attribute('ip-dst', '12.54.76.43')
+            o = first.add_object(name='file')
+            o.add_attribute('filename', value='foo2.exe')
+            first = self.user_misp_connector.update_event(first)
+            self.assertEqual(first.attributes[1].distribution, Distribution.inherit.value)
+            self.assertEqual(first.objects[1].distribution, Distribution.inherit.value)
+            self.assertEqual(first.objects[1].attributes[0].distribution, Distribution.inherit.value)
+            # Attribute create
+            attribute = self.user_misp_connector.add_named_attribute(first, 'comment', 'bar')
+            # FIXME: Add helper that returns a list of MISPAttribute
+            self.assertEqual(attribute[0]['Attribute']['distribution'], str(Distribution.inherit.value))
+            # Object - add
+            o = MISPObject('file')
+            o.add_attribute('filename', value='blah.exe')
+            new_obj = self.user_misp_connector.add_object(first.id, o.template_uuid, o)
+            # FIXME: Add helper that returns a MISPObject
+            self.assertEqual(new_obj['Object']['distribution'], str(Distribution.inherit.value))
+            self.assertEqual(new_obj['Object']['Attribute'][0]['distribution'], str(Distribution.inherit.value))
+            # Object - edit
+            clean_obj = MISPObject(**new_obj['Object'])
+            clean_obj.from_dict(**new_obj['Object'])
+            clean_obj.add_attribute('filename', value='blah.exe')
+            new_obj = self.user_misp_connector.edit_object(clean_obj)
+            for a in new_obj['Object']['Attribute']:
+                self.assertEqual(a['distribution'], str(Distribution.inherit.value))
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
     def test_simple_event(self):
         '''Search a bunch of parameters:
             * Value not existing
@@ -517,7 +562,7 @@ class TestComprehensive(unittest.TestCase):
 
             # quickfilter
             events = self.user_misp_connector.search(timestamp=timeframe,
-                                                     quickfilter='%bar%', pythonify=True)
+                                                     quickfilter='%foo blah%', pythonify=True)
             # FIXME: should return one event
             # print(events)
             # self.assertEqual(len(events), 1)
@@ -920,8 +965,9 @@ class TestComprehensive(unittest.TestCase):
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
-            r = self.admin_misp_connector.pushEventToZMQ(first.id)
-            self.assertEqual(r['message'], 'Event published to ZMQ')
+            if not travis_run:
+                r = self.admin_misp_connector.pushEventToZMQ(first.id)
+                self.assertEqual(r['message'], 'Event published to ZMQ')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
