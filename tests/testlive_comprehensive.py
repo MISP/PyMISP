@@ -8,9 +8,11 @@ from datetime import datetime, timedelta, date
 from io import BytesIO
 
 import time
+from uuid import uuid4
 
 try:
     from keys import url, key
+    verifycert = False
     travis_run = True
 except ImportError as e:
     print(e)
@@ -18,8 +20,6 @@ except ImportError as e:
     key = 'LBelWqKY9SQyG0huZzAMqiEBl6FODxpgRRXMsZFu'
     verifycert = False
     travis_run = False
-
-from uuid import uuid4
 
 
 class TestComprehensive(unittest.TestCase):
