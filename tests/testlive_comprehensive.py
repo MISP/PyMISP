@@ -16,6 +16,7 @@ except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
     key = 'LBelWqKY9SQyG0huZzAMqiEBl6FODxpgRRXMsZFu'
+    verifycert = False
     travis_run = False
 
 from uuid import uuid4
@@ -27,7 +28,7 @@ class TestComprehensive(unittest.TestCase):
     def setUpClass(cls):
         cls.maxDiff = None
         # Connect as admin
-        cls.admin_misp_connector = ExpandedPyMISP(url, key, debug=False)
+        cls.admin_misp_connector = ExpandedPyMISP(url, key, verifycert, debug=False)
         # Creates an org
         org = cls.admin_misp_connector.add_organisation(name='Test Org')
         cls.test_org = MISPOrganisation()
@@ -36,12 +37,12 @@ class TestComprehensive(unittest.TestCase):
         usr = cls.admin_misp_connector.add_user(email='testusr@user.local', org_id=cls.test_org.id, role_id=3)
         cls.test_usr = MISPUser()
         cls.test_usr.from_dict(**usr)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey)
+        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert)
         # Creates a publisher
         pub = cls.admin_misp_connector.add_user(email='testpub@user.local', org_id=cls.test_org.id, role_id=4)
         cls.test_pub = MISPUser()
         cls.test_pub.from_dict(**pub)
-        cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey)
+        cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey, verifycert)
 
     @classmethod
     def tearDownClass(cls):
