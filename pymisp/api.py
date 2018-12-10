@@ -336,6 +336,24 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
+    def get_object(self, obj_id):
+        """Get an object
+
+        :param obj_id: Object id to get
+        """
+        url = urljoin(self.root_url, 'objects/view/{}'.format(obj_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_attribute(self, att_id):
+        """Get an attribute
+
+        :param att_id: Attribute id to get
+        """
+        url = urljoin(self.root_url, 'attributes/view/{}'.format(att_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
     def add_event(self, event):
         """Add a new event
 
@@ -1148,6 +1166,7 @@ class PyMISP(object):
         :param to_ids: return only the attributes with the to_ids flag set
         :param deleted: also return the deleted attributes
         :param event_timestamp: the timestamp of the last modification of the event (attributes controller only)). Can be a list (from->to)
+        :param includeProposals: return shadow attributes if True
         :param async_callback: The function to run when results are returned
         """
         query = {}
@@ -1203,6 +1222,7 @@ class PyMISP(object):
             query['metadata'] = kwargs.pop('metadata', None)
         if controller == 'attributes':
             query['event_timestamp'] = kwargs.pop('event_timestamp', None)
+            query['includeProposals'] = kwargs.pop('includeProposals', None)
 
         # Cleanup
         query = {k: v for k, v in query.items() if v is not None}
@@ -2262,11 +2282,9 @@ class PyMISP(object):
 
     def get_object_template_id(self, object_uuid):
         """Gets the template ID corresponting the UUID passed as parameter"""
-        templates = self.get_object_templates_list()
-        for t in templates:
-            if t['ObjectTemplate']['uuid'] == object_uuid:
-                return t['ObjectTemplate']['id']
-        raise Exception('Unable to find template uuid {} on the MISP instance'.format(object_uuid))
+        url = urljoin(self.root_url, 'objectTemplates/view/{}'.format(object_uuid))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
 
     def update_object_templates(self):
         url = urljoin(self.root_url, '/objectTemplates/update')
