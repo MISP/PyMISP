@@ -464,12 +464,7 @@ class MISPEvent(AbstractMISP):
             event = json_event
         if not event:
             raise PyMISPError('Invalid event')
-        # Invalid event created by MISP up to 2.4.52 (attribute_count is none instead of '0')
-        if (event.get('Event') and
-                'attribute_count' in event.get('Event') and
-                event.get('Event').get('attribute_count') is None):
-            event['Event']['attribute_count'] = '0'
-        self.from_dict(**event['Event'])
+        self.from_dict(**event)
         if validate:
             jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
 
@@ -488,6 +483,8 @@ class MISPEvent(AbstractMISP):
                 raise NewEventError('Invalid format for the date: {} - {}'.format(date, type(date)))
 
     def from_dict(self, **kwargs):
+        if kwargs.get('Event'):
+            kwargs = kwargs.get('Event')
         # Required value
         self.info = kwargs.pop('info', None)
         if self.info is None:

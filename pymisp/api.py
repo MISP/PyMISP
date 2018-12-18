@@ -15,7 +15,7 @@ from io import BytesIO, open
 import zipfile
 
 from . import __version__, deprecated
-from .exceptions import PyMISPError, SearchError, NoURL, NoKey
+from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject
 from .abstract import AbstractMISP, MISPEncode
 
@@ -157,6 +157,11 @@ class PyMISP(object):
         if data is None:
             req = requests.Request(request_type, url)
         else:
+            if not isinstance(data, str):
+                if isinstance(data, dict):
+                    # Remove None values.
+                    data = {k: v for k, v in data.items() if v is not None}
+                data = json.dumps(data)
             req = requests.Request(request_type, url, data=data)
         if self.asynch and background_callback is not None:
             local_session = FuturesSession
@@ -227,6 +232,8 @@ class PyMISP(object):
             json_response = response.json()
         except ValueError:
             # If the server didn't return a JSON blob, we've a problem.
+            if not len(response.text):
+                raise PyMISPEmptyResponse('The server returned an empty response. \n{}\n{}\n'.format(response.request.headers, response.request.body))
             raise PyMISPError(everything_broken.format(response.request.headers, response.request.body, response.text))
 
         errors = []
