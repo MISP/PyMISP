@@ -1231,11 +1231,13 @@ class PyMISP(object):
             query['event_timestamp'] = kwargs.pop('event_timestamp', None)
             query['includeProposals'] = kwargs.pop('includeProposals', None)
 
+        if kwargs:
+            self.logger.info('Some unknown parameters are in kwargs. appending as-is: {}'.format(', '.join(kwargs.keys())))
+            # Add all other keys as-is.
+            query.update({k: v for k, v in kwargs.items()})
+
         # Cleanup
         query = {k: v for k, v in query.items() if v is not None}
-
-        if kwargs:
-            raise SearchError('Unused parameter: {}'.format(', '.join(kwargs.keys())))
 
         # Create a session, make it async if and only if we have a callback
         return self.__query('restSearch/download', query, controller, async_callback)
