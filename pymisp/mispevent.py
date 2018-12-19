@@ -1001,6 +1001,8 @@ class MISPObject(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPObjectReference.')
 
     def from_dict(self, **kwargs):
+        if kwargs.get('Object'):
+            kwargs = kwargs.get('Object')
         if self._known_template:
             if kwargs.get('template_uuid') and kwargs['template_uuid'] != self.template_uuid:
                 if self._strict:
