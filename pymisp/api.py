@@ -1232,7 +1232,7 @@ class PyMISP(object):
             query['includeProposals'] = kwargs.pop('includeProposals', None)
 
         if kwargs:
-            self.logger.info('Some unknown parameters are in kwargs. appending as-is: {}'.format(', '.join(kwargs.keys())))
+            logger.info('Some unknown parameters are in kwargs. appending as-is: {}'.format(', '.join(kwargs.keys())))
             # Add all other keys as-is.
             query.update({k: v for k, v in kwargs.items()})
 
