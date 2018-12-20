@@ -40,6 +40,7 @@
         "imphash",
         "impfuzzy",
         "authentihash",
+        "cdhash",
         "filename",
         "filename|md5",
         "filename|sha1",
@@ -224,6 +225,7 @@
         "authentihash",
         "pehash",
         "tlsh",
+        "cdhash",
         "filename",
         "filename|md5",
         "filename|sha1",
@@ -300,6 +302,7 @@
         "authentihash",
         "pehash",
         "tlsh",
+        "cdhash",
         "filename",
         "filename|md5",
         "filename|sha1",
@@ -461,6 +464,10 @@
       },
       "cc-number": {
         "default_category": "Financial fraud",
+        "to_ids": 1
+      },
+      "cdhash": {
+        "default_category": "Payload delivery",
         "to_ids": 1
       },
       "comment": {
@@ -1100,6 +1107,7 @@
       "sha512/224",
       "sha512/256",
       "tlsh",
+      "cdhash",
       "filename|authentihash",
       "filename|ssdeep",
       "filename|imphash",
