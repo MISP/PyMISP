@@ -4,6 +4,7 @@
 import unittest
 
 from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
+from pymisp.tools import make_binary_objects
 from datetime import datetime, timedelta, date
 from io import BytesIO
 
@@ -880,6 +881,24 @@ class TestComprehensive(unittest.TestCase):
         # FIXME: returns the tag with ID 1
         self.admin_misp_connector.enable_tag(tag['id'])
         # FIXME: returns the tag with ID 1
+
+    def test_add_event_with_attachment(self):
+        first = self.create_simple_event()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            file_obj, bin_obj, sections = make_binary_objects('tests/viper-test-files/test_files/whoami.exe', 'rb')
+            first.add_object(file_obj)
+            first.add_object(bin_obj)
+            for s in sections:
+                first.add_object(s)
+            self.assertEqual(len(first.objects[0].references), 1)
+            self.assertEqual(first.objects[0].references[0].relationship_type, 'included-in')
+            first = self.user_misp_connector.update_event(first)
+            self.assertEqual(len(first.objects[0].references), 1)
+            self.assertEqual(first.objects[0].references[0].relationship_type, 'included-in')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
 
     def test_taxonomies(self):
         # Make sure we're up-to-date
