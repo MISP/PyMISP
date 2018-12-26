@@ -4,6 +4,7 @@
 import random
 from random import randint
 import string
+from pymisp import MISPEvent
 
 
 def randomStringGenerator(size, chars=string.ascii_lowercase + string.digits):
@@ -63,13 +64,16 @@ def create_dummy_event(misp):
 
 
 def create_massive_dummy_events(misp, nbattribute):
-    event = misp.new_event(0, 4, 0, 'massive dummy event')
-    eventid = event['Event']['id']
+    event = MISPEvent()
+    event.info = 'massive dummy event'
+    event = misp.add_event(event)
+    print(event)
+    eventid = event.id
     distribution = '0'
     functions = [floodtxt, floodip, flooddomain, flooddomainip, floodemail, floodattachment]
     for i in range(nbattribute):
         choice = randint(0, 5)
         if choice == 5:
-            floodattachment(misp, eventid, distribution, False, 'Payload delivery', '', event['Event']['info'], event['Event']['analysis'], event['Event']['threat_level_id'])
+            floodattachment(misp, eventid, distribution, False, 'Payload delivery', '', event.info, event.analysis, event.threat_level_id)
         else:
             functions[choice](misp, event)

@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
-from keys import url, key
+from pymisp import ExpandedPyMISP
+try:
+    from keys import url, key
+except ImportError:
+    url = 'http://localhost:8080'
+    key = '8h0gHbhS0fv6JUOlTED0AznLXFbf83TYtQrCycqb'
 import argparse
 import tools
 
@@ -13,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument("-a", "--attribute", type=int, help="Number of attributes per event (default 3000)")
     args = parser.parse_args()
 
-    misp = PyMISP(url, key, True, 'json')
+    misp = ExpandedPyMISP(url, key, True)
 
     if args.limit is None:
         args.limit = 1
