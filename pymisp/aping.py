@@ -69,7 +69,7 @@ class ExpandedPyMISP(PyMISP):
             # The server returns a json message with the error details
             error_message = response.json()
             logger.error(f'Something went wrong ({response.status_code}): {error_message}')
-            return {'error': (response.status_code, error_message)}
+            return {'errors': (response.status_code, error_message)}
 
         # At this point, we had no error.
 
@@ -87,7 +87,7 @@ class ExpandedPyMISP(PyMISP):
             if not len(response.content):
                 # Empty response
                 logger.error('Got an empty response.')
-                return {'error': 'The response is empty.'}
+                return {'errors': 'The response is empty.'}
             return response.text
 
     def get_event(self, event_id: int):

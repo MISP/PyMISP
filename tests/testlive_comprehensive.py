@@ -755,7 +755,7 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
 
             response = self.user_misp_connector.fast_publish(first.id, alert=False)
-            self.assertEqual(response['errors'][0][1]['message'], 'You do not have permission to use this functionality.')
+            self.assertEqual(response['errors'][1]['message'], 'You do not have permission to use this functionality.')
 
             # Default search, attribute with to_ids == True
             first.attributes[0].to_ids = True
