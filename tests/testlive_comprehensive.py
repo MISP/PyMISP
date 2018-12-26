@@ -18,7 +18,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
-    key = 'LBelWqKY9SQyG0huZzAMqiEBl6FODxpgRRXMsZFu'
+    key = '8h0gHbhS0fv6JUOlTED0AznLXFbf83TYtQrCycqb'
     verifycert = False
     travis_run = False
 
@@ -38,7 +38,7 @@ class TestComprehensive(unittest.TestCase):
         usr = cls.admin_misp_connector.add_user(email='testusr@user.local', org_id=cls.test_org.id, role_id=3)
         cls.test_usr = MISPUser()
         cls.test_usr.from_dict(**usr)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert)
+        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=False)
         # Creates a publisher
         pub = cls.admin_misp_connector.add_user(email='testpub@user.local', org_id=cls.test_org.id, role_id=4)
         cls.test_pub = MISPUser()
@@ -886,7 +886,7 @@ class TestComprehensive(unittest.TestCase):
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
-            file_obj, bin_obj, sections = make_binary_objects('tests/viper-test-files/test_files/whoami.exe', 'rb')
+            file_obj, bin_obj, sections = make_binary_objects('tests/viper-test-files/test_files/whoami.exe', standalone=False)
             first.add_object(file_obj)
             first.add_object(bin_obj)
             for s in sections:
