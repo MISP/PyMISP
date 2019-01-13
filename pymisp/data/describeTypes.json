@@ -93,6 +93,14 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
+      "hashh-md5": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
+      "hashhserver-md5": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
       "regkey": {
         "default_category": "Persistence mechanism",
         "to_ids": 1
@@ -642,6 +650,8 @@
       "http-method",
       "user-agent",
       "ja3-fingerprint-md5",
+      "hashh-md5",
+      "hashhserver-md5",
       "regkey",
       "regkey|value",
       "AS",
@@ -882,6 +892,8 @@
         "x509-fingerprint-md5",
         "x509-fingerprint-sha256",
         "ja3-fingerprint-md5",
+        "hassh-md5",
+        "hasshserver-md5",
         "other",
         "hostname|port",
         "email-dst-display-name",
@@ -1038,6 +1050,8 @@
         "x509-fingerprint-sha1",
         "x509-fingerprint-sha256",
         "ja3-fingerprint-md5",
+        "hassh-md5",
+        "hasshserver-md5",
         "other",
         "hex",
         "cookie",
@@ -1104,6 +1118,8 @@
         "x509-fingerprint-md5",
         "x509-fingerprint-sha256",
         "ja3-fingerprint-md5",
+        "hassh-md5",
+        "hasshserver-md5",
         "github-repository",
         "other",
         "cortex"
