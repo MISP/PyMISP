@@ -93,11 +93,11 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
-      "hashh-md5": {
+      "hassh-md5": {
         "default_category": "Network activity",
         "to_ids": 1
       },
-      "hashhserver-md5": {
+      "hasshserver-md5": {
         "default_category": "Network activity",
         "to_ids": 1
       },
@@ -650,8 +650,8 @@
       "http-method",
       "user-agent",
       "ja3-fingerprint-md5",
-      "hashh-md5",
-      "hashhserver-md5",
+      "hassh-md5",
+      "hasshserver-md5",
       "regkey",
       "regkey|value",
       "AS",
