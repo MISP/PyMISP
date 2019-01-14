@@ -488,14 +488,14 @@ class MISPEvent(AbstractMISP):
         # Required value
         self.info = kwargs.pop('info', None)
         if self.info is None:
-            raise NewAttributeError('The info field of the new event is required.')
+            raise NewEventError('The info field of the new event is required.')
 
         # Default values for a valid event to send to a MISP instance
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
             self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4]:
-                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
+                raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
 
         if kwargs.get('threat_level_id') is not None:
             self.threat_level_id = int(kwargs.pop('threat_level_id'))
