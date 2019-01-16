@@ -884,12 +884,6 @@ class PyMISP(object):
         """Add other text"""
         return self.add_named_attribute(event, 'text', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    # ##### Payload delivery attributes #####
-
-    def add_payload_other(self, event, reference, category="Payload delivery", to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
-        """Add payload other"""
-        return self.add_named_attribute(event, 'other', reference, category, to_ids, comment, distribution, proposal, **kwargs)
-
     # ##################################################
     # ######### Upload samples through the API #########
     # ##################################################
@@ -1071,7 +1065,7 @@ class PyMISP(object):
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
                      analysis=None, attribute=None, org=None, async_callback=None, normalize=False,
-                     timestamp=None):
+                     timestamp=None, sharinggroup=None):
         """Search only at the index level. Use ! infront of value as NOT, default OR
         If using async, give a callback that takes 2 args, session and response:
         basic usage is
@@ -1090,11 +1084,12 @@ class PyMISP(object):
         :param async_callback: Function to call when the request returns (if running async)
         :param normalize: Normalize output | True or False
         :param timestamp: Interval since last update (in second, or 1d, 1h, ...)
+        :param sharinggroup: The sharing group value
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'dateuntil': dateuntil,
                    'datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
                    'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
-                   'org': org, 'timestamp': timestamp}
+                   'org': org, 'timestamp': timestamp, 'sharinggroup': sharinggroup}
         rule_levels = {'distribution': ["0", "1", "2", "3", "!0", "!1", "!2", "!3"],
                        'threatlevel': ["1", "2", "3", "4", "!1", "!2", "!3", "!4"],
                        'analysis': ["0", "1", "2", "!0", "!1", "!2"]}
