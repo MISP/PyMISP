@@ -2,6 +2,103 @@ Changelog
 =========
 
 
+v2.4.99 (2018-12-06)
+--------------------
+
+New
+~~~
+- Auto generate doc for PyMISPExpanded. [Raphaël Vinot]
+- Search_index in ExpandedPyMISP, cleanup, update jupyter. [Raphaël
+  Vinot]
+- Add log search. [Raphaël Vinot]
+- Add test for pushing an event to ZMQ. [Raphaël Vinot]
+- Change_distribution method. [Raphaël Vinot]
+- Add test cases for sightings, cleanup. [Raphaël Vinot]
+- [example] Added sighting rest search example. [Sami Mokaddem]
+- [sighting] Added support of sighting REST API. [Sami Mokaddem]
+- Allow to pass csv to return_format in search. [Raphaël Vinot]
+- Page/limit in search. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects & describeTypes. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add test cases for default distribution levels. [Raphaël Vinot]
+- Include proposals in attributes search. [Dawid Czarnecki]
+
+  Add includeProposals param to the search method
+- Bump misp-objects. [Raphaël Vinot]
+- Update readme to document testing. [Raphaël Vinot]
+- Fixes & update Jupyter. [Raphaël Vinot]
+- [tuto] Update search. [Raphaël Vinot]
+- Add a script to load the API key from the file system (training VM)
+  [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add print in testlive to debug travis. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Auto generate doc for PyMISPExpanded. [Raphaël Vinot]
+- Test failing on travis... [Raphaël Vinot]
+- Properly handle errors on event creation/update. [Raphaël Vinot]
+- Test case. [Raphaël Vinot]
+- Do not run the zmq test on travis. [Raphaël Vinot]
+- Type of quick_filter. [Raphaël Vinot]
+- Quick_filter was broken. [Raphaël Vinot]
+- Properly initialize the config when jupyter runs on the VM. [Raphaël
+  Vinot]
+- Travis run. [Raphaël Vinot]
+- Readme update + python3 + pep8. [Christophe Vandeplas]
+
+  align python path to readme specifying python3
+- Feed-generator gitignore. [Christophe Vandeplas]
+- Test cases. [Raphaël Vinot]
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #310 from DragonDev1906/master. [Raphaël Vinot]
+
+  Added get_object & get_attribute (by ID)
+- Dded get_object & get_attribute. [DragonDev1906]
+- Merge pull request #307 from garanews/patch-1. [Raphaël Vinot]
+
+  fix for last pymisp version
+- Fix for last pymisp version. [garanews]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #305 from dawid-
+  czarnecki/feature/include_proposals. [Raphaël Vinot]
+
+  chg: Include proposals in attributes search
+- Merge pull request #301 from deralexxx/patch-7. [Raphaël Vinot]
+
+  mention virtualenv
+- Mention virtualenv. [Alexander J]
+
+  mide make sense for people who want to use it with virtualenv
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Be more precise with the supported time indicators. [Sascha
+  Rommelfangen]
+- Fixed documentation bug. [Sascha Rommelfangen]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #295 from 3c7/fix/search_index_date. [Raphaël
+  Vinot]
+
+  Fixes date parameters for search_index() function
+- Fixes date parameters for search_index() function. [Nils Kuhnert]
+- Merge branch 'sightingAPI' [Raphaël Vinot]
+- Merge branch 'master' into sightingAPI. [Raphaël Vinot]
+- Merge pull request #285 from juju4/devel. [Raphaël Vinot]
+
+  align examples on custom usage of misp_verifycert
+- Align examples on custom usage of misp_verifycert. [juju4]
+
+
 v2.4.96 (2018-10-12)
 --------------------
 
@@ -22,6 +119,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Allow to pass a json string to direct_call. [Raphaël Vinot]
@@ -32,6 +130,7 @@ Changes
 
 Fix
 ~~~
+- Test cases sample files. [Raphaël Vinot]
 - Prevent checking length on a integer. [Sami Mokaddem]
 - Direct call & add example. [Raphaël Vinot]
 - Disable test for travis, take 2. [Raphaël Vinot]

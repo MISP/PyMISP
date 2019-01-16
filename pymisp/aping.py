@@ -6,7 +6,6 @@ from .api import PyMISP, everything_broken
 from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog
 from typing import TypeVar, Optional, Tuple, List, Dict
 from datetime import date, datetime
-import json
 import csv
 
 import logging
@@ -70,7 +69,7 @@ class ExpandedPyMISP(PyMISP):
             # The server returns a json message with the error details
             error_message = response.json()
             logger.error(f'Something went wrong ({response.status_code}): {error_message}')
-            return {'errors': [(response.status_code, error_message)]}
+            return {'errors': (response.status_code, error_message)}
 
         # At this point, we had no error.
 
@@ -80,11 +79,15 @@ class ExpandedPyMISP(PyMISP):
                 logger.debug(response)
             if isinstance(response, dict) and response.get('response') is not None:
                 # Cleanup.
-                return response.get('response')
+                response = response['response']
             return response
         except Exception:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(response.text)
+            if not len(response.content):
+                # Empty response
+                logger.error('Got an empty response.')
+                return {'errors': 'The response is empty.'}
             return response.text
 
     def get_event(self, event_id: int):
@@ -97,6 +100,8 @@ class ExpandedPyMISP(PyMISP):
         created_event = super().add_event(event)
         if isinstance(created_event, str):
             raise NewEventError(f'Unexpected response from server: {created_event}')
+        elif 'errors' in created_event:
+            return created_event
         e = MISPEvent()
         e.load(created_event)
         return e
@@ -105,6 +110,8 @@ class ExpandedPyMISP(PyMISP):
         updated_event = super().update_event(event.uuid, event)
         if isinstance(updated_event, str):
             raise UpdateEventError(f'Unexpected response from server: {updated_event}')
+        elif 'errors' in updated_event:
+            return updated_event
         e = MISPEvent()
         e.load(updated_event)
         return e
@@ -113,6 +120,8 @@ class ExpandedPyMISP(PyMISP):
         updated_attribute = super().update_attribute(attribute.uuid, attribute)
         if isinstance(updated_attribute, str):
             raise UpdateAttributeError(f'Unexpected response from server: {updated_attribute}')
+        elif 'errors' in updated_attribute:
+            return updated_attribute
         a = MISPAttribute()
         a.from_dict(**updated_attribute)
         return a
@@ -172,10 +181,7 @@ class ExpandedPyMISP(PyMISP):
         query['includeEvent'] = include_event_meta
 
         url = urljoin(self.root_url, url_path)
-        # Remove None values.
-        # TODO: put that in self._prepare_request
-        query = {k: v for k, v in query.items() if v is not None}
-        response = self._prepare_request('POST', url, data=json.dumps(query))
+        response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_response(response)
         if isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
                                                     normalized_response.get('errors')):
@@ -348,10 +354,7 @@ class ExpandedPyMISP(PyMISP):
         query['includeContext'] = include_context
         query['headerless'] = headerless
         url = urljoin(self.root_url, f'{controller}/restSearch')
-        # Remove None values.
-        # TODO: put that in self._prepare_request
-        query = {k: v for k, v in query.items() if v is not None}
-        response = self._prepare_request('POST', url, data=json.dumps(query))
+        response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_response(response)
         if return_format == 'csv' and pythonify and not headerless:
             return self._csv_to_dict(normalized_response)
@@ -420,10 +423,7 @@ class ExpandedPyMISP(PyMISP):
             query['id'] = query.pop('log_id')
 
         url = urljoin(self.root_url, 'admin/logs/index')
-        # Remove None values.
-        # TODO: put that in self._prepare_request
-        query = {k: v for k, v in query.items() if v is not None}
-        response = self._prepare_request('POST', url, data=json.dumps(query))
+        response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_response(response)
         if not pythonify:
             return normalized_response
@@ -477,10 +477,7 @@ class ExpandedPyMISP(PyMISP):
                 query['timestamp'] = self.make_timestamp(timestamp)
 
         url = urljoin(self.root_url, 'events/index')
-        # Remove None values.
-        # TODO: put that in self._prepare_request
-        query = {k: v for k, v in query.items() if v is not None}
-        response = self._prepare_request('POST', url, data=json.dumps(query))
+        response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_response(response)
 
         if not pythonify:

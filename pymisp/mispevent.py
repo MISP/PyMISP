@@ -464,13 +464,7 @@ class MISPEvent(AbstractMISP):
             event = json_event
         if not event:
             raise PyMISPError('Invalid event')
-        # Invalid event created by MISP up to 2.4.52 (attribute_count is none instead of '0')
-        if (event.get('Event') and
-                'attribute_count' in event.get('Event') and
-                event.get('Event').get('attribute_count') is None):
-            event['Event']['attribute_count'] = '0'
-        e = event.get('Event')
-        self.from_dict(**e)
+        self.from_dict(**event)
         if validate:
             jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
 
@@ -489,17 +483,19 @@ class MISPEvent(AbstractMISP):
                 raise NewEventError('Invalid format for the date: {} - {}'.format(date, type(date)))
 
     def from_dict(self, **kwargs):
+        if kwargs.get('Event'):
+            kwargs = kwargs.get('Event')
         # Required value
         self.info = kwargs.pop('info', None)
         if self.info is None:
-            raise NewAttributeError('The info field of the new event is required.')
+            raise NewEventError('The info field of the new event is required.')
 
         # Default values for a valid event to send to a MISP instance
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
             self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4]:
-                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
+                raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
 
         if kwargs.get('threat_level_id') is not None:
             self.threat_level_id = int(kwargs.pop('threat_level_id'))
@@ -1005,6 +1001,8 @@ class MISPObject(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPObjectReference.')
 
     def from_dict(self, **kwargs):
+        if kwargs.get('Object'):
+            kwargs = kwargs.get('Object')
         if self._known_template:
             if kwargs.get('template_uuid') and kwargs['template_uuid'] != self.template_uuid:
                 if self._strict:
@@ -1016,6 +1014,12 @@ class MISPObject(AbstractMISP):
                     raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
                 else:
                     self._known_template = False
+
+        if 'distribution' in kwargs and kwargs['distribution'] is not None:
+            self.distribution = kwargs.pop('distribution')
+            self.distribution = int(self.distribution)
+            if self.distribution not in [0, 1, 2, 3, 4, 5]:
+                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
 
         if kwargs.get('timestamp'):
             if sys.version_info >= (3, 3):

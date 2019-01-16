@@ -15,7 +15,7 @@ from io import BytesIO, open
 import zipfile
 
 from . import __version__, deprecated
-from .exceptions import PyMISPError, SearchError, NoURL, NoKey
+from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject
 from .abstract import AbstractMISP, MISPEncode
 
@@ -157,6 +157,11 @@ class PyMISP(object):
         if data is None:
             req = requests.Request(request_type, url)
         else:
+            if not isinstance(data, str):
+                if isinstance(data, dict):
+                    # Remove None values.
+                    data = {k: v for k, v in data.items() if v is not None}
+                data = json.dumps(data)
             req = requests.Request(request_type, url, data=data)
         if self.asynch and background_callback is not None:
             local_session = FuturesSession
@@ -227,6 +232,8 @@ class PyMISP(object):
             json_response = response.json()
         except ValueError:
             # If the server didn't return a JSON blob, we've a problem.
+            if not len(response.text):
+                raise PyMISPEmptyResponse('The server returned an empty response. \n{}\n{}\n'.format(response.request.headers, response.request.body))
             raise PyMISPError(everything_broken.format(response.request.headers, response.request.body, response.text))
 
         errors = []
@@ -333,6 +340,24 @@ class PyMISP(object):
         :param event_id: Event id to get
         """
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_object(self, obj_id):
+        """Get an object
+
+        :param obj_id: Object id to get
+        """
+        url = urljoin(self.root_url, 'objects/view/{}'.format(obj_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_attribute(self, att_id):
+        """Get an attribute
+
+        :param att_id: Attribute id to get
+        """
+        url = urljoin(self.root_url, 'attributes/view/{}'.format(att_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
@@ -1212,11 +1237,13 @@ class PyMISP(object):
             query['event_timestamp'] = kwargs.pop('event_timestamp', None)
             query['includeProposals'] = kwargs.pop('includeProposals', None)
 
+        if kwargs:
+            logger.info('Some unknown parameters are in kwargs. appending as-is: {}'.format(', '.join(kwargs.keys())))
+            # Add all other keys as-is.
+            query.update({k: v for k, v in kwargs.items()})
+
         # Cleanup
         query = {k: v for k, v in query.items() if v is not None}
-
-        if kwargs:
-            raise SearchError('Unused parameter: {}'.format(', '.join(kwargs.keys())))
 
         # Create a session, make it async if and only if we have a callback
         return self.__query('restSearch/download', query, controller, async_callback)
@@ -1407,6 +1434,15 @@ class PyMISP(object):
         else:
             name_sort = 'false'
         url = urljoin(self.root_url, 'tags/tagStatistics/{}/{}'.format(percentage, name_sort))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_users_statistics(self, context='data'):
+        """Get users statistics from the MISP instance"""
+        availables_contexts = ['data', 'orgs', 'users', 'tags', 'attributehistogram', 'sightings', 'attackMatrix']
+        if context not in availables_contexts:
+            context = 'data'
+        url = urljoin(self.root_url, 'users/statistics/{}.json'.format(context))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
@@ -2270,11 +2306,9 @@ class PyMISP(object):
 
     def get_object_template_id(self, object_uuid):
         """Gets the template ID corresponting the UUID passed as parameter"""
-        templates = self.get_object_templates_list()
-        for t in templates:
-            if t['ObjectTemplate']['uuid'] == object_uuid:
-                return t['ObjectTemplate']['id']
-        raise Exception('Unable to find template uuid {} on the MISP instance'.format(object_uuid))
+        url = urljoin(self.root_url, 'objectTemplates/view/{}'.format(object_uuid))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
 
     def update_object_templates(self):
         url = urljoin(self.root_url, '/objectTemplates/update')
