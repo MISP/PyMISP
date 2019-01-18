@@ -16,16 +16,14 @@ python:
     - "3.6-dev"
 
 install:
-    - pip install -U nose pip setuptools
-    - pip install coveralls codecov requests-mock
-    - pip install git+https://github.com/kbandla/pydeep.git
-    - pip install .[fileobjects,neo,openioc,virustotal]
+    - pip install pipenv
+    - pipenv install --dev
     - pushd tests
     - git clone https://github.com/viper-framework/viper-test-files.git
     - popd
 
 script:
-    - nosetests --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
+    - pipenv run nosetests --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
 
 after_success:
     - codecov
