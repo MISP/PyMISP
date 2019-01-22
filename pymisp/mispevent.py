@@ -374,16 +374,16 @@ class MISPEvent(AbstractMISP):
                     self.__json_schema = json.load(f)
         if describe_types:
             # This variable is used in add_attribute in order to avoid duplicating the structure
-            self.describe_types = describe_types
+            self._describe_types = describe_types
         else:
             with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
                 if OLD_PY3:
                     t = json.loads(f.read().decode())
                 else:
                     t = json.load(f)
-            self.describe_types = t['result']
+            self._describe_types = t['result']
 
-        self._types = self.describe_types['types']
+        self._types = self._describe_types['types']
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
@@ -654,7 +654,7 @@ class MISPEvent(AbstractMISP):
         if isinstance(value, list):
             attr_list = [self.add_attribute(type=type, value=a, **kwargs) for a in value]
         else:
-            attribute = MISPAttribute(describe_types=self.describe_types)
+            attribute = MISPAttribute(describe_types=self._describe_types)
             attribute.from_dict(type=type, value=value, **kwargs)
             self.attributes.append(attribute)
         self.edited = True
