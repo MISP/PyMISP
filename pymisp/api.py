@@ -1496,7 +1496,7 @@ class PyMISP(object):
         :type element_id: int
         :param scope: could be attribute or event
         :return: A json list of sighting corresponding to the search
-        :rtype: list
+        :rtype: dict
 
         :Example:
 
