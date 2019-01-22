@@ -475,6 +475,8 @@ class MISPEvent(AbstractMISP):
         """Set a date for the event (string, datetime, or date object)"""
         if isinstance(date, basestring) or isinstance(date, unicode):
             self.date = parse(date).date()
+        elif isinstance(date, int):
+            self.date = datetime.datetime.utcfromtimestamp(date).date()
         elif isinstance(date, datetime.datetime):
             self.date = date.date()
         elif isinstance(date, datetime.date):
