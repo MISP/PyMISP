@@ -307,7 +307,7 @@ class PyMISP(object):
 
         :param uuid: an uuid
         """
-        regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+        regex = re.compile(r'^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
         match = regex.match(uuid)
         return bool(match)
 
@@ -596,12 +596,12 @@ class PyMISP(object):
         elif isinstance(event, int) or (isinstance(event, str) and (event.isdigit() or self._valid_uuid(event))):
             event_id = event
         else:
-            e = MISPEvent(describe_types=self.describe_types)
-            e.load(event)
-            if hasattr(e, 'id'):
-                event_id = e.id
-            elif hasattr(e, 'uuid'):
-                event_id = e.uuid
+            if 'Event' in event:
+                e = event['Event']
+            if 'id' in e:
+                event_id = e['id']
+            elif 'uuid' in e:
+                event_id = e['uuid']
         return event_id
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
