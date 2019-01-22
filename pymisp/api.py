@@ -598,6 +598,8 @@ class PyMISP(object):
         else:
             if 'Event' in event:
                 e = event['Event']
+            else:
+                e = event
             if 'id' in e:
                 event_id = e['id']
             elif 'uuid' in e:
