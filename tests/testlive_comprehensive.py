@@ -18,7 +18,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
-    key = '8h0gHbhS0fv6JUOlTED0AznLXFbf83TYtQrCycqb'
+    key = 'E36iZ8hr31XIcWfqU4NGniwhMuvYRngip6O1dC9T'
     verifycert = False
     travis_run = False
 
@@ -85,6 +85,7 @@ class TestComprehensive(unittest.TestCase):
         second_event.add_attribute('text', str(uuid4()))
         second_event.attributes[0].add_tag('tlp:white___test')
         second_event.add_attribute('ip-dst', '1.1.1.1')
+        second_event.attributes[1].add_tag('tlp:amber___test')
         # Same value as in first event.
         second_event.add_attribute('text', first_event.attributes[0].value)
 
@@ -214,9 +215,9 @@ class TestComprehensive(unittest.TestCase):
             for e in events:
                 self.assertIn(e.id, [first.id, second.id, third.id])
             events = self.admin_misp_connector.search(tags='tlp:amber___test', pythonify=True)
-            self.assertEqual(len(events), 1)
+            self.assertEqual(len(events), 2)
             for e in events:
-                self.assertIn(e.id, [third.id])
+                self.assertIn(e.id, [second.id, third.id])
             events = self.admin_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(len(events), 1)
             for e in events:
@@ -227,9 +228,9 @@ class TestComprehensive(unittest.TestCase):
             for e in events:
                 self.assertIn(e.id, [second.id, third.id])
             events = self.user_misp_connector.search(tags='tlp:amber___test', pythonify=True)
-            self.assertEqual(len(events), 1)
+            self.assertEqual(len(events), 2)
             for e in events:
-                self.assertIn(e.id, [third.id])
+                self.assertIn(e.id, [second.id, third.id])
             events = self.user_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(events, [])
         finally:
@@ -246,16 +247,19 @@ class TestComprehensive(unittest.TestCase):
             attributes = self.admin_misp_connector.search(controller='attributes', tags='tlp:white___test', pythonify=True)
             self.assertEqual(len(attributes), 5)
             attributes = self.admin_misp_connector.search(controller='attributes', tags='tlp:amber___test', pythonify=True)
-            self.assertEqual(len(attributes), 2)
+            self.assertEqual(len(attributes), 3)
             attributes = self.admin_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(len(attributes), 1)
             # Search as user
             attributes = self.user_misp_connector.search(controller='attributes', tags='tlp:white___test', pythonify=True)
             self.assertEqual(len(attributes), 4)
             attributes = self.user_misp_connector.search(controller='attributes', tags='tlp:amber___test', pythonify=True)
-            self.assertEqual(len(attributes), 2)
+            self.assertEqual(len(attributes), 3)
             attributes = self.user_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(attributes, [])
+            attributes_tags_search = self.admin_misp_connector.build_complex_query(or_parameters=['tlp:amber___test'], not_parameters=['tlp:white___test'])
+            attributes = self.user_misp_connector.search(controller='attributes', tags=attributes_tags_search, pythonify=True)
+            self.assertEqual(len(attributes), 1)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
@@ -592,10 +596,6 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(len(events[0].attributes), 1)
-            events = self.user_misp_connector.search(timestamp=timeframe, to_ids='exclude', pythonify=True)
-            self.assertEqual(len(events), 2)
-            self.assertEqual(len(events[0].attributes), 1)
-            self.assertEqual(len(events[1].attributes), 1)
 
             # deleted
             second.attributes[1].delete()

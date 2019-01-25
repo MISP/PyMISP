@@ -8,6 +8,8 @@ nose = "*"
 coveralls = "*"
 codecov = "*"
 requests-mock = "*"
+jupyter = "*"
+ipython = "*"
 
 [packages]
 pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal"],path = "."}

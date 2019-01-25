@@ -26,5 +26,5 @@ script:
     - pipenv run nosetests --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
 
 after_success:
-    - codecov
-    - coveralls
+    - pipenv run codecov
+    - pipenv run coveralls
