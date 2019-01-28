@@ -2,12 +2,147 @@ Changelog
 =========
 
 
+v2.4.101 (2019-01-28)
+---------------------
+
+New
+~~~
+- Add missing test case for NOT on attribute level, update Pipfile.
+  [Raphaël Vinot]
+- Add support for unix timestamp in set_date. [Raphaël Vinot]
+
+  fix #302
+- Add test for references when adding/updating a full event. [Raphaël
+  Vinot]
+- Bump describe types. [Raphaël Vinot]
+
+  fix #317
+- [usersStats] Possibility to fetch users/statistics data for all
+  context (usage, org, tags, ...) [Sami Mokaddem]
+
+Changes
+~~~~~~~
+- Bump version, misp-objects. [Raphaël Vinot]
+- Force to_ids to be a boolean, as MISP is expecting. [Raphaël Vinot]
+
+  fix #320
+- Add support for sharing group filter for search_index. [Tom King]
+- Support for Payload Delivery > Other attribute as PyMISP function.
+  [Tom King]
+- Add Pipfile config. [Raphaël Vinot]
+- [data] fix describeTypes. [Alexandre Dulaunoy]
+- [data] new types added (hassh-md5 and hasshserver-md5) [Alexandre
+  Dulaunoy]
+- Bump misp-objects. [Raphaël Vinot]
+- [misp-objects] templates updated to the latest version. [Alexandre
+  Dulaunoy]
+- [data] describeTypes updated (grabbed from MISP HEAD) [Alexandre
+  Dulaunoy]
+- [data] ja3-fingerprint-md5 type added. [Alexandre Dulaunoy]
+- [test] set a default distribution for massive event creation.
+  [Alexandre Dulaunoy]
+- [data] describeTypes.json updated to the latest version. [Alexandre
+  Dulaunoy]
+- More flexibility when loading an object from python dict. [Raphaël
+  Vinot]
+- Pass all parameters to the search API. [Raphaël Vinot]
+- Remove compat for MISP 2.4.52, cleanup. [Raphaël Vinot]
+- Set verifycert to false in tests. [Raphaël Vinot]
+- [tests] Added verifycert option in case of using self-signed cert.
+  [Steve Clement]
+
+Fix
+~~~
+- Remove jupyter & ipython from dev install so it works with python2.
+  [Raphaël Vinot]
+- Wrong variable name in MISPEvent. [Raphaël Vinot]
+- Documentation error fix #278. [Raphaël Vinot]
+- Attempt to fix memory footprint in MISPAttribute. [Raphaël Vinot]
+- Still support simple event dict content. [Raphaël Vinot]
+- Don't modify event passed to the add_attribute methods. [Raphaël
+  Vinot]
+
+  fix #321
+- The wrong class name was used when there is an error at Event
+  creation. [Raphaël Vinot]
+- Use new API in get_csv.py. [Raphaël Vinot]
+
+  Fix #314
+- Test case was broken. [Raphaël Vinot]
+- Create massive event using ExpandedPyMISP. [Raphaël Vinot]
+- Error vs errors key. [Raphaël Vinot]
+- Typo. [Raphaël Vinot]
+- Get_object_template_id. [Christophe Vandeplas]
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #325 from winklerrr/patch-1. [Raphaël Vinot]
+
+  Update pymisp tutorial
+- Update pymisp tutorial. [Sandro Winkler]
+
+  Extract the "response" field from the json result returned by misp.search_index
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #306 from tomking2/master. [Raphaël Vinot]
+
+  chg: Support for Payload Delivery > Other attribute as PyMISP function & search_index sharinggroup filter
+- Merge remote-tracking branch 'upstream/master' [Tom King]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #318 from cvandeplas/master. [Alexandre Dulaunoy]
+
+  sort describeTypes.json output
+- Sort describeTypes.json output. [Christophe Vandeplas]
+
+  This is needed for the compatibility with the gen_misp_types_categories.py script. Data was sorted using the order_dict function of the gen_misp_types_categories script.
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #257 from mokaddem/usersStatistics. [Raphaël Vinot]
+
+  new: [usersStats] Possibility to fetch users/statistics
+- Merge pull request #311 from cvandeplas/master. [Raphaël Vinot]
+
+  Bugfixes
+
+
 v2.4.99 (2018-12-06)
 --------------------
 
 New
 ~~~
 - Auto generate doc for PyMISPExpanded. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump Changelog, again. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects & describeTypes. [Raphaël Vinot]
+
+Fix
+~~~
+- Auto generate doc for PyMISPExpanded. [Raphaël Vinot]
+
+Other
+~~~~~
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+- Merge pull request #310 from DragonDev1906/master. [Raphaël Vinot]
+
+  Added get_object & get_attribute (by ID)
+- Dded get_object & get_attribute. [DragonDev1906]
+- Merge pull request #307 from garanews/patch-1. [Raphaël Vinot]
+
+  fix for last pymisp version
+- Fix for last pymisp version. [garanews]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+
+v2.4.98 (2018-12-03)
+--------------------
+
+New
+~~~
 - Search_index in ExpandedPyMISP, cleanup, update jupyter. [Raphaël
   Vinot]
 - Add log search. [Raphaël Vinot]
@@ -21,9 +156,6 @@ New
 
 Changes
 ~~~~~~~
-- Bump Changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump misp-objects & describeTypes. [Raphaël Vinot]
 - Bump Changelog. [Raphaël Vinot]
 - Version bump. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
@@ -43,7 +175,6 @@ Changes
 
 Fix
 ~~~
-- Auto generate doc for PyMISPExpanded. [Raphaël Vinot]
 - Test failing on travis... [Raphaël Vinot]
 - Properly handle errors on event creation/update. [Raphaël Vinot]
 - Test case. [Raphaël Vinot]
@@ -58,19 +189,10 @@ Fix
   align python path to readme specifying python3
 - Feed-generator gitignore. [Christophe Vandeplas]
 - Test cases. [Raphaël Vinot]
+- Test cases sample files. [Raphaël Vinot]
 
 Other
 ~~~~~
-- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
-- Merge pull request #310 from DragonDev1906/master. [Raphaël Vinot]
-
-  Added get_object & get_attribute (by ID)
-- Dded get_object & get_attribute. [DragonDev1906]
-- Merge pull request #307 from garanews/patch-1. [Raphaël Vinot]
-
-  fix for last pymisp version
-- Fix for last pymisp version. [garanews]
-- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
 - Merge pull request #305 from dawid-
   czarnecki/feature/include_proposals. [Raphaël Vinot]
 
@@ -130,7 +252,6 @@ Changes
 
 Fix
 ~~~
-- Test cases sample files. [Raphaël Vinot]
 - Prevent checking length on a integer. [Sami Mokaddem]
 - Direct call & add example. [Raphaël Vinot]
 - Disable test for travis, take 2. [Raphaël Vinot]
