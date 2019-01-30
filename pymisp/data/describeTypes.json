@@ -121,6 +121,10 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
+      "zeek": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
       "pattern-in-file": {
         "default_category": "Payload installation",
         "to_ids": 1
@@ -657,6 +661,7 @@
       "AS",
       "snort",
       "bro",
+      "zeek",
       "pattern-in-file",
       "pattern-in-traffic",
       "pattern-in-memory",
@@ -1056,7 +1061,8 @@
         "hex",
         "cookie",
         "hostname|port",
-        "bro"
+        "bro",
+        "zeek"
       ],
       "Payload type": [
         "comment",
@@ -1105,6 +1111,7 @@
         "AS",
         "snort",
         "bro",
+        "zeek",
         "pattern-in-file",
         "pattern-in-traffic",
         "pattern-in-memory",
