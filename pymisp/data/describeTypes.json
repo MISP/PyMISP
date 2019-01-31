@@ -628,6 +628,10 @@
       "boolean": {
         "default_category": "Other",
         "to_ids": 0
+      },
+      "anonymised": {
+        "default_category": "Other",
+        "to_ids": 0
       }
     },
     "types": [
@@ -787,7 +791,8 @@
       "passenger-name-record-locator-number",
       "mobile-application-id",
       "cortex",
-      "boolean"
+      "boolean",
+      "anonymised"
     ],
     "categories": [
       "Internal reference",
@@ -813,7 +818,8 @@
         "link",
         "comment",
         "other",
-        "hex"
+        "hex",
+        "anonymised"
       ],
       "Targeting data": [
         "target-user",
@@ -822,7 +828,8 @@
         "target-org",
         "target-location",
         "target-external",
-        "comment"
+        "comment",
+        "anonymised"
       ],
       "Antivirus detection": [
         "link",
@@ -830,7 +837,8 @@
         "text",
         "hex",
         "attachment",
-        "other"
+        "other",
+        "anonymised"
       ],
       "Payload delivery": [
         "md5",
@@ -910,7 +918,8 @@
         "email-thread-index",
         "email-message-id",
         "mobile-application-id",
-        "whois-registrant-email"
+        "whois-registrant-email",
+        "anonymised"
       ],
       "Artifacts dropped": [
         "md5",
@@ -965,7 +974,8 @@
         "other",
         "cookie",
         "gene",
-        "mime-type"
+        "mime-type",
+        "anonymised"
       ],
       "Payload installation": [
         "md5",
@@ -1016,7 +1026,8 @@
         "x509-fingerprint-sha256",
         "mobile-application-id",
         "other",
-        "mime-type"
+        "mime-type",
+        "anonymised"
       ],
       "Persistence mechanism": [
         "filename",
@@ -1025,7 +1036,8 @@
         "comment",
         "text",
         "other",
-        "hex"
+        "hex",
+        "anonymised"
       ],
       "Network activity": [
         "ip-src",
@@ -1062,12 +1074,14 @@
         "cookie",
         "hostname|port",
         "bro",
-        "zeek"
+        "zeek",
+        "anonymised"
       ],
       "Payload type": [
         "comment",
         "text",
-        "other"
+        "other",
+        "anonymised"
       ],
       "Attribution": [
         "threat-actor",
@@ -1085,7 +1099,8 @@
         "x509-fingerprint-md5",
         "x509-fingerprint-sha256",
         "other",
-        "dns-soa-email"
+        "dns-soa-email",
+        "anonymised"
       ],
       "External analysis": [
         "md5",
@@ -1129,7 +1144,8 @@
         "hasshserver-md5",
         "github-repository",
         "other",
-        "cortex"
+        "cortex",
+        "anonymised"
       ],
       "Financial fraud": [
         "btc",
@@ -1145,7 +1161,8 @@
         "comment",
         "text",
         "other",
-        "hex"
+        "hex",
+        "anonymised"
       ],
       "Support Tool": [
         "link",
@@ -1153,7 +1170,8 @@
         "attachment",
         "comment",
         "other",
-        "hex"
+        "hex",
+        "anonymised"
       ],
       "Social network": [
         "github-username",
@@ -1166,7 +1184,8 @@
         "comment",
         "text",
         "other",
-        "whois-registrant-email"
+        "whois-registrant-email",
+        "anonymised"
       ],
       "Person": [
         "first-name",
@@ -1196,7 +1215,8 @@
         "text",
         "other",
         "phone-number",
-        "identity-card-number"
+        "identity-card-number",
+        "anonymised"
       ],
       "Other": [
         "comment",
@@ -1210,7 +1230,8 @@
         "float",
         "hex",
         "phone-number",
-        "boolean"
+        "boolean",
+        "anonymised"
       ]
     }
   }
