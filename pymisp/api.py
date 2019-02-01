@@ -1942,6 +1942,12 @@ class PyMISP(object):
         """Disable a warninglist by id."""
         return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=False)
 
+    def check_warninglist(self, value):
+        """Check if IOC values are in warninglist"""
+        url = urljoin(self.root_url, '/warninglists/checkValue')
+        response = self._prepare_request('POST', url, json.dumps(value))
+        return self._check_response(response)
+
     # ############## NoticeLists ##################
 
     def get_noticelists(self):
