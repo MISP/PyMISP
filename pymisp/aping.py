@@ -284,7 +284,7 @@ class ExpandedPyMISP(PyMISP):
 
         '''
 
-        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache']
+        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2']
 
         if controller not in ['events', 'attributes', 'objects', 'sightings']:
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
