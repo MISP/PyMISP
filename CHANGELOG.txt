@@ -2,6 +2,29 @@ Changelog
 =========
 
 
+v2.4.102 (2019-02-03)
+---------------------
+
+New
+~~~
+- Add test cases for stix export. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- [datamodel] new anonymised type added. [Alexandre Dulaunoy]
+- [data] types updated to include the new zeek type. [Alexandre
+  Dulaunoy]
+
+Other
+~~~~~
+- Merge pull request #328 from kirzaks/master. [Raphaël Vinot]
+
+  Check if IOC values are in warninglist
+- Check if IOC values are in warninglist. [Armīns Palms]
+- Merge branch 'master' of github.com:MISP/PyMISP. [Raphaël Vinot]
+
+
 v2.4.101 (2019-01-28)
 ---------------------
 
@@ -22,6 +45,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump version, misp-objects. [Raphaël Vinot]
 - Force to_ids to be a boolean, as MISP is expecting. [Raphaël Vinot]
 
