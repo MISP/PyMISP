@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+
+
 import unittest
 
-from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
 from pymisp.tools import make_binary_objects
 from datetime import datetime, timedelta, date
 from io import BytesIO
@@ -12,6 +14,15 @@ import json
 
 import time
 from uuid import uuid4
+
+try:
+    from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
+except ImportError:
+    if sys.version_info < (3, 6):
+        print('This test suite requires Python 3.6+, breaking.')
+        sys.exit(0)
+    else:
+        raise
 
 try:
     from keys import url, key
