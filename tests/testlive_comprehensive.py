@@ -840,12 +840,13 @@ class TestComprehensive(unittest.TestCase):
         first.add_attribute('ip-src', '8.8.8.8')
         try:
             first = self.user_misp_connector.add_event(first)
-            stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
-            found = re.findall('8.8.8.8', stix)
-            self.assertTrue(found)
-            stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
-            json.dumps(stix2, indent=2)
-            self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
+            if not travis_run:
+                stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
+                found = re.findall('8.8.8.8', stix)
+                self.assertTrue(found)
+                stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
+                json.dumps(stix2, indent=2)
+                self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
