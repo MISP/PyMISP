@@ -1130,7 +1130,7 @@ class PyMISP(object):
     def search_all(self, value):
         """Search a value in the whole database"""
         query = {'value': value, 'searchall': 1}
-        return self.__query('restSearch/download', query)
+        return self.__query('restSearch', query)
 
     def __prepare_rest_search(self, values, not_values):
         """Prepare a search, generate the chain processed by the server
@@ -1219,6 +1219,15 @@ class PyMISP(object):
             else:
                 return {'error': 'You must enter a valid uuid.'}
 
+        returnFormat = kwargs.pop('returnFormat', None)
+        if returnFormat:
+            if returnFormat in ['json', 'openioc', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2']:
+                query['returnFormat'] = returnFormat
+            else:
+                return {'error': 'You must enter a valid returnFormat - json, openioc, xml, suricata, snort, text, rpz, csv, stix, stix2 or cache'}
+        else:
+            query['returnFormat'] = 'json'
+
         query['publish_timestamp'] = kwargs.pop('publish_timestamp', None)
         query['timestamp'] = kwargs.pop('timestamp', None)
         query['enforceWarninglist'] = kwargs.pop('enforceWarninglist', None)
@@ -1243,7 +1252,7 @@ class PyMISP(object):
         query = {k: v for k, v in query.items() if v is not None}
 
         # Create a session, make it async if and only if we have a callback
-        return self.__query('restSearch/download', query, controller, async_callback)
+        return self.__query('restSearch', query, controller, async_callback)
 
     def get_attachment(self, attribute_id):
         """Get an attachement (not a malware sample) by attribute ID.
