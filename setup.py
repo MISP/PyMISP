@@ -40,7 +40,8 @@ setup(
         'Topic :: Internet',
     ],
     install_requires=['six', 'requests', 'python-dateutil', 'jsonschema',
-                      'python-dateutil', 'enum34;python_version<"3.4"'],
+                      'python-dateutil', 'enum34;python_version<"3.4"',
+                      'functools32;python_version<"3.0"'],
     extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
@@ -48,8 +49,7 @@ setup(
     tests_require=[
         'jsonschema',
         'python-magic',
-        'requests-mock',
-        'six'
+        'requests-mock'
     ],
     test_suite="tests.test_offline",
     include_package_data=True,

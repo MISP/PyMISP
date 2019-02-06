@@ -28,7 +28,7 @@ try:
     unicode = str
 except ImportError:
     from urlparse import urljoin
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
 try:
     import requests
