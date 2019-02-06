@@ -15,13 +15,11 @@ from . import deprecated
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
-import six  # Remove that import when discarding python2 support.
-
 import logging
 logger = logging.getLogger('pymisp')
 
 
-if six.PY2:
+if sys.version_info < (3, 0):
     logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
     # This is required because Python 2 is a pain.

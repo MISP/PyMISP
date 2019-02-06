@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import abc
-import six
 from .. import MISPObject
 from ..exceptions import InvalidMISPObject
 from datetime import datetime, date
 from dateutil.parser import parse
 
 
-@six.add_metaclass(abc.ABCMeta)   # Remove that line when discarding python2 support.
-# Python3 way: class MISPObjectGenerator(metaclass=abc.ABCMeta):
 class AbstractMISPObjectGenerator(MISPObject):
 
     def _detect_epoch(self, timestamp):
