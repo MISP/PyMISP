@@ -15,6 +15,9 @@ import json
 import time
 from uuid import uuid4
 
+import logging
+logging.disable(logging.CRITICAL)
+
 try:
     from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
 except ImportError:
