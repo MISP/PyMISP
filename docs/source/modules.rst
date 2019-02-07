@@ -17,7 +17,7 @@ PyMISP
 PyMISPExpanded (Python 3.6+ only)
 ---------------------------------
 
-.. autoclass:: PyMISPExpanded
+.. autoclass:: ExpandedPyMISP
     :members:
 
 MISPAbstract
