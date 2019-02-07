@@ -45,7 +45,8 @@ setup(
     extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
-                    'virustotal': ['validators']},
+                    'virustotal': ['validators'],
+                    'docs': ['sphinx-autodoc-typehints']},
     tests_require=[
         'jsonschema',
         'python-magic',
