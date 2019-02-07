@@ -1545,11 +1545,11 @@ class PyMISP(object):
 
         :Example:
 
-        >>> misp.search_sightings({'publish_timestamp': '30d'}) # search sightings for the last 30 days on the instance
+        >>> misp.search_sightings(**{'publish_timestamp': '30d'}) # search sightings for the last 30 days on the instance
         [ ... ]
-        >>> misp.search_sightings('attribute', {'id': 6, 'include_attribute': 1}) # return list of sighting for attribute 6 along with the attribute itself
+        >>> misp.search_sightings('attribute', context_id=6, include_attribute=1) # return list of sighting for attribute 6 along with the attribute itself
         [ ... ]
-        >>> misp.search_sightings('event', {'id': 17, 'include_event': 1, 'org_id': 2}) # return list of sighting for event 17 filtered with org id 2
+        >>> misp.search_sightings('event', **{'context_id': 17, 'include_event': 1, 'org_id': 2}) # return list of sighting for event 17 filtered with org id 2
         """
         if context not in ['', 'attribute', 'event']:
             raise Exception('Context parameter must be empty, "attribute" or "event"')
