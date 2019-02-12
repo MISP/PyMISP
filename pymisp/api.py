@@ -3,6 +3,7 @@
 
 """Python API using the REST interface of MISP"""
 
+import copy
 import sys
 import json
 import datetime
@@ -278,7 +279,7 @@ class PyMISP(object):
         """Transform a Json MISP event into a MISPEvent"""
         if not isinstance(event, MISPEvent):
             e = MISPEvent(self.describe_types)
-            e.load(event)
+            e.load(copy.copy(event))
         else:
             e = event
         return e
