@@ -20,6 +20,10 @@ try:
 
     from reportlab.pdfgen import canvas
 
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter, inch
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
     HAS_REPORTLAB = True
 except ImportError:
     HAS_REPORTLAB = False
@@ -28,6 +32,25 @@ except ImportError:
 '''
 "INTERNAL" METHODS. Not meant to be used outside of this class. 
 '''
+
+def create_flowable_table_from_event(misp_event):
+
+    data = [['00', '01', '02', '03', '04'],
+            ['10', '11', '12', '13', '14'],
+            ['20', '21', '22', '23', '24'],
+            ['30', '31', '32', '33', '34']]
+
+    t = Table(data, 5 * [0.4 * inch], 4 * [0.4 * inch])
+
+    t.setStyle(TableStyle([('TEXTCOLOR', (0, 0), (0, -1), colors.blue),
+                           ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                           ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                           ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+                           ]))
+
+    return t
+
 
 def collect_parts(misp_event):
     # List of elements/content we want to add
@@ -40,10 +63,12 @@ def collect_parts(misp_event):
     paragraph_2 = Paragraph("Some normal body text",sample_style_sheet['BodyText'])
     paragraph_3 = Paragraph("Dingbat paragraph", sample_style_sheet['BodyText']) # Apply custom style
     Paragraph("A <b>bold</b> word.<br /> An <i>italic</i> word.", sample_style_sheet['BodyText']) # HTML markup is working too
+    table = create_flowable_table_from_event(misp_event)
 
     # Add all parts to final PDF
     flowables.append(paragraph_1)
     flowables.append(paragraph_2)
+    flowables.append(table)
     flowables.append(PageBreak())
     flowables.append(paragraph_2)
     flowables.append(paragraph_3)
@@ -70,7 +95,6 @@ def export_flowables_to_pdf(document, pdf_buffer, flowables):
         onLaterPages=add_page_number, # Pagination for all other page
     )
 
-
 '''
 "EXTERNAL" exposed METHODS. Meant to be used outside of this class.
 '''
@@ -78,11 +102,12 @@ def export_flowables_to_pdf(document, pdf_buffer, flowables):
 PAGESIZE = (140 * mm, 216 * mm) # width, height
 BASE_MARGIN = 5 * mm
 
-def convert_event_in_pdf_buffer(misp_event, debug_file=False):
+def convert_event_in_pdf_buffer(misp_event):
 
-    # Create the document
+    # Create a document buffer
     pdf_buffer = BytesIO()
-    # curr_document = SimpleDocTemplate('myfile.pdf')
+
+    # DEBUG / TO DELETE : curr_document = SimpleDocTemplate('myfile.pdf')
     curr_document = SimpleDocTemplate(pdf_buffer,
         pagesize=PAGESIZE,
         topMargin=BASE_MARGIN,
@@ -116,14 +141,16 @@ def get_values_from_buffer(pdf_buffer):
 def get_base64_from_buffer(pdf_buffer):
     return base64.b64encode(pdf_buffer.value())
 
+def register_to_file(pdf_buffer, file_name):
+    pdf_buffer.seek(0)
+
+    with open(file_name, 'wb') as f:
+        f.write(pdf_buffer.read())
 
 if __name__ == "__main__":
     pdf_buffer = convert_event_in_pdf_buffer(None)
 
-    pdf_buffer.seek(0)
-
-    with open('test.pdf', 'wb') as f:
-        f.write(pdf_buffer.read())
+    register_to_file(pdf_buffer, 'test.pdf')
 
     # get_values_from_buffer(pdf_buffer)
     # get_base64_from_buffer(pdf_buffer)
