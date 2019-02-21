@@ -2046,7 +2046,7 @@ class PyMISP(object):
         if tags:
             if isinstance(tags, list):
                 tags = "&&".join(tags)
-        url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
+        url = urljoin(self.root_url, "events/stix/download/{}/{}/{}/{}/{}".format(
             event_id, with_attachments, tags, from_date, to_date))
         logger.debug("Getting STIX event from %s", url)
         response = self._prepare_request('GET', url)
