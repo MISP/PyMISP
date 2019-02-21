@@ -4,9 +4,8 @@
 from .exceptions import MISPServerError, NewEventError, UpdateEventError, UpdateAttributeError, PyMISPNotImplementedYet
 from .api import PyMISP, everything_broken
 from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog
-from typing import TypeVar, Optional, Tuple, List, Dict
+from typing import TypeVar, Optional, Tuple, List, Dict, Union
 from datetime import date, datetime
-import json
 import csv
 
 import logging
@@ -18,6 +17,7 @@ SearchParameterTypes = TypeVar('SearchParameterTypes', str, List[SearchType], Di
 DateTypes = TypeVar('DateTypes', datetime, date, SearchType, float)
 DateInterval = TypeVar('DateInterval', DateTypes, Tuple[DateTypes, DateTypes])
 
+ToIDSType = TypeVar('ToIDSType', str, int, bool)
 
 logger = logging.getLogger('pymisp')
 
@@ -70,7 +70,7 @@ class ExpandedPyMISP(PyMISP):
             # The server returns a json message with the error details
             error_message = response.json()
             logger.error(f'Something went wrong ({response.status_code}): {error_message}')
-            return {'errors': [(response.status_code, error_message)]}
+            return {'errors': (response.status_code, error_message)}
 
         # At this point, we had no error.
 
@@ -80,11 +80,15 @@ class ExpandedPyMISP(PyMISP):
                 logger.debug(response)
             if isinstance(response, dict) and response.get('response') is not None:
                 # Cleanup.
-                return response.get('response')
+                response = response['response']
             return response
         except Exception:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(response.text)
+            if not len(response.content):
+                # Empty response
+                logger.error('Got an empty response.')
+                return {'errors': 'The response is empty.'}
             return response.text
 
     def get_event(self, event_id: int):
@@ -178,13 +182,10 @@ class ExpandedPyMISP(PyMISP):
         query['includeEvent'] = include_event_meta
 
         url = urljoin(self.root_url, url_path)
-        # Remove None values.
-        # TODO: put that in self._prepare_request
-        query = {k: v for k, v in query.items() if v is not None}
-        response = self._prepare_request('POST', url, data=json.dumps(query))
+        response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_response(response)
-        if isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
-                                                    normalized_response.get('errors')):
+        if isinstance(normalized_response, str) or (isinstance(normalized_response, dict)
+                                                    and normalized_response.get('errors')):
             return normalized_response
         elif pythonify:
             to_return = []
@@ -227,7 +228,7 @@ class ExpandedPyMISP(PyMISP):
                timestamp: Optional[DateInterval]=None,
                published: Optional[bool]=None,
                enforce_warninglist: Optional[bool]=None, enforceWarninglist: Optional[bool]=None,
-               to_ids: Optional[str]=None,
+               to_ids: Optional[Union[ToIDSType, List[ToIDSType]]]=None,
                deleted: Optional[str]=None,
                include_event_uuid: Optional[str]=None, includeEventUuid: Optional[str]=None,
                event_timestamp: Optional[DateTypes]=None,
@@ -260,7 +261,7 @@ class ExpandedPyMISP(PyMISP):
         :param timestamp: Restrict the results by the timestamp (last edit). Any event with a timestamp newer than the given timestamp will be returned. In case you are dealing with /attributes as scope, the attribute's timestamp will be used for the lookup.
         :param published: Set whether published or unpublished events should be returned. Do not set the parameter if you want both.
         :param enforce_warninglist: Remove any attributes from the result that would cause a hit on a warninglist entry.
-        :param to_ids: By default (0) all attributes are returned that match the other filter parameters, irregardless of their to_ids setting. To restrict the returned data set to to_ids only attributes set this parameter to 1. You can only use the special "exclude" setting to only return attributes that have the to_ids flag disabled.
+        :param to_ids: By default all attributes are returned that match the other filter parameters, irregardless of their to_ids setting. To restrict the returned data set to to_ids only attributes set this parameter to 1. 0 for the ones with to_ids set to False.
         :param deleted: If this parameter is set to 1, it will return soft-deleted attributes along with active ones. By using "only" as a parameter it will limit the returned data set to soft-deleted data only.
         :param include_event_uuid: Instead of just including the event ID, also include the event UUID in each of the attributes.
         :param event_timestamp: Only return attributes from events that have received a modification after the given timestamp.
@@ -283,7 +284,7 @@ class ExpandedPyMISP(PyMISP):
 
         '''
 
-        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache']
+        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2']
 
         if controller not in ['events', 'attributes', 'objects', 'sightings']:
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
@@ -337,8 +338,8 @@ class ExpandedPyMISP(PyMISP):
         query['published'] = published
         query['enforceWarninglist'] = enforce_warninglist
         if to_ids is not None:
-            if str(to_ids) not in ['0', '1', 'exclude']:
-                raise ValueError('to_ids has to be in {}'.format(', '.join(['0', '1', 'exclude'])))
+            if int(to_ids) not in [0, 1]:
+                raise ValueError('to_ids has to be in {}'.format(', '.join([0, 1])))
             query['to_ids'] = to_ids
         query['deleted'] = deleted
         query['includeEventUuid'] = include_event_uuid
@@ -354,15 +355,12 @@ class ExpandedPyMISP(PyMISP):
         query['includeContext'] = include_context
         query['headerless'] = headerless
         url = urljoin(self.root_url, f'{controller}/restSearch')
-        # Remove None values.
-        # TODO: put that in self._prepare_request
-        query = {k: v for k, v in query.items() if v is not None}
-        response = self._prepare_request('POST', url, data=json.dumps(query))
+        response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_response(response)
         if return_format == 'csv' and pythonify and not headerless:
             return self._csv_to_dict(normalized_response)
-        elif isinstance(normalized_response, str) or (isinstance(normalized_response, dict) and
-                                                      normalized_response.get('errors')):
+        elif isinstance(normalized_response, str) or (isinstance(normalized_response, dict)
+                                                      and normalized_response.get('errors')):
             return normalized_response
         elif return_format == 'json' and pythonify:
             # The response is in json, we can convert it to a list of pythonic MISP objects
@@ -426,10 +424,7 @@ class ExpandedPyMISP(PyMISP):
             query['id'] = query.pop('log_id')
 
         url = urljoin(self.root_url, 'admin/logs/index')
-        # Remove None values.
-        # TODO: put that in self._prepare_request
-        query = {k: v for k, v in query.items() if v is not None}
-        response = self._prepare_request('POST', url, data=json.dumps(query))
+        response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_response(response)
         if not pythonify:
             return normalized_response
@@ -483,10 +478,7 @@ class ExpandedPyMISP(PyMISP):
                 query['timestamp'] = self.make_timestamp(timestamp)
 
         url = urljoin(self.root_url, 'events/index')
-        # Remove None values.
-        # TODO: put that in self._prepare_request
-        query = {k: v for k, v in query.items() if v is not None}
-        response = self._prepare_request('POST', url, data=json.dumps(query))
+        response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_response(response)
 
         if not pythonify:

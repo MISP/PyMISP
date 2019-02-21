@@ -5,7 +5,6 @@ import unittest
 import requests_mock
 import json
 import os
-import six
 import sys
 from io import BytesIO
 
@@ -308,7 +307,7 @@ class TestOffline(unittest.TestCase):
         return json.dumps(to_return, cls=MISPEncode)
 
     def test_objects_pseudofile(self, m):
-        if six.PY2:
+        if sys.version_info < (3, 0):
             return unittest.SkipTest()
         paths = ['cmd.exe', 'tmux', 'MachO-OSX-x64-ls']
         try:

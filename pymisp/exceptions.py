@@ -67,3 +67,7 @@ class PyMISPNotImplementedYet(PyMISPError):
 
 class PyMISPUnexpectedResponse(PyMISPError):
         pass
+
+
+class PyMISPEmptyResponse(PyMISPError):
+    pass

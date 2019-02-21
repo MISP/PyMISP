@@ -121,6 +121,10 @@ Documentation can be generated with epydoc:
 epydoc --url https://github.com/MISP/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
 ```
 
+### Jupyter notebook
+
+A series of [Jupyter notebooks for PyMISP tutorial](https://github.com/MISP/PyMISP/tree/master/docs/tutorial) are available in the repository.
+
 ## Everything is a Mutable Mapping
 
 ... or at least everything that can be imported/exported from/to a json blob

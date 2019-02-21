@@ -1,24 +1,42 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+
+
 import unittest
 
-from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
+from pymisp.tools import make_binary_objects
 from datetime import datetime, timedelta, date
 from io import BytesIO
+import re
+import json
 
 import time
+from uuid import uuid4
+
+import logging
+logging.disable(logging.CRITICAL)
+
+try:
+    from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
+except ImportError:
+    if sys.version_info < (3, 6):
+        print('This test suite requires Python 3.6+, breaking.')
+        sys.exit(0)
+    else:
+        raise
 
 try:
     from keys import url, key
+    verifycert = False
     travis_run = True
 except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
-    key = 'LBelWqKY9SQyG0huZzAMqiEBl6FODxpgRRXMsZFu'
+    key = 'E36iZ8hr31XIcWfqU4NGniwhMuvYRngip6O1dC9T'
+    verifycert = False
     travis_run = False
-
-from uuid import uuid4
 
 
 class TestComprehensive(unittest.TestCase):
@@ -27,7 +45,7 @@ class TestComprehensive(unittest.TestCase):
     def setUpClass(cls):
         cls.maxDiff = None
         # Connect as admin
-        cls.admin_misp_connector = ExpandedPyMISP(url, key, debug=False)
+        cls.admin_misp_connector = ExpandedPyMISP(url, key, verifycert, debug=False)
         # Creates an org
         org = cls.admin_misp_connector.add_organisation(name='Test Org')
         cls.test_org = MISPOrganisation()
@@ -36,12 +54,12 @@ class TestComprehensive(unittest.TestCase):
         usr = cls.admin_misp_connector.add_user(email='testusr@user.local', org_id=cls.test_org.id, role_id=3)
         cls.test_usr = MISPUser()
         cls.test_usr.from_dict(**usr)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey)
+        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=False)
         # Creates a publisher
         pub = cls.admin_misp_connector.add_user(email='testpub@user.local', org_id=cls.test_org.id, role_id=4)
         cls.test_pub = MISPUser()
         cls.test_pub.from_dict(**pub)
-        cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey)
+        cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey, verifycert)
 
     @classmethod
     def tearDownClass(cls):
@@ -83,6 +101,7 @@ class TestComprehensive(unittest.TestCase):
         second_event.add_attribute('text', str(uuid4()))
         second_event.attributes[0].add_tag('tlp:white___test')
         second_event.add_attribute('ip-dst', '1.1.1.1')
+        second_event.attributes[1].add_tag('tlp:amber___test')
         # Same value as in first event.
         second_event.add_attribute('text', first_event.attributes[0].value)
 
@@ -212,9 +231,9 @@ class TestComprehensive(unittest.TestCase):
             for e in events:
                 self.assertIn(e.id, [first.id, second.id, third.id])
             events = self.admin_misp_connector.search(tags='tlp:amber___test', pythonify=True)
-            self.assertEqual(len(events), 1)
+            self.assertEqual(len(events), 2)
             for e in events:
-                self.assertIn(e.id, [third.id])
+                self.assertIn(e.id, [second.id, third.id])
             events = self.admin_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(len(events), 1)
             for e in events:
@@ -225,9 +244,9 @@ class TestComprehensive(unittest.TestCase):
             for e in events:
                 self.assertIn(e.id, [second.id, third.id])
             events = self.user_misp_connector.search(tags='tlp:amber___test', pythonify=True)
-            self.assertEqual(len(events), 1)
+            self.assertEqual(len(events), 2)
             for e in events:
-                self.assertIn(e.id, [third.id])
+                self.assertIn(e.id, [second.id, third.id])
             events = self.user_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(events, [])
         finally:
@@ -244,16 +263,19 @@ class TestComprehensive(unittest.TestCase):
             attributes = self.admin_misp_connector.search(controller='attributes', tags='tlp:white___test', pythonify=True)
             self.assertEqual(len(attributes), 5)
             attributes = self.admin_misp_connector.search(controller='attributes', tags='tlp:amber___test', pythonify=True)
-            self.assertEqual(len(attributes), 2)
+            self.assertEqual(len(attributes), 3)
             attributes = self.admin_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(len(attributes), 1)
             # Search as user
             attributes = self.user_misp_connector.search(controller='attributes', tags='tlp:white___test', pythonify=True)
             self.assertEqual(len(attributes), 4)
             attributes = self.user_misp_connector.search(controller='attributes', tags='tlp:amber___test', pythonify=True)
-            self.assertEqual(len(attributes), 2)
+            self.assertEqual(len(attributes), 3)
             attributes = self.user_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(attributes, [])
+            attributes_tags_search = self.admin_misp_connector.build_complex_query(or_parameters=['tlp:amber___test'], not_parameters=['tlp:white___test'])
+            attributes = self.user_misp_connector.search(controller='attributes', tags=attributes_tags_search, pythonify=True)
+            self.assertEqual(len(attributes), 1)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
@@ -590,10 +612,6 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(len(events[0].attributes), 1)
-            events = self.user_misp_connector.search(timestamp=timeframe, to_ids='exclude', pythonify=True)
-            self.assertEqual(len(events), 2)
-            self.assertEqual(len(events[0].attributes), 1)
-            self.assertEqual(len(events[1].attributes), 1)
 
             # deleted
             second.attributes[1].delete()
@@ -754,7 +772,7 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
 
             response = self.user_misp_connector.fast_publish(first.id, alert=False)
-            self.assertEqual(response['errors'][0][1]['message'], 'You do not have permission to use this functionality.')
+            self.assertEqual(response['errors'][1]['message'], 'You do not have permission to use this functionality.')
 
             # Default search, attribute with to_ids == True
             first.attributes[0].to_ids = True
@@ -820,6 +838,22 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first.id)
             self.admin_misp_connector.delete_event(second.id)
 
+    def test_search_stix(self):
+        first = self.create_simple_event()
+        first.add_attribute('ip-src', '8.8.8.8')
+        try:
+            first = self.user_misp_connector.add_event(first)
+            if not travis_run:
+                stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
+                found = re.findall('8.8.8.8', stix)
+                self.assertTrue(found)
+                stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
+                json.dumps(stix2, indent=2)
+                self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
     def test_upload_sample(self):
         first = self.create_simple_event()
         second = self.create_simple_event()
@@ -879,6 +913,24 @@ class TestComprehensive(unittest.TestCase):
         # FIXME: returns the tag with ID 1
         self.admin_misp_connector.enable_tag(tag['id'])
         # FIXME: returns the tag with ID 1
+
+    def test_add_event_with_attachment(self):
+        first = self.create_simple_event()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            file_obj, bin_obj, sections = make_binary_objects('tests/viper-test-files/test_files/whoami.exe', standalone=False)
+            first.add_object(file_obj)
+            first.add_object(bin_obj)
+            for s in sections:
+                first.add_object(s)
+            self.assertEqual(len(first.objects[0].references), 1)
+            self.assertEqual(first.objects[0].references[0].relationship_type, 'included-in')
+            first = self.user_misp_connector.update_event(first)
+            self.assertEqual(len(first.objects[0].references), 1)
+            self.assertEqual(first.objects[0].references[0].relationship_type, 'included-in')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
 
     def test_taxonomies(self):
         # Make sure we're up-to-date

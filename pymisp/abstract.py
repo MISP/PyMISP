@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import abc
 import sys
 import datetime
 import json
 from json import JSONEncoder
 import collections
-import six  # Remove that import when discarding python2 support.
 import logging
 from enum import Enum
 
@@ -16,7 +14,7 @@ from .exceptions import PyMISPInvalidFormat
 
 logger = logging.getLogger('pymisp')
 
-if six.PY2:
+if sys.version_info < (3, 0):
     logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
     # This is required because Python 2 is a pain.
@@ -77,7 +75,6 @@ class MISPEncode(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
-@six.add_metaclass(abc.ABCMeta)   # Remove that line when discarding python2 support.
 class AbstractMISP(collections.MutableMapping):
 
     __not_jsonable = []

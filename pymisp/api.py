@@ -3,6 +3,7 @@
 
 """Python API using the REST interface of MISP"""
 
+import copy
 import sys
 import json
 import datetime
@@ -15,7 +16,7 @@ from io import BytesIO, open
 import zipfile
 
 from . import __version__, deprecated
-from .exceptions import PyMISPError, SearchError, NoURL, NoKey
+from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject
 from .abstract import AbstractMISP, MISPEncode
 
@@ -28,7 +29,7 @@ try:
     unicode = str
 except ImportError:
     from urlparse import urljoin
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
 try:
     import requests
@@ -157,6 +158,11 @@ class PyMISP(object):
         if data is None:
             req = requests.Request(request_type, url)
         else:
+            if not isinstance(data, str):
+                if isinstance(data, dict):
+                    # Remove None values.
+                    data = {k: v for k, v in data.items() if v is not None}
+                data = json.dumps(data)
             req = requests.Request(request_type, url, data=data)
         if self.asynch and background_callback is not None:
             local_session = FuturesSession
@@ -227,6 +233,8 @@ class PyMISP(object):
             json_response = response.json()
         except ValueError:
             # If the server didn't return a JSON blob, we've a problem.
+            if not len(response.text):
+                raise PyMISPEmptyResponse('The server returned an empty response. \n{}\n{}\n'.format(response.request.headers, response.request.body))
             raise PyMISPError(everything_broken.format(response.request.headers, response.request.body, response.text))
 
         errors = []
@@ -271,7 +279,7 @@ class PyMISP(object):
         """Transform a Json MISP event into a MISPEvent"""
         if not isinstance(event, MISPEvent):
             e = MISPEvent(self.describe_types)
-            e.load(event)
+            e.load(copy.copy(event))
         else:
             e = event
         return e
@@ -300,7 +308,7 @@ class PyMISP(object):
 
         :param uuid: an uuid
         """
-        regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+        regex = re.compile(r'^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
         match = regex.match(uuid)
         return bool(match)
 
@@ -589,12 +597,14 @@ class PyMISP(object):
         elif isinstance(event, int) or (isinstance(event, str) and (event.isdigit() or self._valid_uuid(event))):
             event_id = event
         else:
-            e = MISPEvent(describe_types=self.describe_types)
-            e.load(event)
-            if hasattr(e, 'id'):
-                event_id = e.id
-            elif hasattr(e, 'uuid'):
-                event_id = e.uuid
+            if 'Event' in event:
+                e = event['Event']
+            else:
+                e = event
+            if 'id' in e:
+                event_id = e['id']
+            elif 'uuid' in e:
+                event_id = e['uuid']
         return event_id
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
@@ -1058,7 +1068,7 @@ class PyMISP(object):
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
                      analysis=None, attribute=None, org=None, async_callback=None, normalize=False,
-                     timestamp=None):
+                     timestamp=None, sharinggroup=None):
         """Search only at the index level. Use ! infront of value as NOT, default OR
         If using async, give a callback that takes 2 args, session and response:
         basic usage is
@@ -1077,11 +1087,12 @@ class PyMISP(object):
         :param async_callback: Function to call when the request returns (if running async)
         :param normalize: Normalize output | True or False
         :param timestamp: Interval since last update (in second, or 1d, 1h, ...)
+        :param sharinggroup: The sharing group value
         """
         allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'dateuntil': dateuntil,
                    'datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
                    'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
-                   'org': org, 'timestamp': timestamp}
+                   'org': org, 'timestamp': timestamp, 'sharinggroup': sharinggroup}
         rule_levels = {'distribution': ["0", "1", "2", "3", "!0", "!1", "!2", "!3"],
                        'threatlevel': ["1", "2", "3", "4", "!1", "!2", "!3", "!4"],
                        'analysis': ["0", "1", "2", "!0", "!1", "!2"]}
@@ -1120,7 +1131,7 @@ class PyMISP(object):
     def search_all(self, value):
         """Search a value in the whole database"""
         query = {'value': value, 'searchall': 1}
-        return self.__query('restSearch/download', query)
+        return self.__query('restSearch', query)
 
     def __prepare_rest_search(self, values, not_values):
         """Prepare a search, generate the chain processed by the server
@@ -1209,6 +1220,15 @@ class PyMISP(object):
             else:
                 return {'error': 'You must enter a valid uuid.'}
 
+        returnFormat = kwargs.pop('returnFormat', None)
+        if returnFormat:
+            if returnFormat in ['json', 'openioc', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2']:
+                query['returnFormat'] = returnFormat
+            else:
+                return {'error': 'You must enter a valid returnFormat - json, openioc, xml, suricata, snort, text, rpz, csv, stix, stix2 or cache'}
+        else:
+            query['returnFormat'] = 'json'
+
         query['publish_timestamp'] = kwargs.pop('publish_timestamp', None)
         query['timestamp'] = kwargs.pop('timestamp', None)
         query['enforceWarninglist'] = kwargs.pop('enforceWarninglist', None)
@@ -1224,14 +1244,16 @@ class PyMISP(object):
             query['event_timestamp'] = kwargs.pop('event_timestamp', None)
             query['includeProposals'] = kwargs.pop('includeProposals', None)
 
+        if kwargs:
+            logger.info('Some unknown parameters are in kwargs. appending as-is: {}'.format(', '.join(kwargs.keys())))
+            # Add all other keys as-is.
+            query.update({k: v for k, v in kwargs.items()})
+
         # Cleanup
         query = {k: v for k, v in query.items() if v is not None}
 
-        if kwargs:
-            raise SearchError('Unused parameter: {}'.format(', '.join(kwargs.keys())))
-
         # Create a session, make it async if and only if we have a callback
-        return self.__query('restSearch/download', query, controller, async_callback)
+        return self.__query('restSearch', query, controller, async_callback)
 
     def get_attachment(self, attribute_id):
         """Get an attachement (not a malware sample) by attribute ID.
@@ -1422,6 +1444,15 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
+    def get_users_statistics(self, context='data'):
+        """Get users statistics from the MISP instance"""
+        availables_contexts = ['data', 'orgs', 'users', 'tags', 'attributehistogram', 'sightings', 'attackMatrix']
+        if context not in availables_contexts:
+            context = 'data'
+        url = urljoin(self.root_url, 'users/statistics/{}.json'.format(context))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
     # ############## Sightings ##################
 
     def sighting_per_id(self, attribute_id):
@@ -1475,7 +1506,7 @@ class PyMISP(object):
         :type element_id: int
         :param scope: could be attribute or event
         :return: A json list of sighting corresponding to the search
-        :rtype: list
+        :rtype: dict
 
         :Example:
 
@@ -1515,11 +1546,11 @@ class PyMISP(object):
 
         :Example:
 
-        >>> misp.search_sightings({'publish_timestamp': '30d'}) # search sightings for the last 30 days on the instance
+        >>> misp.search_sightings(**{'publish_timestamp': '30d'}) # search sightings for the last 30 days on the instance
         [ ... ]
-        >>> misp.search_sightings('attribute', {'id': 6, 'include_attribute': 1}) # return list of sighting for attribute 6 along with the attribute itself
+        >>> misp.search_sightings('attribute', context_id=6, include_attribute=1) # return list of sighting for attribute 6 along with the attribute itself
         [ ... ]
-        >>> misp.search_sightings('event', {'id': 17, 'include_event': 1, 'org_id': 2}) # return list of sighting for event 17 filtered with org id 2
+        >>> misp.search_sightings('event', **{'context_id': 17, 'include_event': 1, 'org_id': 2}) # return list of sighting for event 17 filtered with org id 2
         """
         if context not in ['', 'attribute', 'event']:
             raise Exception('Context parameter must be empty, "attribute" or "event"')
@@ -1920,6 +1951,12 @@ class PyMISP(object):
     def disable_warninglist(self, warninglist_id):
         """Disable a warninglist by id."""
         return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=False)
+
+    def check_warninglist(self, value):
+        """Check if IOC values are in warninglist"""
+        url = urljoin(self.root_url, '/warninglists/checkValue')
+        response = self._prepare_request('POST', url, json.dumps(value))
+        return self._check_response(response)
 
     # ############## NoticeLists ##################
 
