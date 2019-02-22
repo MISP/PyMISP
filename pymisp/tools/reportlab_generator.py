@@ -11,22 +11,21 @@ import pymisp
 logger = logging.getLogger('pymisp')
 
 # Potentially not installed imports
-try:
-    from reportlab.pdfgen import canvas
-    from reportlab.pdfbase.pdfmetrics import stringWidth
-    from reportlab.lib import colors
+#try:
+from reportlab.pdfgen import canvas
+from reportlab.pdfbase.pdfmetrics import stringWidth
+from reportlab.lib import colors
 
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable
 
-    from reportlab.lib.units import mm, inch
-    from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_JUSTIFY, TA_LEFT
-    from reportlab.lib.pagesizes import letter, inch
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import mm
+from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_JUSTIFY, TA_LEFT
 
-    HAS_REPORTLAB = True
-except ImportError:
-    HAS_REPORTLAB = False
-    print("ReportLab cannot be imported. Please verify that ReportLab is installed on the system.")
+#    HAS_REPORTLAB = True
+#except ImportError:
+#    HAS_REPORTLAB = False
+#    print("ReportLab cannot be imported. Please verify that ReportLab is installed on the system.")
 
 
 ########################################################################
@@ -675,7 +674,6 @@ def convert_event_in_pdf_buffer(misp_event: pymisp.MISPEvent):
 def get_values_from_buffer(pdf_buffer):
     return pdf_buffer.value()
 
-
 def get_base64_from_buffer(pdf_buffer):
     return base64.b64encode(pdf_buffer.value())
 
@@ -690,45 +688,5 @@ def register_to_file(pdf_buffer, file_name):
         f.write(pdf_buffer.read())
 
 def register_value_to_file(pdf_value, file_name):
-
     with open(file_name, 'wb') as f:
         f.write(pdf_value)
-
-
-if __name__ == "__main__":
-    # pdf_buffer = convert_event_in_pdf_buffer(None)
-
-    # register_to_file(pdf_buffer, 'test.pdf')
-    get_sample_fonts()
-    get_sample_styles()
-    # get_values_from_buffer(pdf_buffer)
-    # get_base64_from_buffer(pdf_buffer)
-
-''' In the future ? 
-try:
-    from pymispgalaxies import Clusters
-    has_pymispgalaxies = True
-except ImportError:
-    has_pymispgalaxies = False
-
-try:
-    from pytaxonomies import Taxonomies
-    has_pymispgalaxies = True
-except ImportError:
-    has_pymispgalaxies = False
-'''
-'''
-class ReportLabObject():
-
-    def __init__(self, parameters, strict=True, standalone=True, **kwargs):
-        super(ReportLabObject, self).__init__('reportlab', strict=strict, standalone=standalone, **kwargs)
-        self._parameters = parameters
-        self.generate_attributes()
-
-    def generate_attributes(self):
-        first = self._sanitize_timestamp(self._parameters.pop('first-seen', None))
-        self._parameters['first-seen'] = first
-        last = self._sanitize_timestamp(self._parameters.pop('last-seen', None))
-        self._parameters['last-seen'] = last
-        return super(ReportLabObject, self).generate_attributes()
-'''

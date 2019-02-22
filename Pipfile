@@ -13,6 +13,7 @@ requests-mock = "*"
 pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal"],path = "."}
 pydeep = {editable = true,git = "https://github.com/kbandla/pydeep.git"}
 pymispwarninglists = {editable = true,git = "https://github.com/MISP/PyMISPWarningLists.git"}
+reportlab = "*"
 
 [requires]
 python_version = "3.6"

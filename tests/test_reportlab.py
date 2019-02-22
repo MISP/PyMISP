@@ -14,8 +14,8 @@ class TestMISPEvent(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
         self.mispevent = MISPEvent()
-        self.test_folder = "reportlab_testfiles/"
-        self.storage_folder = "reportlab_testoutputs/"
+        self.test_folder = "tests/reportlab_testfiles/"
+        self.storage_folder = "tests/reportlab_testoutputs/"
 
     def init_event(self):
         self.mispevent.info = 'This is a test'
@@ -40,9 +40,9 @@ class TestMISPEvent(unittest.TestCase):
         file_nb = str(len(os.listdir(self.test_folder)))
         i = 0
 
-        for file in os.listdir(self.test_folder):
+        for curr_file in os.listdir(self.test_folder):
             self.mispevent = MISPEvent()
-            file_path = self.test_folder + file
+            file_path = self.test_folder + curr_file
 
             print("Current file : " + file_path + " " + str(i) + " over " + file_nb)
             i += 1
@@ -50,4 +50,4 @@ class TestMISPEvent(unittest.TestCase):
             self.mispevent.load_file(file_path)
 
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
-                                                 self.storage_folder + file + ".pdf")
+                                                 self.storage_folder + curr_file + ".pdf")
