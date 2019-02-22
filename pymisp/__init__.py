@@ -42,6 +42,7 @@ try:
     from .tools import openioc  # noqa
     from .tools import load_warninglists  # noqa
     from .tools import ext_lookups  # noqa
+    from .tools import reportlab_generator  # noqa
     if sys.version_info >= (3, 6):
         from .aping import ExpandedPyMISP  # noqa
     logger.debug('pymisp loaded properly')
