@@ -7,25 +7,27 @@ import logging
 import pprint
 from io import BytesIO
 import pymisp
+from html import escape
 
 logger = logging.getLogger('pymisp')
 
 # Potentially not installed imports
-#try:
-from reportlab.pdfgen import canvas
-from reportlab.pdfbase.pdfmetrics import stringWidth
-from reportlab.lib import colors
+try:
+    from reportlab.pdfgen import canvas
+    from reportlab.pdfbase.pdfmetrics import stringWidth
+    from reportlab.pdfbase.pdfdoc import PDFDictionary, PDFInfo
+    from reportlab.lib import colors
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable
 
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import mm
-from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_JUSTIFY, TA_LEFT
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import mm
+    from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_JUSTIFY, TA_LEFT
 
-#    HAS_REPORTLAB = True
-#except ImportError:
-#    HAS_REPORTLAB = False
-#    print("ReportLab cannot be imported. Please verify that ReportLab is installed on the system.")
+    HAS_REPORTLAB = True
+except ImportError:
+    HAS_REPORTLAB = False
+    print("ReportLab cannot be imported. Please verify that ReportLab is installed on the system.")
 
 
 ########################################################################
@@ -128,6 +130,12 @@ ROW_HEIGHT_FOR_TAGS = 4 * mm  # 4.5 * mm (a bit too short to allow vertical alig
 # == Whole document margins and size ==
 PAGESIZE = (140 * mm, 216 * mm)  # width, height
 BASE_MARGIN = 5 * mm  # Create a list here to specify each row separately
+
+# == Parameters for error handling for content too long to fit on a page ==
+FRAME_MAX_HEIGHT = 500 # 650 # Ad hoc value for a A4 page
+FRAME_MAX_WIDTH = 356
+STR_TOO_LONG_WARNING = "<br/><b><font color=red>[Too long to fit on a single page. Cropped]</font></b>"
+
 
 '''
 "UTILITIES" METHODS. Not meant to be used except for development purposes
@@ -290,7 +298,7 @@ def get_creator_organisation_value(misp_event, item, col2_style):
     :return: a Paragraph to add in the pdf, regarding the values of "creator organisation"
     '''
     if hasattr(misp_event, item[1]):
-        return Paragraph(str(getattr(getattr(misp_event, item[1]), item[3])), col2_style)
+        return Paragraph(escape(str(getattr(getattr(misp_event, item[1]), item[3]))), col2_style)
     else:
         return Paragraph(item[2], col2_style)
 
@@ -326,6 +334,42 @@ def get_tag_value(misp_event, item, col2_style):
         return table_event_tags
     else:
         return Paragraph(item[2], col2_style)
+
+def get_unoverflowable_paragraph(dirty_string, curr_style) :
+    '''
+    Create a paragraph that can fit on a cell of one page. Mostly hardcoded values.
+    This method can be improved (get the exact size of the current frame, and limit the paragraph to this size.)
+    This might be worst look at KeepInFrame (which hasn't went well so far)
+    :param dirty_string:
+    :param curr_style:
+    :return:
+    '''
+    sanitized_str = str(escape(dirty_string))
+
+    # Get the space that the paragraph needs to be printed
+    w, h = Paragraph(sanitized_str, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
+
+    # If there is enough space, directly send back the sanitized paragraph
+    if w <= FRAME_MAX_WIDTH and h <= FRAME_MAX_HEIGHT :
+        return Paragraph(sanitized_str, curr_style)
+    else :
+        # Otherwise, cut the content to fit the paragraph (Dichotomy)
+        max_carac_amount = int((FRAME_MAX_HEIGHT/(h*1.0))*len(sanitized_str))
+
+        i = 0
+        MAX_ITERATION = 10
+        limited_string = ""
+        while (w > FRAME_MAX_WIDTH or h > FRAME_MAX_HEIGHT) and i<MAX_ITERATION:
+            i += 1
+            limited_string = sanitized_str[:max_carac_amount] # .replace("\n", "").replace("\r", "")
+            w, h = Paragraph(limited_string + STR_TOO_LONG_WARNING, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
+            max_carac_amount = int(max_carac_amount/2)
+
+        if w <= FRAME_MAX_WIDTH and h <= FRAME_MAX_HEIGHT :
+            return Paragraph(limited_string + STR_TOO_LONG_WARNING, curr_style)
+        else :
+            # We may still end with a not short enough string
+            return Paragraph(STR_TOO_LONG_WARNING, curr_style)
 
 
 def create_flowable_table_from_data(data):
@@ -410,7 +454,7 @@ def create_flowable_table_from_event(misp_event: pymisp.MISPEvent):
     for item in list_attr_automated:
         if hasattr(misp_event, item[1]):
             # The attribute exist, we fetch it and create the row
-            data.append([Paragraph(item[0], col1_style), Paragraph(str(getattr(misp_event, item[1])), col2_style)])
+            data.append([Paragraph(item[0], col1_style), Paragraph(escape(str(getattr(misp_event, item[1]))), col2_style)]) # TODO : get_unoverflowable_paragraph
         else:
             # The attribute does not exist ,we print a default text on the row
             data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
@@ -438,7 +482,6 @@ def create_flowable_table_from_event(misp_event: pymisp.MISPEvent):
 
     return create_flowable_table_from_data(data)
 
-
 def create_flowable_table_from_attributes(misp_event: pymisp.MISPEvent):
     '''
     Returns a list of flowables representing the list of attributes of a misp event.
@@ -464,7 +507,6 @@ def create_flowable_table_from_attributes(misp_event: pymisp.MISPEvent):
 
     return flowable_table
 
-
 def create_flowable_table_from_one_attribute(misp_attribute: pymisp.mispevent.MISPAttribute):
     '''
     Returns a table (flowalbe) representing the attribute
@@ -488,7 +530,7 @@ def create_flowable_table_from_one_attribute(misp_attribute: pymisp.mispevent.MI
     for item in list_attr_automated:
         if hasattr(misp_attribute, item[1]) and getattr(misp_attribute, item[1]) is not None and getattr(misp_attribute, item[1]) != "":
             # The attribute exist, we fetch it and create the row
-            data.append([Paragraph(item[0], col1_style), Paragraph(str(getattr(misp_attribute, item[1])), col2_style)])
+            data.append([Paragraph(item[0], col1_style), get_unoverflowable_paragraph(getattr(misp_attribute, item[1]), col2_style)])
         #else:
             # The attribute does not exist ,we print a default text on the row
             # TODO : TO ACTIVATE IF YOU WANT A EMPTY LINE INSTEAD OF NOTHING data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
@@ -571,6 +613,8 @@ def collect_parts(misp_event: pymisp.MISPEvent):
     # Get the list of available styles
     sample_style_sheet = getSampleStyleSheet()
 
+    set_metadata(misp_event)
+
     # Create stuff
     title = Paragraph(misp_event.info, sample_style_sheet['Heading1'])
     subtitle = Paragraph("General information", sample_style_sheet['Heading2'])
@@ -594,6 +638,38 @@ def collect_parts(misp_event: pymisp.MISPEvent):
 
     return flowables
 
+
+def set_template(canvas, doc):
+    add_page_number(canvas, doc)
+    add_metadata(canvas, doc)
+
+METADATA = {}
+def set_metadata(misp_event: pymisp.MISPEvent):
+    if hasattr(misp_event, 'info'):
+        METADATA["title"] = getattr(misp_event, 'info')
+    if hasattr(misp_event, 'info'):
+        METADATA["subject"] = getattr(misp_event, 'info')
+    if hasattr(misp_event, 'Orgc'):
+        if hasattr(getattr(misp_event, 'Orgc'), 'name'):
+            METADATA["author"] = getattr(getattr(misp_event, 'Orgc'), 'name')
+            METADATA["creator"] = getattr(getattr(misp_event, 'Orgc'), 'name')
+    if hasattr(misp_event, 'uuid'):
+        METADATA["keywords"] = getattr(misp_event, 'uuid')
+
+def add_metadata(canvas, doc):
+    # There should be a nicer way to do it :
+    # From : https://stackoverflow.com/questions/52358853/reportlab-metadata-creationdate-and-modificationdate
+    keys = METADATA.keys()
+    if 'title' in keys:
+        canvas.setTitle(METADATA["title"])
+    if 'subject' in keys:
+        canvas.setSubject(METADATA["subject"])
+    if 'author' in keys:
+        canvas.setAuthor(METADATA["author"])
+    if 'creator' in keys:
+        canvas.setCreator(METADATA["creator"])
+    if 'keywords' in keys:
+        canvas.setKeywords(METADATA["keywords"])
 
 def add_page_number(canvas, doc):
     '''
@@ -625,12 +701,11 @@ def export_flowables_to_pdf(document, pdf_buffer, flowables):
     :param flowables: list of flowables to compile as pdf
     :return:
     '''
-    # my_doc.build(flowables) # Basic building of the final document
 
     document.build(
         flowables,
-        onFirstPage=add_page_number,  # Pagination for first page
-        onLaterPages=add_page_number,  # Pagination for all other page
+        onFirstPage=set_template,  # Pagination for first page
+        onLaterPages=set_template,  # Pagination for all other page
     )
 
 '''
@@ -661,12 +736,8 @@ def convert_event_in_pdf_buffer(misp_event: pymisp.MISPEvent):
     export_flowables_to_pdf(curr_document, pdf_buffer, flowables)
     pdf_value = pdf_buffer.getvalue()
 
-    # Used for testing purposes
-    # pdf_buffer.seek(0)
-
     # TODO : Not sure what to give back ? Buffer ? Buffer.value() ? Base64(buffer.value()) ? ...
     pdf_buffer.close()
-    # return pdf_value
 
     return pdf_value
 
@@ -681,7 +752,7 @@ def get_base64_from_value(pdf_value):
     return base64.b64encode(pdf_value)
 
 def register_to_file(pdf_buffer, file_name):
-    # Used for testing purposes
+    # Used for testing purposes only
     pdf_buffer.seek(0)
 
     with open(file_name, 'wb') as f:
