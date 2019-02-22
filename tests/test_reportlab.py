@@ -64,25 +64,3 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.load_file(self.test_folder + '5abf6421-c1b8-477b-a9d2-9c0902de0b81.json')
         reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
                                                   self.storage_folder + "super_long.pdf")
-
-    '''
-    ONLY for manual testing
-        def test_batch_OSINT_events(self):
-        self.check_python_2()
-        self.init_event()
-
-        file_nb = str(len(os.listdir(self.test_batch_folder)))
-        i = 0
-
-        for curr_file in os.listdir(self.test_batch_folder):
-            self.mispevent = MISPEvent()
-            file_path = self.test_batch_folder + curr_file
-
-            print("Current file : " + file_path + " " + str(i) + " over " + file_nb)
-            i += 1
-
-            self.mispevent.load_file(file_path)
-
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
-                                                 self.storage_folder + curr_file + ".pdf")
-    '''
