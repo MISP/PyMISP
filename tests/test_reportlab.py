@@ -10,7 +10,7 @@ import sys
 import os
 import time
 
-manual_testing = True
+manual_testing = False
 
 class TestMISPEvent(unittest.TestCase):
 
