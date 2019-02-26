@@ -429,14 +429,14 @@ def get_published_value(misp_event, item, col2_style):
                                    col2_style)
             else:
                 # Published without published date
-                answer = Paragraph(YES_ANSWER + "no date)",col2_style)
+                answer = Paragraph(YES_ANSWER + "no date)", col2_style)
 
         else:
             # Not published
-            answer = Paragraph(NO_ANSWER,col2_style)
+            answer = Paragraph(NO_ANSWER, col2_style)
     else:
         # Does not have a published attribute
-        answer = Paragraph(item[2],col2_style)
+        answer = Paragraph(item[2], col2_style)
 
     return answer
 
@@ -463,8 +463,6 @@ def create_flowable_table_from_one_attribute(misp_attribute):
                            ["Type", 'type', "None"],
                            ["Value", 'value', "None"]]
 
-
-
     # Handle the special case of links
     STANDARD_TYPE = True
     if hasattr(misp_attribute, 'type') and (getattr(misp_attribute, 'type') in [LINK_TYPE, URL_TYPE]):
@@ -482,37 +480,15 @@ def create_flowable_table_from_one_attribute(misp_attribute):
         # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
         # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
 
-    # Handle Special case for links (Value)
-    if not STANDARD_TYPE:
-        item = ["Value", 'value', "None"]
+    # Handle Special case for links (Value) - There were not written in the previous loop
+    item = ["Value", 'value', "None"]
+    if not STANDARD_TYPE and is_safe_attribute(misp_attribute, item[1]):
+        data.append([Paragraph(item[0], col1_style), get_good_or_bad_link(misp_attribute, item, col2_style)])
 
-        if is_safe_attribute(misp_attribute, item[1]):
-            # Handle "Good" links
-            if getattr(misp_attribute, 'type') == LINK_TYPE:
-                data.append([Paragraph(item[0], col1_style), get_unoverflowable_paragraph(
-                    "<font color=" + GOOD_LINK_COLOR + "><a href=" + getattr(misp_attribute, item[1]) + ">" + getattr(
-                        misp_attribute, item[1]) + "</a></font>", col2_style, False)])
-            # Handle "bad "links
-            elif getattr(misp_attribute, 'type') == URL_TYPE:
-                data.append([Paragraph(item[0], col1_style), get_unoverflowable_paragraph(
-                    "<font color=" + BAD_LINK_COLOR + "><a href=" + WARNING_MESSAGE_URL + ">" + getattr(misp_attribute,
-                                                                                                        item[
-                                                                                                            1]) + "</a></font>",
-                    col2_style, False)])
-
-    item = ["Data", 'data', "None"]
     # Handle pictures
+    item = ["Data", 'data', "None"]
     if is_safe_attribute(misp_attribute, item[1]) and getattr(misp_attribute, 'type') == IMAGE_TYPE:
-        try :
-            # Get the image
-            buf = getattr(misp_attribute, item[1])
-
-            # Create image within a bounded box (to allow pdf creation)
-            img = Image(buf, width=FRAME_PICTURE_MAX_WIDTH, height=FRAME_PICTURE_MAX_HEIGHT, kind='bound')
-            data.append([Paragraph(item[0], col1_style), img])
-        except OSError :
-            logger.error("Trying to add an attachment during PDF export generation. Attachement joining failed. Attachmement may not be an image.")
-            data.append([Paragraph(item[0], col1_style),get_unoverflowable_paragraph("<font color=" + BAD_LINK_COLOR + ">" + NOT_A_PICTURE_MESSAGE + "</font>", col2_style, False) ])
+        data.append([Paragraph(item[0], col1_style), get_image_value(misp_attribute, item, col2_style)])
 
     # Tags
     item = ["Tags", 'Tag', "None"]
@@ -539,6 +515,85 @@ def create_tags_table_from_data(data):
     curr_table.setStyle(TableStyle(general_style))
 
     return curr_table
+
+
+def get_good_link(misp_attribute, item, col2_style):
+    '''
+    Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link
+    :param misp_attribute: A misp attribute with a link
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a Paragraph to add in the pdf, regarding the values of this "link" attribute
+    '''
+    return get_unoverflowable_paragraph(
+        "<font color=" + GOOD_LINK_COLOR + "><a href=" + getattr(misp_attribute, item[1]) + ">" + getattr(
+            misp_attribute, item[1]) + "</a></font>", col2_style, False)
+
+
+def get_bad_link(misp_attribute, item, col2_style):
+    '''
+    Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link
+    :param misp_attribute: A misp event with an url
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a Paragraph to add in the pdf, regarding the values of this "url" attribute
+    '''
+    return get_unoverflowable_paragraph(
+        "<font color=" + BAD_LINK_COLOR + "><a href=" + WARNING_MESSAGE_URL + ">" + getattr(misp_attribute,
+                                                                                            item[1]) + "</a></font>",
+        col2_style, False)
+
+
+def get_good_or_bad_link(misp_attribute, item, col2_style):
+    '''
+    Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link or an url
+    :param misp_attribute: A misp attribute with a link or an url
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a Paragraph to add in the pdf, regarding the values of this "link" or "url" attribute
+    '''
+
+    # Handle "Good" links
+    if getattr(misp_attribute, 'type') == LINK_TYPE:
+        answer = get_good_link(misp_attribute, item, col2_style)
+    # Handle "bad "links
+    elif getattr(misp_attribute, 'type') == URL_TYPE:
+        answer = get_bad_link(misp_attribute, item, col2_style)
+
+    return answer
+
+
+def get_image_value(misp_attribute, item, col2_style):
+    '''
+    Returns a flowable image to add to the pdf given the misp attribute type and data
+    :param misp_attribute: A misp attribute with type="attachement" and data
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a flowable image to add in the pdf, regarding the values of "data"
+    '''
+
+    try:
+        # Get the image
+        buf = getattr(misp_attribute, item[1])
+
+        # Create image within a bounded box (to allow pdf creation)
+        img = Image(buf, width=FRAME_PICTURE_MAX_WIDTH, height=FRAME_PICTURE_MAX_HEIGHT, kind='bound')
+        answer = img
+    except OSError:
+        logger.error(
+            "Trying to add an attachment during PDF export generation. Attachement joining failed. Attachmement may not be an image.")
+        answer = get_unoverflowable_paragraph(
+            "<font color=" + BAD_LINK_COLOR + ">" + NOT_A_PICTURE_MESSAGE + "</font>", col2_style, False)
+
+    return answer
 
 
 ########################################################################
