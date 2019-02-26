@@ -10,7 +10,7 @@ import sys
 import os
 import time
 
-manual_testing = False
+manual_testing = True
 
 class TestMISPEvent(unittest.TestCase):
 
@@ -126,6 +126,21 @@ class TestMISPEvent(unittest.TestCase):
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
                                                        self.storage_folder + "config_partial_1.pdf")
 
+    def test_image_json(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        else:
+
+            config = {}
+            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
+            config[moduleconfig[0]] = "http://localhost:8080"
+            config[moduleconfig[1]] =  "My Wonderful CERT"
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'image_event.json')
+            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                                                       self.storage_folder + "image_event.pdf")
+
     def test_batch_OSINT_events(self):
         # Test case ONLY for manual testing. Needs to download a full list of OSINT events !
 
@@ -152,3 +167,4 @@ class TestMISPEvent(unittest.TestCase):
                     reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
                     self.storage_folder + curr_file + ".pdf")
             print("Elapsed time : " + str(time.time() - t))
+            # Local run : 1958.930s for 1064 files

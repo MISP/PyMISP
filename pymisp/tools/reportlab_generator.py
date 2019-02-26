@@ -12,6 +12,7 @@ import sys
 
 if sys.version_info.major >= 3:
     from html import escape
+    # import PIL
 else:
     print(
         "ExportPDF running with Python < 3 : stability and output not guaranteed. Please run exportPDF with at least Python3")
@@ -24,8 +25,9 @@ try:
     from reportlab.pdfbase.pdfmetrics import stringWidth
     from reportlab.pdfbase.pdfdoc import PDFDictionary, PDFInfo
     from reportlab.lib import colors
+    from reportlab.lib.utils import ImageReader
 
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable, Image
 
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import mm
@@ -454,10 +456,12 @@ def create_flowable_table_from_one_attribute(misp_attribute):
                            ["Type", 'type', "None"],
                            ["Value", 'value', "None"]]
 
+    IMAGE_TYPE = "attachment"
+
     # Handle the special case of links
     STANDARD_TYPE = True
-    if hasattr(misp_attribute, 'type') and (
-            getattr(misp_attribute, 'type') == LINK_TYPE or getattr(misp_attribute, 'type') == URL_TYPE):
+    if hasattr(misp_attribute, 'type') and (getattr(misp_attribute, 'type') in [LINK_TYPE, URL_TYPE, IMAGE_TYPE]):
+        # getattr(misp_attribute, 'type') == LINK_TYPE or getattr(misp_attribute, 'type') == URL_TYPE):
         # Special case for links
         STANDARD_TYPE = False
 
@@ -482,10 +486,35 @@ def create_flowable_table_from_one_attribute(misp_attribute):
                         misp_attribute, item[1]) + "</a></font>", col2_style, False)])
             elif getattr(misp_attribute, 'type') == URL_TYPE:
                 data.append([Paragraph(item[0], col1_style), get_unoverflowable_paragraph(
-                    "<font color=" + BAD_LINK_COLOR + "><a href=" + WARNING_MESSAGE_URL + ">" + getattr(misp_attribute,
-                                                                                                        item[
-                                                                                                            1]) + "</a></font>",
-                    col2_style, False)])
+                    "<font color=" + BAD_LINK_COLOR + "><a href=" + WARNING_MESSAGE_URL + ">" + getattr(misp_attribute,item[1]) + "</a></font>",col2_style, False)])
+            elif getattr(misp_attribute, 'type') == IMAGE_TYPE:
+                # Get the image
+                buf = getattr(misp_attribute, 'data')
+
+                # Scale down (or up ?) the image to fit the maximum frame size
+                img_size = ImageReader(buf).getSize()
+                w_scale =  FRAME_MAX_WIDTH / img_size[0]
+                h_scale =  FRAME_MAX_HEIGHT / img_size[1]
+                scale_down = min(w_scale,h_scale)
+
+                print(FRAME_MAX_HEIGHT,FRAME_MAX_WIDTH)
+                print(img_size)
+                print(w_scale)
+                print(h_scale)
+                print(scale_down)
+                print(img_size[0]*scale_down, img_size[1]*scale_down)
+
+                # img_width = 88 * mm # max image height
+                # print(img_size)
+                FRAME_PICTURE_MAX_WIDTH =  88*mm
+                FRAME_PICTURE_MAX_HEIGHT = 195*mm
+                # return Image(path, width=width, height=(width * aspect))
+                img = Image(buf,width=FRAME_PICTURE_MAX_WIDTH,height=FRAME_PICTURE_MAX_HEIGHT,kind='bound')
+                # width, height = img.getSize()
+                # aspect = height / float(width)
+                data.append([Paragraph('data', col1_style),img])
+
+
 
     # Tags
     item = ["Tags", 'Tag', "None"]
