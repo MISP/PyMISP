@@ -515,8 +515,7 @@ def create_flowable_table_from_one_object(misp_object):
                            ["Meta Category", 'meta-category', "None"],
                            ["Object Name", 'name', "None"],
                            ["Comment", 'comment', "None"],
-                           ["Type", 'type', "None"],
-                           ["Object Name", 'name', "None"]]
+                           ["Type", 'type', "None"]]
 
     # Automated adding of standard (python) attributes of the misp object
     for item in list_attr_automated:
