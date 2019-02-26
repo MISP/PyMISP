@@ -54,36 +54,36 @@ class TestMISPEvent(unittest.TestCase):
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'to_delete1.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
-                                                       self.storage_folder + "basic_event.pdf")
+                                                       self.storage_folder + "normal_event.pdf")
 
     def test_HTML_json(self):
         if self.check_python_2():
             self.assertTrue(True)
         else:
             self.init_event()
-            self.mispevent.load_file(self.test_folder + '56e12e66-f01c-41be-afea-4d9a950d210f.json')
+            self.mispevent.load_file(self.test_folder + 'HTML_event.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
-                                                       self.storage_folder + "HTML.pdf")
+                                                       self.storage_folder + "HTML_event.pdf")
 
     def test_long_json(self):
         if self.check_python_2():
             self.assertTrue(True)
         else:
             self.init_event()
-            self.mispevent.load_file(self.test_folder + '57153590-f73c-49fa-be4b-4737950d210f.json')
+            self.mispevent.load_file(self.test_folder + 'long_event.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
-                                                       self.storage_folder + "long.pdf")
+                                                       self.storage_folder + "long_event.pdf")
             # Issue report : "We are not smart enough" : https://pairlist2.pair.net/pipermail/reportlab-users/2010-May/009529.html
-            # Not nice but working solution exposed ther e: https://pairlist2.pair.net/pipermail/reportlab-users/2016-March/011525.html
+            # Not nice but working solution exposed there: https://pairlist2.pair.net/pipermail/reportlab-users/2016-March/011525.html
 
     def test_very_long_json(self):
         if self.check_python_2():
             self.assertTrue(True)
         else:
             self.init_event()
-            self.mispevent.load_file(self.test_folder + '5abf6421-c1b8-477b-a9d2-9c0902de0b81.json')
+            self.mispevent.load_file(self.test_folder + 'very_long_event.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
-                                                       self.storage_folder + "very_long.pdf")
+                                                       self.storage_folder + "very_long_event.pdf")
 
     def test_full_config_json(self):
         if self.check_python_2():
@@ -96,9 +96,9 @@ class TestMISPEvent(unittest.TestCase):
             config[moduleconfig[1]] =  "My Wonderful CERT"
 
             self.init_event()
-            self.mispevent.load_file(self.test_folder + '5abf6421-c1b8-477b-a9d2-9c0902de0b81.json')
+            self.mispevent.load_file(self.test_folder + 'very_long_event.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "config_complete.pdf")
+                                                       self.storage_folder + "config_complete_event.pdf")
 
     def test_partial_0_config_json(self):
         if self.check_python_2():
@@ -110,9 +110,9 @@ class TestMISPEvent(unittest.TestCase):
             config[moduleconfig[0]] = "http://localhost:8080"
 
             self.init_event()
-            self.mispevent.load_file(self.test_folder + '5abf6421-c1b8-477b-a9d2-9c0902de0b81.json')
+            self.mispevent.load_file(self.test_folder + 'very_long_event.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "config_partial_0.pdf")
+                                                       self.storage_folder + "config_partial_0_event.pdf")
 
     def test_partial_1_config_json(self):
         if self.check_python_2():
@@ -124,9 +124,9 @@ class TestMISPEvent(unittest.TestCase):
             config[moduleconfig[1]] =  "My Wonderful CERT"
 
             self.init_event()
-            self.mispevent.load_file(self.test_folder + '5abf6421-c1b8-477b-a9d2-9c0902de0b81.json')
+            self.mispevent.load_file(self.test_folder + 'very_long_event.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "config_partial_1.pdf")
+                                                       self.storage_folder + "config_partial_1_event.pdf")
 
     def test_image_json(self):
         if self.check_python_2():
@@ -142,6 +142,36 @@ class TestMISPEvent(unittest.TestCase):
             self.mispevent.load_file(self.test_folder + 'image_event.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
                                                        self.storage_folder + "image_event.pdf")
+
+    def test_objects_1_json(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        else:
+
+            config = {}
+            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
+            config[moduleconfig[0]] = "http://localhost:8080"
+            config[moduleconfig[1]] =  "My Wonderful CERT"
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'mainly_objects_1.json')
+            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                                                       self.storage_folder + "mainly_objects_1.pdf")
+
+    def test_objects_2_json(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        else:
+
+            config = {}
+            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
+            config[moduleconfig[0]] = "http://localhost:8080"
+            config[moduleconfig[1]] =  "My Wonderful CERT"
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'mainly_objects_2.json')
+            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                                                       self.storage_folder + "mainly_objects_2.pdf")
 
 
     def test_batch_image_events(self):
@@ -170,7 +200,7 @@ class TestMISPEvent(unittest.TestCase):
                     reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
                     self.storage_image_folder + curr_file + ".pdf")
             print("Elapsed time : " + str(time.time() - t))
-            # Local run : 1958.930s for 1064 files
+            # Local run : 73.061s for 102 files
 
     def test_batch_OSINT_events(self):
         # Test case ONLY for manual testing. Needs to download a full list of OSINT events !

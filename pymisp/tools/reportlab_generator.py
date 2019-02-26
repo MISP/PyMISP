@@ -309,11 +309,11 @@ def get_value_link_to_event(misp_event, item, col2_style, config=None, color=Tru
     '''
 
     # Does MispEven has the attribute ?
-    if hasattr(misp_event, item[1]):
+    if is_safe_attribute(misp_event, item[1]):
         # It has the requested attribute .. building upon it.
 
         # Does misp_object has an uuid and do we know the baseurl ?
-        if hasattr(misp_event, "uuid") and config is not None and moduleconfig[0] in config:
+        if is_safe_attribute(misp_event, "uuid") and config is not None and moduleconfig[0] in config:
             # We can build links
             curr_uuid = str(getattr(misp_event, "uuid"))
             curr_baseurl = config[moduleconfig[0]]
@@ -348,7 +348,7 @@ def get_timestamp_value(misp_event, item, col2_style):
     :param col2_style: style to be applied on the returned paragraph
     :return: a Paragraph to add in the pdf, regarding the values of "timestamp"
     '''
-    if hasattr(misp_event, item[1]):
+    if is_safe_attribute(misp_event, item[1]):
         return Paragraph(str(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT)), col2_style)
     return Paragraph(item[2], col2_style)
 
@@ -363,7 +363,7 @@ def get_creator_organisation_value(misp_event, item, col2_style):
     :param col2_style: style to be applied on the returned paragraph
     :return: a Paragraph to add in the pdf, regarding the values of "creator organisation"
     '''
-    if hasattr(misp_event, item[1]):
+    if is_safe_attribute(misp_event, item[1]):
         return Paragraph(safe_string(getattr(getattr(misp_event, item[1]), item[3])), col2_style)
     return Paragraph(item[2], col2_style)
 
@@ -378,7 +378,7 @@ def get_attributes_number_value(misp_event, item, col2_style):
     :param col2_style: style to be applied on the returned paragraph
     :return: a Paragraph to add in the pdf, regarding the values of "attributes"
     '''
-    if hasattr(misp_event, item[1]):
+    if is_safe_attribute(misp_event, item[1]):
         return Paragraph(str(len(getattr(misp_event, item[1]))), col2_style)
     return Paragraph(item[2], col2_style)
 
@@ -393,7 +393,7 @@ def get_tag_value(misp_event, item, col2_style):
     :param col2_style: style to be applied on the returned paragraph
     :return: a Paragraph to add in the pdf, regarding the values of "tags"
     '''
-    if hasattr(misp_event, item[1]):
+    if is_safe_attribute_table(misp_event, item[1]):
         table_event_tags = create_flowable_table_from_tags(misp_event)
         return table_event_tags
     return Paragraph(item[2], col2_style)
@@ -418,12 +418,10 @@ def get_published_value(misp_event, item, col2_style):
     YES_ANSWER = "<font color=" + GREEN_COLOR + "><b> Yes </b></font> ("
     NO_ANSWER = "<font color=" + RED_COLOR + "><b>No</b></font>"
 
-    answer = ""
-
     # Formatting similar to MISP Event web view
-    if hasattr(misp_event, item[1]):
+    if is_safe_attribute(misp_event, item[1]):
         if getattr(misp_event, item[1]):  # == True
-            if hasattr(misp_event, item[3]):
+            if is_safe_attribute(misp_event, item[3]):
                 # Published and have published date
                 answer = Paragraph(YES_ANSWER + getattr(misp_event, item[3]).strftime(EXPORT_DATE_FORMAT) + ")",
                                    col2_style)
@@ -445,6 +443,9 @@ def is_safe_attribute(curr_object, attribute_name):
     return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
         curr_object, attribute_name) != ""
 
+def is_safe_attribute_table(curr_object, attribute_name):
+    return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
+        curr_object, attribute_name) != []
 
 def create_flowable_table_from_one_attribute(misp_attribute):
     '''
@@ -465,7 +466,7 @@ def create_flowable_table_from_one_attribute(misp_attribute):
 
     # Handle the special case of links
     STANDARD_TYPE = True
-    if hasattr(misp_attribute, 'type') and (getattr(misp_attribute, 'type') in [LINK_TYPE, URL_TYPE]):
+    if is_safe_attribute(misp_attribute, 'type') and (getattr(misp_attribute, 'type') in [LINK_TYPE, URL_TYPE]):
         # getattr(misp_attribute, 'type') == LINK_TYPE or getattr(misp_attribute, 'type') == URL_TYPE):
         # Special case for links
         STANDARD_TYPE = False
@@ -492,10 +493,51 @@ def create_flowable_table_from_one_attribute(misp_attribute):
 
     # Tags
     item = ["Tags", 'Tag', "None"]
-    if hasattr(misp_attribute, item[1]):
+    if is_safe_attribute_table(misp_attribute, item[1]):
         data.append([Paragraph(item[0], col1_style), get_tag_value(misp_attribute, item, col2_style)])
 
     return create_flowable_table_from_data(data)
+
+
+def create_flowable_table_from_one_object(misp_object):
+    '''
+    Returns a table (flowable) representing the object
+    :param misp_attribute: A misp object
+    :return: a table representing this misp's object's attributes, to add to the pdf as a flowable
+    '''
+    data = []
+    col1_style, col2_style = get_table_styles()
+
+    # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
+    # to_display_if_not_present) are store in the following list
+    list_attr_automated = [["UUID", 'uuid', "None"],
+                           ["Description", 'description', "None"],
+                           ["Meta Category", 'meta-category', "None"],
+                           ["Object Name", 'name', "None"],
+                           ["Comment", 'comment', "None"],
+                           ["Type", 'type', "None"],
+                           ["Object Name", 'name', "None"]]
+
+    # Automated adding of standard (python) attributes of the misp object
+    for item in list_attr_automated:
+        if is_safe_attribute(misp_object, item[1]):
+            # The attribute exists, we fetch it and create the row
+            data.append([Paragraph(item[0], col1_style),
+                         get_unoverflowable_paragraph(getattr(misp_object, item[1]), col2_style)])
+
+        # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
+        # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
+
+    data = [create_flowable_table_from_data(data)]
+
+    # Handle all the attributes
+    if is_safe_attribute(misp_object, "Attribute"):
+        data += create_flowable_table_from_attributes(misp_object)
+
+    # Add a page break at the end of an object
+    data.append(PageBreak())
+
+    return data
 
 
 def create_tags_table_from_data(data):
@@ -589,7 +631,7 @@ def get_image_value(misp_attribute, item, col2_style):
         answer = img
     except OSError:
         logger.error(
-            "Trying to add an attachment during PDF export generation. Attachement joining failed. Attachmement may not be an image.")
+            "Trying to add an attachment during PDF export generation. Attachement joining failed. Attachement may not be an image.")
         answer = get_unoverflowable_paragraph(
             "<font color=" + BAD_LINK_COLOR + ">" + NOT_A_PICTURE_MESSAGE + "</font>", col2_style, False)
 
@@ -771,16 +813,16 @@ def create_flowable_table_from_attributes(misp_event):
     sample_style_sheet = getSampleStyleSheet()
     i = 0
 
-    if hasattr(misp_event, "Attribute"):
+    if is_safe_attribute_table(misp_event, "Attribute"):
         # There is some attributes for this object
         for item in getattr(misp_event, "Attribute"):
             # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
-            flowable_table.append(Paragraph("Attribute #" + str(i), sample_style_sheet['Heading3']))
+            flowable_table.append(Paragraph("Attribute #" + str(i), sample_style_sheet['Heading4']))
             flowable_table.append(create_flowable_table_from_one_attribute(item))
             i += 1
     else:
         # No attributes for this object
-        flowable_table.append(Paragraph("No attributes", sample_style_sheet['Heading2']))
+        flowable_table.append(Paragraph("No attributes", sample_style_sheet['Heading4']))
 
     return flowable_table
 
@@ -796,7 +838,7 @@ def create_flowable_table_from_tags(misp_event):
     col1_style, col2_style = get_table_styles()
     i = 0
 
-    if hasattr(misp_event, "Tag") and len(getattr(misp_event, "Tag")) > 1:  # 'Tag' can exist and be empty
+    if is_safe_attribute_table(misp_event, "Tag") : # and len(getattr(misp_event, "Tag")) > 1:  # 'Tag' can exist and be empty
         # There is some tags for this object
         for item in getattr(misp_event, "Tag"):
             flowable_table.append(create_flowable_tag(item))
@@ -807,6 +849,34 @@ def create_flowable_table_from_tags(misp_event):
         answer_tags = [Paragraph("No tags", col2_style)]
 
     return answer_tags
+
+
+def create_flowable_table_from_objects(misp_event):
+    '''
+    Returns a list of flowables representing the list of objects of a misp event.
+    The list is composed of a serie of 
+    [ header object, table of object information, [ header of attribute, table of attribute]*] to add to the pdf
+    :param misp_event: A misp event
+    :return: a table of flowables
+    '''
+
+    flowable_table = []
+    sample_style_sheet = getSampleStyleSheet()
+    i = 0
+
+    if is_safe_attribute_table(misp_event, "Object"):
+
+        # There is a list of objects
+        for item in getattr(misp_event, "Object"):
+            # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
+            flowable_table.append(Paragraph("Object #" + str(i), sample_style_sheet['Heading3']))
+            flowable_table += create_flowable_table_from_one_object(item)
+            i += 1
+    else:
+        # No object found
+        flowable_table.append(Paragraph("No object", sample_style_sheet['Heading3']))
+
+    return flowable_table
 
 
 ########################################################################
@@ -884,12 +954,20 @@ def collect_parts(misp_event, config=None):
     sample_style_sheet = getSampleStyleSheet()
 
     # Create stuff
-    title = get_value_link_to_event(misp_event, ["Info", 'info', "None"], sample_style_sheet['Heading1'], config, False)
-    subtitle = Paragraph("General information", sample_style_sheet['Heading2'])
-    attributes = Paragraph("Attributes", sample_style_sheet['Heading2'])
+    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], alignment=TA_CENTER)
+    title = get_value_link_to_event(misp_event, ["Info", 'info', "None"], title_style, config, False)
 
-    table_event_general = create_flowable_table_from_event(misp_event, config)
-    table_event_attribute = create_flowable_table_from_attributes(misp_event)
+    subtitle = Paragraph("General information", sample_style_sheet['Heading2'])
+    table_general_metainformation = create_flowable_table_from_event(misp_event, config)
+
+    event_attributes_title = Paragraph("Attributes", sample_style_sheet['Heading2'])
+    table_direct_attributes = create_flowable_table_from_attributes(misp_event)
+
+    event_objects_title = Paragraph("Objects", sample_style_sheet['Heading2'])
+    table_objects = create_flowable_table_from_objects(misp_event)
+
+    event_sighting_title = Paragraph("Sighting", sample_style_sheet['Heading2'])
+    # TODO : table_event_sightings = create_flowable_table_from_sightings(misp_event)
 
     # If you want to output the full json (as debug), just add next line
     # paragraph_2 = Paragraph(str(misp_event.to_json()), sample_style_sheet['Code'])
@@ -897,12 +975,20 @@ def collect_parts(misp_event, config=None):
     # Add all parts to final PDF
     flowables.append(title)
     flowables.append(subtitle)
-    flowables.append(table_event_general)
+    flowables.append(table_general_metainformation)
 
     flowables.append(PageBreak())
 
-    flowables.append(attributes)
-    flowables += table_event_attribute
+    flowables.append(event_attributes_title)
+    flowables += table_direct_attributes
+
+    flowables.append(PageBreak())
+    flowables.append(event_objects_title)
+    flowables += table_objects
+
+    # TODO : flowables.append(PageBreak())
+    # TODO : flowables.append(event_sighting_title)
+    # TODO : flowables += table_event_sightings
 
     return flowables
 
