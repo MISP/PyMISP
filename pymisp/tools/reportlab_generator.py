@@ -161,10 +161,16 @@ FRAME_MAX_HEIGHT = 500  # 650 # Ad hoc value for a A4 page
 FRAME_MAX_WIDTH = 356
 STR_TOO_LONG_WARNING = "<br/><b><font color=red>[Too long to fit on a single page. Cropped]</font></b>"
 
+# == Parameters for error handling for image too big to fit on a page ==
+FRAME_PICTURE_MAX_WIDTH = 88 * mm
+FRAME_PICTURE_MAX_HEIGHT = 195 * mm
+
 # == Parameters for links management ==
 LINK_TYPE = "link"  # Name of the type that define 'good' links
 URL_TYPE = "url"  # Name of the type that define 'bad' links
+IMAGE_TYPE = "attachment"  # /!\ Not only pictures ! Can be PDF, ...
 WARNING_MESSAGE_URL = "'https://Please_consider_that_this_may_be_a_harmful_link'"
+NOT_A_PICTURE_MESSAGE = "This attachment is not recognized as an image. Please access this attachment directly from your MISP instance."
 GOOD_LINK_COLOR = 'blue'
 BAD_LINK_COLOR = 'red'
 
@@ -423,13 +429,14 @@ def get_published_value(misp_event, item, col2_style):
                                    col2_style)
             else:
                 # Published without published date
-                answer = YES_ANSWER + "no date)"
+                answer = Paragraph(YES_ANSWER + "no date)",col2_style)
+
         else:
             # Not published
-            answer = NO_ANSWER
+            answer = Paragraph(NO_ANSWER,col2_style)
     else:
         # Does not have a published attribute
-        answer = item[2]
+        answer = Paragraph(item[2],col2_style)
 
     return answer
 
@@ -456,11 +463,11 @@ def create_flowable_table_from_one_attribute(misp_attribute):
                            ["Type", 'type', "None"],
                            ["Value", 'value', "None"]]
 
-    IMAGE_TYPE = "attachment"
+
 
     # Handle the special case of links
     STANDARD_TYPE = True
-    if hasattr(misp_attribute, 'type') and (getattr(misp_attribute, 'type') in [LINK_TYPE, URL_TYPE, IMAGE_TYPE]):
+    if hasattr(misp_attribute, 'type') and (getattr(misp_attribute, 'type') in [LINK_TYPE, URL_TYPE]):
         # getattr(misp_attribute, 'type') == LINK_TYPE or getattr(misp_attribute, 'type') == URL_TYPE):
         # Special case for links
         STANDARD_TYPE = False
@@ -480,41 +487,32 @@ def create_flowable_table_from_one_attribute(misp_attribute):
         item = ["Value", 'value', "None"]
 
         if is_safe_attribute(misp_attribute, item[1]):
+            # Handle "Good" links
             if getattr(misp_attribute, 'type') == LINK_TYPE:
                 data.append([Paragraph(item[0], col1_style), get_unoverflowable_paragraph(
                     "<font color=" + GOOD_LINK_COLOR + "><a href=" + getattr(misp_attribute, item[1]) + ">" + getattr(
                         misp_attribute, item[1]) + "</a></font>", col2_style, False)])
+            # Handle "bad "links
             elif getattr(misp_attribute, 'type') == URL_TYPE:
                 data.append([Paragraph(item[0], col1_style), get_unoverflowable_paragraph(
-                    "<font color=" + BAD_LINK_COLOR + "><a href=" + WARNING_MESSAGE_URL + ">" + getattr(misp_attribute,item[1]) + "</a></font>",col2_style, False)])
-            elif getattr(misp_attribute, 'type') == IMAGE_TYPE:
-                # Get the image
-                buf = getattr(misp_attribute, 'data')
+                    "<font color=" + BAD_LINK_COLOR + "><a href=" + WARNING_MESSAGE_URL + ">" + getattr(misp_attribute,
+                                                                                                        item[
+                                                                                                            1]) + "</a></font>",
+                    col2_style, False)])
 
-                # Scale down (or up ?) the image to fit the maximum frame size
-                img_size = ImageReader(buf).getSize()
-                w_scale =  FRAME_MAX_WIDTH / img_size[0]
-                h_scale =  FRAME_MAX_HEIGHT / img_size[1]
-                scale_down = min(w_scale,h_scale)
+    item = ["Data", 'data', "None"]
+    # Handle pictures
+    if is_safe_attribute(misp_attribute, item[1]) and getattr(misp_attribute, 'type') == IMAGE_TYPE:
+        try :
+            # Get the image
+            buf = getattr(misp_attribute, item[1])
 
-                print(FRAME_MAX_HEIGHT,FRAME_MAX_WIDTH)
-                print(img_size)
-                print(w_scale)
-                print(h_scale)
-                print(scale_down)
-                print(img_size[0]*scale_down, img_size[1]*scale_down)
-
-                # img_width = 88 * mm # max image height
-                # print(img_size)
-                FRAME_PICTURE_MAX_WIDTH =  88*mm
-                FRAME_PICTURE_MAX_HEIGHT = 195*mm
-                # return Image(path, width=width, height=(width * aspect))
-                img = Image(buf,width=FRAME_PICTURE_MAX_WIDTH,height=FRAME_PICTURE_MAX_HEIGHT,kind='bound')
-                # width, height = img.getSize()
-                # aspect = height / float(width)
-                data.append([Paragraph('data', col1_style),img])
-
-
+            # Create image within a bounded box (to allow pdf creation)
+            img = Image(buf, width=FRAME_PICTURE_MAX_WIDTH, height=FRAME_PICTURE_MAX_HEIGHT, kind='bound')
+            data.append([Paragraph(item[0], col1_style), img])
+        except OSError :
+            logger.error("Trying to add an attachment during PDF export generation. Attachement joining failed. Attachmement may not be an image.")
+            data.append([Paragraph(item[0], col1_style),get_unoverflowable_paragraph("<font color=" + BAD_LINK_COLOR + ">" + NOT_A_PICTURE_MESSAGE + "</font>", col2_style, False) ])
 
     # Tags
     item = ["Tags", 'Tag', "None"]

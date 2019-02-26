@@ -10,7 +10,7 @@ import sys
 import os
 import time
 
-manual_testing = True
+manual_testing = False
 
 class TestMISPEvent(unittest.TestCase):
 
@@ -23,7 +23,9 @@ class TestMISPEvent(unittest.TestCase):
             self.root = ""
         self.test_folder = self.root + "reportlab_testfiles/"
         self.test_batch_folder = self.root + "OSINT_output/"
+        self.test_image_folder = self.root + "image_json/"
         self.storage_folder = self.root + "reportlab_testoutputs/"
+        self.storage_image_folder = self.root + "reportlab_test_image_outputs/"
 
     def init_event(self):
         self.mispevent.info = 'This is a test'
@@ -140,6 +142,35 @@ class TestMISPEvent(unittest.TestCase):
             self.mispevent.load_file(self.test_folder + 'image_event.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
                                                        self.storage_folder + "image_event.pdf")
+
+
+    def test_batch_image_events(self):
+        # Test case ONLY for manual testing. Needs to download a full list of image events !
+
+        if self.check_python_2():
+            self.assertTrue(True)
+        elif not manual_testing :
+            self.assertTrue(True)
+        else:
+            self.init_event()
+
+            file_nb = str(len(os.listdir(self.test_image_folder)))
+            i = 0
+            t = time.time()
+            for curr_file in os.listdir(self.test_image_folder):
+                self.mispevent = MISPEvent()
+                file_path = self.test_image_folder + curr_file
+
+                print("Current file : " + file_path + " " + str(i) + " over " + file_nb)
+                i += 1
+
+                self.mispevent.load_file(file_path)
+
+                reportlab_generator.register_value_to_file(
+                    reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
+                    self.storage_image_folder + curr_file + ".pdf")
+            print("Elapsed time : " + str(time.time() - t))
+            # Local run : 1958.930s for 1064 files
 
     def test_batch_OSINT_events(self):
         # Test case ONLY for manual testing. Needs to download a full list of OSINT events !
