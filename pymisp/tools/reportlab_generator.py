@@ -527,6 +527,11 @@ def create_flowable_table_from_one_object(misp_object):
         # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
         # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
 
+    # Timestamp
+    item = ["Object date", 'timestamp', "None"]
+    data.append([Paragraph(item[0], col1_style), get_timestamp_value(misp_object, item, col2_style)])
+
+    # Transform list of value in a table
     data = [create_flowable_table_from_data(data)]
 
     # Handle all the attributes
