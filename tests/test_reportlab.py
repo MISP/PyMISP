@@ -26,6 +26,8 @@ class TestMISPEvent(unittest.TestCase):
         self.test_image_folder = self.root + "image_json/"
         self.storage_folder = self.root + "reportlab_testoutputs/"
         self.storage_image_folder = self.root + "reportlab_test_image_outputs/"
+        self.moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description"]
+
 
     def init_event(self):
         self.mispevent.info = 'This is a test'
@@ -91,9 +93,8 @@ class TestMISPEvent(unittest.TestCase):
         else:
 
             config = {}
-            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
-            config[moduleconfig[0]] = "http://localhost:8080"
-            config[moduleconfig[1]] =  "My Wonderful CERT"
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'very_long_event.json')
@@ -106,8 +107,7 @@ class TestMISPEvent(unittest.TestCase):
         else:
 
             config = {}
-            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
-            config[moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[0]] = "http://localhost:8080"
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'very_long_event.json')
@@ -120,8 +120,7 @@ class TestMISPEvent(unittest.TestCase):
         else:
 
             config = {}
-            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
-            config[moduleconfig[1]] =  "My Wonderful CERT"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'very_long_event.json')
@@ -134,9 +133,8 @@ class TestMISPEvent(unittest.TestCase):
         else:
 
             config = {}
-            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
-            config[moduleconfig[0]] = "http://localhost:8080"
-            config[moduleconfig[1]] =  "My Wonderful CERT"
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'image_event.json')
@@ -149,9 +147,8 @@ class TestMISPEvent(unittest.TestCase):
         else:
 
             config = {}
-            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
-            config[moduleconfig[0]] = "http://localhost:8080"
-            config[moduleconfig[1]] =  "My Wonderful CERT"
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'mainly_objects_1.json')
@@ -164,14 +161,56 @@ class TestMISPEvent(unittest.TestCase):
         else:
 
             config = {}
-            moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
-            config[moduleconfig[0]] = "http://localhost:8080"
-            config[moduleconfig[1]] =  "My Wonderful CERT"
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'mainly_objects_2.json')
             reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
                                                        self.storage_folder + "mainly_objects_2.pdf")
+
+    def test_sightings_1_json(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        else:
+
+            config = {}
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'sighting_1.json')
+            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                                                       self.storage_folder + "sighting_1.pdf")
+
+    def test_sightings_2_json(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        else:
+
+            config = {}
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'sighting_2.json')
+            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                                                       self.storage_folder + "sighting_2.pdf")
+
+    def test_textual_json(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        else:
+
+            config = {}
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
+            config[self.moduleconfig[2]] =  True
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'very_long_event.json')
+            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                                                       self.storage_folder + "textual.pdf")
 
 
     def test_batch_image_events(self):
@@ -226,6 +265,39 @@ class TestMISPEvent(unittest.TestCase):
 
                 reportlab_generator.register_value_to_file(
                     reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
+                    self.storage_folder + curr_file + ".pdf")
+            print("Elapsed time : " + str(time.time() - t))
+            # Local run : 1958.930s for 1064 files
+
+    def test_batch_OSINT_with_config_events(self):
+        # Test case ONLY for manual testing. Needs to download a full list of OSINT events !
+
+        if self.check_python_2():
+            self.assertTrue(True)
+        elif not manual_testing :
+            self.assertTrue(True)
+        else:
+            self.init_event()
+
+            config = {}
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] =  "My Wonderful CERT"
+            config[self.moduleconfig[2]] =  True
+
+            file_nb = str(len(os.listdir(self.test_batch_folder)))
+            i = 0
+            t = time.time()
+            for curr_file in os.listdir(self.test_batch_folder):
+                self.mispevent = MISPEvent()
+                file_path = self.test_batch_folder + curr_file
+
+                print("Current file : " + file_path + " " + str(i) + " over " + file_nb)
+                i += 1
+
+                self.mispevent.load_file(file_path)
+
+                reportlab_generator.register_value_to_file(
+                    reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
                     self.storage_folder + curr_file + ".pdf")
             print("Elapsed time : " + str(time.time() - t))
             # Local run : 1958.930s for 1064 files
