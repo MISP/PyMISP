@@ -69,9 +69,10 @@ class PyMISP(object):
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#client-side-certificates
     :param asynch: Use asynchronous processing where possible
+    :param auth: The auth parameter is passed directly to requests, as described here: http://docs.python-requests.org/en/master/user/authentication/
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False, auth=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -83,6 +84,7 @@ class PyMISP(object):
         self.proxies = proxies
         self.cert = cert
         self.asynch = asynch
+        self.auth = auth
         if asynch and not ASYNC_OK:
             logger.critical("You turned on Async, but don't have requests_futures installed")
             self.asynch = False
@@ -178,9 +180,9 @@ class PyMISP(object):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(prepped.headers)
             if self.asynch and background_callback is not None:
-                return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert, background_callback=background_callback)
+                return s.send(prepped, verify=self.ssl, proxies=self.proxies, auth=self.auth, cert=self.cert, background_callback=background_callback)
             else:
-                return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert)
+                return s.send(prepped, verify=self.ssl, proxies=self.proxies, auth=self.auth, cert=self.cert)
 
     # #####################
     # ### Core helpers ####
