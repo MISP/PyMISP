@@ -459,7 +459,7 @@ class MISPEvent(AbstractMISP):
             if OLD_PY3 and isinstance(json_event, bytes):
                 json_event = json_event.decode()
             json_event = json.loads(json_event)
-        if json_event.get('response'):
+        if json_event.get('response'): # hasattr(json_event, 'response') and ... is a Bugfix ?
             event = json_event.get('response')[0]
         else:
             event = json_event

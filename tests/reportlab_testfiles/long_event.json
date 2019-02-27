@@ -1,0 +1,3730 @@
+{
+  "Event": {
+    "threat_level_id": "2",
+    "timestamp": "1467971098",
+    "info": "OSINT - ASERT Threat Intelligence Report 2016-03 The Four-Element Sword Engagement",
+    "published": true,
+    "date": "2016-04-18",
+    "analysis": "2",
+    "uuid": "57153590-f73c-49fa-be4b-4737950d210f",
+    "publish_timestamp": "1550654767",
+    "Orgc": {
+      "name": "CIRCL",
+      "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+    },
+    "Tag": [
+      {
+        "name": "tlp:white",
+        "exportable": true,
+        "colour": "#ffffff"
+      },
+      {
+        "name": "type:OSINT",
+        "exportable": true,
+        "colour": "#004646"
+      }
+    ],
+    "Attribute": [
+      {
+        "timestamp": "1461067952",
+        "value": "107.183.86",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571620b0-5e38-4e8c-9c29-416d950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461067794",
+        "value": "a0dc5723d3e20e93b48a960b31c984c0",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162012-72b8-433b-b5e2-4651950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461067795",
+        "value": "185fc01ec8adbaa94da741c4c1cf1b83185ae63899f14ce9949553c5dac3ecf6",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162013-7804-4691-ac9e-4a15950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461067951",
+        "value": "akm.epac.to",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571620af-e57c-4008-80f2-4933950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461067952",
+        "value": "gugehotel.cn",
+        "type": "domain",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571620b0-7c50-43ef-9724-4c76950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461070490",
+        "value": "905d1cd328c8cfc378fb00bfa38f0427",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162a9a-7fd8-4e15-91ac-4ad5950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461067457",
+        "value": "uhfx.dat",
+        "type": "filename",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57161ec1-1d00-4ab1-b71d-4cd4950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461071212",
+        "value": "fea5902afa6e504a798c73a09b83df5e",
+        "type": "imphash",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162a9b-e1e0-444f-bab2-46e3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461067503",
+        "value": "yxsrhsxhxdbldkc.dat",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57161eef-6108-4bf2-9029-4966950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461067697",
+        "value": "Q:\\Projects\\Br2012\\Release\\svc.pdb",
+        "type": "pdb",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57161f87-c9ec-4f8f-a2ee-48ef950d210f",
+        "category": "Artifacts dropped"
+      },
+      {
+        "timestamp": "1461066519",
+        "value": "bill_clay6801@yahoo.com",
+        "type": "email-src",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57161b17-23b8-4631-96fd-4bad950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461066538",
+        "value": "[BULK] TIBET, OUR BELOVED NATION AND WILL NEVER FORGET IT.",
+        "type": "email-subject",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57161b2a-89a0-4f7c-9258-4f93950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461066559",
+        "value": "brochure .rar",
+        "type": "email-attachment",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57161b3f-f344-447f-804d-4be4950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461069222",
+        "value": "brochure .doc",
+        "type": "filename",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57161c89-443c-40bb-a5f8-4cbb950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461067319",
+        "value": "103.240.203.232",
+        "type": "ip-dst",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 8080; Located in Honk Kong",
+        "uuid": "57161e37-fe5c-4f2a-b9ec-4eea950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461067666",
+        "value": "webmonder.gicp.net",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571610cd-4774-4e4e-bd0a-4407950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461064617",
+        "value": "hkhumanrights.asia@gmail.com",
+        "type": "email-src",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571613a9-3a2c-478a-a180-43a1950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461064643",
+        "value": "US Congress sanctions $6 million fund for Tibetans in Nepal anf India",
+        "type": "email-subject",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571613c3-5d04-4eea-9690-4b95950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461064661",
+        "value": "US Congress sanctions $6 million fund for Tibetans in Nepal anf India.doc",
+        "type": "email-attachment",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571613d5-dc64-43bc-9481-42d0950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461059772",
+        "value": "60ef10cce9974cdc8a453d8fdd8ddf0cad49c6f07d2c4d095ff483998685b421",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "~tmp.doc",
+        "uuid": "571600bc-8178-4d6f-b5fd-47a4950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461059770",
+        "value": "b6e22968461bfb2934c556fc44d0baf0",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "spearfish",
+        "uuid": "571600ba-b0b0-4adb-bd01-43ef950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461059771",
+        "value": "74a4fe17dc7101dbb2bb8f0c41069057",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "571600bb-a9b4-4883-ac7d-4d5a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461059771",
+        "value": "fcfe3867e4fa17d52c51235cf68a86c2",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "~tmp.doc",
+        "uuid": "571600bb-045c-4cbc-b0d6-43da950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461059771",
+        "value": "4f52292a2136eb7f9538230ae54a323c518fa44cf6de5d10ca7a04ecb6a77872",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "spearfish",
+        "uuid": "571600bb-54f0-43d7-83cb-4b3c950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461059772",
+        "value": "0683fac0b564fe5d2096e207b374a238a811e67b87856fc19bdf8eb3d6f76b49",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "571600bc-6348-4e1e-b96d-4cf2950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461064172",
+        "value": "\u8207\u5929\u7a7a\u6709\u7d04!12\u500b2016\u5e74\u4e0d\u53ef\u932f\u904e\u7684\u5929\u6587\u73fe\u8c61mm.doc",
+        "type": "email-attachment",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5715feb0-6a48-44c4-b1ba-4a57950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461058335",
+        "value": "114.60.106.156",
+        "type": "ip-dst",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5715fb1f-18ec-4ed6-8a25-4abd950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058711",
+        "value": "14fcfccb0ae8988f95924256a38477fcc5c2c213d8a55e5a83c8c1bb67a4b6d4",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "malicious RTF targeting CVE-\u00ad2010\u20103333",
+        "uuid": "5715fc97-a5a4-4538-bf86-4bcc950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461067672",
+        "value": "humanbeing2009.gicp.net",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5715fd00-807c-4ce8-8f27-437d950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058035",
+        "value": "uyguhr1.webhop.net",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f3-61e4-431c-96da-426e950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058036",
+        "value": "uygur.51vip.biz",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f4-3954-463f-8012-48a4950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058036",
+        "value": "uyguhr.epac.to",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f4-1008-435d-b573-431d950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058036",
+        "value": "xinxin20080628.gicp.net",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f4-2cd0-4d29-827e-40fc950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058034",
+        "value": "oyghur.yebhio.net",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f2-de84-4c91-8d98-4f9c950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058035",
+        "value": "www.uyghuri.mrface.com",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f3-44bc-457b-90cb-40a1950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058035",
+        "value": "uyghuri.mrface.com",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f3-f55c-4519-b36f-4547950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058035",
+        "value": "uygur.elcp.net",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f3-818c-4fdd-bd6f-45a4950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461057398",
+        "value": "bacc4edb5e775d2c957022ad8360946c19f9f75ef2709c1db2d6708d53ec2cd1",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "spearfish",
+        "uuid": "5715f3b3-6998-40e7-9235-4b3e950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461056715",
+        "value": "IEChecker.exe|7a200c4df99887991c638fe625d07a4a3fc2bdc887112437752b3df5c8da79b6",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5715f3b4-c4f0-4b6b-8661-494f950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461057157",
+        "value": "goodnewspaper.gicp.net",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f659-3464-4c20-9622-489c950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461058034",
+        "value": "uyguhr.sov.te",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f9f2-4e18-46a8-a304-4aaf950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461056523",
+        "value": "af2cc5bb8d97bf019280c80e2891103a8a1d5e5f8c6305b6f6c4dd83ec245a7d",
+        "type": "sha256",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "5715f40b-36e0-4bcc-935b-4c64950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461057163",
+        "value": "goodnewspaper.f3322.org",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f500-cff4-42db-a2d9-44b1950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461057168",
+        "value": "20080628.3322.org",
+        "type": "hostname",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f500-5c34-42da-bd1f-497f950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461057112",
+        "value": "goodnewspaper.3322.org",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Associated with 180.169.28.58 TCP/8080",
+        "uuid": "5715f658-9c1c-4a06-9273-4785950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461070838",
+        "value": "https://www.virustotal.com/file/4a5d864f69aff245793606b694bcbc5243b81e0b018596bce85ecab0e12ac849/analysis/1414340059/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf6-0ef8-4188-9ac9-45d202de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070837",
+        "value": "08d7b5b8c9375e6d8ed7201dcb40d741d4d7866c",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: b2ae8c02163dcee142afe71188914321",
+        "uuid": "57162bf5-af2c-4d7f-8068-4c6402de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070837",
+        "value": "4a5d864f69aff245793606b694bcbc5243b81e0b018596bce85ecab0e12ac849",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: b2ae8c02163dcee142afe71188914321",
+        "uuid": "57162bf5-f478-4079-b265-40bc02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070837",
+        "value": "https://www.virustotal.com/file/51c0d075067709c9f8794a25a7e3920bf69f8c755a1794e857acd818ea8a1010/analysis/1458152391/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf5-7020-440e-94b6-4d4f02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070836",
+        "value": "2a09888223879b1c44ed1780edf48d089a9925f7",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 937c13f5915a103aec8d28bdec7cc769",
+        "uuid": "57162bf4-a518-4dd7-8c8b-4b6902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070836",
+        "value": "51c0d075067709c9f8794a25a7e3920bf69f8c755a1794e857acd818ea8a1010",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 937c13f5915a103aec8d28bdec7cc769",
+        "uuid": "57162bf4-6bf4-435d-92cc-493902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070836",
+        "value": "https://www.virustotal.com/file/7a200c4df99887991c638fe625d07a4a3fc2bdc887112437752b3df5c8da79b6/analysis/1452693896/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf4-0c00-4b36-ad3d-4a8802de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070835",
+        "value": "c6fe39647f6e902ed7737f4ed057fdda419d5bb3",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: 7a200c4df99887991c638fe625d07a4a3fc2bdc887112437752b3df5c8da79b6",
+        "uuid": "57162bf3-5e1c-4c4a-a19e-424002de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070835",
+        "value": "https://www.virustotal.com/file/5676c0b2d3c139dbef5bafa0184576bd1a4ccbd3f7d40b4a6a099a1e61bc2a39/analysis/1456612300/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf3-afb4-4ac7-b466-4e8902de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070835",
+        "value": "09b7e38aa3279eab002f8528c9cae52601bb1038",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: 5676c0b2d3c139dbef5bafa0184576bd1a4ccbd3f7d40b4a6a099a1e61bc2a39",
+        "uuid": "57162bf3-3e24-4b6c-997e-498202de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070834",
+        "value": "https://www.virustotal.com/file/185fc01ec8adbaa94da741c4c1cf1b83185ae63899f14ce9949553c5dac3ecf6/analysis/1453280584/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf2-f18c-491d-8c87-475102de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070834",
+        "value": "6fdd47a2a9dcddd93d9b8ee8a9bb2a28632df58b",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 185fc01ec8adbaa94da741c4c1cf1b83185ae63899f14ce9949553c5dac3ecf6",
+        "uuid": "57162bf2-96bc-4f65-8358-454502de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070834",
+        "value": "https://www.virustotal.com/file/4f52292a2136eb7f9538230ae54a323c518fa44cf6de5d10ca7a04ecb6a77872/analysis/1455729543/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf2-324c-4447-9a59-4ed702de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070833",
+        "value": "9a794b18a1452269adfcc8315520959b512d1c37",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "spearfish - Xchecked via VT: 4f52292a2136eb7f9538230ae54a323c518fa44cf6de5d10ca7a04ecb6a77872",
+        "uuid": "57162bf1-b520-4634-bdc0-4bd202de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070833",
+        "value": "https://www.virustotal.com/file/0683fac0b564fe5d2096e207b374a238a811e67b87856fc19bdf8eb3d6f76b49/analysis/1453026661/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf1-1d44-4294-9d0e-412b02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070833",
+        "value": "133f5b9bb5d344109c9c628f5dce248b838c257b",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF - Xchecked via VT: 0683fac0b564fe5d2096e207b374a238a811e67b87856fc19bdf8eb3d6f76b49",
+        "uuid": "57162bf1-6a38-4c76-89ec-441502de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070833",
+        "value": "https://www.virustotal.com/file/14fcfccb0ae8988f95924256a38477fcc5c2c213d8a55e5a83c8c1bb67a4b6d4/analysis/1457552893/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf1-3924-4392-ab1e-48a302de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070832",
+        "value": "c7c4a469ddf4bef2daf9bacc7711f0ae",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "malicious RTF targeting CVE-\u00ad2010\u20103333 - Xchecked via VT: 14fcfccb0ae8988f95924256a38477fcc5c2c213d8a55e5a83c8c1bb67a4b6d4",
+        "uuid": "57162bf0-fb5c-4756-810e-4a9f02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070832",
+        "value": "256ede6a7bff266589aaf996a47bf3eedcd8b980",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "malicious RTF targeting CVE-\u00ad2010\u20103333 - Xchecked via VT: 14fcfccb0ae8988f95924256a38477fcc5c2c213d8a55e5a83c8c1bb67a4b6d4",
+        "uuid": "57162bf0-b654-42a6-92c0-4cb202de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070832",
+        "value": "https://www.virustotal.com/file/bacc4edb5e775d2c957022ad8360946c19f9f75ef2709c1db2d6708d53ec2cd1/analysis/1455727175/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf0-8618-4bdb-9e83-4d3102de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070831",
+        "value": "c1e63556e2bb088b15d2ccb1c0fe6c9ce29cf4e6",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "spearfish - Xchecked via VT: bacc4edb5e775d2c957022ad8360946c19f9f75ef2709c1db2d6708d53ec2cd1",
+        "uuid": "57162bef-6e34-4ad3-964f-40aa02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070831",
+        "value": "https://www.virustotal.com/file/af2cc5bb8d97bf019280c80e2891103a8a1d5e5f8c6305b6f6c4dd83ec245a7d/analysis/1453438981/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bef-6dcc-4dc2-9a86-419402de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070831",
+        "value": "26f1e48f5e05f6d1f923e3a74219ca7bfa7c0995",
+        "type": "sha1",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "RTF - Xchecked via VT: af2cc5bb8d97bf019280c80e2891103a8a1d5e5f8c6305b6f6c4dd83ec245a7d",
+        "uuid": "57162bef-5094-438d-b933-46c902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070830",
+        "value": "https://www.virustotal.com/file/766e0c75bb13986f6a18f9f6af422dbda8c6717becc9b02cc4046943a960d21f/analysis/1457068422/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bee-05b0-4a80-af98-436002de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070830",
+        "value": "83d3bb544e0542dd9c4168350adef928e4205e69",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 766e0c75bb13986f6a18f9f6af422dbda8c6717becc9b02cc4046943a960d21f",
+        "uuid": "57162bee-44f4-423e-9c17-4a6202de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070830",
+        "value": "https://www.virustotal.com/file/9d69221584a5c6f8147479282eae3017c2884ae5138d3b910c36a2a38039c776/analysis/1436830597/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bee-b524-49ab-9591-43a702de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461071176",
+        "value": "ba77d50870756d247a580b8a3a56722c",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162d48-9f6c-4250-b463-4c73950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070829",
+        "value": "c3a1b57a062bfd27ea9a56f6439193369970e336",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 9d69221584a5c6f8147479282eae3017c2884ae5138d3b910c36a2a38039c776",
+        "uuid": "57162bed-1bfc-4f65-bb04-4e8a02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070939",
+        "value": "brochure .doc|0ed325b841a2beb446c5e9a6825deaa021651c8b627aa7147d89edde05af6598",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162be0-b2b0-4a8d-83be-4446950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070890",
+        "value": "brochure .rar|e8af4f3504b0e1cf165dfd1070342b831fd7b5b45da94c6f2a25c28dd6eb3c4a",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162be0-4da4-41ff-a407-440d950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070743",
+        "value": "brochure .doc|835fee42132feebe9b3231297e5e71a8",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162b63-ecd8-4688-aa03-45bc950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070729",
+        "value": "brochure .rar|c8c6365bf21d947e8e986d4766a9fc16",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162b62-5d5c-4a71-a20b-458b950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070650",
+        "value": "uhfx.dll|a46905252567ed2fe17a407d8ae14036fde180f0a42756304109f34d1e8ad872",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162b3a-443c-40f1-9f45-40cb950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070619",
+        "value": "tnyjs.dll|5676c0b2d3c139dbef5bafa0184576bd1a4ccbd3f7d40b4a6a099a1e61bc2a39",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162b1b-f190-45e8-a60c-4b3d950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070493",
+        "value": "18219708781208889af05842ea6d563e56910424ec97ef8f695c0c7a82610a23",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162a9d-6488-4e2c-852c-4ec9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070492",
+        "value": "uhfx.dll|6db7ad23186f445c410f59a41e7f8ac5",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162a9c-162c-42a2-b2aa-4af9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070491",
+        "value": "tnyjs.dll|5bc954d76342d2860192398f186f3310",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162a9b-3828-4d68-8917-4d4f950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461069906",
+        "value": "rule kivars_service {\r\n\r\nmeta:\r\n\r\n\tdescription = \"Detects instances of Kivars malware when installed as a service\"\r\n\tauthor = \"cwilson@arbor.net\"\r\n\tSHA\u2010256 = \"443d24d719dec79a2e1be682943795b617064d86f2ebaec7975978f0b1f6950d\"\r\n\tSHA-256 = \"44439e2ae675c548ad193aa67baa8e6abff5cc60c8a4c843a5c9f0c13ffec2d8\"\r\n\tSHA\u00ad-256 = \"74ed059519573a393aa7562e2a2afaf046cf872ea51f708a22b58b85c98718a8\"\r\n\tSHA\u00ad\u2010256 = \"80748362762996d4b23f8d4e55d2ef8ca2689b84cc0b5984f420afbb73acad1f\"\r\n\tSHA\u2010256 = \"9ba14273bfdd4a4b192c625d900b29e1fc3c8673154d3b4c4c3202109e918c8d\"\r\n\tSHA-256 = \"fba3cd920165b47cb39f3c970b8157b4e776cc062c74579a252d8dd2874b2e6b\"\r\n\r\nstrings:\r\n\r\n\t$s1 = \"\\\\Projects\\\\Br2012\\\\Release\\\\svc.pdb\"\r\n\t$s2 = \"This is a flag\"\r\n\t$s3 = \"svc.dll\"\r\n\t$s4 = \"ServiceMain\"\r\n\t$s5 = \"winsta0\"\r\n\r\ncondition:\r\n\r\n\tuint16(0) == 0x5A4D and < 1000000 and (all of ($s*))\r\n\r\n}",
+        "type": "yara",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162852-bbe8-4aa9-a420-4f3a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461068924",
+        "value": "122.10.9.121",
+        "type": "ip-dst",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5716247c-22d4-421d-9e0e-4f80950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461068923",
+        "value": "adc.microsoftmse.com",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5716247b-2390-4de2-951c-4bc2950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461068866",
+        "value": "766e0c75bb13986f6a18f9f6af422dbda8c6717becc9b02cc4046943a960d21f",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162442-3070-40ac-8735-4c27950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461068866",
+        "value": "0566703ccda6c60816ef1d8d917aa7b0",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162442-63f4-4891-9148-4876950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461068770",
+        "value": "wins.microsoftmse.com",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571623e2-0aa4-44a7-9198-4cc1950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461068770",
+        "value": "b2ae8c02163dcee142afe71188914321",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571623e2-80e4-4864-a72c-4ca1950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461068770",
+        "value": "9d69221584a5c6f8147479282eae3017c2884ae5138d3b910c36a2a38039c776",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571623e2-1a50-4035-927b-4453950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461068769",
+        "value": "19b2ed8ab09a43151c9951ff0432a861",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571623e1-44e0-4808-9333-4c60950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461068769",
+        "value": "203.160.247.21",
+        "type": "ip-dst",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 443",
+        "uuid": "571623e1-3bb0-4f0b-8543-4483950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461068769",
+        "value": "937c13f5915a103aec8d28bdec7cc769",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571623e1-aaf8-4d39-a018-4a6e950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461056735",
+        "value": "IEChecker.exe|46c7d064a34c4e02bb2df56e0f8470c0",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5715f2cf-8de8-4475-a716-4de1950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461056207",
+        "value": "c674ae90f686d831cffc223a55782a93",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "5715f2cf-ee4c-4585-a40e-4d6c950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461056206",
+        "value": "7d4f8341b58602a17184bc5c07311e8b",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "spearfish",
+        "uuid": "5715f2ce-b55c-4357-bdfe-43d5950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461067343",
+        "value": "180.169.28.58",
+        "type": "ip-dst",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 8080",
+        "uuid": "5715eae1-b6f0-46c6-af87-40de950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461007906",
+        "value": "198.55.120.143",
+        "type": "ip-dst",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 7386",
+        "uuid": "57153622-b0fc-4002-ae3c-3e3c950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461007824",
+        "value": "CVE-2015-1770",
+        "type": "vulnerability",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571535d0-c074-4f8b-b2dc-4fb9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461007824",
+        "value": "CVE-2015-1641",
+        "type": "vulnerability",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571535d0-b898-4ab7-80f4-4555950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461007824",
+        "value": "CVE-2012-1856",
+        "type": "vulnerability",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571535d0-ee34-47e6-8ae9-4c82950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461007824",
+        "value": "CVE-2012-0158",
+        "type": "vulnerability",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571535d0-050c-4c6f-9eee-4b3c950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461007775",
+        "value": "https://www.arbornetworks.com/blog/asert/wp-content/uploads/2016/04/ASERT-Threat-Intelligence-Report-2016-03-The-Four-Element-Sword-Engagement.pdf",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5715359f-6c3c-49f6-9447-4a6b950d210f",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070838",
+        "value": "e12e06f42cbdf05e91b89e364ed4319dd257fc71",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: c8c6365bf21d947e8e986d4766a9fc16",
+        "uuid": "57162bf6-6068-46fd-a2fe-49ef02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070838",
+        "value": "https://www.virustotal.com/file/e8af4f3504b0e1cf165dfd1070342b831fd7b5b45da94c6f2a25c28dd6eb3c4a/analysis/1451715280/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf6-8e08-4388-865b-42b102de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461070839",
+        "value": "3370ec0c71056a6fc6860c54dee96675ffb85b92",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 835fee42132feebe9b3231297e5e71a8",
+        "uuid": "57162bf7-00c0-407d-bd0a-48c102de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461070839",
+        "value": "https://www.virustotal.com/file/0ed325b841a2beb446c5e9a6825deaa021651c8b627aa7147d89edde05af6598/analysis/1456325644/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162bf7-3248-4844-84a2-44aa02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461071177",
+        "value": "1c4e3c4df094c32faf0c30f6a613c63e",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162d49-a7fc-4dc4-9fc7-46a4950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461071177",
+        "value": "89e4cff1496aafa0776619729a75d4ab",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162d49-fa0c-4103-ab37-4905950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461071178",
+        "value": "f25634becd08d5298db1f3014e477e00",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162d4a-afa8-4668-812a-4191950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461071178",
+        "value": "ad251fd7427c0334f34aabe100a216b4af48b1ab4a01705f44b3421edd0be6ae",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162d4a-fbac-4e6d-9bce-427e950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461071178",
+        "value": "f6bc895b36446d172c4a99be2587376b48fa3b1b0f6150eb8ab83f649f7b8bc6",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162d4a-ffc8-4fe8-ae07-4722950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461071179",
+        "value": "8dfcae0eb358f48fc30163e58c75823117f6fd501a48f3dfeb19a06d1c21aa51",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162d4b-fea8-47c9-b704-447a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461071179",
+        "value": "f8a18e8b8e6606617e3a63ee5a3050a1b30361703c9a7d9e2d5cc94090c9907b",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57162d4b-cb90-49de-8706-4258950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461071840",
+        "value": "D:\\WORK\\T9000\\N_Inst_User_M1\\Release\\N_Inst_User32.pdb",
+        "type": "pdb",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57162fe0-9dd8-4d4b-b5db-4511950d210f",
+        "category": "Artifacts dropped"
+      },
+      {
+        "timestamp": "1461074339",
+        "value": "4f1784a4e4181b4c80f8d77675a267cbdd0e35ea1756c9fdb82294251bef1d28",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "bait file",
+        "uuid": "5716393a-9718-4575-b267-4c6d950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461074368",
+        "value": "E804.tmp|5f3d0a319ecc875cc64a40a34d2283cb329abcf79ad02f487fbfd6bef153943c",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571639c0-0f48-454b-b4f5-4f8e950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461074314",
+        "value": "647b443ecaa38d2834e5681f20540fa84a5cf2b7e1bee6a2524ce59783cb8d1b",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "5716393a-59ec-46a8-be9f-4729950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461074289",
+        "value": "9ae498307da6c2e677a97a458bff1aea",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "bait file",
+        "uuid": "5716393a-be40-4cea-860e-4198950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461074233",
+        "value": "E804.tmp|e4e8493898d94f737ff4dc8fab743a4a",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57163939-db08-4130-8859-4246950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461074276",
+        "value": "da97c88858214242374f27d32e27d957",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "57163938-0878-4bcb-a764-4f47950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073849",
+        "value": "d5fa43be20aa94baf1737289c5034e2235f1393890fb6f4e8d4104565be52d8c",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571637b9-a1d4-47e7-924c-478d950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073848",
+        "value": "fb1e8c42d11e3a2de97814e451ee3375",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571637b8-b8a0-472d-982f-49ac950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072137",
+        "value": "igfxtray.exe",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57163109-be58-4cc7-89c1-4446950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461072137",
+        "value": "Data/dtl.dat",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57163109-6304-413e-9884-4a42950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461072137",
+        "value": "Data/glp.uin",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57163109-1e04-4ef4-bf92-480b950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461072625",
+        "value": "http://198.55.120.143:7386/B/ResN32.dll",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f1-d2f8-4e0c-9322-4370950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461072625",
+        "value": "fdb6543bfb77aa6ddff0f4dfe07e442f",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "571632f1-9d80-4532-9288-4598950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072626",
+        "value": "d8d70851641efbdfce8d561e6b1a2f29",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "T9000 main binary",
+        "uuid": "571632f2-4d40-4809-af5e-411a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072626",
+        "value": "Elevate.dll|1d335f6a58cb9fab503a9b9cb371f57b",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f2-5290-46c4-bd6b-48d3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072627",
+        "value": "QQMgr.dll|b9c584c7c34d14599de8cd3b72f2074b",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f3-f5b8-4fe6-bff3-4e11950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072627",
+        "value": "QQMgr.inf|8ac933be588f49560179c26ddbc6a753",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f3-63a8-43a2-9260-43b9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072628",
+        "value": "ResN32.dat|50753c28878ce10a748fbd7b831ecbe1",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f4-d0a0-4595-9c2d-46fa950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072629",
+        "value": "ResN32.dll|a45e5c32fc2bc7be9d6e4bba8b2807bf",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f5-2e3c-4637-95ce-46db950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072629",
+        "value": "hccutils.dll|2299fb8268f47294eb2b18282540a955",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f5-6a74-4bfc-bb34-499a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072630",
+        "value": "hccutils.inf|2f31ef1a8fca047ed0d623010d569857",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f6-743c-4e90-8619-4c5a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072631",
+        "value": "hjwe.dat|d3601a5160b8d122261989d147221eb7",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f7-b1dc-4a7e-98d1-43c3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072631",
+        "value": "qhnj.dat|a9de62186cb8d0e23b0dc75e1ae373ac",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f7-ba34-4fde-b022-499e950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072632",
+        "value": "tyeu.dat|29ec20f5fa1817dc9250c434e61420ea",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f8-ba50-40d4-b668-40b6950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072632",
+        "value": "vnkd.dat|35f4ce864c3a3dc016fea3459d6402a9",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571632f8-b0ac-45b2-b300-4acd950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072966",
+        "value": "8e4de6fb35ce4cd47e06b48fb86b7da3eba02031cfd8ae714e25f8f7903f0141",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "571633f1-ceac-4898-af6f-4077950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461072994",
+        "value": "7c04286734718300e2c0691be9b6622f2d2525ca07ab27102a424af6f8cc3aec",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "T9000 man binary",
+        "uuid": "571633f2-853c-4d2a-99c0-4157950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073261",
+        "value": "Elevate.dll|9c23febc49c7b17387767844356d38d5578727ee1150956164883cf555fe7f95",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5716356d-8e44-44e0-bdbe-43e8950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073285",
+        "value": "QQMgr.dll|bf1b00b7430899d33795ef3405142e880ef8dcbda8aab0b19d80875a14ed852f",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57163585-4fa0-4a17-9aab-46c2950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073322",
+        "value": "ResN32.dat|5b90fa081e3ac29a7339995f9b087dab9981409ff62e3215eb558908c6b96b14",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571635aa-1d00-4b7f-b330-4030950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073346",
+        "value": "QQMgr.inf|ace7e3535f2f1fe32e693920a9f411eea21682c87a8e6661d3b67330cd221a2a",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571635c2-8fb0-46d1-ba3d-4861950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073418",
+        "value": "ResN32.dll|1cea4e49bd785378d8beb863bb8eb662042dffd18c85b8c14c74a0367071d9a7",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5716360a-2a3c-429e-82dd-49d2950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073467",
+        "value": "hccutils.dll|3dfc94605daf51ebd7bbccbb3a9049999f8d555db0999a6a7e6265a7e458cab9",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5716363b-7a90-44eb-92d5-46e3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073483",
+        "value": "hccutils.inf|f05cd0353817bf6c2cab396181464c31c352d6dea07e2d688def261dd6542b27",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5716364b-1940-4d7c-a2ee-4ba3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073500",
+        "value": "hjwe.dat|bb73261072d2ef220b8f87c6bb7488ad2da736790898d61f33a5fb7747abf48b",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5716365c-65b4-4d71-9618-4d3c950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073515",
+        "value": "vnkd.dat|c22b40db7f9f8ebdbde4e5fc3a44e15449f75c40830c88932f9abd541cc78465",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5716366b-7980-4c53-a04c-44ae950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073533",
+        "value": "tyeu.dat|e52b5ed63719a2798314a9c49c42c0ed4eb22a1ac4a2ad30e8bfc899edcea926",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5716367d-2b88-45b5-a3bb-4915950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461073550",
+        "value": "qhnj.dat|c61dbc7b51caab1d0353cbba9a8f51f65ef167459277c1c16f15eb6c7025cfe3",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "5716368e-b1b0-4184-aa05-445c950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461074701",
+        "value": "e1269c22ad1e057b9c91523498b4b04d",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57163b0d-9214-43d4-9c9f-4d5f950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461074701",
+        "value": "b9914fb8c645e0c41d497db303c1ffa594da709686252fccb8d28dffac86275b",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57163b0d-3c58-4378-b036-4eea950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461134495",
+        "value": "yeaton.xicp.net",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5717249f-c33c-4b52-926b-4475950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461134866",
+        "value": "BC29.tmp|e4e8493898d94f737ff4dc8fab743a4a",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57172612-830c-44ef-8b61-4f00950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461134867",
+        "value": "~tmp.doc|751196ce79dacd906eec9b5a1c92890b",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57172613-bf60-445b-b242-4473950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135278",
+        "value": "~tmp.doc|e6ad959a18725954a56a7954d3f47671",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727ae-9478-46db-87bb-4241950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135278",
+        "value": "iuso.exe|07eb4867e436bbef759a9877402af994",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727ae-ef9c-4de4-af85-4e73950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135279",
+        "value": "wget.bat|47e60e347b5791d5f17939f9c97fee01",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727af-0e74-4f10-9b4c-4965950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135280",
+        "value": "wget.exe|f9f8d1c53d312f17c6f830e7b4e6651d",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727b0-16e0-45d6-a286-4a06950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135280",
+        "value": "wthk.txt|d579d7a42ff140952da57264614c37bc",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727b0-e65c-469d-a368-4a7f950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135281",
+        "value": "conhost.exe|f70b295c6a5121b918682310ce0c2165",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727b1-66c8-4be7-8ee1-43c3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135282",
+        "value": "SBieDll.dll|f80edbb0fcfe7cec17592f61a06e4df2",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727b2-5eb0-4dce-98b8-4dba950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135282",
+        "value": "dll2.xor|ce8ec932be16b69ffa06626b3b423395",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727b2-c0ec-413f-abe2-467c950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135283",
+        "value": "maindll.dll|d8ede9e6c3a1a30398b0b98130ee3b38",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727b3-cc50-4e24-8329-49c8950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135284",
+        "value": "nvsvc.exe|e0eb981ad6be0bd16246d5d442028687",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727b4-a3b8-4cbc-be4a-4ebc950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135285",
+        "value": "runas.exe|6a541de84074a2c4ff99eb43252d9030",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571727b5-f7e8-45ce-b313-4df9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461135892",
+        "value": "983333e2c878a62d95747c36748198f0",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57172a14-7bd8-4080-9f8a-4167950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136137",
+        "value": "5ff7e8bd99466159e0285a2029cd3bdd3fed220b",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: b9914fb8c645e0c41d497db303c1ffa594da709686252fccb8d28dffac86275b",
+        "uuid": "57172b09-ec08-4253-84d9-497402de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136138",
+        "value": "https://www.virustotal.com/file/b9914fb8c645e0c41d497db303c1ffa594da709686252fccb8d28dffac86275b/analysis/1395781579/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0a-fb18-45f2-8f9d-4ac102de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136138",
+        "value": "94be2b286a5b0bfe1a0aa575153f919cb3e1d4d9",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "T9000 man binary - Xchecked via VT: 7c04286734718300e2c0691be9b6622f2d2525ca07ab27102a424af6f8cc3aec",
+        "uuid": "57172b0a-c39c-4fb0-ad04-437302de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136138",
+        "value": "https://www.virustotal.com/file/7c04286734718300e2c0691be9b6622f2d2525ca07ab27102a424af6f8cc3aec/analysis/1456141482/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0a-3154-4f7c-9b4a-473702de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136139",
+        "value": "e4007951cfbc27216e9c81eb75bff9ddac9d6f7c",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF - Xchecked via VT: 8e4de6fb35ce4cd47e06b48fb86b7da3eba02031cfd8ae714e25f8f7903f0141",
+        "uuid": "57172b0b-c0ac-4958-9e53-420a02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136139",
+        "value": "https://www.virustotal.com/file/8e4de6fb35ce4cd47e06b48fb86b7da3eba02031cfd8ae714e25f8f7903f0141/analysis/1457170420/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0b-1d78-4aae-939a-4a6d02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136139",
+        "value": "2552c92922e2391246e761dcfc1e4b930fc4ae2f",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: d5fa43be20aa94baf1737289c5034e2235f1393890fb6f4e8d4104565be52d8c",
+        "uuid": "57172b0b-0a64-4adf-bf72-441802de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136140",
+        "value": "https://www.virustotal.com/file/d5fa43be20aa94baf1737289c5034e2235f1393890fb6f4e8d4104565be52d8c/analysis/1455281121/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0c-83d0-4f34-9174-4a5e02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136140",
+        "value": "b57c11f3f3b272d3ac49cc6ef684ccebe48ebf15",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF - Xchecked via VT: 647b443ecaa38d2834e5681f20540fa84a5cf2b7e1bee6a2524ce59783cb8d1b",
+        "uuid": "57172b0c-8a80-4cb3-a81d-44ed02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136140",
+        "value": "https://www.virustotal.com/file/647b443ecaa38d2834e5681f20540fa84a5cf2b7e1bee6a2524ce59783cb8d1b/analysis/1453199270/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0c-49a0-4108-813f-4ef302de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136141",
+        "value": "a44f10783544927137fe94d998523c4ac9a45b92",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: f6bc895b36446d172c4a99be2587376b48fa3b1b0f6150eb8ab83f649f7b8bc6",
+        "uuid": "57172b0d-b1fc-4e7a-af10-416702de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136141",
+        "value": "https://www.virustotal.com/file/f6bc895b36446d172c4a99be2587376b48fa3b1b0f6150eb8ab83f649f7b8bc6/analysis/1452679497/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0d-78a8-457f-af6d-446f02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136142",
+        "value": "2dcb8061c8473c48a6877b26a8704d1b764e7ece",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: ad251fd7427c0334f34aabe100a216b4af48b1ab4a01705f44b3421edd0be6ae",
+        "uuid": "57172b0e-7aa4-49ce-aeb6-43b002de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136142",
+        "value": "https://www.virustotal.com/file/ad251fd7427c0334f34aabe100a216b4af48b1ab4a01705f44b3421edd0be6ae/analysis/1453200173/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0e-2518-42b2-a3f1-40e902de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136142",
+        "value": "cbac437a51f5b0942ddd4999eeee83dabd8f4304",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: c61dbc7b51caab1d0353cbba9a8f51f65ef167459277c1c16f15eb6c7025cfe3",
+        "uuid": "57172b0e-0ba8-4133-bb81-4bf902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136143",
+        "value": "https://www.virustotal.com/file/c61dbc7b51caab1d0353cbba9a8f51f65ef167459277c1c16f15eb6c7025cfe3/analysis/1458792067/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0f-0068-4f9d-8aa1-414002de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136143",
+        "value": "9f99c171532faec90ac1371ff077423b3cb64613",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: e52b5ed63719a2798314a9c49c42c0ed4eb22a1ac4a2ad30e8bfc899edcea926",
+        "uuid": "57172b0f-cc1c-49b9-8bae-4bf302de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136143",
+        "value": "https://www.virustotal.com/file/e52b5ed63719a2798314a9c49c42c0ed4eb22a1ac4a2ad30e8bfc899edcea926/analysis/1459253251/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b0f-e398-420a-a136-49d302de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136144",
+        "value": "c25ac5e3c7739cb404d38437933539d082ed0919",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: c22b40db7f9f8ebdbde4e5fc3a44e15449f75c40830c88932f9abd541cc78465",
+        "uuid": "57172b10-07e0-4001-a6d8-4fac02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136144",
+        "value": "https://www.virustotal.com/file/c22b40db7f9f8ebdbde4e5fc3a44e15449f75c40830c88932f9abd541cc78465/analysis/1457523266/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b10-30a4-4633-9876-46b902de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136145",
+        "value": "5842ba2f51517d3276f5662398d6d3f19e44a345",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: bb73261072d2ef220b8f87c6bb7488ad2da736790898d61f33a5fb7747abf48b",
+        "uuid": "57172b11-b8f4-4ba3-8482-4f6e02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136145",
+        "value": "https://www.virustotal.com/file/bb73261072d2ef220b8f87c6bb7488ad2da736790898d61f33a5fb7747abf48b/analysis/1454685259/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b11-45b0-42ab-9d84-41a302de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136145",
+        "value": "c2c49007a99b79f6e74382fa22ed595602a24130",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: f05cd0353817bf6c2cab396181464c31c352d6dea07e2d688def261dd6542b27",
+        "uuid": "57172b11-b554-4a57-9917-474502de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136146",
+        "value": "https://www.virustotal.com/file/f05cd0353817bf6c2cab396181464c31c352d6dea07e2d688def261dd6542b27/analysis/1461046893/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b12-f8e0-43a0-b10f-469802de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136146",
+        "value": "cb57196bde3f520e87c948b4676bf487c0fd513e",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: 3dfc94605daf51ebd7bbccbb3a9049999f8d555db0999a6a7e6265a7e458cab9",
+        "uuid": "57172b12-ccb4-414a-892f-4d1602de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136146",
+        "value": "https://www.virustotal.com/file/3dfc94605daf51ebd7bbccbb3a9049999f8d555db0999a6a7e6265a7e458cab9/analysis/1459165746/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b12-b1d4-4cb1-a6d8-48ee02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136147",
+        "value": "fb7eba5de0304aa81711e645d6f3f203a1092613",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: 1cea4e49bd785378d8beb863bb8eb662042dffd18c85b8c14c74a0367071d9a7",
+        "uuid": "57172b13-c430-4759-beca-4a0e02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136147",
+        "value": "https://www.virustotal.com/file/1cea4e49bd785378d8beb863bb8eb662042dffd18c85b8c14c74a0367071d9a7/analysis/1455281133/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b13-f4b0-42e3-94e1-4fa402de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136148",
+        "value": "d9296175d7894bdbd5db1b7b477bdd39b8652ac6",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: ace7e3535f2f1fe32e693920a9f411eea21682c87a8e6661d3b67330cd221a2a",
+        "uuid": "57172b14-295c-4018-8c0b-4ff702de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136148",
+        "value": "https://www.virustotal.com/file/ace7e3535f2f1fe32e693920a9f411eea21682c87a8e6661d3b67330cd221a2a/analysis/1461046904/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b14-4674-4191-94f8-4a8802de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136148",
+        "value": "6f3c21da298db324b7d2c299c219bd75c49d9dfd",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: 5b90fa081e3ac29a7339995f9b087dab9981409ff62e3215eb558908c6b96b14",
+        "uuid": "57172b14-6408-4a0d-83f5-4e9b02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136149",
+        "value": "https://www.virustotal.com/file/5b90fa081e3ac29a7339995f9b087dab9981409ff62e3215eb558908c6b96b14/analysis/1461046903/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b15-8988-4d9e-a32e-420602de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136149",
+        "value": "73160d3a59db4a5858cd51ef7428a444caaf7cc4",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: bf1b00b7430899d33795ef3405142e880ef8dcbda8aab0b19d80875a14ed852f",
+        "uuid": "57172b15-ae10-4a05-a760-470702de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136149",
+        "value": "https://www.virustotal.com/file/bf1b00b7430899d33795ef3405142e880ef8dcbda8aab0b19d80875a14ed852f/analysis/1456141391/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b15-61e4-481c-be10-44b702de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136150",
+        "value": "b8f03d78c139faee34293a727e7be74ad0a511d9",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: 9c23febc49c7b17387767844356d38d5578727ee1150956164883cf555fe7f95",
+        "uuid": "57172b16-3340-4e35-97a0-4bd902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136150",
+        "value": "https://www.virustotal.com/file/9c23febc49c7b17387767844356d38d5578727ee1150956164883cf555fe7f95/analysis/1456962260/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b16-0ce0-4c6f-b784-454502de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136151",
+        "value": "d22394046ee36dce7ca64ff95d095cdb02c88629",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "- Xchecked via VT: 5f3d0a319ecc875cc64a40a34d2283cb329abcf79ad02f487fbfd6bef153943c",
+        "uuid": "57172b17-5f24-4f62-b72b-4c2002de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136151",
+        "value": "https://www.virustotal.com/file/5f3d0a319ecc875cc64a40a34d2283cb329abcf79ad02f487fbfd6bef153943c/analysis/1454953266/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b17-4414-4f3f-8fc8-49ea02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136151",
+        "value": "ef97f13f49266a170f4d334482376bb31335fc323ed80917b9943207ff75f750",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 983333e2c878a62d95747c36748198f0",
+        "uuid": "57172b17-868c-4c3b-b79d-45aa02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136152",
+        "value": "b27957884d6506b24751b3d81fb243fb4d97afe5",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 983333e2c878a62d95747c36748198f0",
+        "uuid": "57172b18-fe4c-41b3-abfe-4c5602de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136152",
+        "value": "https://www.virustotal.com/file/ef97f13f49266a170f4d334482376bb31335fc323ed80917b9943207ff75f750/analysis/1385566211/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b18-ec7c-4e74-b032-49e302de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136152",
+        "value": "5b34b3365eb6a6c700b391172849a2668d66a167669018ae3b9555bc2d1e54ab",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 6a541de84074a2c4ff99eb43252d9030",
+        "uuid": "57172b18-d2dc-423c-ba45-49a002de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136153",
+        "value": "c2ffd2f81a33e962b48df1b39c296a163e34aeea",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 6a541de84074a2c4ff99eb43252d9030",
+        "uuid": "57172b19-ab98-403b-bea6-44ce02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136153",
+        "value": "https://www.virustotal.com/file/5b34b3365eb6a6c700b391172849a2668d66a167669018ae3b9555bc2d1e54ab/analysis/1456856209/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b19-c660-45a5-8c0d-4d5802de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136153",
+        "value": "ec05e37230e6534fa148b8e022f797ad0afe80f699fbd222a46672118663cf00",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: e0eb981ad6be0bd16246d5d442028687",
+        "uuid": "57172b19-bd24-4c48-9f17-44cb02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136154",
+        "value": "cbeffef7965a081490171ad36e3001bd74e4123b",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: e0eb981ad6be0bd16246d5d442028687",
+        "uuid": "57172b1a-48e0-4588-acb3-48fa02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136154",
+        "value": "https://www.virustotal.com/file/ec05e37230e6534fa148b8e022f797ad0afe80f699fbd222a46672118663cf00/analysis/1456856205/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b1a-3d00-4a32-a155-4a8f02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136155",
+        "value": "5838582ea26312cc60b43da555189b439d3688597a705e3a52dc4d935517f69d",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: d8ede9e6c3a1a30398b0b98130ee3b38",
+        "uuid": "57172b1b-bda4-481e-91aa-4f1a02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136155",
+        "value": "7536c344b450af882910ce8c9620d0254aff294c",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: d8ede9e6c3a1a30398b0b98130ee3b38",
+        "uuid": "57172b1b-dc30-447b-898a-458202de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136155",
+        "value": "https://www.virustotal.com/file/5838582ea26312cc60b43da555189b439d3688597a705e3a52dc4d935517f69d/analysis/1461075979/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b1b-43d4-40b6-baac-41e702de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136156",
+        "value": "2ac69633da711f244377483d99fac53089ec6614a61d8a1492a0e7228cbb8ffd",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: f80edbb0fcfe7cec17592f61a06e4df2",
+        "uuid": "57172b1c-b8d0-4a48-bb1d-46da02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136156",
+        "value": "e11c82def33edf7162c6b3b24546af341069f4f4",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: f80edbb0fcfe7cec17592f61a06e4df2",
+        "uuid": "57172b1c-4444-48d9-b21d-408b02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136156",
+        "value": "https://www.virustotal.com/file/2ac69633da711f244377483d99fac53089ec6614a61d8a1492a0e7228cbb8ffd/analysis/1461089261/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b1c-dfbc-4ceb-af43-40ed02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136157",
+        "value": "4849af113960f473749acf71d11d56854589cf21d623e66c7408bebd5ad0608f",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: f70b295c6a5121b918682310ce0c2165",
+        "uuid": "57172b1d-edf0-4761-baab-4b6902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136157",
+        "value": "367c0e93dc97478e2f0101e23cae084467932cb2",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: f70b295c6a5121b918682310ce0c2165",
+        "uuid": "57172b1d-add4-4872-8f43-46aa02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136157",
+        "value": "https://www.virustotal.com/file/4849af113960f473749acf71d11d56854589cf21d623e66c7408bebd5ad0608f/analysis/1461046897/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b1d-0d80-4dbf-80b8-4b8202de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136158",
+        "value": "5b875ecf0b7f67a4429aeaa841eddf8e6b58771e16dbdb43ad6918aa7a5b582d",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: d579d7a42ff140952da57264614c37bc",
+        "uuid": "57172b1e-faac-4a67-a2ff-472802de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136158",
+        "value": "62d16dc7335729e2d3508335b12787865f4f6035",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: d579d7a42ff140952da57264614c37bc",
+        "uuid": "57172b1e-d608-4814-bd1c-4a7502de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136158",
+        "value": "https://www.virustotal.com/file/5b875ecf0b7f67a4429aeaa841eddf8e6b58771e16dbdb43ad6918aa7a5b582d/analysis/1452527131/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b1e-dd84-43fe-b7c0-4adf02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136159",
+        "value": "bedfbfe249b4a2be35bbfb1cf166d2119e132ee7c608909d34238e9eba6c9749",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: f9f8d1c53d312f17c6f830e7b4e6651d",
+        "uuid": "57172b1f-add0-49b0-adfa-4e4e02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136159",
+        "value": "6b3eb6069b69fbcfa6e1e9c231ce95674d698f51",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: f9f8d1c53d312f17c6f830e7b4e6651d",
+        "uuid": "57172b1f-3090-4011-a9e9-444902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136160",
+        "value": "https://www.virustotal.com/file/bedfbfe249b4a2be35bbfb1cf166d2119e132ee7c608909d34238e9eba6c9749/analysis/1461046900/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b20-0268-42e0-9264-4cd902de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136160",
+        "value": "9b6053e784c5762fdb9931f9064ba6e52c26c2d4b09efd6ff13ca87bbb33c692",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 47e60e347b5791d5f17939f9c97fee01",
+        "uuid": "57172b20-9494-4e9e-9e67-40e902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136160",
+        "value": "86ba123a6c28df4a470de09c5fdc5ac5ae3d24ce",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 47e60e347b5791d5f17939f9c97fee01",
+        "uuid": "57172b20-f1b0-4c9a-b746-484102de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136161",
+        "value": "https://www.virustotal.com/file/9b6053e784c5762fdb9931f9064ba6e52c26c2d4b09efd6ff13ca87bbb33c692/analysis/1461046910/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b21-3880-4218-9131-437a02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136161",
+        "value": "cf717a646a015ee72f965488f8df2dd3c36c4714ccc755c295645fe8d150d082",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 07eb4867e436bbef759a9877402af994",
+        "uuid": "57172b21-5834-47e6-a2c7-41f402de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136161",
+        "value": "4d758a60b57d2f693fc4a87cbc74ec1744a644ce",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 07eb4867e436bbef759a9877402af994",
+        "uuid": "57172b21-2738-44d4-857b-426e02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136162",
+        "value": "https://www.virustotal.com/file/cf717a646a015ee72f965488f8df2dd3c36c4714ccc755c295645fe8d150d082/analysis/1452794663/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b22-3068-4484-8cfd-444602de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136162",
+        "value": "f0b5336b6f890e2029ac242ad2b613cad535828f7b7004a2284683f3195b7616",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: e6ad959a18725954a56a7954d3f47671",
+        "uuid": "57172b22-7284-4c9d-a29e-49e902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136162",
+        "value": "62fbb1ed89888cbe7ffa7d01537545574c244bfd",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: e6ad959a18725954a56a7954d3f47671",
+        "uuid": "57172b22-8e80-4eab-ae04-417102de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136163",
+        "value": "https://www.virustotal.com/file/f0b5336b6f890e2029ac242ad2b613cad535828f7b7004a2284683f3195b7616/analysis/1461046885/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57172b23-045c-4ba6-8d54-41c502de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461136212",
+        "value": "59.188.12.123",
+        "type": "ip-dst",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 8008",
+        "uuid": "57172b54-6d44-460d-ac20-40a7950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461136297",
+        "value": "09ddd70517cb48a46d9f93644b29c72f",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "57172ba9-9b28-4af8-91e6-44e4950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461136298",
+        "value": "d8becbd6f188e3fb2c4d23a2d36d137b",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RAR",
+        "uuid": "57172baa-a0c4-40e6-8de2-4c99950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461137412",
+        "value": "www.whitewall.top",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 8080",
+        "uuid": "57173004-40c8-44cc-a582-464a950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461137413",
+        "value": "fsguidll.exe|2d7a648ebe64e536944c011c8dcbb375",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57173005-f2dc-43f4-bd30-48b8950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461137414",
+        "value": "fslapi.dll|13d3d0699562a57cf575dd7f969b3141",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57173006-1804-4885-b572-44a9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461137414",
+        "value": "fslapi.dll.gui|894c251a3aad150f80a8af2539baf9d1",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57173006-d0c4-47fc-903c-4f7f950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461138386",
+        "value": "533cd66cf420e8919329ee850077319c",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571733d2-a0fc-4909-8c81-44ea950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461138386",
+        "value": "0ba814941a0adb344cbf2a90552a66b52faa99a24d3107735da1db5a0e1f8360",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571733d2-f430-45fa-b095-4a07950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461138386",
+        "value": "e327abcfd09be4e8f64ef35026309747",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571733d2-0f0c-4b63-9c9a-4615950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461138387",
+        "value": "8b6ef2f4e2af608c755b3114e98ab78ac89e089db5b0bece7f2dc68bd1026a78",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571733d3-ce08-4636-9f75-41cb950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461138387",
+        "value": "103873e3fa8dfc2360bb5c22761da04a",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571733d3-7fe4-430d-a31d-44aa950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461138387",
+        "value": "40099e0f13ba47bd4ea4f3f49228ac8cffdf07700c4ef8089e3b5d8013e914a3",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571733d3-a8e4-4198-aecd-4594950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461140878",
+        "value": "98bcd226890c5c2694ef9a34a23c9fbf",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "57173d6f-0adc-4af5-b8c1-45ce950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461141045",
+        "value": "e13a0357cd51795100dbce25fe846783fbb7fd22c5efe438d9059edc10492f49",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "57173e35-4b34-4a16-8442-478c950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461141066",
+        "value": "softinc.pw",
+        "type": "domain",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57173e4a-4b18-4646-9a26-4712950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461141066",
+        "value": "www.tibetimes.com",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57173e4a-99b8-4146-b38d-48df950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461141143",
+        "value": "a0da9887b4c5af009a41b783db7ffedf949013abc70777c0ec539299628a51eb",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "57173e97-6cd4-47eb-92ad-46c2950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461141168",
+        "value": "b51dd4d5731b71c1a191294466cc8288",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "57173eb0-68b4-4ad0-a243-4022950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461141182",
+        "value": "90t69cf82.dll|86ebcbb3bdd8af257b52daa869ddd6c1",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57173ebe-e2f8-49b3-b75c-4275950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461141183",
+        "value": "B412.tmp|111273c8cba88636a036e250c2626b12",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57173ebf-7e30-489d-bd92-4eb3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461141196",
+        "value": "manhaton.123nat.com",
+        "type": "hostname",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57173ecc-4858-4e78-a121-4223950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461141197",
+        "value": "122.10.112.126",
+        "type": "ip-dst",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 8030",
+        "uuid": "57173ecd-ff54-4b11-921f-46fb950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461142620",
+        "value": "58f8a906b49711d2a6aaed0b59e1c1b7fcf5757666e0567fe50e996bfe0a4589",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "5717445c-4344-4af2-8fe9-4151950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461142701",
+        "value": "www.turkistanuyghur.top",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571744ad-ea7c-4e0f-b713-4893950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461142701",
+        "value": "www.yawropauyghur.top",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571744ad-c1f8-4606-b0b2-45bc950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461142702",
+        "value": "www.japanuyghur.top",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571744ae-aee8-4190-98ae-426d950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461142702",
+        "value": "www.hotansft.top",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571744ae-7ae4-4ddc-bf3c-45ef950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461142702",
+        "value": "www.amerikauyghur.top",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571744ae-1af4-4757-8408-42d7950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461142703",
+        "value": "turkiyeuyghur.com",
+        "type": "domain",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571744af-a4b8-4e3c-9228-49b4950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461142790",
+        "value": "Micbt/BTFly.dump|f7c04e8b188fa38d0f62f620e3bf01dc",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174506-afbc-44f1-b90c-45d6950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461142830",
+        "value": "Micbt/CltID.ini|54afa267dd5acef3858dd6dbea609cd9",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5717452e-22d8-4278-b18b-40c3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461142830",
+        "value": "Micbt/IconConfigBt.DAT|516774cb0d5d56b300c402f63fe47523",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5717452e-f668-4202-bc83-4fcc950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461142831",
+        "value": "Micbt/MemoryLoad.dump|db0f8ba69aa71e9404b52d951458b97c",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5717452f-e860-4d6e-be0a-412d950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461142831",
+        "value": "Micbt/RasTls.dll|1e9e9ce1445a13c1ff4bf82f4a38de0d",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5717452f-bc28-48f8-a88f-4621950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461142832",
+        "value": "Micbt/RasTls.exe|62944e26b36b1dcace429ae26ba66164",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174530-8628-4ec1-945e-4f28950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143026",
+        "value": "fsguidll.exe|5c5e3201d6343e0536b86cb4ab0831c482a304c62cd09c01ac8bdeee5755f635",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571745f2-29dc-4434-8a4e-4f24950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143027",
+        "value": "fslapi.dll|2a6ef9dde178c4afe32fe676ff864162f104d85fac2439986de32366625dc083",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571745f3-0710-48a7-8a66-4f4b950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143028",
+        "value": "fslapi.dll.gui|dc4dac22d58ed7c0cadb13a621f42cb9a01851385ca0dc5b94a73c91677a0739",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571745f4-eab8-481e-bfbc-41b7950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143045",
+        "value": "BC29.tmp|5f3d0a319ecc875cc64a40a34d2283cb329abcf79ad02f487fbfd6bef153943c",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174605-6328-49df-a999-4ad9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143046",
+        "value": "~tmp.doc|76d54a0c8ed8d9a0b02f52d2400c8e74a9473e9bc92aeb558b2f4c894da1b88f",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174606-b230-42b0-b806-47f2950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143075",
+        "value": "~tmp.doc|f0b5336b6f890e2029ac242ad2b613cad535828f7b7004a2284683f3195b7616",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174623-6d50-40d8-9fb3-47c6950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143076",
+        "value": "iuso.exe|cf717a646a015ee72f965488f8df2dd3c36c4714ccc755c295645fe8d150d082",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174624-8aa0-4072-bc11-4657950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143076",
+        "value": "wget.bat|9b6053e784c5762fdb9931f9064ba6e52c26c2d4b09efd6ff13ca87bbb33c692",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174624-a420-4946-be1d-473e950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143077",
+        "value": "wget.exe|bedfbfe249b4a2be35bbfb1cf166d2119e132ee7c608909d34238e9eba6c9749",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174625-257c-43c7-a6a6-4b5f950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143078",
+        "value": "wthk.txt|5b875ecf0b7f67a4429aeaa841eddf8e6b58771e16dbdb43ad6918aa7a5b582d",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174626-4614-4979-b6a0-41d4950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143078",
+        "value": "conhost.exe|4849af113960f473749acf71d11d56854589cf21d623e66c7408bebd5ad0608f",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174626-632c-4e4f-ad7f-42ff950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143079",
+        "value": "SbieDll.dll|2ac69633da711f244377483d99fac53089ec6614a61d8a1492a0e7228cbb8ffd",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174627-93e4-4f5c-8c97-4251950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143080",
+        "value": "dll2.xor|c3fee1c7d402f144023dade4e63dc65db42fc4d6430f9885ece6aa7fa77cade0",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174628-8e70-4cc8-9987-4952950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143080",
+        "value": "maindll.dll|5838582ea26312cc60b43da555189b439d3688597a705e3a52dc4d935517f69d",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174628-caf4-49ba-86d9-40a2950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143081",
+        "value": "nvsvc.exe|ec05e37230e6534fa148b8e022f797ad0afe80f699fbd222a46672118663cf00",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174629-38f4-4809-b539-4fd9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143082",
+        "value": "runas.exe|5b34b3365eb6a6c700b391172849a2668d66a167669018ae3b9555bc2d1e54ab",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5717462a-b1b0-4b33-bf15-45c2950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143265",
+        "value": "90t69cf82.dll|afd0eae5065a689f8fc48c0cfc5b87f4caecc2fb6b1cef4c5e977fc2cc98509d",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e1-8018-47cf-8445-4d2a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143266",
+        "value": "B512.tmp|cdb1d2f843ce797084cfc90107a2582e4861f4051aab0f6ac374468f491232a5",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e2-b3b8-4478-9c44-4c84950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143266",
+        "value": "~tmp.doc|aecd3e146632e9dfa0a92f486855144df0f87181feb67ac414a618fd52960c8c",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e2-5f40-4465-a168-4030950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143267",
+        "value": "Micbt/BTFly.dump|3b828a81ff5b0766c99284524b18fcd10d553191741bc1ed89904cdaa79baae1",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e3-9830-4503-8e36-475c950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143267",
+        "value": "Micbt/CltID.ini|1590a42e67fe02892dfeb6f29e0e6ae91c503d4ea91b550557c513e92f5ac7eb",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e3-489c-4e77-afe4-43b8950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143268",
+        "value": "Micbt/IconConfigBt.DAT|0a47bd32b83f09be1ea5a29dce6b7d307de7b3cdd69f836e0c810fd578f85c7c",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e4-9dd0-4067-8ec7-4fba950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143269",
+        "value": "Micbt/MemoryLoad.dump|aace766acea06845c29b306a9e080edcb3407635398007f3b9b5e053198b54f4",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e5-e05c-451b-9a26-4efa950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143270",
+        "value": "Micbt/RasTls.dll|bc2f7ebcad10aa48a69680f14fc57434436b821d5e7f2666a0f6d8795b0d37d1",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e6-c760-4569-96ff-4d91950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143270",
+        "value": "Micbt/RasTls.exe|f9ebf6aeb3f0fb0c29bd8f3d652476cd1fe8bd9a0c11cb15c43de33bbce0bf68",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "571746e6-e8b4-4c80-8fe4-430e950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143400",
+        "value": "~tmp.doc|e538ad13417b773714b75b5d602e4c6e",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "recognized as Gh0stRAT",
+        "uuid": "57174768-a980-4cfc-adce-4ef9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143448",
+        "value": "~1|df50ea33616c916720c81d65563175d998a2c606360eeb3c8b727a482de3a4fc",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174798-6d98-4b70-b485-4cca950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143464",
+        "value": "~1|b901f0b4aa6a3a6875235f96fce15839",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571747a8-e860-46cd-b1b3-44c1950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143659",
+        "value": "One Tibetan Protester is Freed, Two Others Are Jailed.doc|facd2fbf26e974bdeae3e4db19753f03",
+        "type": "filename|md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5717486b-e948-4e87-b418-42fe950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461143659",
+        "value": "One Tibetan Protester is Freed, Two Others Are Jailed.doc|1140e06fa8580cf869744b01cc037c2d2d2b5af7f26f5b3448d9a536674d681c",
+        "type": "filename|sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "5717486b-ac80-4461-911a-49fc950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144013",
+        "value": "41d05788d844b59f8eb79aeb2060dd5b7bdcad01e8d720f4b8b80d552e41cfe2",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF",
+        "uuid": "571748d1-aef0-4c8b-991b-4c00950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144007",
+        "value": "ddc05b9f39f579f64742980980ca9820b83a243889bbc5baa37f5c2c1c4beb30",
+        "type": "sha256",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RAR \r\n8EC7.tmp",
+        "uuid": "571748d2-03c0-4806-a97b-4b36950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144071",
+        "value": "ffb7a38174aab4744cc4a509e34800aee9be8e57",
+        "type": "pehash",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174a07-2508-4ee1-a57b-4894950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144196",
+        "value": "118.193.240.195",
+        "type": "ip-dst",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174a84-d848-4ef3-8677-43fa950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461144196",
+        "value": "http://www.whitewall.top:8080/850D3011FA326CBB6F57A965",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 8080",
+        "uuid": "57174a84-7878-4c38-ac38-4c38950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461144197",
+        "value": "http://www.whitewall.top:995/5724DD3DCC4A19E8416E5691",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "On port 995",
+        "uuid": "57174a85-8a24-41d6-bc55-4eef950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461144234",
+        "value": "ee49bd5f35cc3012b5b606aca9b0f561",
+        "type": "md5",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174aaa-2894-4f79-83c3-48bb950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144424",
+        "value": "6144:NwOD0nTHfnxBl7p01yDn8FJD1O6JN0MrvVburdr3QM5o1Zx0a4VgLjv9uM+yb3Hx:ZbqQM5oBfv9uMt5yGg",
+        "type": "ssdeep",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174b68-2ef8-49f4-82fc-4e38950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144473",
+        "value": "Y:/UDPSbieDLL/Release/SBieDLL.pdb",
+        "type": "pdb",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174b99-21b4-4881-8088-44f2950d210f",
+        "category": "Artifacts dropped"
+      },
+      {
+        "timestamp": "1461144549",
+        "value": "2016\u7e3d\u7d71\u9078\u8209\u6c11\u60c5\u4e2d\u5fc3\u9810\u6e2c\u503c.doc",
+        "type": "filename",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174be5-742c-456a-a9be-4030950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144549",
+        "value": "www.kcico.com.tw/data/openwebmail/doc/wthk.txt",
+        "type": "url",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174be5-2e14-46d9-a003-4125950d210f",
+        "category": "Network activity"
+      },
+      {
+        "timestamp": "1461144549",
+        "value": "\u4e2d\u56fd\u56fd\u5bb6\u5b89\u5168\u59d4\u5458\u4f1a\u673a\u6784\u8bbe\u7f6e\u548c\u4eba\u5458\u540d\u5355\u63d0\u524d\u66dd\u5149.docx",
+        "type": "filename",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import.",
+        "uuid": "57174be5-41e0-41d6-a2e5-4294950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144573",
+        "value": "One Tibetan Protester is Freed, Two Others Are Jailed.doc",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174bfd-9390-4ea8-b4fd-4a39950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144589",
+        "value": "HUMAN RIGHTS SITUATION IN TIBET.doc",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174c0d-7a14-496d-81b4-4e90950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144659",
+        "value": "[tibethouse] Upcoming Program Announcemet Last Week of December.doc",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174c53-7610-4095-b503-4f52950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144815",
+        "value": "PlugX|40099e0f13ba47bd4ea4f3f49228ac8cffdf07700c4ef8089e3b5d8013e914a3",
+        "type": "filename|sha256",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174cef-6628-4d5c-a692-4a51950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144831",
+        "value": "ufbidruosivibuted|a78ea84acf57e0c54d5b1e5e3bd5eec31cc5935f16d9575e049e161420736e32",
+        "type": "filename|sha256",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174cff-aa9c-441c-8d64-4493950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144850",
+        "value": "PlugX|103873e3fa8dfc2360bb5c22761da04a",
+        "type": "filename|md5",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174d12-942c-4080-977e-4467950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461144866",
+        "value": "ufbidruosivibuted|caefdd6ca90ff791cdeff9313136972e",
+        "type": "filename|md5",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174d22-fcec-4be8-9b94-44a9950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145048",
+        "value": "keylog",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174dd8-3f30-4838-af62-400a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145073",
+        "value": "xx6.tmp",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174df1-3968-479d-85d5-4e03950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145087",
+        "value": "xx3.tmp",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174dff-78ac-400f-bbd4-4c75950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145098",
+        "value": "xx1.tmp",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174e0a-10e0-4022-9a31-4ba1950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145117",
+        "value": "srvlic.dll",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174e1d-32dc-46d5-b717-41c3950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145133",
+        "value": "conhost.log",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174e2d-4558-4971-aa84-4d5a950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145146",
+        "value": "xx4.tmp",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174e3a-3abc-4d57-b5f7-449b950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145160",
+        "value": "xx2.tmp",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174e48-e2dc-4f15-9ae2-4adb950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145172",
+        "value": "xx5.tmp",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174e54-5018-495b-b18a-48eb950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461145194",
+        "value": "up.dat",
+        "type": "filename",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57174e6a-c71c-4c48-a9f4-444b950d210f",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159925",
+        "value": "b3d8f4587f40a598d19ed23c552c02120fd3c0ce",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RAR \r\n8EC7.tmp - Xchecked via VT: ddc05b9f39f579f64742980980ca9820b83a243889bbc5baa37f5c2c1c4beb30",
+        "uuid": "571787f5-98d0-4631-b8c7-4f0102de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159925",
+        "value": "https://www.virustotal.com/file/ddc05b9f39f579f64742980980ca9820b83a243889bbc5baa37f5c2c1c4beb30/analysis/1458560144/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787f5-31d0-4bc2-986d-4bd102de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159926",
+        "value": "4782223722758b1281f31b77f1eb0f8da38af258",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF - Xchecked via VT: 41d05788d844b59f8eb79aeb2060dd5b7bdcad01e8d720f4b8b80d552e41cfe2",
+        "uuid": "571787f6-6d58-4685-aa4c-4b1e02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159926",
+        "value": "https://www.virustotal.com/file/41d05788d844b59f8eb79aeb2060dd5b7bdcad01e8d720f4b8b80d552e41cfe2/analysis/1458273608/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787f6-b9e4-4e7f-812f-476102de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159927",
+        "value": "5ec656d194a15d41b831de750a37e40b28b19c45",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF - Xchecked via VT: 58f8a906b49711d2a6aaed0b59e1c1b7fcf5757666e0567fe50e996bfe0a4589",
+        "uuid": "571787f7-5640-43a9-a1f8-42d202de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159927",
+        "value": "https://www.virustotal.com/file/58f8a906b49711d2a6aaed0b59e1c1b7fcf5757666e0567fe50e996bfe0a4589/analysis/1458825268/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787f7-ed70-43ad-84b7-428702de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159928",
+        "value": "f44dc6b644d7534276c18d8f43420f6f9dac4ef3",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF - Xchecked via VT: a0da9887b4c5af009a41b783db7ffedf949013abc70777c0ec539299628a51eb",
+        "uuid": "571787f8-d818-4455-aec2-4cf002de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159928",
+        "value": "https://www.virustotal.com/file/a0da9887b4c5af009a41b783db7ffedf949013abc70777c0ec539299628a51eb/analysis/1456924149/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787f8-0bc0-4113-bd2a-446d02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159928",
+        "value": "ca8fa4afeeae67ef57dcb22ff2326734f119a8d6",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "RTF - Xchecked via VT: e13a0357cd51795100dbce25fe846783fbb7fd22c5efe438d9059edc10492f49",
+        "uuid": "571787f8-6338-476e-8153-44af02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159929",
+        "value": "https://www.virustotal.com/file/e13a0357cd51795100dbce25fe846783fbb7fd22c5efe438d9059edc10492f49/analysis/1452944526/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787f9-1f18-4b3a-ac70-482102de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159929",
+        "value": "b8ea4d22bd988c021bc45c3a3e84362edca91e78",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 8b6ef2f4e2af608c755b3114e98ab78ac89e089db5b0bece7f2dc68bd1026a78",
+        "uuid": "571787f9-5f08-4091-97a4-40e702de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159930",
+        "value": "https://www.virustotal.com/file/8b6ef2f4e2af608c755b3114e98ab78ac89e089db5b0bece7f2dc68bd1026a78/analysis/1459770897/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787fa-074c-4412-a3f1-4c2302de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159930",
+        "value": "0bdd3484e69af639c3564aa7ab679defc4434def",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 0ba814941a0adb344cbf2a90552a66b52faa99a24d3107735da1db5a0e1f8360",
+        "uuid": "571787fa-81e4-400a-8f49-4e9902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159930",
+        "value": "https://www.virustotal.com/file/0ba814941a0adb344cbf2a90552a66b52faa99a24d3107735da1db5a0e1f8360/analysis/1459770252/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787fa-e10c-4ac1-ac7d-4c5b02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159931",
+        "value": "https://www.virustotal.com/file/5b875ecf0b7f67a4429aeaa841eddf8e6b58771e16dbdb43ad6918aa7a5b582d/analysis/1461148223/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787fb-44bc-4692-b11b-4b2502de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159931",
+        "value": "https://www.virustotal.com/file/51c0d075067709c9f8794a25a7e3920bf69f8c755a1794e857acd818ea8a1010/analysis/1461146860/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787fb-7fcc-4e67-bed8-429a02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159932",
+        "value": "https://www.virustotal.com/file/4a5d864f69aff245793606b694bcbc5243b81e0b018596bce85ecab0e12ac849/analysis/1461147529/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787fc-cb4c-49f7-991d-45d002de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159932",
+        "value": "6dd646bd56e04c6d394f87c97976ccd04ed613df",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 1140e06fa8580cf869744b01cc037c2d2d2b5af7f26f5b3448d9a536674d681c",
+        "uuid": "571787fc-b710-46bc-a454-496202de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159932",
+        "value": "https://www.virustotal.com/file/1140e06fa8580cf869744b01cc037c2d2d2b5af7f26f5b3448d9a536674d681c/analysis/1452854114/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787fc-b338-4b49-a732-473902de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159933",
+        "value": "2616da1697f7c764ee7fb558887a6a3279861fac",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: f9ebf6aeb3f0fb0c29bd8f3d652476cd1fe8bd9a0c11cb15c43de33bbce0bf68",
+        "uuid": "571787fd-6dc4-4c44-82c0-43d602de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159933",
+        "value": "https://www.virustotal.com/file/f9ebf6aeb3f0fb0c29bd8f3d652476cd1fe8bd9a0c11cb15c43de33bbce0bf68/analysis/1461070473/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787fd-9b0c-4c22-98cb-41c302de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159934",
+        "value": "90c9b15d6f5943c515b41d7f306a7bd6eef1845a",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: bc2f7ebcad10aa48a69680f14fc57434436b821d5e7f2666a0f6d8795b0d37d1",
+        "uuid": "571787fe-2ed8-4e88-8cba-4b9002de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159934",
+        "value": "https://www.virustotal.com/file/bc2f7ebcad10aa48a69680f14fc57434436b821d5e7f2666a0f6d8795b0d37d1/analysis/1455192800/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787fe-bf88-4d38-b4a9-47d702de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159934",
+        "value": "79cc8f5b155179360a7a2de772ed1f3945aaf49c",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: aecd3e146632e9dfa0a92f486855144df0f87181feb67ac414a618fd52960c8c",
+        "uuid": "571787fe-7404-450d-a9bd-415a02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159935",
+        "value": "https://www.virustotal.com/file/aecd3e146632e9dfa0a92f486855144df0f87181feb67ac414a618fd52960c8c/analysis/1455797633/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787ff-8ac4-41cb-bbfe-43b102de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159935",
+        "value": "cd8581dc95a92bab7f8025fcc5908d27c183b425",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: afd0eae5065a689f8fc48c0cfc5b87f4caecc2fb6b1cef4c5e977fc2cc98509d",
+        "uuid": "571787ff-3858-4bdc-bd8f-430e02de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159935",
+        "value": "https://www.virustotal.com/file/afd0eae5065a689f8fc48c0cfc5b87f4caecc2fb6b1cef4c5e977fc2cc98509d/analysis/1454375598/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "571787ff-9184-46e3-bda4-460202de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159936",
+        "value": "c6f146def58b701f406a73958cdaacbe53860090",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 2a6ef9dde178c4afe32fe676ff864162f104d85fac2439986de32366625dc083",
+        "uuid": "57178800-8b30-4513-b981-431902de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159936",
+        "value": "https://www.virustotal.com/file/2a6ef9dde178c4afe32fe676ff864162f104d85fac2439986de32366625dc083/analysis/1455406891/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57178800-8760-437a-8ecf-494b02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159937",
+        "value": "f1ec39dddb224a6a1e40d55c8f6877c908f92bcf",
+        "type": "sha1",
+        "to_ids": true,
+        "object_relation": null,
+        "comment": "Imported via the freetext import. - Xchecked via VT: 5c5e3201d6343e0536b86cb4ab0831c482a304c62cd09c01ac8bdeee5755f635",
+        "uuid": "57178801-c614-4982-8611-42d002de0b81",
+        "category": "Payload delivery"
+      },
+      {
+        "timestamp": "1461159937",
+        "value": "https://www.virustotal.com/file/5c5e3201d6343e0536b86cb4ab0831c482a304c62cd09c01ac8bdeee5755f635/analysis/1461046907/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57178801-e5fc-46db-9b1c-41d802de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159937",
+        "value": "https://www.virustotal.com/file/5676c0b2d3c139dbef5bafa0184576bd1a4ccbd3f7d40b4a6a099a1e61bc2a39/analysis/1461146345/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57178801-90c4-4fad-b307-420c02de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1461159938",
+        "value": "https://www.virustotal.com/file/7a200c4df99887991c638fe625d07a4a3fc2bdc887112437752b3df5c8da79b6/analysis/1461146164/",
+        "type": "link",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "",
+        "uuid": "57178802-d774-4018-b499-4c2002de0b81",
+        "category": "External analysis"
+      },
+      {
+        "timestamp": "1467971098",
+        "value": "alert udp any any -> any 53 (msg:\"NF - APT LURK0 C&C Domain - www.amerikauyghur.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0d|amerikauyghur|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016101; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT LURK0 C&C Domain - dge.123nat.com\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|dge|06|123nat|03|com\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016102; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT LURK0 C&C Domain - manhaton.123nat.com\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|08|manhaton|06|123nat|03|com\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016103; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT Saker C&C Domain - bsnl.wang\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|04|bsnl|04|wang\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016104; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT Saker C&C Domain - www.onebook.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|07|onebook|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016105; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT Saker C&C Domain - www.togolaga.com\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|08|togolaga|03|com\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016106; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT Saker C&C Domain - unisers.com\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|07|unisers|03|com\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016107; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT Saker C&C Domain - www.dicemention.com\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0b|dicemention|03|com\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016108; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT Saker C&C Domain - www.updatenewes.com\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0b|updatenewes|03|com\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016109; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT Saker C&C Domain - softinc.pw\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|07|softinc|02|pw\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016110; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT Saker C&C Domain - www.notebookhk.net\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0a|notebookhk|03|net\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016111; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX C&C Domain - www.whitewall.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|09|whitewall|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016112; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-T9000 Win32/Agent.XST Domain - www.kcico.com.tw\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|05|kcico|03|com|02|tw\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016113; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-T9000 Win32/Agent.XST Domain - www.tibetimes.com\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|09|tibetimes|03|com\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016114; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-T9000 Win32/Agent.XST Domain - softinc.pw\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|07|softinc|02|pw\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016115; rev:1;)\r\n\r\nalert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:\"NF - Win32/Agent.XST Checkin\"; flow:established,to_server; content:\"POST\"; http_method; content:!\"Referer|3a|\"; http_header; content:!\"Accept|3a|\"; http_header; content:\"Content-Type|3a 20|text/html|0d 0a|\"; http_header; content:\"this is UP\"; depth:10; http_client_body; fast_pattern; content:\"|00 00 00 00|\"; http_client_body; reference:url,asert.arbornetworks.com/wp-content/uploads/2016/01/ASERT-Threat-Intelligence-Brief-Uncovering-the-Seven-Pointed-Dagger.pdf; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016116; rev:1;)\r\n\r\nalert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:\"NF - Win32/Agent.XST Keepalive\"; flow:established,to_server; content:\"POST|20|\"; depth:5; content:\".asp|20|HTTP/1.\"; distance:0; content:!\"Referer|3a|\"; distance:0; content:!\"Accept|3a|\"; distance:0; content:\"Content-Length|3a 20|2|0d 0a|\"; distance:0; fast_pattern; content:\"Content-Type|3a 20|text/html|0d 0a|\"; content:\"|0d 0a 0d 0a|ok\"; distance:0; threshold: type limit, count 1, seconds 60, track by_src; reference:url,asert.arbornetworks.com/wp-content/uploads/2016/01/ASERT-Threat-Intelligence-Brief-Uncovering-the-Seven-Pointed-Dagger.pdf; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016117; rev:1;)\r\n\r\nalert tcp $HOME_NET any -> $EXTERNAL_NET $HTTP_PORTS (msg:\"NF - Win32/Agent.XST/UP007 Checkin 2\"; flow:established,to_server; content:\"POST\"; http_method; content:!\"Referer|3a|\"; http_header; content:!\"Accept|3a|\"; http_header; content:\"Content-Type|3a 20|text/html|0d 0a|\"; http_header; content:\"this is UP\"; depth:10; http_client_body; fast_pattern; content:\"|00 00 00 00|\"; http_client_body; reference:url,citizenlab.org/2016/04/between-hong-kong-and-burma; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016118; rev:1;)\r\n\r\nalert tcp $HOME_NET any -> $EXTERNAL_NET any (msg:\"NF - Win32/Agent.XST/UP007 Keepalive 2\"; flow:established,to_server; content:\"POST|20|\"; depth:5; content:\".asp|20|HTTP/1.\"; distance:0; content:!\"Referer|3a|\"; distance:0; content:!\"Accept|3a|\"; distance:0; content:\"Content-Length|3a 20|5|0d 0a|\"; distance:0; fast_pattern; content:\"Content-Type|3a 20|text/html|0d 0a|\"; content:\"|0d 0a 0d 0a|READY\"; distance:0; threshold:type limit, count 1, seconds 60, track by_src; reference:url,citizenlab.org/2016/04/between-hong-kong-and-burma; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016119; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX Related Domain - www.turkistanuyghur.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0F|turkistanuyghur|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016120; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX Related Domain - www.yawropauyghur.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0d|yawropauyghur|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016121; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX Related Domain - www.japanuyghur.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0b|japanuyghur|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016122; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX Related Domain - www.hotansft.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|08|hotansft|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016123; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX Related Domain - www.amerikauyghur.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0d|amerikauyghur|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016124; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX Related Domain - www.yawropauyghur.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0d|yawropauyghur|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016125; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX Related Domain - www.turkistanuyghur.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0f|turkistanuyghur|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016126; rev:1;)\r\n\r\nalert udp any any -> any 53 (msg:\"NF - APT-PlugX Related Domain - www.turkistanuyghur.top\"; content:\"|01 00 00 01 00 00 00 00 00 00|\"; depth:10; offset:2; content:\"|03|www|0f|turkistanuyghur|03|top\"; fast_pattern; nocase; distance:0; reference:url,researchcenter.paloaltonetworks.com/2016/06/unit42-recent-mnkit-exploit-activity-reveals-some-common-threads/#more-15097; reference:url,networkforensic.dk; metadata:06072016; priority:1; sid:888016127; rev:1;)",
+        "type": "snort",
+        "to_ids": false,
+        "object_relation": null,
+        "comment": "Some SNORT IDS Rule.",
+        "uuid": "577f761a-5ec4-4532-9e7b-093bc0a8f687",
+        "category": "Network activity"
+      }
+    ]
+  }
+}

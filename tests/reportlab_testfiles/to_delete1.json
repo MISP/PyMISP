@@ -1,0 +1,804 @@
+{
+  "Event": {
+    "info": "OSINT -  New Malware with Ties to SunOrcal Discovered",
+    "publish_timestamp": "1518455494",
+    "timestamp": "1510922435",
+    "analysis": "2",
+    "Attribute": [
+      {
+        "comment": "",
+        "category": "External analysis",
+        "uuid": "5a0a9ade-3b60-4fbb-87d2-4628950d210f",
+        "timestamp": "1510922426",
+        "to_ids": false,
+        "value": "https://researchcenter.paloaltonetworks.com/2017/11/unit42-new-malware-with-ties-to-sunorcal-discovered/",
+        "Tag": [
+          {
+            "colour": "#00223b",
+            "exportable": true,
+            "name": "osint:source-type=\"blog-post\""
+          }
+        ],
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "",
+        "category": "External analysis",
+        "uuid": "5a0a9af4-0d1c-4ae0-8903-45c4950d210f",
+        "timestamp": "1510922426",
+        "to_ids": false,
+        "value": "Unit 42 has discovered a new malware family we\u2019ve named \u201cReaver\u201d with ties to attackers who use SunOrcal malware. SunOrcal activity has been documented to at least 2013, and based on metadata surrounding some of the C2s, may have been active as early as 2010. The new family appears to have been in the wild since late 2016 and to date we have only identified 10 unique samples, indicating it may be sparingly used. Reaver is also somewhat unique in the fact that its final payload is in the form of a Control panel item, or CPL file. To date, only 0.006% of all malware seen by Palo Alto Networks employs this technique, indicating that it is in fact fairly rare.",
+        "Tag": [
+          {
+            "colour": "#00223b",
+            "exportable": true,
+            "name": "osint:source-type=\"blog-post\""
+          }
+        ],
+        "object_relation": null,
+        "type": "comment"
+      },
+      {
+        "comment": "",
+        "category": "Persistence mechanism",
+        "uuid": "5a0a9d47-1c7c-4353-8523-440b950d210f",
+        "timestamp": "1510922426",
+        "to_ids": false,
+        "value": "%COMMONPROGRAMFILES%\\services\\",
+        "object_relation": null,
+        "type": "regkey"
+      },
+      {
+        "comment": "",
+        "category": "Persistence mechanism",
+        "uuid": "5a0a9d47-808c-4833-b739-43bf950d210f",
+        "timestamp": "1510922426",
+        "to_ids": false,
+        "value": "%APPDATA%\\microsoft\\mmc\\",
+        "object_relation": null,
+        "type": "regkey"
+      },
+      {
+        "comment": "",
+        "category": "Persistence mechanism",
+        "uuid": "5a0a9d47-91e0-4fea-8a8d-48ce950d210f",
+        "timestamp": "1510922426",
+        "to_ids": false,
+        "value": "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders\\Common Startup",
+        "object_relation": null,
+        "type": "regkey"
+      },
+      {
+        "comment": "",
+        "category": "Persistence mechanism",
+        "uuid": "5a0a9d47-0d2c-4f98-9913-4ea3950d210f",
+        "timestamp": "1510922426",
+        "to_ids": false,
+        "value": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders\\Startup",
+        "object_relation": null,
+        "type": "regkey"
+      },
+      {
+        "comment": "",
+        "category": "Payload delivery",
+        "uuid": "5a0a9d47-a0a4-4f6b-bd53-42b4950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "\u2018%TEMP%\\~WUpdate.lnk",
+        "object_relation": null,
+        "type": "filename"
+      },
+      {
+        "comment": "",
+        "category": "Payload delivery",
+        "uuid": "5a0a9d96-48d4-4538-b643-4c26950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "%TEMP%\\~Update.lnk",
+        "object_relation": null,
+        "type": "filename"
+      },
+      {
+        "comment": "",
+        "category": "Persistence mechanism",
+        "uuid": "5a0a9d96-d87c-4b6f-b3a6-4eea950d210f",
+        "timestamp": "1510922426",
+        "to_ids": false,
+        "value": "%APPDATA%\\microsoft\\credentials\\",
+        "object_relation": null,
+        "type": "regkey"
+      },
+      {
+        "comment": "",
+        "category": "Payload delivery",
+        "uuid": "5a0a9d96-83dc-4a40-90fe-46d9950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "%TEMP%\\winhelp.dat",
+        "object_relation": null,
+        "type": "filename"
+      },
+      {
+        "comment": "",
+        "category": "Payload delivery",
+        "uuid": "5a0a9d96-cc18-491c-b16b-4ffe950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "[path_previously_identified]\\winhelp.cpl",
+        "object_relation": null,
+        "type": "filename"
+      },
+      {
+        "comment": "C2",
+        "category": "Network activity",
+        "uuid": "5a0a9e4c-1c14-49c0-bee2-4f7d950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "www.fyoutside.com",
+        "object_relation": null,
+        "type": "hostname"
+      },
+      {
+        "comment": "C2",
+        "category": "Network activity",
+        "uuid": "5a0a9e4c-ab08-47f8-991f-471c950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "www.tashdqdxp.com",
+        "object_relation": null,
+        "type": "hostname"
+      },
+      {
+        "comment": "C2",
+        "category": "Network activity",
+        "uuid": "5a0a9e4c-8ba4-43d7-a8e3-4b52950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "www.weryhstui.com",
+        "object_relation": null,
+        "type": "hostname"
+      },
+      {
+        "comment": "",
+        "category": "Network activity",
+        "uuid": "5a0a9e4c-bcf8-42ac-86dc-48b0950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "98.126.156.210",
+        "object_relation": null,
+        "type": "ip-dst"
+      },
+      {
+        "comment": "C2",
+        "category": "Network activity",
+        "uuid": "5a0a9e4c-9440-40fa-ac80-4320950d210f",
+        "timestamp": "1510922426",
+        "to_ids": true,
+        "value": "www.olinaodi.com",
+        "object_relation": null,
+        "type": "hostname"
+      },
+      {
+        "comment": "Reaver.v1",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-a23c-4b65-b46b-4683950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "d560f44188fb56d3abb11d9508e1167329470de19b811163eb1167534722e666",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v2",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-5e1c-411a-b1ba-49ac950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "98eb5465c6330b9b49df2e7c9ad0b1164aa5b35423d9e80495a178eb510cdc1c",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v2",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-ccf0-4390-bcde-43bd950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "05ddbd0506ec95fb460b3994e5b21cdb0418ba4aa406374ca1b91249349b7640",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v3",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-3ef4-42d5-baca-44c4950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "18ac3b14300ecfeed4b64a844c16dccb06b0e3513d0954d6c6182f2ea14e4c92",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v3",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-8cc8-4bbd-adec-4e38950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "c0f8bb77284b96e07cab1c3fab8800b1bbd030720c74628c4ee5666694ef903d",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v3",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-486c-4820-b2b3-4bf0950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "9213f70bce491991c4cbbbd7dc3e67d3a3d535b965d7064973b35c50f265e59b",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v3",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-bef4-4696-a1ab-4c83950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "26c234c73e2c3448589c7d4a0cf17f615ad3666541a4e611e2d8b77637205bcf",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v3",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-7560-4794-90d1-4f4d950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "ae9f158e4886cfdbfb4f1b3b25707d05f6fd873d0be9d8e7334a2c28741228ee",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v3",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-d3c4-4809-aea5-435c950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "1fcda755e8fa23d27329e4bc0443a82e1c1e9a6c1691639db256a187365e4db1",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v3",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-a5dc-43ab-9158-451c950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "c906250e0a4c457663e37119ebe1efa1e4b97eef1d975f383ac3243f9f09908c",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "Reaver.v3",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-1d70-4f14-b316-4ce4950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "1813f10bcf74beb582c824c64fff63cb150d178bef93af81d875ca84214307a1",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "SunOrcal",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-7674-4a3f-a595-4006950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "799139b5278dc2ac24279cc6c3db44f4ef0ea78ee7b721b0ace38fd8018c51ac",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "SunOrcal",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-4a58-4535-9998-49b7950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "81d887fefdbb0219647991c2b7bddf45c2fede4dc6fc18408f1706e0279615b2",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "SunOrcal",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-6ae4-41a1-8402-4328950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "58312fb742ce881e040e1b5b8555f00a402b8dd4fc886acaae2f862040b3bfc5",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "SunOrcal",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-6edc-4177-afd5-4c93950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "38ea33dab0ba2edd16ecd98cba161c550d1036b253c8666c4110d198948329fb",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "SunOrcal",
+        "category": "Payload delivery",
+        "uuid": "5a0a9eae-8388-4e7f-ab5b-4e95950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "cb7c0cf1750baaa11783e93369230ee666b9f3da7298e4d1bb9a07af6a439f2f",
+        "object_relation": null,
+        "type": "sha256"
+      },
+      {
+        "comment": "C2",
+        "category": "Network activity",
+        "uuid": "5a0a9efc-6604-4cd9-acbb-4632950d210f",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "104.148.70.217",
+        "object_relation": null,
+        "type": "ip-dst"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: cb7c0cf1750baaa11783e93369230ee666b9f3da7298e4d1bb9a07af6a439f2f",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-5df0-47a8-9785-44a702de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "da7a5e54d1d45462bda65807c1ef03ee34b7e777",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: cb7c0cf1750baaa11783e93369230ee666b9f3da7298e4d1bb9a07af6a439f2f",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-f580-4b51-a866-482602de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "7dcf79a66192e88b92ccc12810e61329",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: cb7c0cf1750baaa11783e93369230ee666b9f3da7298e4d1bb9a07af6a439f2f",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-8a94-47be-9f1e-463f02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/cb7c0cf1750baaa11783e93369230ee666b9f3da7298e4d1bb9a07af6a439f2f/analysis/1510574305/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 38ea33dab0ba2edd16ecd98cba161c550d1036b253c8666c4110d198948329fb",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-3f4c-411b-9507-4d1602de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "704886d56ded5817e39d7442b0203c2f76207f92",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 38ea33dab0ba2edd16ecd98cba161c550d1036b253c8666c4110d198948329fb",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-6f34-4e76-ba5b-45ae02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "af6a25fc28e0560860c01d74854a2cba",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 38ea33dab0ba2edd16ecd98cba161c550d1036b253c8666c4110d198948329fb",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-5b24-48ce-82c4-4e2b02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/38ea33dab0ba2edd16ecd98cba161c550d1036b253c8666c4110d198948329fb/analysis/1510574322/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 58312fb742ce881e040e1b5b8555f00a402b8dd4fc886acaae2f862040b3bfc5",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-830c-472b-9d19-481002de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "9adbe92835ee2cc93e0d99b9d4536eb7727acf47",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 58312fb742ce881e040e1b5b8555f00a402b8dd4fc886acaae2f862040b3bfc5",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-b94c-4e75-a47d-488002de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "47cc3592bbf8c3b516ae74c95efb3344",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 58312fb742ce881e040e1b5b8555f00a402b8dd4fc886acaae2f862040b3bfc5",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-8d8c-4b7a-a223-498e02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/58312fb742ce881e040e1b5b8555f00a402b8dd4fc886acaae2f862040b3bfc5/analysis/1510574347/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 81d887fefdbb0219647991c2b7bddf45c2fede4dc6fc18408f1706e0279615b2",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-b9b0-40ac-a84f-4b6002de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "7fa8bfc051b98698e6b95cbc7163e4aa41880279",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 81d887fefdbb0219647991c2b7bddf45c2fede4dc6fc18408f1706e0279615b2",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-65e8-471f-9a66-4e3102de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "5eb3a846092cae378fcd45bdf5453536",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 81d887fefdbb0219647991c2b7bddf45c2fede4dc6fc18408f1706e0279615b2",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-d7c0-4ed1-9bdc-497002de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/81d887fefdbb0219647991c2b7bddf45c2fede4dc6fc18408f1706e0279615b2/analysis/1510574318/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 799139b5278dc2ac24279cc6c3db44f4ef0ea78ee7b721b0ace38fd8018c51ac",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-a260-4d97-b3c8-43eb02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "a6e538a01c366580e90e49249251b66dfe39c72f",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 799139b5278dc2ac24279cc6c3db44f4ef0ea78ee7b721b0ace38fd8018c51ac",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-61ec-48e1-8327-492b02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "11a5b1901243396984670af7acc6cf72",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "SunOrcal - Xchecked via VT: 799139b5278dc2ac24279cc6c3db44f4ef0ea78ee7b721b0ace38fd8018c51ac",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-4f20-46d8-b762-4cf702de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/799139b5278dc2ac24279cc6c3db44f4ef0ea78ee7b721b0ace38fd8018c51ac/analysis/1510574343/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 1813f10bcf74beb582c824c64fff63cb150d178bef93af81d875ca84214307a1",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-b6ec-4b31-8078-4c9b02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "03bc4181fb54af3151cab60406a01a44158e5277",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 1813f10bcf74beb582c824c64fff63cb150d178bef93af81d875ca84214307a1",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-67e0-45e3-86d3-4a9d02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "17587683361d8458aebd9b8fdd07137a",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 1813f10bcf74beb582c824c64fff63cb150d178bef93af81d875ca84214307a1",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-cfec-48d4-9919-49ab02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/1813f10bcf74beb582c824c64fff63cb150d178bef93af81d875ca84214307a1/analysis/1510849386/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: c906250e0a4c457663e37119ebe1efa1e4b97eef1d975f383ac3243f9f09908c",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-cb84-4739-a17e-456b02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "b31160953ff19e6abf12fc8319420ab2e1c88e77",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: c906250e0a4c457663e37119ebe1efa1e4b97eef1d975f383ac3243f9f09908c",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-8bd8-4a20-a99e-498b02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "2d563bf83bddca1f24e8a0ffb951a7e9",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: c906250e0a4c457663e37119ebe1efa1e4b97eef1d975f383ac3243f9f09908c",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-c264-45c1-acf8-4ece02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/c906250e0a4c457663e37119ebe1efa1e4b97eef1d975f383ac3243f9f09908c/analysis/1510574300/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 1fcda755e8fa23d27329e4bc0443a82e1c1e9a6c1691639db256a187365e4db1",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-bc04-47cf-8f7b-49cb02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "172b4578cb50985b08c227360d9c9df2cf32117a",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 1fcda755e8fa23d27329e4bc0443a82e1c1e9a6c1691639db256a187365e4db1",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-9340-4443-b23e-4e1902de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "aab319d9715d38a37a10d82e87478dfc",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 1fcda755e8fa23d27329e4bc0443a82e1c1e9a6c1691639db256a187365e4db1",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-b9c8-43aa-8797-462302de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/1fcda755e8fa23d27329e4bc0443a82e1c1e9a6c1691639db256a187365e4db1/analysis/1510574331/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: ae9f158e4886cfdbfb4f1b3b25707d05f6fd873d0be9d8e7334a2c28741228ee",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-8a68-4f7a-adcb-46c302de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "d62f1f039d0be1d7b2a8ed122d97ee917dbc9ce8",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: ae9f158e4886cfdbfb4f1b3b25707d05f6fd873d0be9d8e7334a2c28741228ee",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-dcf8-4fe9-bdee-484502de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "892350b2a44efd9fa1e7c88aec013818",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: ae9f158e4886cfdbfb4f1b3b25707d05f6fd873d0be9d8e7334a2c28741228ee",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-23d8-4bbe-b367-4fae02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/ae9f158e4886cfdbfb4f1b3b25707d05f6fd873d0be9d8e7334a2c28741228ee/analysis/1510574327/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 9213f70bce491991c4cbbbd7dc3e67d3a3d535b965d7064973b35c50f265e59b",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-d850-43f6-aa30-4f5702de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "e96be5b542d100913a5bca0f02fb094d6f3ad85b",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 9213f70bce491991c4cbbbd7dc3e67d3a3d535b965d7064973b35c50f265e59b",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-3ae4-4f3e-b592-474002de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "dd7edadd019bc120978a4dad284fbea6",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 9213f70bce491991c4cbbbd7dc3e67d3a3d535b965d7064973b35c50f265e59b",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-c9a4-4669-a3ba-47e002de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/9213f70bce491991c4cbbbd7dc3e67d3a3d535b965d7064973b35c50f265e59b/analysis/1510574335/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: c0f8bb77284b96e07cab1c3fab8800b1bbd030720c74628c4ee5666694ef903d",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-e764-4ad4-8cdb-438902de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "cbde40a234bff8870f8746eca969c364da7f4aec",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: c0f8bb77284b96e07cab1c3fab8800b1bbd030720c74628c4ee5666694ef903d",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bb-02e0-4eb5-9e34-41e602de0b81",
+        "timestamp": "1510922427",
+        "to_ids": true,
+        "value": "ae185e9c43bb1498a3c653a0886896e3",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: c0f8bb77284b96e07cab1c3fab8800b1bbd030720c74628c4ee5666694ef903d",
+        "category": "External analysis",
+        "uuid": "5a0ed8bb-586c-4a4d-aa3b-4f7c02de0b81",
+        "timestamp": "1510922427",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/c0f8bb77284b96e07cab1c3fab8800b1bbd030720c74628c4ee5666694ef903d/analysis/1510921773/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 18ac3b14300ecfeed4b64a844c16dccb06b0e3513d0954d6c6182f2ea14e4c92",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bc-ba8c-4160-8374-4dba02de0b81",
+        "timestamp": "1510922428",
+        "to_ids": true,
+        "value": "5c6b231111239c0625dc9ff4359d1b8553159ecc",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 18ac3b14300ecfeed4b64a844c16dccb06b0e3513d0954d6c6182f2ea14e4c92",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bc-eff4-4d36-947a-424c02de0b81",
+        "timestamp": "1510922428",
+        "to_ids": true,
+        "value": "c629f8f3206e5a6de83b4c996a2bacfb",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v3 - Xchecked via VT: 18ac3b14300ecfeed4b64a844c16dccb06b0e3513d0954d6c6182f2ea14e4c92",
+        "category": "External analysis",
+        "uuid": "5a0ed8bc-60d8-4f2e-aa79-4d6f02de0b81",
+        "timestamp": "1510922428",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/18ac3b14300ecfeed4b64a844c16dccb06b0e3513d0954d6c6182f2ea14e4c92/analysis/1510610402/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v2 - Xchecked via VT: 98eb5465c6330b9b49df2e7c9ad0b1164aa5b35423d9e80495a178eb510cdc1c",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bc-0124-4bd3-9049-4e6b02de0b81",
+        "timestamp": "1510922428",
+        "to_ids": true,
+        "value": "c05d15fc94d096a821f2c689a29dff7679ce087a",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v2 - Xchecked via VT: 98eb5465c6330b9b49df2e7c9ad0b1164aa5b35423d9e80495a178eb510cdc1c",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bc-c04c-49c4-9d39-464802de0b81",
+        "timestamp": "1510922428",
+        "to_ids": true,
+        "value": "dadf3d3dd411bc02d7c05ee3a18259ea",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v2 - Xchecked via VT: 98eb5465c6330b9b49df2e7c9ad0b1164aa5b35423d9e80495a178eb510cdc1c",
+        "category": "External analysis",
+        "uuid": "5a0ed8bc-37cc-47c1-bdcd-454e02de0b81",
+        "timestamp": "1510922428",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/98eb5465c6330b9b49df2e7c9ad0b1164aa5b35423d9e80495a178eb510cdc1c/analysis/1510823791/",
+        "object_relation": null,
+        "type": "link"
+      },
+      {
+        "comment": "Reaver.v1 - Xchecked via VT: d560f44188fb56d3abb11d9508e1167329470de19b811163eb1167534722e666",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bc-4014-447e-8efc-450702de0b81",
+        "timestamp": "1510922428",
+        "to_ids": true,
+        "value": "0cea48067ddbc9227363168013142f6f3a5dea9f",
+        "object_relation": null,
+        "type": "sha1"
+      },
+      {
+        "comment": "Reaver.v1 - Xchecked via VT: d560f44188fb56d3abb11d9508e1167329470de19b811163eb1167534722e666",
+        "category": "Payload delivery",
+        "uuid": "5a0ed8bc-5768-4c26-85a2-47b902de0b81",
+        "timestamp": "1510922428",
+        "to_ids": true,
+        "value": "9f289cce6f95949450e3f4c96a187f5d",
+        "object_relation": null,
+        "type": "md5"
+      },
+      {
+        "comment": "Reaver.v1 - Xchecked via VT: d560f44188fb56d3abb11d9508e1167329470de19b811163eb1167534722e666",
+        "category": "External analysis",
+        "uuid": "5a0ed8bc-a7a0-499f-bd08-48bb02de0b81",
+        "timestamp": "1510922428",
+        "to_ids": false,
+        "value": "https://www.virustotal.com/file/d560f44188fb56d3abb11d9508e1167329470de19b811163eb1167534722e666/analysis/1510823685/",
+        "object_relation": null,
+        "type": "link"
+      }
+    ],
+    "Tag": [
+      {
+        "colour": "#004646",
+        "exportable": true,
+        "name": "type:OSINT"
+      },
+      {
+        "colour": "#ffffff",
+        "exportable": true,
+        "name": "tlp:white"
+      },
+      {
+        "colour": "#3c7700",
+        "exportable": true,
+        "name": "circl:incident-classification=\"malware\""
+      },
+      {
+        "colour": "#00223b",
+        "exportable": true,
+        "name": "osint:source-type=\"blog-post\""
+      }
+    ],
+    "published": true,
+    "date": "2017-11-10",
+    "Orgc": {
+      "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f",
+      "name": "CIRCL"
+    },
+    "threat_level_id": "3",
+    "uuid": "5a0a9aa9-23a4-4607-b6df-41a9950d210f"
+  }
+}
