@@ -125,7 +125,7 @@ class Flowable_Tag(Flowable):
 
 
 # Copy of pdfexport.py moduleconfig
-moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata"]
+moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description"]
 
 # == Row colors of the table (alternating) ==
 EVEN_COLOR = colors.whitesmoke
@@ -173,6 +173,22 @@ WARNING_MESSAGE_URL = "'https://Please_consider_that_this_may_be_a_harmful_link'
 NOT_A_PICTURE_MESSAGE = "This attachment is not recognized as an image. Please access this attachment directly from your MISP instance."
 GOOD_LINK_COLOR = 'blue'
 BAD_LINK_COLOR = 'red'
+
+# == Parameters for description ==
+LOW_THREAT_COLOR = 'green'
+MEDIUM_THREAT_COLOR = 'orange'
+HIGH_THREAT_COLOR = 'red'
+
+# == Parameters for improvement of event's metadata ==
+
+threat_map = {"0": "<font color =" + MEDIUM_THREAT_COLOR + ">   undefined (0)</font>",
+              "3": "<font color =" + LOW_THREAT_COLOR + ">      Low (3)</font>",
+              "2": "<font color =" + MEDIUM_THREAT_COLOR + ">   Medium (2)</font>",
+              "1": "<font color =" + HIGH_THREAT_COLOR + ">     High (1)</font>"}
+
+analysis_map = {"0": "<font color =" + HIGH_THREAT_COLOR + ">   Initial (0)</font>",
+                "1": "<font color =" + MEDIUM_THREAT_COLOR + "> Ongoing (1)</font>",
+                "2": "<font color =" + LOW_THREAT_COLOR + ">    Completed (2)</font>"}
 
 
 ########################################################################
@@ -338,6 +354,62 @@ def get_value_link_to_event(misp_event, item, col2_style, config=None, color=Tru
     return answer
 
 
+def get_date_value(misp_event, item, col2_style):
+    '''
+    Returns a flowable paragraph to add to the pdf given the misp_event date
+    :param misp_event: A misp event with or without "date" attributes
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a Paragraph to add in the pdf, regarding the values of "date"
+    '''
+    if is_safe_attribute(misp_event, item[1]):
+        return Paragraph(safe_string(getattr(misp_event, item[1])), col2_style)
+    return Paragraph(item[2], col2_style)
+
+def get_owner_value(misp_event, item, col2_style):
+    '''
+    Returns a flowable paragraph to add to the pdf given the misp_event owner
+    :param misp_event: A misp event with or without "owner" attributes
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a Paragraph to add in the pdf, regarding the values of "owner"
+    '''
+    if is_safe_attribute(misp_event, item[1]):
+        return Paragraph(safe_string(getattr(misp_event, item[1])), col2_style)
+    return Paragraph(item[2], col2_style)
+
+def get_threat_value(misp_event, item, col2_style):
+    '''
+    Returns a flowable paragraph to add to the pdf given the misp_event threat
+    :param misp_event: A misp event with or without "threat" attributes
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a Paragraph to add in the pdf, regarding the values of "threat"
+    '''
+    if is_safe_attribute(misp_event, item[1]) and str(getattr(misp_event, item[1])) in threat_map:
+        return Paragraph(threat_map[safe_string(getattr(misp_event, item[1]))], col2_style)
+    return Paragraph(item[2], col2_style)
+
+def get_analysis_value(misp_event, item, col2_style):
+    '''
+    Returns a flowable paragraph to add to the pdf given the misp_event analysis
+    :param misp_event: A misp event with or without "analysis" attributes
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a Paragraph to add in the pdf, regarding the values of "analysis"
+    '''
+    if is_safe_attribute(misp_event, item[1]) and str(getattr(misp_event, item[1])) in analysis_map:
+        return Paragraph(analysis_map[safe_string(getattr(misp_event, item[1]))], col2_style)
+    return Paragraph(item[2], col2_style)
+
 def get_timestamp_value(misp_event, item, col2_style):
     '''
     Returns a flowable paragraph to add to the pdf given the misp_event timestamp
@@ -349,7 +421,7 @@ def get_timestamp_value(misp_event, item, col2_style):
     :return: a Paragraph to add in the pdf, regarding the values of "timestamp"
     '''
     if is_safe_attribute(misp_event, item[1]):
-        return Paragraph(str(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT)), col2_style)
+        return Paragraph(safe_string(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT)), col2_style)
     return Paragraph(item[2], col2_style)
 
 
@@ -379,7 +451,7 @@ def get_attributes_number_value(misp_event, item, col2_style):
     :return: a Paragraph to add in the pdf, regarding the values of "attributes"
     '''
     if is_safe_attribute(misp_event, item[1]):
-        return Paragraph(str(len(getattr(misp_event, item[1]))), col2_style)
+        return Paragraph(safe_string(len(getattr(misp_event, item[1]))), col2_style)
     return Paragraph(item[2], col2_style)
 
 
@@ -443,9 +515,11 @@ def is_safe_attribute(curr_object, attribute_name):
     return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
         curr_object, attribute_name) != ""
 
+
 def is_safe_attribute_table(curr_object, attribute_name):
     return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
         curr_object, attribute_name) != []
+
 
 def create_flowable_table_from_one_attribute(misp_attribute):
     '''
@@ -495,6 +569,12 @@ def create_flowable_table_from_one_attribute(misp_attribute):
     item = ["Tags", 'Tag', "None"]
     if is_safe_attribute_table(misp_attribute, item[1]):
         data.append([Paragraph(item[0], col1_style), get_tag_value(misp_attribute, item, col2_style)])
+
+    # Tags
+    item = ["Sighting", 'Sighting', "None"]
+    if is_safe_attribute_table(misp_attribute, item[1]):
+        data.append([Paragraph(item[0], col1_style),
+                     create_flowable_paragraph_from_sightings(misp_attribute, item, col2_style)])
 
     return create_flowable_table_from_data(data)
 
@@ -741,22 +821,6 @@ def create_flowable_table_from_event(misp_event, config=None):
     :return: a table that can be added to a pdf
     '''
 
-    # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
-    # to_display_if_not_present) are store in the following list
-    list_attr_automated = [
-        # ["Event ID", 'id', "None"],
-        ["Date", 'date', "None"],
-        ["Owner org", 'owner', "None"],
-        ["Threat level", 'threat_level_id', "None"],  # TODO : improve design
-        ["Analysis", 'analysis', "None"],  # TODO : improve design + Ask where the enum is !
-        # TODO : Not present ["Email", 'email', "None"],
-        # TODO : ["Distribution", 'distribution', "None"],
-        # TODO : ["First recorded change", 'TODO', "None"],
-        # TODO : ["Last change", 'TODO', "None"],
-        # TODO : ["Modification map", 'TODO', "None"],
-        # TODO : ["Sightings", 'TODO', "None"]
-    ]
-
     data = []
     col1_style, col2_style = get_table_styles()
 
@@ -765,19 +829,22 @@ def create_flowable_table_from_event(misp_event, config=None):
     item = ["UUID", 'uuid', "None"]
     data.append([Paragraph(item[0], col1_style), get_value_link_to_event(misp_event, item, col2_style, config)])
 
-    # Automated adding of standard (python) attributes of the misp event
-    # Note that PEP 0363 may change the syntax in future release : https://www.python.org/dev/peps/pep-0363/
-    for item in list_attr_automated:
-        if hasattr(misp_event, item[1]):
-            # The attribute exist, we fetch it and create the row
-            data.append(
-                [Paragraph(item[0], col1_style),
-                 get_unoverflowable_paragraph(getattr(misp_event, item[1]), col2_style)])
-        else:
-            # The attribute does not exist ,we print a default text on the row
-            data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
+    # Date
+    item = ["Date", 'date', "None"]
+    data.append([Paragraph(item[0], col1_style), get_date_value(misp_event, item, col2_style)])
 
-    # Manual addition
+    # Owner
+    item = ["Owner org", 'owner', "None"]
+    data.append([Paragraph(item[0], col1_style), get_owner_value(misp_event, item, col2_style)])
+
+    # Threat
+    item = ["Threat level", 'threat_level_id', "None"]
+    data.append([Paragraph(item[0], col1_style), get_threat_value(misp_event, item, col2_style)])
+
+    # Analysis
+    item = ["Analysis", 'analysis', "None"]
+    data.append([Paragraph(item[0], col1_style), get_analysis_value(misp_event, item, col2_style)])
+
     # Info
     item = ["Info", 'info', "None"]
     data.append([Paragraph(item[0], col1_style), get_value_link_to_event(misp_event, item, col2_style, config)])
@@ -803,6 +870,111 @@ def create_flowable_table_from_event(misp_event, config=None):
     data.append([Paragraph(item[0], col1_style), get_tag_value(misp_event, item, col2_style)])
 
     return create_flowable_table_from_data(data)
+
+
+def create_flowable_description_from_event(misp_event, config=None):
+    '''
+    Returns a Paragraph presenting a MISP event
+    :param misp_event: A misp event (complete or not)
+    :return: a paragraph that can be added to a pdf
+    '''
+
+    '''
+    The event "{EventName}" | that occurred on {EventDate}, | had been shared by {Organisation Name} | on the {Date}. 
+    '''
+
+    text = ""
+
+    item = ["Info", 'info', "None"]
+    if is_safe_attribute(misp_event, item[1]):
+        text += "The event '"
+        text += str(getattr(misp_event, item[1]))
+        text += "'"
+    else:
+        text += "This event"
+
+    item = ["Event date", 'timestamp', "None"]
+    if is_safe_attribute(misp_event, item[1]):
+        text += " that occurred on "
+        text += str(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT))
+        text += ","
+
+    item = ["Creator Org", 'Orgc', "None", "name"]
+    text += " had been shared by "
+    if is_safe_attribute(misp_event, item[1]):
+        text += safe_string(getattr(getattr(misp_event, item[1]), item[3]))
+    else:
+        text += " an unknown organisation"
+
+    item = ["Date", 'date', "None"]
+    if is_safe_attribute(misp_event, item[1]):
+        text += " on the "
+        text += str(getattr(misp_event, item[1]))
+    else:
+        text += " on an unknown date"
+    text += "."
+
+    '''
+    The threat level of this event is {ThreatLevel} and the analysis that was made of this event is {AnalysisLevel}. 
+    '''
+
+    item = ["Threat level", 'threat_level_id', "None"]
+    text += " The threat level of this event is "
+    if is_safe_attribute(misp_event, item[1]) and str(getattr(misp_event, item[1])) in threat_map:
+        text += threat_map[str(getattr(misp_event, item[1]))]
+    else:
+        text += " unknown"
+
+    item = ["Analysis", 'analysis', "None"]
+    text += " and the analysis that was made of this event is "
+    if is_safe_attribute(misp_event, item[1]) and str(getattr(misp_event, item[1])) in analysis_map:
+        text += analysis_map[str(getattr(misp_event, item[1]))]
+    else:
+        text += " undefined"
+    text += "."
+
+    '''
+    The event is currently {Published} and has associated attributes {Attribute Number}.
+    '''
+
+    item = ["Published", 'published', "None", "publish_timestamp"]
+    text += " The event is currently "
+    if is_safe_attribute(misp_event, item[1]) and getattr(misp_event, item[1]):
+        text += " published"
+        if is_safe_attribute(misp_event, item[3]):
+            text += " since " + getattr(misp_event, item[3]).strftime(EXPORT_DATE_FORMAT)
+    else:
+        text += " private"
+
+    # Number of Attributes
+    item = ["# Attributes", 'Attribute', "None"]
+    text += ", has "
+    if is_safe_attribute_table(misp_event, item[1]):
+        text += str(len(getattr(misp_event, item[1])))
+    else:
+        text += " 0"
+
+    text += " associated attributes"
+
+    # Number of Objects
+    item = ["# Objects", 'Object', "None"]
+    text += " and has "
+    if is_safe_attribute_table(misp_event, item[1]):
+        text += str(len(getattr(misp_event, item[1])))
+    else:
+        text += " 0"
+
+    text += " associated objects."
+
+    '''
+    For more information on the event, please consult the rest of the document
+    '''
+    text += "<br/>For more information on the event, please consult following information."
+
+    col1_style, col2_style = get_table_styles()
+    description_style = ParagraphStyle(name='Description', parent=col2_style, alignment=TA_JUSTIFY)
+
+    return Paragraph(text, description_style)
 
 
 def create_flowable_table_from_attributes(misp_event):
@@ -842,7 +1014,8 @@ def create_flowable_table_from_tags(misp_event):
     col1_style, col2_style = get_table_styles()
     i = 0
 
-    if is_safe_attribute_table(misp_event, "Tag") : # and len(getattr(misp_event, "Tag")) > 1:  # 'Tag' can exist and be empty
+    if is_safe_attribute_table(misp_event,
+                               "Tag"):  # and len(getattr(misp_event, "Tag")) > 1:  # 'Tag' can exist and be empty
         # There is some tags for this object
         for item in getattr(misp_event, "Tag"):
             flowable_table.append(create_flowable_tag(item))
@@ -881,6 +1054,43 @@ def create_flowable_table_from_objects(misp_event):
         flowable_table.append(Paragraph("No object", sample_style_sheet['Heading3']))
 
     return flowable_table
+
+
+def create_flowable_paragraph_from_sightings(misp_attribute, item, col2_style):
+    '''
+    Returns a Table (flowable) to add to a pdf, representing the list of sightings of an event or a misp event
+    :param misp_event: A misp event
+    :return: a table of flowable to add to the pdf
+    '''
+
+    col1_style, col2_style = get_table_styles()
+    i = 0
+    POSITIVE_SIGHT_COLOR = 'green'
+    NEGATIVE_SIGHT_COLOR = 'red'
+    MISC_SIGHT_COLOR = 'orange'
+
+    list_sighting = [0, 0, 0]
+    if is_safe_attribute_table(misp_attribute, "Sighting"):
+        # There is some tags for this object
+        for item in getattr(misp_attribute, "Sighting"):
+            # TODO : When Sightings will be object : if is_safe_attribute(item, "type"):
+            if "type" in item:
+                # Store the likes/dislikes depending on their types
+                list_sighting[int(item["type"])] += 1
+            i += 1
+
+        # Create the sighting text
+        sight_text = "<font color =" + POSITIVE_SIGHT_COLOR + "> Positive : " + str(list_sighting[0]) + "</font>"
+        sight_text += " / " + "<font color =" + NEGATIVE_SIGHT_COLOR + "> Negative : " + str(
+            list_sighting[1]) + "</font>"
+        sight_text += " / " + "<font color =" + MISC_SIGHT_COLOR + "> Misc. : " + str(list_sighting[2]) + "</font>"
+
+        answer_sighting = Paragraph(sight_text, col2_style)
+    else:
+        # No tags for this object
+        answer_sighting = Paragraph("No sighting", col2_style)
+
+    return answer_sighting
 
 
 ########################################################################
@@ -960,39 +1170,36 @@ def collect_parts(misp_event, config=None):
     # Create stuff
     title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], alignment=TA_CENTER)
     title = get_value_link_to_event(misp_event, ["Info", 'info', "None"], title_style, config, False)
+    # Add all parts to final PDF
+    flowables.append(title)
+
+    if config is not None and moduleconfig[2] in config:
+        description = Paragraph("Description", sample_style_sheet['Heading2'])
+        description_text = create_flowable_description_from_event(misp_event, config)
+        flowables.append(description)
+        flowables.append(description_text)
 
     subtitle = Paragraph("General information", sample_style_sheet['Heading2'])
     table_general_metainformation = create_flowable_table_from_event(misp_event, config)
-
-    event_attributes_title = Paragraph("Attributes", sample_style_sheet['Heading2'])
-    table_direct_attributes = create_flowable_table_from_attributes(misp_event)
-
-    event_objects_title = Paragraph("Objects", sample_style_sheet['Heading2'])
-    table_objects = create_flowable_table_from_objects(misp_event)
-
-    event_sighting_title = Paragraph("Sighting", sample_style_sheet['Heading2'])
-    # TODO : table_event_sightings = create_flowable_table_from_sightings(misp_event)
-
-    # If you want to output the full json (as debug), just add next line
-    # paragraph_2 = Paragraph(str(misp_event.to_json()), sample_style_sheet['Code'])
-
-    # Add all parts to final PDF
-    flowables.append(title)
     flowables.append(subtitle)
     flowables.append(table_general_metainformation)
 
     flowables.append(PageBreak())
 
+    event_attributes_title = Paragraph("Attributes", sample_style_sheet['Heading2'])
+    table_direct_attributes = create_flowable_table_from_attributes(misp_event)
     flowables.append(event_attributes_title)
     flowables += table_direct_attributes
 
     flowables.append(PageBreak())
+
+    event_objects_title = Paragraph("Objects", sample_style_sheet['Heading2'])
+    table_objects = create_flowable_table_from_objects(misp_event)
     flowables.append(event_objects_title)
     flowables += table_objects
 
-    # TODO : flowables.append(PageBreak())
-    # TODO : flowables.append(event_sighting_title)
-    # TODO : flowables += table_event_sightings
+    # If you want to output the full json (as debug), just add next line and add it to flowables
+    # paragraph_2 = Paragraph(str(misp_event.to_json()), sample_style_sheet['Code'])
 
     return flowables
 
