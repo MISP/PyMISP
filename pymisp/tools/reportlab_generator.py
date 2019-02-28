@@ -10,6 +10,8 @@ from functools import partial
 
 import sys
 
+from orca.cmdnames import TABLE_CELL_FIRST
+
 if sys.version_info.major >= 3:
     from html import escape
     # import PIL
@@ -125,7 +127,8 @@ class Flowable_Tag(Flowable):
 
 
 # Copy of pdfexport.py moduleconfig
-moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description"]
+moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
+                "Activate_galaxy_description"]
 
 # == Row colors of the table (alternating) ==
 EVEN_COLOR = colors.whitesmoke
@@ -310,6 +313,71 @@ def get_table_styles():
 
 
 ########################################################################
+# Checks
+
+def safe_string(bad_str):
+    return escape(str(bad_str))
+
+def is_safe_attribute(curr_object, attribute_name):
+    return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
+        curr_object, attribute_name) != ""
+
+
+def is_safe_dict_attribute(curr_object, attribute_name):
+    return attribute_name in curr_object and curr_object[attribute_name] is not None and curr_object[
+        attribute_name] != ""
+
+
+def is_safe_attribute_table(curr_object, attribute_name):
+    return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
+        curr_object, attribute_name) != []
+
+########################################################################
+# General attribut formater
+
+def get_unoverflowable_paragraph(dirty_string, curr_style, do_escape_string=True):
+    '''
+    Create a paragraph that can fit on a cell of one page. Mostly hardcoded values.
+    This method can be improved (get the exact size of the current frame, and limit the paragraph to this size.)
+    This might be worst look at KeepInFrame (which hasn't went well so far)
+    :param do_escape_string: Activate the escaping (may be useful to add inline HTML, e.g. hyperlinks)
+    :param dirty_string: String to transform
+    :param curr_style: Style to apply to the returned paragraph
+    :return:
+    '''
+    if do_escape_string:
+        sanitized_str = str(escape(str(dirty_string)))
+    else:
+        sanitized_str = dirty_string
+
+    # Get the space that the paragraph needs to be printed
+    w, h = Paragraph(sanitized_str, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
+
+    # If there is enough space, directly send back the sanitized paragraph
+    if w <= FRAME_MAX_WIDTH and h <= FRAME_MAX_HEIGHT:
+        answer_paragraph = Paragraph(sanitized_str, curr_style)
+    else:
+        # Otherwise, cut the content to fit the paragraph (Dichotomy)
+        max_carac_amount = int((FRAME_MAX_HEIGHT / (h * 1.0)) * len(sanitized_str))
+
+        i = 0
+        MAX_ITERATION = 10
+        limited_string = ""
+        while (w > FRAME_MAX_WIDTH or h > FRAME_MAX_HEIGHT) and i < MAX_ITERATION:
+            i += 1
+            limited_string = sanitized_str[:max_carac_amount]  # .replace("\n", "").replace("\r", "")
+            w, h = Paragraph(limited_string + STR_TOO_LONG_WARNING, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
+            max_carac_amount = int(max_carac_amount / 2)
+
+        if w <= FRAME_MAX_WIDTH and h <= FRAME_MAX_HEIGHT:
+            answer_paragraph = Paragraph(limited_string + STR_TOO_LONG_WARNING, curr_style)
+        else:
+            # We may still end with a not short enough string
+            answer_paragraph = Paragraph(STR_TOO_LONG_WARNING, curr_style)
+
+    return answer_paragraph
+
+########################################################################
 # Specific attribute formater
 
 def get_value_link_to_event(misp_event, item, col2_style, config=None, color=True):
@@ -368,6 +436,7 @@ def get_date_value(misp_event, item, col2_style):
         return Paragraph(safe_string(getattr(misp_event, item[1])), col2_style)
     return Paragraph(item[2], col2_style)
 
+
 def get_owner_value(misp_event, item, col2_style):
     '''
     Returns a flowable paragraph to add to the pdf given the misp_event owner
@@ -381,6 +450,7 @@ def get_owner_value(misp_event, item, col2_style):
     if is_safe_attribute(misp_event, item[1]):
         return Paragraph(safe_string(getattr(misp_event, item[1])), col2_style)
     return Paragraph(item[2], col2_style)
+
 
 def get_threat_value(misp_event, item, col2_style):
     '''
@@ -396,6 +466,7 @@ def get_threat_value(misp_event, item, col2_style):
         return Paragraph(threat_map[safe_string(getattr(misp_event, item[1]))], col2_style)
     return Paragraph(item[2], col2_style)
 
+
 def get_analysis_value(misp_event, item, col2_style):
     '''
     Returns a flowable paragraph to add to the pdf given the misp_event analysis
@@ -409,6 +480,7 @@ def get_analysis_value(misp_event, item, col2_style):
     if is_safe_attribute(misp_event, item[1]) and str(getattr(misp_event, item[1])) in analysis_map:
         return Paragraph(analysis_map[safe_string(getattr(misp_event, item[1]))], col2_style)
     return Paragraph(item[2], col2_style)
+
 
 def get_timestamp_value(misp_event, item, col2_style):
     '''
@@ -471,6 +543,22 @@ def get_tag_value(misp_event, item, col2_style):
     return Paragraph(item[2], col2_style)
 
 
+def get_galaxy_value(misp_event, item, col2_style):
+    '''
+    Returns a flowable paragraph to add to the pdf given the misp_event galaxies
+    :param misp_event: A misp event with or without "galaxies" attributes
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a Paragraph to add in the pdf, regarding the values of "galaxies"
+    '''
+    if is_safe_attribute_table(misp_event, item[1]):
+        table_event_tags = create_flowable_table_from_galaxies(misp_event)
+        return table_event_tags
+    return Paragraph(item[2], col2_style)
+
+
 def get_published_value(misp_event, item, col2_style):
     '''
     Returns a flowable paragraph to add to the pdf given the misp_event published/published_time
@@ -510,23 +598,13 @@ def get_published_value(misp_event, item, col2_style):
 
     return answer
 
-
-def is_safe_attribute(curr_object, attribute_name):
-    return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
-        curr_object, attribute_name) != ""
-
-
-def is_safe_attribute_table(curr_object, attribute_name):
-    return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
-        curr_object, attribute_name) != []
-
-
-def create_flowable_table_from_one_attribute(misp_attribute):
+def create_flowable_table_from_one_attribute(misp_attribute, config=None):
     '''
     Returns a table (flowalbe) representing the attribute
     :param misp_attribute: A misp attribute
     :return: a table representing this misp's attribute's attributes, to add to the pdf as a flowable
     '''
+
     data = []
     col1_style, col2_style = get_table_styles()
 
@@ -570,16 +648,22 @@ def create_flowable_table_from_one_attribute(misp_attribute):
     if is_safe_attribute_table(misp_attribute, item[1]):
         data.append([Paragraph(item[0], col1_style), get_tag_value(misp_attribute, item, col2_style)])
 
-    # Tags
+    # Sighting
     item = ["Sighting", 'Sighting', "None"]
     if is_safe_attribute_table(misp_attribute, item[1]):
         data.append([Paragraph(item[0], col1_style),
                      create_flowable_paragraph_from_sightings(misp_attribute, item, col2_style)])
 
+    if config is not None and moduleconfig[3] in config:
+        # Galaxies
+        item = ["Galaxies", 'Galaxy', "None"]
+        if is_safe_attribute_table(misp_attribute, item[1]):
+            data.append([Paragraph(item[0], col1_style), get_galaxy_value(misp_attribute, item, col2_style)])
+
     return create_flowable_table_from_data(data)
 
 
-def create_flowable_table_from_one_object(misp_object):
+def create_flowable_table_from_one_object(misp_object, config=None):
     '''
     Returns a table (flowable) representing the object
     :param misp_attribute: A misp object
@@ -616,13 +700,145 @@ def create_flowable_table_from_one_object(misp_object):
 
     # Handle all the attributes
     if is_safe_attribute(misp_object, "Attribute"):
-        data += create_flowable_table_from_attributes(misp_object)
+        data += create_flowable_table_from_attributes(misp_object, config)
 
     # Add a page break at the end of an object
     data.append(PageBreak())
 
     return data
 
+def create_flowable_table_from_one_galaxy(misp_galaxy):
+    '''
+    Returns a table (flowable) representing the galaxy
+    :param misp_attribute: A misp galaxy
+    :return: a table representing this misp's galaxy's attributes, to add to the pdf as a flowable
+    '''
+    data = []
+    col1_style, col2_style = get_table_styles()
+
+    # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
+    # to_display_if_not_present) are store in the following list
+    list_attr_automated = [["Name", 'name', "None"],
+                           ["Type", 'type', "None"],
+                           ["Description", 'description', "None"],
+                           ["NameSpace", 'namespace', "None"]]
+
+    # Automated adding of standard (python) attributes of the misp object
+    for item in list_attr_automated:
+        if is_safe_dict_attribute(misp_galaxy, item[1]):
+            # The attribute exists, we fetch it and create the row
+            data.append([Paragraph(item[0], col1_style),
+                         get_unoverflowable_paragraph(misp_galaxy[item[1]], col2_style)])
+
+    # Clusters
+    item = ["Clusters", 'GalaxyCluster', "None"]
+    data.append([Paragraph(item[0], col1_style), create_flowable_table_from_one_galaxy_cluster(misp_galaxy, item, col2_style)])
+
+    tmp_table = Table(data, ["25%","75%"])
+        # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
+        # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
+    return [tmp_table]
+
+
+def create_flowable_table_from_one_galaxy_cluster(misp_galaxy):
+    '''
+    Returns a table (flowable) representing the galaxy
+    :param misp_attribute: A misp galaxy
+    :return: a table representing this misp's galaxy's attributes, to add to the pdf as a flowable
+    '''
+    data = []
+    col1_style, col2_style = get_table_styles()
+
+    # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
+    # to_display_if_not_present) are store in the following list
+    list_attr_automated = [["Name", 'name', "None"],
+                           ["Type", 'type', "None"],
+                           ["Description", 'description', "None"],
+                           ["NameSpace", 'namespace', "None"]]
+
+    # Automated adding of standard (python) attributes of the misp object
+    for item in list_attr_automated:
+        if is_safe_dict_attribute(misp_galaxy, item[1]):
+            # The attribute exists, we fetch it and create the row
+            data.append([Paragraph(item[0], col1_style),
+                         get_unoverflowable_paragraph(misp_galaxy[item[1]], col2_style)])
+
+    # Clusters
+    item = ["Object date", 'timestamp', "None"]
+    data.append([Paragraph(item[0], col1_style), get_timestamp_value(misp_object, item, col2_style)])
+
+
+    tmp_table = Table(data, ["25%","75%"])
+        # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
+        # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
+    return [tmp_table]
+
+def get_image_value(misp_attribute, item, col2_style):
+    '''
+    Returns a flowable image to add to the pdf given the misp attribute type and data
+    :param misp_attribute: A misp attribute with type="attachement" and data
+    :param item: a list of name, in order :
+    ["Name to be print in the pdf", "json property access name",
+    " Name to be display if no values found in the misp_event"]
+    :param col2_style: style to be applied on the returned paragraph
+    :return: a flowable image to add in the pdf, regarding the values of "data"
+    '''
+
+    try:
+        # Get the image
+        buf = getattr(misp_attribute, item[1])
+
+        # Create image within a bounded box (to allow pdf creation)
+        img = Image(buf, width=FRAME_PICTURE_MAX_WIDTH, height=FRAME_PICTURE_MAX_HEIGHT, kind='bound')
+        answer = img
+    except OSError:
+        logger.error(
+            "Trying to add an attachment during PDF export generation. Attachement joining failed. Attachement may not be an image.")
+        answer = get_unoverflowable_paragraph(
+            "<font color=" + BAD_LINK_COLOR + ">" + NOT_A_PICTURE_MESSAGE + "</font>", col2_style, False)
+
+    return answer
+
+
+
+
+########################################################################
+# General Event's Attributes formater tools
+
+def uuid_to_url(baseurl, uuid):
+    '''
+    Return an url constructed from the MISP baseurl and the uuid of the event, to go to this event on this MISP
+    :param baseurl: the baseurl of the MISP instnce e.g. http://localhost:8080 or http://localhost:8080/
+    :param uuid: the uuid of the event that we want to have a link to
+    :return: the complete URL to go to this event on this MISP instance
+    '''
+    if baseurl[len(baseurl) - 1] != "/":
+        baseurl += "/"
+    return baseurl + "events/view/" + uuid
+
+
+def create_flowable_table_from_data(data, col_w = COL_WIDTHS):
+    '''
+    Given a list of flowables items (2D/list of list), creates a Table with styles.
+    :param data: list of list of items (flowables is better)
+    :return: a Table - with styles - to add to the pdf
+    '''
+    # Create the table
+    curr_table = Table(data, col_w)
+
+    # Aside notes :
+    #   colWidths='*' does a 100% and share the space automatically
+    #   rowHeights=ROW_HEIGHT if you want a fixed height. /!\ Problems with paragraphs that are spreading everywhere
+
+    # Create styles and set parameters
+    alternate_colors_style = alternate_colors_style_generator(data)
+    lines_style = lines_style_generator(data)
+    general_style = general_style_generator()
+
+    # Make the table nicer
+    curr_table.setStyle(TableStyle(general_style + alternate_colors_style + lines_style))
+
+    return curr_table
 
 def create_tags_table_from_data(data):
     '''
@@ -693,122 +909,6 @@ def get_good_or_bad_link(misp_attribute, item, col2_style):
         answer = get_bad_link(misp_attribute, item, col2_style)
 
     return answer
-
-
-def get_image_value(misp_attribute, item, col2_style):
-    '''
-    Returns a flowable image to add to the pdf given the misp attribute type and data
-    :param misp_attribute: A misp attribute with type="attachement" and data
-    :param item: a list of name, in order :
-    ["Name to be print in the pdf", "json property access name",
-    " Name to be display if no values found in the misp_event"]
-    :param col2_style: style to be applied on the returned paragraph
-    :return: a flowable image to add in the pdf, regarding the values of "data"
-    '''
-
-    try:
-        # Get the image
-        buf = getattr(misp_attribute, item[1])
-
-        # Create image within a bounded box (to allow pdf creation)
-        img = Image(buf, width=FRAME_PICTURE_MAX_WIDTH, height=FRAME_PICTURE_MAX_HEIGHT, kind='bound')
-        answer = img
-    except OSError:
-        logger.error(
-            "Trying to add an attachment during PDF export generation. Attachement joining failed. Attachement may not be an image.")
-        answer = get_unoverflowable_paragraph(
-            "<font color=" + BAD_LINK_COLOR + ">" + NOT_A_PICTURE_MESSAGE + "</font>", col2_style, False)
-
-    return answer
-
-
-########################################################################
-# General attribut formater
-
-def safe_string(bad_str):
-    return escape(str(bad_str))
-
-
-def get_unoverflowable_paragraph(dirty_string, curr_style, do_escape_string=True):
-    '''
-    Create a paragraph that can fit on a cell of one page. Mostly hardcoded values.
-    This method can be improved (get the exact size of the current frame, and limit the paragraph to this size.)
-    This might be worst look at KeepInFrame (which hasn't went well so far)
-    :param do_escape_string: Activate the escaping (may be useful to add inline HTML, e.g. hyperlinks)
-    :param dirty_string: String to transform
-    :param curr_style: Style to apply to the returned paragraph
-    :return:
-    '''
-    if do_escape_string:
-        sanitized_str = str(escape(str(dirty_string)))
-    else:
-        sanitized_str = dirty_string
-
-    # Get the space that the paragraph needs to be printed
-    w, h = Paragraph(sanitized_str, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
-
-    # If there is enough space, directly send back the sanitized paragraph
-    if w <= FRAME_MAX_WIDTH and h <= FRAME_MAX_HEIGHT:
-        answer_paragraph = Paragraph(sanitized_str, curr_style)
-    else:
-        # Otherwise, cut the content to fit the paragraph (Dichotomy)
-        max_carac_amount = int((FRAME_MAX_HEIGHT / (h * 1.0)) * len(sanitized_str))
-
-        i = 0
-        MAX_ITERATION = 10
-        limited_string = ""
-        while (w > FRAME_MAX_WIDTH or h > FRAME_MAX_HEIGHT) and i < MAX_ITERATION:
-            i += 1
-            limited_string = sanitized_str[:max_carac_amount]  # .replace("\n", "").replace("\r", "")
-            w, h = Paragraph(limited_string + STR_TOO_LONG_WARNING, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
-            max_carac_amount = int(max_carac_amount / 2)
-
-        if w <= FRAME_MAX_WIDTH and h <= FRAME_MAX_HEIGHT:
-            answer_paragraph = Paragraph(limited_string + STR_TOO_LONG_WARNING, curr_style)
-        else:
-            # We may still end with a not short enough string
-            answer_paragraph = Paragraph(STR_TOO_LONG_WARNING, curr_style)
-
-    return answer_paragraph
-
-
-########################################################################
-# General Event's Attributes formater tools
-
-def uuid_to_url(baseurl, uuid):
-    '''
-    Return an url constructed from the MISP baseurl and the uuid of the event, to go to this event on this MISP
-    :param baseurl: the baseurl of the MISP instnce e.g. http://localhost:8080 or http://localhost:8080/
-    :param uuid: the uuid of the event that we want to have a link to
-    :return: the complete URL to go to this event on this MISP instance
-    '''
-    if baseurl[len(baseurl) - 1] != "/":
-        baseurl += "/"
-    return baseurl + "events/view/" + uuid
-
-
-def create_flowable_table_from_data(data):
-    '''
-    Given a list of flowables items (2D/list of list), creates a Table with styles.
-    :param data: list of list of items (flowables is better)
-    :return: a Table - with styles - to add to the pdf
-    '''
-    # Create the table
-    curr_table = Table(data, COL_WIDTHS)
-
-    # Aside notes :
-    #   colWidths='*' does a 100% and share the space automatically
-    #   rowHeights=ROW_HEIGHT if you want a fixed height. /!\ Problems with paragraphs that are spreading everywhere
-
-    # Create styles and set parameters
-    alternate_colors_style = alternate_colors_style_generator(data)
-    lines_style = lines_style_generator(data)
-    general_style = general_style_generator()
-
-    # Make the table nicer
-    curr_table.setStyle(TableStyle(general_style + alternate_colors_style + lines_style))
-
-    return curr_table
 
 
 ########################################################################
@@ -977,14 +1077,13 @@ def create_flowable_description_from_event(misp_event, config=None):
     return Paragraph(text, description_style)
 
 
-def create_flowable_table_from_attributes(misp_event):
+def create_flowable_table_from_attributes(misp_event, config=None):
     '''
     Returns a list of flowables representing the list of attributes of a misp event.
     The list is composed alternatively of headers and tables, to add to the pdf
     :param misp_event: A misp event
     :return: a table of flowables
     '''
-
     flowable_table = []
     sample_style_sheet = getSampleStyleSheet()
     i = 0
@@ -994,7 +1093,7 @@ def create_flowable_table_from_attributes(misp_event):
         for item in getattr(misp_event, "Attribute"):
             # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
             flowable_table.append(Paragraph("Attribute #" + str(i), sample_style_sheet['Heading4']))
-            flowable_table.append(create_flowable_table_from_one_attribute(item))
+            flowable_table.append(create_flowable_table_from_one_attribute(item, config))
             i += 1
     else:
         # No attributes for this object
@@ -1027,8 +1126,7 @@ def create_flowable_table_from_tags(misp_event):
 
     return answer_tags
 
-
-def create_flowable_table_from_objects(misp_event):
+def create_flowable_table_from_objects(misp_event, config=None):
     '''
     Returns a list of flowables representing the list of objects of a misp event.
     The list is composed of a serie of 
@@ -1047,7 +1145,7 @@ def create_flowable_table_from_objects(misp_event):
         for item in getattr(misp_event, "Object"):
             # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
             flowable_table.append(Paragraph("Object #" + str(i), sample_style_sheet['Heading3']))
-            flowable_table += create_flowable_table_from_one_object(item)
+            flowable_table += create_flowable_table_from_one_object(item, config)
             i += 1
     else:
         # No object found
@@ -1072,11 +1170,11 @@ def create_flowable_paragraph_from_sightings(misp_attribute, item, col2_style):
     list_sighting = [0, 0, 0]
     if is_safe_attribute_table(misp_attribute, "Sighting"):
         # There is some tags for this object
-        for item in getattr(misp_attribute, "Sighting"):
+        for curr_item in getattr(misp_attribute, "Sighting"):
             # TODO : When Sightings will be object : if is_safe_attribute(item, "type"):
-            if "type" in item:
+            if "type" in curr_item:
                 # Store the likes/dislikes depending on their types
-                list_sighting[int(item["type"])] += 1
+                list_sighting[int(curr_item["type"])] += 1
             i += 1
 
         # Create the sighting text
@@ -1093,6 +1191,30 @@ def create_flowable_paragraph_from_sightings(misp_attribute, item, col2_style):
     return answer_sighting
 
 
+def create_flowable_table_from_galaxies(misp_event):
+    '''
+    Returns a Table (flowable) to add to a pdf, representing the list of galaxies of an event or a misp event
+    :param misp_event: A misp event
+    :return: a table of flowables to add to the pdf
+    '''
+
+    flowable_table = []
+    col1_style, col2_style = get_table_styles()
+    i = 0
+
+    if is_safe_attribute_table(misp_event, "Galaxy"):
+        # There is some galaxies for this object
+        for item in getattr(misp_event, "Galaxy"):
+            # flowable_table.append([get_unoverflowable_paragraph(item["name"],col2_style)])
+            flowable_table.append(create_flowable_table_from_one_galaxy(item))
+            i += 1
+        answer_tags = create_flowable_table_from_data(flowable_table, ["99%"])
+    else:
+        # No galaxies for this object
+        answer_tags = [Paragraph("No galaxies", col2_style)]
+
+    return answer_tags
+
 ########################################################################
 # Handling static parts drawn on the upper layer
 
@@ -1101,7 +1223,6 @@ def set_template(canvas, doc, misp_event, config=None):
     add_metadata(canvas, doc, misp_event, config)
     # TODO : add_header()
     # TODO : add_footer()
-
 
 def add_metadata(canvas, doc, misp_event, config=None):
     '''
@@ -1187,14 +1308,14 @@ def collect_parts(misp_event, config=None):
     flowables.append(PageBreak())
 
     event_attributes_title = Paragraph("Attributes", sample_style_sheet['Heading2'])
-    table_direct_attributes = create_flowable_table_from_attributes(misp_event)
+    table_direct_attributes = create_flowable_table_from_attributes(misp_event, config)
     flowables.append(event_attributes_title)
     flowables += table_direct_attributes
 
     flowables.append(PageBreak())
 
     event_objects_title = Paragraph("Objects", sample_style_sheet['Heading2'])
-    table_objects = create_flowable_table_from_objects(misp_event)
+    table_objects = create_flowable_table_from_objects(misp_event, config)
     flowables.append(event_objects_title)
     flowables += table_objects
 
