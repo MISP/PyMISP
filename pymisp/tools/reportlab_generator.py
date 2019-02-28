@@ -716,6 +716,34 @@ class Value_Formatter():
 
         return answer
 
+    def get_galaxy_name_value(self, misp_galaxy):
+        item = ["Name", 'name', "None", "namespace", "type"]
+        if is_safe_dict_attribute(misp_galaxy, item[1]):
+            return self.get_unoverflowable_paragraph(safe_string(misp_galaxy[item[1]])
+                                                     + " <i>from</i> " + safe_string(misp_galaxy[item[3]]) + ":"
+                                                     + safe_string(misp_galaxy[item[4]]), do_escape_string=False)
+        return self.get_unoverflowable_paragraph(item[2])
+
+    def get_galaxy_cluster_name_value(self, misp_cluster):
+        item = ["Name", 'value', "None", "source", "meta", "synonyms"]
+        tmp_text = ""
+
+        if is_safe_dict_attribute(misp_cluster, item[1]):
+            print(misp_cluster[item[1]])
+            tmp_text += safe_string(misp_cluster[item[1]])
+
+            #if is_safe_dict_attribute(misp_cluster, item[3]) :
+                # tmp_text += "<br/><i>Source :</i> " + misp_cluster[item[3]]
+
+            if is_safe_dict_attribute(misp_cluster, item[4]) and is_safe_dict_attribute(misp_cluster[item[4]], item[5]):
+                tmp_text += " <br/><i>Synonyms :</i> "
+                for i, synonyme in enumerate(misp_cluster[item[4]][item[5]]) :
+                    if i != 0 :
+                        tmp_text += " / "
+                    tmp_text += safe_string(synonyme)
+
+            return self.get_unoverflowable_paragraph(tmp_text, do_escape_string=False)
+        return self.get_unoverflowable_paragraph(item[2])
 
 class Event_Metadata():
 
@@ -801,11 +829,7 @@ class Event_Metadata():
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
         curr_Galaxy = Galaxy(self.config, self.value_formatter)
-        if is_safe_attribute_table(misp_event, item[1]) and is_in_config(self.config, 3):
-            galaxy_title = Paragraph(item[0], self.sample_style_sheet['Heading5'])
-
-            flowable_table.append(galaxy_title)
-            flowable_table.append(curr_Galaxy.get_galaxy_value(misp_event, item))
+        flowable_table += curr_Galaxy.get_galaxy_value(misp_event, item)
 
         return flowable_table
 
@@ -1013,11 +1037,7 @@ class Attributes():
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
         curr_Galaxy = Galaxy(self.config, self.value_formatter)
-        if is_safe_attribute_table(misp_attribute, item[1]) and is_in_config(self.config, 3):
-            galaxy_title = Paragraph(item[0], self.sample_style_sheet['Heading5'])
-
-            flowable_table.append(galaxy_title)
-            flowable_table.append(curr_Galaxy.get_galaxy_value(misp_attribute, item))
+        flowable_table += curr_Galaxy.get_galaxy_value(misp_attribute, item)
 
         return flowable_table
 
@@ -1219,6 +1239,7 @@ class Galaxy():
     def __init__(self, config, value_formatter):
         self.config = config
         self.value_formatter = value_formatter
+        self.sample_style_sheet = getSampleStyleSheet()
 
     # ----------------------------------------------------------------------
 
@@ -1232,9 +1253,20 @@ class Galaxy():
         :param col2_style: style to be applied on the returned paragraph
         :return: a Flowable to add in the pdf, regarding the values of "galaxies"
         '''
-        if is_safe_attribute_table(misp_event, item[1]):
-            return self.create_flowable_table_from_galaxies(misp_event)
-        return self.value_formatter.get_unoverflowable_paragraph(item[2])
+
+        flowable_table = []
+
+        # Galaxies
+        # item = ["Related Galaxies", 'Galaxy', "None"]
+        if is_safe_attribute_table(misp_event, item[1]) and is_in_config(self.config, 3):
+            galaxy_title = Paragraph(item[0], self.sample_style_sheet['Heading5'])
+
+            flowable_table.append(galaxy_title)
+            flowable_table += self.create_flowable_table_from_galaxies(misp_event)
+        else :
+            flowable_table.append(self.value_formatter.get_unoverflowable_paragraph(item[2]))
+
+        return flowable_table
 
 
     def create_flowable_table_from_galaxies(self, misp_event):
@@ -1247,12 +1279,17 @@ class Galaxy():
         flowable_table = []
         scheme_alternation = []
         curr_color = 0
+        i = 0
 
         if is_safe_attribute_table(misp_event, "Galaxy"):
             # There is some galaxies for this object
 
             for curr_galaxy in getattr(misp_event, "Galaxy"):
                 # For each galaxy of the misp object
+
+                galaxy_title = Paragraph("Galaxy # " + str(i), self.sample_style_sheet['Heading6'])
+                flowable_table.append(galaxy_title)
+                i += 1
 
                 # Add metadata about the Galaxy
                 galaxy_metadata, nb_added_item = self.create_flowable_table_from_one_galaxy(curr_galaxy)
@@ -1261,22 +1298,27 @@ class Galaxy():
                 # Construct the line color scheme and line scheme
                 scheme_alternation += [curr_color] * nb_added_item
 
+                # Apply the scheme
+                # answer_tags = create_flowable_table_from_data(flowable_table)
+
                 # Add metadata about clusters
                 curr_cluster = Galaxy_cluster(self.config, self.value_formatter)
-                clusters_metadata, nb_added_item = curr_cluster.create_flowable_table_from_galaxy_clusters(curr_galaxy)
+                clusters_metadata = curr_cluster.create_flowable_table_from_galaxy_clusters(curr_galaxy)
                 flowable_table += clusters_metadata
 
+
+                '''
                 # Construct the line color scheme and line scheme
                 scheme_alternation += [curr_color] * nb_added_item
                 curr_color += 1 if curr_color == 0 else 0
+                '''
 
-            # Apply the scheme
-            answer_tags = create_flowable_table_from_data(flowable_table, color_alternation=scheme_alternation , line_alternation=scheme_alternation)
         else:
             # No galaxies for this object
             answer_tags = [self.value_formatter.get_unoverflowable_paragraph("No galaxies")]
+            flowable_table.append(create_flowable_table_from_data(answer_tags))
 
-        return answer_tags
+        return flowable_table
 
     def create_flowable_table_from_one_galaxy(self, misp_galaxy):
         '''
@@ -1287,24 +1329,24 @@ class Galaxy():
         data = []
         nb_added_item = 0
 
-        # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
-        # to_display_if_not_present) are store in the following list
-        list_attr_automated = [["Name", 'name', "None"],
-                               ["Type", 'type', "None"],
-                               ["Description", 'description', "None"],
-                               ["NameSpace", 'namespace', "None"]]
+        # Name
+        item = ["Name", 'name', "None"]
+        if is_safe_dict_attribute(misp_galaxy, item[1]):
+            data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                         self.value_formatter.get_galaxy_name_value(misp_galaxy)])
+            nb_added_item += 1
 
-        # Automated adding of standard (python) attributes of the misp object
-        for item in list_attr_automated:
-            if is_safe_dict_attribute(misp_galaxy, item[1]):
-                # The attribute exists, we fetch it and create the row
-                data.append([self.value_formatter.get_col1_paragraph(item[0]),
+        # Description
+        item = ["Description", 'description', "None"]
+        if is_safe_dict_attribute(misp_galaxy, item[1]):
+            data.append([self.value_formatter.get_col1_paragraph(item[0]),
                              self.value_formatter.get_unoverflowable_paragraph(misp_galaxy[item[1]])])
-                nb_added_item += 1
+            nb_added_item += 1
 
-        # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
-        # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
-        return data, nb_added_item
+        flowable_table = []
+        flowable_table.append(create_flowable_table_from_data(data))
+
+        return flowable_table, nb_added_item
 
 
 class Galaxy_cluster():
@@ -1313,6 +1355,7 @@ class Galaxy_cluster():
     def __init__(self, config, value_formatter):
         self.config = config
         self.value_formatter = value_formatter
+        self.sample_style_sheet = getSampleStyleSheet()
 
     # ----------------------------------------------------------------------
     def create_flowable_table_from_galaxy_clusters(self, misp_galaxy):
@@ -1323,23 +1366,39 @@ class Galaxy_cluster():
         '''
 
         data = []
-        nb_added_item = 0
+        i = 0
+
+        item = ["Cluster #", 'name', "None"]
+
 
         if is_safe_dict_attribute(misp_galaxy, "GalaxyCluster"):
             # There is some clusters for this object
             for curr_cluster in misp_galaxy["GalaxyCluster"]:
 
+                '''
+                galaxy_title = [Paragraph("Cluster #" + str(i), self.sample_style_sheet['Heading6'])]
+                data.append(galaxy_title)
+                i += 1
+                '''
+
                 # For each cluster
-                tmp_data, curr_added_items = self.create_flowable_table_from_one_galaxy_cluster(curr_cluster)
-                data += tmp_data
-                nb_added_item += curr_added_items
+                tmp_data = self.create_flowable_table_from_one_galaxy_cluster(curr_cluster)
+                tmp_flowable_table = []
+                tmp_flowable_table.append(create_flowable_table_from_data(tmp_data, color_alternation = [0], line_alternation=[0]))
+                data.append([self.value_formatter.get_col1_paragraph(item[0]), tmp_flowable_table])
+
+                # data += tmp_data
 
         else:
             # No galaxies for this object
             data = [self.value_formatter.get_unoverflowable_paragraph("No galaxy cluster")]
-            nb_added_item += 1
 
-        return data, nb_added_item
+
+        flowable_table = []
+        flowable_table.append(create_flowable_table_from_data(data))
+
+
+        return flowable_table
 
     def create_flowable_table_from_one_galaxy_cluster(self, misp_cluster):
         '''
@@ -1348,28 +1407,20 @@ class Galaxy_cluster():
         :return: a table representing this misp's galaxy's cluster attributes, to add to the pdf as a flowable
         '''
         data = []
-        nb_added_item = 0
 
-        # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
-        # to_display_if_not_present) are store in the following list
-        list_attr_automated = [["Cluster #", 'tag_name', "None"],
-                               ["Type", 'type', "None"],
-                               ["Description", 'description', "None"],
-                               ["NameSpace", 'namespace', "None"]]
+        # Name
+        item = ["Name", 'name', "None"]
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                         self.value_formatter.get_galaxy_cluster_name_value(misp_cluster)])
 
-        # Automated adding of standard (python) attributes of the misp object
-        for item in list_attr_automated:
-            if is_safe_dict_attribute(misp_cluster, item[1]):
-                # The attribute exists, we fetch it and create the row
-                data.append([self.value_formatter.get_col1_paragraph(item[0]),
+        # Description
+        item = ["Description", 'description', "None"]
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
                              self.value_formatter.get_unoverflowable_paragraph(misp_cluster[item[1]])])
-                nb_added_item += 1
 
-        # tmp_table = Table(data, ["25%", "75%"])
-        # print(tmp_table)
-        # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
-        # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
-        return data, nb_added_item
+        # Refs ?
+
+        return data
 
 
 ########################################################################
