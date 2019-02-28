@@ -41,7 +41,7 @@ setup(
     ],
     install_requires=['six', 'requests', 'python-dateutil', 'jsonschema',
                       'python-dateutil', 'enum34;python_version<"3.4"',
-                      'functools32;python_version<"3.0"', 'reportlab'],
+                      'functools32;python_version<"3.0"'],
     extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
