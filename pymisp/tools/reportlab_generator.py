@@ -148,6 +148,7 @@ TEXT_FONT_SIZE = 8
 LEADING_SPACE = 7
 EXPORT_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 COL_WIDTHS = ['30%', '75%']  # colWidths='*' # Not documented but does exist
+# COL_WIDTHS = ['20%', '80%']  # colWidths='*' # Not documented but does exist
 ROW_HEIGHT = 5 * mm  # 4.5 * mm (a bit too short to allow vertical align TODO : Fix it)
 ROW_HEIGHT_FOR_TAGS = 4 * mm  # 4.5 * mm (a bit too short to allow vertical align TODO : Fix it)
 
@@ -234,7 +235,7 @@ def uuid_to_url(baseurl, uuid):
     return baseurl + "events/view/" + uuid
 
 
-def create_flowable_table_from_data(data, col_w=COL_WIDTHS):
+def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=None, line_alternation=None):
     '''
     Given a list of flowables items (2D/list of list), creates a Table with styles.
     :param data: list of list of items (flowables is better)
@@ -248,8 +249,8 @@ def create_flowable_table_from_data(data, col_w=COL_WIDTHS):
     #   rowHeights=ROW_HEIGHT if you want a fixed height. /!\ Problems with paragraphs that are spreading everywhere
 
     # Create styles and set parameters
-    alternate_colors_style = alternate_colors_style_generator(data)
-    lines_style = lines_style_generator(data)
+    alternate_colors_style = alternate_colors_style_generator(data,color_alternation)
+    lines_style = lines_style_generator(data,line_alternation)
     general_style = general_style_generator()
 
     # Make the table nicer
@@ -258,11 +259,13 @@ def create_flowable_table_from_data(data, col_w=COL_WIDTHS):
     return curr_table
 
 
-def alternate_colors_style_generator(data):
+def alternate_colors_style_generator(data, color_alternation):
     '''
     Create a style, applicable on a table that will be built with parameter's data, with alternated
     background color for each line.
     Modified from : https://gist.github.com/chadcooper/5798392
+    :param color_alternation: Allow to control the color scheme. e.g. [0,0,0,1,1,0 ... will produce 3 lines of a color,
+    2 lines of another, 1 of the first one ...
     :param data: list of list of items (2D table) to be displayed in the pdf
     :return: A list of 'BACKGROUND' properties, usable in a TableStyle, with alternated colours
     '''
@@ -270,33 +273,60 @@ def alternate_colors_style_generator(data):
     data_len = len(data)
     color_list = []
 
-    # For each line, generate a tuple giving to a line a color
-    for each in range(data_len):
-        if each % 2 == 0:
-            bg_color = EVEN_COLOR
-        else:
-            bg_color = ODD_COLOR
-        color_list.append(('BACKGROUND', (0, each), (-1, each), bg_color))
+    if color_alternation is None:
+        # For each line, generate a tuple giving to a line a color
+        for each in range(data_len):
+            if each % 2 == 0:
+                bg_color = EVEN_COLOR
+            else:
+                bg_color = ODD_COLOR
+            color_list.append(('BACKGROUND', (0, each), (-1, each), bg_color))
+    else:
+        if data_len > len(color_alternation) :
+            logger.warning("Line alternation for PDF display isn't correctly set. Looping on given values only.")
+
+        # For each line, generate a tuple giving to a line a color
+        for each in range(data_len):
+            if color_alternation[each%len(color_alternation)] % 2 == 0:
+                bg_color = EVEN_COLOR
+            else:
+                bg_color = ODD_COLOR
+            color_list.append(('BACKGROUND', (0, each), (-1, each), bg_color))
 
     return color_list
 
 
-def lines_style_generator(data):
+def lines_style_generator(data, line_alternation):
     '''
     Create a style, applicable on a table that will be built with parameter's data,
     that draw colored lines above and below each line of the table
+    :param line_alternation: Allow to control the color scheme. e.g. [0,0,0,1,1,0 ... will produce with a line up it,
+    2 lines without, 1 of the first one ...
     :param data:  list of list of items (2D table) to be displayed in the pdf
     :return: A list of 'LINE****' properties, usable in a TableStyle, that are drawing lines
     '''
     data_len = len(data)
     lines_list = []
 
-    # For each line, generate a tuple giving to a line a color
-    for each in range(data_len):
-        lines_list.append(('LINEABOVE', (0, each), (-1, each), LINE_THICKNESS, LINE_COLOR))
+    if line_alternation is None:
+        # For each line, generate a tuple giving to a line a color
+        for each in range(data_len):
+            lines_list.append(('LINEABOVE', (0, each), (-1, each), LINE_THICKNESS, LINE_COLOR))
 
-    # Last line
-    lines_list.append(('LINEBELOW', (0, len(data) - 1), (-1, len(data) - 1), LINE_THICKNESS, LINE_COLOR))
+        # Last line
+        lines_list.append(('LINEBELOW', (0, len(data) - 1), (-1, len(data) - 1), LINE_THICKNESS, LINE_COLOR))
+    else:
+        if data_len > len(line_alternation) :
+            logger.warning("Line alternation for PDF display isn't correctly set. Looping on given values only.")
+
+        # For each line, generate a tuple giving to a line a color
+        for each in range(data_len):
+            if each == 0 or line_alternation[each%len(line_alternation)] != line_alternation[(each-1)%len(line_alternation)]:
+                lines_list.append(('LINEABOVE', (0, each), (-1, each), LINE_THICKNESS, LINE_COLOR))
+
+        # Last line
+        lines_list.append(('LINEBELOW', (0, len(data) - 1), (-1, len(data) - 1), LINE_THICKNESS, LINE_COLOR))
+
 
     return lines_list
 
@@ -366,8 +396,10 @@ def is_safe_attribute_table(curr_object, attribute_name):
     return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
         curr_object, attribute_name) != []
 
+
 def is_in_config(config, index):
     return config is not None and moduleconfig[index] in config
+
 
 ########################################################################
 # Functions grouped by misp object type
@@ -379,6 +411,7 @@ class Value_Formatter():
         ["Name to be print in the pdf", "json property access name",
         " Name to be display if no values found in the misp_event"]
     '''
+
     # ----------------------------------------------------------------------
     def __init__(self, config, col1_style, col2_style):
         self.config = config
@@ -391,7 +424,7 @@ class Value_Formatter():
     def get_col1_paragraph(self, dirty_string):
         return self.get_unoverflowable_paragraph(dirty_string, self.col1_style)
 
-    def get_unoverflowable_paragraph(self, dirty_string, curr_style = None, do_escape_string=True):
+    def get_unoverflowable_paragraph(self, dirty_string, curr_style=None, do_escape_string=True):
         '''
         Create a paragraph that can fit on a cell displayed one page maximum.
         This method can be improved (get the exact size of the current frame, and limit the paragraph to this size.)
@@ -425,7 +458,8 @@ class Value_Formatter():
             while (w > FRAME_MAX_WIDTH or h > FRAME_MAX_HEIGHT) and i < MAX_ITERATION:
                 i += 1
                 limited_string = sanitized_str[:max_carac_amount]  # .replace("\n", "").replace("\r", "")
-                w, h = Paragraph(limited_string + STR_TOO_LONG_WARNING, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
+                w, h = Paragraph(limited_string + STR_TOO_LONG_WARNING, curr_style).wrap(FRAME_MAX_WIDTH,
+                                                                                         FRAME_MAX_HEIGHT)
                 max_carac_amount = int(max_carac_amount / 2)
 
             if w <= FRAME_MAX_WIDTH and h <= FRAME_MAX_HEIGHT:
@@ -436,8 +470,7 @@ class Value_Formatter():
 
         return answer_paragraph
 
-
-    def get_value_link_to_event(self, misp_event, item, curr_style = None, color=True):
+    def get_value_link_to_event(self, misp_event, item, curr_style=None, color=True):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event uuid, with or without link
         :param color: Boolean to give a color or not to the generate link (good link color)
@@ -456,7 +489,7 @@ class Value_Formatter():
             # It has the requested attribute .. building upon it.
 
             # Does misp_object has an uuid and do we know the baseurl ?
-            if is_safe_attribute(misp_event, "uuid") and is_in_config(self.config,0):
+            if is_safe_attribute(misp_event, "uuid") and is_in_config(self.config, 0):
                 # We can build links
                 curr_uuid = str(getattr(misp_event, "uuid"))
                 curr_baseurl = self.config[moduleconfig[0]]
@@ -495,7 +528,6 @@ class Value_Formatter():
             return self.get_unoverflowable_paragraph(safe_string(getattr(misp_event, item[1])))
         return self.get_unoverflowable_paragraph(item[2])
 
-
     def get_owner_value(self, misp_event, item):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event owner
@@ -508,7 +540,6 @@ class Value_Formatter():
             return self.get_unoverflowable_paragraph(safe_string(getattr(misp_event, item[1])))
         return self.get_unoverflowable_paragraph(item[2])
 
-
     def get_threat_value(self, misp_event, item):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event threat
@@ -518,9 +549,9 @@ class Value_Formatter():
         :return: a Paragraph to add in the pdf, regarding the values of "threat"
         '''
         if is_safe_attribute(misp_event, item[1]) and str(getattr(misp_event, item[1])) in threat_map:
-            return self.get_unoverflowable_paragraph(threat_map[safe_string(getattr(misp_event, item[1]))], do_escape_string=False)
+            return self.get_unoverflowable_paragraph(threat_map[safe_string(getattr(misp_event, item[1]))],
+                                                     do_escape_string=False)
         return self.get_unoverflowable_paragraph(item[2])
-
 
     def get_analysis_value(self, misp_event, item):
         '''
@@ -531,9 +562,9 @@ class Value_Formatter():
         :return: a Paragraph to add in the pdf, regarding the values of "analysis"
         '''
         if is_safe_attribute(misp_event, item[1]) and str(getattr(misp_event, item[1])) in analysis_map:
-            return self.get_unoverflowable_paragraph(analysis_map[safe_string(getattr(misp_event, item[1]))], do_escape_string=False)
+            return self.get_unoverflowable_paragraph(analysis_map[safe_string(getattr(misp_event, item[1]))],
+                                                     do_escape_string=False)
         return self.get_unoverflowable_paragraph(item[2])
-
 
     def get_timestamp_value(self, misp_event, item):
         '''
@@ -544,9 +575,9 @@ class Value_Formatter():
         :return: a Paragraph to add in the pdf, regarding the values of "timestamp"
         '''
         if is_safe_attribute(misp_event, item[1]):
-            return self.get_unoverflowable_paragraph(safe_string(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT)))
+            return self.get_unoverflowable_paragraph(
+                safe_string(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT)))
         return self.get_unoverflowable_paragraph(item[2])
-
 
     def get_creator_organisation_value(self, misp_event, item):
         '''
@@ -562,7 +593,6 @@ class Value_Formatter():
             return self.get_unoverflowable_paragraph(safe_string(getattr(getattr(misp_event, item[1]), item[3])))
         return self.get_unoverflowable_paragraph(item[2])
 
-
     def get_attributes_number_value(self, misp_event, item):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event attributes
@@ -574,8 +604,6 @@ class Value_Formatter():
         if is_safe_attribute(misp_event, item[1]):
             return self.get_unoverflowable_paragraph(safe_string(len(getattr(misp_event, item[1]))))
         return self.get_unoverflowable_paragraph(item[2])
-
-
 
     def get_published_value(self, misp_event, item):
         '''
@@ -601,7 +629,9 @@ class Value_Formatter():
             if getattr(misp_event, item[1]):  # == True
                 if is_safe_attribute(misp_event, item[3]):
                     # Published and have published date
-                    answer = self.get_unoverflowable_paragraph(YES_ANSWER + getattr(misp_event, item[3]).strftime(EXPORT_DATE_FORMAT) + ")", do_escape_string=False)
+                    answer = self.get_unoverflowable_paragraph(
+                        YES_ANSWER + getattr(misp_event, item[3]).strftime(EXPORT_DATE_FORMAT) + ")",
+                        do_escape_string=False)
                 else:
                     # Published without published date
                     answer = self.get_unoverflowable_paragraph(YES_ANSWER + "no date)", do_escape_string=False)
@@ -614,7 +644,6 @@ class Value_Formatter():
             answer = self.get_unoverflowable_paragraph(item[2], do_escape_string=False)
 
         return answer
-
 
     def get_image_value(self, misp_attribute, item):
         '''
@@ -641,7 +670,7 @@ class Value_Formatter():
 
         return answer
 
-    def get_good_link(self,misp_attribute, item):
+    def get_good_link(self, misp_attribute, item):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link
         :param misp_attribute: A misp attribute with a link
@@ -653,8 +682,7 @@ class Value_Formatter():
             "<font color=" + GOOD_LINK_COLOR + "><a href=" + getattr(misp_attribute, item[1]) + ">" + getattr(
                 misp_attribute, item[1]) + "</a></font>", do_escape_string=False)
 
-
-    def get_bad_link(self,misp_attribute, item):
+    def get_bad_link(self, misp_attribute, item):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link
         :param misp_attribute: A misp event with an url
@@ -664,10 +692,11 @@ class Value_Formatter():
         '''
         return self.get_unoverflowable_paragraph(
             "<font color=" + BAD_LINK_COLOR + "><a href=" + WARNING_MESSAGE_URL + ">" + getattr(misp_attribute,
-                                                                                                item[1]) + "</a></font>", do_escape_string=False)
+                                                                                                item[
+                                                                                                    1]) + "</a></font>",
+            do_escape_string=False)
 
-
-    def get_good_or_bad_link(self,misp_attribute, item):
+    def get_good_or_bad_link(self, misp_attribute, item):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link or an url
         :param misp_attribute: A misp attribute with a link or an url
@@ -693,7 +722,8 @@ class Event_Metadata():
     # ----------------------------------------------------------------------
     def __init__(self, config, value_formatter):
         self.config = config
-        self.curr_val_f = value_formatter
+        self.value_formatter = value_formatter
+        self.sample_style_sheet = getSampleStyleSheet()
 
     # ----------------------------------------------------------------------
 
@@ -708,61 +738,76 @@ class Event_Metadata():
         '''
 
         data = []
+        flowable_table = []
 
         # Manual addition
         # UUID
         item = ["UUID", 'uuid', "None"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_value_link_to_event(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_value_link_to_event(misp_event, item)])
 
         # Date
         item = ["Date", 'date', "None"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_date_value(misp_event, item)])
+        data.append(
+            [self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_date_value(misp_event, item)])
 
         # Owner
         item = ["Owner org", 'owner', "None"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_owner_value(misp_event, item)])
+        data.append(
+            [self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_owner_value(misp_event, item)])
 
         # Threat
         item = ["Threat level", 'threat_level_id', "None"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_threat_value(misp_event, item)])
+        data.append(
+            [self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_threat_value(misp_event, item)])
 
         # Analysis
         item = ["Analysis", 'analysis', "None"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_analysis_value(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_analysis_value(misp_event, item)])
 
         # Info
         item = ["Info", 'info', "None"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_value_link_to_event(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_value_link_to_event(misp_event, item)])
 
         # Timestamp
         item = ["Event date", 'timestamp', "None"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_timestamp_value(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_timestamp_value(misp_event, item)])
 
         # Published
         item = ["Published", 'published', "None", "publish_timestamp"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_published_value(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_published_value(misp_event, item)])
 
         # Creator organisation
         item = ["Creator Org", 'Orgc', "None", "name"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_creator_organisation_value(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_creator_organisation_value(misp_event, item)])
 
         # Number of Attributes
         item = ["# Attributes", 'Attribute', "None"]
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), self.curr_val_f.get_attributes_number_value(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_attributes_number_value(misp_event, item)])
 
         # Tags
         item = ["Tags", 'Tag', "None"]
-        curr_Tags = Tags(self.config, self.curr_val_f)
-        data.append([self.curr_val_f.get_col1_paragraph(item[0]), curr_Tags.get_tag_value(misp_event, item)])
+        curr_Tags = Tags(self.config, self.value_formatter)
+        data.append([self.value_formatter.get_col1_paragraph(item[0]), curr_Tags.get_tag_value(misp_event, item)])
 
-        if is_in_config(self.config, 3):
-            # Galaxies
-            item = ["Galaxies", 'Galaxy', "None"]
-            if is_safe_attribute_table(misp_event, item[1]):
-                curr_Galaxy = Galaxy(self.config, self.curr_val_f)
-                data.append([self.curr_val_f.get_col1_paragraph(item[0]), curr_Galaxy.get_galaxy_value(misp_event, item)])
+        flowable_table.append(create_flowable_table_from_data(data))
 
-        return create_flowable_table_from_data(data)
+        # Galaxies
+        item = ["Related Galaxies", 'Galaxy', "None"]
+        curr_Galaxy = Galaxy(self.config, self.value_formatter)
+        if is_safe_attribute_table(misp_event, item[1]) and is_in_config(self.config, 3):
+            galaxy_title = Paragraph(item[0], self.sample_style_sheet['Heading5'])
+
+            flowable_table.append(galaxy_title)
+            flowable_table.append(curr_Galaxy.get_galaxy_value(misp_event, item))
+
+        return flowable_table
 
     def create_flowable_description_from_event(self, misp_event):
         '''
@@ -863,10 +908,10 @@ class Event_Metadata():
         '''
         text += "<br/>For more information on the event, please consult following information."
 
-        description_style = ParagraphStyle(name='Description', parent=self.curr_val_f.col2_style, alignment=TA_JUSTIFY)
+        description_style = ParagraphStyle(name='Description', parent=self.value_formatter.col2_style,
+                                           alignment=TA_JUSTIFY)
 
         return Paragraph(text, description_style)
-
 
 
 class Attributes():
@@ -876,6 +921,7 @@ class Attributes():
         self.config = config
         self.value_formatter = value_formatter
         self.sample_style_sheet = getSampleStyleSheet()
+
     # ----------------------------------------------------------------------
 
     def create_flowable_table_from_attributes(self, misp_event):
@@ -893,7 +939,7 @@ class Attributes():
             for item in getattr(misp_event, "Attribute"):
                 # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
                 flowable_table.append(Paragraph("Attribute #" + str(i), self.sample_style_sheet['Heading4']))
-                flowable_table.append(self.create_flowable_table_from_one_attribute(item))
+                flowable_table += self.create_flowable_table_from_one_attribute(item)
                 i += 1
         else:
             # No attributes for this object
@@ -909,7 +955,7 @@ class Attributes():
         '''
 
         data = []
-        col1_style, col2_style = get_table_styles()
+        flowable_table = []
 
         # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
         # to_display_if_not_present) are store in the following list
@@ -939,18 +985,21 @@ class Attributes():
         # Handle Special case for links (Value) - There were not written in the previous loop
         item = ["Value", 'value', "None"]
         if not STANDARD_TYPE and is_safe_attribute(misp_attribute, item[1]):
-            data.append([self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_good_or_bad_link(misp_attribute, item)])
+            data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                         self.value_formatter.get_good_or_bad_link(misp_attribute, item)])
 
         # Handle pictures
         item = ["Data", 'data', "None"]
         if is_safe_attribute(misp_attribute, item[1]) and getattr(misp_attribute, 'type') == IMAGE_TYPE:
-            data.append([self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_image_value(misp_attribute, item)])
+            data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                         self.value_formatter.get_image_value(misp_attribute, item)])
 
         # Tags
         item = ["Tags", 'Tag', "None"]
         curr_Tags = Tags(self.config, self.value_formatter)
         if is_safe_attribute_table(misp_attribute, item[1]):
-            data.append([self.value_formatter.get_col1_paragraph(item[0]), curr_Tags.get_tag_value(misp_attribute, item)])
+            data.append(
+                [self.value_formatter.get_col1_paragraph(item[0]), curr_Tags.get_tag_value(misp_attribute, item)])
 
         # Sighting
         item = ["Sighting", 'Sighting', "None"]
@@ -959,14 +1008,18 @@ class Attributes():
             data.append([self.value_formatter.get_col1_paragraph(item[0]),
                          curr_Sighting.create_flowable_paragraph_from_sightings(misp_attribute, item)])
 
-        if is_in_config(self.config, 3):
-            # Galaxies
-            item = ["Galaxies", 'Galaxy', "None"]
-            curr_Galaxy = Galaxy(self.config, self.value_formatter)
-            if is_safe_attribute_table(misp_attribute, item[1]):
-                data.append([Paragraph(item[0], col1_style), curr_Galaxy.get_galaxy_value(misp_attribute, item)])
+        flowable_table.append(create_flowable_table_from_data(data))
 
-        return create_flowable_table_from_data(data)
+        # Galaxies
+        item = ["Related Galaxies", 'Galaxy', "None"]
+        curr_Galaxy = Galaxy(self.config, self.value_formatter)
+        if is_safe_attribute_table(misp_attribute, item[1]) and is_in_config(self.config, 3):
+            galaxy_title = Paragraph(item[0], self.sample_style_sheet['Heading5'])
+
+            flowable_table.append(galaxy_title)
+            flowable_table.append(curr_Galaxy.get_galaxy_value(misp_attribute, item))
+
+        return flowable_table
 
 
 class Tags():
@@ -1001,7 +1054,7 @@ class Tags():
         flowable_table = []
         i = 0
 
-        if is_safe_attribute_table(misp_event,"Tag"):
+        if is_safe_attribute_table(misp_event, "Tag"):
             # There is some tags for this object
             for item in getattr(misp_event, "Tag"):
                 flowable_table.append(create_flowable_tag(item))
@@ -1059,7 +1112,7 @@ class Sightings():
             # There is some tags for this object
             for curr_item in getattr(misp_attribute, item[1]):
                 # TODO : When Sightings will be object : if is_safe_attribute(item, "type"):
-                if is_safe_dict_attribute(curr_item,"type"):
+                if is_safe_dict_attribute(curr_item, "type"):
                     # Store the likes/dislikes depending on their types
                     list_sighting[int(curr_item["type"])] += 1
                 i += 1
@@ -1076,6 +1129,7 @@ class Sightings():
             answer_sighting = self.value_formatter.get_unoverflowable_paragraph("No sighting")
 
         return answer_sighting
+
 
 class Object():
 
@@ -1176,12 +1230,12 @@ class Galaxy():
         ["Name to be print in the pdf", "json property access name",
         " Name to be display if no values found in the misp_event"]
         :param col2_style: style to be applied on the returned paragraph
-        :return: a Paragraph to add in the pdf, regarding the values of "galaxies"
+        :return: a Flowable to add in the pdf, regarding the values of "galaxies"
         '''
         if is_safe_attribute_table(misp_event, item[1]):
-            table_event_tags = self.create_flowable_table_from_galaxies(misp_event)
-            return table_event_tags
+            return self.create_flowable_table_from_galaxies(misp_event)
         return self.value_formatter.get_unoverflowable_paragraph(item[2])
+
 
     def create_flowable_table_from_galaxies(self, misp_event):
         '''
@@ -1191,22 +1245,38 @@ class Galaxy():
         '''
 
         flowable_table = []
-        col1_style, col2_style = get_table_styles()
-        i = 0
+        scheme_alternation = []
+        curr_color = 0
 
         if is_safe_attribute_table(misp_event, "Galaxy"):
             # There is some galaxies for this object
-            for item in getattr(misp_event, "Galaxy"):
-                # flowable_table.append([get_unoverflowable_paragraph(item["name"],col2_style)])
-                flowable_table.append(self.create_flowable_table_from_one_galaxy(item))
-                i += 1
-            answer_tags = create_flowable_table_from_data(flowable_table, ["99%"])
+
+            for curr_galaxy in getattr(misp_event, "Galaxy"):
+                # For each galaxy of the misp object
+
+                # Add metadata about the Galaxy
+                galaxy_metadata, nb_added_item = self.create_flowable_table_from_one_galaxy(curr_galaxy)
+                flowable_table += galaxy_metadata
+
+                # Construct the line color scheme and line scheme
+                scheme_alternation += [curr_color] * nb_added_item
+
+                # Add metadata about clusters
+                curr_cluster = Galaxy_cluster(self.config, self.value_formatter)
+                clusters_metadata, nb_added_item = curr_cluster.create_flowable_table_from_galaxy_clusters(curr_galaxy)
+                flowable_table += clusters_metadata
+
+                # Construct the line color scheme and line scheme
+                scheme_alternation += [curr_color] * nb_added_item
+                curr_color += 1 if curr_color == 0 else 0
+
+            # Apply the scheme
+            answer_tags = create_flowable_table_from_data(flowable_table, color_alternation=scheme_alternation , line_alternation=scheme_alternation)
         else:
             # No galaxies for this object
-            answer_tags = [Paragraph("No galaxies", col2_style)]
+            answer_tags = [self.value_formatter.get_unoverflowable_paragraph("No galaxies")]
 
         return answer_tags
-
 
     def create_flowable_table_from_one_galaxy(self, misp_galaxy):
         '''
@@ -1215,7 +1285,7 @@ class Galaxy():
         :return: a table representing this misp's galaxy's attributes, to add to the pdf as a flowable
         '''
         data = []
-        col1_style, col2_style = get_table_styles()
+        nb_added_item = 0
 
         # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
         # to_display_if_not_present) are store in the following list
@@ -1230,15 +1300,11 @@ class Galaxy():
                 # The attribute exists, we fetch it and create the row
                 data.append([self.value_formatter.get_col1_paragraph(item[0]),
                              self.value_formatter.get_unoverflowable_paragraph(misp_galaxy[item[1]])])
+                nb_added_item += 1
 
-        # Clusters
-        item = ["Clusters", 'GalaxyCluster', "None"]
-        # data.append([Paragraph(item[0], col1_style), create_flowable_table_from_galaxy_clusters(misp_galaxy)])
-
-        tmp_table = Table(data, ["25%", "75%"])
         # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
         # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
-        return [tmp_table]
+        return data, nb_added_item
 
 
 class Galaxy_cluster():
@@ -1249,40 +1315,44 @@ class Galaxy_cluster():
         self.value_formatter = value_formatter
 
     # ----------------------------------------------------------------------
-    def create_flowable_table_from_galaxy_clusters(self, misp_event):
+    def create_flowable_table_from_galaxy_clusters(self, misp_galaxy):
         '''
         Returns a Table (flowable) to add to a pdf, representing the list of galaxy clusters of a galaxy
         :param misp_event: A misp event
         :return: a table of flowables to add to the pdf
         '''
 
-        flowable_table = []
-        i = 0
+        data = []
+        nb_added_item = 0
 
-        if is_safe_dict_attribute(misp_event, "GalaxyCluster"):
-            # There is some galaxies for this object
-            for item in misp_event["GalaxyCluster"]:
-                # flowable_table.append([get_unoverflowable_paragraph(item["name"],col2_style)])
-                flowable_table.append(self.create_flowable_table_from_one_galaxy_cluster(item))
-                i += 1
-            answer_tags = create_flowable_table_from_data(flowable_table, ["99%"])
+        if is_safe_dict_attribute(misp_galaxy, "GalaxyCluster"):
+            # There is some clusters for this object
+            for curr_cluster in misp_galaxy["GalaxyCluster"]:
+
+                # For each cluster
+                tmp_data, curr_added_items = self.create_flowable_table_from_one_galaxy_cluster(curr_cluster)
+                data += tmp_data
+                nb_added_item += curr_added_items
+
         else:
             # No galaxies for this object
-            answer_tags = [self.value_formatter.get_unoverflowable_paragraph("No galaxy cluster")]
+            data = [self.value_formatter.get_unoverflowable_paragraph("No galaxy cluster")]
+            nb_added_item += 1
 
-        return answer_tags
+        return data, nb_added_item
 
     def create_flowable_table_from_one_galaxy_cluster(self, misp_cluster):
         '''
-        Returns a table (flowable) representing the galaxy
+        Returns a table (flowable) representing a galaxy cluster
         :param misp_attribute: A misp galaxy
-        :return: a table representing this misp's galaxy's attributes, to add to the pdf as a flowable
+        :return: a table representing this misp's galaxy's cluster attributes, to add to the pdf as a flowable
         '''
         data = []
+        nb_added_item = 0
 
         # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
         # to_display_if_not_present) are store in the following list
-        list_attr_automated = [["Name", 'name', "None"],
+        list_attr_automated = [["Cluster #", 'tag_name', "None"],
                                ["Type", 'type', "None"],
                                ["Description", 'description', "None"],
                                ["NameSpace", 'namespace', "None"]]
@@ -1293,14 +1363,13 @@ class Galaxy_cluster():
                 # The attribute exists, we fetch it and create the row
                 data.append([self.value_formatter.get_col1_paragraph(item[0]),
                              self.value_formatter.get_unoverflowable_paragraph(misp_cluster[item[1]])])
+                nb_added_item += 1
 
-        tmp_table = Table(data, ["25%", "75%"])
-        print(tmp_table)
+        # tmp_table = Table(data, ["25%", "75%"])
+        # print(tmp_table)
         # The attribute does not exist, you may want to print a default text on the row. Then use as a else case :
         # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
-        return [tmp_table]
-
-
+        return data, nb_added_item
 
 
 ########################################################################
@@ -1322,8 +1391,7 @@ class Statics_Drawings():
         # TODO : add_header()
         # TODO : add_footer()
 
-
-    def add_metadata(self,canvas, doc):
+    def add_metadata(self, canvas, doc):
         '''
         Allow to add metadata to the pdf. Would need deeper digging to change other metadata.
         :param canvas: / Automatically filled during pdf compilation
@@ -1342,7 +1410,7 @@ class Statics_Drawings():
             if is_safe_attribute(getattr(self.misp_event, 'Orgc'), 'name'):
                 canvas.setAuthor(getattr(getattr(self.misp_event, 'Orgc'), 'name'))
 
-                if  is_in_config(self.config,1) :
+                if is_in_config(self.config, 1):
                     canvas.setCreator(self.config[moduleconfig[1]])
                 else:
                     canvas.setCreator(getattr(getattr(self.misp_event, 'Orgc'), 'name'))
@@ -1350,8 +1418,7 @@ class Statics_Drawings():
         if is_safe_attribute(self.misp_event, 'uuid'):
             canvas.setKeywords(getattr(self.misp_event, 'uuid'))
 
-
-    def add_page_number(self,canvas, doc):
+    def add_page_number(self, canvas, doc):
         '''
         Draw the page number on each page
         :param canvas: / Automatically filled during pdf compilation
@@ -1401,7 +1468,7 @@ def collect_parts(misp_event, config=None):
     curr_attr = Attributes(config, curr_val_f)
     curr_object = Object(config, curr_val_f)
 
-    if is_in_config(config,2) : # If description is activated
+    if is_in_config(config, 2):  # If description is activated
         description = Paragraph("Description", sample_style_sheet['Heading2'])
         description_text = curr_event.create_flowable_description_from_event(misp_event)
         flowables.append(description)
@@ -1410,7 +1477,7 @@ def collect_parts(misp_event, config=None):
     subtitle = Paragraph("General information", sample_style_sheet['Heading2'])
     table_general_metainformation = curr_event.create_flowable_table_from_event(misp_event)
     flowables.append(subtitle)
-    flowables.append(table_general_metainformation)
+    flowables += table_general_metainformation
 
     flowables.append(PageBreak())
 
@@ -1449,7 +1516,8 @@ def export_flowables_to_pdf(document, misp_event, flowables, config):
         onFirstPage=static_drawer.set_template,  # Pagination for first page
         onLaterPages=static_drawer.set_template,  # Pagination for all other page
     )
-    # Old way :         onLaterPages=partial(static_drawer.set_template, misp_event=misp_event),  # Pagination for all other page
+    # Old way : onLaterPages=partial(static_drawer.set_template, misp_event=misp_event),  # Pagination for all other page
+
 
 ########################################################################
 # "EXTERNAL" exposed METHODS. Meant to be used outside of this class.
@@ -1482,7 +1550,6 @@ def convert_event_in_pdf_buffer(misp_event, config=None):
     pdf_buffer.close()
 
     return pdf_value
-
 
 
 def get_values_from_buffer(pdf_buffer):
