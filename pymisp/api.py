@@ -171,6 +171,7 @@ class PyMISP(object):
         else:
             local_session = requests.Session
         with local_session() as s:
+            req.auth = self.auth
             prepped = s.prepare_request(req)
             prepped.headers.update(
                 {'Authorization': self.key,
@@ -180,9 +181,9 @@ class PyMISP(object):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(prepped.headers)
             if self.asynch and background_callback is not None:
-                return s.send(prepped, verify=self.ssl, proxies=self.proxies, auth=self.auth, cert=self.cert, background_callback=background_callback)
+                return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert, background_callback=background_callback)
             else:
-                return s.send(prepped, verify=self.ssl, proxies=self.proxies, auth=self.auth, cert=self.cert)
+                return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert)
 
     # #####################
     # ### Core helpers ####
