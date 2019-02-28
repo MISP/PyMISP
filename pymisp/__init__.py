@@ -47,6 +47,9 @@ try:
         # Let's not bother with python 2
         try:
             from .tools import reportlab_generator  # noqa
+        except ImportError:
+            # FIXME: The import should not raise an exception if reportlab isn't installed
+            pass
         except NameError:
             # FIXME: The import should not raise an exception if reportlab isn't installed
             pass
