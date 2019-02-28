@@ -496,7 +496,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(new_obj['Object']['distribution'], str(Distribution.inherit.value))
             self.assertEqual(new_obj['Object']['Attribute'][0]['distribution'], str(Distribution.inherit.value))
             # Object - edit
-            clean_obj = MISPObject(**new_obj['Object'])
+            clean_obj = MISPObject(strict=True, **new_obj['Object'])
             clean_obj.from_dict(**new_obj['Object'])
             clean_obj.add_attribute('filename', value='blah.exe')
             new_obj = self.user_misp_connector.edit_object(clean_obj)
