@@ -4,7 +4,6 @@
 import unittest
 from pymisp import MISPEvent
 
-from pymisp.tools import reportlab_generator
 
 import sys
 import os
@@ -15,6 +14,8 @@ manual_testing = False
 if sys.version_info < (3, 6):
     print('This test suite requires Python 3.6+, breaking.')
     sys.exit(0)
+else:
+    from pymisp import reportlab_generator
 
 
 class TestMISPEvent(unittest.TestCase):
