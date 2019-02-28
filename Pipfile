@@ -10,10 +10,9 @@ codecov = "*"
 requests-mock = "*"
 
 [packages]
-pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal"],path = "."}
+pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal", "pdfexport"],path = "."}
 pydeep = {editable = true,git = "https://github.com/kbandla/pydeep.git"}
 pymispwarninglists = {editable = true,git = "https://github.com/MISP/PyMISPWarningLists.git"}
-reportlab = "*"
 
 [requires]
 python_version = "3.6"

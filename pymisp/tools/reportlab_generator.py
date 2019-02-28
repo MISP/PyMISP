@@ -8,14 +8,8 @@ import pprint
 from io import BytesIO
 from functools import partial
 
-import sys
-
-if sys.version_info.major >= 3:
-    from html import escape
-    # import PIL
-else:
-    print(
-        "ExportPDF running with Python < 3 : stability and output not guaranteed. Please run exportPDF with at least Python3")
+# NOTE: The module isn't loaded at all unless we're using python 3.4+
+from html import escape
 
 logger = logging.getLogger('pymisp')
 
@@ -36,7 +30,6 @@ try:
     HAS_REPORTLAB = True
 except ImportError:
     HAS_REPORTLAB = False
-    print("ReportLab cannot be imported. Please verify that ReportLab is installed on the system.")
 
 
 ########################################################################
@@ -880,7 +873,7 @@ def create_flowable_description_from_event(misp_event, config=None):
     '''
 
     '''
-    The event "{EventName}" | that occurred on {EventDate}, | had been shared by {Organisation Name} | on the {Date}. 
+    The event "{EventName}" | that occurred on {EventDate}, | had been shared by {Organisation Name} | on the {Date}.
     '''
 
     text = ""
@@ -915,7 +908,7 @@ def create_flowable_description_from_event(misp_event, config=None):
     text += "."
 
     '''
-    The threat level of this event is {ThreatLevel} and the analysis that was made of this event is {AnalysisLevel}. 
+    The threat level of this event is {ThreatLevel} and the analysis that was made of this event is {AnalysisLevel}.
     '''
 
     item = ["Threat level", 'threat_level_id', "None"]
@@ -1031,7 +1024,7 @@ def create_flowable_table_from_tags(misp_event):
 def create_flowable_table_from_objects(misp_event):
     '''
     Returns a list of flowables representing the list of objects of a misp event.
-    The list is composed of a serie of 
+    The list is composed of a serie of
     [ header object, table of object information, [ header of attribute, table of attribute]*] to add to the pdf
     :param misp_event: A misp event
     :return: a table of flowables
