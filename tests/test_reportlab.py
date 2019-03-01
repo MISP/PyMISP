@@ -35,6 +35,7 @@ class TestMISPEvent(unittest.TestCase):
         self.moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
                              "Activate_galaxy_description"]
 
+
     def init_event(self):
         self.mispevent.info = 'This is a test'
         self.mispevent.distribution = 1
