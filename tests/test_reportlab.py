@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import unittest
-from pymisp import MISPEvent
-
-
-import sys
 import os
+import sys
 import time
+import unittest
+
+from pymisp import MISPEvent
+from pymisp.tools import reportlab_generator
 
 manual_testing = False
 
@@ -16,7 +16,6 @@ if sys.version_info < (3, 6):
     sys.exit(0)
 else:
     from pymisp import reportlab_generator
-
 
 class TestMISPEvent(unittest.TestCase):
 
@@ -29,10 +28,13 @@ class TestMISPEvent(unittest.TestCase):
             self.root = ""
         self.test_folder = self.root + "reportlab_testfiles/"
         self.test_batch_folder = self.root + "OSINT_output/"
+        self.storage_folder_OSINT = self.root + "OSINT_PDF/"
         self.test_image_folder = self.root + "image_json/"
         self.storage_folder = self.root + "reportlab_testoutputs/"
         self.storage_image_folder = self.root + "reportlab_test_image_outputs/"
-        self.moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description"]
+        self.moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
+                             "Activate_galaxy_description"]
+
 
     def init_event(self):
         self.mispevent.info = 'This is a test'
@@ -103,8 +105,9 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'very_long_event.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "config_complete_event.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "config_complete_event.pdf")
 
     def test_partial_0_config_json(self):
         if self.check_python_2():
@@ -116,8 +119,9 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'very_long_event.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "config_partial_0_event.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "config_partial_0_event.pdf")
 
     def test_partial_1_config_json(self):
         if self.check_python_2():
@@ -129,8 +133,9 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'very_long_event.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "config_partial_1_event.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "config_partial_1_event.pdf")
 
     def test_image_json(self):
         if self.check_python_2():
@@ -143,8 +148,9 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'image_event.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "image_event.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "image_event.pdf")
 
     def test_objects_1_json(self):
         if self.check_python_2():
@@ -157,8 +163,9 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'mainly_objects_1.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "mainly_objects_1.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "mainly_objects_1.pdf")
 
     def test_objects_2_json(self):
         if self.check_python_2():
@@ -171,8 +178,9 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'mainly_objects_2.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "mainly_objects_2.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "mainly_objects_2.pdf")
 
     def test_sightings_1_json(self):
         if self.check_python_2():
@@ -185,8 +193,9 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'sighting_1.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "sighting_1.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "sighting_1.pdf")
 
     def test_sightings_2_json(self):
         if self.check_python_2():
@@ -199,8 +208,9 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'sighting_2.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "sighting_2.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "sighting_2.pdf")
 
     def test_textual_json(self):
         if self.check_python_2():
@@ -214,8 +224,25 @@ class TestMISPEvent(unittest.TestCase):
 
             self.init_event()
             self.mispevent.load_file(self.test_folder + 'very_long_event.json')
-            reportlab_generator.register_value_to_file(reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                                                       self.storage_folder + "textual.pdf")
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "textual.pdf")
+
+    def test_galaxy_1(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        else:
+            config = {}
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] = "My Wonderful CERT"
+            config[self.moduleconfig[2]] = True
+            config[self.moduleconfig[3]] = True
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'galaxy_1.json')
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "galaxy_1.pdf")
 
     def test_batch_image_events(self):
         # Test case ONLY for manual testing. Needs to download a full list of image events !
@@ -269,7 +296,7 @@ class TestMISPEvent(unittest.TestCase):
 
                 reportlab_generator.register_value_to_file(
                     reportlab_generator.convert_event_in_pdf_buffer(self.mispevent),
-                    self.storage_folder + curr_file + ".pdf")
+                    self.storage_folder_OSINT + curr_file + ".pdf")
             print("Elapsed time : " + str(time.time() - t))
             # Local run : 1958.930s for 1064 files
 
@@ -287,6 +314,8 @@ class TestMISPEvent(unittest.TestCase):
             config[self.moduleconfig[0]] = "http://localhost:8080"
             config[self.moduleconfig[1]] = "My Wonderful CERT"
             config[self.moduleconfig[2]] = True
+            config[self.moduleconfig[3]] = True
+
 
             file_nb = str(len(os.listdir(self.test_batch_folder)))
             i = 0
@@ -302,6 +331,6 @@ class TestMISPEvent(unittest.TestCase):
 
                 reportlab_generator.register_value_to_file(
                     reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
-                    self.storage_folder + curr_file + ".pdf")
+                    self.storage_folder_OSINT + curr_file + ".pdf")
             print("Elapsed time : " + str(time.time() - t))
-            # Local run : 1958.930s for 1064 files
+            # Local run : 1513.283s for 1064 files
