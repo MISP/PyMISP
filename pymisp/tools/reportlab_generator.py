@@ -6,6 +6,7 @@ import base64
 import logging
 import pprint
 from io import BytesIO
+
 import sys
 
 if sys.version_info.major >= 3:
@@ -1207,7 +1208,6 @@ class Object():
 
     # ----------------------------------------------------------------------
 
-
     def create_flowable_table_from_objects(self, misp_event, config=None):
         '''
         Returns a list of flowables representing the list of objects of a misp event.
@@ -1314,7 +1314,6 @@ class Galaxy():
             flowable_table.append(self.value_formatter.get_unoverflowable_paragraph(item[2]))
 
         return flowable_table
-
 
     def create_flowable_table_from_galaxies(self, misp_event):
         '''
