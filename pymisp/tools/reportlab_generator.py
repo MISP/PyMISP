@@ -161,7 +161,7 @@ ROW_HEIGHT = 5 * mm  # 4.5 * mm (a bit too short to allow vertical align TODO : 
 ROW_HEIGHT_FOR_TAGS = 4 * mm  # 4.5 * mm (a bit too short to allow vertical align TODO : Fix it)
 
 # == Whole document margins and size ==
-PAGESIZE = (140 * mm, 216 * mm)  # width, height
+PAGESIZE = A4 # (140 * mm, 216 * mm)  # width, height
 BASE_MARGIN = 5 * mm  # Create a list here to specify each row separately
 
 # == Parameters for error handling for content too long to fit on a page ==
@@ -1631,7 +1631,7 @@ def convert_event_in_pdf_buffer(misp_event, config=None):
 
     # DEBUG / TO DELETE : curr_document = SimpleDocTemplate('myfile.pdf')
     curr_document = SimpleDocTemplate(pdf_buffer,
-                                      pagesize=A4,
+                                      pagesize=PAGESIZE,
                                       topMargin=BASE_MARGIN,
                                       leftMargin=BASE_MARGIN,
                                       rightMargin=BASE_MARGIN,
