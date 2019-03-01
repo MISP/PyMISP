@@ -9,8 +9,13 @@ import unittest
 from pymisp import MISPEvent
 from pymisp.tools import reportlab_generator
 
-manual_testing = True
+manual_testing = False
 
+if sys.version_info < (3, 6):
+    print('This test suite requires Python 3.6+, breaking.')
+    sys.exit(0)
+else:
+    from pymisp import reportlab_generator
 
 class TestMISPEvent(unittest.TestCase):
 
@@ -226,7 +231,6 @@ class TestMISPEvent(unittest.TestCase):
         if self.check_python_2():
             self.assertTrue(True)
         else:
-
             config = {}
             config[self.moduleconfig[0]] = "http://localhost:8080"
             config[self.moduleconfig[1]] = "My Wonderful CERT"
@@ -309,6 +313,8 @@ class TestMISPEvent(unittest.TestCase):
             config[self.moduleconfig[0]] = "http://localhost:8080"
             config[self.moduleconfig[1]] = "My Wonderful CERT"
             config[self.moduleconfig[2]] = True
+            config[self.moduleconfig[3]] = True
+
 
             file_nb = str(len(os.listdir(self.test_batch_folder)))
             i = 0

@@ -34,7 +34,6 @@ try:
     HAS_REPORTLAB = True
 except ImportError:
     HAS_REPORTLAB = False
-    print("ReportLab cannot be imported. Please verify that ReportLab is installed on the system.")
 
 
 ########################################################################
@@ -190,6 +189,17 @@ analysis_map = {"0": "<font color =" + HIGH_THREAT_COLOR + ">   Initial (0)</fon
                 "1": "<font color =" + MEDIUM_THREAT_COLOR + "> Ongoing (1)</font>",
                 "2": "<font color =" + LOW_THREAT_COLOR + ">    Completed (2)</font>"}
 
+# == Parameters for Sightings ==
+POSITIVE_SIGHT_COLOR = 'green'
+NEGATIVE_SIGHT_COLOR = 'red'
+MISC_SIGHT_COLOR = 'orange'
+
+# == Parameters for galaxies ==
+DO_SMALL_GALAXIES = True
+FIRST_LEVEL_GALAXY_WIDTHS = ["15%","85%"]
+SECOND_LEVEL_GALAXY_WIDTHS = ["20%","80%"]
+CLUSTER_COLORS = [0] # or 1
+OFFSET = 1
 
 ########################################################################
 # "UTILITIES" METHODS. Not meant to be used except for development purposes
@@ -315,6 +325,9 @@ def lines_style_generator(data, line_alternation):
 
         # Last line
         lines_list.append(('LINEBELOW', (0, len(data) - 1), (-1, len(data) - 1), LINE_THICKNESS, LINE_COLOR))
+    elif line_alternation == [] :
+        # Do nothing
+        return lines_list
     else:
         if data_len > len(line_alternation) :
             logger.warning("Line alternation for PDF display isn't correctly set. Looping on given values only.")
@@ -374,6 +387,30 @@ def get_table_styles():
 
     return custom_body_style_col_1, custom_body_style_col_2
 
+def get_clusters_table_styles():
+    '''
+    Create and returns the two mains styles for the columns of a table describing a cluster.
+    :return: two styles, one for each columns of the document, describing the MISP object.
+    '''
+    col1, col2 = get_table_styles()
+
+    custom_body_style_col_1 = ParagraphStyle(name='Column_1_small',
+                                             parent=col1,
+                                             fontName=FIRST_COL_FONT,
+                                             textColor=FIRST_COL_FONT_COLOR,
+                                             fontSize=TEXT_FONT_SIZE - 2,
+                                             leading=LEADING_SPACE- 1,
+                                             alignment=FIRST_COL_ALIGNEMENT)
+
+    custom_body_style_col_2 = ParagraphStyle(name='Column_2_small',
+                                             parent=col2,
+                                             fontName=SECOND_COL_FONT,
+                                             textColor=SECOND_COL_FONT_COLOR,
+                                             fontSize=TEXT_FONT_SIZE - 2,
+                                             leading=LEADING_SPACE- 1,
+                                             alignment=TA_JUSTIFY)
+
+    return custom_body_style_col_1, custom_body_style_col_2
 
 ########################################################################
 # Checks
@@ -413,18 +450,22 @@ class Value_Formatter():
     '''
 
     # ----------------------------------------------------------------------
-    def __init__(self, config, col1_style, col2_style):
+    def __init__(self, config, col1_style, col2_style, col1_small_style, col2_small_style):
         self.config = config
         self.col1_style = col1_style
         self.col2_style = col2_style
+        self.col1_small_style = col1_small_style
+        self.col2_small_style = col2_small_style
 
     # ----------------------------------------------------------------------
     ########################################################################
     # General attribut formater
-    def get_col1_paragraph(self, dirty_string):
-        return self.get_unoverflowable_paragraph(dirty_string, self.col1_style)
+    def get_col1_paragraph(self, dirty_string,  do_small=False):
+        if do_small :
+            return self.get_unoverflowable_paragraph(dirty_string, self.col1_small_style, do_small=do_small)
+        return self.get_unoverflowable_paragraph(dirty_string, self.col1_style, do_small=do_small)
 
-    def get_unoverflowable_paragraph(self, dirty_string, curr_style=None, do_escape_string=True):
+    def get_unoverflowable_paragraph(self, dirty_string, curr_style=None, do_escape_string=True, do_small=False):
         '''
         Create a paragraph that can fit on a cell displayed one page maximum.
         This method can be improved (get the exact size of the current frame, and limit the paragraph to this size.)
@@ -439,8 +480,12 @@ class Value_Formatter():
         else:
             sanitized_str = dirty_string
 
-        if curr_style is None:
-            curr_style = self.col2_style
+        if curr_style is None :
+            if do_small :
+                curr_style = self.col2_small_style
+            else :
+                curr_style = self.col2_style
+
 
         # Get the space that the paragraph needs to be printed
         w, h = Paragraph(sanitized_str, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
@@ -721,10 +766,10 @@ class Value_Formatter():
         if is_safe_dict_attribute(misp_galaxy, item[1]):
             return self.get_unoverflowable_paragraph(safe_string(misp_galaxy[item[1]])
                                                      + " <i>from</i> " + safe_string(misp_galaxy[item[3]]) + ":"
-                                                     + safe_string(misp_galaxy[item[4]]), do_escape_string=False)
-        return self.get_unoverflowable_paragraph(item[2])
+                                                     + safe_string(misp_galaxy[item[4]]), do_escape_string=False, do_small=True)
+        return self.get_unoverflowable_paragraph(item[2], do_small=True)
 
-    def get_galaxy_cluster_name_value(self, misp_cluster):
+    def get_galaxy_cluster_name_value(self, misp_cluster, do_small=False):
         item = ["Name", 'value', "None", "source", "meta", "synonyms"]
         tmp_text = ""
 
@@ -742,8 +787,8 @@ class Value_Formatter():
                         tmp_text += " / "
                     tmp_text += safe_string(synonyme)
 
-            return self.get_unoverflowable_paragraph(tmp_text, do_escape_string=False)
-        return self.get_unoverflowable_paragraph(item[2])
+            return self.get_unoverflowable_paragraph(tmp_text, do_escape_string=False, do_small=do_small)
+        return self.get_unoverflowable_paragraph(item[2], do_small=do_small)
 
 class Event_Metadata():
 
@@ -825,6 +870,8 @@ class Event_Metadata():
         data.append([self.value_formatter.get_col1_paragraph(item[0]), curr_Tags.get_tag_value(misp_event, item)])
 
         flowable_table.append(create_flowable_table_from_data(data))
+
+        flowable_table.append(PageBreak())
 
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
@@ -962,7 +1009,7 @@ class Attributes():
             # There is some attributes for this object
             for item in getattr(misp_event, "Attribute"):
                 # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
-                flowable_table.append(Paragraph("Attribute #" + str(i), self.sample_style_sheet['Heading4']))
+                flowable_table.append(Paragraph("Attribute #" + str(i+OFFSET), self.sample_style_sheet['Heading4']))
                 flowable_table += self.create_flowable_table_from_one_attribute(item)
                 i += 1
         else:
@@ -1036,8 +1083,9 @@ class Attributes():
 
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
-        curr_Galaxy = Galaxy(self.config, self.value_formatter)
-        flowable_table += curr_Galaxy.get_galaxy_value(misp_attribute, item)
+        if is_safe_attribute_table(misp_attribute, item[1]) :
+            curr_Galaxy = Galaxy(self.config, self.value_formatter)
+            flowable_table += curr_Galaxy.get_galaxy_value(misp_attribute, item)
 
         return flowable_table
 
@@ -1121,11 +1169,7 @@ class Sightings():
         :return: a table of flowable to add to the pdf
         '''
 
-        col1_style, col2_style = get_table_styles()
         i = 0
-        POSITIVE_SIGHT_COLOR = 'green'
-        NEGATIVE_SIGHT_COLOR = 'red'
-        MISC_SIGHT_COLOR = 'orange'
 
         list_sighting = [0, 0, 0]
         if is_safe_attribute_table(misp_attribute, item[1]):
@@ -1151,6 +1195,7 @@ class Sightings():
         return answer_sighting
 
 
+
 class Object():
 
     # ----------------------------------------------------------------------
@@ -1160,6 +1205,7 @@ class Object():
         self.sample_style_sheet = getSampleStyleSheet()
 
     # ----------------------------------------------------------------------
+
 
     def create_flowable_table_from_objects(self, misp_event, config=None):
         '''
@@ -1178,7 +1224,7 @@ class Object():
             # There is a list of objects
             for item in getattr(misp_event, "Object"):
                 # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
-                flowable_table.append(Paragraph("Object #" + str(i), self.sample_style_sheet['Heading3']))
+                flowable_table.append(Paragraph("Object #" + str(i+OFFSET), self.sample_style_sheet['Heading3']))
                 flowable_table += self.create_flowable_table_from_one_object(item, config)
                 i += 1
         else:
@@ -1187,6 +1233,7 @@ class Object():
 
         return flowable_table
 
+
     def create_flowable_table_from_one_object(self, misp_object, config=None):
         '''
         Returns a table (flowable) representing the object
@@ -1194,7 +1241,6 @@ class Object():
         :return: a table representing this misp's object's attributes, to add to the pdf as a flowable
         '''
         data = []
-        col1_style, col2_style = get_table_styles()
 
         # To reduce code size, and automate it a bit, triplet (Displayed Name, object_attribute_name,
         # to_display_if_not_present) are store in the following list
@@ -1217,7 +1263,7 @@ class Object():
 
         # Timestamp
         item = ["Object date", 'timestamp', "None"]
-        data.append([Paragraph(item[0], col1_style), self.value_formatter.get_timestamp_value(misp_object, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_timestamp_value(misp_object, item)])
 
         # Transform list of value in a table
         data = [create_flowable_table_from_data(data)]
@@ -1275,11 +1321,11 @@ class Galaxy():
         :param misp_event: A misp event
         :return: a table of flowables to add to the pdf
         '''
-
         flowable_table = []
         scheme_alternation = []
         curr_color = 0
         i = 0
+
 
         if is_safe_attribute_table(misp_event, "Galaxy"):
             # There is some galaxies for this object
@@ -1287,7 +1333,8 @@ class Galaxy():
             for curr_galaxy in getattr(misp_event, "Galaxy"):
                 # For each galaxy of the misp object
 
-                galaxy_title = Paragraph("Galaxy # " + str(i), self.sample_style_sheet['Heading6'])
+                txt_title = "Galaxy #" + str(i+OFFSET) + " - " + safe_string(curr_galaxy["name"])
+                galaxy_title = Paragraph(txt_title, self.sample_style_sheet['Heading6'])
                 flowable_table.append(galaxy_title)
                 i += 1
 
@@ -1298,20 +1345,11 @@ class Galaxy():
                 # Construct the line color scheme and line scheme
                 scheme_alternation += [curr_color] * nb_added_item
 
-                # Apply the scheme
-                # answer_tags = create_flowable_table_from_data(flowable_table)
-
                 # Add metadata about clusters
                 curr_cluster = Galaxy_cluster(self.config, self.value_formatter)
                 clusters_metadata = curr_cluster.create_flowable_table_from_galaxy_clusters(curr_galaxy)
                 flowable_table += clusters_metadata
 
-
-                '''
-                # Construct the line color scheme and line scheme
-                scheme_alternation += [curr_color] * nb_added_item
-                curr_color += 1 if curr_color == 0 else 0
-                '''
 
         else:
             # No galaxies for this object
@@ -1332,21 +1370,22 @@ class Galaxy():
         # Name
         item = ["Name", 'name', "None"]
         if is_safe_dict_attribute(misp_galaxy, item[1]):
-            data.append([self.value_formatter.get_col1_paragraph(item[0]),
+            data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=DO_SMALL_GALAXIES),
                          self.value_formatter.get_galaxy_name_value(misp_galaxy)])
             nb_added_item += 1
 
         # Description
         item = ["Description", 'description', "None"]
         if is_safe_dict_attribute(misp_galaxy, item[1]):
-            data.append([self.value_formatter.get_col1_paragraph(item[0]),
-                             self.value_formatter.get_unoverflowable_paragraph(misp_galaxy[item[1]])])
+            data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=DO_SMALL_GALAXIES),
+                             self.value_formatter.get_unoverflowable_paragraph(misp_galaxy[item[1]], do_small=DO_SMALL_GALAXIES)])
             nb_added_item += 1
 
         flowable_table = []
         flowable_table.append(create_flowable_table_from_data(data))
 
         return flowable_table, nb_added_item
+
 
 
 class Galaxy_cluster():
@@ -1366,37 +1405,31 @@ class Galaxy_cluster():
         '''
 
         data = []
-        i = 0
-
         item = ["Cluster #", 'name', "None"]
-
 
         if is_safe_dict_attribute(misp_galaxy, "GalaxyCluster"):
             # There is some clusters for this object
-            for curr_cluster in misp_galaxy["GalaxyCluster"]:
+            for i, curr_cluster in enumerate(misp_galaxy["GalaxyCluster"]):
 
-                '''
-                galaxy_title = [Paragraph("Cluster #" + str(i), self.sample_style_sheet['Heading6'])]
-                data.append(galaxy_title)
-                i += 1
-                '''
+                # If title is needed :
+                # galaxy_title = [Paragraph("Cluster #" + str(i), self.sample_style_sheet['Heading6'])]
+                # data.append(galaxy_title)
+
+
+                item[0] = "Cluster #" + str(i + OFFSET)
 
                 # For each cluster
                 tmp_data = self.create_flowable_table_from_one_galaxy_cluster(curr_cluster)
                 tmp_flowable_table = []
-                tmp_flowable_table.append(create_flowable_table_from_data(tmp_data, color_alternation = [0], line_alternation=[0]))
-                data.append([self.value_formatter.get_col1_paragraph(item[0]), tmp_flowable_table])
-
-                # data += tmp_data
+                tmp_flowable_table.append(create_flowable_table_from_data(tmp_data, col_w=SECOND_LEVEL_GALAXY_WIDTHS, color_alternation = CLUSTER_COLORS, line_alternation=[]))
+                data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=DO_SMALL_GALAXIES), tmp_flowable_table]) # Cluster #X - 3 lines
 
         else:
             # No galaxies for this object
-            data = [self.value_formatter.get_unoverflowable_paragraph("No galaxy cluster")]
-
+            data = [self.value_formatter.get_unoverflowable_paragraph("No galaxy cluster", do_small=DO_SMALL_GALAXIES)]
 
         flowable_table = []
-        flowable_table.append(create_flowable_table_from_data(data))
-
+        flowable_table.append(create_flowable_table_from_data(data, col_w=FIRST_LEVEL_GALAXY_WIDTHS, color_alternation = CLUSTER_COLORS))
 
         return flowable_table
 
@@ -1410,15 +1443,19 @@ class Galaxy_cluster():
 
         # Name
         item = ["Name", 'name', "None"]
-        data.append([self.value_formatter.get_col1_paragraph(item[0]),
-                         self.value_formatter.get_galaxy_cluster_name_value(misp_cluster)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=True),
+                         self.value_formatter.get_galaxy_cluster_name_value(misp_cluster, do_small=True)])
 
-        # Description
-        item = ["Description", 'description', "None"]
-        data.append([self.value_formatter.get_col1_paragraph(item[0]),
-                             self.value_formatter.get_unoverflowable_paragraph(misp_cluster[item[1]])])
+        if misp_cluster['value'] != misp_cluster['description'] : # Prevent name that are same as description
+            # Description
+            item = ["Description", 'description', "None"]
+            data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=True),
+                                 self.value_formatter.get_unoverflowable_paragraph(misp_cluster[item[1]], do_small=True)])
 
         # Refs ?
+        # item = ["Description", 'description', "None"]
+        # data.append([self.value_formatter.get_col1_paragraph(item[0]),
+        # self.value_formatter.get_unoverflowable_paragraph(misp_cluster[item[1]])])
 
         return data
 
@@ -1506,7 +1543,8 @@ def collect_parts(misp_event, config=None):
     # Get the list of available styles
     sample_style_sheet = getSampleStyleSheet()
     col1_style, col2_style = get_table_styles()
-    curr_val_f = Value_Formatter(config, col1_style, col2_style)
+    col1_small_style, col2_small_style = get_clusters_table_styles()
+    curr_val_f = Value_Formatter(config, col1_style, col2_style, col1_small_style, col2_small_style)
 
     # Create stuff
     title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], alignment=TA_CENTER)

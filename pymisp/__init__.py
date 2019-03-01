@@ -42,7 +42,17 @@ try:
     from .tools import openioc  # noqa
     from .tools import load_warninglists  # noqa
     from .tools import ext_lookups  # noqa
-    from .tools import reportlab_generator  # noqa
+
+    if sys.version_info >= (3, 4):
+        # Let's not bother with python 2
+        try:
+            from .tools import reportlab_generator  # noqa
+        except ImportError:
+            # FIXME: The import should not raise an exception if reportlab isn't installed
+            pass
+        except NameError:
+            # FIXME: The import should not raise an exception if reportlab isn't installed
+            pass
     if sys.version_info >= (3, 6):
         from .aping import ExpandedPyMISP  # noqa
     logger.debug('pymisp loaded properly')

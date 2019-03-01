@@ -69,9 +69,10 @@ class PyMISP(object):
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#client-side-certificates
     :param asynch: Use asynchronous processing where possible
+    :param auth: The auth parameter is passed directly to requests, as described here: http://docs.python-requests.org/en/master/user/authentication/
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False, auth=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -83,6 +84,7 @@ class PyMISP(object):
         self.proxies = proxies
         self.cert = cert
         self.asynch = asynch
+        self.auth = auth
         if asynch and not ASYNC_OK:
             logger.critical("You turned on Async, but don't have requests_futures installed")
             self.asynch = False
@@ -169,6 +171,7 @@ class PyMISP(object):
         else:
             local_session = requests.Session
         with local_session() as s:
+            req.auth = self.auth
             prepped = s.prepare_request(req)
             prepped.headers.update(
                 {'Authorization': self.key,
@@ -1779,7 +1782,7 @@ class PyMISP(object):
 
     def get_roles_list(self):
         """Get the list of existing roles"""
-        url = urljoin(self.root_url, '/roles')
+        url = urljoin(self.root_url, 'roles')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
@@ -1787,13 +1790,13 @@ class PyMISP(object):
 
     def get_tags_list(self):
         """Get the list of existing tags."""
-        url = urljoin(self.root_url, '/tags')
+        url = urljoin(self.root_url, 'tags')
         response = self._prepare_request('GET', url)
         return self._check_response(response)['Tag']
 
     def get_tag(self, tag_id):
         """Get a tag by id."""
-        url = urljoin(self.root_url, '/tags/view/{}'.format(tag_id))
+        url = urljoin(self.root_url, 'tags/view/{}'.format(tag_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
@@ -1827,7 +1830,7 @@ class PyMISP(object):
         old_tag = self.get_tag(tag_id)
         new_tag = self._set_tag_parameters(name, colour, exportable, hide_tag, org_id, count, user_id,
                                            numerical_value, attribute_count, old_tag)
-        url = urljoin(self.root_url, '/tags/edit/{}'.format(tag_id))
+        url = urljoin(self.root_url, 'tags/edit/{}'.format(tag_id))
         response = self._prepare_request('POST', url, json.dumps(new_tag))
         return self._check_response(response)
 
@@ -1835,7 +1838,7 @@ class PyMISP(object):
         """Edit the tag using a json file."""
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
-        url = urljoin(self.root_url, '/tags/edit/{}'.format(tag_id))
+        url = urljoin(self.root_url, 'tags/edit/{}'.format(tag_id))
         response = self._prepare_request('POST', url, json.dumps(jdata))
         return self._check_response(response)
 
@@ -1853,38 +1856,38 @@ class PyMISP(object):
 
     def get_taxonomies_list(self):
         """Get all the taxonomies."""
-        url = urljoin(self.root_url, '/taxonomies')
+        url = urljoin(self.root_url, 'taxonomies')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_taxonomy(self, taxonomy_id):
         """Get a taxonomy by id."""
-        url = urljoin(self.root_url, '/taxonomies/view/{}'.format(taxonomy_id))
+        url = urljoin(self.root_url, 'taxonomies/view/{}'.format(taxonomy_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def update_taxonomies(self):
         """Update all the taxonomies."""
-        url = urljoin(self.root_url, '/taxonomies/update')
+        url = urljoin(self.root_url, 'taxonomies/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def enable_taxonomy(self, taxonomy_id):
         """Enable a taxonomy by id."""
-        url = urljoin(self.root_url, '/taxonomies/enable/{}'.format(taxonomy_id))
+        url = urljoin(self.root_url, 'taxonomies/enable/{}'.format(taxonomy_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def disable_taxonomy(self, taxonomy_id):
         """Disable a taxonomy by id."""
         self.disable_taxonomy_tags(taxonomy_id)
-        url = urljoin(self.root_url, '/taxonomies/disable/{}'.format(taxonomy_id))
+        url = urljoin(self.root_url, 'taxonomies/disable/{}'.format(taxonomy_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def get_taxonomy_tags_list(self, taxonomy_id):
         """Get all the tags of a taxonomy by id."""
-        url = urljoin(self.root_url, '/taxonomies/view/{}'.format(taxonomy_id))
+        url = urljoin(self.root_url, 'taxonomies/view/{}'.format(taxonomy_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)["entries"]
 
@@ -1892,13 +1895,13 @@ class PyMISP(object):
         """Enable all the tags of a taxonomy by id."""
         enabled = self.get_taxonomy(taxonomy_id)['Taxonomy']['enabled']
         if enabled:
-            url = urljoin(self.root_url, '/taxonomies/addTag/{}'.format(taxonomy_id))
+            url = urljoin(self.root_url, 'taxonomies/addTag/{}'.format(taxonomy_id))
             response = self._prepare_request('POST', url)
             return self._check_response(response)
 
     def disable_taxonomy_tags(self, taxonomy_id):
         """Disable all the tags of a taxonomy by id."""
-        url = urljoin(self.root_url, '/taxonomies/disableTag/{}'.format(taxonomy_id))
+        url = urljoin(self.root_url, 'taxonomies/disableTag/{}'.format(taxonomy_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
@@ -1906,19 +1909,19 @@ class PyMISP(object):
 
     def get_warninglists(self):
         """Get all the warninglists."""
-        url = urljoin(self.root_url, '/warninglists')
+        url = urljoin(self.root_url, 'warninglists')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_warninglist(self, warninglist_id):
         """Get a warninglist by id."""
-        url = urljoin(self.root_url, '/warninglists/view/{}'.format(warninglist_id))
+        url = urljoin(self.root_url, 'warninglists/view/{}'.format(warninglist_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def update_warninglists(self):
         """Update all the warninglists."""
-        url = urljoin(self.root_url, '/warninglists/update')
+        url = urljoin(self.root_url, 'warninglists/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
@@ -1940,7 +1943,7 @@ class PyMISP(object):
             query['name'] = warninglist_name
         if force_enable is not None:
             query['enabled'] = force_enable
-        url = urljoin(self.root_url, '/warninglists/toggleEnable')
+        url = urljoin(self.root_url, 'warninglists/toggleEnable')
         response = self._prepare_request('POST', url, json.dumps(query))
         return self._check_response(response)
 
@@ -1954,7 +1957,7 @@ class PyMISP(object):
 
     def check_warninglist(self, value):
         """Check if IOC values are in warninglist"""
-        url = urljoin(self.root_url, '/warninglists/checkValue')
+        url = urljoin(self.root_url, 'warninglists/checkValue')
         response = self._prepare_request('POST', url, json.dumps(value))
         return self._check_response(response)
 
@@ -1962,31 +1965,31 @@ class PyMISP(object):
 
     def get_noticelists(self):
         """Get all the noticelists."""
-        url = urljoin(self.root_url, '/noticelists')
+        url = urljoin(self.root_url, 'noticelists')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_noticelist(self, noticelist_id):
         """Get a noticelist by id."""
-        url = urljoin(self.root_url, '/noticelists/view/{}'.format(noticelist_id))
+        url = urljoin(self.root_url, 'noticelists/view/{}'.format(noticelist_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def update_noticelists(self):
         """Update all the noticelists."""
-        url = urljoin(self.root_url, '/noticelists/update')
+        url = urljoin(self.root_url, 'noticelists/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def enable_noticelist(self, noticelist_id):
         """Enable a noticelist by id."""
-        url = urljoin(self.root_url, '/noticelists/enableNoticelist/{}/true'.format(noticelist_id))
+        url = urljoin(self.root_url, 'noticelists/enableNoticelist/{}/true'.format(noticelist_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     def disable_noticelist(self, noticelist_id):
         """Disable a noticelist by id."""
-        url = urljoin(self.root_url, '/noticelists/enableNoticelist/{}'.format(noticelist_id))
+        url = urljoin(self.root_url, 'noticelists/enableNoticelist/{}'.format(noticelist_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
@@ -1994,19 +1997,19 @@ class PyMISP(object):
 
     def get_galaxies(self):
         """Get all the galaxies."""
-        url = urljoin(self.root_url, '/galaxies')
+        url = urljoin(self.root_url, 'galaxies')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_galaxy(self, galaxy_id):
         """Get a galaxy by id."""
-        url = urljoin(self.root_url, '/galaxies/view/{}'.format(galaxy_id))
+        url = urljoin(self.root_url, 'galaxies/view/{}'.format(galaxy_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def update_galaxies(self):
         """Update all the galaxies."""
-        url = urljoin(self.root_url, '/galaxies/update')
+        url = urljoin(self.root_url, 'galaxies/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
@@ -2046,7 +2049,7 @@ class PyMISP(object):
         if tags:
             if isinstance(tags, list):
                 tags = "&&".join(tags)
-        url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
+        url = urljoin(self.root_url, "events/stix/download/{}/{}/{}/{}/{}".format(
             event_id, with_attachments, tags, from_date, to_date))
         logger.debug("Getting STIX event from %s", url)
         response = self._prepare_request('GET', url)
@@ -2064,7 +2067,7 @@ class PyMISP(object):
         :param context: Add event level context (event_info,event_member_org,event_source_org,event_distribution,event_threat_level_id,event_analysis,event_date,event_tag)
         :param ignore: Returns the attributes even if the event isn't published, or the attribute doesn't have the to_ids flag set
         """
-        url = urljoin(self.root_url, '/events/csv/download')
+        url = urljoin(self.root_url, 'events/csv/download')
         to_post = {}
         if eventid:
             to_post['eventid'] = eventid
@@ -2217,7 +2220,7 @@ class PyMISP(object):
         :extend: Allow the organisation to extend the group
         '''
         to_jsonify = {'sg_id': sharing_group, 'org_id': organisation, 'extend': extend}
-        url = urljoin(self.root_url, '/sharingGroups/addOrg')
+        url = urljoin(self.root_url, 'sharingGroups/addOrg')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
@@ -2227,7 +2230,7 @@ class PyMISP(object):
         :organisation: Organisation's local instance ID, or Organisation's global UUID, or Organisation's name as known to the curent instance
         '''
         to_jsonify = {'sg_id': sharing_group, 'org_id': organisation}
-        url = urljoin(self.root_url, '/sharingGroups/removeOrg')
+        url = urljoin(self.root_url, 'sharingGroups/removeOrg')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
@@ -2238,7 +2241,7 @@ class PyMISP(object):
         :all_orgs: Add all the organisations of the server to the group
         '''
         to_jsonify = {'sg_id': sharing_group, 'server_id': server, 'all_orgs': all_orgs}
-        url = urljoin(self.root_url, '/sharingGroups/addServer')
+        url = urljoin(self.root_url, 'sharingGroups/addServer')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
@@ -2248,7 +2251,7 @@ class PyMISP(object):
         :server: Server's local instance ID, or URL of the Server, or Server's name as known to the curent instance
         '''
         to_jsonify = {'sg_id': sharing_group, 'server_id': server}
-        url = urljoin(self.root_url, '/sharingGroups/removeServer')
+        url = urljoin(self.root_url, 'sharingGroups/removeServer')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
@@ -2324,7 +2327,7 @@ class PyMISP(object):
         return self._check_response(response)
 
     def update_object_templates(self):
-        url = urljoin(self.root_url, '/objectTemplates/update')
+        url = urljoin(self.root_url, 'objectTemplates/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
