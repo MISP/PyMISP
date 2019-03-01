@@ -27,7 +27,7 @@ try:
     from reportlab.lib.utils import ImageReader
     from reportlab.lib.pagesizes import A4
 
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable, Image
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable, Image, Indenter
 
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import mm
@@ -130,6 +130,8 @@ moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Act
 # == Row colors of the table (alternating) ==
 EVEN_COLOR = colors.whitesmoke
 ODD_COLOR = colors.lightgrey
+EVEN_COLOR_GALAXY = colors.powderblue
+ODD_COLOR_GALAXY = colors.lavenderblush
 
 # == Lines parameters of the table ==
 LINE_COLOR = colors.lightslategray
@@ -163,15 +165,17 @@ ROW_HEIGHT_FOR_TAGS = 4 * mm  # 4.5 * mm (a bit too short to allow vertical alig
 # == Whole document margins and size ==
 PAGESIZE = A4 # (140 * mm, 216 * mm)  # width, height
 BASE_MARGIN = 5 * mm  # Create a list here to specify each row separately
+INDENT_SIZE = 6 * mm # The Indentation of attribute from object, etc.
+INDENT_SIZE_HEADING = 3 * mm # The Indentation of attribute from object, etc.
 
 # == Parameters for error handling for content too long to fit on a page ==
-FRAME_MAX_HEIGHT = 500  # 650 # Ad hoc value for a A4 page
-FRAME_MAX_WIDTH = 356
+FRAME_MAX_HEIGHT = 200*mm # 500  # Ad hoc value for a A4 page
+FRAME_MAX_WIDTH = 145*mm - INDENT_SIZE # 356
 STR_TOO_LONG_WARNING = "<br/><b><font color=red>[Too long to fit on a single page. Cropped]</font></b>"
 
 # == Parameters for error handling for image too big to fit on a page ==
-FRAME_PICTURE_MAX_WIDTH = 88 * mm
-FRAME_PICTURE_MAX_HEIGHT = 195 * mm
+FRAME_PICTURE_MAX_HEIGHT = 200*mm # 195 * mm
+FRAME_PICTURE_MAX_WIDTH = 145*mm - INDENT_SIZE # 88 * mm
 
 # == Parameters for links management ==
 LINK_TYPE = "link"  # Name of the type that define 'good' links
@@ -254,7 +258,7 @@ def uuid_to_url(baseurl, uuid):
     return baseurl + "events/view/" + uuid
 
 
-def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=None, line_alternation=None):
+def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=None, line_alternation=None, galaxy_colors=False):
     '''
     Given a list of flowables items (2D/list of list), creates a Table with styles.
     :param data: list of list of items (flowables is better)
@@ -268,7 +272,7 @@ def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=No
     #   rowHeights=ROW_HEIGHT if you want a fixed height. /!\ Problems with paragraphs that are spreading everywhere
 
     # Create styles and set parameters
-    alternate_colors_style = alternate_colors_style_generator(data,color_alternation)
+    alternate_colors_style = alternate_colors_style_generator(data,color_alternation, galaxy_colors)
     lines_style = lines_style_generator(data,line_alternation)
     general_style = general_style_generator()
 
@@ -278,7 +282,7 @@ def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=No
     return curr_table
 
 
-def alternate_colors_style_generator(data, color_alternation):
+def alternate_colors_style_generator(data, color_alternation, galaxy_colors=True):
     '''
     Create a style, applicable on a table that will be built with parameter's data, with alternated
     background color for each line.
@@ -296,20 +300,20 @@ def alternate_colors_style_generator(data, color_alternation):
         # For each line, generate a tuple giving to a line a color
         for each in range(data_len):
             if each % 2 == 0:
-                bg_color = EVEN_COLOR
+                bg_color = EVEN_COLOR if not galaxy_colors else EVEN_COLOR_GALAXY
             else:
-                bg_color = ODD_COLOR
+                bg_color = ODD_COLOR if not galaxy_colors else ODD_COLOR_GALAXY
             color_list.append(('BACKGROUND', (0, each), (-1, each), bg_color))
     else:
-        if data_len > len(color_alternation) :
-            logger.warning("Line alternation for PDF display isn't correctly set. Looping on given values only.")
+        # if data_len > len(color_alternation) :
+        #    logger.warning("Line alternation for PDF display isn't correctly set. Looping on given values only.")
 
         # For each line, generate a tuple giving to a line a color
         for each in range(data_len):
             if color_alternation[each%len(color_alternation)] % 2 == 0:
-                bg_color = EVEN_COLOR
+                bg_color = EVEN_COLOR if not galaxy_colors else EVEN_COLOR_GALAXY
             else:
-                bg_color = ODD_COLOR
+                bg_color = ODD_COLOR if not galaxy_colors else ODD_COLOR_GALAXY
             color_list.append(('BACKGROUND', (0, each), (-1, each), bg_color))
 
     return color_list
@@ -338,8 +342,8 @@ def lines_style_generator(data, line_alternation):
         # Do nothing
         return lines_list
     else:
-        if data_len > len(line_alternation) :
-            logger.warning("Line alternation for PDF display isn't correctly set. Looping on given values only.")
+        # if data_len > len(line_alternation) :
+        #    logger.warning("Line alternation for PDF display isn't correctly set. Looping on given values only.")
 
         # For each line, generate a tuple giving to a line a color
         for each in range(data_len):
@@ -784,7 +788,6 @@ class Value_Formatter():
         tmp_text = ""
 
         if is_safe_dict_attribute(misp_cluster, item[1]):
-            print(misp_cluster[item[1]])
             tmp_text += safe_string(misp_cluster[item[1]])
 
             #if is_safe_dict_attribute(misp_cluster, item[3]) :
@@ -1020,7 +1023,10 @@ class Attributes():
             # There is some attributes for this object
             for item in getattr(misp_event, "Attribute"):
                 # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
+                flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
                 flowable_table.append(Paragraph("Attribute #" + str(i+OFFSET), self.sample_style_sheet['Heading4']))
+                flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
+
                 flowable_table += self.create_flowable_table_from_one_attribute(item)
                 i += 1
         else:
@@ -1092,11 +1098,14 @@ class Attributes():
 
         flowable_table.append(create_flowable_table_from_data(data))
 
+
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
         if is_safe_attribute_table(misp_attribute, item[1]) :
             curr_Galaxy = Galaxy(self.config, self.value_formatter)
+            flowable_table.append(Indenter(left=INDENT_SIZE))
             flowable_table += curr_Galaxy.get_galaxy_value(misp_attribute, item)
+            flowable_table.append(Indenter(left=-INDENT_SIZE))
 
         return flowable_table
 
@@ -1234,7 +1243,9 @@ class Object():
             # There is a list of objects
             for item in getattr(misp_event, "Object"):
                 # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
+                flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
                 flowable_table.append(Paragraph("Object #" + str(i+OFFSET), self.sample_style_sheet['Heading3']))
+                flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
                 flowable_table += self.create_flowable_table_from_one_object(item, config)
                 i += 1
         else:
@@ -1281,7 +1292,9 @@ class Object():
         # Handle all the attributes
         if is_safe_attribute(misp_object, "Attribute"):
             curr_attributes = Attributes(self.config, self.value_formatter)
+            data.append(Indenter(left=INDENT_SIZE))
             data += curr_attributes.create_flowable_table_from_attributes(misp_object)
+            data.append(Indenter(left=-INDENT_SIZE))
 
         # Add a page break at the end of an object
         data.append(PageBreak())
@@ -1317,7 +1330,9 @@ class Galaxy():
         if is_safe_attribute_table(misp_event, item[1]) and is_in_config(self.config, 3):
             galaxy_title = Paragraph(item[0], self.sample_style_sheet['Heading5'])
 
+            flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
             flowable_table.append(galaxy_title)
+            flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
             flowable_table += self.create_flowable_table_from_galaxies(misp_event)
         else :
             flowable_table.append(self.value_formatter.get_unoverflowable_paragraph(item[2]))
@@ -1344,7 +1359,9 @@ class Galaxy():
 
                 txt_title = "Galaxy #" + str(i+OFFSET) + " - " + safe_string(curr_galaxy["name"])
                 galaxy_title = Paragraph(txt_title, self.sample_style_sheet['Heading6'])
+                flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
                 flowable_table.append(galaxy_title)
+                flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
                 i += 1
 
                 # Add metadata about the Galaxy
@@ -1430,7 +1447,7 @@ class Galaxy_cluster():
                 # For each cluster
                 tmp_data = self.create_flowable_table_from_one_galaxy_cluster(curr_cluster)
                 tmp_flowable_table = []
-                tmp_flowable_table.append(create_flowable_table_from_data(tmp_data, col_w=SECOND_LEVEL_GALAXY_WIDTHS, color_alternation = CLUSTER_COLORS, line_alternation=[]))
+                tmp_flowable_table.append(create_flowable_table_from_data(tmp_data, col_w=SECOND_LEVEL_GALAXY_WIDTHS, color_alternation = CLUSTER_COLORS, line_alternation=[], galaxy_colors=True))
                 data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=DO_SMALL_GALAXIES), tmp_flowable_table]) # Cluster #X - 3 lines
 
         else:
@@ -1438,7 +1455,7 @@ class Galaxy_cluster():
             data = [self.value_formatter.get_unoverflowable_paragraph("No galaxy cluster", do_small=DO_SMALL_GALAXIES)]
 
         flowable_table = []
-        flowable_table.append(create_flowable_table_from_data(data, col_w=FIRST_LEVEL_GALAXY_WIDTHS, color_alternation = CLUSTER_COLORS))
+        flowable_table.append(create_flowable_table_from_data(data, col_w=FIRST_LEVEL_GALAXY_WIDTHS, color_alternation = CLUSTER_COLORS, galaxy_colors=True))
 
         return flowable_table
 
