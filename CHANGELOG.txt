@@ -2,6 +2,14 @@ Changelog
 =========
 
 
+%%version%% (unreleased)
+------------------------
+
+Changes
+~~~~~~~
+- Build all formats for the documentation. [Raphaël Vinot]
+
+
 v2.4.103 (2019-03-01)
 ---------------------
 
@@ -13,6 +21,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump version. [Raphaël Vinot]
 - [jupyter] remove all the response key (as response is removing it)
   [Alexandre Dulaunoy]
 - Enforce strict in object testing to ease debugging. [Raphaël Vinot]
