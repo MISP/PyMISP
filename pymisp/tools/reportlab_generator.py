@@ -887,7 +887,7 @@ class Event_Metadata():
 
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
-        if is_safe_attribute_table(misp_event, item[1]) :
+        if is_safe_attribute_table(misp_event, item[1]) and is_in_config(self.config, 3):
             flowable_table.append(PageBreak())
             curr_Galaxy = Galaxy(self.config, self.value_formatter)
             flowable_table += curr_Galaxy.get_galaxy_value(misp_event, item)
@@ -1101,7 +1101,7 @@ class Attributes():
 
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
-        if is_safe_attribute_table(misp_attribute, item[1]) :
+        if is_safe_attribute_table(misp_attribute, item[1]) and is_in_config(self.config, 3) :
             curr_Galaxy = Galaxy(self.config, self.value_formatter)
             flowable_table.append(Indenter(left=INDENT_SIZE))
             flowable_table += curr_Galaxy.get_galaxy_value(misp_attribute, item)
@@ -1329,7 +1329,6 @@ class Galaxy():
         # item = ["Related Galaxies", 'Galaxy', "None"]
         if is_safe_attribute_table(misp_event, item[1]) and is_in_config(self.config, 3):
             galaxy_title = Paragraph(item[0], self.sample_style_sheet['Heading5'])
-
             flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
             flowable_table.append(galaxy_title)
             flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
@@ -1594,14 +1593,16 @@ def collect_parts(misp_event, config=None):
     flowables.append(subtitle)
     flowables += table_general_metainformation
 
-    flowables.append(PageBreak())
+    if is_safe_attribute_table(misp_event, "Attribute") :
+        flowables.append(PageBreak())
 
     event_attributes_title = Paragraph("Attributes", sample_style_sheet['Heading2'])
     table_direct_attributes = curr_attr.create_flowable_table_from_attributes(misp_event)
     flowables.append(event_attributes_title)
     flowables += table_direct_attributes
 
-    flowables.append(PageBreak())
+    if is_safe_attribute_table(misp_event, "Object") :
+        flowables.append(PageBreak())
 
     event_objects_title = Paragraph("Objects", sample_style_sheet['Heading2'])
     table_objects = curr_object.create_flowable_table_from_objects(misp_event)
