@@ -25,6 +25,7 @@ try:
     from reportlab.pdfbase.pdfdoc import PDFDictionary, PDFInfo
     from reportlab.lib import colors
     from reportlab.lib.utils import ImageReader
+    from reportlab.lib.pagesizes import A4
 
     from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable, Image
 
@@ -146,8 +147,15 @@ SECOND_COL_ALIGNEMENT = TA_LEFT
 
 TEXT_FONT_SIZE = 8
 LEADING_SPACE = 7
+
+# Small clusters fonts
+SMALL_FONT_SIZE = TEXT_FONT_SIZE - 1
+SMALL_LEADING_SPACE = LEADING_SPACE
+SMALL_COL1_ALIGMENT = FIRST_COL_ALIGNEMENT
+SMALL_COL2_ALIGMENT = TA_JUSTIFY
+
 EXPORT_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
-COL_WIDTHS = ['30%', '75%']  # colWidths='*' # Not documented but does exist
+COL_WIDTHS = ['25%', '75%']  # colWidths='*' # Not documented but does exist
 # COL_WIDTHS = ['20%', '80%']  # colWidths='*' # Not documented but does exist
 ROW_HEIGHT = 5 * mm  # 4.5 * mm (a bit too short to allow vertical align TODO : Fix it)
 ROW_HEIGHT_FOR_TAGS = 4 * mm  # 4.5 * mm (a bit too short to allow vertical align TODO : Fix it)
@@ -388,6 +396,7 @@ def get_table_styles():
 
     return custom_body_style_col_1, custom_body_style_col_2
 
+
 def get_clusters_table_styles():
     '''
     Create and returns the two mains styles for the columns of a table describing a cluster.
@@ -399,17 +408,17 @@ def get_clusters_table_styles():
                                              parent=col1,
                                              fontName=FIRST_COL_FONT,
                                              textColor=FIRST_COL_FONT_COLOR,
-                                             fontSize=TEXT_FONT_SIZE - 2,
-                                             leading=LEADING_SPACE- 1,
-                                             alignment=FIRST_COL_ALIGNEMENT)
+                                             fontSize=SMALL_FONT_SIZE,
+                                             leading=SMALL_LEADING_SPACE,
+                                             alignment=SMALL_COL1_ALIGMENT)
 
     custom_body_style_col_2 = ParagraphStyle(name='Column_2_small',
                                              parent=col2,
                                              fontName=SECOND_COL_FONT,
                                              textColor=SECOND_COL_FONT_COLOR,
-                                             fontSize=TEXT_FONT_SIZE - 2,
-                                             leading=LEADING_SPACE- 1,
-                                             alignment=TA_JUSTIFY)
+                                             fontSize=SMALL_FONT_SIZE,
+                                             leading=SMALL_LEADING_SPACE,
+                                             alignment=SMALL_COL2_ALIGMENT)
 
     return custom_body_style_col_1, custom_body_style_col_2
 
@@ -1622,7 +1631,7 @@ def convert_event_in_pdf_buffer(misp_event, config=None):
 
     # DEBUG / TO DELETE : curr_document = SimpleDocTemplate('myfile.pdf')
     curr_document = SimpleDocTemplate(pdf_buffer,
-                                      pagesize=PAGESIZE,
+                                      pagesize=A4,
                                       topMargin=BASE_MARGIN,
                                       leftMargin=BASE_MARGIN,
                                       rightMargin=BASE_MARGIN,
