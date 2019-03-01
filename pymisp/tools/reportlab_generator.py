@@ -871,12 +871,13 @@ class Event_Metadata():
 
         flowable_table.append(create_flowable_table_from_data(data))
 
-        flowable_table.append(PageBreak())
 
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
-        curr_Galaxy = Galaxy(self.config, self.value_formatter)
-        flowable_table += curr_Galaxy.get_galaxy_value(misp_event, item)
+        if is_safe_attribute_table(misp_event, item[1]) :
+            flowable_table.append(PageBreak())
+            curr_Galaxy = Galaxy(self.config, self.value_formatter)
+            flowable_table += curr_Galaxy.get_galaxy_value(misp_event, item)
 
         return flowable_table
 
