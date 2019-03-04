@@ -21,11 +21,13 @@ logger = logging.getLogger('pymisp')
 # Potentially not installed imports
 try:
     from reportlab.pdfgen import canvas
-    from reportlab.pdfbase.pdfmetrics import stringWidth
+    from reportlab.pdfbase.pdfmetrics import stringWidth, registerFont, registerFontFamily
     from reportlab.pdfbase.pdfdoc import PDFDictionary, PDFInfo
+    from reportlab.pdfbase.ttfonts import TTFont
     from reportlab.lib import colors
     from reportlab.lib.utils import ImageReader
     from reportlab.lib.pagesizes import A4
+    from reportlab.lib.fonts import addMapping
 
     from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable, Image, Indenter
 
@@ -125,7 +127,7 @@ class Flowable_Tag(Flowable):
 
 # Copy of pdfexport.py moduleconfig
 moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
-                "Activate_galaxy_description"]
+                             "Activate_galaxy_description", "Activate_related_events"]
 
 # == Row colors of the table (alternating) ==
 EVEN_COLOR = colors.whitesmoke
@@ -884,6 +886,10 @@ class Event_Metadata():
 
         flowable_table.append(create_flowable_table_from_data(data))
 
+        # Correlation
+        item = ["Related Events", 'RelatedEvent', "None"]
+        if is_safe_attribute_table(misp_event, item[1]) and is_in_config(self.config, 4):
+            flowable_table += self.get_correlation_values(misp_event, item)
 
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
@@ -893,6 +899,38 @@ class Event_Metadata():
             flowable_table += curr_Galaxy.get_galaxy_value(misp_event, item)
 
         return flowable_table
+
+
+    def create_reduced_flowable_table_from_event(self, misp_event):
+        '''
+        Returns Table presenting a MISP event
+        :param misp_event: A misp event (complete or not)
+        :return: a table that can be added to a pdf
+        '''
+
+        data = []
+        flowable_table = []
+
+        # Manual addition
+        # UUID
+        item = ["UUID", 'uuid', "None"]
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_value_link_to_event(misp_event, item)])
+
+        # Info
+        item = ["Info", 'info', "None"]
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_value_link_to_event(misp_event, item)])
+
+        # Timestamp
+        item = ["Event date", 'timestamp', "None"]
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_timestamp_value(misp_event, item)])
+
+        flowable_table.append(create_flowable_table_from_data(data))
+
+        return flowable_table
+
 
     def create_flowable_description_from_event(self, misp_event):
         '''
@@ -988,6 +1026,14 @@ class Event_Metadata():
 
         text += " associated objects."
 
+        curr_attributes = Attributes(self.config, self.value_formatter)
+        tmp_text = curr_attributes.get_external_analysis(misp_event)
+
+        if tmp_text != "" :
+            text += "<br/>"
+            text += tmp_text
+            text += "<br/>"
+
         '''
         For more information on the event, please consult the rest of the document
         '''
@@ -997,6 +1043,33 @@ class Event_Metadata():
                                            alignment=TA_JUSTIFY)
 
         return Paragraph(text, description_style)
+
+    def get_correlation_values(self, misp_event, item):
+        '''
+        Returns a flowable paragraph to add to the pdf given the misp_event correlated events
+        :param misp_event: A misp event with or without "RelatedEvent" attributes
+        :param item:  as defined in class definition
+        :param col2_style: style to be applied on the returned paragraph
+        :return: a Paragraph to add in the pdf, regarding the values of "RelatedEvent"
+        '''
+        flowable_table = []
+
+        flowable_table.append(PageBreak())
+        flowable_table.append(Paragraph("Related Events", self.sample_style_sheet['Heading3']))
+
+        if is_safe_attribute_table(misp_event, item[1]):
+            for i, evt in enumerate(getattr(misp_event, item[1])):
+                flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
+                flowable_table.append(Paragraph("Related Event #" + str(i + OFFSET), self.sample_style_sheet['Heading4']))
+                flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
+
+                flowable_table += self.create_reduced_flowable_table_from_event(evt)
+                i += 1
+        else:
+            return flowable_table.append(self.value_formatter.get_unoverflowable_paragraph(item[2]))
+
+        return flowable_table
+
 
 
 class Attributes():
@@ -1098,7 +1171,6 @@ class Attributes():
 
         flowable_table.append(create_flowable_table_from_data(data))
 
-
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
         if is_safe_attribute_table(misp_attribute, item[1]) and is_in_config(self.config, 3) :
@@ -1109,6 +1181,24 @@ class Attributes():
 
         return flowable_table
 
+    def get_external_analysis(self, misp_event):
+        '''
+        Returns a string representing the list of external analysis comments of a misp event.
+        :param misp_event: A misp event
+        :return: a table of flowables
+        '''
+        text = ""
+
+        if is_safe_attribute_table(misp_event, "Attribute"):
+            # There is some attributes for this object
+            for attribute in getattr(misp_event, "Attribute"):
+                # If the current event is an external analysis and a comment
+                if is_safe_attribute(attribute, "value") and is_safe_attribute(attribute, "category") and is_safe_attribute(attribute, "type") and getattr(attribute, "category") == "External analysis" and getattr(attribute, "type") == "comment" :
+
+                    # We add it to the description
+                    text += "<br/>" + getattr(attribute, "value")
+
+        return text
 
 class Tags():
 
