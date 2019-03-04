@@ -219,8 +219,6 @@ OFFSET = 1
 
 ########################################################################
 # "UTILITIES" METHODS. Not meant to be used except for development purposes
-from pathlib import Path
-
 
 def get_sample_fonts():
     '''
