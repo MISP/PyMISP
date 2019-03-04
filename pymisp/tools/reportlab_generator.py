@@ -149,6 +149,51 @@ SECOND_COL_FONT_COLOR = colors.black
 SECOND_COL_FONT = 'Helvetica'
 SECOND_COL_ALIGNEMENT = TA_LEFT
 
+import os
+def internationalize_font():
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/tools"
+    print(str(BASE_DIR))
+
+    global FIRST_COL_FONT
+    global SECOND_COL_FONT
+
+    helvetica_neue = BASE_DIR + "/pdf_fonts/helvetica-neue-5-cufonfonts/HelveticaNeueLight.ttf"
+    helvetica_neue_bold = BASE_DIR + "/pdf_fonts/helvetica-neue-5-cufonfonts/HelveticaNeueMedium.ttf"
+
+    registerFont(TTFont("helvetica_neue", helvetica_neue))
+    registerFont(TTFont("helvetica_neue_bold", helvetica_neue_bold))
+
+    inter_normal_font = BASE_DIR + "/pdf_fonts/NotoSans-hinted/NotoSans-Medium.ttf"
+    inter_normal_font_italic = BASE_DIR + "/pdf_fonts/NotoSans-hinted/NotoSans-MediumItalic.ttf"
+    inter_normal_font_bold = BASE_DIR + "/pdf_fonts/NotoSans-hinted/NotoSans-SemiCondensedBold.ttf"
+    inter_normal_font_bold_italic = BASE_DIR + "/pdf_fonts/NotoSans-hinted/NotoSans-SemiCondensedBoldItalic.ttf"
+
+    # Register each font manually
+    registerFont(TTFont("NotoSans-Medium", inter_normal_font))
+    registerFont(TTFont("NotoSans-MediumItalic", inter_normal_font_italic))
+    registerFont(TTFont("NotoSans-MediumBold", inter_normal_font_bold))
+    registerFont(TTFont("NotoSans-MediumBoldItalic", inter_normal_font_bold_italic))
+
+
+    addMapping('NotoSans', 0, 0, 'NotoSans-Medium')  # normal
+    addMapping('NotoSans', 0, 1, 'NotoSans-MediumItalic')  # italic
+    addMapping('NotoSans', 1, 0, 'NotoSans-MediumBold')  # bold
+    addMapping('NotoSans', 1, 1, 'NotoSans-MediumBoldItalic')  # italic and bold
+
+    # Register it as one big font
+    registerFontFamily('Arial-better', normal='NotoSans-Medium', bold='NotoSans-MediumBold', italic='NotoSans-MediumItalic',
+                       boldItalic='NotoSans-MediumBoldItalic')
+
+    FIRST_COL_FONT = 'helvetica_neue'
+    SECOND_COL_FONT = 'helvetica_neue_bold'
+    '''
+
+    tmp_test = BASE_DIR + "/pdf_fonts/arial-unicode-ms/ARIALUNI.TTF"
+    registerFont(TTFont("Arial-better", tmp_test))
+    FIRST_COL_FONT = 'Arial-better'
+    SECOND_COL_FONT = 'Arial-better'
+    '''
+
 TEXT_FONT_SIZE = 8
 LEADING_SPACE = 7
 
@@ -192,6 +237,7 @@ BAD_LINK_COLOR = 'red'
 LOW_THREAT_COLOR = 'green'
 MEDIUM_THREAT_COLOR = 'orange'
 HIGH_THREAT_COLOR = 'red'
+EXTERNAL_ANALYSIS_PREFIX = "<i>External analysis from an attribute : </i>"
 
 # == Parameters for improvement of event's metadata ==
 
@@ -230,6 +276,11 @@ def get_sample_fonts():
 
     # Print list of usable fonts
     pprint.pprint(c.getAvailableFonts())
+
+
+if __name__ == '__main__':
+    internationalize_font()
+    get_sample_fonts()
 
 
 def get_sample_styles():
@@ -1196,9 +1247,10 @@ class Attributes():
                 if is_safe_attribute(attribute, "value") and is_safe_attribute(attribute, "category") and is_safe_attribute(attribute, "type") and getattr(attribute, "category") == "External analysis" and getattr(attribute, "type") == "comment" :
 
                     # We add it to the description
-                    text += "<br/>" + getattr(attribute, "value")
+                    text += "<br/>" + EXTERNAL_ANALYSIS_PREFIX + safe_string(getattr(attribute, "value"))
 
         return text
+
 
 class Tags():
 
@@ -1418,7 +1470,7 @@ class Galaxy():
         # Galaxies
         # item = ["Related Galaxies", 'Galaxy', "None"]
         if is_safe_attribute_table(misp_event, item[1]) and is_in_config(self.config, 3):
-            galaxy_title = Paragraph(item[0], self.sample_style_sheet['Heading5'])
+            galaxy_title = Paragraph(safe_string(item[0]), self.sample_style_sheet['Heading5'])
             flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
             flowable_table.append(galaxy_title)
             flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
@@ -1662,7 +1714,7 @@ def collect_parts(misp_event, config=None):
     curr_val_f = Value_Formatter(config, col1_style, col2_style, col1_small_style, col2_small_style)
 
     # Create stuff
-    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], alignment=TA_CENTER)
+    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], alignment=TA_CENTER) # , fontName=FIRST_COL_FONT
     title = curr_val_f.get_value_link_to_event(misp_event, ["Info", 'info', "None"], title_style, color=False)
     # Add all parts to final PDF
     flowables.append(title)
@@ -1736,6 +1788,8 @@ def convert_event_in_pdf_buffer(misp_event, config=None):
     '''
     # Create a document buffer
     pdf_buffer = BytesIO()
+
+    internationalize_font()
 
     # DEBUG / TO DELETE : curr_document = SimpleDocTemplate('myfile.pdf')
     curr_document = SimpleDocTemplate(pdf_buffer,
