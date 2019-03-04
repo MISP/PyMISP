@@ -59,5 +59,6 @@ setup(
                              'data/misp-objects/schema_objects.json',
                              'data/misp-objects/schema_relationships.json',
                              'data/misp-objects/objects/*/definition.json',
-                             'data/misp-objects/relationships/definition.json']},
+                             'data/misp-objects/relationships/definition.json',
+                             'tools/pdf_fonts/Noto_TTF/*']},
 )

@@ -128,7 +128,7 @@ class Flowable_Tag(Flowable):
 
 # Copy of pdfexport.py moduleconfig
 moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
-                             "Activate_galaxy_description", "Activate_related_events"]
+                             "Activate_galaxy_description", "Activate_related_events", "Activate_internationalization_fonts"]
 
 # == Row colors of the table (alternating) ==
 EVEN_COLOR = colors.whitesmoke
@@ -220,6 +220,7 @@ OFFSET = 1
 
 ########################################################################
 # "UTILITIES" METHODS. Not meant to be used except for development purposes
+from pathlib import Path
 
 def internationalize_font():
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/tools"
@@ -240,11 +241,14 @@ def internationalize_font():
     noto_bold = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-Bold.ttf"
     noto = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-DemiLight.ttf"
 
-    registerFont(TTFont("Noto", noto))
-    registerFont(TTFont("Noto-bold", noto_bold))
+    if os.path.isfile(noto_bold) and os.path.isfile(noto):
+        registerFont(TTFont("Noto", noto))
+        registerFont(TTFont("Noto-bold", noto_bold))
 
-    FIRST_COL_FONT = 'Noto-bold'
-    SECOND_COL_FONT = 'Noto'
+        FIRST_COL_FONT = 'Noto-bold'
+        SECOND_COL_FONT = 'Noto'
+    else :
+        logger.error("Trying to load a custom (internationalization) font, unable to access the file : " + noto_bold)
 
 def get_sample_fonts():
     '''
@@ -1771,7 +1775,9 @@ def convert_event_in_pdf_buffer(misp_event, config=None):
     # Create a document buffer
     pdf_buffer = BytesIO()
 
-    internationalize_font()
+    if is_in_config(config, 5) : # We want internationalization
+        logger.info("Internationalization of fonts during pdf export activated. CJK-fonts supported.")
+        internationalize_font()
 
     # DEBUG / TO DELETE : curr_document = SimpleDocTemplate('myfile.pdf')
     curr_document = SimpleDocTemplate(pdf_buffer,
