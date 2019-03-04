@@ -8,6 +8,7 @@ import pprint
 from io import BytesIO
 
 import sys
+import os
 
 if sys.version_info.major >= 3:
     from html import escape
@@ -149,51 +150,6 @@ SECOND_COL_FONT_COLOR = colors.black
 SECOND_COL_FONT = 'Helvetica'
 SECOND_COL_ALIGNEMENT = TA_LEFT
 
-import os
-def internationalize_font():
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/tools"
-    print(str(BASE_DIR))
-
-    global FIRST_COL_FONT
-    global SECOND_COL_FONT
-
-    helvetica_neue = BASE_DIR + "/pdf_fonts/helvetica-neue-5-cufonfonts/HelveticaNeueLight.ttf"
-    helvetica_neue_bold = BASE_DIR + "/pdf_fonts/helvetica-neue-5-cufonfonts/HelveticaNeueMedium.ttf"
-
-    registerFont(TTFont("helvetica_neue", helvetica_neue))
-    registerFont(TTFont("helvetica_neue_bold", helvetica_neue_bold))
-
-    inter_normal_font = BASE_DIR + "/pdf_fonts/NotoSans-hinted/NotoSans-Medium.ttf"
-    inter_normal_font_italic = BASE_DIR + "/pdf_fonts/NotoSans-hinted/NotoSans-MediumItalic.ttf"
-    inter_normal_font_bold = BASE_DIR + "/pdf_fonts/NotoSans-hinted/NotoSans-SemiCondensedBold.ttf"
-    inter_normal_font_bold_italic = BASE_DIR + "/pdf_fonts/NotoSans-hinted/NotoSans-SemiCondensedBoldItalic.ttf"
-
-    # Register each font manually
-    registerFont(TTFont("NotoSans-Medium", inter_normal_font))
-    registerFont(TTFont("NotoSans-MediumItalic", inter_normal_font_italic))
-    registerFont(TTFont("NotoSans-MediumBold", inter_normal_font_bold))
-    registerFont(TTFont("NotoSans-MediumBoldItalic", inter_normal_font_bold_italic))
-
-
-    addMapping('NotoSans', 0, 0, 'NotoSans-Medium')  # normal
-    addMapping('NotoSans', 0, 1, 'NotoSans-MediumItalic')  # italic
-    addMapping('NotoSans', 1, 0, 'NotoSans-MediumBold')  # bold
-    addMapping('NotoSans', 1, 1, 'NotoSans-MediumBoldItalic')  # italic and bold
-
-    # Register it as one big font
-    registerFontFamily('Arial-better', normal='NotoSans-Medium', bold='NotoSans-MediumBold', italic='NotoSans-MediumItalic',
-                       boldItalic='NotoSans-MediumBoldItalic')
-
-    FIRST_COL_FONT = 'helvetica_neue'
-    SECOND_COL_FONT = 'helvetica_neue_bold'
-    '''
-
-    tmp_test = BASE_DIR + "/pdf_fonts/arial-unicode-ms/ARIALUNI.TTF"
-    registerFont(TTFont("Arial-better", tmp_test))
-    FIRST_COL_FONT = 'Arial-better'
-    SECOND_COL_FONT = 'Arial-better'
-    '''
-
 TEXT_FONT_SIZE = 8
 LEADING_SPACE = 7
 
@@ -264,6 +220,31 @@ OFFSET = 1
 
 ########################################################################
 # "UTILITIES" METHODS. Not meant to be used except for development purposes
+
+def internationalize_font():
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/tools"
+
+    global FIRST_COL_FONT
+    global SECOND_COL_FONT
+
+    ''' # Available fonts : 
+        NotoSansCJKtc - DemiLight.ttf
+        NotoSansCJKtc - Regular.ttf
+        NotoSansCJKtc - Black.ttf
+        NotoSansCJKtc - Light.ttf
+        NotoSansCJKtc - Thin.ttf
+        NotoSansCJKtc - Bold.ttf
+        NotoSansCJKtc - Medium.ttf
+    '''
+
+    noto_bold = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-Bold.ttf"
+    noto = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-DemiLight.ttf"
+
+    registerFont(TTFont("Noto", noto))
+    registerFont(TTFont("Noto-bold", noto_bold))
+
+    FIRST_COL_FONT = 'Noto-bold'
+    SECOND_COL_FONT = 'Noto'
 
 def get_sample_fonts():
     '''
@@ -1490,7 +1471,8 @@ class Galaxy():
         scheme_alternation = []
         curr_color = 0
         i = 0
-
+        small_title_style = ParagraphStyle(name='Column_1', parent=self.sample_style_sheet['Heading6'],
+                                           fontName=FIRST_COL_FONT, alignment=TA_LEFT)
 
         if is_safe_attribute_table(misp_event, "Galaxy"):
             # There is some galaxies for this object
@@ -1499,7 +1481,7 @@ class Galaxy():
                 # For each galaxy of the misp object
 
                 txt_title = "Galaxy #" + str(i+OFFSET) + " - " + safe_string(curr_galaxy["name"])
-                galaxy_title = Paragraph(txt_title, self.sample_style_sheet['Heading6'])
+                galaxy_title = Paragraph(txt_title, small_title_style)
                 flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
                 flowable_table.append(galaxy_title)
                 flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
@@ -1714,7 +1696,7 @@ def collect_parts(misp_event, config=None):
     curr_val_f = Value_Formatter(config, col1_style, col2_style, col1_small_style, col2_small_style)
 
     # Create stuff
-    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], alignment=TA_CENTER) # , fontName=FIRST_COL_FONT
+    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], fontName=FIRST_COL_FONT, alignment=TA_CENTER)
     title = curr_val_f.get_value_link_to_event(misp_event, ["Info", 'info', "None"], title_style, color=False)
     # Add all parts to final PDF
     flowables.append(title)
