@@ -30,7 +30,8 @@ try:
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.fonts import addMapping
 
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable, Image, Indenter
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable, Image, \
+        Indenter
 
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import mm
@@ -128,7 +129,7 @@ class Flowable_Tag(Flowable):
 
 # Copy of pdfexport.py moduleconfig
 moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
-                             "Activate_galaxy_description", "Activate_related_events", "Activate_internationalization_fonts"]
+                "Activate_galaxy_description", "Activate_related_events", "Activate_internationalization_fonts"]
 
 # == Row colors of the table (alternating) ==
 EVEN_COLOR = colors.whitesmoke
@@ -141,7 +142,6 @@ LINE_COLOR = colors.lightslategray
 LINE_THICKNESS = 0.75
 
 # == Columns colors, aligment, fonts, space, size, width, heights ==
-# FIRST_COL_FONT_COLOR = colors.darkslateblue # Test purposes
 FIRST_COL_FONT_COLOR = colors.HexColor("#333333")  # Same as GUI
 FIRST_COL_FONT = 'Helvetica-Bold'
 FIRST_COL_ALIGNEMENT = TA_CENTER
@@ -161,24 +161,23 @@ SMALL_COL2_ALIGMENT = TA_JUSTIFY
 
 EXPORT_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 COL_WIDTHS = ['25%', '75%']  # colWidths='*' # Not documented but does exist
-# COL_WIDTHS = ['20%', '80%']  # colWidths='*' # Not documented but does exist
 ROW_HEIGHT = 5 * mm  # 4.5 * mm (a bit too short to allow vertical align TODO : Fix it)
 ROW_HEIGHT_FOR_TAGS = 4 * mm  # 4.5 * mm (a bit too short to allow vertical align TODO : Fix it)
 
 # == Whole document margins and size ==
-PAGESIZE = A4 # (140 * mm, 216 * mm)  # width, height
+PAGESIZE = A4  # (140 * mm, 216 * mm)  # width, height
 BASE_MARGIN = 5 * mm  # Create a list here to specify each row separately
-INDENT_SIZE = 6 * mm # The Indentation of attribute from object, etc.
-INDENT_SIZE_HEADING = 3 * mm # The Indentation of attribute from object, etc.
+INDENT_SIZE = 6 * mm  # The Indentation of attribute from object, etc.
+INDENT_SIZE_HEADING = 3 * mm  # The Indentation of attribute from object, etc.
 
 # == Parameters for error handling for content too long to fit on a page ==
-FRAME_MAX_HEIGHT = 200*mm # 500  # Ad hoc value for a A4 page
-FRAME_MAX_WIDTH = 145*mm - INDENT_SIZE # 356
+FRAME_MAX_HEIGHT = 200 * mm  # 500  # Ad hoc value for a A4 page
+FRAME_MAX_WIDTH = 145 * mm - INDENT_SIZE  # 356
 STR_TOO_LONG_WARNING = "<br/><b><font color=red>[Too long to fit on a single page. Cropped]</font></b>"
 
 # == Parameters for error handling for image too big to fit on a page ==
-FRAME_PICTURE_MAX_HEIGHT = 200*mm # 195 * mm
-FRAME_PICTURE_MAX_WIDTH = 145*mm - INDENT_SIZE # 88 * mm
+FRAME_PICTURE_MAX_HEIGHT = 200 * mm  # 195 * mm
+FRAME_PICTURE_MAX_WIDTH = 145 * mm - INDENT_SIZE  # 88 * mm
 
 # == Parameters for links management ==
 LINK_TYPE = "link"  # Name of the type that define 'good' links
@@ -213,42 +212,15 @@ MISC_SIGHT_COLOR = 'orange'
 
 # == Parameters for galaxies ==
 DO_SMALL_GALAXIES = True
-FIRST_LEVEL_GALAXY_WIDTHS = ["15%","85%"]
-SECOND_LEVEL_GALAXY_WIDTHS = ["20%","80%"]
-CLUSTER_COLORS = [0] # or 1
+FIRST_LEVEL_GALAXY_WIDTHS = ["15%", "85%"]
+SECOND_LEVEL_GALAXY_WIDTHS = ["20%", "80%"]
+CLUSTER_COLORS = [0]  # or 1
 OFFSET = 1
 
 ########################################################################
 # "UTILITIES" METHODS. Not meant to be used except for development purposes
 from pathlib import Path
 
-def internationalize_font():
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/tools"
-
-    global FIRST_COL_FONT
-    global SECOND_COL_FONT
-
-    ''' # Available fonts : 
-        NotoSansCJKtc - DemiLight.ttf
-        NotoSansCJKtc - Regular.ttf
-        NotoSansCJKtc - Black.ttf
-        NotoSansCJKtc - Light.ttf
-        NotoSansCJKtc - Thin.ttf
-        NotoSansCJKtc - Bold.ttf
-        NotoSansCJKtc - Medium.ttf
-    '''
-
-    noto_bold = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-Bold.ttf"
-    noto = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-DemiLight.ttf"
-
-    if os.path.isfile(noto_bold) and os.path.isfile(noto):
-        registerFont(TTFont("Noto", noto))
-        registerFont(TTFont("Noto-bold", noto_bold))
-
-        FIRST_COL_FONT = 'Noto-bold'
-        SECOND_COL_FONT = 'Noto'
-    else :
-        logger.error("Trying to load a custom (internationalization) font, unable to access the file : " + noto_bold)
 
 def get_sample_fonts():
     '''
@@ -261,11 +233,6 @@ def get_sample_fonts():
 
     # Print list of usable fonts
     pprint.pprint(c.getAvailableFonts())
-
-
-if __name__ == '__main__':
-    internationalize_font()
-    get_sample_fonts()
 
 
 def get_sample_styles():
@@ -296,7 +263,8 @@ def uuid_to_url(baseurl, uuid):
     return baseurl + "events/view/" + uuid
 
 
-def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=None, line_alternation=None, galaxy_colors=False):
+def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=None, line_alternation=None,
+                                    galaxy_colors=False):
     '''
     Given a list of flowables items (2D/list of list), creates a Table with styles.
     :param data: list of list of items (flowables is better)
@@ -310,8 +278,8 @@ def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=No
     #   rowHeights=ROW_HEIGHT if you want a fixed height. /!\ Problems with paragraphs that are spreading everywhere
 
     # Create styles and set parameters
-    alternate_colors_style = alternate_colors_style_generator(data,color_alternation, galaxy_colors)
-    lines_style = lines_style_generator(data,line_alternation)
+    alternate_colors_style = alternate_colors_style_generator(data, color_alternation, galaxy_colors)
+    lines_style = lines_style_generator(data, line_alternation)
     general_style = general_style_generator()
 
     # Make the table nicer
@@ -348,7 +316,7 @@ def alternate_colors_style_generator(data, color_alternation, galaxy_colors=True
 
         # For each line, generate a tuple giving to a line a color
         for each in range(data_len):
-            if color_alternation[each%len(color_alternation)] % 2 == 0:
+            if color_alternation[each % len(color_alternation)] % 2 == 0:
                 bg_color = EVEN_COLOR if not galaxy_colors else EVEN_COLOR_GALAXY
             else:
                 bg_color = ODD_COLOR if not galaxy_colors else ODD_COLOR_GALAXY
@@ -376,7 +344,7 @@ def lines_style_generator(data, line_alternation):
 
         # Last line
         lines_list.append(('LINEBELOW', (0, len(data) - 1), (-1, len(data) - 1), LINE_THICKNESS, LINE_COLOR))
-    elif line_alternation == [] :
+    elif line_alternation == []:
         # Do nothing
         return lines_list
     else:
@@ -385,12 +353,12 @@ def lines_style_generator(data, line_alternation):
 
         # For each line, generate a tuple giving to a line a color
         for each in range(data_len):
-            if each == 0 or line_alternation[each%len(line_alternation)] != line_alternation[(each-1)%len(line_alternation)]:
+            if each == 0 or line_alternation[each % len(line_alternation)] != line_alternation[
+                (each - 1) % len(line_alternation)]:
                 lines_list.append(('LINEABOVE', (0, each), (-1, each), LINE_THICKNESS, LINE_COLOR))
 
         # Last line
         lines_list.append(('LINEBELOW', (0, len(data) - 1), (-1, len(data) - 1), LINE_THICKNESS, LINE_COLOR))
-
 
     return lines_list
 
@@ -411,6 +379,36 @@ def general_style_generator():
     # lines_list.append(('BOTTOMPADDING', (0, 0), (-1, -1), VERTICAL_PADDING))
 
     return lines_list
+
+
+def internationalize_font():
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/tools"
+
+    global FIRST_COL_FONT
+    global SECOND_COL_FONT
+
+    ''' # Available fonts : 
+        NotoSansCJKtc - DemiLight.ttf
+        NotoSansCJKtc - Regular.ttf
+        NotoSansCJKtc - Black.ttf
+        NotoSansCJKtc - Light.ttf
+        NotoSansCJKtc - Thin.ttf
+        NotoSansCJKtc - Bold.ttf
+        NotoSansCJKtc - Medium.ttf
+    '''
+
+    noto_bold = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-Bold.ttf"
+    noto = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-DemiLight.ttf"
+
+    if os.path.isfile(noto_bold) and os.path.isfile(noto):
+        registerFont(TTFont("Noto", noto))
+        registerFont(TTFont("Noto-bold", noto_bold))
+
+        FIRST_COL_FONT = 'Noto-bold'
+        SECOND_COL_FONT = 'Noto'
+    else:
+        logger.error(
+            "Trying to load a custom (internationalization) font, unable to access the file : " + noto_bold)
 
 
 def get_table_styles():
@@ -464,6 +462,7 @@ def get_clusters_table_styles():
 
     return custom_body_style_col_1, custom_body_style_col_2
 
+
 ########################################################################
 # Checks
 
@@ -512,8 +511,8 @@ class Value_Formatter():
     # ----------------------------------------------------------------------
     ########################################################################
     # General attribut formater
-    def get_col1_paragraph(self, dirty_string,  do_small=False):
-        if do_small :
+    def get_col1_paragraph(self, dirty_string, do_small=False):
+        if do_small:
             return self.get_unoverflowable_paragraph(dirty_string, self.col1_small_style, do_small=do_small)
         return self.get_unoverflowable_paragraph(dirty_string, self.col1_style, do_small=do_small)
 
@@ -532,12 +531,11 @@ class Value_Formatter():
         else:
             sanitized_str = dirty_string
 
-        if curr_style is None :
-            if do_small :
+        if curr_style is None:
+            if do_small:
                 curr_style = self.col2_small_style
-            else :
+            else:
                 curr_style = self.col2_style
-
 
         # Get the space that the paragraph needs to be printed
         w, h = Paragraph(sanitized_str, curr_style).wrap(FRAME_MAX_WIDTH, FRAME_MAX_HEIGHT)
@@ -818,7 +816,8 @@ class Value_Formatter():
         if is_safe_dict_attribute(misp_galaxy, item[1]):
             return self.get_unoverflowable_paragraph(safe_string(misp_galaxy[item[1]])
                                                      + " <i>from</i> " + safe_string(misp_galaxy[item[3]]) + ":"
-                                                     + safe_string(misp_galaxy[item[4]]), do_escape_string=False, do_small=True)
+                                                     + safe_string(misp_galaxy[item[4]]), do_escape_string=False,
+                                                     do_small=True)
         return self.get_unoverflowable_paragraph(item[2], do_small=True)
 
     def get_galaxy_cluster_name_value(self, misp_cluster, do_small=False):
@@ -828,18 +827,19 @@ class Value_Formatter():
         if is_safe_dict_attribute(misp_cluster, item[1]):
             tmp_text += safe_string(misp_cluster[item[1]])
 
-            #if is_safe_dict_attribute(misp_cluster, item[3]) :
-                # tmp_text += "<br/><i>Source :</i> " + misp_cluster[item[3]]
+            # if is_safe_dict_attribute(misp_cluster, item[3]) :
+            # tmp_text += "<br/><i>Source :</i> " + misp_cluster[item[3]]
 
             if is_safe_dict_attribute(misp_cluster, item[4]) and is_safe_dict_attribute(misp_cluster[item[4]], item[5]):
                 tmp_text += " <br/><i>Synonyms :</i> "
-                for i, synonyme in enumerate(misp_cluster[item[4]][item[5]]) :
-                    if i != 0 :
+                for i, synonyme in enumerate(misp_cluster[item[4]][item[5]]):
+                    if i != 0:
                         tmp_text += " / "
                     tmp_text += safe_string(synonyme)
 
             return self.get_unoverflowable_paragraph(tmp_text, do_escape_string=False, do_small=do_small)
         return self.get_unoverflowable_paragraph(item[2], do_small=do_small)
+
 
 class Event_Metadata():
 
@@ -936,7 +936,6 @@ class Event_Metadata():
 
         return flowable_table
 
-
     def create_reduced_flowable_table_from_event(self, misp_event):
         '''
         Returns Table presenting a MISP event
@@ -966,7 +965,6 @@ class Event_Metadata():
         flowable_table.append(create_flowable_table_from_data(data))
 
         return flowable_table
-
 
     def create_flowable_description_from_event(self, misp_event):
         '''
@@ -1065,7 +1063,7 @@ class Event_Metadata():
         curr_attributes = Attributes(self.config, self.value_formatter)
         tmp_text = curr_attributes.get_external_analysis(misp_event)
 
-        if tmp_text != "" :
+        if tmp_text != "":
             text += "<br/>"
             text += tmp_text
             text += "<br/>"
@@ -1096,7 +1094,8 @@ class Event_Metadata():
         if is_safe_attribute_table(misp_event, item[1]):
             for i, evt in enumerate(getattr(misp_event, item[1])):
                 flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
-                flowable_table.append(Paragraph("Related Event #" + str(i + OFFSET), self.sample_style_sheet['Heading4']))
+                flowable_table.append(
+                    Paragraph("Related Event #" + str(i + OFFSET), self.sample_style_sheet['Heading4']))
                 flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
 
                 flowable_table += self.create_reduced_flowable_table_from_event(evt)
@@ -1105,7 +1104,6 @@ class Event_Metadata():
             return flowable_table.append(self.value_formatter.get_unoverflowable_paragraph(item[2]))
 
         return flowable_table
-
 
 
 class Attributes():
@@ -1133,7 +1131,7 @@ class Attributes():
             for item in getattr(misp_event, "Attribute"):
                 # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
                 flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
-                flowable_table.append(Paragraph("Attribute #" + str(i+OFFSET), self.sample_style_sheet['Heading4']))
+                flowable_table.append(Paragraph("Attribute #" + str(i + OFFSET), self.sample_style_sheet['Heading4']))
                 flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
 
                 flowable_table += self.create_flowable_table_from_one_attribute(item)
@@ -1209,7 +1207,7 @@ class Attributes():
 
         # Galaxies
         item = ["Related Galaxies", 'Galaxy', "None"]
-        if is_safe_attribute_table(misp_attribute, item[1]) and is_in_config(self.config, 3) :
+        if is_safe_attribute_table(misp_attribute, item[1]) and is_in_config(self.config, 3):
             curr_Galaxy = Galaxy(self.config, self.value_formatter)
             flowable_table.append(Indenter(left=INDENT_SIZE))
             flowable_table += curr_Galaxy.get_galaxy_value(misp_attribute, item)
@@ -1229,8 +1227,10 @@ class Attributes():
             # There is some attributes for this object
             for attribute in getattr(misp_event, "Attribute"):
                 # If the current event is an external analysis and a comment
-                if is_safe_attribute(attribute, "value") and is_safe_attribute(attribute, "category") and is_safe_attribute(attribute, "type") and getattr(attribute, "category") == "External analysis" and getattr(attribute, "type") == "comment" :
-
+                if is_safe_attribute(attribute, "value") and is_safe_attribute(attribute,
+                                                                               "category") and is_safe_attribute(
+                        attribute, "type") and getattr(attribute, "category") == "External analysis" and getattr(
+                        attribute, "type") == "comment":
                     # We add it to the description
                     text += "<br/>" + EXTERNAL_ANALYSIS_PREFIX + safe_string(getattr(attribute, "value"))
 
@@ -1342,7 +1342,6 @@ class Sightings():
         return answer_sighting
 
 
-
 class Object():
 
     # ----------------------------------------------------------------------
@@ -1371,7 +1370,7 @@ class Object():
             for item in getattr(misp_event, "Object"):
                 # you can use a spacer instead of title to separate paragraph: flowable_table.append(Spacer(1, 5 * mm))
                 flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
-                flowable_table.append(Paragraph("Object #" + str(i+OFFSET), self.sample_style_sheet['Heading3']))
+                flowable_table.append(Paragraph("Object #" + str(i + OFFSET), self.sample_style_sheet['Heading3']))
                 flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
                 flowable_table += self.create_flowable_table_from_one_object(item, config)
                 i += 1
@@ -1380,7 +1379,6 @@ class Object():
             flowable_table.append(Paragraph("No object", self.sample_style_sheet['Heading3']))
 
         return flowable_table
-
 
     def create_flowable_table_from_one_object(self, misp_object, config=None):
         '''
@@ -1411,7 +1409,8 @@ class Object():
 
         # Timestamp
         item = ["Object date", 'timestamp', "None"]
-        data.append([self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_timestamp_value(misp_object, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_timestamp_value(misp_object, item)])
 
         # Transform list of value in a table
         data = [create_flowable_table_from_data(data)]
@@ -1460,7 +1459,7 @@ class Galaxy():
             flowable_table.append(galaxy_title)
             flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
             flowable_table += self.create_flowable_table_from_galaxies(misp_event)
-        else :
+        else:
             flowable_table.append(self.value_formatter.get_unoverflowable_paragraph(item[2]))
 
         return flowable_table
@@ -1484,7 +1483,7 @@ class Galaxy():
             for curr_galaxy in getattr(misp_event, "Galaxy"):
                 # For each galaxy of the misp object
 
-                txt_title = "Galaxy #" + str(i+OFFSET) + " - " + safe_string(curr_galaxy["name"])
+                txt_title = "Galaxy #" + str(i + OFFSET) + " - " + safe_string(curr_galaxy["name"])
                 galaxy_title = Paragraph(txt_title, small_title_style)
                 flowable_table.append(Indenter(left=INDENT_SIZE_HEADING))
                 flowable_table.append(galaxy_title)
@@ -1531,14 +1530,14 @@ class Galaxy():
         item = ["Description", 'description', "None"]
         if is_safe_dict_attribute(misp_galaxy, item[1]):
             data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=DO_SMALL_GALAXIES),
-                             self.value_formatter.get_unoverflowable_paragraph(misp_galaxy[item[1]], do_small=DO_SMALL_GALAXIES)])
+                         self.value_formatter.get_unoverflowable_paragraph(misp_galaxy[item[1]],
+                                                                           do_small=DO_SMALL_GALAXIES)])
             nb_added_item += 1
 
         flowable_table = []
         flowable_table.append(create_flowable_table_from_data(data))
 
         return flowable_table, nb_added_item
-
 
 
 class Galaxy_cluster():
@@ -1563,26 +1562,29 @@ class Galaxy_cluster():
         if is_safe_dict_attribute(misp_galaxy, "GalaxyCluster"):
             # There is some clusters for this object
             for i, curr_cluster in enumerate(misp_galaxy["GalaxyCluster"]):
-
                 # If title is needed :
                 # galaxy_title = [Paragraph("Cluster #" + str(i), self.sample_style_sheet['Heading6'])]
                 # data.append(galaxy_title)
-
 
                 item[0] = "Cluster #" + str(i + OFFSET)
 
                 # For each cluster
                 tmp_data = self.create_flowable_table_from_one_galaxy_cluster(curr_cluster)
                 tmp_flowable_table = []
-                tmp_flowable_table.append(create_flowable_table_from_data(tmp_data, col_w=SECOND_LEVEL_GALAXY_WIDTHS, color_alternation = CLUSTER_COLORS, line_alternation=[], galaxy_colors=True))
-                data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=DO_SMALL_GALAXIES), tmp_flowable_table]) # Cluster #X - 3 lines
+                tmp_flowable_table.append(create_flowable_table_from_data(tmp_data, col_w=SECOND_LEVEL_GALAXY_WIDTHS,
+                                                                          color_alternation=CLUSTER_COLORS,
+                                                                          line_alternation=[], galaxy_colors=True))
+                data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=DO_SMALL_GALAXIES),
+                             tmp_flowable_table])  # Cluster #X - 3 lines
 
         else:
             # No galaxies for this object
             data = [self.value_formatter.get_unoverflowable_paragraph("No galaxy cluster", do_small=DO_SMALL_GALAXIES)]
 
         flowable_table = []
-        flowable_table.append(create_flowable_table_from_data(data, col_w=FIRST_LEVEL_GALAXY_WIDTHS, color_alternation = CLUSTER_COLORS, galaxy_colors=True))
+        flowable_table.append(
+            create_flowable_table_from_data(data, col_w=FIRST_LEVEL_GALAXY_WIDTHS, color_alternation=CLUSTER_COLORS,
+                                            galaxy_colors=True))
 
         return flowable_table
 
@@ -1597,13 +1599,13 @@ class Galaxy_cluster():
         # Name
         item = ["Name", 'name', "None"]
         data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=True),
-                         self.value_formatter.get_galaxy_cluster_name_value(misp_cluster, do_small=True)])
+                     self.value_formatter.get_galaxy_cluster_name_value(misp_cluster, do_small=True)])
 
-        if misp_cluster['value'] != misp_cluster['description'] : # Prevent name that are same as description
+        if misp_cluster['value'] != misp_cluster['description']:  # Prevent name that are same as description
             # Description
             item = ["Description", 'description', "None"]
             data.append([self.value_formatter.get_col1_paragraph(item[0], do_small=True),
-                                 self.value_formatter.get_unoverflowable_paragraph(misp_cluster[item[1]], do_small=True)])
+                         self.value_formatter.get_unoverflowable_paragraph(misp_cluster[item[1]], do_small=True)])
 
         # Refs ?
         # item = ["Description", 'description', "None"]
@@ -1700,7 +1702,8 @@ def collect_parts(misp_event, config=None):
     curr_val_f = Value_Formatter(config, col1_style, col2_style, col1_small_style, col2_small_style)
 
     # Create stuff
-    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], fontName=FIRST_COL_FONT, alignment=TA_CENTER)
+    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], fontName=FIRST_COL_FONT,
+                                 alignment=TA_CENTER)
     title = curr_val_f.get_value_link_to_event(misp_event, ["Info", 'info', "None"], title_style, color=False)
     # Add all parts to final PDF
     flowables.append(title)
@@ -1721,7 +1724,7 @@ def collect_parts(misp_event, config=None):
     flowables.append(subtitle)
     flowables += table_general_metainformation
 
-    if is_safe_attribute_table(misp_event, "Attribute") :
+    if is_safe_attribute_table(misp_event, "Attribute"):
         flowables.append(PageBreak())
 
     event_attributes_title = Paragraph("Attributes", sample_style_sheet['Heading2'])
@@ -1729,7 +1732,7 @@ def collect_parts(misp_event, config=None):
     flowables.append(event_attributes_title)
     flowables += table_direct_attributes
 
-    if is_safe_attribute_table(misp_event, "Object") :
+    if is_safe_attribute_table(misp_event, "Object"):
         flowables.append(PageBreak())
 
     event_objects_title = Paragraph("Objects", sample_style_sheet['Heading2'])
@@ -1775,7 +1778,7 @@ def convert_event_in_pdf_buffer(misp_event, config=None):
     # Create a document buffer
     pdf_buffer = BytesIO()
 
-    if is_in_config(config, 5) : # We want internationalization
+    if is_in_config(config, 5):  # We want internationalization
         logger.info("Internationalization of fonts during pdf export activated. CJK-fonts supported.")
         internationalize_font()
 
