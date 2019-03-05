@@ -129,7 +129,8 @@ class Flowable_Tag(Flowable):
 
 # Copy of pdfexport.py moduleconfig
 moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
-                "Activate_galaxy_description", "Activate_related_events", "Activate_internationalization_fonts"]
+                "Activate_galaxy_description", "Activate_related_events", "Activate_internationalization_fonts",
+                "Custom_fonts_path"]
 
 # == Row colors of the table (alternating) ==
 EVEN_COLOR = colors.whitesmoke
@@ -216,6 +217,7 @@ FIRST_LEVEL_GALAXY_WIDTHS = ["15%", "85%"]
 SECOND_LEVEL_GALAXY_WIDTHS = ["20%", "80%"]
 CLUSTER_COLORS = [0]  # or 1
 OFFSET = 1
+
 
 ########################################################################
 # "UTILITIES" METHODS. Not meant to be used except for development purposes
@@ -379,34 +381,48 @@ def general_style_generator():
     return lines_list
 
 
-def internationalize_font():
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/tools"
-
+def internationalize_font(config=None):
     global FIRST_COL_FONT
     global SECOND_COL_FONT
 
-    ''' # Available fonts : 
-        NotoSansCJKtc - DemiLight.ttf
-        NotoSansCJKtc - Regular.ttf
-        NotoSansCJKtc - Black.ttf
-        NotoSansCJKtc - Light.ttf
-        NotoSansCJKtc - Thin.ttf
-        NotoSansCJKtc - Bold.ttf
-        NotoSansCJKtc - Medium.ttf
-    '''
+    if is_in_config(config, 6) and config[moduleconfig[6]] != "" :
+        # Handle custom fonts. Has to be TrueType = one TTF only
+        fonts_path_custom = config[moduleconfig[6]]
 
-    noto_bold = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-Bold.ttf"
-    noto = BASE_DIR + "/pdf_fonts/Noto_TTF/NotoSansCJKtc-DemiLight.ttf"
+        if fonts_path_custom and os.path.isfile(fonts_path_custom):
+            registerFont(TTFont("custom_font", fonts_path_custom))
+            FIRST_COL_FONT = 'custom_font'
+            SECOND_COL_FONT = 'custom_font'
 
-    if os.path.isfile(noto_bold) and os.path.isfile(noto):
-        registerFont(TTFont("Noto", noto))
-        registerFont(TTFont("Noto-bold", noto_bold))
-
-        FIRST_COL_FONT = 'Noto-bold'
-        SECOND_COL_FONT = 'Noto'
+        else:
+            logger.error(
+                "Trying to load a custom font, unable to access the file. Path : " + str(fonts_path_custom))
     else:
-        logger.error(
-            "Trying to load a custom (internationalization) font, unable to access the file : " + noto_bold)
+        ''' Handle provided NOTO fonts (CJK only for now)
+            # Available fonts : 
+            NotoSansCJKtc - DemiLight.ttf
+            NotoSansCJKtc - Regular.ttf
+            NotoSansCJKtc - Black.ttf
+            NotoSansCJKtc - Light.ttf
+            NotoSansCJKtc - Thin.ttf
+            NotoSansCJKtc - Bold.ttf
+            NotoSansCJKtc - Medium.ttf
+        '''
+        font_path = os.path.join(os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)), 'tools', 'pdf_fonts',
+                                 'Noto_TTF')
+
+        noto_bold = font_path + "/NotoSansCJKtc-Bold.ttf"
+        noto = font_path + "/NotoSansCJKtc-DemiLight.ttf"
+
+        if os.path.isfile(noto_bold) and os.path.isfile(noto):
+            registerFont(TTFont("Noto", noto))
+            registerFont(TTFont("Noto-bold", noto_bold))
+
+            FIRST_COL_FONT = 'Noto-bold'
+            SECOND_COL_FONT = 'Noto'
+        else:
+            logger.error(
+                "Trying to load a custom (internationalization) font, unable to access the file : " + noto_bold)
 
 
 def get_table_styles():
@@ -1227,8 +1243,8 @@ class Attributes():
                 # If the current event is an external analysis and a comment
                 if is_safe_attribute(attribute, "value") and is_safe_attribute(attribute,
                                                                                "category") and is_safe_attribute(
-                        attribute, "type") and getattr(attribute, "category") == "External analysis" and getattr(
-                        attribute, "type") == "comment":
+                    attribute, "type") and getattr(attribute, "category") == "External analysis" and getattr(
+                    attribute, "type") == "comment":
                     # We add it to the description
                     text += "<br/>" + EXTERNAL_ANALYSIS_PREFIX + safe_string(getattr(attribute, "value"))
 
@@ -1332,7 +1348,7 @@ class Sightings():
                 list_sighting[1]) + "</font>"
             sight_text += " / " + "<font color =" + MISC_SIGHT_COLOR + "> Misc. : " + str(list_sighting[2]) + "</font>"
 
-            answer_sighting = self.value_formatter.get_unoverflowable_paragraph(sight_text)
+            answer_sighting = self.value_formatter.get_unoverflowable_paragraph(sight_text, do_escape_string=False)
         else:
             # No tags for this object
             answer_sighting = self.value_formatter.get_unoverflowable_paragraph("No sighting")
@@ -1778,7 +1794,7 @@ def convert_event_in_pdf_buffer(misp_event, config=None):
 
     if is_in_config(config, 5):  # We want internationalization
         logger.info("Internationalization of fonts during pdf export activated. CJK-fonts supported.")
-        internationalize_font()
+        internationalize_font(config)
 
     # DEBUG / TO DELETE : curr_document = SimpleDocTemplate('myfile.pdf')
     curr_document = SimpleDocTemplate(pdf_buffer,
