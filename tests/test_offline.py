@@ -412,7 +412,7 @@ class TestOffline(unittest.TestCase):
     def test_change_disablecorrelation(self, m):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
-        self.assertEqual({}, pymisp.change_disable_correlation(self.key, 1))
+        self.assertEqual({}, pymisp.change_disablecorrelation(self.key, 1))
 
     def test_change_disablecorrelation_invalid(self, m):
         self.initURI(m)
