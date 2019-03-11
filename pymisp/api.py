@@ -180,7 +180,7 @@ class PyMISP(object):
                  'User-Agent': 'PyMISP {} - Python {}.{}.{}'.format(__version__, *sys.version_info)})
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(prepped.headers)
-            settings = s.merge_environment_settings(req.url, proxies=self.proxies, stream=None, verify=self.ssl, cert=self.cert)
+            settings = s.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None, verify=self.ssl, cert=self.cert)
             if self.asynch and background_callback is not None:
                 return s.send(prepped, background_callback=background_callback, **settings)
             else:
