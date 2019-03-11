@@ -1032,10 +1032,11 @@ class PyMISP(object):
         query = {"comment": comment}
         return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
 
-    def change_disablecorrelation(self, attribute_uuid, disable_correlation):
+    def change_disable_correlation(self, attribute_uuid, disable_correlation):
         """Change the disable_correlation flag"""
-        if disable_correlation not in [0, 1]:
-            raise Exception('disable_correlation can only be 0 or 1')
+        possible_values = [0, 1, False, True]
+        if disable_correlation not in possible_values:
+            raise Exception('disable_correlation can only be in {}'.format(', '.join(possible_values)))
         query = {"disable_correlation": disable_correlation}
         return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
 

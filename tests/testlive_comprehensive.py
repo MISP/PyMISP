@@ -703,6 +703,10 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(attribute.comment, 'This is the modified comment')
             attribute = self.user_misp_connector.change_comment(first.attributes[0].uuid, 'This is the modified comment, again')
             self.assertEqual(attribute['Attribute']['comment'], 'This is the modified comment, again')
+            attribute = self.user_misp_connector.change_disable_correlation(first.attributes[0].uuid, True)
+            self.assertEqual(attribute['Attribute']['disable_correlation'], True)
+            attribute = self.user_misp_connector.change_disable_correlation(first.attributes[0].uuid, 0)
+            self.assertEqual(attribute['Attribute']['disable_correlation'], False)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
