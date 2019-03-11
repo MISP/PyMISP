@@ -34,7 +34,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'http://localhost:8080'
-    key = 'E36iZ8hr31XIcWfqU4NGniwhMuvYRngip6O1dC9T'
+    key = 'HRizIMmaxBOXAQSzKZ874rDWUsQEk4vGAGBoljQO'
     verifycert = False
     travis_run = False
 
@@ -892,6 +892,21 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first.id)
             self.admin_misp_connector.delete_event(second.id)
             self.admin_misp_connector.delete_event(third.id)
+
+    def test_update_object(self):
+        first = self.create_simple_event()
+        ip_dom = MISPObject('domain-ip')
+        ip_dom.add_attribute('domain', value='google.fr')
+        ip_dom.add_attribute('ip', value='8.8.8.8')
+        first.add_object(ip_dom)
+        try:
+            first = self.user_misp_connector.add_event(first)
+            first.objects[0].add_attribute('ip', value='8.9.9.8')
+            first = self.user_misp_connector.update_event(first)
+            self.assertEqual(first.objects[0].attributes[2].value, '8.9.9.8')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
 
     def test_update_modules(self):
         # object templates
