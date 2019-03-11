@@ -908,6 +908,10 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
 
+    def test_object_template(self):
+        template = self.admin_misp_connector.get_object_template('688c46fb-5edb-40a3-8273-1af7923e2215')
+        self.assertEqual(template['ObjectTemplate']['uuid'], '688c46fb-5edb-40a3-8273-1af7923e2215')
+
     def test_update_modules(self):
         # object templates
         self.admin_misp_connector.update_object_templates()

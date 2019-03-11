@@ -2320,11 +2320,22 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    def get_object_template_id(self, object_uuid):
-        """Gets the template ID corresponting the UUID passed as parameter"""
+    def get_object_template(self, object_uuid):
+        """Gets the full object template corresponting the UUID passed as parameter"""
         url = urljoin(self.root_url, 'objectTemplates/view/{}'.format(object_uuid))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
+        if 'ObjectTemplate' in response:
+            return response['ObjectTemplate']['id']
+        return response
+
+    def get_object_template_id(self, object_uuid):
+        """Gets the template ID corresponting the UUID passed as parameter"""
+        template = self.get_object_template(object_uuid)
+        if 'ObjectTemplate' in template:
+            return template['ObjectTemplate']['id']
+        # Contains the error message.
+        return template
 
     def update_object_templates(self):
         url = urljoin(self.root_url, 'objectTemplates/update')
