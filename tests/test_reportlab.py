@@ -33,7 +33,7 @@ class TestMISPEvent(unittest.TestCase):
         self.storage_folder = self.root + "reportlab_testoutputs/"
         self.storage_image_folder = self.root + "reportlab_test_image_outputs/"
         self.moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
-                             "Activate_galaxy_description", "Activate_related_events", "Activate_internationalization_fonts"]
+                             "Activate_galaxy_description", "Activate_related_events", "Activate_internationalization_fonts", "Custom_fonts_path"]
 
 
     def init_event(self):
@@ -295,6 +295,45 @@ class TestMISPEvent(unittest.TestCase):
             reportlab_generator.register_value_to_file(
                 reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
                 self.storage_folder + "japanese_test.pdf")
+
+    def test_utf_heavy(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        else:
+            config = {}
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] = "My Wonderful CERT"
+            config[self.moduleconfig[2]] = True
+            config[self.moduleconfig[3]] = True
+            config[self.moduleconfig[4]] = True
+            config[self.moduleconfig[5]] = True
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'japanese_test_heavy.json')
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "japanese_test_heavy.pdf")
+
+    def test_utf_ArialUNI_custompath(self):
+        if self.check_python_2():
+            self.assertTrue(True)
+        elif not manual_testing:
+            self.assertTrue(True)
+        else:
+            config = {}
+            config[self.moduleconfig[0]] = "http://localhost:8080"
+            config[self.moduleconfig[1]] = "My Wonderful CERT"
+            config[self.moduleconfig[2]] = True
+            config[self.moduleconfig[3]] = True
+            config[self.moduleconfig[4]] = True
+            config[self.moduleconfig[5]] = True
+            config[self.moduleconfig[6]] = "/home/user/Desktop/PyMISP/pymisp/tools/pdf_fonts/arial-unicode-ms/ARIALUNI.TTF"
+
+            self.init_event()
+            self.mispevent.load_file(self.test_folder + 'japanese_test_heavy.json')
+            reportlab_generator.register_value_to_file(
+                reportlab_generator.convert_event_in_pdf_buffer(self.mispevent, config),
+                self.storage_folder + "custom_path.pdf")
 
     def test_batch_image_events(self):
         # Test case ONLY for manual testing. Needs to download a full list of image events !
