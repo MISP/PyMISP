@@ -12,7 +12,7 @@ manual_testing = False
 
 try:
     from pymisp.tools import reportlab_generator
-except ImportError:
+except Exception:
     if sys.version_info < (3, 6):
         print('This test suite requires Python 3.6+, breaking.')
         sys.exit(0)
