@@ -43,8 +43,8 @@ try:
     from .tools import load_warninglists  # noqa
     from .tools import ext_lookups  # noqa
 
-    if sys.version_info >= (3, 4):
-        # Let's not bother with python 2
+    if sys.version_info >= (3, 6):
+        # Let's not bother with old python
         try:
             from .tools import reportlab_generator  # noqa
         except ImportError:
