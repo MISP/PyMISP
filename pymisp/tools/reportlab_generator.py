@@ -6,36 +6,31 @@ import base64
 import logging
 import pprint
 from io import BytesIO
+from pathlib import Path
 
 import sys
 import os
 
 if sys.version_info.major >= 3:
     from html import escape
-    # import PIL
 else:
-    print(
-        "ExportPDF running with Python < 3 : stability and output not guaranteed. Please run exportPDF with at least Python3")
+    print("ExportPDF running with Python < 3 : stability and output not guaranteed. Please run exportPDF with at least Python3")
 
 logger = logging.getLogger('pymisp')
 
 # Potentially not installed imports
 try:
     from reportlab.pdfgen import canvas
-    from reportlab.pdfbase.pdfmetrics import stringWidth, registerFont, registerFontFamily
-    from reportlab.pdfbase.pdfdoc import PDFDictionary, PDFInfo
+    from reportlab.pdfbase.pdfmetrics import stringWidth, registerFont
     from reportlab.pdfbase.ttfonts import TTFont
     from reportlab.lib import colors
-    from reportlab.lib.utils import ImageReader
     from reportlab.lib.pagesizes import A4
-    from reportlab.lib.fonts import addMapping
 
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Spacer, Table, TableStyle, Flowable, Image, \
-        Indenter
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Table, TableStyle, Flowable, Image, Indenter
 
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import mm
-    from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_JUSTIFY, TA_LEFT
+    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 
     HAS_REPORTLAB = True
 except ImportError:
@@ -113,8 +108,7 @@ class Flowable_Tag(Flowable):
         LEFT_INTERNAL_PADDING = 2
         ELONGATION = LEFT_INTERNAL_PADDING * 2
 
-        p = Paragraph("<font color='" + self.choose_good_text_color() + "'>" + self.text + "</font>",
-                      style=self.custom_style)
+        p = Paragraph("<font color='{}'>{}</font>".format(self.choose_good_text_color(), self.text), style=self.custom_style)
         string_width = stringWidth(self.text, self.custom_style.fontName, self.custom_style.fontSize)
 
         self.width = string_width + ELONGATION
@@ -197,14 +191,14 @@ EXTERNAL_ANALYSIS_PREFIX = "<i>External analysis from an attribute : </i>"
 
 # == Parameters for improvement of event's metadata ==
 
-threat_map = {"0": "<font color =" + MEDIUM_THREAT_COLOR + ">   undefined (0)</font>",
-              "3": "<font color =" + LOW_THREAT_COLOR + ">      Low (3)</font>",
-              "2": "<font color =" + MEDIUM_THREAT_COLOR + ">   Medium (2)</font>",
-              "1": "<font color =" + HIGH_THREAT_COLOR + ">     High (1)</font>"}
+threat_map = {"0": f"<font color ={MEDIUM_THREAT_COLOR}>   undefined (0)</font>",
+              "3": f"<font color ={LOW_THREAT_COLOR}>      Low (3)</font>",
+              "2": f"<font color ={MEDIUM_THREAT_COLOR}>   Medium (2)</font>",
+              "1": f"<font color ={HIGH_THREAT_COLOR}>     High (1)</font>"}
 
-analysis_map = {"0": "<font color =" + HIGH_THREAT_COLOR + ">   Initial (0)</font>",
-                "1": "<font color =" + MEDIUM_THREAT_COLOR + "> Ongoing (1)</font>",
-                "2": "<font color =" + LOW_THREAT_COLOR + ">    Completed (2)</font>"}
+analysis_map = {"0": f"<font color ={HIGH_THREAT_COLOR}>   Initial (0)</font>",
+                "1": f"<font color ={MEDIUM_THREAT_COLOR}> Ongoing (1)</font>",
+                "2": f"<font color ={LOW_THREAT_COLOR}>    Completed (2)</font>"}
 
 # == Parameters for Sightings ==
 POSITIVE_SIGHT_COLOR = 'green'
@@ -260,11 +254,11 @@ def uuid_to_url(baseurl, uuid):
     '''
     if baseurl[len(baseurl) - 1] != "/":
         baseurl += "/"
-    return baseurl + "events/view/" + uuid
+    return f"{baseurl}events/view/{uuid}"
 
 
-def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=None, line_alternation=None,
-                                    galaxy_colors=False):
+def create_flowable_table_from_data(data, col_w=COL_WIDTHS, color_alternation=None,
+                                    line_alternation=None, galaxy_colors=False):
     '''
     Given a list of flowables items (2D/list of list), creates a Table with styles.
     :param data: list of list of items (flowables is better)
@@ -353,8 +347,7 @@ def lines_style_generator(data, line_alternation):
 
         # For each line, generate a tuple giving to a line a color
         for each in range(data_len):
-            if each == 0 or line_alternation[each % len(line_alternation)] != line_alternation[
-                (each - 1) % len(line_alternation)]:
+            if each == 0 or line_alternation[each % len(line_alternation)] != line_alternation[(each - 1) % len(line_alternation)]:
                 lines_list.append(('LINEABOVE', (0, each), (-1, each), LINE_THICKNESS, LINE_COLOR))
 
         # Last line
@@ -385,7 +378,7 @@ def internationalize_font(config=None):
     global FIRST_COL_FONT
     global SECOND_COL_FONT
 
-    if is_in_config(config, 6) and config[moduleconfig[6]] != "" :
+    if is_in_config(config, 6) and config[moduleconfig[6]] != "":
         # Handle custom fonts. Has to be TrueType = one TTF only
         fonts_path_custom = config[moduleconfig[6]]
 
@@ -395,11 +388,10 @@ def internationalize_font(config=None):
             SECOND_COL_FONT = 'custom_font'
 
         else:
-            logger.error(
-                "Trying to load a custom font, unable to access the file. Path : " + str(fonts_path_custom))
+            logger.error(f"Trying to load a custom font, unable to access the file. Path: {fonts_path_custom}")
     else:
         ''' Handle provided NOTO fonts (CJK only for now)
-            # Available fonts : 
+            # Available fonts :
             NotoSansCJKtc - DemiLight.ttf
             NotoSansCJKtc - Regular.ttf
             NotoSansCJKtc - Black.ttf
@@ -408,21 +400,19 @@ def internationalize_font(config=None):
             NotoSansCJKtc - Bold.ttf
             NotoSansCJKtc - Medium.ttf
         '''
-        font_path = os.path.join(os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)), 'tools', 'pdf_fonts',
-                                 'Noto_TTF')
+        font_path = Path(sys.modules['pymisp'].__file__).parent / 'tools' / 'pdf_fonts' / 'Noto_TTF'
 
-        noto_bold = font_path + "/NotoSansCJKtc-Bold.ttf"
-        noto = font_path + "/NotoSansCJKtc-DemiLight.ttf"
+        noto_bold = font_path / "NotoSansCJKtc-Bold.ttf"
+        noto = font_path / "NotoSansCJKtc-DemiLight.ttf"
 
-        if os.path.isfile(noto_bold) and os.path.isfile(noto):
+        if noto_bold.is_file() and noto.is_file():
             registerFont(TTFont("Noto", noto))
             registerFont(TTFont("Noto-bold", noto_bold))
 
             FIRST_COL_FONT = 'Noto-bold'
             SECOND_COL_FONT = 'Noto'
         else:
-            logger.error(
-                "Trying to load a custom (internationalization) font, unable to access the file : " + noto_bold)
+            logger.error(f"Trying to load a custom (internationalization) font, unable to access the file: {noto_bold}")
 
 
 def get_table_styles():
@@ -485,18 +475,21 @@ def safe_string(bad_str):
 
 
 def is_safe_attribute(curr_object, attribute_name):
-    return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
-        curr_object, attribute_name) != ""
+    return (hasattr(curr_object, attribute_name)
+            and getattr(curr_object, attribute_name) is not None
+            and getattr(curr_object, attribute_name) != "")
 
 
 def is_safe_dict_attribute(curr_object, attribute_name):
-    return attribute_name in curr_object and curr_object[attribute_name] is not None and curr_object[
-        attribute_name] != ""
+    return (attribute_name in curr_object
+            and curr_object[attribute_name] is not None
+            and curr_object[attribute_name] != "")
 
 
 def is_safe_attribute_table(curr_object, attribute_name):
-    return hasattr(curr_object, attribute_name) and getattr(curr_object, attribute_name) is not None and getattr(
-        curr_object, attribute_name) != []
+    return (hasattr(curr_object, attribute_name)
+            and getattr(curr_object, attribute_name) is not None
+            and getattr(curr_object, attribute_name) != [])
 
 
 def is_in_config(config, index):
@@ -593,34 +586,37 @@ class Value_Formatter():
         if curr_style is None:
             curr_style = self.col2_style
 
-        # Does MispEven has the attribute ?
+        escape = True
+        # Does MispEvent has the attribute ?
         if is_safe_attribute(misp_event, item[1]):
             # It has the requested attribute .. building upon it.
 
             # Does misp_object has an uuid and do we know the baseurl ?
             if is_safe_attribute(misp_event, "uuid") and is_in_config(self.config, 0):
                 # We can build links
+                escape = False
                 curr_uuid = str(getattr(misp_event, "uuid"))
                 curr_baseurl = self.config[moduleconfig[0]]
                 curr_url = uuid_to_url(curr_baseurl, curr_uuid)
-                html_url = "<a href=" + curr_url + ">" + safe_string(getattr(misp_event, item[1])) + "</a>"
+                html_url = "<a href={}>{}</a>".format(curr_url, safe_string(getattr(misp_event, item[1])))
 
                 if color:
                     # They want fancy colors
-                    html_url = "<font color=" + GOOD_LINK_COLOR + ">" + html_url + "</font>"
-
+                    html_url = f"<font color={GOOD_LINK_COLOR}>{html_url}</font>"
                 # Construct final paragraph
-                answer = self.get_unoverflowable_paragraph(html_url, curr_style=curr_style, do_escape_string=False)
+                answer = html_url
 
             else:
                 # We can't build links
-                answer = self.get_unoverflowable_paragraph(getattr(misp_event, item[1]), curr_style=curr_style)
+                answer = getattr(misp_event, item[1])
 
         else:
             # No it doesn't, so we directly give the default answer
-            answer = self.get_unoverflowable_paragraph(item[2], curr_style=curr_style)
+            answer = item[2]
 
-        return answer
+        if not escape:
+            return self.get_unoverflowable_paragraph(answer, curr_style=curr_style, do_escape_string=False)
+        return self.get_unoverflowable_paragraph(answer, curr_style=curr_style)
 
     ########################################################################
     # Specific attribute formater
@@ -684,8 +680,7 @@ class Value_Formatter():
         :return: a Paragraph to add in the pdf, regarding the values of "timestamp"
         '''
         if is_safe_attribute(misp_event, item[1]):
-            return self.get_unoverflowable_paragraph(
-                safe_string(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT)))
+            return self.get_unoverflowable_paragraph(safe_string(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT)))
         return self.get_unoverflowable_paragraph(item[2])
 
     def get_creator_organisation_value(self, misp_event, item):
@@ -730,29 +725,28 @@ class Value_Formatter():
 
         RED_COLOR = '#ff0000'
         GREEN_COLOR = '#008000'
-        YES_ANSWER = "<font color=" + GREEN_COLOR + "><b> Yes </b></font> ("
-        NO_ANSWER = "<font color=" + RED_COLOR + "><b>No</b></font>"
+        YES_ANSWER = f"<font color={GREEN_COLOR}><b> Yes </b></font>"
+        NO_ANSWER = f"<font color={RED_COLOR}><b> No </b></font>"
 
         # Formatting similar to MISP Event web view
         if is_safe_attribute(misp_event, item[1]):
             if getattr(misp_event, item[1]):  # == True
+                answer = YES_ANSWER
                 if is_safe_attribute(misp_event, item[3]):
                     # Published and have published date
-                    answer = self.get_unoverflowable_paragraph(
-                        YES_ANSWER + getattr(misp_event, item[3]).strftime(EXPORT_DATE_FORMAT) + ")",
-                        do_escape_string=False)
+                    answer += '({})'.format(getattr(misp_event, item[3]).strftime(EXPORT_DATE_FORMAT))
                 else:
                     # Published without published date
-                    answer = self.get_unoverflowable_paragraph(YES_ANSWER + "no date)", do_escape_string=False)
+                    answer += "(no date)"
 
             else:
                 # Not published
-                answer = self.get_unoverflowable_paragraph(NO_ANSWER, do_escape_string=False)
+                answer = NO_ANSWER
         else:
             # Does not have a published attribute
-            answer = self.get_unoverflowable_paragraph(item[2], do_escape_string=False)
+            answer = item[2]
 
-        return answer
+        return self.get_unoverflowable_paragraph(answer, do_escape_string=False)
 
     def get_image_value(self, misp_attribute, item):
         '''
@@ -772,10 +766,8 @@ class Value_Formatter():
             answer = img
 
         except OSError:
-            logger.error(
-                "Trying to add an attachment during PDF export generation. Attachement joining failed. Attachement may not be an image.")
-            answer = self.get_unoverflowable_paragraph(
-                "<font color=" + BAD_LINK_COLOR + ">" + NOT_A_PICTURE_MESSAGE + "</font>", do_escape_string=False)
+            logger.error("Trying to add an attachment during PDF export generation. Attachement joining failed. Attachement may not be an image.")
+            answer = self.get_unoverflowable_paragraph(f"<font color={BAD_LINK_COLOR}>{NOT_A_PICTURE_MESSAGE}</font>", do_escape_string=False)
 
         return answer
 
@@ -787,9 +779,7 @@ class Value_Formatter():
         :param col2_style: style to be applied on the returned paragraph
         :return: a Paragraph to add in the pdf, regarding the values of this "link" attribute
         '''
-        return self.get_unoverflowable_paragraph(
-            "<font color=" + GOOD_LINK_COLOR + "><a href=" + getattr(misp_attribute, item[1]) + ">" + getattr(
-                misp_attribute, item[1]) + "</a></font>", do_escape_string=False)
+        return self.get_unoverflowable_paragraph(f"<font color={GOOD_LINK_COLOR}><a href={getattr(misp_attribute, item[1])}>{getattr(misp_attribute, item[1])}</a></font>", do_escape_string=False)
 
     def get_bad_link(self, misp_attribute, item):
         '''
@@ -799,11 +789,7 @@ class Value_Formatter():
         :param col2_style: style to be applied on the returned paragraph
         :return: a Paragraph to add in the pdf, regarding the values of this "url" attribute
         '''
-        return self.get_unoverflowable_paragraph(
-            "<font color=" + BAD_LINK_COLOR + "><a href=" + WARNING_MESSAGE_URL + ">" + getattr(misp_attribute,
-                                                                                                item[
-                                                                                                    1]) + "</a></font>",
-            do_escape_string=False)
+        return self.get_unoverflowable_paragraph(f"<font color={BAD_LINK_COLOR}><a href={WARNING_MESSAGE_URL}>{getattr(misp_attribute, item[1])}</a></font>", do_escape_string=False)
 
     def get_good_or_bad_link(self, misp_attribute, item):
         '''
@@ -828,11 +814,12 @@ class Value_Formatter():
     def get_galaxy_name_value(self, misp_galaxy):
         item = ["Name", 'name', "None", "namespace", "type"]
         if is_safe_dict_attribute(misp_galaxy, item[1]):
-            return self.get_unoverflowable_paragraph(safe_string(misp_galaxy[item[1]])
-                                                     + " <i>from</i> " + safe_string(misp_galaxy[item[3]]) + ":"
-                                                     + safe_string(misp_galaxy[item[4]]), do_escape_string=False,
-                                                     do_small=True)
-        return self.get_unoverflowable_paragraph(item[2], do_small=True)
+            to_return = '{} <i>from</i> {}:{}'.format(safe_string(misp_galaxy[item[1]]),
+                                                      safe_string(misp_galaxy[item[3]]),
+                                                      safe_string(misp_galaxy[item[4]]))
+        else:
+            to_return = item[2]
+        return self.get_unoverflowable_paragraph(to_return, do_small=True)
 
     def get_galaxy_cluster_name_value(self, misp_cluster, do_small=False):
         item = ["Name", 'value', "None", "source", "meta", "synonyms"]
@@ -886,18 +873,18 @@ class Event_Metadata():
 
         # Date
         item = ["Date", 'date', "None"]
-        data.append(
-            [self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_date_value(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_date_value(misp_event, item)])
 
         # Owner
         item = ["Owner org", 'owner', "None"]
-        data.append(
-            [self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_owner_value(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_owner_value(misp_event, item)])
 
         # Threat
         item = ["Threat level", 'threat_level_id', "None"]
-        data.append(
-            [self.value_formatter.get_col1_paragraph(item[0]), self.value_formatter.get_threat_value(misp_event, item)])
+        data.append([self.value_formatter.get_col1_paragraph(item[0]),
+                     self.value_formatter.get_threat_value(misp_event, item)])
 
         # Analysis
         item = ["Analysis", 'analysis', "None"]
@@ -988,23 +975,21 @@ class Event_Metadata():
         '''
 
         '''
-        The event "{EventName}" | that occurred on {EventDate}, | had been shared by {Organisation Name} | on the {Date}. 
+        The event "{EventName}" | that occurred on {EventDate}, | had been shared by {Organisation Name} | on the {Date}.
         '''
 
         text = ""
 
-        item = ["Info", 'info', "None"]
-        if is_safe_attribute(misp_event, item[1]):
+        if is_safe_attribute(misp_event, 'info'):
             text += "The event '"
-            text += safe_string(getattr(misp_event, item[1]))
+            text += safe_string(misp_event.info)
             text += "'"
         else:
             text += "This event"
 
-        item = ["Event date", 'timestamp', "None"]
-        if is_safe_attribute(misp_event, item[1]):
+        if is_safe_attribute(misp_event, 'timestamp'):
             text += " that occurred on "
-            text += safe_string(getattr(misp_event, item[1]).strftime(EXPORT_DATE_FORMAT))
+            text += safe_string(misp_event.timestamp.strftime(EXPORT_DATE_FORMAT))
             text += ","
 
         item = ["Creator Org", 'Orgc', "None", "name"]
@@ -1023,7 +1008,7 @@ class Event_Metadata():
         text += "."
 
         '''
-        The threat level of this event is {ThreatLevel} and the analysis that was made of this event is {AnalysisLevel}. 
+        The threat level of this event is {ThreatLevel} and the analysis that was made of this event is {AnalysisLevel}.
         '''
 
         item = ["Threat level", 'threat_level_id', "None"]
@@ -1176,7 +1161,7 @@ class Attributes():
 
         # Handle the special case of links
         STANDARD_TYPE = True
-        if is_safe_attribute(misp_attribute, 'type') and (getattr(misp_attribute, 'type') in [LINK_TYPE, URL_TYPE]):
+        if is_safe_attribute(misp_attribute, 'type') and (misp_attribute.type in [LINK_TYPE, URL_TYPE]):
             # getattr(misp_attribute, 'type') == LINK_TYPE or getattr(misp_attribute, 'type') == URL_TYPE):
             # Special case for links
             STANDARD_TYPE = False
@@ -1241,10 +1226,11 @@ class Attributes():
             # There is some attributes for this object
             for attribute in getattr(misp_event, "Attribute"):
                 # If the current event is an external analysis and a comment
-                if is_safe_attribute(attribute, "value") and is_safe_attribute(attribute,
-                                                                               "category") and is_safe_attribute(
-                    attribute, "type") and getattr(attribute, "category") == "External analysis" and getattr(
-                    attribute, "type") == "comment":
+                if (is_safe_attribute(attribute, "value")
+                        and is_safe_attribute(attribute, "category")
+                        and is_safe_attribute(attribute, "type")
+                        and getattr(attribute, "category") == "External analysis"
+                        and getattr(attribute, "type") == "comment"):
                     # We add it to the description
                     text += "<br/>" + EXTERNAL_ANALYSIS_PREFIX + safe_string(getattr(attribute, "value"))
 
@@ -1343,10 +1329,9 @@ class Sightings():
                 i += 1
 
             # Create the sighting text
-            sight_text = "<font color =" + POSITIVE_SIGHT_COLOR + "> Positive : " + str(list_sighting[0]) + "</font>"
-            sight_text += " / " + "<font color =" + NEGATIVE_SIGHT_COLOR + "> Negative : " + str(
-                list_sighting[1]) + "</font>"
-            sight_text += " / " + "<font color =" + MISC_SIGHT_COLOR + "> Misc. : " + str(list_sighting[2]) + "</font>"
+            sight_text = f"<font color ={POSITIVE_SIGHT_COLOR}> Positive: {list_sighting[0]}</font>"
+            sight_text += f" / <font color ={NEGATIVE_SIGHT_COLOR}> Negative: {list_sighting[1]}</font>"
+            sight_text += f" / <font color ={MISC_SIGHT_COLOR}> Misc.: {list_sighting[2]}</font>"
 
             answer_sighting = self.value_formatter.get_unoverflowable_paragraph(sight_text, do_escape_string=False)
         else:
@@ -1516,7 +1501,6 @@ class Galaxy():
                 clusters_metadata = curr_cluster.create_flowable_table_from_galaxy_clusters(curr_galaxy)
                 flowable_table += clusters_metadata
 
-
         else:
             # No galaxies for this object
             answer_tags = [self.value_formatter.get_unoverflowable_paragraph("No galaxies")]
@@ -1658,22 +1642,20 @@ class Statics_Drawings():
         '''
 
         if is_safe_attribute(self.misp_event, 'info'):
-            canvas.setTitle(getattr(self.misp_event, 'info'))
-
-        if is_safe_attribute(self.misp_event, 'info'):
-            canvas.setSubject(getattr(self.misp_event, 'info'))
+            canvas.setTitle(self.misp_event.info)
+            canvas.setSubject(self.misp_event.info)
 
         if is_safe_attribute(self.misp_event, 'Orgc'):
-            if is_safe_attribute(getattr(self.misp_event, 'Orgc'), 'name'):
-                canvas.setAuthor(getattr(getattr(self.misp_event, 'Orgc'), 'name'))
+            if is_safe_attribute(self.misp_event.Orgc, 'name'):
+                canvas.setAuthor(self.misp_event.Orgc.name)
 
                 if is_in_config(self.config, 1):
                     canvas.setCreator(self.config[moduleconfig[1]])
                 else:
-                    canvas.setCreator(getattr(getattr(self.misp_event, 'Orgc'), 'name'))
+                    canvas.setCreator(self.misp_event.Orgc.name)
 
         if is_safe_attribute(self.misp_event, 'uuid'):
-            canvas.setKeywords(getattr(self.misp_event, 'uuid'))
+            canvas.setKeywords(self.misp_event.uuid)
 
     def add_page_number(self, canvas, doc):
         '''
@@ -1716,8 +1698,8 @@ def collect_parts(misp_event, config=None):
     curr_val_f = Value_Formatter(config, col1_style, col2_style, col1_small_style, col2_small_style)
 
     # Create stuff
-    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'], fontName=FIRST_COL_FONT,
-                                 alignment=TA_CENTER)
+    title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'],
+                                 fontName=FIRST_COL_FONT, alignment=TA_CENTER)
     title = curr_val_f.get_value_link_to_event(misp_event, ["Info", 'info', "None"], title_style, color=False)
     # Add all parts to final PDF
     flowables.append(title)
