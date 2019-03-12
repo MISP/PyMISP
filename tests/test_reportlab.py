@@ -7,17 +7,20 @@ import time
 import unittest
 
 from pymisp import MISPEvent
-from pymisp.tools import reportlab_generator
 
 manual_testing = False
 
-if sys.version_info < (3, 6):
-    print('This test suite requires Python 3.6+, breaking.')
-    sys.exit(0)
-else:
-    from pymisp import reportlab_generator
+try:
+    from pymisp.tools import reportlab_generator
+except ImportError:
+    if sys.version_info < (3, 6):
+        print('This test suite requires Python 3.6+, breaking.')
+        sys.exit(0)
+    else:
+        raise
 
-class TestMISPEvent(unittest.TestCase):
+
+class TestPDFExport(unittest.TestCase):
 
     def setUp(self):
         self.maxDiff = None
@@ -34,7 +37,6 @@ class TestMISPEvent(unittest.TestCase):
         self.storage_image_folder = self.root + "reportlab_test_image_outputs/"
         self.moduleconfig = ["MISP_base_url_for_dynamic_link", "MISP_name_for_metadata", "Activate_textual_description",
                              "Activate_galaxy_description", "Activate_related_events", "Activate_internationalization_fonts", "Custom_fonts_path"]
-
 
     def init_event(self):
         self.mispevent.info = 'This is a test'
@@ -408,7 +410,6 @@ class TestMISPEvent(unittest.TestCase):
             config[self.moduleconfig[3]] = True
             config[self.moduleconfig[4]] = True
             config[self.moduleconfig[5]] = True
-
 
             file_nb = str(len(os.listdir(self.test_batch_folder)))
             i = 0
