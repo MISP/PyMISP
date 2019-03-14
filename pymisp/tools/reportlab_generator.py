@@ -638,7 +638,7 @@ class Value_Formatter():
     def get_date_value(self, date=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event date
-        :param misp_event: A misp event with or without "date" attributes
+        :param date: MISP_EVENT date to be formatted
         :return: a Paragraph to add in the pdf, regarding the values of "date"
         '''
         answer = DEFAULT_VALUE
@@ -650,7 +650,7 @@ class Value_Formatter():
     def get_owner_value(self, owner=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event owner
-        :param misp_event: A misp event with or without "owner" attributes
+        :param owner: MISP_EVENT owner to be formatted
         :return: a Paragraph to add in the pdf, regarding the values of "owner"
         '''
         answer = DEFAULT_VALUE
@@ -663,7 +663,7 @@ class Value_Formatter():
     def get_threat_value(self, threat_level = None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event threat
-        :param misp_event: A misp event with or without "threat" attributes
+        :param threat_level: MISP_EVENT threat level (int) to be formatted
         :return: a Paragraph to add in the pdf, regarding the values of "threat"
         '''
         answer = "No threat level specified."
@@ -676,7 +676,7 @@ class Value_Formatter():
     def get_analysis_value(self, analysis_level = None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event analysis
-        :param misp_event: A misp event with or without "analysis" attributes
+        :param analysis_level: MISP_EVENT analysis level (int) to be formatted
         :return: a Paragraph to add in the pdf, regarding the values of "analysis"
         '''
         answer = "No analysis status specified."
@@ -689,7 +689,7 @@ class Value_Formatter():
     def get_timestamp_value(self, timestamp=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event timestamp
-        :param col2_style: style to be applied on the returned paragraph
+        :param timestamp: MISP_EVENT timestamp (int) to be formatted
         :return: a Paragraph to add in the pdf, regarding the values of "timestamp"
         '''
         answer = "No timestamp specified."
@@ -702,7 +702,7 @@ class Value_Formatter():
     def get_creator_organisation_value(self, creator=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event creator organisation
-        :param col2_style: style to be applied on the returned paragraph
+        :param creator: MISP_EVENT creator (not the name directly) to be formatted
         :return: a Paragraph to add in the pdf, regarding the values of "creator organisation"
         '''
         answer = DEFAULT_VALUE
@@ -715,7 +715,7 @@ class Value_Formatter():
     def get_attributes_number_value(self, attributes=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event attributes
-        :param col2_style: style to be applied on the returned paragraph
+        :param attributes: MISP_EVENT attributes list to be formatted
         :return: a Paragraph to add in the pdf, regarding the values of "attributes"
         '''
         answer = "0 - no attribute"
@@ -730,7 +730,8 @@ class Value_Formatter():
         Returns a flowable paragraph to add to the pdf given the misp_event published/published_time
         More information on how to play with paragraph into reportlab cells :
         https://stackoverflow.com/questions/11810008/reportlab-add-two-paragraphs-into-one-table-cell
-        :param col2_style: style to be applied on the returned paragraph
+        :param published_timestamp: MISP_EVENT published_timestamp to be formatted
+        :param published_bool: MISP_EVENT published boolean value
         :return: a Paragraph to add in the pdf, regarding the values of "published"/"publish_timestamp"
         '''
 
@@ -757,7 +758,7 @@ class Value_Formatter():
     def get_image_value(self, image_buffer=None):
         '''
         Returns a flowable image to add to the pdf given the misp attribute type and data
-        :param image_buffer:
+        :param image_buffer: an image contained an attribute, for example (buffer / Base 64)
         :return: a flowable image to add in the pdf, regarding the values of "data"
         '''
 
@@ -778,6 +779,7 @@ class Value_Formatter():
     def get_good_link(self, value=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link
+        :param value: string, of an url to format as a good link
         :return: a Paragraph to add in the pdf, regarding the values of this "link" attribute
         '''
         return self.get_unoverflowable_paragraph(f"<font color={GOOD_LINK_COLOR}><a href={value}>{value}</a></font>", do_escape_string=False)
@@ -785,6 +787,7 @@ class Value_Formatter():
     def get_bad_link(self, value=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link
+        :param value: string, of an url to format as a bad link
         :return: a Paragraph to add in the pdf, regarding the values of this "url" attribute
         '''
         return self.get_unoverflowable_paragraph(f"<font color={BAD_LINK_COLOR}><a href={WARNING_MESSAGE_URL}>{value}</a></font>", do_escape_string=False)
@@ -792,6 +795,8 @@ class Value_Formatter():
     def get_good_or_bad_link(self, value=None, type=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_attribute value, if this is a link or an url
+        :param type: Type of the url (url or link) as a string
+        :param value: string, of an url to format as a good or bad link
         :return: a Paragraph to add in the pdf, regarding the values of this "link" or "url" attribute
         '''
 
@@ -807,6 +812,11 @@ class Value_Formatter():
         return answer
 
     def get_galaxy_name_value(self, misp_galaxy):
+        '''
+        Create a displayable name for a galaxy
+        :param misp_galaxy: MISP_EVENT galaxy, as an object (not a list)
+        :return: a Flowable Paragraph to add in the pdf, regarding the value of the MISP galaxy
+        '''
         answer = DEFAULT_VALUE
 
         if is_safe_dict_attribute(misp_galaxy, 'name'):
@@ -817,6 +827,12 @@ class Value_Formatter():
         return self.get_unoverflowable_paragraph(answer, do_small=True)
 
     def get_galaxy_cluster_name_value(self, misp_cluster, do_small=False):
+        '''
+        Create a displayable name for a cluster
+        :param misp_cluster: a MISP_EVENT's GALAXY's cluster, as an object (not a list)
+        :param do_small: Compress the display (reduce the size of the flowable paragraph, fonts, etc.)
+        :return: a Flowable Paragraph to add in the pdf, regarding the value of the MISP cluster
+        '''
         # TODO : To be changed when Clust becomes an object
         tmp_text = ""
 
