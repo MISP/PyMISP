@@ -87,6 +87,23 @@ def _int_to_str(d):
     return d
 
 
+def make_bool(value):
+    if isinstance(value, bool):
+        return value
+    if not value:  # None, 0, '', {}, []
+        return False
+
+    if isinstance(value, int):
+        return bool(value)
+
+    if isinstance(value, str):
+        if value == '0':
+            return False
+        return True
+    else:
+        raise Exception('Unable to convert {} to a boolean.'.format(value))
+
+
 class MISPAttribute(AbstractMISP):
 
     def __init__(self, describe_types=None, strict=False):
@@ -193,6 +210,9 @@ class MISPAttribute(AbstractMISP):
         self.to_ids = kwargs.pop('to_ids', bool(int(type_defaults['to_ids'])))
         if self.to_ids is None:
             self.to_ids = bool(int(type_defaults['to_ids']))
+        else:
+            self.to_ids = make_bool(self.to_ids)
+
         if not isinstance(self.to_ids, bool):
             raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
 
@@ -459,7 +479,7 @@ class MISPEvent(AbstractMISP):
             if OLD_PY3 and isinstance(json_event, bytes):
                 json_event = json_event.decode()
             json_event = json.loads(json_event)
-        if json_event.get('response'): # hasattr(json_event, 'response') and ... is a Bugfix ?
+        if json_event.get('response'):
             event = json_event.get('response')[0]
         else:
             event = json_event
