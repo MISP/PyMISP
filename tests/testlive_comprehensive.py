@@ -929,10 +929,10 @@ class TestComprehensive(unittest.TestCase):
                 break
         tag = self.admin_misp_connector.get_tag(tags[0]['id'])
         self.assertTrue('name' in tag)
-        self.admin_misp_connector.disable_tag(tag['id'])
-        # FIXME: returns the tag with ID 1
-        self.admin_misp_connector.enable_tag(tag['id'])
-        # FIXME: returns the tag with ID 1
+        r = self.admin_misp_connector.disable_tag(tag['id'])
+        self.assertTrue(r['Tag']['hide_tag'])
+        r = self.admin_misp_connector.enable_tag(tag['id'])
+        self.assertFalse(r['Tag']['hide_tag'])
 
     def test_add_event_with_attachment(self):
         first = self.create_simple_event()
