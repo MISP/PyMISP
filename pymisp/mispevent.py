@@ -90,11 +90,10 @@ def _int_to_str(d):
 def make_bool(value):
     if isinstance(value, bool):
         return value
-    if not value:  # None, 0, '', {}, []
-        return False
-
     if isinstance(value, int):
         return bool(value)
+    if not value:  # None, 0, '', {}, []
+        return False
 
     if isinstance(value, str):
         if value == '0':
