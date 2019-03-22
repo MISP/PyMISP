@@ -935,6 +935,33 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.enable_tag(tag['id'])
         self.assertFalse(r['Tag']['hide_tag'])
 
+    def test_add_event_with_attachment_object_controller(self):
+        first = self.create_simple_event()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            fo, peo, seos = make_binary_objects('tests/viper-test-files/test_files/whoami.exe')
+            for s in seos:
+                template_id = self.user_misp_connector.get_object_template_id(s.template_uuid)
+                r = self.user_misp_connector.add_object(first.id, template_id, s)
+                self.assertEqual(r['Object']['name'], 'pe-section')
+
+            template_id = self.user_misp_connector.get_object_template_id(peo.template_uuid)
+            r = self.user_misp_connector.add_object(first.id, template_id, peo)
+            self.assertEqual(r['Object']['name'], 'pe')
+            for ref in peo.ObjectReference:
+                r = self.user_misp_connector.add_object_reference(ref)
+                self.assertTrue('ObjectReference' in r)
+
+            template_id = self.user_misp_connector.get_object_template_id(fo.template_uuid)
+            r = self.user_misp_connector.add_object(first.id, template_id, fo)
+            self.assertEqual(r['Object']['name'], 'file')
+            for ref in fo.ObjectReference:
+                r = self.user_misp_connector.add_object_reference(ref)
+                self.assertTrue('ObjectReference' in r)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
     def test_add_event_with_attachment(self):
         first = self.create_simple_event()
         try:
