@@ -60,6 +60,12 @@ class TestComprehensive(unittest.TestCase):
         cls.test_pub = MISPUser()
         cls.test_pub.from_dict(**pub)
         cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey, verifycert)
+        # Update all json stuff
+        cls.admin_misp_connector.update_object_templates()
+        cls.admin_misp_connector.update_galaxies()
+        cls.admin_misp_connector.update_noticelists()
+        cls.admin_misp_connector.update_warninglists()
+        cls.admin_misp_connector.update_taxonomies()
 
     @classmethod
     def tearDownClass(cls):
@@ -639,7 +645,6 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(events), 1)
 
             # warninglist
-            self.admin_misp_connector.update_warninglists()
             response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%', force_enable=True)  # enable ipv4 DNS.
             self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) enabled'})
             second.add_attribute('ip-src', '1.11.71.4')
@@ -913,7 +918,6 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first.id)
 
     def test_object_template(self):
-        self.admin_misp_connector.update_object_templates()
         r = self.admin_misp_connector.update_object_templates()
         self.assertEqual(type(r), list)
         if not travis_run:
@@ -985,7 +989,6 @@ class TestComprehensive(unittest.TestCase):
 
     def test_taxonomies(self):
         # Make sure we're up-to-date
-        self.admin_misp_connector.update_taxonomies()
         r = self.admin_misp_connector.update_taxonomies()
         self.assertEqual(r['name'], 'All taxonomy libraries are up to date already.')
         # Get list
@@ -1006,10 +1009,12 @@ class TestComprehensive(unittest.TestCase):
 
     def test_warninglists(self):
         # Make sure we're up-to-date
-        self.admin_misp_connector.update_warninglists()
         r = self.admin_misp_connector.update_warninglists()
-        self.assertTrue('name' in r, r)
-        self.assertEqual(r['name'], 'All warninglists are up to date already.', msg=r)
+        self.assertTrue('name' in r, msg=r)
+        try:
+            self.assertEqual(r['name'], 'All warninglists are up to date already.', msg=r)
+        except Exception:
+            print(r)
         # Get list
         r = self.admin_misp_connector.get_warninglists()
         # FIXME It returns Warninglists object instead of a list of warning lists directly. This is inconsistent.
@@ -1030,7 +1035,6 @@ class TestComprehensive(unittest.TestCase):
 
     def test_noticelists(self):
         # Make sure we're up-to-date
-        self.admin_misp_connector.update_noticelists()
         r = self.admin_misp_connector.update_noticelists()
         self.assertEqual(r['name'], 'All noticelists are up to date already.')
         # Get list
@@ -1052,7 +1056,6 @@ class TestComprehensive(unittest.TestCase):
     def test_galaxies(self):
         if not travis_run:
             # Make sure we're up-to-date
-            self.admin_misp_connector.update_galaxies()
             r = self.admin_misp_connector.update_galaxies()
             self.assertEqual(r['name'], 'Galaxies updated.')
             # Get list
