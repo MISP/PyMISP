@@ -1097,6 +1097,11 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second.id)
             self.admin_misp_connector.delete_event(third.id)
 
+    def test_live_acl(self):
+        missing_acls = self.admin_misp_connector.get_live_query_acl()
+        self.assertTrue('response' in missing_acls, msg=missing_acls)
+        self.assertEqual(missing_acls['response'], [], msg=missing_acls)
+
 
 if __name__ == '__main__':
     unittest.main()
