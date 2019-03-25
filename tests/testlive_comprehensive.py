@@ -943,21 +943,24 @@ class TestComprehensive(unittest.TestCase):
             for s in seos:
                 template_id = self.user_misp_connector.get_object_template_id(s.template_uuid)
                 r = self.user_misp_connector.add_object(first.id, template_id, s)
-                self.assertEqual(r['Object']['name'], 'pe-section')
+                self.assertTrue('Object' in r, r)
+                self.assertEqual(r['Object']['name'], 'pe-section', r)
 
             template_id = self.user_misp_connector.get_object_template_id(peo.template_uuid)
             r = self.user_misp_connector.add_object(first.id, template_id, peo)
-            self.assertEqual(r['Object']['name'], 'pe')
+            self.assertTrue('Object' in r, r)
+            self.assertEqual(r['Object']['name'], 'pe', r)
             for ref in peo.ObjectReference:
                 r = self.user_misp_connector.add_object_reference(ref)
-                self.assertTrue('ObjectReference' in r)
+                self.assertTrue('ObjectReference' in r, r)
 
             template_id = self.user_misp_connector.get_object_template_id(fo.template_uuid)
             r = self.user_misp_connector.add_object(first.id, template_id, fo)
-            self.assertEqual(r['Object']['name'], 'file')
+            self.assertTrue('Object' in r, r)
+            self.assertEqual(r['Object']['name'], 'file', r)
             for ref in fo.ObjectReference:
                 r = self.user_misp_connector.add_object_reference(ref)
-                self.assertTrue('ObjectReference' in r)
+                self.assertTrue('ObjectReference' in r, r)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
@@ -1005,7 +1008,8 @@ class TestComprehensive(unittest.TestCase):
         # Make sure we're up-to-date
         self.admin_misp_connector.update_warninglists()
         r = self.admin_misp_connector.update_warninglists()
-        self.assertEqual(r['name'], 'All warninglists are up to date already.')
+        self.assertTrue('name' in r, r)
+        self.assertEqual(r['name'], 'All warninglists are up to date already.', msg=r)
         # Get list
         r = self.admin_misp_connector.get_warninglists()
         # FIXME It returns Warninglists object instead of a list of warning lists directly. This is inconsistent.
