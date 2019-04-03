@@ -3,7 +3,7 @@
 
 from .exceptions import MISPServerError, NewEventError, UpdateEventError, UpdateAttributeError, PyMISPNotImplementedYet
 from .api import PyMISP, everything_broken
-from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog
+from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject
 from typing import TypeVar, Optional, Tuple, List, Dict, Union
 from datetime import date, datetime
 import csv
@@ -96,6 +96,16 @@ class ExpandedPyMISP(PyMISP):
         e = MISPEvent()
         e.load(event)
         return e
+
+    def add_object(self, event_id: int, misp_object: MISPObject):
+        created_object = super().add_object(event_id, misp_object)
+        if isinstance(created_object, str):
+            raise NewEventError(f'Unexpected response from server: {created_object}')
+        elif 'errors' in created_object:
+            return created_object
+        o = MISPObject(misp_object.name)
+        o.from_dict(**created_object)
+        return o
 
     def add_event(self, event: MISPEvent):
         created_event = super().add_event(event)
