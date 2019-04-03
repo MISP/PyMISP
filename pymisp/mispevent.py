@@ -230,10 +230,13 @@ class MISPAttribute(AbstractMISP):
         if kwargs.get('event_id'):
             self.event_id = int(kwargs.pop('event_id'))
         if kwargs.get('timestamp'):
-            if sys.version_info >= (3, 3):
-                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), datetime.timezone.utc)
+            ts = kwargs.pop('timestamp')
+            if isinstance(ts, datetime.datetime):
+                self.timestamp = ts
+            elif sys.version_info >= (3, 3):
+                self.timestamp = datetime.datetime.fromtimestamp(int(ts), datetime.timezone.utc)
             else:
-                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), UTC())
+                self.timestamp = datetime.datetime.fromtimestamp(int(ts), UTC())
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
 
@@ -1044,10 +1047,13 @@ class MISPObject(AbstractMISP):
                 raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
 
         if kwargs.get('timestamp'):
-            if sys.version_info >= (3, 3):
-                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), datetime.timezone.utc)
+            ts = kwargs.pop('timestamp')
+            if isinstance(ts, datetime.datetime):
+                self.timestamp = ts
+            elif sys.version_info >= (3, 3):
+                self.timestamp = datetime.datetime.fromtimestamp(int(ts), datetime.timezone.utc)
             else:
-                self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), UTC())
+                self.timestamp = datetime.datetime.fromtimestamp(int(ts), UTC())
         if kwargs.get('Attribute'):
             for a in kwargs.pop('Attribute'):
                 self.add_attribute(**a)

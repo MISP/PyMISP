@@ -107,6 +107,16 @@ class ExpandedPyMISP(PyMISP):
         o.from_dict(**created_object)
         return o
 
+    def update_object(self, misp_object: MISPObject):
+        updated_object = super().edit_object(misp_object)
+        if isinstance(updated_object, str):
+            raise NewEventError(f'Unexpected response from server: {updated_object}')
+        elif 'errors' in updated_object:
+            return updated_object
+        o = MISPObject(misp_object.name)
+        o.from_dict(**updated_object)
+        return o
+
     def add_event(self, event: MISPEvent):
         created_event = super().add_event(event)
         if isinstance(created_event, str):
