@@ -1,0 +1,305 @@
+{
+    "Event": {
+        "id": "60",
+        "orgc_id": "5",
+        "org_id": "1",
+        "date": "2018-08-01",
+        "threat_level_id": "3",
+        "info": "Ursnif, MALWAREMESSIAGH",
+        "published": true,
+        "uuid": "5b646415-7b48-40d5-86b4-c0070acd0835",
+        "attribute_count": "5",
+        "analysis": "2",
+        "timestamp": "1533306089",
+        "distribution": "3",
+        "proposal_email_lock": false,
+        "locked": false,
+        "publish_timestamp": "1550506283",
+        "sharing_group_id": "0",
+        "disable_correlation": false,
+        "extends_uuid": "",
+        "Org": {
+            "id": "1",
+            "name": "ORGNAME",
+            "uuid": "5c6983c8-3af8-4304-869c-4800d6c1883c"
+        },
+        "Orgc": {
+            "id": "5",
+            "name": "Synovus Financial",
+            "uuid": "5a68c02d-959c-4c8a-a571-0dcac0a8060a"
+        },
+        "Attribute": [
+            {
+                "id": "8885",
+                "type": "domain",
+                "category": "Network activity",
+                "to_ids": true,
+                "uuid": "5b6464ca-e73c-4707-9b8a-d0350acd0835",
+                "event_id": "60",
+                "distribution": "5",
+                "timestamp": "1533306058",
+                "comment": "Ursnif",
+                "sharing_group_id": "0",
+                "deleted": false,
+                "disable_correlation": false,
+                "object_id": "0",
+                "object_relation": null,
+                "value": "ooiasjdnqjwbeasdasd.com",
+                "Galaxy": [],
+                "ShadowAttribute": [],
+                "Sighting": [
+                    {
+                        "id": "8",
+                        "attribute_id": "8885",
+                        "event_id": "60",
+                        "org_id": "1",
+                        "date_sighting": "1551253950",
+                        "uuid": "5c7641bf-a4e8-4d5d-a653-03240a00020f",
+                        "source": "",
+                        "type": "0",
+                        "Organisation": {
+                            "id": "1",
+                            "uuid": "5c6983c8-3af8-4304-869c-4800d6c1883c",
+                            "name": "ORGNAME"
+                        },
+                        "attribute_uuid": "5b6464ca-e73c-4707-9b8a-d0350acd0835"
+                    }
+                ]
+            },
+            {
+                "id": "8886",
+                "type": "domain",
+                "category": "Network activity",
+                "to_ids": true,
+                "uuid": "5b6464ca-45f8-43d0-8b78-d0350acd0835",
+                "event_id": "60",
+                "distribution": "5",
+                "timestamp": "1533306058",
+                "comment": "Ursnif",
+                "sharing_group_id": "0",
+                "deleted": false,
+                "disable_correlation": false,
+                "object_id": "0",
+                "object_relation": null,
+                "value": "eqowiesajenqweasd.com",
+                "Galaxy": [],
+                "ShadowAttribute": [],
+                "Sighting": [
+                    {
+                        "id": "9",
+                        "attribute_id": "8886",
+                        "event_id": "60",
+                        "org_id": "1",
+                        "date_sighting": "1551253959",
+                        "uuid": "5c7641c7-f020-4643-92b4-03240a00020f",
+                        "source": "",
+                        "type": "1",
+                        "Organisation": {
+                            "id": "1",
+                            "uuid": "5c6983c8-3af8-4304-869c-4800d6c1883c",
+                            "name": "ORGNAME"
+                        },
+                        "attribute_uuid": "5b6464ca-45f8-43d0-8b78-d0350acd0835"
+                    }
+                ]
+            },
+            {
+                "id": "8887",
+                "type": "domain",
+                "category": "Network activity",
+                "to_ids": true,
+                "uuid": "5b6464ca-8c84-4c2d-95d9-d0350acd0835",
+                "event_id": "60",
+                "distribution": "5",
+                "timestamp": "1533306058",
+                "comment": "Ursnif",
+                "sharing_group_id": "0",
+                "deleted": false,
+                "disable_correlation": false,
+                "object_id": "0",
+                "object_relation": null,
+                "value": "dquohwdihaewqdcas.com",
+                "Galaxy": [],
+                "ShadowAttribute": [],
+                "Sighting": [
+                    {
+                        "id": "10",
+                        "attribute_id": "8887",
+                        "event_id": "60",
+                        "org_id": "1",
+                        "date_sighting": "1551253962",
+                        "uuid": "5c7641cb-ccc0-44ee-ab75-03240a00020f",
+                        "source": "",
+                        "type": "1",
+                        "Organisation": {
+                            "id": "1",
+                            "uuid": "5c6983c8-3af8-4304-869c-4800d6c1883c",
+                            "name": "ORGNAME"
+                        },
+                        "attribute_uuid": "5b6464ca-8c84-4c2d-95d9-d0350acd0835"
+                    }
+                ]
+            },
+            {
+                "id": "8888",
+                "type": "domain",
+                "category": "Network activity",
+                "to_ids": true,
+                "uuid": "5b6464ca-e0a0-40e0-8e21-d0350acd0835",
+                "event_id": "60",
+                "distribution": "5",
+                "timestamp": "1533306058",
+                "comment": "Ursnif",
+                "sharing_group_id": "0",
+                "deleted": false,
+                "disable_correlation": false,
+                "object_id": "0",
+                "object_relation": null,
+                "value": "diqjwhebseqhbasdh.com",
+                "Galaxy": [],
+                "ShadowAttribute": [],
+                "Sighting": [
+                    {
+                        "id": "11",
+                        "attribute_id": "8888",
+                        "event_id": "60",
+                        "org_id": "1",
+                        "date_sighting": "1551253968",
+                        "uuid": "5c7641d5-58bc-4d20-9a84-05f10a00020f",
+                        "source": "honeyp",
+                        "type": "2",
+                        "Organisation": {
+                            "id": "1",
+                            "uuid": "5c6983c8-3af8-4304-869c-4800d6c1883c",
+                            "name": "ORGNAME"
+                        },
+                        "attribute_uuid": "5b6464ca-e0a0-40e0-8e21-d0350acd0835"
+                    },
+                    {
+                        "id": "12",
+                        "attribute_id": "8888",
+                        "event_id": "60",
+                        "org_id": "1",
+                        "date_sighting": "1551253976",
+                        "uuid": "5c7641db-a9a0-49b0-b536-05f10a00020f",
+                        "source": "dede",
+                        "type": "1",
+                        "Organisation": {
+                            "id": "1",
+                            "uuid": "5c6983c8-3af8-4304-869c-4800d6c1883c",
+                            "name": "ORGNAME"
+                        },
+                        "attribute_uuid": "5b6464ca-e0a0-40e0-8e21-d0350acd0835"
+                    }
+                ]
+            },
+            {
+                "id": "8889",
+                "type": "url",
+                "category": "Payload delivery",
+                "to_ids": true,
+                "uuid": "5b6464e9-e73c-484d-a0b3-c0070acd0835",
+                "event_id": "60",
+                "distribution": "5",
+                "timestamp": "1533306089",
+                "comment": "Ursnif dropped file",
+                "sharing_group_id": "0",
+                "deleted": false,
+                "disable_correlation": false,
+                "object_id": "0",
+                "object_relation": null,
+                "value": "http:\/\/sistemait.it\/softaculous\/backup\/client.rar",
+                "Galaxy": [],
+                "ShadowAttribute": [],
+                "Sighting": [
+                    {
+                        "id": "7",
+                        "attribute_id": "8889",
+                        "event_id": "60",
+                        "org_id": "1",
+                        "date_sighting": "1551253943",
+                        "uuid": "5c7641b7-b618-4e41-a9c9-03240a00020f",
+                        "source": "",
+                        "type": "0",
+                        "Organisation": {
+                            "id": "1",
+                            "uuid": "5c6983c8-3af8-4304-869c-4800d6c1883c",
+                            "name": "ORGNAME"
+                        },
+                        "attribute_uuid": "5b6464e9-e73c-484d-a0b3-c0070acd0835"
+                    }
+                ]
+            }
+        ],
+        "ShadowAttribute": [],
+        "RelatedEvent": [],
+        "Galaxy": [
+            {
+                "id": "4",
+                "uuid": "59f20cce-5420-4084-afd5-0884c0a83832",
+                "name": "Banker",
+                "type": "banker",
+                "description": "Banking malware galaxy.",
+                "version": "3",
+                "icon": "usd",
+                "namespace": "misp",
+                "GalaxyCluster": [
+                    {
+                        "id": "289",
+                        "collection_uuid": "b9448d2a-a23c-4bf2-92a1-d860716ba2f3",
+                        "type": "banker",
+                        "value": "Gozi",
+                        "tag_name": "misp-galaxy:banker=\"Gozi\"",
+                        "description": "Banking trojan delivered primarily via email (typically malspam) and exploit kits. Gozi 1.0 source leaked in 2010",
+                        "galaxy_id": "4",
+                        "source": "Open Sources",
+                        "authors": [
+                            "Unknown",
+                            "raw-data"
+                        ],
+                        "version": "16",
+                        "uuid": "",
+                        "tag_id": "86",
+                        "meta": {
+                            "date": [
+                                "First seen ~ 2007"
+                            ],
+                            "refs": [
+                                "https:\/\/www.secureworks.com\/research\/gozi",
+                                "https:\/\/www.gdatasoftware.com\/blog\/2016\/11\/29325-analysis-ursnif-spying-on-your-data-since-2007",
+                                "https:\/\/lokalhost.pl\/gozi_tree.txt"
+                            ],
+                            "synonyms": [
+                                "Ursnif",
+                                "CRM",
+                                "Snifula",
+                                "Papras"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ],
+        "Object": [],
+        "Tag": [
+            {
+                "id": "85",
+                "name": "PasteBin: MALWAREMESSIAGH",
+                "colour": "#ab34e3",
+                "exportable": true,
+                "user_id": "0",
+                "hide_tag": false,
+                "numerical_value": null
+            },
+            {
+                "id": "86",
+                "name": "misp-galaxy:banker=\"Gozi\"",
+                "colour": "#0088cc",
+                "exportable": true,
+                "user_id": "0",
+                "hide_tag": false,
+                "numerical_value": null
+            }
+        ]
+    }
+}

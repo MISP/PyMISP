@@ -3,6 +3,7 @@
 
 """Python API using the REST interface of MISP"""
 
+import copy
 import sys
 import json
 import datetime
@@ -15,7 +16,7 @@ from io import BytesIO, open
 import zipfile
 
 from . import __version__, deprecated
-from .exceptions import PyMISPError, SearchError, NoURL, NoKey
+from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject
 from .abstract import AbstractMISP, MISPEncode
 
@@ -28,7 +29,7 @@ try:
     unicode = str
 except ImportError:
     from urlparse import urljoin
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.5")
+    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
 try:
     import requests
@@ -68,9 +69,10 @@ class PyMISP(object):
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#client-side-certificates
     :param asynch: Use asynchronous processing where possible
+    :param auth: The auth parameter is passed directly to requests, as described here: http://docs.python-requests.org/en/master/user/authentication/
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False, auth=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -82,6 +84,7 @@ class PyMISP(object):
         self.proxies = proxies
         self.cert = cert
         self.asynch = asynch
+        self.auth = auth
         if asynch and not ASYNC_OK:
             logger.critical("You turned on Async, but don't have requests_futures installed")
             self.asynch = False
@@ -157,12 +160,18 @@ class PyMISP(object):
         if data is None:
             req = requests.Request(request_type, url)
         else:
+            if not isinstance(data, str):
+                if isinstance(data, dict):
+                    # Remove None values.
+                    data = {k: v for k, v in data.items() if v is not None}
+                data = json.dumps(data)
             req = requests.Request(request_type, url, data=data)
         if self.asynch and background_callback is not None:
             local_session = FuturesSession
         else:
             local_session = requests.Session
         with local_session() as s:
+            req.auth = self.auth
             prepped = s.prepare_request(req)
             prepped.headers.update(
                 {'Authorization': self.key,
@@ -171,10 +180,11 @@ class PyMISP(object):
                  'User-Agent': 'PyMISP {} - Python {}.{}.{}'.format(__version__, *sys.version_info)})
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(prepped.headers)
+            settings = s.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None, verify=self.ssl, cert=self.cert)
             if self.asynch and background_callback is not None:
-                return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert, background_callback=background_callback)
+                return s.send(prepped, background_callback=background_callback, **settings)
             else:
-                return s.send(prepped, verify=self.ssl, proxies=self.proxies, cert=self.cert)
+                return s.send(prepped, **settings)
 
     # #####################
     # ### Core helpers ####
@@ -226,7 +236,9 @@ class PyMISP(object):
         try:
             json_response = response.json()
         except ValueError:
-            # It the server didn't return a JSON blob, we've a problem.
+            # If the server didn't return a JSON blob, we've a problem.
+            if not len(response.text):
+                raise PyMISPEmptyResponse('The server returned an empty response. \n{}\n{}\n'.format(response.request.headers, response.request.body))
             raise PyMISPError(everything_broken.format(response.request.headers, response.request.body, response.text))
 
         errors = []
@@ -271,7 +283,7 @@ class PyMISP(object):
         """Transform a Json MISP event into a MISPEvent"""
         if not isinstance(event, MISPEvent):
             e = MISPEvent(self.describe_types)
-            e.load(event)
+            e.load(copy.copy(event))
         else:
             e = event
         return e
@@ -300,7 +312,7 @@ class PyMISP(object):
 
         :param uuid: an uuid
         """
-        regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+        regex = re.compile(r'^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
         match = regex.match(uuid)
         return bool(match)
 
@@ -333,6 +345,24 @@ class PyMISP(object):
         :param event_id: Event id to get
         """
         url = urljoin(self.root_url, 'events/{}'.format(event_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_object(self, obj_id):
+        """Get an object
+
+        :param obj_id: Object id to get
+        """
+        url = urljoin(self.root_url, 'objects/view/{}'.format(obj_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_attribute(self, att_id):
+        """Get an attribute
+
+        :param att_id: Attribute id to get
+        """
+        url = urljoin(self.root_url, 'attributes/view/{}'.format(att_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
@@ -401,6 +431,17 @@ class PyMISP(object):
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
+    def direct_call(self, url, data=None):
+        '''Very lightweight call that posts a data blob (python dictionary or json string) on the URL'''
+        url = urljoin(self.root_url, url)
+        if not data:
+            response = self._prepare_request('GET', url)
+        else:
+            if isinstance(data, dict):
+                data = json.dumps(data)
+            response = self._prepare_request('POST', url, data)
+        return self._check_response(response)
+
     # ##############################################
     # ############### Event handling ###############
     # ##############################################
@@ -455,6 +496,12 @@ class PyMISP(object):
         """Change the analysis status of an event"""
         e = self._make_mispevent(event)
         e.analysis = analysis_status
+        return self.update(e)
+
+    def change_distribution(self, event, distribution):
+        """Change the distribution of an event"""
+        e = self._make_mispevent(event)
+        e.distribution = distribution
         return self.update(e)
 
     def change_sharing_group(self, event, sharing_group_id):
@@ -554,12 +601,14 @@ class PyMISP(object):
         elif isinstance(event, int) or (isinstance(event, str) and (event.isdigit() or self._valid_uuid(event))):
             event_id = event
         else:
-            e = MISPEvent(describe_types=self.describe_types)
-            e.load(event)
-            if hasattr(e, 'id'):
-                event_id = e.id
-            elif hasattr(e, 'uuid'):
-                event_id = e.uuid
+            if 'Event' in event:
+                e = event['Event']
+            else:
+                e = event
+            if 'id' in e:
+                event_id = e['id']
+            elif 'uuid' in e:
+                event_id = e['uuid']
         return event_id
 
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
@@ -984,6 +1033,14 @@ class PyMISP(object):
         query = {"comment": comment}
         return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
 
+    def change_disable_correlation(self, attribute_uuid, disable_correlation):
+        """Change the disable_correlation flag"""
+        possible_values = [0, 1, False, True]
+        if disable_correlation not in possible_values:
+            raise Exception('disable_correlation can only be in {}'.format(', '.join(possible_values)))
+        query = {"disable_correlation": disable_correlation}
+        return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
+
     # ##############################
     # ###### Attribute update ######
     # ##############################
@@ -1010,8 +1067,8 @@ class PyMISP(object):
         """Helper to prepare a search query"""
         if query.get('error') is not None:
             return query
-        if controller not in ['events', 'attributes', 'objects']:
-            raise ValueError('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes', 'objects'])))
+        if controller not in ['events', 'attributes', 'objects', 'sightings']:
+            raise ValueError('Invalid controller. Can only be {}'.format(', '.join(['events', 'attributes', 'objects', 'sightings'])))
         url = urljoin(self.root_url, '{}/{}'.format(controller, path.lstrip('/')))
 
         if ASYNC_OK and async_callback:
@@ -1023,7 +1080,7 @@ class PyMISP(object):
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
                      analysis=None, attribute=None, org=None, async_callback=None, normalize=False,
-                     timestamp=None):
+                     timestamp=None, sharinggroup=None):
         """Search only at the index level. Use ! infront of value as NOT, default OR
         If using async, give a callback that takes 2 args, session and response:
         basic usage is
@@ -1042,11 +1099,12 @@ class PyMISP(object):
         :param async_callback: Function to call when the request returns (if running async)
         :param normalize: Normalize output | True or False
         :param timestamp: Interval since last update (in second, or 1d, 1h, ...)
+        :param sharinggroup: The sharing group value
         """
-        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'Dateuntil': dateuntil,
-                   'Datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
+        allowed = {'published': published, 'eventid': eventid, 'tag': tag, 'dateuntil': dateuntil,
+                   'datefrom': datefrom, 'eventinfo': eventinfo, 'threatlevel': threatlevel,
                    'distribution': distribution, 'analysis': analysis, 'attribute': attribute,
-                   'org': org, 'timestamp': timestamp}
+                   'org': org, 'timestamp': timestamp, 'sharinggroup': sharinggroup}
         rule_levels = {'distribution': ["0", "1", "2", "3", "!0", "!1", "!2", "!3"],
                        'threatlevel': ["1", "2", "3", "4", "!1", "!2", "!3", "!4"],
                        'analysis': ["0", "1", "2", "!0", "!1", "!2"]}
@@ -1085,7 +1143,7 @@ class PyMISP(object):
     def search_all(self, value):
         """Search a value in the whole database"""
         query = {'value': value, 'searchall': 1}
-        return self.__query('restSearch/download', query)
+        return self.__query('restSearch', query)
 
     def __prepare_rest_search(self, values, not_values):
         """Prepare a search, generate the chain processed by the server
@@ -1131,6 +1189,7 @@ class PyMISP(object):
         :param to_ids: return only the attributes with the to_ids flag set
         :param deleted: also return the deleted attributes
         :param event_timestamp: the timestamp of the last modification of the event (attributes controller only)). Can be a list (from->to)
+        :param includeProposals: return shadow attributes if True
         :param async_callback: The function to run when results are returned
         """
         query = {}
@@ -1173,6 +1232,15 @@ class PyMISP(object):
             else:
                 return {'error': 'You must enter a valid uuid.'}
 
+        returnFormat = kwargs.pop('returnFormat', None)
+        if returnFormat:
+            if returnFormat in ['json', 'openioc', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2']:
+                query['returnFormat'] = returnFormat
+            else:
+                return {'error': 'You must enter a valid returnFormat - json, openioc, xml, suricata, snort, text, rpz, csv, stix, stix2 or cache'}
+        else:
+            query['returnFormat'] = 'json'
+
         query['publish_timestamp'] = kwargs.pop('publish_timestamp', None)
         query['timestamp'] = kwargs.pop('timestamp', None)
         query['enforceWarninglist'] = kwargs.pop('enforceWarninglist', None)
@@ -1186,15 +1254,18 @@ class PyMISP(object):
             query['metadata'] = kwargs.pop('metadata', None)
         if controller == 'attributes':
             query['event_timestamp'] = kwargs.pop('event_timestamp', None)
+            query['includeProposals'] = kwargs.pop('includeProposals', None)
+
+        if kwargs:
+            logger.info('Some unknown parameters are in kwargs. appending as-is: {}'.format(', '.join(kwargs.keys())))
+            # Add all other keys as-is.
+            query.update({k: v for k, v in kwargs.items()})
 
         # Cleanup
         query = {k: v for k, v in query.items() if v is not None}
 
-        if kwargs:
-            raise SearchError('Unused parameter: {}'.format(', '.join(kwargs.keys())))
-
         # Create a session, make it async if and only if we have a callback
-        return self.__query('restSearch/download', query, controller, async_callback)
+        return self.__query('restSearch', query, controller, async_callback)
 
     def get_attachment(self, attribute_id):
         """Get an attachement (not a malware sample) by attribute ID.
@@ -1385,6 +1456,15 @@ class PyMISP(object):
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
+    def get_users_statistics(self, context='data'):
+        """Get users statistics from the MISP instance"""
+        availables_contexts = ['data', 'orgs', 'users', 'tags', 'attributehistogram', 'sightings', 'attackMatrix']
+        if context not in availables_contexts:
+            context = 'data'
+        url = urljoin(self.root_url, 'users/statistics/{}.json'.format(context))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
     # ############## Sightings ##################
 
     def sighting_per_id(self, attribute_id):
@@ -1423,7 +1503,7 @@ class PyMISP(object):
         :value: Value of the attribute the sighting is related too. Pushing this object
                 will update the sighting count of each attriutes with thifs value on the instance
         :uuid: UUID of the attribute to update
-        :id: ID of the attriute to update
+        :id: ID of the attribute to update
         :source: Source of the sighting
         :type: Type of the sighting
         :timestamp: Timestamp associated to the sighting
@@ -1438,7 +1518,7 @@ class PyMISP(object):
         :type element_id: int
         :param scope: could be attribute or event
         :return: A json list of sighting corresponding to the search
-        :rtype: list
+        :rtype: dict
 
         :Example:
 
@@ -1462,13 +1542,60 @@ class PyMISP(object):
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
+    def search_sightings(self, context='', async_callback=None, **kwargs):
+        """Search sightings via the REST API
+        :context: The context of the search, could be attribute, event or False
+        :param context_id: ID of the attribute or event if context is specified
+        :param type_sighting: Type of the sighting
+        :param date_from: From date
+        :param date_to: To date
+        :param publish_timestamp: Last published sighting (e.g. 5m, 3h, 7d)
+        :param org_id: The org_id
+        :param source: The source of the sighting
+        :param include_attribute: Should the result include attribute data
+        :param include_event: Should the result include event data
+        :param async_callback: The function to run when results are returned
+
+        :Example:
+
+        >>> misp.search_sightings(**{'publish_timestamp': '30d'}) # search sightings for the last 30 days on the instance
+        [ ... ]
+        >>> misp.search_sightings('attribute', context_id=6, include_attribute=1) # return list of sighting for attribute 6 along with the attribute itself
+        [ ... ]
+        >>> misp.search_sightings('event', **{'context_id': 17, 'include_event': 1, 'org_id': 2}) # return list of sighting for event 17 filtered with org id 2
+        """
+        if context not in ['', 'attribute', 'event']:
+            raise Exception('Context parameter must be empty, "attribute" or "event"')
+        query = {}
+        # Sighting: array('id', 'type', 'from', 'to', 'last', 'org_id', 'includeAttribute', 'includeEvent');
+        query['returnFormat'] = kwargs.pop('returnFormat', 'json')
+        query['id'] = kwargs.pop('context_id', None)
+        query['type'] = kwargs.pop('type_sighting', None)
+        query['from'] = kwargs.pop('date_from', None)
+        query['to'] = kwargs.pop('date_to', None)
+        query['last'] = kwargs.pop('publish_timestamp', None)
+        query['org_id'] = kwargs.pop('org_id', None)
+        query['source'] = kwargs.pop('source', None)
+        query['includeAttribute'] = kwargs.pop('include_attribute', None)
+        query['includeEvent'] = kwargs.pop('include_event', None)
+
+        # Cleanup
+        query = {k: v for k, v in query.items() if v is not None}
+
+        if kwargs:
+            raise SearchError('Unused parameter: {}'.format(', '.join(kwargs.keys())))
+
+        # Create a session, make it async if and only if we have a callback
+        controller = 'sightings'
+        return self.__query('restSearch/' + context, query, controller, async_callback)
+
     # ############## Sharing Groups ##################
 
     def get_sharing_groups(self):
         """Get the existing sharing groups"""
         url = urljoin(self.root_url, 'sharing_groups.json')
         response = self._prepare_request('GET', url)
-        return self._check_response(response)['response']
+        return self._check_response(response)
 
     # ############## Users ##################
 
@@ -1664,71 +1791,234 @@ class PyMISP(object):
 
     def get_roles_list(self):
         """Get the list of existing roles"""
-        url = urljoin(self.root_url, '/roles')
+        url = urljoin(self.root_url, 'roles')
         response = self._prepare_request('GET', url)
-        return self._check_response(response)['response']
+        return self._check_response(response)
 
     # ############## Tags ##################
 
     def get_tags_list(self):
-        """Get the list of existing tags"""
-        url = urljoin(self.root_url, '/tags')
+        """Get the list of existing tags."""
+        url = urljoin(self.root_url, 'tags')
         response = self._prepare_request('GET', url)
         return self._check_response(response)['Tag']
+
+    def get_tag(self, tag_id):
+        """Get a tag by id."""
+        url = urljoin(self.root_url, 'tags/view/{}'.format(tag_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def _set_tag_parameters(self, name, colour, exportable, hide_tag, org_id, count, user_id, numerical_value,
+                            attribute_count, old_tag):
+        tag = old_tag
+        if name is not None:
+            tag['name'] = name
+        if colour is not None:
+            tag['colour'] = colour
+        if exportable is not None:
+            tag['exportable'] = exportable
+        if hide_tag is not None:
+            tag['hide_tag'] = hide_tag
+        if org_id is not None:
+            tag['org_id'] = org_id
+        if count is not None:
+            tag['count'] = count
+        if user_id is not None:
+            tag['user_id'] = user_id
+        if numerical_value is not None:
+            tag['numerical_value'] = numerical_value
+        if attribute_count is not None:
+            tag['attribute_count'] = attribute_count
+
+        return {'Tag': tag}
+
+    def edit_tag(self, tag_id, name=None, colour=None, exportable=None, hide_tag=None, org_id=None, count=None,
+                 user_id=None, numerical_value=None, attribute_count=None):
+        """Edit only the provided parameters of a tag."""
+        old_tag = self.get_tag(tag_id)
+        new_tag = self._set_tag_parameters(name, colour, exportable, hide_tag, org_id, count, user_id,
+                                           numerical_value, attribute_count, old_tag)
+        url = urljoin(self.root_url, 'tags/edit/{}'.format(tag_id))
+        response = self._prepare_request('POST', url, json.dumps(new_tag))
+        return self._check_response(response)
+
+    def edit_tag_json(self, json_file, tag_id):
+        """Edit the tag using a json file."""
+        with open(json_file, 'rb') as f:
+            jdata = json.load(f)
+        url = urljoin(self.root_url, 'tags/edit/{}'.format(tag_id))
+        response = self._prepare_request('POST', url, json.dumps(jdata))
+        return self._check_response(response)
+
+    def enable_tag(self, tag_id):
+        """Enable a tag by id."""
+        response = self.edit_tag(tag_id, hide_tag=False)
+        return response
+
+    def disable_tag(self, tag_id):
+        """Disable a tag by id."""
+        response = self.edit_tag(tag_id, hide_tag=True)
+        return response
 
     # ############## Taxonomies ##################
 
     def get_taxonomies_list(self):
-        url = urljoin(self.root_url, '/taxonomies')
+        """Get all the taxonomies."""
+        url = urljoin(self.root_url, 'taxonomies')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_taxonomy(self, taxonomy_id):
-        url = urljoin(self.root_url, '/taxonomies/view/{}'.format(taxonomy_id))
+        """Get a taxonomy by id."""
+        url = urljoin(self.root_url, 'taxonomies/view/{}'.format(taxonomy_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def update_taxonomies(self):
-        url = urljoin(self.root_url, '/taxonomies/update')
+        """Update all the taxonomies."""
+        url = urljoin(self.root_url, 'taxonomies/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
+    def enable_taxonomy(self, taxonomy_id):
+        """Enable a taxonomy by id."""
+        url = urljoin(self.root_url, 'taxonomies/enable/{}'.format(taxonomy_id))
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
+    def disable_taxonomy(self, taxonomy_id):
+        """Disable a taxonomy by id."""
+        self.disable_taxonomy_tags(taxonomy_id)
+        url = urljoin(self.root_url, 'taxonomies/disable/{}'.format(taxonomy_id))
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
+    def get_taxonomy_tags_list(self, taxonomy_id):
+        """Get all the tags of a taxonomy by id."""
+        url = urljoin(self.root_url, 'taxonomies/view/{}'.format(taxonomy_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)["entries"]
+
+    def enable_taxonomy_tags(self, taxonomy_id):
+        """Enable all the tags of a taxonomy by id."""
+        enabled = self.get_taxonomy(taxonomy_id)['Taxonomy']['enabled']
+        if enabled:
+            url = urljoin(self.root_url, 'taxonomies/addTag/{}'.format(taxonomy_id))
+            response = self._prepare_request('POST', url)
+            return self._check_response(response)
+
+    def disable_taxonomy_tags(self, taxonomy_id):
+        """Disable all the tags of a taxonomy by id."""
+        url = urljoin(self.root_url, 'taxonomies/disableTag/{}'.format(taxonomy_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     # ############## WarningLists ##################
 
     def get_warninglists(self):
-        url = urljoin(self.root_url, '/warninglists')
+        """Get all the warninglists."""
+        url = urljoin(self.root_url, 'warninglists')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_warninglist(self, warninglist_id):
-        url = urljoin(self.root_url, '/warninglists/view/{}'.format(warninglist_id))
+        """Get a warninglist by id."""
+        url = urljoin(self.root_url, 'warninglists/view/{}'.format(warninglist_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def update_warninglists(self):
-        url = urljoin(self.root_url, '/warninglists/update')
+        """Update all the warninglists."""
+        url = urljoin(self.root_url, 'warninglists/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
+    def toggle_warninglist(self, warninglist_id=None, warninglist_name=None, force_enable=None):
+        '''Toggle (enable/disable) the status of a warninglist by ID.
+        :param warninglist_id: ID of the WarningList
+        :param force_enable: Force the warning list in the enabled state (does nothing if already enabled)
+        '''
+        if warninglist_id is None and warninglist_name is None:
+            raise Exception('Either warninglist_id or warninglist_name is required.')
+        query = {}
+        if warninglist_id is not None:
+            if not isinstance(warninglist_id, list):
+                warninglist_id = [warninglist_id]
+            query['id'] = warninglist_id
+        if warninglist_name is not None:
+            if not isinstance(warninglist_name, list):
+                warninglist_name = [warninglist_name]
+            query['name'] = warninglist_name
+        if force_enable is not None:
+            query['enabled'] = force_enable
+        url = urljoin(self.root_url, 'warninglists/toggleEnable')
+        response = self._prepare_request('POST', url, json.dumps(query))
+        return self._check_response(response)
+
+    def enable_warninglist(self, warninglist_id):
+        """Enable a warninglist by id."""
+        return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=True)
+
+    def disable_warninglist(self, warninglist_id):
+        """Disable a warninglist by id."""
+        return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=False)
+
+    def check_warninglist(self, value):
+        """Check if IOC values are in warninglist"""
+        url = urljoin(self.root_url, 'warninglists/checkValue')
+        response = self._prepare_request('POST', url, json.dumps(value))
+        return self._check_response(response)
+
+    # ############## NoticeLists ##################
+
+    def get_noticelists(self):
+        """Get all the noticelists."""
+        url = urljoin(self.root_url, 'noticelists')
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
+    def get_noticelist(self, noticelist_id):
+        """Get a noticelist by id."""
+        url = urljoin(self.root_url, 'noticelists/view/{}'.format(noticelist_id))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+
     def update_noticelists(self):
-        url = urljoin(self.root_url, '/noticelists/update')
+        """Update all the noticelists."""
+        url = urljoin(self.root_url, 'noticelists/update')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
+    def enable_noticelist(self, noticelist_id):
+        """Enable a noticelist by id."""
+        url = urljoin(self.root_url, 'noticelists/enableNoticelist/{}/true'.format(noticelist_id))
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)
+
+    def disable_noticelist(self, noticelist_id):
+        """Disable a noticelist by id."""
+        url = urljoin(self.root_url, 'noticelists/enableNoticelist/{}'.format(noticelist_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     # ############## Galaxies/Clusters ##################
 
     def get_galaxies(self):
-        url = urljoin(self.root_url, '/galaxies')
+        """Get all the galaxies."""
+        url = urljoin(self.root_url, 'galaxies')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def get_galaxy(self, galaxy_id):
-        url = urljoin(self.root_url, '/galaxies/view/{}'.format(galaxy_id))
+        """Get a galaxy by id."""
+        url = urljoin(self.root_url, 'galaxies/view/{}'.format(galaxy_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
     def update_galaxies(self):
-        url = urljoin(self.root_url, '/galaxies/update')
+        """Update all the galaxies."""
+        url = urljoin(self.root_url, 'galaxies/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
@@ -1768,7 +2058,7 @@ class PyMISP(object):
         if tags:
             if isinstance(tags, list):
                 tags = "&&".join(tags)
-        url = urljoin(self.root_url, "/events/stix/download/{}/{}/{}/{}/{}".format(
+        url = urljoin(self.root_url, "events/stix/download/{}/{}/{}/{}/{}".format(
             event_id, with_attachments, tags, from_date, to_date))
         logger.debug("Getting STIX event from %s", url)
         response = self._prepare_request('GET', url)
@@ -1786,7 +2076,7 @@ class PyMISP(object):
         :param context: Add event level context (event_info,event_member_org,event_source_org,event_distribution,event_threat_level_id,event_analysis,event_date,event_tag)
         :param ignore: Returns the attributes even if the event isn't published, or the attribute doesn't have the to_ids flag set
         """
-        url = urljoin(self.root_url, '/events/csv/download')
+        url = urljoin(self.root_url, 'events/csv/download')
         to_post = {}
         if eventid:
             to_post['eventid'] = eventid
@@ -1939,7 +2229,7 @@ class PyMISP(object):
         :extend: Allow the organisation to extend the group
         '''
         to_jsonify = {'sg_id': sharing_group, 'org_id': organisation, 'extend': extend}
-        url = urljoin(self.root_url, '/sharingGroups/addOrg')
+        url = urljoin(self.root_url, 'sharingGroups/addOrg')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
@@ -1949,7 +2239,7 @@ class PyMISP(object):
         :organisation: Organisation's local instance ID, or Organisation's global UUID, or Organisation's name as known to the curent instance
         '''
         to_jsonify = {'sg_id': sharing_group, 'org_id': organisation}
-        url = urljoin(self.root_url, '/sharingGroups/removeOrg')
+        url = urljoin(self.root_url, 'sharingGroups/removeOrg')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
@@ -1960,7 +2250,7 @@ class PyMISP(object):
         :all_orgs: Add all the organisations of the server to the group
         '''
         to_jsonify = {'sg_id': sharing_group, 'server_id': server, 'all_orgs': all_orgs}
-        url = urljoin(self.root_url, '/sharingGroups/addServer')
+        url = urljoin(self.root_url, 'sharingGroups/addServer')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
@@ -1970,7 +2260,7 @@ class PyMISP(object):
         :server: Server's local instance ID, or URL of the Server, or Server's name as known to the curent instance
         '''
         to_jsonify = {'sg_id': sharing_group, 'server_id': server}
-        url = urljoin(self.root_url, '/sharingGroups/removeServer')
+        url = urljoin(self.root_url, 'sharingGroups/removeServer')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
@@ -2037,18 +2327,27 @@ class PyMISP(object):
         """Returns the list of Object templates available on the MISP instance"""
         url = urljoin(self.root_url, 'objectTemplates')
         response = self._prepare_request('GET', url)
-        return self._check_response(response)['response']
+        return self._check_response(response)
+
+    def get_object_template(self, object_uuid):
+        """Gets the full object template corresponting the UUID passed as parameter"""
+        url = urljoin(self.root_url, 'objectTemplates/view/{}'.format(object_uuid))
+        response = self._prepare_request('GET', url)
+        return self._check_response(response)
+        if 'ObjectTemplate' in response:
+            return response['ObjectTemplate']['id']
+        return response
 
     def get_object_template_id(self, object_uuid):
         """Gets the template ID corresponting the UUID passed as parameter"""
-        templates = self.get_object_templates_list()
-        for t in templates:
-            if t['ObjectTemplate']['uuid'] == object_uuid:
-                return t['ObjectTemplate']['id']
-        raise Exception('Unable to find template uuid {} on the MISP instance'.format(object_uuid))
+        template = self.get_object_template(object_uuid)
+        if 'ObjectTemplate' in template:
+            return template['ObjectTemplate']['id']
+        # Contains the error message.
+        return template
 
     def update_object_templates(self):
-        url = urljoin(self.root_url, '/objectTemplates/update')
+        url = urljoin(self.root_url, 'objectTemplates/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 

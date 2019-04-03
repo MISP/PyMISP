@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import json
 
 
 def init(url, key):
-    return PyMISP(url, key, True, 'json', True)
+    return PyMISP(url, key, misp_verifycert, 'json', True)
 
 
 def get_tags(m):

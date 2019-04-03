@@ -9,14 +9,14 @@
 
 import sys, json, time, requests
 from pymisp import PyMISP
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 
 et_url = 'https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt'
 et_str = 'Emerging Threats '
 
 def init_misp():
     global mymisp
-    mymisp = PyMISP(misp_url, misp_key)
+    mymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
 def load_misp_event(eid):
     global et_attr

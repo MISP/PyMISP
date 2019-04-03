@@ -1,5 +1,4 @@
-{
-  "response": [
+[
     {
       "SharingGroup": {
         "id": "1",
@@ -96,5 +95,4 @@
       ],
       "editable": true
     }
-  ]
-}
+]

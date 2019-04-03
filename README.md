@@ -4,6 +4,9 @@ README
 [![Documentation Status](https://readthedocs.org/projects/pymisp/badge/?version=latest)](http://pymisp.readthedocs.io/?badge=latest)
 [![Build Status](https://travis-ci.org/MISP/PyMISP.svg?branch=master)](https://travis-ci.org/MISP/PyMISP)
 [![Coverage Status](https://coveralls.io/repos/github/MISP/PyMISP/badge.svg?branch=master)](https://coveralls.io/github/MISP/PyMISP?branch=master)
+[![Python 3.6](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360/)
+[![PyPi version](https://img.shields.io/pypi/v/pymisp.svg)](https://pypi.python.org/pypi/pymisp/)
+[![Number of PyPI downloads](https://pypip.in/d/pymisp/badge.png)](https://pypi.python.org/pypi/pymisp/)
 
 # PyMISP - Python Library to access MISP
 
@@ -26,7 +29,37 @@ pip3 install pymisp
 ```
 git clone https://github.com/MISP/PyMISP.git && cd PyMISP
 git submodule update --init
-pip3 install -I .
+pip3 install -I .[fileobjects,neo,openioc,virustotal]
+```
+
+## Installing it with virtualenv
+
+It is recommended to use virtualenv to not polute your OS python envirenment.
+```
+pip3 install virtualenv
+git clone https://github.com/MISP/PyMISP.git && cd PyMISP
+python3 -m venv ./
+source venv/bin/activate
+git submodule update --init
+pip3 install -I .[fileobjects,neo,openioc,virustotal]
+```
+
+## Running the tests
+
+```bash
+pip3 install -U nose pip setuptools coveralls codecov requests-mock
+pip3 install git+https://github.com/kbandla/pydeep.git
+
+git clone https://github.com/viper-framework/viper-test-files.git tests/viper-test-files
+nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
+```
+
+If you have a MISP instance to test against, you can also run the live ones:
+
+**Note**: You need to update the key in `tests/testlive_comprehensive.py` to the automation key of your admin account.
+
+```bash
+nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py
 ```
 
 ## Samples and how to use PyMISP
@@ -44,12 +77,15 @@ vim keys.py
 The API key of MISP is available in the Automation section of the MISP web interface.
 
 To test if your URL and API keys are correct, you can test with examples/last.py to
-fetch the last 10 events published.
-
+fetch the events published in the last x amount of time (supported time indicators: days (d), hours (h) and minutes (m)).
+last.py
 ```
 cd examples
-python3 last.py -l 10
+python3 last.py -l 10h # 10 hours
+python3 last.py -l 5d  #  5 days
+python3 last.py -l 45m # 45 minutes
 ```
+
 
 ## Debugging
 
@@ -87,6 +123,10 @@ Documentation can be generated with epydoc:
 ```
 epydoc --url https://github.com/MISP/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
 ```
+
+### Jupyter notebook
+
+A series of [Jupyter notebooks for PyMISP tutorial](https://github.com/MISP/PyMISP/tree/master/docs/tutorial) are available in the repository.
 
 ## Everything is a Mutable Mapping
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
 # For python2 & 3 compat, a bit dirty, but it seems to be the least bad one
@@ -13,7 +13,7 @@ except NameError:
 
 
 def init(url, key):
-    return PyMISP(url, key, True, 'json', debug=True)
+    return PyMISP(url, key, misp_verifycert, 'json', debug=True)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create an event on MISP.')

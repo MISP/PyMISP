@@ -1,4 +1,4 @@
-__version__ = '2.4.95'
+__version__ = '2.4.103'
 import logging
 import functools
 import warnings
@@ -32,16 +32,27 @@ def deprecated(func):
 
 
 try:
-    from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse  # noqa
+    from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse  # noqa
     from .api import PyMISP  # noqa
     from .abstract import AbstractMISP, MISPEncode, MISPTag, Distribution, ThreatLevel, Analysis  # noqa
-    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting   # noqa
+    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting, MISPLog  # noqa
     from .tools import AbstractMISPObjectGenerator  # noqa
     from .tools import Neo4j  # noqa
     from .tools import stix  # noqa
     from .tools import openioc  # noqa
     from .tools import load_warninglists  # noqa
     from .tools import ext_lookups  # noqa
+
+    if sys.version_info >= (3, 6):
+        # Let's not bother with old python
+        try:
+            from .tools import reportlab_generator  # noqa
+        except ImportError:
+            # FIXME: The import should not raise an exception if reportlab isn't installed
+            pass
+        except NameError:
+            # FIXME: The import should not raise an exception if reportlab isn't installed
+            pass
     if sys.version_info >= (3, 6):
         from .aping import ExpandedPyMISP  # noqa
     logger.debug('pymisp loaded properly')

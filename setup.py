@@ -39,17 +39,19 @@ setup(
         'Topic :: Security',
         'Topic :: Internet',
     ],
-    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema', 'setuptools>=36.4', 'python-dateutil', 'enum34;python_version<"3.4"'],
+    install_requires=['six', 'requests', 'python-dateutil', 'jsonschema',
+                      'python-dateutil', 'enum34;python_version<"3.4"',
+                      'functools32;python_version<"3.0"'],
     extras_require={'fileobjects': ['lief>=0.8', 'python-magic'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
                     'virustotal': ['validators'],
-                    'warninglists': ['pymispwarninglists']},
+                    'docs': ['sphinx-autodoc-typehints'],
+                    'pdfexport': ['reportlab']},
     tests_require=[
         'jsonschema',
         'python-magic',
-        'requests-mock',
-        'six'
+        'requests-mock'
     ],
     test_suite="tests.test_offline",
     include_package_data=True,
@@ -57,5 +59,6 @@ setup(
                              'data/misp-objects/schema_objects.json',
                              'data/misp-objects/schema_relationships.json',
                              'data/misp-objects/objects/*/definition.json',
-                             'data/misp-objects/relationships/definition.json']},
+                             'data/misp-objects/relationships/definition.json',
+                             'tools/pdf_fonts/Noto_TTF/*']},
 )

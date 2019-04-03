@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from keys import misp_url, misp_key
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 from pymisp import PyMISP
 
@@ -12,7 +12,7 @@ except NameError:
     pass
     
 def init(url, key):
-    return PyMISP(url, key, False, 'json', debug=False)
+    return PyMISP(url, key, misp_verifycert, 'json', debug=False)
 
 
 if __name__ == '__main__':

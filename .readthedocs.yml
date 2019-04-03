@@ -1,0 +1,14 @@
+version: 2
+
+python:
+  version: 3.6
+  install:
+      - method: pip
+        path: .
+        extra_requirements:
+            - docs
+
+build:
+    image: latest
+
+formats: all

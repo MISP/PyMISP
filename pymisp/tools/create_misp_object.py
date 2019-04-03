@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import six
+import sys
 
 from . import FileObject, PEObject, ELFObject, MachOObject
 from ..exceptions import MISPObjectException
@@ -57,7 +57,7 @@ def make_binary_objects(filepath=None, pseudofile=None, filename=None, standalon
             if filepath:
                 lief_parsed = lief.parse(filepath=filepath)
             else:
-                if six.PY2:
+                if sys.version_info < (3, 0):
                     logger.critical('Pseudofile is not supported in python2. Just update.')
                     lief_parsed = None
                 else:

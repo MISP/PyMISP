@@ -5,7 +5,6 @@ import unittest
 import requests_mock
 import json
 import os
-import six
 import sys
 from io import BytesIO
 
@@ -112,7 +111,8 @@ class TestOffline(unittest.TestCase):
         self.initURI(m)
         pymisp = PyMISP(self.domain, self.key)
         sharing_groups = pymisp.get_sharing_groups()
-        self.assertEqual(sharing_groups[0], self.sharing_groups['response'][0])
+        print(sharing_groups)
+        self.assertEqual(sharing_groups['response'][0], self.sharing_groups[0])
 
     def test_auth_error(self, m):
         self.initURI(m)
@@ -307,7 +307,7 @@ class TestOffline(unittest.TestCase):
         return json.dumps(to_return, cls=MISPEncode)
 
     def test_objects_pseudofile(self, m):
-        if six.PY2:
+        if sys.version_info < (3, 0):
             return unittest.SkipTest()
         paths = ['cmd.exe', 'tmux', 'MachO-OSX-x64-ls']
         try:

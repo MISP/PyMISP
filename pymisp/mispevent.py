@@ -15,13 +15,11 @@ from . import deprecated
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
-import six  # Remove that import when discarding python2 support.
-
 import logging
 logger = logging.getLogger('pymisp')
 
 
-if six.PY2:
+if sys.version_info < (3, 0):
     logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
     # This is required because Python 2 is a pain.
@@ -87,6 +85,22 @@ def _int_to_str(d):
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             d[k] = str(v)
     return d
+
+
+def make_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int):
+        return bool(value)
+    if not value:  # None, 0, '', {}, []
+        return False
+
+    if isinstance(value, str):
+        if value == '0':
+            return False
+        return True
+    else:
+        raise Exception('Unable to convert {} to a boolean.'.format(value))
 
 
 class MISPAttribute(AbstractMISP):
@@ -195,6 +209,9 @@ class MISPAttribute(AbstractMISP):
         self.to_ids = kwargs.pop('to_ids', bool(int(type_defaults['to_ids'])))
         if self.to_ids is None:
             self.to_ids = bool(int(type_defaults['to_ids']))
+        else:
+            self.to_ids = make_bool(self.to_ids)
+
         if not isinstance(self.to_ids, bool):
             raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
 
@@ -372,15 +389,18 @@ class MISPEvent(AbstractMISP):
                     self.__json_schema = json.loads(f.read().decode())
                 else:
                     self.__json_schema = json.load(f)
-        if not describe_types:
+        if describe_types:
+            # This variable is used in add_attribute in order to avoid duplicating the structure
+            self._describe_types = describe_types
+        else:
             with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
                 if OLD_PY3:
                     t = json.loads(f.read().decode())
                 else:
                     t = json.load(f)
-            describe_types = t['result']
+            self._describe_types = t['result']
 
-        self._types = describe_types['types']
+        self._types = self._describe_types['types']
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
@@ -464,13 +484,7 @@ class MISPEvent(AbstractMISP):
             event = json_event
         if not event:
             raise PyMISPError('Invalid event')
-        # Invalid event created by MISP up to 2.4.52 (attribute_count is none instead of '0')
-        if (event.get('Event') and
-                'attribute_count' in event.get('Event') and
-                event.get('Event').get('attribute_count') is None):
-            event['Event']['attribute_count'] = '0'
-        e = event.get('Event')
-        self.from_dict(**e)
+        self.from_dict(**event)
         if validate:
             jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
 
@@ -478,6 +492,8 @@ class MISPEvent(AbstractMISP):
         """Set a date for the event (string, datetime, or date object)"""
         if isinstance(date, basestring) or isinstance(date, unicode):
             self.date = parse(date).date()
+        elif isinstance(date, int):
+            self.date = datetime.datetime.utcfromtimestamp(date).date()
         elif isinstance(date, datetime.datetime):
             self.date = date.date()
         elif isinstance(date, datetime.date):
@@ -489,17 +505,19 @@ class MISPEvent(AbstractMISP):
                 raise NewEventError('Invalid format for the date: {} - {}'.format(date, type(date)))
 
     def from_dict(self, **kwargs):
+        if kwargs.get('Event'):
+            kwargs = kwargs.get('Event')
         # Required value
         self.info = kwargs.pop('info', None)
         if self.info is None:
-            raise NewAttributeError('The info field of the new event is required.')
+            raise NewEventError('The info field of the new event is required.')
 
         # Default values for a valid event to send to a MISP instance
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
             self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4]:
-                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
+                raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
 
         if kwargs.get('threat_level_id') is not None:
             self.threat_level_id = int(kwargs.pop('threat_level_id'))
@@ -600,10 +618,10 @@ class MISPEvent(AbstractMISP):
         '''
         tags = []
         for a in self.attributes + [attribute for o in self.objects for attribute in o.attributes]:
-            if ((hasattr(a, 'id') and a.id == attribute_identifier) or
-                (hasattr(a, 'uuid') and a.uuid == attribute_identifier) or
-                (hasattr(a, 'value') and attribute_identifier == a.value or
-                 attribute_identifier in a.value.split('|'))):
+            if ((hasattr(a, 'id') and a.id == attribute_identifier)
+                    or (hasattr(a, 'uuid') and a.uuid == attribute_identifier)
+                    or (hasattr(a, 'value') and attribute_identifier == a.value
+                        or attribute_identifier in a.value.split('|'))):
                 tags += a.tags
         return tags
 
@@ -614,10 +632,10 @@ class MISPEvent(AbstractMISP):
         '''
         attributes = []
         for a in self.attributes + [attribute for o in self.objects for attribute in o.attributes]:
-            if ((hasattr(a, 'id') and a.id == attribute_identifier) or
-                (hasattr(a, 'uuid') and a.uuid == attribute_identifier) or
-                (hasattr(a, 'value') and attribute_identifier == a.value or
-                 attribute_identifier in a.value.split('|'))):
+            if ((hasattr(a, 'id') and a.id == attribute_identifier)
+                    or (hasattr(a, 'uuid') and a.uuid == attribute_identifier)
+                    or (hasattr(a, 'value') and attribute_identifier == a.value
+                        or attribute_identifier in a.value.split('|'))):
                 a.add_tag(tag)
                 attributes.append(a)
 
@@ -638,8 +656,8 @@ class MISPEvent(AbstractMISP):
         """Delete an attribute, you can search by ID or UUID"""
         found = False
         for a in self.attributes:
-            if ((hasattr(a, 'id') and a.id == attribute_id) or
-                    (hasattr(a, 'uuid') and a.uuid == attribute_id)):
+            if ((hasattr(a, 'id') and a.id == attribute_id)
+                    or (hasattr(a, 'uuid') and a.uuid == attribute_id)):
                 a.delete()
                 found = True
                 break
@@ -653,7 +671,7 @@ class MISPEvent(AbstractMISP):
         if isinstance(value, list):
             attr_list = [self.add_attribute(type=type, value=a, **kwargs) for a in value]
         else:
-            attribute = MISPAttribute()
+            attribute = MISPAttribute(describe_types=self._describe_types)
             attribute.from_dict(type=type, value=value, **kwargs)
             self.attributes.append(attribute)
         self.edited = True
@@ -818,6 +836,15 @@ class MISPFeed(AbstractMISP):
 
     def __init__(self):
         super(MISPFeed, self).__init__()
+
+
+class MISPLog(AbstractMISP):
+
+    def __init__(self):
+        super(MISPLog, self).__init__()
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}({self.model}, {self.action}, {self.title})'.format(self=self)
 
 
 class MISPSighting(AbstractMISP):
@@ -996,6 +1023,8 @@ class MISPObject(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPObjectReference.')
 
     def from_dict(self, **kwargs):
+        if kwargs.get('Object'):
+            kwargs = kwargs.get('Object')
         if self._known_template:
             if kwargs.get('template_uuid') and kwargs['template_uuid'] != self.template_uuid:
                 if self._strict:
@@ -1007,6 +1036,12 @@ class MISPObject(AbstractMISP):
                     raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
                 else:
                     self._known_template = False
+
+        if 'distribution' in kwargs and kwargs['distribution'] is not None:
+            self.distribution = kwargs.pop('distribution')
+            self.distribution = int(self.distribution)
+            if self.distribution not in [0, 1, 2, 3, 4, 5]:
+                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
 
         if kwargs.get('timestamp'):
             if sys.version_info >= (3, 3):
