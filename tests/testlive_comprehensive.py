@@ -911,10 +911,16 @@ class TestComprehensive(unittest.TestCase):
         ip_dom.add_attribute('ip', value='8.8.8.8')
         first.add_object(ip_dom)
         try:
+            # Update with full event
             first = self.user_misp_connector.add_event(first)
             first.objects[0].add_attribute('ip', value='8.9.9.8')
             first = self.user_misp_connector.update_event(first)
             self.assertEqual(first.objects[0].attributes[2].value, '8.9.9.8')
+            # Update object only
+            misp_object = self.user_misp_connector.get_object(first.objects[0].id)
+            misp_object.attributes[2].value = '8.9.9.9'
+            misp_object = self.user_misp_connector.update_object(misp_object)
+            self.assertEqual(misp_object.attributes[2].value, '8.9.9.9')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
