@@ -553,3 +553,8 @@ class ExpandedPyMISP(PyMISP):
             me.from_dict(**e_meta)
             to_return.append(me)
         return to_return
+
+    def set_default_role(self, role_id: int):
+        url = urljoin(self.root_url, f'/admin/roles/set_default/{role_id}')
+        response = self._prepare_request('POST', url)
+        return self._check_response(response)

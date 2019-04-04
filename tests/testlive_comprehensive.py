@@ -52,8 +52,9 @@ class TestComprehensive(unittest.TestCase):
         organisation = MISPOrganisation()
         organisation.name = 'Test Org'
         cls.test_org = cls.admin_misp_connector.add_organisation(organisation)
+        # Set the refault role (id 3 on the VM)
+        cls.admin_misp_connector.set_default_role(3)
         # Creates a user
-        # TODO & FIXME: set the default role to User is not already set - MISP/MISP #4423
         user = MISPUser()
         user.email = 'testusr@user.local'
         user.org_id = cls.test_org.id
@@ -1127,6 +1128,11 @@ class TestComprehensive(unittest.TestCase):
     def test_live_acl(self):
         missing_acls = self.admin_misp_connector.get_live_query_acl()
         self.assertEqual(missing_acls, [], msg=missing_acls)
+
+    def test_roles(self):
+        role = self.admin_misp_connector.set_default_role(4)
+        self.assertEqual(role['message'], 'Default role set.')
+        self.admin_misp_connector.set_default_role(3)
 
 
 if __name__ == '__main__':
