@@ -1602,12 +1602,16 @@ class PyMISP(object):
     def get_users_list(self):
         return self._rest_list('admin/users')
 
-    def get_user(self, user_id):
-        return self._rest_view('admin/users', user_id)
+    def get_user(self, user_id='me'):
+        return self._rest_view('users', user_id)
 
-    def add_user(self, email, org_id, role_id, **kwargs):
-        new_user = MISPUser()
-        new_user.from_dict(email=email, org_id=org_id, role_id=role_id, **kwargs)
+    def add_user(self, email, org_id=None, role_id=None, **kwargs):
+        if isinstance(email, MISPUser):
+            # Very dirty, allow to call that from ExpandedPyMISP
+            new_user = email
+        else:
+            new_user = MISPUser()
+            new_user.from_dict(email=email, org_id=org_id, role_id=role_id, **kwargs)
         return self._rest_add('admin/users', new_user)
 
     def add_user_json(self, json_file):
@@ -1647,12 +1651,16 @@ class PyMISP(object):
         return self._rest_view('organisations', organisation_id)
 
     def add_organisation(self, name, **kwargs):
-        new_org = MISPOrganisation()
-        new_org.from_dict(name=name, **kwargs)
-        if 'local' in new_org:
-            if new_org.get('local') is False:
-                if 'uuid' not in new_org:
-                    raise PyMISPError('A remote org MUST have a valid uuid')
+        if isinstance(name, MISPOrganisation):
+            # Very dirty, allow to call that from ExpandedPyMISP
+            new_org = name
+        else:
+            new_org = MISPOrganisation()
+            new_org.from_dict(name=name, **kwargs)
+            if 'local' in new_org:
+                if new_org.get('local') is False:
+                    if 'uuid' not in new_org:
+                        raise PyMISPError('A remote org MUST have a valid uuid')
         return self._rest_add('admin/organisations', new_org)
 
     def add_organisation_json(self, json_file):

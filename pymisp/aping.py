@@ -3,7 +3,7 @@
 
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPNotImplementedYet
 from .api import PyMISP, everything_broken
-from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject
+from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation
 from typing import TypeVar, Optional, Tuple, List, Dict, Union
 from datetime import date, datetime
 import csv
@@ -160,6 +160,36 @@ class ExpandedPyMISP(PyMISP):
         a = MISPAttribute()
         a.from_dict(**updated_attribute)
         return a
+
+    def add_user(self, user: MISPUser):
+        user = super().add_user(user)
+        if isinstance(user, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {user}')
+        elif 'errors' in user:
+            return user
+        u = MISPUser()
+        u.from_dict(**user)
+        return u
+
+    def get_user(self, userid='me'):
+        user = super().get_user(userid)
+        if isinstance(user, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {user}')
+        elif 'errors' in user:
+            return user
+        u = MISPUser()
+        u.from_dict(**user)
+        return u
+
+    def add_organisation(self, organisation: MISPOrganisation):
+        organisation = super().add_organisation(organisation)
+        if isinstance(organisation, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {organisation}')
+        elif 'errors' in organisation:
+            return organisation
+        o = MISPOrganisation()
+        o.from_dict(**organisation)
+        return o
 
     def search_sightings(self, context: Optional[str]=None,
                          context_id: Optional[SearchType]=None,

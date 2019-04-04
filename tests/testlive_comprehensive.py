@@ -49,18 +49,22 @@ class TestComprehensive(unittest.TestCase):
         # Connect as admin
         cls.admin_misp_connector = ExpandedPyMISP(url, key, verifycert, debug=False)
         # Creates an org
-        org = cls.admin_misp_connector.add_organisation(name='Test Org')
-        cls.test_org = MISPOrganisation()
-        cls.test_org.from_dict(**org)
+        organisation = MISPOrganisation()
+        organisation.name = 'Test Org'
+        cls.test_org = cls.admin_misp_connector.add_organisation(organisation)
         # Creates a user
-        usr = cls.admin_misp_connector.add_user(email='testusr@user.local', org_id=cls.test_org.id, role_id=3)
-        cls.test_usr = MISPUser()
-        cls.test_usr.from_dict(**usr)
+        # TODO & FIXME: set the default role to User is not already set - MISP/MISP #4423
+        user = MISPUser()
+        user.email = 'testusr@user.local'
+        user.org_id = cls.test_org.id
+        cls.test_usr = cls.admin_misp_connector.add_user(user)
         cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=False)
         # Creates a publisher
-        pub = cls.admin_misp_connector.add_user(email='testpub@user.local', org_id=cls.test_org.id, role_id=4)
-        cls.test_pub = MISPUser()
-        cls.test_pub.from_dict(**pub)
+        user = MISPUser()
+        user.email = 'testpub@user.local'
+        user.org_id = cls.test_org.id
+        user.role_id = 4
+        cls.test_pub = cls.admin_misp_connector.add_user(user)
         cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey, verifycert)
         # Update all json stuff
         cls.admin_misp_connector.update_object_templates()
@@ -429,7 +433,6 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
 
-    # @unittest.skip("Uncomment when adding new tests, it has a 10s sleep")
     def test_search_publish_timestamp(self):
         '''Search for a specific publication timestamp, an interval, and invalid values.'''
         # Creating event 1
@@ -1099,6 +1102,10 @@ class TestComprehensive(unittest.TestCase):
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
+
+    def test_user(self):
+        user = self.user_misp_connector.get_user()
+        self.assertEqual(user.authkey, self.test_usr.authkey)
 
     @unittest.skip("Currently failing")
     def test_search_type_event_csv(self):
