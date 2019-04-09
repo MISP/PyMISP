@@ -1097,9 +1097,11 @@ class MISPObject(AbstractMISP):
         '''True if all the relations in the list are defined in the object'''
         return all(relation in self._fast_attribute_access for relation in list_of_relations)
 
-    def add_attribute(self, object_relation, **value):
+    def add_attribute(self, object_relation, simple_value=None, **value):
         """Add an attribute. object_relation is required and the value key is a
         dictionary with all the keys supported by MISPAttribute"""
+        if simple_value:
+            value = {'value': simple_value}
         if value.get('value') is None:
             return None
         if self._known_template:
@@ -1117,6 +1119,20 @@ class MISPObject(AbstractMISP):
         self.Attribute.append(attribute)
         self.edited = True
         return attribute
+
+    def add_attributes(self, object_relation, *attributes):
+        '''Add multiple attributes with the same object_relation.
+        Helper for object_relation when multiple is True in the template.
+        It is the same as calling multiple times add_attribute with the same object_relation.
+        '''
+        to_return = []
+        for attribute in attributes:
+            if isinstance(attribute, dict):
+                a = self.add_attribute(object_relation, **attribute)
+            else:
+                a = self.add_attribute(object_relation, value=attribute)
+            to_return.append(a)
+        return to_return
 
     def to_dict(self, strict=False):
         if strict or self._strict and self._known_template:

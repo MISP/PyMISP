@@ -21,7 +21,7 @@ logging.disable(logging.CRITICAL)
 
 try:
     from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
-    from pymisp.tools import CSVLoader
+    from pymisp.tools import CSVLoader, DomainIPObject
 except ImportError:
     if sys.version_info < (3, 6):
         print('This test suite requires Python 3.6+, breaking.')
@@ -918,13 +918,41 @@ class TestComprehensive(unittest.TestCase):
             # Update with full event
             first = self.user_misp_connector.add_event(first)
             first.objects[0].add_attribute('ip', value='8.9.9.8')
+            first.objects[0].add_attribute('ip', '8.9.9.10')
             first = self.user_misp_connector.update_event(first)
             self.assertEqual(first.objects[0].attributes[2].value, '8.9.9.8')
+            self.assertEqual(first.objects[0].attributes[3].value, '8.9.9.10')
             # Update object only
             misp_object = self.user_misp_connector.get_object(first.objects[0].id)
             misp_object.attributes[2].value = '8.9.9.9'
             misp_object = self.user_misp_connector.update_object(misp_object)
             self.assertEqual(misp_object.attributes[2].value, '8.9.9.9')
+            # Test with add_attributes
+            second = self.create_simple_event()
+            ip_dom = MISPObject('domain-ip')
+            ip_dom.add_attribute('domain', value='google.fr')
+            ip_dom.add_attributes('ip', {'value': '10.8.8.8', 'to_ids': False}, '10.9.8.8')
+            ip_dom.add_attributes('ip', '11.8.8.8', '11.9.8.8')
+            second.add_object(ip_dom)
+            second = self.user_misp_connector.add_event(second)
+            self.assertEqual(len(second.objects[0].attributes), 5)
+            self.assertFalse(second.objects[0].attributes[1].to_ids)
+            self.assertTrue(second.objects[0].attributes[2].to_ids)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second.id)
+
+    def test_domain_ip_object(self):
+        first = self.create_simple_event()
+        try:
+            dom_ip_obj = DomainIPObject({'ip': ['1.1.1.1', {'value': '2.2.2.2', 'to_ids': False}],
+                                         'first-seen': '20190101',
+                                         'last-seen': '2019-02-03',
+                                         'domain': 'circl.lu'})
+            first.add_object(dom_ip_obj)
+            first = self.user_misp_connector.add_event(first)
+            self.assertEqual(len(first.objects[0].attributes), 5)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)

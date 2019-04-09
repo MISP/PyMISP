@@ -47,6 +47,8 @@ class AbstractMISPObjectGenerator(MISPObject):
                     continue
                 if isinstance(value, dict):
                     self.add_attribute(object_relation, **value)
+                elif isinstance(value, list):
+                    self.add_attributes(object_relation, *value)
                 else:
                     # Assume it is the value only
                     self.add_attribute(object_relation, value=value)
