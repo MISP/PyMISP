@@ -137,6 +137,7 @@ class TestMISPEvent(unittest.TestCase):
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
 
+    @unittest.skip("Not supported on MISP.")
     def test_shadow_attributes(self):
         self.init_event()
         p = self.mispevent.add_proposal(type='filename', value='baz.jpg')

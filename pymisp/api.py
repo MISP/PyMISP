@@ -164,7 +164,7 @@ class PyMISP(object):
                 if isinstance(data, dict):
                     # Remove None values.
                     data = {k: v for k, v in data.items() if v is not None}
-                data = json.dumps(data)
+                data = json.dumps(data, cls=MISPEncode)
             req = requests.Request(request_type, url, data=data)
         if self.asynch and background_callback is not None:
             local_session = FuturesSession

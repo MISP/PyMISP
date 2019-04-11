@@ -3,7 +3,7 @@
 
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPNotImplementedYet
 from .api import PyMISP, everything_broken
-from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation
+from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation, MISPShadowAttribute
 from typing import TypeVar, Optional, Tuple, List, Dict, Union
 from datetime import date, datetime
 import csv
@@ -151,6 +151,36 @@ class ExpandedPyMISP(PyMISP):
         e.load(updated_event)
         return e
 
+    def get_attribute(self, attribute_id: int):
+        attribute = super().get_attribute(attribute_id)
+        a = MISPAttribute()
+        a.from_dict(**attribute)
+        return a
+
+    def add_attribute(self, event_id: int, attribute: MISPAttribute):
+        url = urljoin(self.root_url, 'attributes/add/{}'.format(event_id))
+        response = self._prepare_request('POST', url, data=attribute)
+        new_attribute = self._check_response(response)
+        if isinstance(new_attribute, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {new_attribute}')
+        elif 'errors' in new_attribute:
+            return new_attribute
+        a = MISPAttribute()
+        a.from_dict(**new_attribute)
+        return a
+
+    def add_attribute_proposal(self, event_id: int, attribute: MISPAttribute):
+        url = urljoin(self.root_url, 'shadow_attributes/add/{}'.format(event_id))
+        response = self._prepare_request('POST', url, attribute)
+        new_attribute_proposal = self._check_response(response)
+        if isinstance(new_attribute_proposal, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {new_attribute_proposal}')
+        elif 'errors' in new_attribute_proposal:
+            return new_attribute_proposal
+        a = MISPShadowAttribute()
+        a.from_dict(**new_attribute_proposal)
+        return a
+
     def update_attribute(self, attribute: MISPAttribute):
         updated_attribute = super().update_attribute(attribute.uuid, attribute)
         if isinstance(updated_attribute, str):
@@ -160,6 +190,48 @@ class ExpandedPyMISP(PyMISP):
         a = MISPAttribute()
         a.from_dict(**updated_attribute)
         return a
+
+    def update_attribute_proposal(self, attribute_id: int, attribute: MISPAttribute):
+        url = urljoin(self.root_url, 'shadow_attributes/edit/{}'.format(attribute_id))
+        # FIXME: Inconsistency on MISP side
+        attribute = {'ShadowAttribute': attribute}
+        response = self._prepare_request('POST', url, attribute)
+        attribute_proposal = self._check_response(response)
+        if isinstance(attribute_proposal, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {attribute_proposal}')
+        elif 'errors' in attribute_proposal:
+            return attribute_proposal
+        a = MISPShadowAttribute()
+        a.from_dict(**attribute_proposal)
+        return a
+
+    def get_attribute_proposal(self, proposal_id: int):
+        url = urljoin(self.root_url, 'shadow_attributes/view/{}'.format(proposal_id))
+        response = self._prepare_request('GET', url)
+        attribute_proposal = self._check_response(response)
+        if isinstance(attribute_proposal, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {attribute_proposal}')
+        elif 'errors' in attribute_proposal:
+            return attribute_proposal
+        a = MISPShadowAttribute()
+        a.from_dict(**attribute_proposal)
+        return a
+
+    def accept_attribute_proposal(self, proposal_id: int):
+        url = urljoin(self.root_url, 'shadow_attributes/accept/{}'.format(proposal_id))
+        response = self._prepare_request('POST', url)
+        r = self._check_response(response)
+        if isinstance(r, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {r}')
+        return r
+
+    def discard_attribute_proposal(self, proposal_id: int):
+        url = urljoin(self.root_url, 'shadow_attributes/discard/{}'.format(proposal_id))
+        response = self._prepare_request('POST', url)
+        r = self._check_response(response)
+        if isinstance(r, str):
+            raise PyMISPUnexpectedResponse(f'Unexpected response from server: {r}')
+        return r
 
     def add_user(self, user: MISPUser):
         user = super().add_user(user)

@@ -916,10 +916,16 @@ class MISPObjectAttribute(MISPAttribute):
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
-class MISPShadowAttribute(MISPAttribute):
+class MISPShadowAttribute(AbstractMISP):
+    # NOTE: Kindof a MISPAttribute, but can be lot more lightweight (just one key for example)
 
     def __init__(self):
         super(MISPShadowAttribute, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('ShadowAttribute'):
+            kwargs = kwargs.get('ShadowAttribute')
+        super(MISPShadowAttribute, self).from_dict(**kwargs)
 
 
 class MISPObject(AbstractMISP):
