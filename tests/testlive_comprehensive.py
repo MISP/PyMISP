@@ -21,7 +21,7 @@ logging.disable(logging.CRITICAL)
 
 try:
     from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
-    from pymisp.tools import CSVLoader, DomainIPObject
+    from pymisp.tools import CSVLoader, DomainIPObject, ASNObject
 except ImportError:
     if sys.version_info < (3, 6):
         print('This test suite requires Python 3.6+, breaking.')
@@ -953,6 +953,19 @@ class TestComprehensive(unittest.TestCase):
             first.add_object(dom_ip_obj)
             first = self.user_misp_connector.add_event(first)
             self.assertEqual(len(first.objects[0].attributes), 5)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
+    def test_asn_object(self):
+        first = self.create_simple_event()
+        try:
+            dom_ip_obj = ASNObject({'asn': '12345',
+                                    'first-seen': '20190101',
+                                    'last-seen': '2019-02-03'})
+            first.add_object(dom_ip_obj)
+            first = self.user_misp_connector.add_event(first)
+            self.assertEqual(len(first.objects[0].attributes), 3)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
