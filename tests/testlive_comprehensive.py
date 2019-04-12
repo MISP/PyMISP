@@ -20,7 +20,7 @@ import logging
 logging.disable(logging.CRITICAL)
 
 try:
-    from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject
+    from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject
 except ImportError:
     if sys.version_info < (3, 6):
@@ -1148,6 +1148,55 @@ class TestComprehensive(unittest.TestCase):
     def test_user(self):
         user = self.user_misp_connector.get_user()
         self.assertEqual(user.authkey, self.test_usr.authkey)
+
+    def test_attribute(self):
+        first = self.create_simple_event()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            # Get attribute
+            attribute = self.user_misp_connector.get_attribute(first.attributes[0].id)
+            self.assertEqual(first.attributes[0].uuid, attribute.uuid)
+            # Add attribute
+            new_attribute = MISPAttribute()
+            new_attribute.value = '1.2.3.4'
+            new_attribute.type = 'ip-dst'
+            new_attribute = self.user_misp_connector.add_attribute(first.id, new_attribute)
+            self.assertEqual(new_attribute.value, '1.2.3.4')
+            # Add attribute as proposal
+            new_proposal = MISPAttribute()
+            new_proposal.value = '5.2.3.4'
+            new_proposal.type = 'ip-dst'
+            new_proposal.category = 'Network activity'
+            new_proposal = self.user_misp_connector.add_attribute_proposal(first.id, new_proposal)
+            self.assertEqual(new_proposal.value, '5.2.3.4')
+            # Update attribute
+            new_attribute.value = '5.6.3.4'
+            new_attribute = self.user_misp_connector.update_attribute(new_attribute)
+            self.assertEqual(new_attribute.value, '5.6.3.4')
+            # Update attribute as proposal
+            new_proposal_update = self.user_misp_connector.update_attribute_proposal(new_attribute.id, {'to_ids': False})
+            self.assertEqual(new_proposal_update.to_ids, False)
+            # Get attribute proposal
+            temp_new_proposal = self.user_misp_connector.get_attribute_proposal(new_proposal.id)
+            self.assertEqual(temp_new_proposal.uuid, new_proposal.uuid)
+            # Accept attribute proposal - New attribute
+            self.user_misp_connector.accept_attribute_proposal(new_proposal.id)
+            first = self.user_misp_connector.get_event(first.id)
+            self.assertEqual(first.attributes[-1].value, '5.2.3.4')
+            # Accept attribute proposal - Attribute update
+            response = self.user_misp_connector.accept_attribute_proposal(new_proposal_update.id)
+            self.assertEqual(response['message'], 'Proposed change accepted.')
+            attribute = self.user_misp_connector.get_attribute(new_attribute.id)
+            self.assertEqual(attribute.to_ids, False)
+            # Discard attribute proposal
+            new_proposal_update = self.user_misp_connector.update_attribute_proposal(new_attribute.id, {'to_ids': True})
+            response = self.user_misp_connector.discard_attribute_proposal(new_proposal_update.id)
+            self.assertEqual(response['message'], 'Proposal discarded.')
+            attribute = self.user_misp_connector.get_attribute(new_attribute.id)
+            self.assertEqual(attribute.to_ids, False)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
 
     @unittest.skip("Currently failing")
     def test_search_type_event_csv(self):
