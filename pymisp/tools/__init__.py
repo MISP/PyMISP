@@ -15,6 +15,7 @@ from .fail2banobject import Fail2BanObject  # noqa
 from .domainipobject import DomainIPObject  # noqa
 from .asnobject import ASNObject  # noqa
 from .geolocationobject import GeolocationObject  # noqa
+from .mimetypeobject import MIMETypeObject  # noqa
 
 if sys.version_info >= (3, 6):
     from .emailobject import EMailObject  # noqa
