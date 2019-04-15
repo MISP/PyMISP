@@ -100,10 +100,9 @@ class MIMETypeObject(AbstractMISPObjectGenerator):
 
         for k, v in file_metadata.items():
             sanitized_key_name = re.sub(r'\W', '-', k)
-            if type(v) is None:
+            if v is None:
                 pass
             elif v == '':
                 pass
             else:
                 self.add_attribute(sanitized_key_name, value=v)
-
