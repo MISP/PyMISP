@@ -43,4 +43,3 @@ if __name__ == '__main__':
 
         if mispObject:
             r = pymisp.add_object(args.event, mispObject)
-
