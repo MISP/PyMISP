@@ -1076,6 +1076,9 @@ class MISPObject(AbstractMISP):
 
     def add_reference(self, referenced_uuid, relationship_type, comment=None, **kwargs):
         """Add a link (uuid) to an other object"""
+        if isinstance(referenced_uuid, AbstractMISP):
+            # Allow to pass an object or an attribute instead of its UUID
+            referenced_uuid = referenced_uuid.uuid
         if kwargs.get('object_uuid'):
             # Load existing object
             object_uuid = kwargs.pop('object_uuid')
