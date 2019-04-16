@@ -63,7 +63,7 @@ class PyMISP(object):
 
     :param url: URL of the MISP instance you want to connect to
     :param key: API key of the user you want to use
-    :param ssl: can be True or False (to check ot not the validity of the certificate. Or a CA_BUNDLE in case of self signed certiifcate (the concatenation of all the \*.crt of the chain)
+    :param ssl: can be True or False (to check ot not the validity of the certificate. Or a CA_BUNDLE in case of self signed certificate (the concatenation of all the \*.crt of the chain)
     :param out_type: Type of object (json) NOTE: XML output isn't supported anymore, keeping the flag for compatibility reasons.
     :param debug: Write all the debug information to stderr
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
