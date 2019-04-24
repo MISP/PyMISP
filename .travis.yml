@@ -1,5 +1,7 @@
 language: python
 
+dist: xenial
+
 cache: pip
 
 addons:
@@ -11,13 +13,14 @@ addons:
 
 python:
     - "2.7"
-    - "3.5-dev"
     - "3.6"
     - "3.6-dev"
 
 install:
     - pip install pipenv
     - pipenv install --dev
+    - pipenv shell
+    - pip install lief
     - pushd tests
     - git clone https://github.com/viper-framework/viper-test-files.git
     - popd
