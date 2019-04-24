@@ -32,6 +32,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump Objects. [Raphaël Vinot]
+- Bump version, Bump changelog. [Raphaël Vinot]
 - Add python 3.7 support for pipenv users. [Raphaël Vinot]
 - Allow to pass a eml as string to EmailObject. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
