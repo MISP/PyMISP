@@ -36,7 +36,10 @@ class EMailObject(AbstractMISPObjectGenerator):
     def attachments(self):
         to_return = []
         for attachment in self.__email.iter_attachments():
-            to_return.append((attachment.get_filename(), BytesIO(attachment.get_content())))
+            content = attachment.get_content()
+            if isinstance(content, str):
+                content = content.encode()
+            to_return.append((attachment.get_filename(), BytesIO(content)))
         return to_return
 
     def generate_attributes(self):
@@ -47,16 +50,16 @@ class EMailObject(AbstractMISPObjectGenerator):
         if 'Message-ID' in self.__email:
             self.add_attribute('message-id', value=self.__email['Message-ID'])
         if 'To' in self.__email:
-            for to in self.__email['To'].split(','):
-                self.add_attribute('to', value=to.strip())
+            to_add = [to.strip() for to in self.__email['To'].split(',')]
+            self.add_attributes('to', *to_add)
         if 'Cc' in self.__email:
-            for cc in self.__email['Cc'].split(','):
-                self.add_attribute('cc', value=cc.strip())
+            to_add = [to.strip() for to in self.__email['Cc'].split(',')]
+            self.add_attributes('cc', *to_add)
         if 'Subject' in self.__email:
             self.add_attribute('subject', value=self.__email['Subject'])
         if 'From' in self.__email:
-            for e_from in self.__email['From'].split(','):
-                self.add_attribute('from', value=e_from.strip())
+            to_add = [to.strip() for to in self.__email['From'].split(',')]
+            self.add_attributes('from', *to_add)
         if 'Return-Path' in self.__email:
             self.add_attribute('return-path', value=self.__email['Return-Path'])
         if 'User-Agent' in self.__email:
