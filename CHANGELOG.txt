@@ -2,12 +2,99 @@ Changelog
 =========
 
 
-%%version%% (unreleased)
-------------------------
+v2.4.106 (2019-04-24)
+---------------------
+
+New
+~~~
+- Test cases for attributes and proposals. [Raphaël Vinot]
+- Improve python3.6+ lib. [Raphaël Vinot]
+- Add_attributes method in MISPObject (for multiple attributes) [Raphaël
+  Vinot]
+- Method to set the default role. [Raphaël Vinot]
+- Default to "me" in the get_user method, update ExpandedPyMISP.
+  [Raphaël Vinot]
+
+  Fix #377
+- Add get_object to ExpandedPyMISP. [Raphaël Vinot]
+
+  Fix #372
+- Test cases for CSV loader, add cleaner methods in ExpandedPyMISP.
+  [Raphaël Vinot]
+- Add CSV loader. [Raphaël Vinot]
+
+  Fix #376
+- Helper to create MISP Objects for regcheck.org.uk. [Raphaël Vinot]
+- Test for ACLs in testlive. [Raphaël Vinot]
+- Test for manual calls to add_object and add_object_reference. [Raphaël
+  Vinot]
+- Test update object in event. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
-- Build all formats for the documentation. [Raphaël Vinot]
+- Add python 3.7 support for pipenv users. [Raphaël Vinot]
+- Allow to pass a eml as string to EmailObject. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+
+  Fix CVE-2019-11324 (urllib3)
+- Bump dependencies. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Allow to pass an AbstractMISP to add_reference. [Raphaël Vinot]
+
+  Fix #379
+- Rework notebooks. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Display an error on failure in testlive. [Raphaël Vinot]
+- Add tests for disable_tag. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Reorganize some tests. [Raphaël Vinot]
+- Orders of tests in make_bool. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Initial set of refactoring on PDF generator. [Raphaël Vinot]
+- Add i8n for pdfexport, without all the fonts in the main repo.
+  [Raphaël Vinot]
+
+Fix
+~~~
+- Build on readthedocs. [Raphaël Vinot]
+- [typo] Fixed a small typo I noticed in the docs. [Steve Clement]
+- Add missing files for testing (CSV loader) [Raphaël Vinot]
+- Properly test query ACLs. [Raphaël Vinot]
+- Update all json submodules at one place in testlive. [Raphaël Vinot]
+- Disable some tests for the run on travis. [Raphaël Vinot]
+- [exportpdf] Doc update. [Falconieri]
+- [exportpdf] Coding Style. [Falconieri]
+- Improper handling of to_ids passed as integer in MISPEvent. [Raphaël
+  Vinot]
+
+  Fix #364
+- Do not fail when importing the reportlab file. [Raphaël Vinot]
+- PDF Export requires python 3.6+. [Raphaël Vinot]
+- Do not run PDF Export tests on python < 3.6. [Raphaël Vinot]
+- [exportpdf] Custom path for fonts and font package. [Falconieri]
+- Allow to use global variables HTTP_PROXY and HTTPS_PROXY again.
+  [Raphaël Vinot]
+
+  Fix #365
+- Slight changes in new .change_disable_correlation method. [Raphaël
+  Vinot]
+- Get_object_template_id was broken. Add test case. [Raphaël Vinot]
+
+  Fix #361
+
+Other
+~~~~~
+- New Add test for ASNObject. [Raphaël Vinot]
+- Update README.md. [Steve Clement]
+
+  Added number of monthly PyPi downloads
+- Add: [exportpdf] documentation added about exportPDF. [Falconieri]
+- Fix for "'NoneType' object has no attribute 'setdefault'" [Jacco
+  Ligthart]
+- Fix a type on function name. [l3m0ntr33]
+- Add new function
+  PyMISP.change_disablecorrelation(attribute_uuid,disable_correlation)
+  to be able to enable/disable correlation on attributes. [hrifflet]
 
 
 v2.4.103 (2019-03-01)
@@ -21,6 +108,7 @@ New
 
 Changes
 ~~~~~~~
+- Build all formats for the documentation. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - [jupyter] remove all the response key (as response is removing it)
   [Alexandre Dulaunoy]
@@ -86,6 +174,7 @@ Fix
 
 Other
 ~~~~~
+- Re-bump changelog. [Raphaël Vinot]
 - - Set my misp-objects… [Steve Clement]
 - Add : [exportpdf] Objects handling, tests cases, test files.
   [Falconieri]
