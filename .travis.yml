@@ -19,7 +19,6 @@ python:
 install:
     - pip install pipenv
     - pipenv install --dev
-    - pipenv shell
     - pip install lief
     - pushd tests
     - git clone https://github.com/viper-framework/viper-test-files.git
