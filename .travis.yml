@@ -1,7 +1,5 @@
 language: python
 
-dist: xenial
-
 cache: pip
 
 addons:
@@ -11,21 +9,33 @@ addons:
       - libstdc++6
       - libfuzzy-dev
 
-python:
-    - "2.7"
-    - "3.6"
-    - "3.6-dev"
+
+matrix:
+    include:
+        - name: "Python 2.7 - legacy"
+          python: 2.7
+          env: LEGACY=true
+        - name: "Python 3.5"
+          python: 3.5
+          dist: xenial
+        - name: "Python 3.6"
+          python: 3.6
+          dist: xenial
+        - name: "Python 3.6 - Dev"
+          python: 3.6-dev
+          dist: xenial
+        - name: "Python 3.7"
+          python: 3.7
+          dist: xenial
+        - name: "Python 3.7 - Dev"
+          python: 3.7-dev
+          dist: xenial
 
 install:
-    - pip install pipenv
-    - pipenv install --dev
-    - pip install lief
-    - pushd tests
-    - git clone https://github.com/viper-framework/viper-test-files.git
-    - popd
+    - bash travis/install_travis.sh
 
 script:
-    - pipenv run nosetests --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
+    - bash travis/test_travis.sh
 
 after_success:
     - pipenv run codecov
