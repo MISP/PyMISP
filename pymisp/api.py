@@ -70,9 +70,10 @@ class PyMISP(object):
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#client-side-certificates
     :param asynch: Use asynchronous processing where possible
     :param auth: The auth parameter is passed directly to requests, as described here: http://docs.python-requests.org/en/master/user/authentication/
+    :param tool: The software using PyMISP (string), used to set a unique user-agent
     """
 
-    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False, auth=None):
+    def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False, auth=None, tool=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -85,6 +86,7 @@ class PyMISP(object):
         self.cert = cert
         self.asynch = asynch
         self.auth = auth
+        self.tool = tool
         if asynch and not ASYNC_OK:
             logger.critical("You turned on Async, but don't have requests_futures installed")
             self.asynch = False
@@ -171,13 +173,16 @@ class PyMISP(object):
         else:
             local_session = requests.Session
         with local_session() as s:
+            ua_suffix = ''
+            if self.tool:
+                ua_suffix = ' - {}'.format(self.tool)
             req.auth = self.auth
             prepped = s.prepare_request(req)
             prepped.headers.update(
                 {'Authorization': self.key,
                  'Accept': 'application/{}'.format(output_type),
                  'content-type': 'application/{}'.format(output_type),
-                 'User-Agent': 'PyMISP {} - Python {}.{}.{}'.format(__version__, *sys.version_info)})
+                 'User-Agent': 'PyMISP {} - Python {}.{}.{}{}'.format(__version__, sys.version_info[0], sys.version_info[1], sys.version_info[2], ua_suffix)})
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(prepped.headers)
             settings = s.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None, verify=self.ssl, cert=self.cert)
