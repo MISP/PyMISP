@@ -36,7 +36,7 @@ def init(url, key):
     return PyMISP(url, key, misp_verifycert, 'json')
 
 
-def get_vmray_config(url, key, default_wait_period):
+def get_vmray_config(url, key, misp_verifycert, default_wait_period):
     '''
         Fetch configuration settings from MISP
         Includes VMRay API and modules URL
@@ -44,7 +44,7 @@ def get_vmray_config(url, key, default_wait_period):
 
     try:
         misp_headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': key}
-        req = requests.get(url + 'servers/serverSettings.json', verify=False, headers=misp_headers)
+        req = requests.get(url + 'servers/serverSettings.json', verify=misp_verifycert, headers=misp_headers)
 
         if req.status_code == 200:
             req_json = req.json()
@@ -209,5 +209,5 @@ if __name__ == '__main__':
     default_wait_period = 30
 
     misp = init(misp_url, misp_key)
-    vmray_config = get_vmray_config(misp_url, misp_key, default_wait_period)
+    vmray_config = get_vmray_config(misp_url, misp_key, misp_verifycert, default_wait_period)
     search_vmray_incomplete(misp, misp_url, vmray_config['vmray_wait_period'], vmray_config['module_import_url'], vmray_config['module_import_port'], vmray_config['vmray_url'], vmray_config['vmray_api'], vmray_attribute_category, vmray_include_analysisid, vmray_include_imphash_ssdeep, vmray_include_extracted_files, vmray_include_analysisdetails, vmray_include_vtidetails, custom_tags_incomplete, custom_tags_complete)
