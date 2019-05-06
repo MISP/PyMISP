@@ -14,7 +14,7 @@ Do inline config in "main"
 '''
 
 from pymisp import PyMISP
-from keys import misp_url, misp_key,misp_verifycert
+from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
 import json
@@ -43,11 +43,11 @@ def get_vmray_config(url, key, default_wait_period):
     '''
 
     try:
-        misp_headers = {'Content-Type': 'application/json','Accept': 'application/json', 'Authorization': key }
-        req = requests.get(url + 'servers/serverSettings.json', verify=False,  headers=misp_headers)
+        misp_headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': key}
+        req = requests.get(url + 'servers/serverSettings.json', verify=False, headers=misp_headers)
 
         if req.status_code == 200:
-            req_json=req.json()
+            req_json = req.json()
             if 'finalSettings' in req_json:
                 finalSettings = req_json['finalSettings']
                 vmray_api = ''
@@ -58,14 +58,14 @@ def get_vmray_config(url, key, default_wait_period):
                     # Is the vmray import module enabled?
                     if el['setting'] == 'Plugin.Import_vmray_import_enabled':
                         vmray_import_enabled = el['value']
-                        if vmray_import_enabled == False:
+                        if vmray_import_enabled is False:
                             break
                     # Get the VMRay API key from the MISP settings
                     elif el['setting'] == 'Plugin.Import_vmray_import_apikey':
                         vmray_api = el['value']
                     # The VMRay URL to query
                     elif el['setting'] == 'Plugin.Import_vmray_import_url':
-                        vmray_url = el['value'].replace('/','\\/')
+                        vmray_url = el['value'].replace('/', '\\/')
                     # MISP modules - Port?
                     elif el['setting'] == 'Plugin.Import_services_port':
                         module_import_port = el['value']
@@ -88,7 +88,6 @@ def get_vmray_config(url, key, default_wait_period):
 
     except Exception as e:
         sys.exit('Unable to get VMRay config from MISP')
-
 
 
 def search_vmray_incomplete(m, url, wait_period, module_import_url, module_import_port, vmray_url, vmray_api, vmray_attribute_category, vmray_include_analysisid, vmray_include_imphash_ssdeep, vmray_include_extracted_files, vmray_include_analysisdetails, vmray_include_vtidetails, custom_tags_incomplete, custom_tags_complete):
@@ -118,7 +117,8 @@ def search_vmray_incomplete(m, url, wait_period, module_import_url, module_impor
         # Not enough time has gone by to lookup the analysis jobs
         if int((time.time() - timestamp) / 60) < int(wait_period):
             if module_DEBUG:
-                print("Attribute to recent - %s " % (int(time.time() - timestamp) / 60) )
+                r_timestamp = datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                print("Attribute to recent for wait_period (%s minutes) - timestamp attribute: %s (%s minutes old)" % (wait_period, r_timestamp, round((int(time.time() - timestamp) / 60), 2)))
             return False
 
         if module_DEBUG:
@@ -136,7 +136,7 @@ def search_vmray_incomplete(m, url, wait_period, module_import_url, module_impor
                 if vmray_sample_id.isdigit():
                     event_id = att['event_id']
                     if module_DEBUG:
-                        print("Found event %s with matching tags %s for sample id %s " % (event_id,custom_tags_incomplete,vmray_sample_id) )
+                        print("Found event %s with matching tags %s for sample id %s " % (event_id, custom_tags_incomplete, vmray_sample_id))
 
                     # Prepare request to send to vmray_import via misp modules
                     misp_modules_url = module_import_url + ':' + module_import_port + '/query'
@@ -144,11 +144,11 @@ def search_vmray_incomplete(m, url, wait_period, module_import_url, module_impor
                     misp_modules_body = '{ "sample_id":"' + vmray_sample_id + '","module":"vmray_import","event_id":"' + event_id + '","config":{"apikey":"' + vmray_api + '","url":"' + vmray_url + '","include_analysisid":"' + vmray_include_analysisid + '","include_analysisdetails":"' + vmray_include_analysisdetails + '","include_extracted_files":"' + vmray_include_extracted_files + '","include_imphash_ssdeep":"' + vmray_include_imphash_ssdeep + '","include_vtidetails":"' + vmray_include_vtidetails + '","sample_id":"' + vmray_sample_id + '"},"data":""}'
                     req = requests.post(misp_modules_url, data=misp_modules_body, headers=misp_modules_headers)
                     if module_DEBUG and req is not None:
-                        print("Response code from submitting to MISP modules %s" % (req.status_code) )
+                        print("Response code from submitting to MISP modules %s" % (req.status_code))
 
                     # Succesful response from the misp modules?
                     if req.status_code == 200:
-                        req_json=req.json()
+                        req_json = req.json()
                         if "error" in req_json:
                             print("Error code in reply %s " % req_json["error"])
                             continue
@@ -160,6 +160,8 @@ def search_vmray_incomplete(m, url, wait_period, module_import_url, module_impor
                                 to_ids = True
                                 values = el['values']
                                 types = el['types']
+                                if "to_ids" in el:
+                                    to_ids = el['to_ids']
                                 if "text" in types:
                                     to_ids = False
                                 comment = el['comment']
@@ -169,9 +171,9 @@ def search_vmray_incomplete(m, url, wait_period, module_import_url, module_impor
                                 # Attribute can belong in different types
                                 for type in types:
                                     try:
-                                        r = m.add_named_attribute( event_id, type, values, vmray_attribute_category, to_ids, comment)
+                                        r = m.add_named_attribute(event_id, type, values, vmray_attribute_category, to_ids, comment)
                                         if module_DEBUG:
-                                            print("Add event %s: %s as %s (%s)" % (event_id, values, type, comment))
+                                            print("Add event %s: %s as %s (%s) (toids: %s)" % (event_id, values, type, comment, to_ids))
                                     except Exception as e:
                                         continue
                                         if module_DEBUG:
@@ -185,7 +187,7 @@ def search_vmray_incomplete(m, url, wait_period, module_import_url, module_impor
                                 print("Updated event %s" % event_id)
 
                     else:
-                        sys.exit('MISP modules did not return HTTP 200 code (event %s ; sampleid %s)' % (event_id,vmray_sample_id) )
+                        sys.exit('MISP modules did not return HTTP 200 code (event %s ; sampleid %s)' % (event_id, vmray_sample_id))
 
     except Exception as e:
         sys.exit("Invalid response received from MISP : %s", e)
