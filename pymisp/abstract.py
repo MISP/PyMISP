@@ -11,11 +11,18 @@ from enum import Enum
 
 from .exceptions import PyMISPInvalidFormat
 
+# Try to import MutableMapping the python 3.3+ way
+try:
+    from collections.abc import MutableMapping
+except:
+    pass
+
 
 logger = logging.getLogger('pymisp')
 
 if sys.version_info < (3, 0):
     logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
+    from collections import MutableMapping
 
     # This is required because Python 2 is a pain.
     from datetime import tzinfo, timedelta

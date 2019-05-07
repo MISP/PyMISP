@@ -10,6 +10,9 @@ from pymisp import MISPEvent
 
 manual_testing = False
 
+import logging
+logging.disable(logging.CRITICAL)
+
 try:
     from pymisp.tools import reportlab_generator
 except Exception:
