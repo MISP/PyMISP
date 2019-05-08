@@ -9,7 +9,7 @@ if [ ${LEGACY} == true ]; then
 else
     # We're in python3, installing with pipenv.
 	pip install pipenv
-	pipenv install --dev
+	pipenv update --dev
 fi
 pushd tests
 git clone https://github.com/viper-framework/viper-test-files.git
