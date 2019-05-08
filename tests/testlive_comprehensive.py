@@ -1008,6 +1008,8 @@ class TestComprehensive(unittest.TestCase):
                 self.assertTrue('ObjectReference' in r, r)
 
             r = self.user_misp_connector.add_object(first.id, fo)
+            obj_attrs = r.get_attributes_by_relation('ssdeep')
+            self.assertEqual(len(obj_attrs), 1, obj_attrs)
             self.assertEqual(r.name, 'file', r)
             for ref in fo.ObjectReference:
                 r = self.user_misp_connector.add_object_reference(ref)

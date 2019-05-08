@@ -16,7 +16,6 @@ requests-mock = "*"
 
 [packages]
 pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal", "pdfexport"],path = "."}
-pydeep = {editable = true,git = "https://github.com/kbandla/pydeep.git"}
 pymispwarninglists = {editable = true,git = "https://github.com/MISP/PyMISPWarningLists.git"}
 lief = {version = "==0.9.0.dev0",index = "lief_index",markers = "python_version >= '3.5'"}
 

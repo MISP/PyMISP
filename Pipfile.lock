@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "46b6226f0c646fd9216d5a9b0d498bd1ebb68d9d39bc5ab26f6d6557ffe93984"
+            "sha256": "62cc8da79f6f7af6037a4b1a6d797070ae6e2dee6f46c7f81414ca63f3cd81f2"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -177,9 +177,9 @@
         },
         "neobolt": {
             "hashes": [
-                "sha256:225c11ae26cbcc723fdb51f3a3d2587e5a26b0792843457ec1b950fd84848b30"
+                "sha256:7be4852d6974c4c2a14ac32b4618074e6c6ee0b672a6029bf11d927358fcadfd"
             ],
-            "version": "==1.7.11"
+            "version": "==1.7.12"
         },
         "neotime": {
             "hashes": [
@@ -239,9 +239,10 @@
             "version": "==2.19"
         },
         "pydeep": {
-            "editable": true,
-            "git": "https://github.com/kbandla/pydeep.git",
-            "ref": "bc0d33bff4b45718b4c5f2c79d4715d92a427eda"
+            "hashes": [
+                "sha256:22866eb422d1d5907f8076ee792da65caecb172425d27576274e2a8eacf6afc1"
+            ],
+            "version": "==0.4"
         },
         "pygments": {
             "hashes": [
