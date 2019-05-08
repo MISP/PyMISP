@@ -5,7 +5,6 @@ import sys
 import datetime
 import json
 from json import JSONEncoder
-import collections
 import logging
 from enum import Enum
 
@@ -82,7 +81,7 @@ class MISPEncode(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
-class AbstractMISP(collections.MutableMapping):
+class AbstractMISP(MutableMapping):
 
     __not_jsonable = []
 
