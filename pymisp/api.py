@@ -513,7 +513,9 @@ class PyMISP(object):
         """Change the sharing group of an event"""
         e = self._make_mispevent(event)
         e.distribution = 4      # Needs to be 'Sharing group'
-        e.sharing_group_id = sharing_group_id
+        if e.SharingGroup:      # Delete former SharingGroup information
+            del e.SharingGroup
+        e.sharing_group_id = sharing_group_id # Set new sharing group id
         return self.update(e)
 
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
@@ -1188,6 +1190,7 @@ class PyMISP(object):
         :param publish_timestamp: the publish timestamp
         :param timestamp: the timestamp of the last modification. Can be a list (from->to)
         :param enforceWarninglist: Enforce the warning lists
+        :param includeWarninglistHits: Include the warning list hits
         :param searchall: full text search on the database
         :param metadata: return only metadata if True
         :param published: return only published events
@@ -1249,6 +1252,7 @@ class PyMISP(object):
         query['publish_timestamp'] = kwargs.pop('publish_timestamp', None)
         query['timestamp'] = kwargs.pop('timestamp', None)
         query['enforceWarninglist'] = kwargs.pop('enforceWarninglist', None)
+        query['includeWarninglistHits'] = kwargs.pop('includeWarninglistHits', None)
         query['to_ids'] = kwargs.pop('to_ids', None)
         query['deleted'] = kwargs.pop('deleted', None)
         query['published'] = kwargs.pop('published', None)
