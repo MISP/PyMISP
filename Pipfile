@@ -17,7 +17,7 @@ requests-mock = "*"
 [packages]
 pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal", "pdfexport"],path = "."}
 pymispwarninglists = {editable = true,git = "https://github.com/MISP/PyMISPWarningLists.git"}
-lief = {version = "==0.9.0.dev0",index = "lief_index",markers = "python_version >= '3.5'"}
+lief = {version = ">=0.10.0.dev0",index = "lief_index",markers = "python_version >= '3.5'"}
 
 [requires]
 python_version = "3"
