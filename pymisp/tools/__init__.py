@@ -20,3 +20,4 @@ if sys.version_info >= (3, 6):
     from .emailobject import EMailObject  # noqa
     from .vehicleobject import VehicleObject  # noqa
     from .csvloader import CSVLoader  # noqa
+    from .sshauthkeyobject import SSHAuthorizedKeysObject  # noqa
