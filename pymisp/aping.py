@@ -7,6 +7,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
 from typing import TypeVar, Optional, Tuple, List, Dict, Union
 from datetime import date, datetime
 import csv
+from pathlib import Path
 
 import logging
 from urllib.parse import urljoin
@@ -630,3 +631,26 @@ class ExpandedPyMISP(PyMISP):
         url = urljoin(self.root_url, f'/admin/roles/set_default/{role_id}')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
+
+    def upload_stix(self, path, version: str='2'):
+        """Upload a STIX file to MISP.
+        :param path: Path to the STIX on the disk (can be a path-like object, or a pseudofile)
+        :param version: Can be 1 or 2
+        """
+        if isinstance(path, (str, Path)):
+            with open(path, 'rb') as f:
+                to_post = f.read()
+        else:
+            to_post = path.read()
+
+        if isinstance(to_post, bytes):
+            to_post = to_post.decode()
+
+        if str(version) == '1':
+            url = urljoin(self.root_url, '/events/upload_stix')
+            response = self._prepare_request('POST', url, data=to_post, output_type='xml')
+        else:
+            url = urljoin(self.root_url, '/events/upload_stix/2')
+            response = self._prepare_request('POST', url, data=to_post)
+
+        return response
