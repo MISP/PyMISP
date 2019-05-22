@@ -236,7 +236,7 @@ class PyMISP(object):
 
         return messages
 
-    def _check_response(self, response):
+    def _check_response(self, response, lenient_response_type=False):
         """Check if the response from the server is not an unexpected error"""
         try:
             json_response = response.json()
@@ -244,7 +244,10 @@ class PyMISP(object):
             # If the server didn't return a JSON blob, we've a problem.
             if not len(response.text):
                 raise PyMISPEmptyResponse('The server returned an empty response. \n{}\n{}\n'.format(response.request.headers, response.request.body))
-            raise PyMISPError(everything_broken.format(response.request.headers, response.request.body, response.text))
+            if lenient_response_type and not response.headers.get('content-type').startswith('application/json;'):
+                return response.text
+            else:
+                raise PyMISPError(everything_broken.format(response.request.headers, response.request.body, response.text))
 
         errors = []
 
@@ -445,7 +448,7 @@ class PyMISP(object):
             if isinstance(data, dict):
                 data = json.dumps(data)
             response = self._prepare_request('POST', url, data)
-        return self._check_response(response)
+        return self._check_response(response, lenient_response_type=True)
 
     # ##############################################
     # ############### Event handling ###############
