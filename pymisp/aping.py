@@ -62,7 +62,7 @@ class ExpandedPyMISP(PyMISP):
         else:
             return value
 
-    def _check_response(self, response):
+    def _check_response(self, response, lenient_response_type=False):
         """Check if the response from the server is not an unexpected error"""
         if response.status_code >= 500:
             logger.critical(everything_broken.format(response.request.headers, response.request.body, response.text))
@@ -84,6 +84,8 @@ class ExpandedPyMISP(PyMISP):
                 response = response['response']
             return response
         except Exception:
+            if lenient_response_type and not response.headers.get('content-type').startswith('application/json;'):
+                    return response.text
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(response.text)
             if not len(response.content):
