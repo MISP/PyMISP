@@ -18,7 +18,8 @@ objectsFields = {
         'data',
         'timestamp',
         'to_ids',
-        'object_relation'
+        'object_relation',
+        'disable_correlation'
     },
     'Event': {
         'uuid',
@@ -28,7 +29,8 @@ objectsFields = {
         'timestamp',
         'publish_timestamp',
         'published',
-        'date'
+        'date',
+        'extends_uuid'
     },
     'Object': {
         'name',
