@@ -631,7 +631,7 @@ class TestComprehensive(unittest.TestCase):
             events = self.user_misp_connector.search(eventid=second.id, pythonify=True)
             self.assertEqual(len(events[0].attributes), 1)
             events = self.user_misp_connector.search(eventid=second.id, deleted=True, pythonify=True)
-            self.assertEqual(len(events[0].attributes), 2)
+            self.assertEqual(len(events[0].attributes), 1)
 
             # include_event_uuid
             attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, include_event_uuid=True, pythonify=True)
