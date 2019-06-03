@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-import sys
+import datetime
+import hashlib
 import json
 import os
-import hashlib
-import datetime
+import sys
 import time
 import uuid
 
@@ -142,9 +142,24 @@ class FeedGenerator:
 
     # Manifest
     def _init_manifest(self):
+        # check if outputdir exists and try to create it if not
+        if not os.path.exists(settings.outputdir):
+            try:
+                os.makedirs(settings.outputdir)
+            except PermissionError as error:
+                print(error)
+                print("Please fix the above error and try again.")
+                sys.exit(126)
+
         # create an empty manifest
-        with open(os.path.join(settings.outputdir, 'manifest.json'), 'w'):
-            pass
+        try:
+            with open(os.path.join(settings.outputdir, 'manifest.json'), 'w'):
+                pass
+        except PermissionError as error:
+            print(error)
+            print("Please fix the above error and try again.")
+            sys.exit(126)
+
         # create new event and save manifest
         self.create_daily_event()
 
