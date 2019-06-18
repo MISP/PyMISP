@@ -218,7 +218,11 @@ def set_values(value1, value2=None):
         compositeMapping = '{}|{}'.format(value1.find('context')['search'], value2.find('context')['search'])
         mapping = get_mapping(compositeMapping, mappingDict=iocMispCompositeMapping)
     else:
-        mapping = get_mapping(value1.find('context')['search'])
+        content_type = value1.find('content').get('type', None)
+        if content_type:
+            mapping = get_mapping(value1.find('context')['search'] + '/' + content_type)
+        else:
+            mapping = get_mapping(value1.find('context')['search'])
 
     if mapping:
         attribute_values.update(mapping)
