@@ -17,7 +17,7 @@ import zipfile
 
 from . import __version__, deprecated
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
-from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject
+from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject, MISPSharingGroup
 from .abstract import AbstractMISP, MISPEncode
 
 logger = logging.getLogger('pymisp')
@@ -2241,6 +2241,22 @@ class PyMISP(object):
     # ######################
     # ### Sharing Groups ###
     # ######################
+    def add_sharing_group(self, name, releasability, description, active=True, roaming=False):
+        """Add a new sharing group, which includes the organisation associated
+        with the API key and the local server
+
+        :name: The name of the sharing group to create
+        :releasability: The releasibility information
+        :description: The description of the sharing group
+        :active: Should the sharing group be set to be active?
+        :roaming: Should the sharing group be allowed to roam?
+        """
+
+        new_sg = MISPSharingGroup()
+        new_sg.from_dict(name=name, releasability=releasability,
+                         description=description, active=active, roaming=roaming)
+
+        return self._rest_add('sharing_groups', new_sg)
 
     def sharing_group_org_add(self, sharing_group, organisation, extend=False):
         '''Add an organisation to a sharing group.
