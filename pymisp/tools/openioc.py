@@ -100,7 +100,7 @@ iocMispMapping = {
 
     'RouteEntryItem/Destination': {'type': 'ip-dst'},
     'RouteEntryItem/Destination/IP': {'type': 'ip-dst', 'comment': 'RouteDestination. '},
-    'RouteEntryItem/Destination/string': {'type': 'url', 'comment': 'RouteDestination. '},
+    'RouteEntryItem/Destination/string': {'type': 'domain', 'comment': 'RouteDestination. '},
 
 
     'ServiceItem/name': {'type': 'windows-service-name'},
