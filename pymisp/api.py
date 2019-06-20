@@ -2284,6 +2284,12 @@ class PyMISP(object):
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
+    def delete_sharing_group(self, sharing_group):
+        """Delete a sharing group
+        :sharing_group: Sharing group's local instance ID, or Sharing group's global uuid
+        """
+        return self._rest_delete("sharing_groups", sharing_group)
+
     # ###################
     # ###   Objects   ###
     # ###################
