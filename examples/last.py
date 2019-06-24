@@ -9,14 +9,14 @@ import json
 
 
 # Usage for pipe masters: ./last.py -l 5h | jq .
-
+# Usage in case of large data set and pivoting page by page: python3 last.py  -l 48h  -m 10 -p 2  | jq .[].Event.info
 
 def init(url, key):
     return PyMISP(url, key, misp_verifycert, 'json')
 
 
-def download_last(m, last, out=None):
-    result = m.download_last(last)
+def download_last(m, last, limit='10', page='1', out=None):
+    result = m.search(last=last, limit=limit, page=page)
     if out is None:
         if 'response' in result:
             print(json.dumps(result['response']))
@@ -30,14 +30,16 @@ def download_last(m, last, out=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download latest events from a MISP instance.')
     parser.add_argument("-l", "--last", required=True, help="can be defined in days, hours, minutes (for example 5d or 12h or 30m).")
+    parser.add_argument("-m", "--limit", required=False, default="10", help="Add the limit of records to get (by default, the limit is set to 10)")
+    parser.add_argument("-p", "--page", required=False, default="1", help="Add the page to request to paginate over large dataset (by default page is set to 1)")
     parser.add_argument("-o", "--output", help="Output file")
 
     args = parser.parse_args()
 
     if args.output is not None and os.path.exists(args.output):
-        print('Output file already exists, abord.')
+        print('Output file already exists, aborted.')
         exit(0)
 
     misp = init(misp_url, misp_key)
 
-    download_last(misp, args.last, args.output)
+    download_last(misp, args.last, limit=args.limit, page=args.page, out=args.output)
