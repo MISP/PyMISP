@@ -8,8 +8,11 @@ from pymisp import MISPObject
 
 class CSVLoader():
 
-    def __init__(self, template_name: str, csv_path: Path, fieldnames: list=[], has_fieldnames=False):
+    def __init__(self, template_name: str, csv_path: Path, fieldnames: list=[], has_fieldnames=False,
+                 delimiter: str=',', quotechar: str='"'):
         self.template_name = template_name
+        self.delimiter = delimiter
+        self.quotechar = quotechar
         self.csv_path = csv_path
         self.fieldnames = [f.strip().lower() for f in fieldnames]
         if not self.fieldnames:
@@ -23,7 +26,7 @@ class CSVLoader():
         objects = []
 
         with open(self.csv_path, newline='') as csvfile:
-            reader = csv.reader(csvfile)
+            reader = csv.reader(csvfile, delimiter=self.delimiter, quotechar=self.quotechar)
             if self.has_fieldnames:
                 # The file has fieldnames, we either ignore it, or validate its validity
                 fieldnames = [f.strip().lower() for f in reader.__next__()]

@@ -35,6 +35,8 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--fieldnames", nargs='*', default=[], help="Fieldnames of the CSV, have to match the object-relation allowed in the template. If empty, the fieldnames of the CSV have to match the template.")
     parser.add_argument("-s", "--skip_fieldnames", action='store_true', help="Skip fieldnames in the CSV.")
     parser.add_argument("-d", "--dump", action='store_true', help="(Debug) Dump the object in the terminal.")
+    parser.add_argument("--delimiter", type=str, default=',', help="Delimiter between firlds in the CSV. Default: ','.")
+    parser.add_argument("--quotechar", type=str, default='"', help="Quote character of the fields in the CSV. Default: '\"'.")
 
     # Interact with MISP
     misp_group = parser.add_mutually_exclusive_group()
@@ -48,7 +50,8 @@ if __name__ == '__main__':
     else:
         has_fieldnames = args.skip_fieldnames
     csv_loader = CSVLoader(template_name=args.object_name, csv_path=args.path,
-                           fieldnames=args.fieldnames, has_fieldnames=has_fieldnames)
+                           fieldnames=args.fieldnames, has_fieldnames=has_fieldnames,
+                           delimiter=args.delimiter, quotechar=args.quotechar)
 
     objects = csv_loader.load()
     if args.dump:
