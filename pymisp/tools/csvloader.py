@@ -45,7 +45,11 @@ class CSVLoader():
 
             for row in reader:
                 tmp_object = MISPObject(self.template_name)
+                has_attribute = False
                 for object_relation, value in zip(self.fieldnames, row):
-                    tmp_object.add_attribute(object_relation, value=value)
-                objects.append(tmp_object)
+                    if value:
+                        has_attribute = True
+                        tmp_object.add_attribute(object_relation, value=value)
+                if has_attribute:
+                    objects.append(tmp_object)
         return objects
