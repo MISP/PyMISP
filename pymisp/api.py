@@ -17,7 +17,7 @@ import zipfile
 
 from . import __version__, deprecated
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
-from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject
+from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject, MISPSharingGroup
 from .abstract import AbstractMISP, MISPEncode
 
 logger = logging.getLogger('pymisp')
@@ -2241,6 +2241,20 @@ class PyMISP(object):
     # ######################
     # ### Sharing Groups ###
     # ######################
+    def add_sharing_group(self, name, releasability, description, active=True):
+        """Add a new sharing group, which includes the organisation associated
+        with the API key and the local server
+
+        :name: The name of the sharing group to create
+        :releasability: The releasibility information
+        :description: The description of the sharing group
+        :active: Should the sharing group be set to be active?
+        """
+
+        new_sg = MISPSharingGroup()
+        new_sg.from_dict(name=name, releasability=releasability,
+                         description=description, active=active)
+        return self._rest_add('sharing_groups', new_sg)
 
     def sharing_group_org_add(self, sharing_group, organisation, extend=False):
         '''Add an organisation to a sharing group.
@@ -2283,6 +2297,12 @@ class PyMISP(object):
         url = urljoin(self.root_url, 'sharingGroups/removeServer')
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
+
+    def delete_sharing_group(self, sharing_group):
+        """Delete a sharing group
+        :sharing_group: Sharing group's local instance ID, or Sharing group's global uuid
+        """
+        return self._rest_delete("sharing_groups", sharing_group)
 
     # ###################
     # ###   Objects   ###

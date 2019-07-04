@@ -1176,3 +1176,12 @@ class MISPObject(AbstractMISP):
         if hasattr(self, 'name'):
             return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
+
+class MISPSharingGroup(AbstractMISP):
+
+    def __init__(self):
+        super(MISPSharingGroup, self).__init__()
+
+    def from_dict(self, **kwargs):
+        super(MISPSharingGroup, self).from_dict(**kwargs)
