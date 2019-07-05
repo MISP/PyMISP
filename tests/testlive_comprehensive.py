@@ -880,6 +880,7 @@ class TestComprehensive(unittest.TestCase):
                 response = self.user_misp_connector.upload_sample(filename='testfile.py', filepath_or_bytes=f.read(),
                                                                   event_id=first.id)
             self.assertTrue('message' in response, "Content of response: {}".format(response))
+            print(response)
             self.assertEqual(response['message'], 'Success, saved all attributes.')
             first = self.user_misp_connector.get_event(first.id)
             self.assertEqual(len(first.objects), 1)
