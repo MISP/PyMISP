@@ -1,6 +1,5 @@
 __version__ = '2.4.111'
 import logging
-import functools
 import warnings
 import sys
 
@@ -14,28 +13,26 @@ logger.addHandler(default_handler)
 logger.setLevel(logging.WARNING)
 
 
-def deprecated(func):
-    '''This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used.'''
+def warning_2020():
 
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.showwarning(
-            "Call to deprecated function {}.".format(func.__name__),
-            category=DeprecationWarning,
-            filename=func.__code__.co_filename,
-            lineno=func.__code__.co_firstlineno + 1
-        )
-        return func(*args, **kwargs)
-    return new_func
+    if sys.version_info < (3, 6):
+        warnings.warn("""
+Python 2.7 is officially end of life the 2020-01-01. For this occasion,
+we decided to review which versions of Python we support and our conclusion
+is to only support python 3.6+ starting the 2020-01-01.
+
+Every version of pymisp released after the 2020-01-01 will fail if the
+python interpreter is prior to python 3.6.
+
+**Please update your codebase.**""", DeprecationWarning, stacklevel=3)
 
 
 try:
+    warning_2020()
     from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse  # noqa
     from .api import PyMISP  # noqa
     from .abstract import AbstractMISP, MISPEncode, MISPTag, Distribution, ThreatLevel, Analysis  # noqa
-    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute  # noqa
+    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed # noqa
     from .tools import AbstractMISPObjectGenerator  # noqa
     from .tools import Neo4j  # noqa
     from .tools import stix  # noqa
@@ -44,6 +41,7 @@ try:
     from .tools import ext_lookups  # noqa
 
     if sys.version_info >= (3, 6):
+        from .aping import ExpandedPyMISP  # noqa
         # Let's not bother with old python
         try:
             from .tools import reportlab_generator  # noqa
@@ -53,8 +51,6 @@ try:
         except NameError:
             # FIXME: The import should not raise an exception if reportlab isn't installed
             pass
-    if sys.version_info >= (3, 6):
-        from .aping import ExpandedPyMISP  # noqa
     logger.debug('pymisp loaded properly')
 except ImportError as e:
     logger.warning('Unable to load pymisp properly: {}'.format(e))

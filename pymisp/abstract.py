@@ -13,14 +13,13 @@ from .exceptions import PyMISPInvalidFormat
 # Try to import MutableMapping the python 3.3+ way
 try:
     from collections.abc import MutableMapping
-except:
+except Exception:
     pass
 
 
 logger = logging.getLogger('pymisp')
 
 if sys.version_info < (3, 0):
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
     from collections import MutableMapping
 
     # This is required because Python 2 is a pain.
@@ -74,7 +73,7 @@ class MISPEncode(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, AbstractMISP):
             return obj.jsonable()
-        elif isinstance(obj, datetime.datetime):
+        elif isinstance(obj, (datetime.datetime, datetime.date)):
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
@@ -270,16 +269,17 @@ class AbstractMISP(MutableMapping):
         else:
             return False
 
+    def __repr__(self):
+        if hasattr(self, 'name'):
+            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
 
 class MISPTag(AbstractMISP):
     def __init__(self):
         super(MISPTag, self).__init__()
 
-    def from_dict(self, name, **kwargs):
-        self.name = name
+    def from_dict(self, **kwargs):
+        if kwargs.get('Tag'):
+            kwargs = kwargs.get('Tag')
         super(MISPTag, self).from_dict(**kwargs)
-
-    def __repr__(self):
-        if hasattr(self, 'name'):
-            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)

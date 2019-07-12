@@ -11,17 +11,15 @@ import sys
 import uuid
 from collections import defaultdict
 
-from . import deprecated
+from deprecated import deprecated
+
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
 import logging
 logger = logging.getLogger('pymisp')
 
-
 if sys.version_info < (3, 0):
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
-
     # This is required because Python 2 is a pain.
     from datetime import tzinfo, timedelta
 
@@ -354,23 +352,23 @@ class MISPAttribute(AbstractMISP):
             signed, _ = c.sign(to_sign, mode=mode.DETACH)
             self.sig = base64.b64encode(signed).decode()
 
-    @deprecated
+    @deprecated(reason="Use self.known_types instead. Removal date: 2020-01-01.")
     def get_known_types(self):  # pragma: no cover
         return self.known_types
 
-    @deprecated
+    @deprecated(reason="Use self.malware_binary instead. Removal date: 2020-01-01.")
     def get_malware_binary(self):  # pragma: no cover
         return self.malware_binary
 
-    @deprecated
+    @deprecated(reason="Use self.to_dict() instead. Removal date: 2020-01-01.")
     def _json(self):  # pragma: no cover
         return self.to_dict()
 
-    @deprecated
+    @deprecated(reason="Use self.to_dict() instead. Removal date: 2020-01-01.")
     def _json_full(self):  # pragma: no cover
         return self.to_dict()
 
-    @deprecated
+    @deprecated(reason="Use self.from_dict(**kwargs) instead. Removal date: 2020-01-01.")
     def set_all_values(self, **kwargs):  # pragma: no cover
         self.from_dict(**kwargs)
 
@@ -782,15 +780,15 @@ class MISPEvent(AbstractMISP):
                 to_return['global'] = False
         return to_return
 
-    @deprecated
+    @deprecated(reason="Use self.known_types instead. Removal date: 2020-01-01.")
     def get_known_types(self):  # pragma: no cover
         return self.known_types
 
-    @deprecated
+    @deprecated(reason="Use self.from_dict(**kwargs) instead. Removal date: 2020-01-01.")
     def set_all_values(self, **kwargs):  # pragma: no cover
         self.from_dict(**kwargs)
 
-    @deprecated
+    @deprecated(reason="Use self.to_dict() instead. Removal date: 2020-01-01.")
     def _json(self):  # pragma: no cover
         return self.to_dict()
 
@@ -800,17 +798,26 @@ class MISPObjectReference(AbstractMISP):
     def __init__(self):
         super(MISPObjectReference, self).__init__()
 
-    def from_dict(self, object_uuid, referenced_uuid, relationship_type, comment=None, **kwargs):
-        self.object_uuid = object_uuid
-        self.referenced_uuid = referenced_uuid
-        self.relationship_type = relationship_type
-        self.comment = comment
+    def from_dict(self, **kwargs):
+        if kwargs.get('ObjectReference'):
+            kwargs = kwargs.get('ObjectReference')
         super(MISPObjectReference, self).from_dict(**kwargs)
 
     def __repr__(self):
-        if hasattr(self, 'referenced_uuid'):
+        if hasattr(self, 'referenced_uuid') and hasattr(self, 'object_uuid'):
             return '<{self.__class__.__name__}(object_uuid={self.object_uuid}, referenced_uuid={self.referenced_uuid}, relationship_type={self.relationship_type})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
+
+class MISPObjectTemplate(AbstractMISP):
+
+    def __init__(self):
+        super(MISPObjectTemplate, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('ObjectTemplate'):
+            kwargs = kwargs.get('ObjectTemplate')
+        super(MISPObjectTemplate, self).from_dict(**kwargs)
 
 
 class MISPUser(AbstractMISP):
@@ -840,11 +847,98 @@ class MISPFeed(AbstractMISP):
     def __init__(self):
         super(MISPFeed, self).__init__()
 
+    def from_dict(self, **kwargs):
+        if kwargs.get('Feed'):
+            kwargs = kwargs.get('Feed')
+        super(MISPFeed, self).from_dict(**kwargs)
+
+
+class MISPWarninglist(AbstractMISP):
+
+    def __init__(self):
+        super(MISPWarninglist, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Warninglist'):
+            kwargs = kwargs.get('Warninglist')
+        super(MISPWarninglist, self).from_dict(**kwargs)
+
+
+class MISPTaxonomy(AbstractMISP):
+
+    def __init__(self):
+        super(MISPTaxonomy, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Taxonomy'):
+            kwargs = kwargs.get('Taxonomy')
+        super(MISPTaxonomy, self).from_dict(**kwargs)
+
+
+class MISPGalaxy(AbstractMISP):
+
+    def __init__(self):
+        super(MISPGalaxy, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Galaxy'):
+            kwargs = kwargs.get('Galaxy')
+        super(MISPGalaxy, self).from_dict(**kwargs)
+
+
+class MISPNoticelist(AbstractMISP):
+
+    def __init__(self):
+        super(MISPNoticelist, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Noticelist'):
+            kwargs = kwargs.get('Noticelist')
+        super(MISPNoticelist, self).from_dict(**kwargs)
+
+
+class MISPRole(AbstractMISP):
+
+    def __init__(self):
+        super(MISPRole, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Role'):
+            kwargs = kwargs.get('Role')
+        super(MISPRole, self).from_dict(**kwargs)
+
+
+class MISPServer(AbstractMISP):
+
+    def __init__(self):
+        super(MISPServer, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Server'):
+            kwargs = kwargs.get('Server')
+        super(MISPServer, self).from_dict(**kwargs)
+
+
+class MISPSharingGroup(AbstractMISP):
+
+    def __init__(self):
+        super(MISPSharingGroup, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('SharingGroup'):
+            kwargs = kwargs.get('SharingGroup')
+        super(MISPSharingGroup, self).from_dict(**kwargs)
+
 
 class MISPLog(AbstractMISP):
 
     def __init__(self):
         super(MISPLog, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Log'):
+            kwargs = kwargs.get('Log')
+        super(MISPLog, self).from_dict(**kwargs)
 
     def __repr__(self):
         return '<{self.__class__.__name__}({self.model}, {self.action}, {self.title})'.format(self=self)
@@ -855,7 +949,7 @@ class MISPSighting(AbstractMISP):
     def __init__(self):
         super(MISPSighting, self).__init__()
 
-    def from_dict(self, value=None, uuid=None, id=None, source=None, type=None, timestamp=None, **kwargs):
+    def from_dict(self, **kwargs):
         """Initialize the MISPSighting from a dictionary
         :value: Value of the attribute the sighting is related too. Pushing this object
                 will update the sighting count of each attriutes with thifs value on the instance
@@ -865,12 +959,8 @@ class MISPSighting(AbstractMISP):
         :type: Type of the sighting
         :timestamp: Timestamp associated to the sighting
         """
-        self.value = value
-        self.uuid = uuid
-        self.id = id
-        self.source = source
-        self.type = type
-        self.timestamp = timestamp
+        if kwargs.get('Sighting'):
+            kwargs = kwargs.get('Sighting')
         super(MISPSighting, self).from_dict(**kwargs)
 
     def __repr__(self):
@@ -917,7 +1007,6 @@ class MISPObjectAttribute(MISPAttribute):
 
 
 class MISPShadowAttribute(AbstractMISP):
-    # NOTE: Kindof a MISPAttribute, but can be lot more lightweight (just one key for example)
 
     def __init__(self):
         super(MISPShadowAttribute, self).__init__()
@@ -926,6 +1015,11 @@ class MISPShadowAttribute(AbstractMISP):
         if kwargs.get('ShadowAttribute'):
             kwargs = kwargs.get('ShadowAttribute')
         super(MISPShadowAttribute, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        if hasattr(self, 'value'):
+            return '<{self.__class__.__name__}(type={self.type}, value={self.value})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
 class MISPObject(AbstractMISP):
@@ -1176,12 +1270,3 @@ class MISPObject(AbstractMISP):
         if hasattr(self, 'name'):
             return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
-
-
-class MISPSharingGroup(AbstractMISP):
-
-    def __init__(self):
-        super(MISPSharingGroup, self).__init__()
-
-    def from_dict(self, **kwargs):
-        super(MISPSharingGroup, self).from_dict(**kwargs)

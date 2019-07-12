@@ -125,6 +125,10 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
+      "community-id": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
       "pattern-in-file": {
         "default_category": "Payload installation",
         "to_ids": 1
@@ -666,6 +670,7 @@
       "snort",
       "bro",
       "zeek",
+      "community-id",
       "pattern-in-file",
       "pattern-in-traffic",
       "pattern-in-memory",
@@ -1075,7 +1080,8 @@
         "hostname|port",
         "bro",
         "zeek",
-        "anonymised"
+        "anonymised",
+        "community-id"
       ],
       "Payload type": [
         "comment",
@@ -1145,7 +1151,8 @@
         "github-repository",
         "other",
         "cortex",
-        "anonymised"
+        "anonymised",
+        "community-id"
       ],
       "Financial fraud": [
         "btc",

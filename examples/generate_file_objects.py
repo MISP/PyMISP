@@ -5,7 +5,7 @@ import argparse
 import json
 
 try:
-    from pymisp import MISPEncode
+    from pymisp import MISPEncode, AbstractMISP
     from pymisp.tools import make_binary_objects
 except ImportError:
     pass
@@ -59,6 +59,7 @@ if __name__ == '__main__':
     group.add_argument("-p", "--path", help="Path to process.")
     group.add_argument("-c", "--check", action='store_true', help="Check the dependencies.")
     args = parser.parse_args()
+    a = AbstractMISP()
 
     if args.check:
         print(check())
