@@ -2,6 +2,103 @@ Changelog
 =========
 
 
+v2.4.111 (2019-07-12)
+---------------------
+
+New
+~~~
+- Introduce ability to create a sharing group. [Tom King]
+- Allow to pass delimiter & quotechar to the CSV loader. [Raphaël Vinot]
+- [example] Added edit_organisation examples. [Steve Clement]
+- Method to POST a STIX file to MISP and create a new event. [Raphaël
+  Vinot]
+- Object generator for ssh authorized_keys files. [Raphaël Vinot]
+- Allow custom user-agent. [Christophe Vandeplas]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bumb misp-objects. [Raphaël Vinot]
+- [tests] WTF upload_sample on travis. [Raphaël Vinot]
+- [tests] Add custom error message on upload_sample - fix last commit.
+  [Raphaël Vinot]
+- [tests] Add custom error message on upload_sample. [Raphaël Vinot]
+- Remove roaming as it can't be set in this request. [Tom King]
+- Allow for deletion of security group. [Tom King]
+- Bump dependencies. [Raphaël Vinot]
+- [last] You can now paginate over multiple results in the last example
+  command. [Alexandre Dulaunoy]
+
+  You can do stuff like this:
+
+  python3 last.py  -l 48h  -m 10 -p 2  | jq .[].Event.info
+
+  which means the last 10 events on second page which are between a
+  time range of 0 and 48 hours.
+- [tests] now deleted flag is returning only the deleted values (to be
+  consistent) [Alexandre Dulaunoy]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Bump deps (lief 0.10 dev) [Raphaël Vinot]
+- Use pydeep from pypi, add test. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump Pipfile for python 3.7. [Raphaël Vinot]
+
+Fix
+~~~
+- Skip attribute in object when value is empty, skip empty objects.
+  [Raphaël Vinot]
+- [perms] Added try/except for various permission conditions, also
+  create the output dir if not exist fix: [try/except] Catch Ctrl-c
+  keyboard interrupt fix: [style] isort imports. [Steve Clement]
+- [direct_call] Allows the response type to be something else than a
+  JSON (e.g. csv). [mokaddem]
+- [feed generator] Added missing fields. [iglocska]
+- Properly fix deprecation warning. [Raphaël Vinot]
+
+  fix #390
+- Travis & python2. [Raphaël Vinot]
+- Last commit foobar. [Raphaël Vinot]
+- Install lief on python < 3.7 with pipenv. [Raphaël Vinot]
+- Bump Test files because of new template version. [Raphaël Vinot]
+
+Other
+~~~~~
+- [openioc] changed default mapping for
+  RouteEntryItem/Destination/string. [0x3c7]
+- [openioc] Changed mapping for RouteEntryItem/Destination/string to
+  domain instead of url because UrlHistoryItem/URL is mostly used for
+  urls. [0x3c7]
+- Fixes other mapping to other types. [0x3c7]
+- [openioc] Allow the use of types in openioc content tags. [0x3c7]
+- Sync sightings between MISP servers. [Koen Van Impe]
+
+  Sync sightings between MISP servers
+  Sync from multiple clients to one authoritative MISP instance.
+  To be run from cron
+  (blog docu coming)
+- Added includeWarninglistHits as a possible filter for the event level
+  restsearch. [Jeroen Pinoy]
+- Resolve issue with change_sharing_group which do not update event
+  successfully. [hrifflet]
+- Use misp_verifycert flag. [Koen Van Impe]
+- Take 'to_ids' setting in account and PEP8 checks. [Koen Van Impe]
+
+  - Include check if 'to_ids' is included in the data returned from the
+  import module
+  - PEP8 checks
+- Automation script that links vmray_submit and vmray_import. [Koen Van
+  Impe]
+
+  Import finished VMRay tasks ; add attributes to event
+  Makes use of the 'incomplete' workflow taxonomy
+  Needs to be put in a cronjob to run in the background
+- Update PyMISP_tutorial.ipynb. [Carlos Borges]
+
+  The function to collect event_id and put it into a list isn't looking into each MISPAttribute.
+  Just updated the script to look it.
+
+
 v2.4.106 (2019-04-24)
 ---------------------
 
@@ -32,6 +129,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump Objects. [Raphaël Vinot]
 - Bump version, Bump changelog. [Raphaël Vinot]
 - Add python 3.7 support for pipenv users. [Raphaël Vinot]
