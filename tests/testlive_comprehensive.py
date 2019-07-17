@@ -81,11 +81,11 @@ class TestComprehensive(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         # Delete publisher
-        cls.admin_misp_connector.delete_user(user_id=cls.test_pub.id)
+        cls.admin_misp_connector.delete_user(cls.test_pub.id)
         # Delete user
-        cls.admin_misp_connector.delete_user(user_id=cls.test_usr.id)
+        cls.admin_misp_connector.delete_user(cls.test_usr.id)
         # Delete org
-        cls.admin_misp_connector.delete_organisation(organisation_id=cls.test_org.id)
+        cls.admin_misp_connector.delete_organisation(cls.test_org.id)
 
     def create_simple_event(self, force_timestamps=False):
         mispevent = MISPEvent(force_timestamps=force_timestamps)
@@ -1282,7 +1282,7 @@ class TestComprehensive(unittest.TestCase):
         # Update org
         organisation.name = 'blah'
         organisation = self.admin_misp_connector.update_organisation(organisation)
-        self.assertEqual(organisation.name, 'blah')
+        self.assertEqual(organisation.name, 'blah', organisation)
 
     def test_attribute(self):
         first = self.create_simple_event()
@@ -1501,12 +1501,12 @@ class TestComprehensive(unittest.TestCase):
         # add org
         # FIXME: https://github.com/MISP/MISP/issues/4884
         # r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group.id,
-        #                                                       organisation_id=self.test_org.id, extend=True)
+        #                                                       self.test_org.id, extend=True)
 
         # delete org
         # FIXME: https://github.com/MISP/MISP/issues/4884
         # r = self.admin_misp_connector.remove_org_from_sharing_group(sharing_group.id,
-        #                                                       organisation_id=self.test_org.id)
+        #                                                       self.test_org.id)
 
         # Get list
         sharing_groups = self.admin_misp_connector.sharing_groups(pythonify=True)
@@ -1558,6 +1558,7 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(botvrij.url, "http://www.botvrij.eu/data/feed-osint")
         # Enable
         # MISP OSINT
+        print(feeds[0].id)
         feed = self.admin_misp_connector.enable_feed(feeds[0].id, pythonify=True)
         self.assertTrue(feed.enabled)
         feed = self.admin_misp_connector.enable_feed_cache(feeds[0].id, pythonify=True)
