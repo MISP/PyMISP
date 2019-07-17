@@ -75,7 +75,7 @@ class PyMISP(object):  # pragma: no cover
 
     warning_2020()
 
-    @deprecated(reason="Please use ExpandedPyMISP instead (requires Python 3.6+). This class will be removed an alias of ExpandedPyMISP early 2020.")
+    @deprecated(reason="Please use ExpandedPyMISP instead (requires Python 3.6+). This class will be an alias of ExpandedPyMISP early 2020 and your code will most probably fail.")
     def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False, auth=None, tool=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
