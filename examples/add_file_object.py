@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from pymisp.tools import make_binary_objects
 import traceback
 from keys import misp_url, misp_key, misp_verifycert
@@ -14,28 +14,25 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--path", required=True, help="Path to process (expanded using glob).")
     args = parser.parse_args()
 
-    pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
+    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
 
     for f in glob.glob(args.path):
         try:
             fo, peo, seos = make_binary_objects(f)
-        except Exception as e:
+        except Exception:
             traceback.print_exc()
             continue
 
         if seos:
             for s in seos:
-                template_id = pymisp.get_object_template_id(s.template_uuid)
-                r = pymisp.add_object(args.event, template_id, s)
+                r = pymisp.add_object(args.event, s)
 
         if peo:
-            template_id = pymisp.get_object_template_id(peo.template_uuid)
-            r = pymisp.add_object(args.event, template_id, peo)
+            r = pymisp.add_object(args.event, peo)
             for ref in peo.ObjectReference:
                 r = pymisp.add_object_reference(ref)
 
         if fo:
-            template_id = pymisp.get_object_template_id(fo.template_uuid)
-            response = pymisp.add_object(args.event, template_id, fo)
+            response = pymisp.add_object(args.event, fo)
             for ref in fo.ObjectReference:
                 r = pymisp.add_object_reference(ref)

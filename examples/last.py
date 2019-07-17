@@ -1,31 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
-import json
 
 
 # Usage for pipe masters: ./last.py -l 5h | jq .
 # Usage in case of large data set and pivoting page by page: python3 last.py  -l 48h  -m 10 -p 2  | jq .[].Event.info
-
-def init(url, key):
-    return PyMISP(url, key, misp_verifycert, 'json')
-
-
-def download_last(m, last, limit='10', page='1', out=None):
-    result = m.search(last=last, limit=limit, page=page)
-    if out is None:
-        if 'response' in result:
-            print(json.dumps(result['response']))
-        else:
-            print('No results for that time period')
-            exit(0)
-    else:
-        with open(out, 'w') as f:
-            f.write(json.dumps(result['response']))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download latest events from a MISP instance.')
@@ -40,6 +23,17 @@ if __name__ == '__main__':
         print('Output file already exists, aborted.')
         exit(0)
 
-    misp = init(misp_url, misp_key)
+    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    result = misp.search(publish_timestamp=args.last, limit=args.limit, page=args.page, pythonify=True)
 
-    download_last(misp, args.last, limit=args.limit, page=args.page, out=args.output)
+    if not result:
+        print('No results for that time period')
+        exit(0)
+
+    if args.output:
+        with open(args.output, 'w') as f:
+            for r in result:
+                f.write(r.to_json() + '\n')
+    else:
+        for r in result:
+            print(r.to_json())

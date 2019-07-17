@@ -1,19 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP, MISPOrganisation
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
-
-# For python2 & 3 compat, a bit dirty, but it seems to be the least bad one
-try:
-    input = raw_input
-except NameError:
-    pass
-
-
-def init(url, key):
-    return PyMISP(url, key, misp_verifycert, 'json')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Edit the email of the organisation designed by the organisation_id.')
@@ -21,6 +11,10 @@ if __name__ == '__main__':
     parser.add_argument("-e", "--email", help="Email linked to the organisation.")
     args = parser.parse_args()
 
-    misp = init(misp_url, misp_key)
+    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
 
-    print(misp.edit_organisation(args.organisation_id, email=args.email))
+    org = MISPOrganisation()
+    org.id = args.organisation_id
+    org.email = args.email
+
+    print(misp.update_organisation(org, pythonify=True))

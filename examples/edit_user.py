@@ -1,19 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP, MISPUser
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
-# For python2 & 3 compat, a bit dirty, but it seems to be the least bad one
-try:
-    input = raw_input
-except NameError:
-    pass
-
-
-def init(url, key):
-    return PyMISP(url, key, misp_verifycert, 'json')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Edit the email of the user designed by the user_id.')
@@ -21,6 +12,9 @@ if __name__ == '__main__':
     parser.add_argument("-e", "--email", help="Email linked to the account.")
     args = parser.parse_args()
 
-    misp = init(misp_url, misp_key)
+    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    user = MISPUser
+    user.id = args.user_id
+    user.email = args.email
 
-    print(misp.edit_user(args.user_id, email=args.email))
+    print(misp.edit_user(user, pythonify=True))

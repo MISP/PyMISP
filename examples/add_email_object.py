@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from pymisp.tools import EMailObject
 import traceback
 from keys import misp_url, misp_key, misp_verifycert
@@ -15,17 +15,16 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--path", required=True, help="Path to process (expanded using glob).")
     args = parser.parse_args()
 
-    pymisp = PyMISP(misp_url, misp_key, misp_verifycert, debug=True)
+    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, debug=True)
 
     for f in glob.glob(args.path):
         try:
             eo = EMailObject(f)
-        except Exception as e:
+        except Exception:
             traceback.print_exc()
             continue
 
         if eo:
-            template_id = pymisp.get_object_template_id(eo.template_uuid)
-            response = pymisp.add_object(args.event, template_id, eo)
+            response = pymisp.add_object(args.event, eo)
             for ref in eo.ObjectReference:
                 r = pymisp.add_object_reference(ref)

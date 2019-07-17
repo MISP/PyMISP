@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP, MISPEvent
+from pymisp import ExpandedPyMISP, MISPEvent
 from pymisp.tools import Fail2BanObject
 import argparse
 from base64 import b64decode
@@ -43,23 +43,23 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--disable_new", action='store_true', default=False, help="Do not create a new Event.")
     args = parser.parse_args()
 
-    pymisp = PyMISP(misp_url, misp_key, misp_verifycert, debug=True)
+    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, debug=True)
     event_id = -1
     me = None
     if args.force_new:
         me = create_new_event()
     else:
-        response = pymisp.search_index(tag=args.tag, timestamp='1h')
-        if response['response']:
+        response = pymisp.search_index(tag=args.tag, timestamp='1h', pythonify=True)
+        if response:
             if args.disable_new:
-                event_id = response['response'][0]['id']
+                event_id = response[0].id
             else:
-                last_event_date = parse(response['response'][0]['date']).date()
-                nb_attr = response['response'][0]['attribute_count']
+                last_event_date = parse(response[0].date).date()
+                nb_attr = response[0].attribute_count
                 if last_event_date < date.today() or int(nb_attr) > 1000:
                     me = create_new_event()
                 else:
-                    event_id = response['response'][0]['id']
+                    event_id = response[0].id
         else:
             me = create_new_event()
 
@@ -83,5 +83,4 @@ if __name__ == '__main__':
         me.add_object(f2b)
         pymisp.add_event(me)
     elif event_id:
-        template_id = pymisp.get_object_template_id(f2b.template_uuid)
-        a = pymisp.add_object(event_id, template_id, f2b)
+        a = pymisp.add_object(event_id, f2b)

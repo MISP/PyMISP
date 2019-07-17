@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Copy Emerging Threats Block IPs list to several MISP events
 # Because of the large size of the list the first run will take a minute
 # Running it again will update the MISP events if changes are detected
@@ -24,7 +24,7 @@ def load_misp_event(eid):
     global et_event
     et_attr = {}
     et_drev = {}
-    
+
     et_event = mymisp.get(eid)
     echeck(et_event)
     for a in et_event['Event']['Attribute']:
@@ -66,7 +66,7 @@ def update_et_event(name):
         # Weed out attributes still in ET data
         for k,v in et_data[name].items():
             et_attr.pop(k, None)
-        
+
         # Delete the leftover attributes from MISP
         for k,v in et_attr.items():
             r = mymisp.delete_attribute(v)
@@ -92,7 +92,7 @@ def update_et_event(name):
         attr = []
         attr.append(et_drev)
 
-        # Publish updated MISP event 
+        # Publish updated MISP event
         et_event['Event']['Attribute'] = attr
         et_event['Event']['published'] = False
         et_event['Event']['date'] = time.strftime('%Y-%m-%d')

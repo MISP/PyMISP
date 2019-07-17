@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
@@ -12,9 +12,6 @@ except NameError:
     pass
 
 
-def init(url, key):
-    return PyMISP(url, key, misp_verifycert, 'json', debug=True)
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add an attribute to an event')
     parser.add_argument("-e", "--event", help="The id, uuid or json of the event to update.")
@@ -22,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument("-v", "--value", help="The value of the attribute")
     args = parser.parse_args()
 
-    misp = init(misp_url, misp_key)
+    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
 
-    event = misp.add_named_attribute(args.event, args.type, args.value)
+    event = misp.add_attribute(args.event, {'type': args.type, 'value': args.value}, pythonify=True)
     print(event)
