@@ -7,5 +7,5 @@ if [ -z ${LEGACY} ]; then
     # We're in python3, test all and use pipenv.
     pipenv run nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
 else
-	nosetests --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_offline.py
+	nosetests --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_mispevent.py
 fi
