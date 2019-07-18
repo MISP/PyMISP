@@ -727,7 +727,7 @@ class MISPEvent(AbstractMISP):
                 try:
                     from .tools import make_binary_objects
                 except ImportError as e:
-                    logger.info(f'Unable to load make_binary_objects: {e}')
+                    logger.info('Unable to load make_binary_objects: {}'.format(e))
                     continue
                 file_object, bin_type_object, bin_section_objects = make_binary_objects(pseudofile=attribute.malware_binary, filename=attribute.malware_filename)
                 self.add_object(file_object)
@@ -738,7 +738,7 @@ class MISPEvent(AbstractMISP):
                         self.add_object(bin_section_object)
                 self.attributes.pop(index)
             else:
-                logger.warning(f'No expansions for this data type ({attribute.type}). Open an issue if needed.')
+                logger.warning('No expansions for this data type ({}). Open an issue if needed.'.format(attribute.type))
 
     def __repr__(self):
         if hasattr(self, 'info'):
