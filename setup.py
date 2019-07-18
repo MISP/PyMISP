@@ -46,7 +46,7 @@ setup(
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
                     'virustotal': ['validators'],
-                    'docs': ['sphinx-autodoc-typehints'],
+                    'docs': ['sphinx-autodoc-typehints', 'recommonmark'],
                     'pdfexport': ['reportlab']},
     tests_require=[
         'jsonschema',

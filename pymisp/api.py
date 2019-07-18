@@ -1023,6 +1023,7 @@ class PyMISP(object):  # pragma: no cover
             binblob = filepath_or_bytes
         return base64.b64encode(binblob).decode()
 
+    @deprecated(reason="Use MISPEvent.add_attribute with the expand='binary' key")
     def upload_sample(self, filename, filepath_or_bytes, event_id, distribution=None,
                       to_ids=True, category=None, comment=None, info=None,
                       analysis=None, threat_level_id=None, advanced_extraction=False):
@@ -1033,6 +1034,7 @@ class PyMISP(object):  # pragma: no cover
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath_or_bytes)}]
         return self._upload_sample(to_post, event_id)
 
+    @deprecated(reason="Use MISPEvent.add_attribute with the expand='binary' key")
     def upload_samplelist(self, filepaths, event_id, distribution=None,
                           to_ids=True, category=None, comment=None, info=None,
                           analysis=None, threat_level_id=None, advanced_extraction=False):

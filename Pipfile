@@ -8,9 +8,10 @@ nose = "*"
 coveralls = "*"
 codecov = "*"
 requests-mock = "*"
+pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal", "pdfexport", "docs"],path = "."}
 
 [packages]
-pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal", "pdfexport"],path = "."}
+pymisp = {editable = true,extras = ["fileobjects", "openioc", "virustotal", "pdfexport"],path = "."}
 pymispwarninglists = {editable = true,git = "https://github.com/MISP/PyMISPWarningLists.git"}
 
 [requires]

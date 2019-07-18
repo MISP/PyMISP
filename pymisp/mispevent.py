@@ -10,13 +10,13 @@ from zipfile import ZipFile
 import sys
 import uuid
 from collections import defaultdict
+import logging
 
 from deprecated import deprecated
 
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
-import logging
 logger = logging.getLogger('pymisp')
 
 if sys.version_info < (3, 0):
@@ -715,12 +715,37 @@ class MISPEvent(AbstractMISP):
         self.edited = True
         return misp_obj
 
+    def run_expansions(self):
+        if sys.version_info < (3, 6):
+            raise PyMISPError("No, seriously, ain't gonna work with python <=3.6")
+        for index, attribute in enumerate(self.attributes):
+            if 'expand' not in attribute:
+                continue
+            # NOTE: Always make sure the attribute with the expand key is either completely removed,
+            # of the key is deleted to avoid seeing it processed again on MISP side
+            elif attribute.expand == 'binary':
+                try:
+                    from .tools import make_binary_objects
+                except ImportError as e:
+                    logger.info(f'Unable to load make_binary_objects: {e}')
+                    continue
+                file_object, bin_type_object, bin_section_objects = make_binary_objects(pseudofile=attribute.malware_binary, filename=attribute.malware_filename)
+                self.add_object(file_object)
+                if bin_type_object:
+                    self.add_object(bin_type_object)
+                if bin_section_objects:
+                    for bin_section_object in bin_section_objects:
+                        self.add_object(bin_section_object)
+                self.attributes.pop(index)
+            else:
+                logger.warning(f'No expansions for this data type ({attribute.type}). Open an issue if needed.')
+
     def __repr__(self):
         if hasattr(self, 'info'):
             return '<{self.__class__.__name__}(info={self.info})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
-    def _serialize(self):
+    def _serialize(self):  # pragma: no cover
         return '{date}{threat_level_id}{info}{uuid}{analysis}{timestamp}'.format(
             date=self.date, threat_level_id=self.threat_level_id, info=self.info,
             uuid=self.uuid, analysis=self.analysis, timestamp=self.timestamp).encode()

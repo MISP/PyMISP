@@ -1615,6 +1615,18 @@ class TestComprehensive(unittest.TestCase):
         server = self.admin_misp_connector.delete_server(server.id)
         # FIXME: https://github.com/MISP/MISP/issues/4889
 
+    def test_expansion(self):
+        first = self.create_simple_event()
+        try:
+            with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
+                first.add_attribute('malware-sample', value='whoami.exe', data=BytesIO(f.read()), expand='binary')
+            first.run_expansions()
+            first = self.admin_misp_connector.add_event(first)
+            self.assertEqual(len(first.objects), 7)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
     def test_upload_stix(self):
         # FIXME https://github.com/MISP/MISP/issues/4892
         pass

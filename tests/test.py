@@ -5,8 +5,8 @@ try:
     from keys import url, key
 except ImportError as e:
     print(e)
-    url = 'http://localhost:8080'
-    key = 'fk5BodCZw8owbscW8pQ4ykMASLeJ4NYhuAbshNjo'
+    url = 'https://localhost:8443'
+    key = 'K5yV0CcxdnklzDfCKlnPniIxrMX41utQ2dG13zZ3'
 
 import time
 
