@@ -1615,6 +1615,7 @@ class TestComprehensive(unittest.TestCase):
         server = self.admin_misp_connector.delete_server(server.id)
         # FIXME: https://github.com/MISP/MISP/issues/4889
 
+    @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_expansion(self):
         first = self.create_simple_event()
         try:
