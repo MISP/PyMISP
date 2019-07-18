@@ -2,6 +2,41 @@ Changelog
 =========
 
 
+v2.4.111.1 (2019-07-18)
+-----------------------
+
+New
+~~~
+- Add option to locally expand malware samples with LIEF. [Raphaël
+  Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Remove legacy tests. [Raphaël Vinot]
+- Improve deprecation message on PyMISP. [Raphaël Vinot]
+- [describeTypes] updated to add community-id. [Alexandre Dulaunoy]
+- Bump examples to python3. [Raphaël Vinot]
+- Reorganise ExpandedPyMISP methods, normalise the parameters. [Raphaël
+  Vinot]
+- Deprecate everything in PyMISP. [Raphaël Vinot]
+
+Fix
+~~~
+- Python < 3.6 support. [Raphaël Vinot]
+
+Other
+~~~~~
+- Create statistical reports for MISP. [Koen Van Impe]
+
+  PyMISP script to run every x-days to get an overview of new
+  events/attributes ; MISP-Galaxies ; MITRE ; Tags
+
+  Output of report is on screen or sent via e-mail ; all stats attached
+  as CSV
+
+
 v2.4.111 (2019-07-12)
 ---------------------
 
@@ -17,6 +52,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bumb misp-objects. [Raphaël Vinot]
 - [tests] WTF upload_sample on travis. [Raphaël Vinot]
@@ -60,7 +96,6 @@ Fix
 - Travis & python2. [Raphaël Vinot]
 - Last commit foobar. [Raphaël Vinot]
 - Install lief on python < 3.7 with pipenv. [Raphaël Vinot]
-- Bump Test files because of new template version. [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -156,6 +191,7 @@ Changes
 
 Fix
 ~~~
+- Bump Test files because of new template version. [Raphaël Vinot]
 - Build on readthedocs. [Raphaël Vinot]
 - [typo] Fixed a small typo I noticed in the docs. [Steve Clement]
 - Add missing files for testing (CSV loader) [Raphaël Vinot]
