@@ -307,6 +307,10 @@ class ExpandedPyMISP(PyMISP):
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
         new_attribute = self._prepare_request('POST', f'attributes/add/{event_id}', data=attribute)
         if new_attribute.status_code == 403:
+            if new_attribute['message'] == 'Could not add Attribute':
+                # In that case, we have a duplicate (uuid or value), and need to return the error to the user
+                return new_attribute
+            # At this point, we assume the user tried to add an attribute on an event they don't own
             # Re-try with a proposal
             return self.add_attribute_proposal(event_id, attribute, pythonify)
         new_attribute = self._check_response(new_attribute, expect_json=True)
