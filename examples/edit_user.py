@@ -4,6 +4,7 @@
 from pymisp import ExpandedPyMISP, MISPUser
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
+import json
 
 
 if __name__ == '__main__':
@@ -17,4 +18,4 @@ if __name__ == '__main__':
     user.id = args.user_id
     user.email = args.email
 
-    print(misp.edit_user(user, pythonify=True))
+    print(json.dumps(misp.edit_user(user, pythonify=True)))
