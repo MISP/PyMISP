@@ -33,13 +33,11 @@ except ImportError:
 try:
     from keys import url, key
     verifycert = False
-    travis_run = True
 except ImportError as e:
     print(e)
     url = 'https://localhost:8443'
     key = 'K5yV0CcxdnklzDfCKlnPniIxrMX41utQ2dG13zZ3'
     verifycert = False
-    travis_run = False
 
 
 urllib3.disable_warnings()
@@ -479,8 +477,6 @@ class TestComprehensive(unittest.TestCase):
 
     def test_default_distribution(self):
         '''The default distributions on the VM are This community only for the events and Inherit from event for attr/obj)'''
-        if travis_run:
-            return
         first = self.create_simple_event()
         del first.distribution
         o = first.add_object(name='file')
@@ -670,14 +666,12 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(len(events[0].attributes), 5)
 
-            if not travis_run:
-                # FIXME: This is failing on travis for no discernable reason...
-                events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True, pythonify=True)
-                self.assertEqual(len(events), 1)
-                self.assertEqual(events[0].id, second.id)
-                self.assertEqual(len(events[0].attributes), 3)
-                response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%')  # disable ipv4 DNS.
-                self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
+            events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True, pythonify=True)
+            self.assertEqual(len(events), 1)
+            self.assertEqual(events[0].id, second.id)
+            self.assertEqual(len(events[0].attributes), 3)
+            response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%')  # disable ipv4 DNS.
+            self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
 
             # Page / limit
             attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=1, limit=3, pythonify=True)
@@ -893,13 +887,12 @@ class TestComprehensive(unittest.TestCase):
         first.add_attribute('ip-src', '8.8.8.8')
         try:
             first = self.user_misp_connector.add_event(first)
-            if not travis_run:
-                stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
-                found = re.findall('8.8.8.8', stix)
-                self.assertTrue(found)
-                stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
-                json.dumps(stix2, indent=2)
-                self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
+            stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
+            found = re.findall('8.8.8.8', stix)
+            self.assertTrue(found)
+            stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
+            json.dumps(stix2, indent=2)
+            self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
@@ -1129,10 +1122,9 @@ class TestComprehensive(unittest.TestCase):
         for tax in taxonomies:
             if tax.namespace == list_name_test:
                 break
-        if not travis_run:
-            r = self.admin_misp_connector.get_taxonomy(tax.id, pythonify=True)
-            self.assertEqual(r.namespace, list_name_test)
-            self.assertTrue('enabled' in r)
+        r = self.admin_misp_connector.get_taxonomy(tax.id, pythonify=True)
+        self.assertEqual(r.namespace, list_name_test)
+        self.assertTrue('enabled' in r)
         r = self.admin_misp_connector.enable_taxonomy(tax.id)
         self.assertEqual(r['message'], 'Taxonomy enabled')
         r = self.admin_misp_connector.enable_taxonomy_tags(tax.id)
@@ -1192,29 +1184,27 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(r['Noticelist']['enabled'], r)
 
     def test_galaxies(self):
-        if not travis_run:
-            # Make sure we're up-to-date
-            r = self.admin_misp_connector.update_galaxies()
-            self.assertEqual(r['name'], 'Galaxies updated.')
-            # Get list
-            galaxies = self.admin_misp_connector.galaxies(pythonify=True)
-            self.assertTrue(isinstance(galaxies, list))
-            list_name_test = 'Mobile Attack - Attack Pattern'
-            for galaxy in galaxies:
-                if galaxy.name == list_name_test:
-                    break
-            r = self.admin_misp_connector.get_galaxy(galaxy.id, pythonify=True)
-            self.assertEqual(r.name, list_name_test)
-            # FIXME: Fails due to https://github.com/MISP/MISP/issues/4855
-            # self.assertTrue('GalaxyCluster' in r)
+        # Make sure we're up-to-date
+        r = self.admin_misp_connector.update_galaxies()
+        self.assertEqual(r['name'], 'Galaxies updated.')
+        # Get list
+        galaxies = self.admin_misp_connector.galaxies(pythonify=True)
+        self.assertTrue(isinstance(galaxies, list))
+        list_name_test = 'Mobile Attack - Attack Pattern'
+        for galaxy in galaxies:
+            if galaxy.name == list_name_test:
+                break
+        r = self.admin_misp_connector.get_galaxy(galaxy.id, pythonify=True)
+        self.assertEqual(r.name, list_name_test)
+        # FIXME: Fails due to https://github.com/MISP/MISP/issues/4855
+        # self.assertTrue('GalaxyCluster' in r)
 
     def test_zmq(self):
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
-            if not travis_run:
-                r = self.admin_misp_connector.push_event_to_ZMQ(first.id)
-                self.assertEqual(r['message'], 'Event published to ZMQ')
+            r = self.admin_misp_connector.push_event_to_ZMQ(first.id)
+            self.assertEqual(r['message'], 'Event published to ZMQ')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
