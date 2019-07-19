@@ -1079,8 +1079,28 @@ class TestComprehensive(unittest.TestCase):
         tag.name = 'this is a test tag'
         new_tag = self.admin_misp_connector.add_tag(tag, pythonify=True)
         self.assertEqual(new_tag.name, tag.name)
+        # Add non-exportable tag
+        tag = MISPTag()
+        tag.name = 'non-exportable tag'
+        tag.exportable = False
+        non_exportable_tag = self.admin_misp_connector.add_tag(tag, pythonify=True)
+        self.assertFalse(non_exportable_tag.exportable)
+        first = self.create_simple_event()
+        first.attributes[0].add_tag('non-exportable tag')
+        try:
+            first = self.user_misp_connector.add_event(first, pythonify=True)
+            self.assertFalse(first.attributes[0].tags)
+            first = self.admin_misp_connector.get_event(first, pythonify=True)
+            # Reference: https://github.com/MISP/MISP/issues/1394
+            self.assertFalse(first.attributes[0].tags)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
         # Delete tag
         response = self.admin_misp_connector.delete_tag(new_tag.id)
+        self.assertEqual(response['message'], 'Tag deleted.')
+        response = self.admin_misp_connector.delete_tag(non_exportable_tag.id)
         self.assertEqual(response['message'], 'Tag deleted.')
 
     def test_add_event_with_attachment_object_controller(self):
