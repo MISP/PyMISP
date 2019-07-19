@@ -904,43 +904,6 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
 
-    @unittest.skip("Wait for https://github.com/MISP/MISP/issues/4848")
-    def test_upload_sample(self):
-        first = self.create_simple_event()
-        second = self.create_simple_event()
-        third = self.create_simple_event()
-        try:
-            # Simple, not executable
-            first = self.user_misp_connector.add_event(first)
-            response = self.user_misp_connector.add_sample_to_event(event_id=first.id, path_to_sample=Path('tests/testlive_comprehensive.py'))
-            self.assertTrue('message' in response, "Content of response: {}".format(response))
-            self.assertEqual(response['message'], 'Success, saved all attributes.')
-            first = self.user_misp_connector.get_event(first.id)
-            self.assertEqual(len(first.objects), 1)
-            self.assertEqual(first.objects[0].name, 'file')
-            # Simple, executable
-            second = self.user_misp_connector.add_event(second)
-            with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
-                pseudofile = BytesIO(f.read())
-            response = self.user_misp_connector.add_sample_to_event(event_id=second.id, filename='whoami.exe', pseudofile=pseudofile)
-            self.assertEqual(response['message'], 'Success, saved all attributes.')
-            second = self.user_misp_connector.get_event(second.id)
-            self.assertEqual(len(second.objects), 1)
-            self.assertEqual(second.objects[0].name, 'file')
-            third = self.user_misp_connector.add_event(third)
-            if not travis_run:
-                # Advanced, executable
-                response = self.user_misp_connector.add_sample_to_event(event_id=third.id, path_to_sample=Path('tests/viper-test-files/test_files/whoami.exe'), advanced_extraction=True)
-                self.assertEqual(response['message'], 'Success, saved all attributes.')
-                third = self.user_misp_connector.get_event(third.id)
-                self.assertEqual(len(third.objects), 7)
-                self.assertEqual(third.objects[0].name, 'pe-section')
-        finally:
-            # Delete event
-            self.admin_misp_connector.delete_event(first.id)
-            self.admin_misp_connector.delete_event(second.id)
-            self.admin_misp_connector.delete_event(third.id)
-
     def test_update_object(self):
         first = self.create_simple_event()
         ip_dom = MISPObject('domain-ip')
@@ -1365,13 +1328,24 @@ class TestComprehensive(unittest.TestCase):
             # FIXME: attribute needs to be a complete MISPAttribute: https://github.com/MISP/MISP/issues/4868
             prop_attr = MISPAttribute()
             prop_attr.from_dict(**{'type': 'ip-dst', 'value': '123.43.32.21'})
+            # Add attribute on event owned by someone else
             attribute = self.user_misp_connector.add_attribute(second.id, prop_attr)
             self.assertTrue(isinstance(attribute, MISPShadowAttribute))
+            # Add attribute with the same value as an existing proposal
+            prop_attr.uuid = str(uuid4())
+            attribute = self.admin_misp_connector.add_attribute(second.id, prop_attr)
+            prop_attr.uuid = str(uuid4())
+            # Add a duplicate attribute (same value)
+            attribute = self.admin_misp_connector.add_attribute(second.id, prop_attr)
+            self.assertTrue('errors' in attribute)
+            # Update attribute owned by someone else
             attribute = self.user_misp_connector.update_attribute({'comment': 'blah'}, second.attributes[0].id)
             self.assertTrue(isinstance(attribute, MISPShadowAttribute))
             self.assertEqual(attribute.value, second.attributes[0].value)
+            # Delete attribute owned by someone else
             response = self.user_misp_connector.delete_attribute(second.attributes[1].id)
             self.assertTrue(response['success'])
+            # Delete attribute owned by user
             response = self.admin_misp_connector.delete_attribute(second.attributes[1].id)
             self.assertEqual(response['message'], 'Attribute deleted.')
         finally:

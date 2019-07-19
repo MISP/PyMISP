@@ -306,14 +306,12 @@ class ExpandedPyMISP(PyMISP):
         '''Add an attribute to an existing MISP event'''
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
         new_attribute = self._prepare_request('POST', f'attributes/add/{event_id}', data=attribute)
-        if new_attribute.status_code == 403:
-            if new_attribute['message'] == 'Could not add Attribute':
-                # In that case, we have a duplicate (uuid or value), and need to return the error to the user
-                return new_attribute
+        new_attribute = self._check_response(new_attribute, expect_json=True)
+        if ('errors' in new_attribute and new_attribute['errors'][0] == 403
+                and new_attribute['errors'][1]['message'] == 'You do not have permission to do that.'):
             # At this point, we assume the user tried to add an attribute on an event they don't own
             # Re-try with a proposal
             return self.add_attribute_proposal(event_id, attribute, pythonify)
-        new_attribute = self._check_response(new_attribute, expect_json=True)
         if not pythonify or 'errors' in new_attribute:
             return new_attribute
         a = MISPAttribute()
@@ -325,10 +323,13 @@ class ExpandedPyMISP(PyMISP):
         if attribute_id is None:
             attribute_id = self.__get_uuid_or_id_from_abstract_misp(attribute)
         updated_attribute = self._prepare_request('POST', f'attributes/edit/{attribute_id}', data=attribute)
-        if updated_attribute.status_code == 403:
+        updated_attribute = self._check_response(updated_attribute, expect_json=True)
+        if ('errors' in updated_attribute and updated_attribute['errors'][0] == 403
+                and updated_attribute['errors'][1]['message'] == 'Invalid attribute.'):
+            # FIXME: https://github.com/MISP/MISP/issues/4913
+            # At this point, we assume the user tried to update an attribute on an event they don't own
             # Re-try with a proposal
             return self.update_attribute_proposal(attribute_id, attribute, pythonify)
-        updated_attribute = self._check_response(updated_attribute, expect_json=True)
         if not pythonify or 'errors' in updated_attribute:
             return updated_attribute
         a = MISPAttribute()
@@ -339,10 +340,14 @@ class ExpandedPyMISP(PyMISP):
         '''Delete an attribute from a MISP instance'''
         attribute_id = self.__get_uuid_or_id_from_abstract_misp(attribute)
         response = self._prepare_request('POST', f'attributes/delete/{attribute_id}')
-        if response.status_code == 403:
+        response = self._check_response(response, expect_json=True)
+        if ('errors' in response and response['errors'][0] == 403
+                and response['errors'][1]['message'] == 'Attribute not found or not authorised.'):
+            # FIXME: https://github.com/MISP/MISP/issues/4913
+            # At this point, we assume the user tried to delete an attribute on an event they don't own
             # Re-try with a proposal
             return self.delete_attribute_proposal(attribute_id)
-        return self._check_response(response, expect_json=True)
+        return response
 
     # ## END Attribute ###
 
