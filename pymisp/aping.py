@@ -447,6 +447,12 @@ class ExpandedPyMISP(PyMISP):
         s.from_dict(**new_sighting)
         return s
 
+    def delete_sighting(self, sighting: Union[MISPSighting, int, str, UUID]):
+        '''Delete a sighting from a MISP instance'''
+        sighting_id = self.__get_uuid_or_id_from_abstract_misp(sighting)
+        response = self._prepare_request('POST', f'sightings/delete/{sighting_id}')
+        return self._check_response(response, expect_json=True)
+
     # ## END Sighting ###
 
     # ## BEGIN Tags ###
