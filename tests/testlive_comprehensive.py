@@ -1402,10 +1402,10 @@ class TestComprehensive(unittest.TestCase):
             attr_stats = self.admin_misp_connector.attributes_statistics(context='category', percentage=True)
             self.assertDictEqual(attr_stats, expected_attr_stats_category_percent)
             # Tags
-            to_test = {'tags': {'tlp:white___test': '1'}, 'taxonomies': {'workflow': 0}}
+            to_test = {'tags': {'tlp:white___test': '1'}, 'taxonomies': []}
             tags_stats = self.admin_misp_connector.tags_statistics()
             self.assertDictEqual(tags_stats, to_test)
-            to_test = {'tags': {'tlp:white___test': '100%'}, 'taxonomies': {'workflow': '0%'}}
+            to_test = {'tags': {'tlp:white___test': '100%'}, 'taxonomies': []}
             tags_stats = self.admin_misp_connector.tags_statistics(percentage=True, name_sort=True)
             self.assertDictEqual(tags_stats, to_test)
             # Users
