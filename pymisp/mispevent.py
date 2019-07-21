@@ -1228,9 +1228,10 @@ class MISPObject(AbstractMISP):
     def add_attribute(self, object_relation, simple_value=None, **value):
         """Add an attribute. object_relation is required and the value key is a
         dictionary with all the keys supported by MISPAttribute"""
-        if simple_value:
+        if simple_value is not None:  # /!\ The value *can* be 0
             value = {'value': simple_value}
         if value.get('value') is None:
+            # FIXME: Add a warning to the user, silently discarding the call isn't the best idea
             return None
         if self._known_template:
             if self._definition['attributes'].get(object_relation):
