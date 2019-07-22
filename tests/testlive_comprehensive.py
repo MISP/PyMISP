@@ -53,7 +53,7 @@ class TestComprehensive(unittest.TestCase):
         # Creates an org
         organisation = MISPOrganisation()
         organisation.name = 'Test Org'
-        cls.test_org = cls.admin_misp_connector.add_organisation(organisation)
+        cls.test_org = cls.admin_misp_connector.add_organisation(organisation, pythonify=True)
         # Set the refault role (id 3 on the VM)
         cls.admin_misp_connector.set_default_role(3)
         # Creates a user
@@ -62,6 +62,7 @@ class TestComprehensive(unittest.TestCase):
         user.org_id = cls.test_org.id
         cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)
         cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=False)
+        cls.user_misp_connector.toggle_global_pythonify()
         # Creates a publisher
         user = MISPUser()
         user.email = 'testpub@user.local'
@@ -136,8 +137,8 @@ class TestComprehensive(unittest.TestCase):
 
         # Create first and third event as admin
         # usr won't be able to see the first one
-        first = self.admin_misp_connector.add_event(first_event)
-        third = self.admin_misp_connector.add_event(third_event)
+        first = self.admin_misp_connector.add_event(first_event, pythonify=True)
+        third = self.admin_misp_connector.add_event(third_event, pythonify=True)
         # Create second event as user
         second = self.user_misp_connector.add_event(second_event)
         return first, second, third
@@ -155,12 +156,12 @@ class TestComprehensive(unittest.TestCase):
             for e in events:
                 self.assertIn(e.id, [first.id, second.id])
             # Search as user
-            events = self.user_misp_connector.search(value=first.attributes[0].value, pythonify=True)
+            events = self.user_misp_connector.search(value=first.attributes[0].value)
             self.assertEqual(len(events), 1)
             for e in events:
                 self.assertIn(e.id, [second.id])
             # Non-existing value
-            events = self.user_misp_connector.search(value=str(uuid4()), pythonify=True)
+            events = self.user_misp_connector.search(value=str(uuid4()))
             self.assertEqual(events, [])
         finally:
             # Delete events
@@ -178,12 +179,12 @@ class TestComprehensive(unittest.TestCase):
             for a in attributes:
                 self.assertIn(a.event_id, [first.id, second.id])
             # Search as user
-            attributes = self.user_misp_connector.search(controller='attributes', value=first.attributes[0].value, pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', value=first.attributes[0].value)
             self.assertEqual(len(attributes), 1)
             for a in attributes:
                 self.assertIn(a.event_id, [second.id])
             # Non-existing value
-            attributes = self.user_misp_connector.search(controller='attributes', value=str(uuid4()), pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', value=str(uuid4()))
             self.assertEqual(attributes, [])
         finally:
             # Delete event
@@ -254,15 +255,15 @@ class TestComprehensive(unittest.TestCase):
             for e in events:
                 self.assertIn(e.id, [first.id])
             # Search as user
-            events = self.user_misp_connector.search(tags='tlp:white___test', pythonify=True)
+            events = self.user_misp_connector.search(tags='tlp:white___test')
             self.assertEqual(len(events), 2)
             for e in events:
                 self.assertIn(e.id, [second.id, third.id])
-            events = self.user_misp_connector.search(tags='tlp:amber___test', pythonify=True)
+            events = self.user_misp_connector.search(tags='tlp:amber___test')
             self.assertEqual(len(events), 2)
             for e in events:
                 self.assertIn(e.id, [second.id, third.id])
-            events = self.user_misp_connector.search(tags='admin_only', pythonify=True)
+            events = self.user_misp_connector.search(tags='admin_only')
             self.assertEqual(events, [])
         finally:
             # Delete event
@@ -282,14 +283,14 @@ class TestComprehensive(unittest.TestCase):
             attributes = self.admin_misp_connector.search(tags='admin_only', pythonify=True)
             self.assertEqual(len(attributes), 1)
             # Search as user
-            attributes = self.user_misp_connector.search(controller='attributes', tags='tlp:white___test', pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', tags='tlp:white___test')
             self.assertEqual(len(attributes), 4)
-            attributes = self.user_misp_connector.search(controller='attributes', tags='tlp:amber___test', pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', tags='tlp:amber___test')
             self.assertEqual(len(attributes), 3)
-            attributes = self.user_misp_connector.search(tags='admin_only', pythonify=True)
+            attributes = self.user_misp_connector.search(tags='admin_only')
             self.assertEqual(attributes, [])
             attributes_tags_search = self.admin_misp_connector.build_complex_query(or_parameters=['tlp:amber___test'], not_parameters=['tlp:white___test'])
-            attributes = self.user_misp_connector.search(controller='attributes', tags=attributes_tags_search, pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', tags=attributes_tags_search)
             self.assertEqual(len(attributes), 1)
         finally:
             # Delete event
@@ -361,19 +362,19 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
             # Search as user
             # # Test - last 4 min
-            events = self.user_misp_connector.search(timestamp='4m', pythonify=True)
+            events = self.user_misp_connector.search(timestamp='4m')
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(events[0].timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
             # # Test timestamp of 2nd event
-            events = self.user_misp_connector.search(timestamp=event_creation_timestamp_second.timestamp(), pythonify=True)
+            events = self.user_misp_connector.search(timestamp=event_creation_timestamp_second.timestamp())
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(events[0].timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
             # # Test interval -6 min -> -4 min
-            events = self.user_misp_connector.search(timestamp=['6m', '4m'], pythonify=True)
+            events = self.user_misp_connector.search(timestamp=['6m', '4m'])
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
             self.assertEqual(events[0].timestamp.timestamp(), int(event_creation_timestamp_first.timestamp()))
@@ -399,19 +400,19 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
             # Search as user
             # # Test - last 4 min
-            attributes = self.user_misp_connector.search(controller='attributes', timestamp='4m', pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', timestamp='4m')
             self.assertEqual(len(attributes), 1)
             self.assertEqual(attributes[0].event_id, second.id)
             self.assertEqual(attributes[0].timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
             # # Test timestamp of 2nd event
-            attributes = self.user_misp_connector.search(controller='attributes', timestamp=event_creation_timestamp_second.timestamp(), pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', timestamp=event_creation_timestamp_second.timestamp())
             self.assertEqual(len(attributes), 1)
             self.assertEqual(attributes[0].event_id, second.id)
             self.assertEqual(attributes[0].timestamp.timestamp(), int(event_creation_timestamp_second.timestamp()))
 
             # # Test interval -6 min -> -4 min
-            attributes = self.user_misp_connector.search(controller='attributes', timestamp=['6m', '4m'], pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', timestamp=['6m', '4m'])
             self.assertEqual(len(attributes), 1)
             self.assertEqual(attributes[0].event_id, first.id)
             self.assertEqual(attributes[0].timestamp.timestamp(), int(event_creation_timestamp_first.timestamp()))
@@ -430,7 +431,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertFalse(first.published)
             # Add event as publisher
             first.publish()
-            first = self.pub_misp_connector.update_event(first)
+            first = self.pub_misp_connector.update_event(first, pythonify=True)
             self.assertTrue(first.published)
         finally:
             # Delete event
@@ -445,9 +446,9 @@ class TestComprehensive(unittest.TestCase):
         second = self.create_simple_event()
         second.publish()
         try:
-            first = self.pub_misp_connector.add_event(first)
+            first = self.pub_misp_connector.add_event(first, pythonify=True)
             time.sleep(10)
-            second = self.pub_misp_connector.add_event(second)
+            second = self.pub_misp_connector.add_event(second, pythonify=True)
             # Test invalid query
             events = self.pub_misp_connector.search(publish_timestamp='5x', pythonify=True)
             self.assertEqual(events, [])
@@ -497,7 +498,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(first.objects[1].distribution, Distribution.inherit.value)
             self.assertEqual(first.objects[1].attributes[0].distribution, Distribution.inherit.value)
             # Attribute create
-            attribute = self.user_misp_connector.add_attribute(first.id, {'type': 'comment', 'value': 'bar'}, pythonify=True)
+            attribute = self.user_misp_connector.add_attribute(first.id, {'type': 'comment', 'value': 'bar'})
             self.assertEqual(attribute.value, 'bar', attribute.to_json())
             self.assertEqual(attribute.distribution, Distribution.inherit.value, attribute.to_json())
             # Object - add
@@ -547,13 +548,13 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
             timeframe = [first.timestamp.timestamp() - 5, first.timestamp.timestamp() + 5]
             # Search event we just created in multiple ways. Make sure it doesn't catch it when it shouldn't
-            events = self.user_misp_connector.search(timestamp=timeframe, pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe)
             self.assertEqual(len(events), 2)
             self.assertEqual(events[0].id, first.id)
             self.assertEqual(events[1].id, second.id)
-            events = self.user_misp_connector.search(timestamp=timeframe, value='nothere', pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, value='nothere')
             self.assertEqual(events, [])
-            events = self.user_misp_connector.search(timestamp=timeframe, value=first.attributes[0].value, pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, value=first.attributes[0].value)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
             events = self.user_misp_connector.search(timestamp=[first.timestamp.timestamp() - 50,
@@ -562,34 +563,34 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events, [])
 
             # Test return content
-            events = self.user_misp_connector.search(timestamp=timeframe, metadata=False, pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, metadata=False)
             self.assertEqual(len(events), 2)
             self.assertEqual(len(events[0].attributes), 1)
             self.assertEqual(len(events[1].attributes), 2)
-            events = self.user_misp_connector.search(timestamp=timeframe, metadata=True, pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, metadata=True)
             self.assertEqual(len(events), 2)
             self.assertEqual(len(events[0].attributes), 0)
             self.assertEqual(len(events[1].attributes), 0)
 
             # other things
-            events = self.user_misp_connector.search(timestamp=timeframe, published=True, pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, published=True)
             self.assertEqual(events, [])
-            events = self.user_misp_connector.search(timestamp=timeframe, published=False, pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, published=False)
             self.assertEqual(len(events), 2)
-            events = self.user_misp_connector.search(eventid=first.id, pythonify=True)
+            events = self.user_misp_connector.search(eventid=first.id)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
-            events = self.user_misp_connector.search(uuid=first.uuid, pythonify=True)
+            events = self.user_misp_connector.search(uuid=first.uuid)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
-            events = self.user_misp_connector.search(org=first.orgc_id, pythonify=True)
+            events = self.user_misp_connector.search(org=first.orgc_id)
             self.assertEqual(len(events), 2)
 
             # test like search
-            events = self.user_misp_connector.search(timestamp=timeframe, value='%{}%'.format(first.attributes[0].value.split('-')[2]), pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, value='%{}%'.format(first.attributes[0].value.split('-')[2]))
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
-            events = self.user_misp_connector.search(timestamp=timeframe, eventinfo='%bar blah%', pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, eventinfo='%bar blah%')
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
 
@@ -602,24 +603,24 @@ class TestComprehensive(unittest.TestCase):
             # self.assertEqual(events[0].id, second.id)
 
             # date_from / date_to
-            events = self.user_misp_connector.search(timestamp=timeframe, date_from=date.today().isoformat(), pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, date_from=date.today().isoformat())
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
-            events = self.user_misp_connector.search(timestamp=timeframe, date_from='2018-09-01', pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, date_from='2018-09-01')
             self.assertEqual(len(events), 2)
-            events = self.user_misp_connector.search(timestamp=timeframe, date_from='2018-09-01', date_to='2018-09-02', pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, date_from='2018-09-01', date_to='2018-09-02')
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
 
             # Category
-            events = self.user_misp_connector.search(timestamp=timeframe, category='Network activity', pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, category='Network activity')
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
 
             # toids
-            events = self.user_misp_connector.search(timestamp=timeframe, to_ids='0', pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, to_ids='0')
             self.assertEqual(len(events), 2)
-            events = self.user_misp_connector.search(timestamp=timeframe, to_ids='1', pythonify=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, to_ids='1')
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(len(events[0].attributes), 1)
@@ -627,26 +628,26 @@ class TestComprehensive(unittest.TestCase):
             # deleted
             second.attributes[1].delete()
             self.user_misp_connector.update_event(second)
-            events = self.user_misp_connector.search(eventid=second.id, pythonify=True)
+            events = self.user_misp_connector.search(eventid=second.id)
             self.assertEqual(len(events[0].attributes), 1)
-            events = self.user_misp_connector.search(eventid=second.id, deleted=True, pythonify=True)
+            events = self.user_misp_connector.search(eventid=second.id, deleted=True)
             self.assertEqual(len(events[0].attributes), 1)
 
             # include_event_uuid
-            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, include_event_uuid=True, pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, include_event_uuid=True)
             self.assertEqual(attributes[0].event_uuid, second.uuid)
 
             # event_timestamp
             time.sleep(1)
             second.add_attribute('ip-src', '8.8.8.9')
             second = self.user_misp_connector.update_event(second)
-            events = self.user_misp_connector.search(event_timestamp=second.timestamp.timestamp(), pythonify=True)
+            events = self.user_misp_connector.search(event_timestamp=second.timestamp.timestamp())
             self.assertEqual(len(events), 1)
 
             # searchall
             second.add_attribute('text', 'This is a test for the full text search', comment='Test stuff comment')
             second = self.user_misp_connector.update_event(second)
-            events = self.user_misp_connector.search(value='%for the full text%', searchall=True, pythonify=True)
+            events = self.user_misp_connector.search(value='%for the full text%', searchall=True)
             self.assertEqual(len(events), 1)
 
             # warninglist
@@ -656,17 +657,17 @@ class TestComprehensive(unittest.TestCase):
             second.add_attribute('ip-src', '9.9.9.9')
             second = self.user_misp_connector.update_event(second)
 
-            events = self.user_misp_connector.search(eventid=second.id, pythonify=True)
+            events = self.user_misp_connector.search(eventid=second.id)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(len(events[0].attributes), 5)
 
-            events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=False, pythonify=True)
+            events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=False)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(len(events[0].attributes), 5)
 
-            events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True, pythonify=True)
+            events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(len(events[0].attributes), 3)
@@ -674,10 +675,10 @@ class TestComprehensive(unittest.TestCase):
             self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
 
             # Page / limit
-            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=1, limit=3, pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=1, limit=3)
             self.assertEqual(len(attributes), 3)
 
-            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=2, limit=3, pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, page=2, limit=3)
             self.assertEqual(len(attributes), 2)
 
             time.sleep(1)  # make sure the next attribute is added one at least one second later
@@ -734,6 +735,8 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
 
             current_ts = int(time.time())
+            # NOTE: no pythonify available yet
+            # r = self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             r = self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             self.assertEqual(r['message'], 'Sighting added')
 
@@ -741,6 +744,8 @@ class TestComprehensive(unittest.TestCase):
             s.value = second.attributes[0].value
             s.source = 'Testcases'
             s.type = '1'
+            # NOTE: no pythonify available yet
+            # r = self.user_misp_connector.add_sighting(s, second.attributes[0].id)
             r = self.user_misp_connector.add_sighting(s, second.attributes[0].id)
             self.assertEqual(r['message'], 'Sighting added')
 
@@ -781,15 +786,17 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(s[0]['sighting'].attribute_id, str(second.attributes[0].id))
 
             # Get sightings from event/attribute / org
-            s = self.user_misp_connector.sightings(first, pythonify=True)
+            s = self.user_misp_connector.sightings(first)
             self.assertTrue(isinstance(s, list))
             self.assertEqual(int(s[0].attribute_id), first.attributes[0].id)
 
+            # NOTE: no pythonify available yet
+            # r = self.admin_misp_connector.add_sighting(s, second.attributes[0].id, pythonify=True)
             r = self.admin_misp_connector.add_sighting(s, second.attributes[0].id)
             self.assertEqual(r['message'], 'Sighting added')
-            s = self.user_misp_connector.sightings(second.attributes[0], pythonify=True)
+            s = self.user_misp_connector.sightings(second.attributes[0])
             self.assertEqual(len(s), 2)
-            s = self.user_misp_connector.sightings(second.attributes[0], self.test_org.id, pythonify=True)
+            s = self.user_misp_connector.sightings(second.attributes[0], self.test_org.id)
             self.assertEqual(len(s), 1)
             self.assertEqual(s[0].org_id, self.test_org.id)
             # Delete sighting
@@ -819,39 +826,39 @@ class TestComprehensive(unittest.TestCase):
             first.attributes[0].to_ids = True
             first = self.user_misp_connector.update_event(first)
             self.admin_misp_connector.publish(first.id, alert=False)
-            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp())
             self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
 
             # eventid
-            csv = self.user_misp_connector.search(return_format='csv', eventid=first.id, pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', eventid=first.id)
             self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
 
             # category
-            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), category='Other', pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), category='Other')
             self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
-            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), category='Person', pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), category='Person')
             self.assertEqual(len(csv), 0)
 
             # type_attribute
-            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), type_attribute='text', pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), type_attribute='text')
             self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
-            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), type_attribute='ip-src', pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), type_attribute='ip-src')
             self.assertEqual(len(csv), 0)
 
             # context
-            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), include_context=True, pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp(), include_context=True)
             self.assertEqual(len(csv), 1)
             self.assertTrue('event_info' in csv[0])
 
             # date_from date_to
-            csv = self.user_misp_connector.search(return_format='csv', date_from=date.today().isoformat(), pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', date_from=date.today().isoformat())
             self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
-            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02')
             self.assertEqual(len(csv), 2)
 
             # headerless
@@ -862,14 +869,14 @@ class TestComprehensive(unittest.TestCase):
             # self.assertEqual(len(csv.strip().split('\n')), 2)
 
             # include_context
-            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', include_context=True, pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', include_context=True)
             event_context_keys = ['event_info', 'event_member_org', 'event_source_org', 'event_distribution', 'event_threat_level_id', 'event_analysis', 'event_date', 'event_tag', 'event_timestamp']
             for k in event_context_keys:
                 self.assertTrue(k in csv[0])
 
             # requested_attributes
             columns = ['value', 'event_id']
-            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', requested_attributes=columns, pythonify=True)
+            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', requested_attributes=columns)
             self.assertEqual(len(csv[0].keys()), 2)
             for k in columns:
                 self.assertTrue(k in csv[0])
@@ -1048,7 +1055,7 @@ class TestComprehensive(unittest.TestCase):
         first = self.create_simple_event()
         first.attributes[0].add_tag('non-exportable tag')
         try:
-            first = self.user_misp_connector.add_event(first, pythonify=True)
+            first = self.user_misp_connector.add_event(first)
             self.assertFalse(first.attributes[0].tags)
             first = self.admin_misp_connector.get_event(first, pythonify=True)
             # Reference: https://github.com/MISP/MISP/issues/1394
@@ -1075,7 +1082,7 @@ class TestComprehensive(unittest.TestCase):
             r = self.user_misp_connector.add_object(first.id, peo)
             self.assertEqual(r.name, 'pe', r)
             for ref in peo.ObjectReference:
-                r = self.user_misp_connector.add_object_reference(ref, pythonify=True)
+                r = self.user_misp_connector.add_object_reference(ref)
                 # FIXME: https://github.com/MISP/MISP/issues/4866
                 # self.assertEqual(r.object_uuid, peo.uuid, r.to_json())
 
@@ -1083,7 +1090,7 @@ class TestComprehensive(unittest.TestCase):
             obj_attrs = r.get_attributes_by_relation('ssdeep')
             self.assertEqual(len(obj_attrs), 1, obj_attrs)
             self.assertEqual(r.name, 'file', r)
-            r = self.user_misp_connector.add_object_reference(fo.ObjectReference[0], pythonify=True)
+            r = self.user_misp_connector.add_object_reference(fo.ObjectReference[0])
             # FIXME: https://github.com/MISP/MISP/issues/4866
             # self.assertEqual(r.object_uuid, fo.uuid, r.to_json())
             self.assertEqual(r.referenced_uuid, peo.uuid, r.to_json())
@@ -1258,7 +1265,7 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(organisation.name, 'Test Org')
         # Update org
         organisation.name = 'blah'
-        organisation = self.admin_misp_connector.update_organisation(organisation)
+        organisation = self.admin_misp_connector.update_organisation(organisation, pythonify=True)
         self.assertEqual(organisation.name, 'blah', organisation)
 
     def test_attribute(self):
@@ -1289,7 +1296,7 @@ class TestComprehensive(unittest.TestCase):
             new_attribute = self.user_misp_connector.update_attribute(new_attribute)
             self.assertEqual(new_attribute.value, '5.6.3.4')
             # Update attribute as proposal
-            new_proposal_update = self.user_misp_connector.update_attribute_proposal(new_attribute.id, {'to_ids': False}, pythonify=True)
+            new_proposal_update = self.user_misp_connector.update_attribute_proposal(new_attribute.id, {'to_ids': False})
             self.assertEqual(new_proposal_update.to_ids, False)
             # Delete attribute as proposal
             proposal_delete = self.user_misp_connector.delete_attribute_proposal(new_attribute.id)
@@ -1323,10 +1330,10 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(isinstance(attribute, MISPShadowAttribute))
             # Add attribute with the same value as an existing proposal
             prop_attr.uuid = str(uuid4())
-            attribute = self.admin_misp_connector.add_attribute(second.id, prop_attr)
+            attribute = self.admin_misp_connector.add_attribute(second.id, prop_attr, pythonify=True)
             prop_attr.uuid = str(uuid4())
             # Add a duplicate attribute (same value)
-            attribute = self.admin_misp_connector.add_attribute(second.id, prop_attr)
+            attribute = self.admin_misp_connector.add_attribute(second.id, prop_attr, pythonify=True)
             self.assertTrue('errors' in attribute)
             # Update attribute owned by someone else
             attribute = self.user_misp_connector.update_attribute({'comment': 'blah'}, second.attributes[0].id)
@@ -1424,6 +1431,8 @@ class TestComprehensive(unittest.TestCase):
             # FIXME: https://github.com/MISP/MISP/issues/4880
             # users_stats = self.admin_misp_connector.users_statistics(context='attributehistogram')
 
+            # NOTE Not supported yet
+            # self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             users_stats = self.user_misp_connector.users_statistics(context='sightings')
             self.assertEqual(list(users_stats.keys()), ['toplist', 'eventids'])
@@ -1502,7 +1511,7 @@ class TestComprehensive(unittest.TestCase):
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
-            first = self.admin_misp_connector.change_sharing_group_on_entity(first, sharing_group.id)
+            first = self.admin_misp_connector.change_sharing_group_on_entity(first, sharing_group.id, pythonify=True)
             self.assertEqual(first.SharingGroup['name'], 'Testcases SG')
             # FIXME https://github.com/MISP/MISP/issues/4891
             # first_attribute = self.admin_misp_connector.change_sharing_group_on_entity(first.attributes[0], sharing_group.id)
@@ -1606,7 +1615,7 @@ class TestComprehensive(unittest.TestCase):
             with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
                 first.add_attribute('malware-sample', value='whoami.exe', data=BytesIO(f.read()), expand='binary')
             first.run_expansions()
-            first = self.admin_misp_connector.add_event(first)
+            first = self.admin_misp_connector.add_event(first, pythonify=True)
             self.assertEqual(len(first.objects), 7)
         finally:
             # Delete event
@@ -1615,6 +1624,21 @@ class TestComprehensive(unittest.TestCase):
     def test_upload_stix(self):
         # FIXME https://github.com/MISP/MISP/issues/4892
         pass
+
+    def test_toggle_global_pythonify(self):
+        first = self.create_simple_event()
+        second = self.create_simple_event()
+        try:
+            self.admin_misp_connector.toggle_global_pythonify()
+            first = self.admin_misp_connector.add_event(first)
+            self.assertTrue(isinstance(first, MISPEvent))
+            self.admin_misp_connector.toggle_global_pythonify()
+            second = self.admin_misp_connector.add_event(second)
+            self.assertTrue(isinstance(second, dict))
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+            self.admin_misp_connector.delete_event(second['Event']['id'])
 
 
 if __name__ == '__main__':
