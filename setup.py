@@ -53,7 +53,7 @@ setup(
         'python-magic',
         'requests-mock'
     ],
-    test_suite="tests.test_offline",
+    test_suite="tests.test_mispevent",
     include_package_data=True,
     package_data={'pymisp': ['data/*.json',
                              'data/misp-objects/schema_objects.json',
