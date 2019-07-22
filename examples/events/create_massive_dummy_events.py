@@ -18,6 +18,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     misp = ExpandedPyMISP(url, key, True)
+    misp.toggle_global_pythonify()
 
     if args.limit is None:
         args.limit = 1
