@@ -2,6 +2,43 @@ Changelog
 =========
 
 
+v2.4.111.2 (2019-07-22)
+-----------------------
+
+New
+~~~
+- [Sightings] Delete method. [Raphaël Vinot]
+
+  Fix #230
+- [tests] non-exportable tags. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump verison. [Raphaël Vinot]
+- Make pythonify=False default everywhere. [Raphaël Vinot]
+
+  Add a method to toggle pythonify globally
+- [tests] Update stats. [Raphaël Vinot]
+- [tests] Remove travis exceptions. [Raphaël Vinot]
+
+Fix
+~~~
+- [tests] Path to test file. [Raphaël Vinot]
+
+  Fix #423
+- [objects] Allow the value of an attribute to be 0. [Raphaël Vinot]
+- [tests] Disable one of the test cases for now. [Raphaël Vinot]
+- [tests] By default, the workflow taxonomy isn't enabled. [Raphaël
+  Vinot]
+- Properly handle fallbacks add/update/delete attributes. [Raphaël
+  Vinot]
+- [add_attribute] Only create a proposal when needed. [Raphaël Vinot]
+
+Other
+~~~~~
+- Fix for issue 420. [github-pba]
+
+
 v2.4.111.1 (2019-07-18)
 -----------------------
 
@@ -12,6 +49,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Remove legacy tests. [Raphaël Vinot]
