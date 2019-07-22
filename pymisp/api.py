@@ -537,12 +537,12 @@ class PyMISP(object):  # pragma: no cover
         e.distribution = distribution
         return self.update(e)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_sharing_group")
+    @deprecated(reason="Use ExpandedPyMISP.change_sharing_group_on_entity")
     def change_sharing_group(self, event, sharing_group_id):
         """Change the sharing group of an event"""
         e = self._make_mispevent(event)
-        e.distribution = 4      # Needs to be 'Sharing group'
-        if e.SharingGroup:      # Delete former SharingGroup information
+        e.distribution = 4       # Needs to be 'Sharing group'
+        if 'SharingGroup' in e:  # Delete former SharingGroup information
             del e.SharingGroup
         e.sharing_group_id = sharing_group_id  # Set new sharing group id
         return self.update(e)
