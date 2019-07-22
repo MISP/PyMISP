@@ -67,7 +67,7 @@ if __name__ == '__main__':
                 event.info = args.new_event
                 for o in objects:
                     event.add_object(**o)
-                new_event = misp.add_event(event)
+                new_event = misp.add_event(event, pythonify=True)
                 if isinstance(new_event, str):
                     print(new_event)
                 elif 'id' in new_event:
@@ -77,7 +77,7 @@ if __name__ == '__main__':
                     print(new_event)
             else:
                 for o in objects:
-                    new_object = misp.add_object(args.update_event, o)
+                    new_object = misp.add_object(args.update_event, o, pythonify=True)
                     if isinstance(new_object, str):
                         print(new_object)
                     elif new_object.attributes:

@@ -25,6 +25,6 @@ if __name__ == '__main__':
             continue
 
         if eo:
-            response = pymisp.add_object(args.event, eo)
+            response = pymisp.add_object(args.event, eo, pythonify=True)
             for ref in eo.ObjectReference:
                 r = pymisp.add_object_reference(ref)

@@ -24,6 +24,6 @@ if __name__ == '__main__':
             traceback.print_exc()
             continue
 
-        response = pymisp.add_object(args.event, auth_keys)
+        response = pymisp.add_object(args.event, auth_keys, pythonify=True)
         for ref in auth_keys.ObjectReference:
             r = pymisp.add_object_reference(ref)

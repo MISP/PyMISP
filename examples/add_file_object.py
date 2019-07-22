@@ -28,11 +28,11 @@ if __name__ == '__main__':
                 r = pymisp.add_object(args.event, s)
 
         if peo:
-            r = pymisp.add_object(args.event, peo)
+            r = pymisp.add_object(args.event, peo, pythonify=True)
             for ref in peo.ObjectReference:
                 r = pymisp.add_object_reference(ref)
 
         if fo:
-            response = pymisp.add_object(args.event, fo)
+            response = pymisp.add_object(args.event, fo, pythonify=True)
             for ref in fo.ObjectReference:
                 r = pymisp.add_object_reference(ref)
