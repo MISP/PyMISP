@@ -195,6 +195,8 @@ class MISPAttribute(AbstractMISP):
         self.value = kwargs.pop('value', None)
         if self.value is None:
             raise NewAttributeError('The value of the attribute is required.')
+        if self.type == 'datetime' and isinstance(self.value, str):
+            self.value = parse(self.value)
 
         # Default values
         self.category = kwargs.pop('category', type_defaults['default_category'])
@@ -694,6 +696,14 @@ class MISPEvent(AbstractMISP):
             if hasattr(obj, 'uuid') and obj.uuid == object_uuid:
                 return obj
         raise InvalidMISPObject('Object with {} does not exist in this event'.format(object_uuid))
+
+    def get_objects_by_name(self, object_name):
+        """Get an object by UUID (UUID is set by the server when creating the new object)"""
+        objects = []
+        for obj in self.objects:
+            if hasattr(obj, 'uuid') and obj.name == object_name:
+                objects.append(obj)
+        return objects
 
     def add_object(self, obj=None, **kwargs):
         """Add an object to the Event, either by passing a MISPObject, or a dictionary"""
