@@ -62,7 +62,7 @@ class MachOObject(AbstractMISPObjectGenerator):
             pos = 0
             for section in self.__macho.sections:
                 s = MachOSectionObject(section, self._standalone, default_attributes_parameters=self._default_attributes_parameters)
-                self.add_reference(s.uuid, 'included-in', 'Section {} of MachO'.format(pos))
+                self.add_reference(s.uuid, 'includes', 'Section {} of MachO'.format(pos))
                 pos += 1
                 self.sections.append(s)
         self.add_attribute('number-sections', value=len(self.sections))

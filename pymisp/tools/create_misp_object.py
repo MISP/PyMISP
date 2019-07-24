@@ -24,7 +24,7 @@ class FileTypeNotImplemented(MISPObjectException):
 
 def make_pe_objects(lief_parsed, misp_file, standalone=True, default_attributes_parameters={}):
     pe_object = PEObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
-    misp_file.add_reference(pe_object.uuid, 'included-in', 'PE indicators')
+    misp_file.add_reference(pe_object.uuid, 'includes', 'PE indicators')
     pe_sections = []
     for s in pe_object.sections:
         pe_sections.append(s)
@@ -33,7 +33,7 @@ def make_pe_objects(lief_parsed, misp_file, standalone=True, default_attributes_
 
 def make_elf_objects(lief_parsed, misp_file, standalone=True, default_attributes_parameters={}):
     elf_object = ELFObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
-    misp_file.add_reference(elf_object.uuid, 'included-in', 'ELF indicators')
+    misp_file.add_reference(elf_object.uuid, 'includes', 'ELF indicators')
     elf_sections = []
     for s in elf_object.sections:
         elf_sections.append(s)
@@ -42,7 +42,7 @@ def make_elf_objects(lief_parsed, misp_file, standalone=True, default_attributes
 
 def make_macho_objects(lief_parsed, misp_file, standalone=True, default_attributes_parameters={}):
     macho_object = MachOObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
-    misp_file.add_reference(macho_object.uuid, 'included-in', 'MachO indicators')
+    misp_file.add_reference(macho_object.uuid, 'includes', 'MachO indicators')
     macho_sections = []
     for s in macho_object.sections:
         macho_sections.append(s)
