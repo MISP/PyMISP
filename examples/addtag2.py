@@ -27,8 +27,6 @@ if __name__ == '__main__':
 
     misp = init(misp_url, misp_key)
 
-    event = misp.get_event(args.event)
-
     if args.event and not args.attribute:
         result = misp.search(eventid=args.event)
         data = result['response']
