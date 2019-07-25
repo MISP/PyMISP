@@ -966,6 +966,23 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first.id)
             self.admin_misp_connector.delete_event(second.id)
 
+    def test_custom_template(self):
+        first = self.create_simple_event()
+        try:
+            with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
+                first.add_attribute('malware-sample', value='whoami.exe', data=BytesIO(f.read()), expand='binary')
+            first.run_expansions()
+            first = self.admin_misp_connector.add_event(first, pythonify=True)
+            self.assertEqual(len(first.objects), 7)
+            file_object = first.get_objects_by_name('file')[0]
+            file_object.force_misp_objects_path_custom('tests/mispevent_testfiles', 'overwrite_file')
+            file_object.add_attribute('test_overwrite', 'blah')
+            obj = self.admin_misp_connector.update_object(file_object, pythonify=True)
+            self.assertEqual(obj.get_attributes_by_relation('test_overwrite')[0].value, 'blah')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
     def test_unknown_template(self):
         first = self.create_simple_event()
         attributeAsDict = [{'MyCoolAttribute': {'value': 'critical thing', 'type': 'text'}},
@@ -1110,10 +1127,10 @@ class TestComprehensive(unittest.TestCase):
             for s in sections:
                 first.add_object(s)
             self.assertEqual(len(first.objects[0].references), 1)
-            self.assertEqual(first.objects[0].references[0].relationship_type, 'included-in')
+            self.assertEqual(first.objects[0].references[0].relationship_type, 'includes')
             first = self.user_misp_connector.update_event(first)
             self.assertEqual(len(first.objects[0].references), 1)
-            self.assertEqual(first.objects[0].references[0].relationship_type, 'included-in')
+            self.assertEqual(first.objects[0].references[0].relationship_type, 'includes')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)

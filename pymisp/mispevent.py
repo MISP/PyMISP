@@ -1075,35 +1075,23 @@ class MISPObject(AbstractMISP):
         super(MISPObject, self).__init__(**kwargs)
         self._strict = strict
         self.name = name
-        misp_objects_path = os.path.join(
-            os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)),
-            'data', 'misp-objects', 'objects')
-        misp_objects_path_custom = kwargs.get('misp_objects_path_custom')
-        if misp_objects_path_custom and os.path.exists(os.path.join(misp_objects_path_custom, self.name, 'definition.json')):
-            # Use the local object path by default if provided (allows to overwrite a default template)
-            template_path = os.path.join(misp_objects_path_custom, self.name, 'definition.json')
-            self._known_template = True
-        elif os.path.exists(os.path.join(misp_objects_path, self.name, 'definition.json')):
-            template_path = os.path.join(misp_objects_path, self.name, 'definition.json')
-            self._known_template = True
-        else:
-            if self._strict:
-                raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
-            else:
-                self._known_template = False
-        if self._known_template:
-            with open(template_path, 'rb') as f:
-                if OLD_PY3:
-                    self._definition = json.loads(f.read().decode())
-                else:
-                    self._definition = json.load(f)
-            setattr(self, 'meta-category', self._definition['meta-category'])
-            self.template_uuid = self._definition['uuid']
-            self.description = self._definition['description']
-            self.template_version = self._definition['version']
+        self._known_template = False
+
+        if kwargs.get('misp_objects_path_custom'):
+            # If misp_objects_path_custom is given, and an object with the given name exists, use that.
+            self._known_template = self._load_template_path(os.path.join(kwargs.get('misp_objects_path_custom'), self.name, 'definition.json'))
+
+        if not self._known_template:
+            # Check if the object is known in the default templates bundled in with PyMISP
+            misp_objects_path = os.path.join(os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)), 'data', 'misp-objects', 'objects')
+            self._known_template = self._load_template_path(os.path.join(misp_objects_path, self.name, 'definition.json'))
+
+        if not self._known_template and self._strict:
+            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
         else:
             # Then we have no meta-category, template_uuid, description and template_version
             pass
+
         self.uuid = str(uuid.uuid4())
         self.__fast_attribute_access = defaultdict(list)  # Hashtable object_relation: [attributes]
         self.ObjectReference = []
@@ -1136,6 +1124,33 @@ class MISPObject(AbstractMISP):
         if self._standalone:
             # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
             self.update_not_jsonable('ObjectReference')
+
+    def _load_template_path(self, template_path):
+        if not os.path.exists(template_path):
+            return False
+        with open(template_path, 'rb') as f:
+            if OLD_PY3:
+                self._definition = json.loads(f.read().decode())
+            else:
+                self._definition = json.load(f)
+        setattr(self, 'meta-category', self._definition['meta-category'])
+        self.template_uuid = self._definition['uuid']
+        self.description = self._definition['description']
+        self.template_version = self._definition['version']
+        return True
+
+    def force_misp_objects_path_custom(self, misp_objects_path_custom, object_name=None):
+        if object_name:
+            self.name = object_name
+        template_path = os.path.join(misp_objects_path_custom, self.name, 'definition.json')
+
+        self._known_template = self._load_template_path(template_path)
+        if not self._known_template:
+            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory ({}).'.format(self.name, template_path))
+
+    @property
+    def disable_validation(self):
+        self._strict = False
 
     @property
     def attributes(self):
