@@ -13,11 +13,12 @@ def init(url, key):
 
     result = m.get_event(event)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get an event from a MISP instance.')
     parser.add_argument("-e", "--event", required=True, help="Event ID to get.")
     parser.add_argument("-a", "--attribute", help="Attribute ID to modify. A little dirty for now, argument need to be included in event")
-    parser.add_argument("-t", "--tag", required=True, type=int, help="Attribute ID to modify.")
+    parser.add_argument("-t", "--tag", required=True, type=int, help="Tag ID.")
     parser.add_argument("-m", "--modify_attribute", action='store_true', help="If set, the tag will be add to the attribute, otherwise to the event.")
 
     args = parser.parse_args()
