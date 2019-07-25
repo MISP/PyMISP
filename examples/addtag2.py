@@ -12,12 +12,13 @@ def init(url, key):
 
     result = m.get_event(event)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tag something.')
     parser.add_argument("-u", "--uuid", help="UUID to tag.")
     parser.add_argument("-e", "--event", help="Event ID to tag.")
     parser.add_argument("-a", "--attribute", help="Attribute ID to tag")
-    parser.add_argument("-t", "--tag", required=True, help="Attribute ID to modify.")
+    parser.add_argument("-t", "--tag", required=True, help="Tag ID.")
     args = parser.parse_args()
 
     if not args.event and not args.uuid and not args.attribute:
@@ -48,5 +49,5 @@ if __name__ == '__main__':
     if args.uuid:
         uuid = args.uuid
 
-    print("UUID tagged: %s"%uuid)
+    print("UUID tagged: %s" % uuid)
     misp.tag(uuid, args.tag)
