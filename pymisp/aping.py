@@ -1703,7 +1703,7 @@ class ExpandedPyMISP(PyMISP):
     def _make_timestamp(self, value: DateTypes):
         '''Catch-all method to normalize anything that can be converted to a timestamp'''
         if isinstance(value, datetime):
-            return datetime.timestamp()
+            return value.timestamp()
         elif isinstance(value, date):
             return datetime.combine(value, datetime.max.time()).timestamp()
         elif isinstance(value, str):
