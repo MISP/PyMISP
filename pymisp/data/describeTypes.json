@@ -173,6 +173,10 @@
         "default_category": "External analysis",
         "to_ids": 0
       },
+      "weakness": {
+        "default_category": "External analysis",
+        "to_ids": 0
+      },
       "attachment": {
         "default_category": "External analysis",
         "to_ids": 0
@@ -682,6 +686,7 @@
       "identity-card-number",
       "cookie",
       "vulnerability",
+      "weakness",
       "attachment",
       "malware-sample",
       "link",
@@ -906,6 +911,7 @@
         "text",
         "hex",
         "vulnerability",
+        "weakness",
         "x509-fingerprint-sha1",
         "x509-fingerprint-md5",
         "x509-fingerprint-sha256",
@@ -1020,6 +1026,7 @@
         "yara",
         "sigma",
         "vulnerability",
+        "weakness",
         "attachment",
         "malware-sample",
         "malware-type",
@@ -1137,6 +1144,7 @@
         "pattern-in-traffic",
         "pattern-in-memory",
         "vulnerability",
+        "weakness",
         "attachment",
         "malware-sample",
         "link",
