@@ -1551,10 +1551,9 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(r['name'], 'Organisation added to the sharing group.')
 
         # delete org
-        # FIXME: https://github.com/MISP/MISP/issues/4884
-        # r = self.admin_misp_connector.remove_org_from_sharing_group(sharing_group.id,
-        #                                                            self.test_org.id)
-        # self.assertEqual(r['name'], 'Organisation deleted from the sharing group.', r)
+        r = self.admin_misp_connector.remove_org_from_sharing_group(sharing_group.id,
+                                                                    self.test_org.id)
+        self.assertEqual(r['name'], 'Organisation removed from the sharing group.', r)
         # Get list
         sharing_groups = self.admin_misp_connector.sharing_groups(pythonify=True)
         self.assertTrue(isinstance(sharing_groups, list))
@@ -1563,20 +1562,26 @@ class TestComprehensive(unittest.TestCase):
         # Use the SG
 
         first = self.create_simple_event()
+        o = first.add_object(name='file')
+        o.add_attribute('filename', value='foo2.exe')
         try:
             first = self.user_misp_connector.add_event(first)
             first = self.admin_misp_connector.change_sharing_group_on_entity(first, sharing_group.id, pythonify=True)
             self.assertEqual(first.SharingGroup['name'], 'Testcases SG')
+
+            first_object = self.admin_misp_connector.change_sharing_group_on_entity(first.objects[0], sharing_group.id, pythonify=True)
+            self.assertEqual(first_object.sharing_group_id, sharing_group.id)
             # FIXME https://github.com/MISP/MISP/issues/4891
-            # first_attribute = self.admin_misp_connector.change_sharing_group_on_entity(first.attributes[0], sharing_group.id)
-            # self.assertEqual(first_attribute.SharingGroup['name'], 'Testcases SG')
+            # NOTE: Fails with pythonify because the sharing group id isn't in the response
+            # first_attribute = self.admin_misp_connector.change_sharing_group_on_entity(first.attributes[0], sharing_group.id, pythonify=True)
+            # self.assertEqual(first_attribute.distribution, 4)
+            # self.assertEqual(first_attribute.sharing_group_id, sharing_group.id)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
-
-        # delete
-        r = self.admin_misp_connector.delete_sharing_group(sharing_group.id)
-        self.assertEqual(r['message'], 'SharingGroup deleted')
+            # Delete sharing group
+            r = self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+            self.assertEqual(r['message'], 'SharingGroup deleted')
 
     def test_feeds(self):
         # Add

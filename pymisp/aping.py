@@ -604,11 +604,6 @@ class ExpandedPyMISP(PyMISP):
 
     # ## BEGIN Taxonomies ###
 
-    def update_taxonomies(self):
-        """Update all the taxonomies."""
-        response = self._prepare_request('POST', 'taxonomies/update')
-        return self._check_response(response, expect_json=True)
-
     def taxonomies(self, pythonify: bool=False):
         """Get all the taxonomies."""
         taxonomies = self._prepare_request('GET', 'taxonomies')
@@ -663,6 +658,11 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', url)
         return self._check_response(response, expect_json=True)
 
+    def update_taxonomies(self):
+        """Update all the taxonomies."""
+        response = self._prepare_request('POST', 'taxonomies/update')
+        return self._check_response(response, expect_json=True)
+
     # ## END Taxonomies ###
 
     # ## BEGIN Warninglists ###
@@ -713,11 +713,6 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', 'warninglists/toggleEnable', data=json.dumps(query))
         return self._check_response(response, expect_json=True)
 
-    def update_warninglists(self):
-        """Update all the warninglists."""
-        response = self._prepare_request('POST', 'warninglists/update')
-        return self._check_response(response, expect_json=True)
-
     def enable_warninglist(self, warninglist: Union[MISPWarninglist, int, str, UUID]):
         """Enable a warninglist."""
         warninglist_id = self.__get_uuid_or_id_from_abstract_misp(warninglist)
@@ -731,6 +726,11 @@ class ExpandedPyMISP(PyMISP):
     def values_in_warninglist(self, value: list):
         """Check if IOC values are in warninglist"""
         response = self._prepare_request('POST', 'warninglists/checkValue', data=json.dumps(value))
+        return self._check_response(response, expect_json=True)
+
+    def update_warninglists(self):
+        """Update all the warninglists."""
+        response = self._prepare_request('POST', 'warninglists/update')
         return self._check_response(response, expect_json=True)
 
     # ## END Warninglists ###
@@ -1693,11 +1693,10 @@ class ExpandedPyMISP(PyMISP):
 
     def users_statistics(self, context: str='data'):
         """Get users statistics from the MISP instance"""
-        # FIXME: https://github.com/MISP/MISP/issues/4874
         availables_contexts = ['data', 'orgs', 'users', 'tags', 'attributehistogram', 'sightings', 'galaxyMatrix']
         if context not in availables_contexts:
             raise PyMISPError("context can only be {','.join(availables_contexts)}")
-        response = self._prepare_request('GET', f'users/statistics/{context}.json')
+        response = self._prepare_request('GET', f'users/statistics/{context}')
         return self._check_response(response)
 
     # ## END Statistics ###
