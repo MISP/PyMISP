@@ -1841,7 +1841,7 @@ class ExpandedPyMISP(PyMISP):
             url = f'{url}/{to_append_url}'
         req = requests.Request(request_type, url, data=data, params=params)
         with requests.Session() as s:
-            user_agent = 'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
+            user_agent = f'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
             if self.tool:
                 user_agent = f'{user_agent} - {self.tool}'
             req.auth = self.auth
