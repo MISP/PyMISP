@@ -1152,8 +1152,7 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.enable_taxonomy(tax.id)
         self.assertEqual(r['message'], 'Taxonomy enabled')
         r = self.admin_misp_connector.enable_taxonomy_tags(tax.id)
-        # FIXME: https://github.com/MISP/MISP/issues/4865
-        # self.assertEqual(r, [])
+        self.assertEqual(r['name'], 'The tag(s) has been saved.')
         r = self.admin_misp_connector.disable_taxonomy(tax.id)
         self.assertEqual(r['message'], 'Taxonomy disabled')
 
@@ -1292,6 +1291,7 @@ class TestComprehensive(unittest.TestCase):
         second.distribution = Distribution.all_communities
         try:
             first = self.user_misp_connector.add_event(first)
+            second = self.admin_misp_connector.add_event(second, pythonify=True)
             # Get attribute
             attribute = self.user_misp_connector.get_attribute(first.attributes[0].id)
             self.assertEqual(first.attributes[0].uuid, attribute.uuid)
@@ -1321,6 +1321,20 @@ class TestComprehensive(unittest.TestCase):
             # Get attribute proposal
             temp_new_proposal = self.user_misp_connector.get_attribute_proposal(new_proposal.id)
             self.assertEqual(temp_new_proposal.uuid, new_proposal.uuid)
+            # Get attribute proposal*S*
+            proposals = self.user_misp_connector.attribute_proposals()
+            self.assertTrue(isinstance(proposals, list))
+            self.assertEqual(len(proposals), 3)
+            self.assertEqual(proposals[0].value, '5.2.3.4')
+            # Get proposals on a specific event
+            self.admin_misp_connector.add_attribute_proposal(second.id, {'type': 'ip-src', 'value': '123.123.123.1'})
+            proposals = self.admin_misp_connector.attribute_proposals(pythonify=True)
+            self.assertTrue(isinstance(proposals, list))
+            self.assertEqual(len(proposals), 4)
+            proposals = self.admin_misp_connector.attribute_proposals(second, pythonify=True)
+            self.assertTrue(isinstance(proposals, list))
+            self.assertEqual(len(proposals), 1)
+            self.assertEqual(proposals[0].value, '123.123.123.1')
             # Accept attribute proposal - New attribute
             self.user_misp_connector.accept_attribute_proposal(new_proposal.id)
             first = self.user_misp_connector.get_event(first.id)
@@ -1338,12 +1352,13 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(attribute.to_ids, False)
 
             # Test fallback to proposal if the user doesn't own the event
-            second = self.admin_misp_connector.add_event(second, pythonify=True)
-            # FIXME: attribute needs to be a complete MISPAttribute: https://github.com/MISP/MISP/issues/4868
             prop_attr = MISPAttribute()
             prop_attr.from_dict(**{'type': 'ip-dst', 'value': '123.43.32.21'})
             # Add attribute on event owned by someone else
             attribute = self.user_misp_connector.add_attribute(second.id, prop_attr)
+            self.assertTrue(isinstance(attribute, MISPShadowAttribute))
+            # Test if add proposal without category works - https://github.com/MISP/MISP/issues/4868
+            attribute = self.user_misp_connector.add_attribute(second.id, {'type': 'ip-dst', 'value': '123.43.32.22'})
             self.assertTrue(isinstance(attribute, MISPShadowAttribute))
             # Add attribute with the same value as an existing proposal
             prop_attr.uuid = str(uuid4())
@@ -1362,6 +1377,17 @@ class TestComprehensive(unittest.TestCase):
             # Delete attribute owned by user
             response = self.admin_misp_connector.delete_attribute(second.attributes[1].id)
             self.assertEqual(response['message'], 'Attribute deleted.')
+
+            # Test attribute*S*
+            attributes = self.admin_misp_connector.attributes()
+            self.assertEqual(len(attributes), 5)
+            # attributes = self.user_misp_connector.attributes()
+            # self.assertEqual(len(attributes), 5)
+            # Test event*S*
+            events = self.admin_misp_connector.events()
+            self.assertEqual(len(events), 2)
+            events = self.user_misp_connector.events()
+            self.assertEqual(len(events), 2)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
@@ -1445,11 +1471,9 @@ class TestComprehensive(unittest.TestCase):
             users_stats = self.admin_misp_connector.users_statistics(context='tags')
             self.assertEqual(list(users_stats.keys()), ['flatData', 'treemap'])
 
-            # FIXME: https://github.com/MISP/MISP/issues/4880
-            # users_stats = self.admin_misp_connector.users_statistics(context='attributehistogram')
+            users_stats = self.admin_misp_connector.users_statistics(context='attributehistogram')
+            self.assertTrue(isinstance(users_stats, dict))
 
-            # NOTE Not supported yet
-            # self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             users_stats = self.user_misp_connector.users_statistics(context='sightings')
             self.assertEqual(list(users_stats.keys()), ['toplist', 'eventids'])
@@ -1480,23 +1504,36 @@ class TestComprehensive(unittest.TestCase):
         try:
             self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%', force_enable=True)
             first = self.user_misp_connector.add_event(first)
+            # disable_background_processing => returns the parsed data, before insertion
             r = self.user_misp_connector.freetext(first.id, '1.1.1.1 foo@bar.de', adhereToWarninglists=False,
-                                                  distribution=2, returnMetaAttributes=False, pythonify=True)
+                                                  distribution=2, returnMetaAttributes=False, pythonify=True,
+                                                  kw_params={'disable_background_processing': 1})
             self.assertTrue(isinstance(r, list))
             self.assertEqual(r[0].value, '1.1.1.1')
-
-            # FIXME: https://github.com/MISP/MISP/issues/4881
-            # r_wl = self.user_misp_connector.freetext(first.id, '8.8.8.8 foo@bar.de', adhereToWarninglists=True,
-            #                                         distribution=2, returnMetaAttributes=False)
-            # print(r_wl)
+            r = self.user_misp_connector.freetext(first.id, '9.9.9.9 foo@bar.com', adhereToWarninglists='soft',
+                                                  distribution=2, returnMetaAttributes=False, pythonify=True,
+                                                  kw_params={'disable_background_processing': 1})
+            self.assertTrue(isinstance(r, list))
+            self.assertEqual(r[0].value, '9.9.9.9')
+            event = self.user_misp_connector.get_event(first.id, pythonify=True)
+            self.assertEqual(event.attributes[3].value, '9.9.9.9')
+            self.assertFalse(event.attributes[3].to_ids)
+            # keep disable_background_processing enabled => returns the same ???? FIXME
+            r_wl = self.user_misp_connector.freetext(first.id, '8.8.8.8 foo@bar.de', adhereToWarninglists=True,
+                                                     distribution=2, returnMetaAttributes=False,
+                                                     kw_params={'disable_background_processing': 0})
+            self.assertEqual(r_wl[0].value, '8.8.8.8')
+            event = self.user_misp_connector.get_event(first.id, pythonify=True)
+            for attribute in event.attributes:
+                self.assertFalse(attribute.value == '8.8.8.8')
             r = self.user_misp_connector.freetext(first.id, '1.1.1.1 foo@bar.de', adhereToWarninglists=True,
                                                   distribution=2, returnMetaAttributes=True)
             self.assertTrue(isinstance(r, list))
             self.assertTrue(isinstance(r[0]['types'], dict))
+        finally:
             # NOTE: required, or the attributes are inserted *after* the event is deleted
             # FIXME: https://github.com/MISP/MISP/issues/4886
             time.sleep(10)
-        finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
 
@@ -1509,15 +1546,15 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(sharing_group.name, 'Testcases SG')
         self.assertEqual(sharing_group.releasability, 'Testing')
         # add org
-        # FIXME: https://github.com/MISP/MISP/issues/4884
-        # r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group.id,
-        #                                                       self.test_org.id, extend=True)
+        r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group.id,
+                                                               self.test_org.id, extend=True)
+        self.assertEqual(r['name'], 'Organisation added to the sharing group.')
 
         # delete org
         # FIXME: https://github.com/MISP/MISP/issues/4884
         # r = self.admin_misp_connector.remove_org_from_sharing_group(sharing_group.id,
-        #                                                       self.test_org.id)
-
+        #                                                            self.test_org.id)
+        # self.assertEqual(r['name'], 'Organisation deleted from the sharing group.', r)
         # Get list
         sharing_groups = self.admin_misp_connector.sharing_groups(pythonify=True)
         self.assertTrue(isinstance(sharing_groups, list))
@@ -1568,7 +1605,6 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(botvrij.url, "http://www.botvrij.eu/data/feed-osint")
         # Enable
         # MISP OSINT
-        print(feeds[0].id)
         feed = self.admin_misp_connector.enable_feed(feeds[0].id, pythonify=True)
         self.assertTrue(feed.enabled)
         feed = self.admin_misp_connector.enable_feed_cache(feeds[0].id, pythonify=True)
@@ -1622,8 +1658,8 @@ class TestComprehensive(unittest.TestCase):
         servers = self.admin_misp_connector.servers(pythonify=True)
         self.assertEqual(servers[0].name, 'Updated name')
         # Delete
-        server = self.admin_misp_connector.delete_server(server.id)
-        # FIXME: https://github.com/MISP/MISP/issues/4889
+        r = self.admin_misp_connector.delete_server(server.id)
+        self.assertEqual(r['name'], 'Server deleted')
 
     @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_expansion(self):

@@ -616,9 +616,9 @@ class MISPEvent(AbstractMISP):
         return misp_shadow_attribute
 
     def get_attribute_tag(self, attribute_identifier):
-        '''Return the tags associated to an attribute or an object attribute.
+        """Return the tags associated to an attribute or an object attribute.
            :attribute_identifier: can be an ID, UUID, or the value.
-        '''
+        """
         tags = []
         for a in self.attributes + [attribute for o in self.objects for attribute in o.attributes]:
             if ((hasattr(a, 'id') and a.id == attribute_identifier)
@@ -629,10 +629,10 @@ class MISPEvent(AbstractMISP):
         return tags
 
     def add_attribute_tag(self, tag, attribute_identifier):
-        '''Add a tag to an existing attribute, raise an Exception if the attribute doesn't exists.
+        """Add a tag to an existing attribute, raise an Exception if the attribute doesn't exists.
             :tag: Tag name as a string, MISPTag instance, or dictionary
             :attribute_identifier: can be an ID, UUID, or the value.
-        '''
+        """
         attributes = []
         for a in self.attributes + [attribute for o in self.objects for attribute in o.attributes]:
             if ((hasattr(a, 'id') and a.id == attribute_identifier)

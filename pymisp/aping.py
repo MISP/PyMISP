@@ -12,6 +12,8 @@ import requests
 from requests.auth import AuthBase
 import re
 from uuid import UUID
+import warnings
+import sys
 
 from . import __version__
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPNotImplementedYet, PyMISPError, NoURL, NoKey
@@ -78,6 +80,9 @@ class ExpandedPyMISP(PyMISP):
                 elif pymisp_version_tup[:3] < recommended_version_tup:
                     logger.warning(f"The version of PyMISP recommended by the MI)SP instance ({response['version']}) is newer than the one you're using now ({__version__}). Please upgrade PyMISP.")
 
+            misp_version = self.misp_instance_version
+            if 'version' in misp_version:
+                self._misp_version = tuple(int(v) for v in misp_version['version'].split('.'))
         except Exception as e:
             raise PyMISPError(f'Unable to connect to MISP ({self.root_url}). Please make sure the API key and the URL are correct (http/https is required): {e}')
 
@@ -149,7 +154,30 @@ class ExpandedPyMISP(PyMISP):
     def toggle_global_pythonify(self):
         self.global_pythonify = not self.global_pythonify
 
+    def _old_misp(self, minimal_version_required: tuple, removal_date: Union[str, date, datetime], method: str=None, message: str=None):
+        if self._misp_version >= minimal_version_required:
+            return False
+        if isinstance(removal_date, (datetime, date)):
+            removal_date = removal_date.isoformat()
+        to_print = f'The instance of MISP you are using is outdated. Unless you update your MISP instance, {method} will stop working after {removal_date}.'
+        if message:
+            to_print += f' {message}'
+        warnings.warn(to_print, DeprecationWarning)
+        return True
+
     # ## BEGIN Event ##
+
+    def events(self, pythonify: bool=False):
+        events = self._prepare_request('GET', 'events')
+        events = self._check_response(events, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in events:
+            return events
+        to_return = []
+        for event in events:
+            e = MISPEvent()
+            e.from_dict(**event)
+            to_return.append(e)
+        return to_return
 
     def get_event(self, event: Union[MISPEvent, int, str, UUID], pythonify: bool=False):
         '''Get an event from a MISP instance'''
@@ -240,7 +268,6 @@ class ExpandedPyMISP(PyMISP):
 
     def delete_object(self, misp_object: Union[MISPObject, int, str, UUID]):
         '''Delete an object from a MISP instance'''
-        # FIXME: MISP doesn't support DELETE on this endpoint
         object_id = self.__get_uuid_or_id_from_abstract_misp(misp_object)
         response = self._prepare_request('POST', f'objects/delete/{object_id}')
         return self._check_response(response, expect_json=True)
@@ -295,6 +322,18 @@ class ExpandedPyMISP(PyMISP):
     # ## END Object ###
 
     # ## BEGIN Attribute ###
+
+    def attributes(self, pythonify: bool=False):
+        attributes = self._prepare_request('GET', f'attributes/index')
+        attributes = self._check_response(attributes, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in attributes:
+            return attributes
+        to_return = []
+        for attribute in attributes:
+            a = MISPAttribute()
+            a.from_dict(**attribute)
+            to_return.append(a)
+        return to_return
 
     def get_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], pythonify: bool=False):
         '''Get an attribute from a MISP instance'''
@@ -358,6 +397,22 @@ class ExpandedPyMISP(PyMISP):
 
     # ## BEGIN Attribute Proposal ###
 
+    def attribute_proposals(self, event: Union[MISPEvent, int, str, UUID]=None, pythonify: bool=False):
+        if event:
+            event_id = self.__get_uuid_or_id_from_abstract_misp(event)
+            attribute_proposals = self._prepare_request('GET', f'shadow_attributes/index/{event_id}')
+        else:
+            attribute_proposals = self._prepare_request('GET', f'shadow_attributes')
+        attribute_proposals = self._check_response(attribute_proposals, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in attribute_proposals:
+            return attribute_proposals
+        to_return = []
+        for attribute_proposal in attribute_proposals:
+            a = MISPShadowAttribute()
+            a.from_dict(**attribute_proposal)
+            to_return.append(a)
+        return to_return
+
     def get_attribute_proposal(self, proposal: Union[MISPShadowAttribute, int, str, UUID], pythonify: bool=False):
         proposal_id = self.__get_uuid_or_id_from_abstract_misp(proposal)
         attribute_proposal = self._prepare_request('GET', f'shadow_attributes/view/{proposal_id}')
@@ -373,7 +428,6 @@ class ExpandedPyMISP(PyMISP):
     def add_attribute_proposal(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool=False):
         '''Propose a new attribute in an event'''
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
-        # FIXME: attribute needs to be a complete MISPAttribute: https://github.com/MISP/MISP/issues/4868
         new_attribute_proposal = self._prepare_request('POST', f'shadow_attributes/add/{event_id}', data=attribute)
         new_attribute_proposal = self._check_response(new_attribute_proposal, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in new_attribute_proposal:
@@ -384,9 +438,11 @@ class ExpandedPyMISP(PyMISP):
 
     def update_attribute_proposal(self, initial_attribute: Union[MISPAttribute, int, str, UUID], attribute: MISPAttribute, pythonify: bool=False):
         '''Propose a change for an attribute'''
-        # FIXME: inconsistency in MISP: https://github.com/MISP/MISP/issues/4857
         initial_attribute_id = self.__get_uuid_or_id_from_abstract_misp(initial_attribute)
-        attribute = {'ShadowAttribute': attribute}
+        if self._old_misp((2, 4, 112), '2020-01-01', sys._getframe().f_code.co_name):
+            # Inconsistency in MISP: https://github.com/MISP/MISP/issues/4857
+            # Fix: https://github.com/MISP/MISP/commit/d6a15438f7a53f589ddeabe2b14e65c92baf43d3
+            attribute = {'ShadowAttribute': attribute}
         update_attribute_proposal = self._prepare_request('POST', f'shadow_attributes/edit/{initial_attribute_id}', data=attribute)
         update_attribute_proposal = self._check_response(update_attribute_proposal, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in update_attribute_proposal:
@@ -421,19 +477,28 @@ class ExpandedPyMISP(PyMISP):
 
     def sightings(self, misp_entity: AbstractMISP, org: Union[MISPOrganisation, int, str, UUID]=None, pythonify: bool=False):
         """Get the list of sighting related to a MISPEvent or a MISPAttribute (depending on type of misp_entity)"""
-        # FIXME: https://github.com/MISP/MISP/issues/4875
         if isinstance(misp_entity, MISPEvent):
-            scope = 'event'
+            context = 'event'
         elif isinstance(misp_entity, MISPAttribute):
-            scope = 'attribute'
+            context = 'attribute'
         else:
             raise PyMISPError('misp_entity can only be a MISPEvent or a MISPAttribute')
         if org is not None:
             org_id = self.__get_uuid_or_id_from_abstract_misp(org)
-            url = f'sightings/listSightings/{misp_entity.id}/{scope}/{org_id}'
         else:
-            url = f'sightings/listSightings/{misp_entity.id}/{scope}'
-        sightings = self._prepare_request('POST', url)
+            org_id = None
+
+        if self._old_misp((2, 4, 112), '2020-01-01', sys._getframe().f_code.co_name):
+            url = f'sightings/listSightings/{misp_entity.id}/{context}'
+            if org_id:
+                url = f'{url}/{org_id}'
+            sightings = self._prepare_request('POST', url)
+        else:
+            to_post = {'id': misp_entity.id, 'context': context}
+            if org_id:
+                to_post['org_id'] = org_id
+            sightings = self._prepare_request('POST', 'sightings/listSightings', data=to_post)
+
         sightings = self._check_response(sightings, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in sightings:
             return sightings
@@ -926,7 +991,6 @@ class ExpandedPyMISP(PyMISP):
     def server_pull(self, server: Union[MISPServer, int, str, UUID], event: Union[MISPEvent, int, str, UUID]=None):
         '''Initialize a pull from a sync server'''
         server_id = self.__get_uuid_or_id_from_abstract_misp(server)
-        # FIXME: POST & data
         if event:
             event_id = self.__get_uuid_or_id_from_abstract_misp(event)
             url = f'servers/pull/{server_id}/{event_id}'
@@ -939,7 +1003,6 @@ class ExpandedPyMISP(PyMISP):
     def server_push(self, server: Union[MISPServer, int, str, UUID], event: Union[MISPEvent, int, str, UUID]=None):
         '''Initialize a push to a sync server'''
         server_id = self.__get_uuid_or_id_from_abstract_misp(server)
-        # FIXME: POST & data
         if event:
             event_id = self.__get_uuid_or_id_from_abstract_misp(event)
             url = f'servers/push/{server_id}/{event_id}'
@@ -970,8 +1033,10 @@ class ExpandedPyMISP(PyMISP):
         """Add a new sharing group"""
         sharing_group = self._prepare_request('POST', f'sharing_groups/add', data=sharing_group)
         sharing_group = self._check_response(sharing_group, expect_json=True)
-        # FIXME: https://github.com/MISP/MISP/issues/4882
-        sharing_group = sharing_group[0]
+        if self._old_misp((2, 4, 112), '2020-01-01', sys._getframe().f_code.co_name) and isinstance(sharing_group, list):
+            # https://github.com/MISP/MISP/issues/4882
+            # https://github.com/MISP/MISP/commit/d75c6c9e3b7874fd0f083445126743873e5c53c4
+            sharing_group = sharing_group[0]
         if not (self.global_pythonify or pythonify) or 'errors' in sharing_group:
             return sharing_group
         s = MISPSharingGroup()
@@ -1539,16 +1604,16 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', f'events/pushEventToZMQ/{event_id}.json')
         return self._check_response(response, expect_json=True)
 
-    def direct_call(self, url: str, data: dict=None, params: dict={}):
+    def direct_call(self, url: str, data: dict=None, params: dict={}, kw_params: dict={}):
         '''Very lightweight call that posts a data blob (python dictionary or json string) on the URL'''
         if data is None:
-            response = self._prepare_request('GET', url, params=params)
+            response = self._prepare_request('GET', url, params=params, kw_params=kw_params)
         else:
-            response = self._prepare_request('POST', url, data=data, params=params)
+            response = self._prepare_request('POST', url, data=data, params=params, kw_params=kw_params)
         return self._check_response(response, lenient_response_type=True)
 
     def freetext(self, event: Union[MISPEvent, int, str, UUID], string: str, adhereToWarninglists: Union[bool, str]=False,
-                 distribution: int=None, returnMetaAttributes: bool=False, pythonify: bool=False):
+                 distribution: int=None, returnMetaAttributes: bool=False, pythonify: bool=False, **kwargs):
         """Pass a text to the freetext importer"""
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
         query = {"value": string}
@@ -1561,7 +1626,7 @@ class ExpandedPyMISP(PyMISP):
             query['distribution'] = distribution
         if returnMetaAttributes:
             query['returnMetaAttributes'] = returnMetaAttributes
-        attributes = self._prepare_request('POST', f'events/freeTextImport/{event_id}', data=query)
+        attributes = self._prepare_request('POST', f'events/freeTextImport/{event_id}', data=query, **kwargs)
         attributes = self._check_response(attributes, expect_json=True)
         if returnMetaAttributes or not (self.global_pythonify or pythonify) or 'errors' in attributes:
             return attributes
@@ -1756,7 +1821,8 @@ class ExpandedPyMISP(PyMISP):
     def __repr__(self):
         return f'<{self.__class__.__name__}(url={self.root_url})'
 
-    def _prepare_request(self, request_type: str, url: str, data: dict={}, params: dict={}, output_type: str='json'):
+    def _prepare_request(self, request_type: str, url: str, data: dict={}, params: dict={},
+                         kw_params: dict={}, output_type: str='json'):
         '''Prepare a request for python-requests'''
         url = urljoin(self.root_url, url)
         if logger.isEnabledFor(logging.DEBUG):
@@ -1770,6 +1836,10 @@ class ExpandedPyMISP(PyMISP):
                     data = {k: v for k, v in data.items() if v is not None}
                 data = json.dumps(data, cls=MISPEncode)
 
+        if kw_params:
+            # CakePHP params in URL
+            to_append_url = '/'.join([f'{k}:{v}' for k, v in kw_params.items()])
+            url = f'{url}/{to_append_url}'
         req = requests.Request(request_type, url, data=data, params=params)
         with requests.Session() as s:
             user_agent = 'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
