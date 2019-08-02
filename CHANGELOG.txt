@@ -2,6 +2,49 @@ Changelog
 =========
 
 
+v2.4.112 (2019-08-02)
+---------------------
+
+New
+~~~
+- [Search] Add a few new options in rest search. [Raphaël Vinot]
+- Allow to change the template on an object on-the-fly. [Raphaël Vinot]
+- [example] Script to load datasets from Scripps CO2. [Raphaël Vinot]
+- Get_objects_by_name in MISPEvent. [Raphaël Vinot]
+
+  new: Convert datetime objects to python datetime.
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- [tests] Few improvements. [Raphaël Vinot]
+- [tests] Add new test cases. [Raphaël Vinot]
+- Rename relationship included-in -> includes. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- [deps] Bump. [Raphaël Vinot]
+- [examples] pythonify properly when needed. [Raphaël Vinot]
+- [tests] Toggle pythonify in create_massive_dummy_events. [Raphaël
+  Vinot]
+
+Fix
+~~~
+- PyTaxonomies is not compatible with python<3.6. [Raphaël Vinot]
+- Rename filename. [Raphaël Vinot]
+- [deprecation] Wrong deprecation message. [Raphaël Vinot]
+
+  Also, deprecated method was broken.
+
+  Fix #424
+
+Other
+~~~~~
+- Add: New attribute type weakness. [chrisr3d]
+- Fix missing f in f-string. [Paal Braathen]
+- Wrong variable. [Georges Toth]
+- Remove unused line. [kovacsbalu]
+- Fix tag help text Minor pycodestyle. [kovacsbalu]
+
+
 v2.4.111.2 (2019-07-22)
 -----------------------
 
@@ -14,6 +57,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump verison. [Raphaël Vinot]
 - Make pythonify=False default everywhere. [Raphaël Vinot]
 
