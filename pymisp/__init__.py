@@ -1,4 +1,4 @@
-__version__ = '2.4.111.2'
+__version__ = '2.4.112'
 import logging
 import warnings
 import sys
