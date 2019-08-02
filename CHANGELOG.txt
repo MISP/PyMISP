@@ -16,6 +16,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - [tests] Few improvements. [Raphaël Vinot]
 - [tests] Add new test cases. [Raphaël Vinot]
@@ -28,6 +29,8 @@ Changes
 
 Fix
 ~~~
+- Inconsistency in MISPEvent, reenable tests. [Raphaël Vinot]
+- Some test cases need more love. [Raphaël Vinot]
 - PyTaxonomies is not compatible with python<3.6. [Raphaël Vinot]
 - Rename filename. [Raphaël Vinot]
 - [deprecation] Wrong deprecation message. [Raphaël Vinot]
