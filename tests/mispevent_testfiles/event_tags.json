@@ -1,20 +1,18 @@
 {
-  "Event": {
-	"Tag": [
-	  {
-		"name": "bar"
-	  },
-	  {
-		"name": "baz"
-	  },
-	  {
-		"name": "foo"
-	  }
-	],
-    "analysis": "1",
-    "date": "2017-12-31",
-    "distribution": "1",
-    "info": "This is a test",
-    "threat_level_id": "1"
-  }
+  "Tag": [
+    {
+      "name": "bar"
+    },
+    {
+      "name": "baz"
+    },
+    {
+      "name": "foo"
+    }
+  ],
+  "analysis": "1",
+  "date": "2017-12-31",
+  "distribution": "1",
+  "info": "This is a test",
+  "threat_level_id": "1"
 }
