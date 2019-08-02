@@ -567,7 +567,7 @@ class MISPEvent(AbstractMISP):
             for rel_event in kwargs.pop('RelatedEvent'):
                 sub_event = MISPEvent()
                 sub_event.load(rel_event)
-                self.RelatedEvent.append(sub_event)
+                self.RelatedEvent.append({'Event': sub_event})
         if kwargs.get('Tag'):
             for tag in kwargs.pop('Tag'):
                 self.add_tag(tag)

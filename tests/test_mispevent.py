@@ -110,7 +110,6 @@ class TestMISPEvent(unittest.TestCase):
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
 
-    @unittest.skip("fixme")
     def test_existing_malware(self):
         self.mispevent.load_file('tests/mispevent_testfiles/malware_exist.json')
         with open('tests/mispevent_testfiles/simple.json', 'rb') as f:
@@ -126,7 +125,6 @@ class TestMISPEvent(unittest.TestCase):
             ref_json = json.load(f)
         self.assertEqual(sighting.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
 
-    @unittest.skip("fixme")
     def test_existing_event(self):
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
         with open('tests/mispevent_testfiles/existing_event.json', 'r') as f:
@@ -235,7 +233,6 @@ class TestMISPEvent(unittest.TestCase):
         self.assertTrue(self.mispevent.objects[0].edited)
         self.assertTrue(self.mispevent.edited)
 
-    @unittest.skip("fixme")
     def test_event_object_attribute_edited_tag(self):
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
         self.assertFalse(self.mispevent.edited)
