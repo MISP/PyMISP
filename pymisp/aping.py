@@ -1260,7 +1260,7 @@ class ExpandedPyMISP(PyMISP):
                enforce_warninglist: Optional[bool]=None, enforceWarninglist: Optional[bool]=None,
                to_ids: Optional[Union[ToIDSType, List[ToIDSType]]]=None,
                deleted: Optional[str]=None,
-               include_event_uuid: Optional[str]=None, includeEventUuid: Optional[str]=None,
+               include_event_uuid: Optional[bool]=None, includeEventUuid: Optional[bool]=None,
                event_timestamp: Optional[DateTypes]=None,
                sg_reference_only: Optional[bool]=None,
                eventinfo: Optional[str]=None,
@@ -1268,6 +1268,8 @@ class ExpandedPyMISP(PyMISP):
                requested_attributes: Optional[str]=None,
                include_context: Optional[bool]=None, includeContext: Optional[bool]=None,
                headerless: Optional[bool]=None,
+               include_sightings: Optional[bool]=None, includeSightings: Optional[bool]=None,
+               include_correlations: Optional[bool]=None, includeCorrelations: Optional[bool]=None,
                pythonify: Optional[bool]=False,
                **kwargs):
         '''Search in the MISP instance
@@ -1299,8 +1301,10 @@ class ExpandedPyMISP(PyMISP):
         :param eventinfo: Filter on the event's info field.
         :param searchall: Search for a full or a substring (delimited by % for substrings) in the event info, event tags, attribute tags, attribute values or attribute comment fields.
         :param requested_attributes: [CSV only] Select the fields that you wish to include in the CSV export. By setting event level fields additionally, includeContext is not required to get event metadata.
-        :param include_context: [CSV Only] Include the event data with each attribute.
+        :param include_context: [Attribute only] Include the event data with each attribute.
         :param headerless: [CSV Only] The CSV created when this setting is set to true will not contain the header row.
+        :param include_sightings: [JSON Only - Attribute] Include the sightings of the matching attributes.
+        :param include_correlations: [JSON Only - attribute] Include the correlations of the matching attributes.
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
@@ -1332,7 +1336,10 @@ class ExpandedPyMISP(PyMISP):
             include_event_uuid = includeEventUuid
         if includeContext is not None:
             include_context = includeContext
-
+        if includeCorrelations is not None:
+            include_correlations = includeCorrelations
+        if includeSightings is not None:
+            include_sightings = includeSightings
         # Add all the parameters in kwargs are aimed at modules, or other 3rd party components, and cannot be sanitized.
         # They are passed as-is.
         query = kwargs
@@ -1352,8 +1359,8 @@ class ExpandedPyMISP(PyMISP):
         query['from'] = self._make_timestamp(date_from)
         query['to'] = self._make_timestamp(date_to)
         query['eventid'] = eventid
-        query['withAttachments'] = with_attachments
-        query['metadata'] = metadata
+        query['withAttachments'] = self._make_misp_bool(with_attachments)
+        query['metadata'] = self._make_misp_bool(metadata)
         query['uuid'] = uuid
         if publish_timestamp is not None:
             if isinstance(publish_timestamp, (list, tuple)):
@@ -1366,24 +1373,26 @@ class ExpandedPyMISP(PyMISP):
             else:
                 query['timestamp'] = self._make_timestamp(timestamp)
         query['published'] = published
-        query['enforceWarninglist'] = enforce_warninglist
+        query['enforceWarninglist'] = self._make_misp_bool(enforce_warninglist)
         if to_ids is not None:
             if int(to_ids) not in [0, 1]:
                 raise ValueError('to_ids has to be in {}'.format(', '.join([0, 1])))
             query['to_ids'] = to_ids
         query['deleted'] = deleted
-        query['includeEventUuid'] = include_event_uuid
+        query['includeEventUuid'] = self._make_misp_bool(include_event_uuid)
         if event_timestamp is not None:
             if isinstance(event_timestamp, (list, tuple)):
                 query['event_timestamp'] = (self._make_timestamp(event_timestamp[0]), self._make_timestamp(event_timestamp[1]))
             else:
                 query['event_timestamp'] = self._make_timestamp(event_timestamp)
-        query['sgReferenceOnly'] = sg_reference_only
+        query['sgReferenceOnly'] = self._make_misp_bool(sg_reference_only)
         query['eventinfo'] = eventinfo
         query['searchall'] = searchall
         query['requested_attributes'] = requested_attributes
-        query['includeContext'] = include_context
-        query['headerless'] = headerless
+        query['includeContext'] = self._make_misp_bool(include_context)
+        query['headerless'] = self._make_misp_bool(headerless)
+        query['includeSightings'] = self._make_misp_bool(include_sightings)
+        query['includeCorrelations'] = self._make_misp_bool(include_correlations)
         url = urljoin(self.root_url, f'{controller}/restSearch')
         response = self._prepare_request('POST', url, data=query)
         if return_format == 'json':
@@ -1404,9 +1413,32 @@ class ExpandedPyMISP(PyMISP):
                     me.load(e)
                     to_return.append(me)
             elif controller == 'attributes':
+                # FIXME: obvs, this is hurting my soul. We need something generic.
                 for a in normalized_response.get('Attribute'):
                     ma = MISPAttribute()
                     ma.from_dict(**a)
+                    if 'Event' in ma:
+                        me = MISPEvent()
+                        me.from_dict(**ma.Event)
+                        ma.Event = me
+                    if 'RelatedAttribute' in ma:
+                        related_attributes = []
+                        for ra in ma.RelatedAttribute:
+                            r_attribute = MISPAttribute()
+                            r_attribute.from_dict(**ra)
+                            if 'Event' in r_attribute:
+                                me = MISPEvent()
+                                me.from_dict(**r_attribute.Event)
+                                r_attribute.Event = me
+                            related_attributes.append(r_attribute)
+                        ma.RelatedAttribute = related_attributes
+                    if 'Sighting' in ma:
+                        sightings = []
+                        for sighting in ma.Sighting:
+                            s = MISPSighting()
+                            s.from_dict(**sighting)
+                            sightings.append(s)
+                        ma.Sighting = sightings
                     to_return.append(ma)
             elif controller == 'objects':
                 raise PyMISPNotImplementedYet('Not implemented yet')
@@ -1763,6 +1795,12 @@ class ExpandedPyMISP(PyMISP):
         elif 'id' in obj:
             return obj['id']
         return obj['uuid']
+
+    def _make_misp_bool(self, parameter: Union[bool, str, None]):
+        '''MISP wants 0 or 1 for bool, so we avoid True/False '0', '1' '''
+        if parameter is None:
+            return 0
+        return 1 if int(parameter) else 0
 
     def _make_timestamp(self, value: DateTypes):
         '''Catch-all method to normalize anything that can be converted to a timestamp'''

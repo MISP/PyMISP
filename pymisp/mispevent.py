@@ -593,7 +593,7 @@ class MISPEvent(AbstractMISP):
         if to_return.get('publish_timestamp'):
             to_return['publish_timestamp'] = self._datetime_to_timestamp(self.publish_timestamp)
 
-        return {'Event': _int_to_str(to_return)}
+        return to_return
 
     def add_proposal(self, shadow_attribute=None, **kwargs):
         """Alias for add_shadow_attribute"""

@@ -102,7 +102,7 @@ class TestComprehensive(unittest.TestCase):
         first_event.threat_level_id = ThreatLevel.low
         first_event.analysis = Analysis.completed
         first_event.set_date("2017-12-31")
-        first_event.add_attribute('text', str(uuid4()))
+        first_event.add_attribute('text', 'FIRST_EVENT' + str(uuid4()))
         first_event.attributes[0].add_tag('admin_only')
         first_event.attributes[0].add_tag('tlp:white___test')
         first_event.add_attribute('text', str(uuid4()))
@@ -114,7 +114,7 @@ class TestComprehensive(unittest.TestCase):
         second_event.threat_level_id = ThreatLevel.medium
         second_event.analysis = Analysis.ongoing
         second_event.set_date("Aug 18 2018")
-        second_event.add_attribute('text', str(uuid4()))
+        second_event.add_attribute('text', 'SECOND_EVENT' + str(uuid4()))
         second_event.attributes[0].add_tag('tlp:white___test')
         second_event.add_attribute('ip-dst', '1.1.1.1')
         second_event.attributes[1].add_tag('tlp:amber___test')
@@ -128,7 +128,7 @@ class TestComprehensive(unittest.TestCase):
         third_event.analysis = Analysis.initial
         third_event.set_date("Jun 25 2018")
         third_event.add_tag('tlp:white___test')
-        third_event.add_attribute('text', str(uuid4()))
+        third_event.add_attribute('text', 'THIRD_EVENT' + str(uuid4()))
         third_event.attributes[0].add_tag('tlp:amber___test')
         third_event.attributes[0].add_tag('foo_double___test')
         third_event.add_attribute('ip-src', '8.8.8.8')
@@ -186,6 +186,34 @@ class TestComprehensive(unittest.TestCase):
             # Non-existing value
             attributes = self.user_misp_connector.search(controller='attributes', value=str(uuid4()))
             self.assertEqual(attributes, [])
+
+            # Include context - search as user (can only see one event)
+            attributes = self.user_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_context=True, pythonify=True)
+            self.assertTrue(isinstance(attributes[0].Event, MISPEvent))
+            self.assertEqual(attributes[0].Event.uuid, second.uuid)
+
+            # Include context - search as admin (can see both event)
+            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_context=True, pythonify=True)
+            self.assertTrue(isinstance(attributes[0].Event, MISPEvent))
+            self.assertEqual(attributes[0].Event.uuid, first.uuid)
+            self.assertEqual(attributes[1].Event.uuid, second.uuid)
+
+            # Include correlations - search as admin (can see both event)
+            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_correlations=True, pythonify=True)
+            self.assertTrue(isinstance(attributes[0].Event, MISPEvent))
+            self.assertEqual(attributes[0].Event.uuid, first.uuid)
+            self.assertEqual(attributes[1].Event.uuid, second.uuid)
+            self.assertEqual(attributes[0].RelatedAttribute[0].Event.uuid, second.uuid)
+            self.assertEqual(attributes[1].RelatedAttribute[0].Event.uuid, first.uuid)
+
+            # Include sightings - search as admin (can see both event)
+            self.admin_misp_connector.add_sighting({'value': first.attributes[0].value})
+            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_sightings=True, pythonify=True)
+            self.assertTrue(isinstance(attributes[0].Event, MISPEvent))
+            self.assertEqual(attributes[0].Event.uuid, first.uuid)
+            self.assertEqual(attributes[1].Event.uuid, second.uuid)
+            self.assertTrue(isinstance(attributes[0].Sighting[0], MISPSighting))
+
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
@@ -863,10 +891,8 @@ class TestComprehensive(unittest.TestCase):
 
             # headerless
             csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', headerless=True)
-            # FIXME: The header is here.
-            # print(csv)
             # Expects 2 lines after removing the empty ones.
-            # self.assertEqual(len(csv.strip().split('\n')), 2)
+            self.assertEqual(len(csv.strip().split('\n')), 2)
 
             # include_context
             csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', include_context=True)
@@ -876,15 +902,16 @@ class TestComprehensive(unittest.TestCase):
 
             # requested_attributes
             columns = ['value', 'event_id']
-            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01', date_to='2018-09-02', requested_attributes=columns)
+            csv = self.user_misp_connector.search(return_format='csv', date_from='2018-09-01',
+                                                  date_to='2018-09-02', requested_attributes=columns)
             self.assertEqual(len(csv[0].keys()), 2)
             for k in columns:
                 self.assertTrue(k in csv[0])
 
+        finally:
             # FIXME Publish is async, if we delete the event too fast, we have an empty one.
             # https://github.com/MISP/MISP/issues/4886
-            time.sleep(10)
-        finally:
+            time.sleep(5)
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
             self.admin_misp_connector.delete_event(second.id)
