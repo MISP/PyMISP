@@ -909,8 +909,7 @@ class TestComprehensive(unittest.TestCase):
                 self.assertTrue(k in csv[0])
 
         finally:
-            # FIXME Publish is async, if we delete the event too fast, we have an empty one.
-            # https://github.com/MISP/MISP/issues/4886
+            # Mostly solved -> https://github.com/MISP/MISP/issues/4886
             time.sleep(5)
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
@@ -1128,7 +1127,7 @@ class TestComprehensive(unittest.TestCase):
             for ref in peo.ObjectReference:
                 r = self.user_misp_connector.add_object_reference(ref)
                 # FIXME: https://github.com/MISP/MISP/issues/4866
-                # self.assertEqual(r.object_uuid, peo.uuid, r.to_json())
+                self.assertEqual(r.object_uuid, peo.uuid, r.to_json())
 
             r = self.user_misp_connector.add_object(first.id, fo)
             obj_attrs = r.get_attributes_by_relation('ssdeep')
@@ -1136,7 +1135,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(r.name, 'file', r)
             r = self.user_misp_connector.add_object_reference(fo.ObjectReference[0])
             # FIXME: https://github.com/MISP/MISP/issues/4866
-            # self.assertEqual(r.object_uuid, fo.uuid, r.to_json())
+            self.assertEqual(r.object_uuid, fo.uuid, r.to_json())
             self.assertEqual(r.referenced_uuid, peo.uuid, r.to_json())
             r = self.user_misp_connector.delete_object_reference(r.id)
             self.assertEqual(r['message'], 'ObjectReference deleted')
@@ -1545,7 +1544,6 @@ class TestComprehensive(unittest.TestCase):
             event = self.user_misp_connector.get_event(first.id, pythonify=True)
             self.assertEqual(event.attributes[3].value, '9.9.9.9')
             self.assertFalse(event.attributes[3].to_ids)
-            # keep disable_background_processing enabled => returns the same ???? FIXME
             r_wl = self.user_misp_connector.freetext(first.id, '8.8.8.8 foo@bar.de', adhereToWarninglists=True,
                                                      distribution=2, returnMetaAttributes=False,
                                                      kw_params={'disable_background_processing': 0})
@@ -1558,8 +1556,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(isinstance(r, list))
             self.assertTrue(isinstance(r[0]['types'], dict))
         finally:
-            # NOTE: required, or the attributes are inserted *after* the event is deleted
-            # FIXME: https://github.com/MISP/MISP/issues/4886
+            # Mostly solved https://github.com/MISP/MISP/issues/4886
             time.sleep(10)
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
