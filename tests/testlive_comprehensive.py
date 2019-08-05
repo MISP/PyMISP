@@ -36,7 +36,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'https://localhost:8443'
-    key = 'K5yV0CcxdnklzDfCKlnPniIxrMX41utQ2dG13zZ3'
+    key = 'd6OmdDFvU3Seau3UjwvHS1y3tFQbaRNhJhDX0tjh'
     verifycert = False
 
 
@@ -1598,11 +1598,9 @@ class TestComprehensive(unittest.TestCase):
 
             first_object = self.admin_misp_connector.change_sharing_group_on_entity(first.objects[0], sharing_group.id, pythonify=True)
             self.assertEqual(first_object.sharing_group_id, sharing_group.id)
-            # FIXME https://github.com/MISP/MISP/issues/4891
-            # NOTE: Fails with pythonify because the sharing group id isn't in the response
-            # first_attribute = self.admin_misp_connector.change_sharing_group_on_entity(first.attributes[0], sharing_group.id, pythonify=True)
-            # self.assertEqual(first_attribute.distribution, 4)
-            # self.assertEqual(first_attribute.sharing_group_id, sharing_group.id)
+            first_attribute = self.admin_misp_connector.change_sharing_group_on_entity(first.attributes[0], sharing_group.id, pythonify=True)
+            self.assertEqual(first_attribute.distribution, 4)
+            self.assertEqual(first_attribute.sharing_group_id, int(sharing_group.id))
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
