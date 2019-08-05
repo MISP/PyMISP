@@ -351,8 +351,19 @@ class ExpandedPyMISP(PyMISP):
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
         new_attribute = self._prepare_request('POST', f'attributes/add/{event_id}', data=attribute)
         new_attribute = self._check_response(new_attribute, expect_json=True)
-        if ('errors' in new_attribute and new_attribute['errors'][0] == 403
-                and new_attribute['errors'][1]['message'] == 'You do not have permission to do that.'):
+        # Escape KeyError due multiple response (added and already added attributes)
+        # FIXME Check for better solution instead of try-except block
+        try:
+            if (new_attribute['errors'][0] == 403
+                    and new_attribute['errors'][1]['message'] == 'You do not have permission to do that.'):
+                permission_marker = True
+            else:
+                permission_marker = False
+        except TypeError:
+            permission_marker = False
+        except KeyError:
+            permission_marker = False
+        if ('errors' in new_attribute and permission_marker is True):
             # At this point, we assume the user tried to add an attribute on an event they don't own
             # Re-try with a proposal
             return self.add_attribute_proposal(event_id, attribute, pythonify)
