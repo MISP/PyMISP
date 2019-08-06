@@ -46,13 +46,11 @@ try:
     from dateutil.parser import parse
 except ImportError:
     logger.exception("Cannot import dateutil")
-    pass
 
 try:
     import jsonschema
 except ImportError:
     logger.exception("Cannot import jsonschema")
-    pass
 
 try:
     # pyme renamed to gpg the 2016-10-28
@@ -680,8 +678,7 @@ class MISPEvent(AbstractMISP):
         self.edited = True
         if attr_list:
             return attr_list
-        else:
-            return attribute
+        return attribute
 
     def get_object_by_id(self, object_id):
         """Get an object by ID (the ID is the one set by the server when creating the new object)"""
