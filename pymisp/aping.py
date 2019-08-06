@@ -365,7 +365,7 @@ class ExpandedPyMISP(PyMISP):
 
             for new_attr in new_attribute['Attribute']:
                 a = MISPAttribute()
-                a.from_dict(**attribute)
+                a.from_dict(**new_attr)
                 to_return['attributes'].append(a)
             return to_return
 

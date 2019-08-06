@@ -1351,12 +1351,13 @@ class TestComprehensive(unittest.TestCase):
             attr4.type = 'ip-dst'
             attr4.add_tag('tlp:amber___test')
             response = self.user_misp_connector.add_attribute(first.id, [attr1, attr2, attr3, attr4])
-            # FIXME: https://github.com/MISP/MISP/issues/4959
-            # self.assertEqual(response['attributes'][0].value, '1.2.3.5')
-            # self.assertEqual(response['attributes'][1].value, '1.2.3.6')
-            # self.assertEqual(response['attributes'][1].tags[0].name, 'tlp:amber___test')
-            # self.assertEqual(response['errors']['attribute_0']['value'][0], 'A similar attribute already exists for this event.')
-            # self.assertEqual(response['errors']['attribute_2']['value'][0], 'A similar attribute already exists for this event.')
+            if 'attributes' in response:
+                # FIXME: this if statement can be removed as soon as 2.4.113 is released: the format changed between 112 and 113, we test 113+
+                self.assertEqual(response['attributes'][0].value, '1.2.3.5')
+                self.assertEqual(response['attributes'][1].value, '1.2.3.6')
+                self.assertEqual(response['attributes'][1].tags[0].name, 'tlp:amber___test')
+                self.assertEqual(response['errors']['attribute_0']['value'][0], 'A similar attribute already exists for this event.')
+                self.assertEqual(response['errors']['attribute_2']['value'][0], 'A similar attribute already exists for this event.')
 
             # Add attribute as proposal
             new_proposal = MISPAttribute()
