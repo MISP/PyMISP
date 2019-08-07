@@ -151,19 +151,21 @@ class ExpandedPyMISP(PyMISP):
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
         return {'error': 'Impossible to retrieve the version of the master branch.'}
 
+    def update_misp(self):
+        response = self._prepare_request('POST', '/servers/update')
+        return self._check_response(response, lenient_response_type=True)
+
+    def set_server_setting(self, setting: str, value: Union[str, int, bool], force: bool=False):
+        data = {'value': value, 'force': force}
+        response = self._prepare_request('POST', f'/servers/serverSettingsEdit/{setting}', data=data)
+        return self._check_response(response, expect_json=True)
+
+    def server_settings(self):
+        response = self._prepare_request('GET', f'/servers/serverSettings')
+        return self._check_response(response, expect_json=True)
+
     def toggle_global_pythonify(self):
         self.global_pythonify = not self.global_pythonify
-
-    def _old_misp(self, minimal_version_required: tuple, removal_date: Union[str, date, datetime], method: str=None, message: str=None):
-        if self._misp_version >= minimal_version_required:
-            return False
-        if isinstance(removal_date, (datetime, date)):
-            removal_date = removal_date.isoformat()
-        to_print = f'The instance of MISP you are using is outdated. Unless you update your MISP instance, {method} will stop working after {removal_date}.'
-        if message:
-            to_print += f' {message}'
-        warnings.warn(to_print, DeprecationWarning)
-        return True
 
     # ## BEGIN Event ##
 
@@ -1030,6 +1032,11 @@ class ExpandedPyMISP(PyMISP):
         # FIXME: can we pythonify?
         return self._check_response(response)
 
+    def test_server(self, server: Union[MISPServer, int, str, UUID]):
+        server_id = self.__get_uuid_or_id_from_abstract_misp(server)
+        response = self._prepare_request('POST', f'servers/testConnection/{server_id}')
+        return self._check_response(response, expect_json=True)
+
     # ## END Server ###
 
     # ## BEGIN Sharing group ###
@@ -1808,6 +1815,17 @@ class ExpandedPyMISP(PyMISP):
     # ## END Global helpers ###
 
     # ## Internal methods ###
+
+    def _old_misp(self, minimal_version_required: tuple, removal_date: Union[str, date, datetime], method: str=None, message: str=None):
+        if self._misp_version >= minimal_version_required:
+            return False
+        if isinstance(removal_date, (datetime, date)):
+            removal_date = removal_date.isoformat()
+        to_print = f'The instance of MISP you are using is outdated. Unless you update your MISP instance, {method} will stop working after {removal_date}.'
+        if message:
+            to_print += f' {message}'
+        warnings.warn(to_print, DeprecationWarning)
+        return True
 
     def __get_uuid_or_id_from_abstract_misp(self, obj: Union[AbstractMISP, int, str, UUID]):
         if isinstance(obj, UUID):
