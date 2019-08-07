@@ -82,12 +82,11 @@ class MISPEncode(JSONEncoder):
 
 class AbstractMISP(MutableMapping):
 
-    __not_jsonable = []
-
     def __init__(self, **kwargs):
         """Abstract class for all the MISP objects"""
         super(AbstractMISP, self).__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
+        self.__not_jsonable = []
 
         if kwargs.get('force_timestamps') is not None:
             # Ignore the edited objects and keep the timestamps.
