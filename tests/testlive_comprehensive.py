@@ -50,6 +50,8 @@ class TestComprehensive(unittest.TestCase):
         cls.maxDiff = None
         # Connect as admin
         cls.admin_misp_connector = ExpandedPyMISP(url, key, verifycert, debug=False)
+        r = cls.admin_misp_connector.update_misp()
+        print(r)
         # Creates an org
         organisation = MISPOrganisation()
         organisation.name = 'Test Org'
@@ -142,6 +144,33 @@ class TestComprehensive(unittest.TestCase):
         # Create second event as user
         second = self.user_misp_connector.add_event(second_event)
         return first, second, third
+
+    def test_server_settings(self):
+        settings = self.admin_misp_connector.server_settings()
+        for final_setting in settings['finalSettings']:
+            if final_setting['setting'] == 'MISP.max_correlations_per_event':
+                self.assertEqual(final_setting['value'], 5000)
+                break
+        self.admin_misp_connector.set_server_setting('MISP.max_correlations_per_event', 10)
+        settings = self.admin_misp_connector.server_settings()
+        for final_setting in settings['finalSettings']:
+            if final_setting['setting'] == 'MISP.max_correlations_per_event':
+                self.assertEqual(final_setting['value'], 10)
+                break
+        self.admin_misp_connector.set_server_setting('MISP.max_correlations_per_event', 5000)
+
+        settings = self.admin_misp_connector.server_settings()
+        for final_setting in settings['finalSettings']:
+            if final_setting['setting'] == 'MISP.live':
+                self.assertTrue(final_setting['value'])
+                break
+        self.admin_misp_connector.set_server_setting('MISP.live', False, force=True)
+        settings = self.admin_misp_connector.server_settings()
+        for final_setting in settings['finalSettings']:
+            if final_setting['setting'] == 'MISP.live':
+                self.assertFalse(final_setting['value'])
+                break
+        self.admin_misp_connector.set_server_setting('MISP.live', True, force=True)
 
     def test_search_value_event(self):
         '''Search a value on the event controller
