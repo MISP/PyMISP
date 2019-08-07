@@ -862,6 +862,11 @@ class MISPUser(AbstractMISP):
             kwargs = kwargs.get('User')
         super(MISPUser, self).from_dict(**kwargs)
 
+    def __repr__(self):
+        if hasattr(self, 'email'):
+            return '<{self.__class__.__name__}(object_uuid={self.email})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
 
 class MISPOrganisation(AbstractMISP):
 
