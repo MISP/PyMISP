@@ -90,4 +90,4 @@ def make_binary_objects(filepath=None, pseudofile=None, filename=None, standalon
             logger.warning(e)
     if not HAS_LIEF:
         logger.warning('Please install lief, documentation here: https://github.com/lief-project/LIEF')
-    return misp_file, None, None
+    return misp_file, None, []
