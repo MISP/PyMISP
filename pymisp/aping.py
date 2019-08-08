@@ -416,6 +416,14 @@ class ExpandedPyMISP(PyMISP):
     # ## END Attribute ###
 
     # ## BEGIN Attribute Proposal ###
+    def attribute_proposals(self, timestamp: Union[int, str]=0, pythonify: bool=False):
+        attribute_proposal = self._prepare_request('GET', f'shadow_attributes/index/all:1/timestamp:{timestamp}')
+        attribute_proposal = self._check_response(attribute_proposal, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in attribute_proposal:
+            return attribute_proposal
+        a = MISPShadowAttribute()
+        a.from_dict(**attribute_proposal)
+        return a
 
     def attribute_proposals(self, event: Union[MISPEvent, int, str, UUID]=None, pythonify: bool=False):
         if event:

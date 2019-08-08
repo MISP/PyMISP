@@ -1075,6 +1075,10 @@ class PyMISP(object):  # pragma: no cover
             response = self._prepare_request('POST', url)
         return self._check_response(response)
 
+    @deprecated(reason="Use ExpandedPyMISP.attribute_proposals", version='2.4.111')
+    def proposal_index(self, timestamp=0):
+        return self.__query_proposal('index', 'all:1/timestamp:{}'.format(timestamp))
+
     @deprecated(reason="Use ExpandedPyMISP.get_attribute_proposal", version='2.4.111')
     def proposal_view(self, event_id=None, proposal_id=None):
         """View a proposal"""
