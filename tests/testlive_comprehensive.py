@@ -494,6 +494,24 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first.id)
 
+    def test_delete_by_uuid(self):
+        try:
+            first = self.create_simple_event()
+            obj = MISPObject('file')
+            obj.add_attribute('filename', 'foo')
+            first.add_object(obj)
+            first = self.user_misp_connector.add_event(first)
+            r = self.user_misp_connector.delete_attribute(first.attributes[0].uuid)
+            self.assertEqual(r['message'], 'Attribute deleted.')
+            # FIXME https://github.com/MISP/MISP/issues/4974
+            # r = self.user_misp_connector.delete_object(first.objects[0].uuid)
+            # self.assertEqual(r['message'], 'Object deleted.')
+            # r = self.user_misp_connector.delete_event(first.uuid)
+            # self.assertEqual(r['message'], 'Event deleted.')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first.id)
+
     def test_search_publish_timestamp(self):
         '''Search for a specific publication timestamp, an interval, and invalid values.'''
         # Creating event 1

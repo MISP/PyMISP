@@ -864,7 +864,7 @@ class MISPUser(AbstractMISP):
 
     def __repr__(self):
         if hasattr(self, 'email'):
-            return '<{self.__class__.__name__}(object_uuid={self.email})'.format(self=self)
+            return '<{self.__class__.__name__}(email={self.email})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 

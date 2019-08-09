@@ -164,6 +164,10 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('GET', f'/servers/serverSettings')
         return self._check_response(response, expect_json=True)
 
+    def restart_workers(self):
+        response = self._prepare_request('POST', f'/servers/restartWorkers')
+        return self._check_response(response, expect_json=True)
+
     def toggle_global_pythonify(self):
         self.global_pythonify = not self.global_pythonify
 
@@ -220,10 +224,11 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('DELETE', f'events/delete/{event_id}')
         return self._check_response(response, expect_json=True)
 
-    def publish(self, event_id: int, alert: bool=False):
+    def publish(self, event: Union[MISPEvent, int, str, UUID], alert: bool=False):
         """Publish the event with one single HTTP POST.
         The default is to not send a mail as it is assumed this method is called on update.
         """
+        event_id = self.__get_uuid_or_id_from_abstract_misp(event)
         if alert:
             response = self._prepare_request('POST', f'events/alert/{event_id}')
         else:
@@ -979,6 +984,26 @@ class ExpandedPyMISP(PyMISP):
             s.from_dict(**server)
             to_return.append(s)
         return to_return
+
+    def get_sync_config(self, pythonify: bool=False):
+        '''WARNING: This method only works if the current user is a sync user'''
+        server = self._prepare_request('GET', 'servers/createSync')
+        server = self._check_response(server, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in server:
+            return server
+        s = MISPServer()
+        s.from_dict(**server)
+        return s
+
+    def import_server(self, server: MISPServer, pythonify: bool=False):
+        """Import a sync server config"""
+        server = self._prepare_request('POST', f'servers/import', data=server)
+        server = self._check_response(server, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in server:
+            return server
+        s = MISPServer()
+        s.from_dict(**server)
+        return s
 
     def add_server(self, server: MISPServer, pythonify: bool=False):
         """Add a server to synchronise with"""
