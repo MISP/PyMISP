@@ -123,6 +123,8 @@ class MISPInstance():
         self.site_admin_connector.set_server_setting('MISP.external_baseurl', params['external_baseurl'], force=True)
         # Setup baseurl
         self.site_admin_connector.set_server_setting('MISP.baseurl', params['url'], force=True)
+        # Setup host org
+        self.site_admin_connector.set_server_setting('MISP.host_org_id', self.test_org.id)
 
         self.external_base_url = params['external_baseurl']
         self.sync = []
@@ -168,6 +170,24 @@ class MISPInstance():
         self.initial_user_connector.delete_user(self.test_site_admin.id)
         # Delete org
         self.initial_user_connector.delete_organisation(self.test_org.id)
+
+        # Make sure the instance is back to a clean state
+        if self.initial_user_connector.events():
+            raise Exception(f'Events still on the instance {self.external_base_url}')
+        if self.initial_user_connector.attributes():
+            raise Exception(f'Attributes still on the instance {self.external_base_url}')
+        if self.initial_user_connector.attribute_proposals():
+            raise Exception(f'AttributeProposals still on the instance {self.external_base_url}')
+        if self.initial_user_connector.sightings():
+            raise Exception(f'Sightings still on the instance {self.external_base_url}')
+        if self.initial_user_connector.servers():
+            raise Exception(f'Servers still on the instance {self.external_base_url}')
+        if self.initial_user_connector.sharing_groups():
+            raise Exception(f'SharingGroups still on the instance {self.external_base_url}')
+        if len(self.initial_user_connector.organisations()) > 1:
+            raise Exception(f'Organisations still on the instance {self.external_base_url}')
+        if len(self.initial_user_connector.users()) > 1:
+            raise Exception(f'Users still on the instance {self.external_base_url}')
 
 
 class TestSync(unittest.TestCase):
@@ -231,7 +251,7 @@ class TestSync(unittest.TestCase):
     def test_simple_sync(self):
         '''Test simple event, push to one server'''
         event = MISPEvent()
-        event.info = 'Event created on first instance'
+        event.info = 'Event created on first instance - test_simple_sync'
         event.distribution = Distribution.all_communities
         event.add_attribute('ip-src', '1.1.1.1')
         try:
@@ -251,7 +271,7 @@ class TestSync(unittest.TestCase):
     def test_sync_community(self):
         '''Simple event, this community only, pull from member of the community'''
         event = MISPEvent()
-        event.info = 'Event created on first instance'
+        event.info = 'Event created on first instance - test_sync_community'
         event.distribution = Distribution.this_community_only
         event.add_attribute('ip-src', '1.1.1.1')
         try:
@@ -270,7 +290,7 @@ class TestSync(unittest.TestCase):
     def test_sync_all_communities(self):
         '''Simple event, all communities, enable automatic push on two sub-instances'''
         event = MISPEvent()
-        event.info = 'Event created on first instance'
+        event.info = 'Event created on first instance - test_sync_all_communities'
         event.distribution = Distribution.all_communities
         event.add_attribute('ip-src', '1.1.1.1')
         try:
@@ -292,6 +312,8 @@ class TestSync(unittest.TestCase):
             source.org_admin_connector.delete_event(event)
             middle.site_admin_connector.delete_event(middle_event)
             last.site_admin_connector.delete_event(last_event)
+            source.site_admin_connector.update_server({'push': False}, source.sync_servers[0].id)
+            middle.site_admin_connector.update_server({'push': False}, middle.sync_servers[1].id)
 
     def create_complex_event(self):
         event = MISPEvent()
@@ -367,6 +389,8 @@ class TestSync(unittest.TestCase):
             source.org_admin_connector.delete_event(event)
             middle.site_admin_connector.delete_event(event_middle)
             last.site_admin_connector.delete_event(event_last)
+            source.site_admin_connector.update_server({'push': False}, source.sync_servers[0].id)
+            middle.site_admin_connector.update_server({'push': False}, middle.sync_servers[1].id)
 
     def test_complex_event_pull(self):
         '''Test pull'''
@@ -419,7 +443,7 @@ class TestSync(unittest.TestCase):
 
             event = source.org_admin_connector.add_event(event)
             source.org_admin_connector.publish(event)
-            time.sleep(60)
+            time.sleep(15)
 
             event_middle = middle.user_connector.get_event(event.uuid)
             event_last = last.user_connector.get_event(event.uuid)
@@ -429,9 +453,17 @@ class TestSync(unittest.TestCase):
             event_middle_as_site_admin = middle.site_admin_connector.get_event(event.uuid)
             self.assertEqual(len(event_middle_as_site_admin.attributes), 3)
             event_last_as_site_admin = last.site_admin_connector.get_event(event.uuid)
-            self.assertEqual(len(event_last_as_site_admin.attributes), 2)  # FIXME: should be 1, I think.
+            self.assertEqual(len(event_last_as_site_admin.attributes), 1)
+            # Get sharing group from middle instance
+            sgs = middle.site_admin_connector.sharing_groups()
+            self.assertEqual(len(sgs), 1)
+            self.assertEqual(sgs[0].name, 'Testcases SG')
+            middle.site_admin_connector.delete_sharing_group(sgs[0])
         finally:
             source.org_admin_connector.delete_event(event)
             middle.site_admin_connector.delete_event(event_middle)
             last.site_admin_connector.delete_event(event_last)
             source.site_admin_connector.delete_sharing_group(sharing_group.id)
+            middle.site_admin_connector.delete_sharing_group(sharing_group.id)
+            source.site_admin_connector.update_server({'push': False}, source.sync_servers[0].id)
+            middle.site_admin_connector.update_server({'push': False}, middle.sync_servers[1].id)

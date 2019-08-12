@@ -500,14 +500,14 @@ class ExpandedPyMISP(PyMISP):
 
     # ## BEGIN Sighting ###
 
-    def sightings(self, misp_entity: AbstractMISP, org: Union[MISPOrganisation, int, str, UUID]=None, pythonify: bool=False):
+    def sightings(self, misp_entity: AbstractMISP=None, org: Union[MISPOrganisation, int, str, UUID]=None, pythonify: bool=False):
         """Get the list of sighting related to a MISPEvent or a MISPAttribute (depending on type of misp_entity)"""
         if isinstance(misp_entity, MISPEvent):
             context = 'event'
         elif isinstance(misp_entity, MISPAttribute):
             context = 'attribute'
         else:
-            raise PyMISPError('misp_entity can only be a MISPEvent or a MISPAttribute')
+            context = None
         if org is not None:
             org_id = self.__get_uuid_or_id_from_abstract_misp(org)
         else:
@@ -519,10 +519,15 @@ class ExpandedPyMISP(PyMISP):
                 url = f'{url}/{org_id}'
             sightings = self._prepare_request('POST', url)
         else:
-            to_post = {'id': misp_entity.id, 'context': context}
+            if context is None:
+                url = 'sightings'
+                to_post = {}
+            else:
+                url = 'sightings/listSightings'
+                to_post = {'id': misp_entity.id, 'context': context}
             if org_id:
                 to_post['org_id'] = org_id
-            sightings = self._prepare_request('POST', 'sightings/listSightings', data=to_post)
+            sightings = self._prepare_request('POST', url, data=to_post)
 
         sightings = self._check_response(sightings, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in sightings:

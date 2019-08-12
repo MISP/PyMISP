@@ -1535,8 +1535,18 @@ class TestComprehensive(unittest.TestCase):
 
     def test_describe_types(self):
         remote = self.admin_misp_connector.describe_types_remote
+        remote_types = remote.pop('types')
+        remote_categories = remote.pop('categories')
+        remote_category_type_mappings = remote.pop('category_type_mappings')
         local = self.admin_misp_connector.describe_types_local
+        local_types = local.pop('types')
+        local_categories = local.pop('categories')
+        local_category_type_mappings = local.pop('category_type_mappings')
         self.assertDictEqual(remote, local)
+        self.assertEqual(sorted(remote_types), sorted(local_types))
+        self.assertEqual(sorted(remote_categories), sorted(local_categories))
+        for category, mapping in remote_category_type_mappings.items():
+            self.assertEqual(sorted(local_category_type_mappings[category]), sorted(mapping))
 
     def test_versions(self):
         self.assertEqual(self.user_misp_connector.version, self.user_misp_connector.pymisp_version_master)
