@@ -351,6 +351,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--timeframe', required=True, help='Timeframe to include in the report ')
     parser.add_argument('-e', '--mispevent', action='store_true', help='Include MISP event titles')
     parser.add_argument('-m', '--mail', action='store_true', help='Mail the report')
+    parser.add_argument('-o', '--mailoptions', action='store', help='mailoptions: \'smtp_from=INSERT_FROM;smtp_to=INSERT_TO;smtp_server=localhost\'')
     misp = init(misp_url, misp_key, misp_verifycert)
 
     args = parser.parse_args()
@@ -363,6 +364,16 @@ if __name__ == '__main__':
     smtp_to = 'INSERT_TO'
     smtp_server = 'localhost'
 
+    if args.mailoptions:
+        mailoptions = args.mailoptions.split(';')
+        for s in mailoptions:
+            if s.split('=')[0] == 'smtp_from':
+                smtp_from = s.split('=')[1]
+            if s.split('=')[0] == 'smtp_to':
+                smtp_to = s.split('=')[1]
+            if s.split('=')[0] == 'smtp_server':
+                smtp_server = s.split('=')[1]
+                
     report = get_data(misp, timeframe)
     if(report):
         report_body, attachments = build_report(report, timeframe, misp_url)
