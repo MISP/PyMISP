@@ -160,6 +160,10 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', f'/servers/serverSettingsEdit/{setting}', data=data)
         return self._check_response(response, expect_json=True)
 
+    def get_server_setting(self, setting: str):
+        response = self._prepare_request('GET', f'/servers/getSetting/{setting}')
+        return self._check_response(response, expect_json=True)
+
     def server_settings(self):
         response = self._prepare_request('GET', f'/servers/serverSettings')
         return self._check_response(response, expect_json=True)
@@ -210,6 +214,8 @@ class ExpandedPyMISP(PyMISP):
         '''Update an event on a MISP instance'''
         if event_id is None:
             event_id = self.__get_uuid_or_id_from_abstract_misp(event)
+        else:
+            event_id = self.__get_uuid_or_id_from_abstract_misp(event_id)
         updated_event = self._prepare_request('POST', f'events/{event_id}', data=event)
         updated_event = self._check_response(updated_event, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
@@ -265,6 +271,8 @@ class ExpandedPyMISP(PyMISP):
         '''Update an object on a MISP instance'''
         if object_id is None:
             object_id = self.__get_uuid_or_id_from_abstract_misp(misp_object)
+        else:
+            object_id = self.__get_uuid_or_id_from_abstract_misp(object_id)
         updated_object = self._prepare_request('POST', f'objects/edit/{object_id}', data=misp_object)
         updated_object = self._check_response(updated_object, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_object:
@@ -391,6 +399,8 @@ class ExpandedPyMISP(PyMISP):
         '''Update an attribute on a MISP instance'''
         if attribute_id is None:
             attribute_id = self.__get_uuid_or_id_from_abstract_misp(attribute)
+        else:
+            attribute_id = self.__get_uuid_or_id_from_abstract_misp(attribute_id)
         updated_attribute = self._prepare_request('POST', f'attributes/edit/{attribute_id}', data=attribute)
         updated_attribute = self._check_response(updated_attribute, expect_json=True)
         if ('errors' in updated_attribute and updated_attribute['errors'][0] == 403
@@ -614,6 +624,8 @@ class ExpandedPyMISP(PyMISP):
         """Edit only the provided parameters of a tag."""
         if tag_id is None:
             tag_id = self.__get_uuid_or_id_from_abstract_misp(tag)
+        else:
+            tag_id = self.__get_uuid_or_id_from_abstract_misp(tag_id)
         # FIXME: inconsistency in MISP: https://github.com/MISP/MISP/issues/4852
         tag = {'Tag': tag}
         updated_tag = self._prepare_request('POST', f'tags/edit/{tag_id}', data=tag)
@@ -925,6 +937,8 @@ class ExpandedPyMISP(PyMISP):
         '''Update a feed on a MISP instance'''
         if feed_id is None:
             feed_id = self.__get_uuid_or_id_from_abstract_misp(feed)
+        else:
+            feed_id = self.__get_uuid_or_id_from_abstract_misp(feed_id)
         # FIXME: https://github.com/MISP/MISP/issues/4834
         feed = {'Feed': feed}
         updated_feed = self._prepare_request('POST', f'feeds/edit/{feed_id}', data=feed)
@@ -991,7 +1005,7 @@ class ExpandedPyMISP(PyMISP):
         return to_return
 
     def get_sync_config(self, pythonify: bool=False):
-        '''WARNING: This method only works if the current user is a sync user'''
+        '''WARNING: This method only works if the user calling it is a sync user'''
         server = self._prepare_request('GET', 'servers/createSync')
         server = self._check_response(server, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in server:
@@ -1001,7 +1015,7 @@ class ExpandedPyMISP(PyMISP):
         return s
 
     def import_server(self, server: MISPServer, pythonify: bool=False):
-        """Import a sync server config"""
+        """Import a sync server config received from get_sync_config"""
         server = self._prepare_request('POST', f'servers/import', data=server)
         server = self._check_response(server, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in server:
@@ -1011,7 +1025,8 @@ class ExpandedPyMISP(PyMISP):
         return s
 
     def add_server(self, server: MISPServer, pythonify: bool=False):
-        """Add a server to synchronise with"""
+        """Add a server to synchronise with.
+        Note: You probably fant to use ExpandedPyMISP.get_sync_config and ExpandedPyMISP.import_server instead"""
         server = self._prepare_request('POST', f'servers/add', data=server)
         server = self._check_response(server, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in server:
@@ -1024,6 +1039,8 @@ class ExpandedPyMISP(PyMISP):
         '''Update a server to synchronise with'''
         if server_id is None:
             server_id = self.__get_uuid_or_id_from_abstract_misp(server)
+        else:
+            server_id = self.__get_uuid_or_id_from_abstract_misp(server_id)
         updated_server = self._prepare_request('POST', f'servers/edit/{server_id}', data=server)
         updated_server = self._check_response(updated_server, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_server:
@@ -1196,6 +1213,8 @@ class ExpandedPyMISP(PyMISP):
         '''Update an organisation'''
         if organisation_id is None:
             organisation_id = self.__get_uuid_or_id_from_abstract_misp(organisation)
+        else:
+            organisation_id = self.__get_uuid_or_id_from_abstract_misp(organisation_id)
         updated_organisation = self._prepare_request('POST', f'admin/organisations/edit/{organisation_id}', data=organisation)
         updated_organisation = self._check_response(updated_organisation, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_organisation:
@@ -1253,6 +1272,8 @@ class ExpandedPyMISP(PyMISP):
         '''Update an event on a MISP instance'''
         if user_id is None:
             user_id = self.__get_uuid_or_id_from_abstract_misp(user)
+        else:
+            user_id = self.__get_uuid_or_id_from_abstract_misp(user_id)
         updated_user = self._prepare_request('POST', f'admin/users/edit/{user_id}', data=user)
         updated_user = self._check_response(updated_user, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_user:
@@ -1601,6 +1622,8 @@ class ExpandedPyMISP(PyMISP):
             url_path = f'sightings/restSearch/{context}'
         else:
             url_path = 'sightings/restSearch'
+        if isinstance(context_id, (MISPEvent, MISPAttribute)):
+            context_id = self.__get_uuid_or_id_from_abstract_misp(context_id)
         query['id'] = context_id
         query['type'] = type_sighting
         query['from'] = date_from
@@ -1862,9 +1885,15 @@ class ExpandedPyMISP(PyMISP):
             return str(obj)
         if isinstance(obj, (int, str)):
             return obj
-        if 'id' in obj:
+        if self._old_misp((2, 4, 113), '2020-01-01', sys._getframe().f_code.co_name, message='MISP now accepts UUIDs to access entiries, usinf it is a lot safer across instances. Just update your MISP instance, plz.'):
+            if 'id' in obj:
+                return obj['id']
+        if isinstance(obj, MISPShadowAttribute):
+            # A ShadowAttribute has the same UUID as the related Attribute, we *need* to use the ID
             return obj['id']
-        return obj['uuid']
+        if 'uuid' in obj:
+            return obj['uuid']
+        return obj['id']
 
     def _make_misp_bool(self, parameter: Union[bool, str, None]):
         '''MISP wants 0 or 1 for bool, so we avoid True/False '0', '1' '''

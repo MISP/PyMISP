@@ -435,7 +435,9 @@ class TestSync(unittest.TestCase):
             sg.name = 'Testcases SG'
             sg.releasability = 'Testing'
             sharing_group = source.site_admin_connector.add_sharing_group(sg)
-            a = source.site_admin_connector.add_org_to_sharing_group(sharing_group, middle.test_org.uuid)
+            source.site_admin_connector.add_org_to_sharing_group(sharing_group, middle.test_org.uuid)
+            source.site_admin_connector.add_server_to_sharing_group(sharing_group, 0)  # Add local server
+            # NOTE: the data on that sharing group *won't be synced anywhere*
 
             a = event.add_attribute('text', 'SG only attr')
             a.distribution = Distribution.sharing_group
@@ -443,26 +445,33 @@ class TestSync(unittest.TestCase):
 
             event = source.org_admin_connector.add_event(event)
             source.org_admin_connector.publish(event)
-            time.sleep(15)
+            time.sleep(60)
 
-            event_middle = middle.user_connector.get_event(event.uuid)
-            event_last = last.user_connector.get_event(event.uuid)
-            self.assertEqual(len(event_middle.attributes), 3)
+            event_middle = middle.user_connector.get_event(event)
+            self.assertTrue(isinstance(event_middle, MISPEvent), event_middle)
+            self.assertEqual(len(event_middle.attributes), 2, event_middle)
+            self.assertEqual(len(event_middle.objects), 1, event_middle)
+            self.assertEqual(len(event_middle.objects[0].attributes), 1, event_middle)
+
+            event_last = last.user_connector.get_event(event)
+            self.assertTrue(isinstance(event_last, MISPEvent), event_last)
             self.assertEqual(len(event_last.attributes), 1)
             # Test if event is properly sanitized
             event_middle_as_site_admin = middle.site_admin_connector.get_event(event.uuid)
-            self.assertEqual(len(event_middle_as_site_admin.attributes), 3)
+            self.assertEqual(len(event_middle_as_site_admin.attributes), 2)
             event_last_as_site_admin = last.site_admin_connector.get_event(event.uuid)
             self.assertEqual(len(event_last_as_site_admin.attributes), 1)
             # Get sharing group from middle instance
             sgs = middle.site_admin_connector.sharing_groups()
-            self.assertEqual(len(sgs), 1)
-            self.assertEqual(sgs[0].name, 'Testcases SG')
-            middle.site_admin_connector.delete_sharing_group(sgs[0])
+            self.assertEqual(len(sgs), 0)
+
+            # TODO: Update sharing group so the attribute is pushed
+            # self.assertEqual(sgs[0].name, 'Testcases SG')
+            # middle.site_admin_connector.delete_sharing_group(sgs[0])
         finally:
             source.org_admin_connector.delete_event(event)
-            middle.site_admin_connector.delete_event(event_middle)
-            last.site_admin_connector.delete_event(event_last)
+            middle.site_admin_connector.delete_event(event)
+            last.site_admin_connector.delete_event(event)
             source.site_admin_connector.delete_sharing_group(sharing_group.id)
             middle.site_admin_connector.delete_sharing_group(sharing_group.id)
             source.site_admin_connector.update_server({'push': False}, source.sync_servers[0].id)
