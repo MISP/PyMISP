@@ -403,12 +403,12 @@ class ExpandedPyMISP(PyMISP):
             attribute_id = self.__get_uuid_or_id_from_abstract_misp(attribute_id)
         updated_attribute = self._prepare_request('POST', f'attributes/edit/{attribute_id}', data=attribute)
         updated_attribute = self._check_response(updated_attribute, expect_json=True)
-        if ('errors' in updated_attribute and updated_attribute['errors'][0] == 403
-                and updated_attribute['errors'][1]['message'] == 'Invalid attribute.'):
-            # FIXME: https://github.com/MISP/MISP/issues/4913
-            # At this point, we assume the user tried to update an attribute on an event they don't own
-            # Re-try with a proposal
-            return self.update_attribute_proposal(attribute_id, attribute, pythonify)
+        if 'errors' in updated_attribute:
+            if (updated_attribute['errors'][0] == 403
+                    and updated_attribute['errors'][1]['message'] == 'You do not have permission to do that.'):
+                # At this point, we assume the user tried to update an attribute on an event they don't own
+                # Re-try with a proposal
+                return self.update_attribute_proposal(attribute_id, attribute, pythonify)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_attribute:
             return updated_attribute
         a = MISPAttribute()
