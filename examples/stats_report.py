@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 Koen Van Impe
+Maxime Thiebaut
 
 Generate a report of your MISP statistics
 Put this script in crontab to run every /15 or /60
@@ -11,7 +12,7 @@ Do inline config in "main"
 
 '''
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
@@ -35,7 +36,7 @@ def init(url, key, verifycert):
     '''
         Template to get MISP module started
     '''
-    return PyMISP(url, key, verifycert, 'json')
+    return ExpandedPyMISP(url, key, verifycert, 'json')
 
 
 
@@ -60,8 +61,7 @@ def get_data(misp, timeframe):
     report = {}
 
     try:
-        stats_event = misp.search(last=timeframe)
-        stats_event_response = stats_event['response']
+        stats_event_response = misp.search(last=timeframe)
 
         # Number of new or updated events since timestamp
         report['number_of_misp_events'] = len(stats_event_response)
@@ -105,10 +105,6 @@ def get_data(misp, timeframe):
                         attr_category[category] = attr_category[category] + 1
                     else:
                         attr_category[category] = 1
-            report['number_of_attributes'] = number_of_attributes
-            report['number_of_attributes_to_ids'] = number_of_attributes_to_ids
-            report['attr_type'] = attr_type
-            report['attr_category'] = attr_category
 
             # Process tags
             if 'Tag' in event_data:
@@ -140,11 +136,6 @@ def get_data(misp, timeframe):
                         tags_type[tag_title] = tags_type[tag_title] + 1
                     else:
                         tags_type[tag_title] = 1
-            report['tags_type'] = tags_type
-            report['tags_tlp'] = tags_tlp
-            report['tags_misp_galaxy_mitre'] = tags_misp_galaxy_mitre
-            report['tags_misp_galaxy'] = tags_misp_galaxy
-            report['tags_misp_galaxy_threat_actor'] = tags_misp_galaxy_threat_actor
 
             # Process the galaxies
             if 'Galaxy' in event_data:
@@ -163,12 +154,21 @@ def get_data(misp, timeframe):
                             galaxies_cluster[cluster_value] = galaxies_cluster[cluster_value] + 1
                         else:
                             galaxies_cluster[cluster_value] = 1
-            report['galaxies'] = galaxies
-            report['galaxies_cluster'] = galaxies_cluster
+        report['number_of_attributes'] = number_of_attributes
+        report['number_of_attributes_to_ids'] = number_of_attributes_to_ids
+        report['attr_type'] = attr_type
+        report['attr_category'] = attr_category
+        report['tags_type'] = tags_type
+        report['tags_tlp'] = tags_tlp
+        report['tags_misp_galaxy_mitre'] = tags_misp_galaxy_mitre
+        report['tags_misp_galaxy'] = tags_misp_galaxy
+        report['tags_misp_galaxy_threat_actor'] = tags_misp_galaxy_threat_actor
+        report['galaxies'] = galaxies
+        report['galaxies_cluster'] = galaxies_cluster
 
         # General MISP statistics
-        user_statistics = misp.get_users_statistics()
-        if user_statistics:
+        user_statistics = misp.users_statistics()
+        if user_statistics and 'errors' not in user_statistics:
             report['user_statistics'] = user_statistics
 
         # Return the report data
@@ -191,12 +191,13 @@ def build_report(report, timeframe, misp_url):
     report_body = report_body + '\nNew or updated attributes: %s' % report['number_of_attributes']
     report_body = report_body + '\nNew or updated attributes with IDS flag: %s' % report['number_of_attributes_to_ids']
     report_body = report_body + '\n'
-    report_body = report_body + '\nTotal events: %s' % report['user_statistics']['stats']['event_count']
-    report_body = report_body + '\nTotal attributes: %s' % report['user_statistics']['stats']['attribute_count']
-    report_body = report_body + '\nTotal users: %s' % report['user_statistics']['stats']['user_count']
-    report_body = report_body + '\nTotal orgs: %s' % report['user_statistics']['stats']['org_count']
-    report_body = report_body + '\nTotal correlation: %s' % report['user_statistics']['stats']['correlation_count']
-    report_body = report_body + '\nTotal proposals: %s' % report['user_statistics']['stats']['proposal_count']
+    if 'user_statistics' in report:
+        report_body = report_body + '\nTotal events: %s' % report['user_statistics']['stats']['event_count']
+        report_body = report_body + '\nTotal attributes: %s' % report['user_statistics']['stats']['attribute_count']
+        report_body = report_body + '\nTotal users: %s' % report['user_statistics']['stats']['user_count']
+        report_body = report_body + '\nTotal orgs: %s' % report['user_statistics']['stats']['org_count']
+        report_body = report_body + '\nTotal correlation: %s' % report['user_statistics']['stats']['correlation_count']
+        report_body = report_body + '\nTotal proposals: %s' % report['user_statistics']['stats']['proposal_count']
 
     report_body = report_body + '\n\n'
 
@@ -204,8 +205,8 @@ def build_report(report, timeframe, misp_url):
         report_body = report_body + '\nNew or updated events\n-------------------------------------------------------------------------------'
         attachments['misp_events'] = 'ID;Title;Date;Updated;Published;ThreatLevel;AnalysisStatus'
         for el in report['misp_events']:
-            report_body = report_body + '\n #%s %s (%s) \t%s \n\t\t\t\t(Date: %s, Updated: %s, Published: %s)' % (el['id'], el['threat_level'], el['analysis_completion'], el['title'], el['date'], el['timestamp'], el['publish_timestamp'])
-            attachments['misp_events'] = attachments['misp_events'] + '\n%s;%s;%s;%s;%s;%s;%s' % (el['id'], el['title'], el['date'], el['timestamp'], el['publish_timestamp'], el['threat_level'], el['analysis_completion'])
+            report_body = report_body + '\n #%s %s (%s) \t%s \n\t\t\t\t(Date: %s, Updated: %s, Published: %s)' % (el['id'], el['threat_level'], el['analysis_completion'], el['title'].decode('utf-8'), el['date'], el['timestamp'], el['publish_timestamp'])
+            attachments['misp_events'] = attachments['misp_events'] + '\n%s;%s;%s;%s;%s;%s;%s' % (el['id'], el['title'].decode('utf-8'), el['date'], el['timestamp'], el['publish_timestamp'], el['threat_level'], el['analysis_completion'])
 
     report_body = report_body + '\n\n'
 
@@ -350,6 +351,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--timeframe', required=True, help='Timeframe to include in the report ')
     parser.add_argument('-e', '--mispevent', action='store_true', help='Include MISP event titles')
     parser.add_argument('-m', '--mail', action='store_true', help='Mail the report')
+    parser.add_argument('-o', '--mailoptions', action='store', help='mailoptions: \'smtp_from=INSERT_FROM;smtp_to=INSERT_TO;smtp_server=localhost\'')
     misp = init(misp_url, misp_key, misp_verifycert)
 
     args = parser.parse_args()
@@ -362,6 +364,16 @@ if __name__ == '__main__':
     smtp_to = 'INSERT_TO'
     smtp_server = 'localhost'
 
+    if args.mailoptions:
+        mailoptions = args.mailoptions.split(';')
+        for s in mailoptions:
+            if s.split('=')[0] == 'smtp_from':
+                smtp_from = s.split('=')[1]
+            if s.split('=')[0] == 'smtp_to':
+                smtp_to = s.split('=')[1]
+            if s.split('=')[0] == 'smtp_server':
+                smtp_server = s.split('=')[1]
+                
     report = get_data(misp, timeframe)
     if(report):
         report_body, attachments = build_report(report, timeframe, misp_url)
