@@ -151,17 +151,22 @@ class TestComprehensive(unittest.TestCase):
             if final_setting['setting'] == 'MISP.max_correlations_per_event':
                 self.assertEqual(final_setting['value'], 5000)
                 break
-        self.admin_misp_connector.set_server_setting('MISP.max_correlations_per_event', 10)
+        r = self.admin_misp_connector.set_server_setting('MISP.max_correlations_per_event', 10)
+        self.assertEqual(r['message'], 'Field updated', r)
+
         setting = self.admin_misp_connector.get_server_setting('MISP.max_correlations_per_event')
         self.assertEqual(setting['value'], 10)
-        self.admin_misp_connector.set_server_setting('MISP.max_correlations_per_event', 5000)
+        r = self.admin_misp_connector.set_server_setting('MISP.max_correlations_per_event', 5000)
+        self.assertEqual(r['message'], 'Field updated', r)
 
         setting = self.admin_misp_connector.get_server_setting('MISP.live')
         self.assertTrue(setting['value'])
-        self.admin_misp_connector.set_server_setting('MISP.live', False, force=True)
+        r = self.admin_misp_connector.set_server_setting('MISP.live', False, force=True)
+        self.assertEqual(r['message'], 'Field updated', r)
         setting = self.admin_misp_connector.get_server_setting('MISP.live')
         self.assertFalse(setting['value'])
-        self.admin_misp_connector.set_server_setting('MISP.live', True, force=True)
+        r = self.admin_misp_connector.set_server_setting('MISP.live', True, force=True)
+        self.assertEqual(r['message'], 'Field updated', r)
         setting = self.admin_misp_connector.get_server_setting('MISP.live')
         self.assertTrue(setting['value'])
 

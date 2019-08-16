@@ -282,8 +282,8 @@ class TestBasic(unittest.TestCase):
     def test_describeTypes_types_in_categories(self):
         category_type_mappings = self.live_describe_types['category_type_mappings']
         for category, types in category_type_mappings.items():
-                existing_types = [t for t in types if t in self.live_describe_types['types']]
-                self.assertEqual(sorted(existing_types), sorted(types))
+            existing_types = [t for t in types if t in self.live_describe_types['types']]
+            self.assertEqual(sorted(existing_types), sorted(types))
 
     def test_describeTypes_types_have_category(self):
         category_type_mappings = self.live_describe_types['category_type_mappings']
@@ -298,14 +298,6 @@ class TestBasic(unittest.TestCase):
         for t, sd in sane_default.items():
             self.assertTrue(sd['to_ids'] in [0, 1])
             self.assertTrue(sd['default_category'] in categories)
-
-    def test_describeTypes_uptodate(self):
-        local_describe = self.misp.get_local_describe_types()
-        for temp_key in local_describe.keys():
-            if isinstance(local_describe[temp_key], list):
-                self.assertEqual(sorted(self.live_describe_types[temp_key]), sorted(local_describe[temp_key]))
-            else:
-                self.assertEqual(self.live_describe_types[temp_key], local_describe[temp_key])
 
     def test_live_acl(self):
         query_acl = self.misp.get_live_query_acl()
