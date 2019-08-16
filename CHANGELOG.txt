@@ -2,6 +2,66 @@ Changelog
 =========
 
 
+v2.4.113 (2019-08-16)
+---------------------
+
+New
+~~~
+- Helpers & testcases for syncing. [Raphaël Vinot]
+- Preliminaty setup for testing syncing. [Raphaël Vinot]
+- Add few tests for admin tasks. [Raphaël Vinot]
+- Update MISP, test sync server. [Raphaël Vinot]
+- Properly support attribute/add of multiple attributes (2.4.113+)
+  [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Improve test cases. [Raphaël Vinot]
+- Update and improve live testing. [Raphaël Vinot]
+- Add tests cases for sync, bump describeTypes. [Raphaël Vinot]
+- Return empty list instead of None. [Pierre-Jean Grenier]
+
+  In all cases but one, the 3rd returned object is a (potentially empty) list.
+- Some more code cleanup. [Raphaël Vinot]
+- Code cleanup. [Raphaël Vinot]
+- Enable more tests. [Raphaël Vinot]
+- #4891 was fixed. [Raphaël Vinot]
+- Bump describeTypes. [Raphaël Vinot]
+
+Fix
+~~~
+- Fallback to propose attribute update. [Raphaël Vinot]
+- Properly __repr__ MISPUser. [Raphaël Vinot]
+- Move __not_jsonable *inside* the __init__ [Raphaël Vinot]
+
+  Turns out, if you modify a variable defined outside the __init__,
+  every instances (and inherited classes) of that class will be impacted by it.
+- Exception when posting multiple attributes on attributes/add. [Raphaël
+  Vinot]
+
+  Fix #433
+
+  Few cleanups in code.
+
+Other
+~~~~~
+- Include date_from & date_to in subject and report content. [Koen Van
+  Impe]
+- Allow statistics date_from date_to. [Koen Van Impe]
+
+  - date_from + date_to
+  - move misp object creation after argument parser
+- Allow to supply mail options as arguments on command line. [Koen Van
+  Impe]
+- Fix stats_report example to use ExpandedPyMISP. [Maxime Thiebaut]
+
+  The stats_report example relied on deprecated functions making it crash.
+  This has been fixed by upgrading to ExpandedPyMISP. Further checks have
+  been introduced to ensure used dictionnary keys do exist as the example
+  also crashed on clean MISP instances due to empty responses.
+
+
 v2.4.112 (2019-08-02)
 ---------------------
 
@@ -16,6 +76,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - [tests] Few improvements. [Raphaël Vinot]
