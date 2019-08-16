@@ -17,6 +17,7 @@ from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
 from datetime import datetime
+from datetime import date
 import time
 import sys
 import smtplib
@@ -40,7 +41,7 @@ def init(url, key, verifycert):
 
 
 
-def get_data(misp, timeframe):
+def get_data(misp, timeframe, date_from = None, date_to = None):
     '''
         Get the event date to build our report
     '''
@@ -61,7 +62,10 @@ def get_data(misp, timeframe):
     report = {}
 
     try:
-        stats_event_response = misp.search(last=timeframe)
+        if date_from and date_to:
+            stats_event_response = misp.search(date_from=date_from, date_to=date_to)
+        else:
+            stats_event_response = misp.search(last=timeframe)
 
         # Number of new or updated events since timestamp
         report['number_of_misp_events'] = len(stats_event_response)
@@ -186,7 +190,11 @@ def build_report(report, timeframe, misp_url):
 
     now = datetime.now()
     current_date = now.strftime(ts_format)
-    report_body = 'MISP Report %s for last %s on %s\n-------------------------------------------------------------------------------' % (current_date, timeframe, misp_url)
+    if timeframe:
+        report_body = "MISP Report %s for last %s on %s\n-------------------------------------------------------------------------------" % (current_date, timeframe, misp_url)
+    else:
+        report_body = "MISP Report %s from %s to %s on %s\n-------------------------------------------------------------------------------" % (current_date, date_from, date_to, misp_url)
+
     report_body = report_body + '\nNew or updated events: %s' % report['number_of_misp_events']
     report_body = report_body + '\nNew or updated attributes: %s' % report['number_of_attributes']
     report_body = report_body + '\nNew or updated attributes with IDS flag: %s' % report['number_of_attributes_to_ids']
@@ -313,7 +321,10 @@ def print_report(report_body, attachments, smtp_from, smtp_to, smtp_server, misp
         now = datetime.now()
         current_date = now.strftime(ts_format)
 
-        subject = "MISP Report %s for last %s on %s" % (current_date, timeframe, misp_url)
+        if timeframe:
+            subject = "MISP Report %s for last %s on %s" % (current_date, timeframe, misp_url)
+        else:
+            subject = "MISP Report %s from %s to %s on %s" % (current_date, date_from, date_to, misp_url)
 
         msg = MIMEMultipart()
         msg['From'] = smtp_from
@@ -348,14 +359,28 @@ def print_report(report_body, attachments, smtp_from, smtp_to, smtp_server, misp
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate a report of your MISP statistics.')
-    parser.add_argument('-t', '--timeframe', required=True, help='Timeframe to include in the report ')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-t', '--timeframe',action='store', help='Timeframe to include in the report')
+    group.add_argument('-f', '--date_from',action='store', help='Start date of query (YYYY-MM-DD)')
+    parser.add_argument('-u', '---date-to', action='store', help='End date of query (YYYY-MM-DD)')
     parser.add_argument('-e', '--mispevent', action='store_true', help='Include MISP event titles')
     parser.add_argument('-m', '--mail', action='store_true', help='Mail the report')
     parser.add_argument('-o', '--mailoptions', action='store', help='mailoptions: \'smtp_from=INSERT_FROM;smtp_to=INSERT_TO;smtp_server=localhost\'')
-    misp = init(misp_url, misp_key, misp_verifycert)
 
     args = parser.parse_args()
+    misp = init(misp_url, misp_key, misp_verifycert)
+
     timeframe = args.timeframe
+    if not timeframe:
+        date_from = args.date_from
+        if not args.date_to:
+            today = date.today()
+            date_to = today.strftime("%Y-%m-%d")
+        else:
+            date_to = args.date_to
+    else:
+        date_from = None
+        date_to = None
 
     ts_format = '%Y-%m-%d %H:%M:%S'
     threat_levels = ['High', 'Medium', 'Low', 'Undef']
@@ -373,8 +398,8 @@ if __name__ == '__main__':
                 smtp_to = s.split('=')[1]
             if s.split('=')[0] == 'smtp_server':
                 smtp_server = s.split('=')[1]
-                
-    report = get_data(misp, timeframe)
+
+    report = get_data(misp, timeframe, date_from, date_to)
     if(report):
         report_body, attachments = build_report(report, timeframe, misp_url)
         print_report(report_body, attachments, smtp_from, smtp_to, smtp_server, misp_url)
