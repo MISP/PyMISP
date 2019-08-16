@@ -190,7 +190,11 @@ def build_report(report, timeframe, misp_url):
 
     now = datetime.now()
     current_date = now.strftime(ts_format)
-    report_body = 'MISP Report %s for last %s on %s\n-------------------------------------------------------------------------------' % (current_date, timeframe, misp_url)
+    if timeframe:
+        report_body = "MISP Report %s for last %s on %s\n-------------------------------------------------------------------------------" % (current_date, timeframe, misp_url)
+    else:
+        report_body = "MISP Report %s from %s to %s on %s\n-------------------------------------------------------------------------------" % (current_date, date_from, date_to, misp_url)
+
     report_body = report_body + '\nNew or updated events: %s' % report['number_of_misp_events']
     report_body = report_body + '\nNew or updated attributes: %s' % report['number_of_attributes']
     report_body = report_body + '\nNew or updated attributes with IDS flag: %s' % report['number_of_attributes_to_ids']
@@ -317,7 +321,10 @@ def print_report(report_body, attachments, smtp_from, smtp_to, smtp_server, misp
         now = datetime.now()
         current_date = now.strftime(ts_format)
 
-        subject = "MISP Report %s for last %s on %s" % (current_date, timeframe, misp_url)
+        if timeframe:
+            subject = "MISP Report %s for last %s on %s" % (current_date, timeframe, misp_url)
+        else:
+            subject = "MISP Report %s from %s to %s on %s" % (current_date, date_from, date_to, misp_url)
 
         msg = MIMEMultipart()
         msg['From'] = smtp_from
@@ -396,4 +403,3 @@ if __name__ == '__main__':
     if(report):
         report_body, attachments = build_report(report, timeframe, misp_url)
         print_report(report_body, attachments, smtp_from, smtp_to, smtp_server, misp_url)
-
