@@ -1396,6 +1396,8 @@ class TestComprehensive(unittest.TestCase):
             attr4.type = 'ip-dst'
             attr4.add_tag('tlp:amber___test')
             response = self.user_misp_connector.add_attribute(first, [attr1, attr2, attr3, attr4])
+            time.sleep(5)
+            self.assertEqual(isinstance(response['attributes'], list), response['attributes'])
             self.assertEqual(response['attributes'][0].value, '1.2.3.5')
             self.assertEqual(response['attributes'][1].value, '1.2.3.6')
             self.assertEqual(isinstance(response['attributes'][1].tags, list), response['attributes'][1].to_json())
