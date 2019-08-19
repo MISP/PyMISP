@@ -1357,7 +1357,8 @@ class TestComprehensive(unittest.TestCase):
     def test_attribute(self):
         first = self.create_simple_event()
         second = self.create_simple_event()
-        second.add_attribute('ip-src', '11.11.11.11')
+        a = second.add_attribute('ip-src', '11.11.11.11')
+        a.add_tag('testtag_admin_created')
         second.distribution = Distribution.all_communities
         try:
             first = self.user_misp_connector.add_event(first)
@@ -1394,7 +1395,8 @@ class TestComprehensive(unittest.TestCase):
             attr4 = MISPAttribute()
             attr4.value = '1.2.3.6'
             attr4.type = 'ip-dst'
-            attr4.add_tag('tlp:amber___test')
+            attr4.add_tag('tlp:amber___test_unique_not_created')
+            attr4.add_tag('testtag_admin_created')
             response = self.user_misp_connector.add_attribute(first, [attr1, attr2, attr3, attr4])
             time.sleep(5)
             self.assertTrue(isinstance(response['attributes'], list), response['attributes'])
@@ -1402,7 +1404,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(response['attributes'][1].value, '1.2.3.6')
             self.assertTrue(isinstance(response['attributes'][1].tags, list), response['attributes'][1].to_json())
             self.assertTrue(len(response['attributes'][1].tags), response['attributes'][1].to_json())
-            self.assertEqual(response['attributes'][1].tags[0].name, 'tlp:amber___test')
+            self.assertEqual(response['attributes'][1].tags[0].name, 'testtag_admin_created')
             self.assertEqual(response['errors']['attribute_0']['value'][0], 'A similar attribute already exists for this event.')
             self.assertEqual(response['errors']['attribute_2']['value'][0], 'A similar attribute already exists for this event.')
 
