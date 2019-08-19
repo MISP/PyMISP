@@ -1401,6 +1401,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(response['attributes'][0].value, '1.2.3.5')
             self.assertEqual(response['attributes'][1].value, '1.2.3.6')
             self.assertTrue(isinstance(response['attributes'][1].tags, list), response['attributes'][1].to_json())
+            self.assertTrue(len(response['attributes'][1].tags), response['attributes'][1].to_json())
             self.assertEqual(response['attributes'][1].tags[0].name, 'tlp:amber___test')
             self.assertEqual(response['errors']['attribute_0']['value'][0], 'A similar attribute already exists for this event.')
             self.assertEqual(response['errors']['attribute_2']['value'][0], 'A similar attribute already exists for this event.')
