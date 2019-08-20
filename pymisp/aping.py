@@ -549,10 +549,8 @@ class ExpandedPyMISP(PyMISP):
             to_return.append(s)
         return to_return
 
-    def add_sighting(self, sighting: MISPSighting, attribute: Union[MISPAttribute, int, str, UUID]=None):
+    def add_sighting(self, sighting: MISPSighting, attribute: Union[MISPAttribute, int, str, UUID]=None, pythonify: bool=False):
         '''Add a new sighting (globally, or to a specific attribute)'''
-        # FIXME: no pythonify possible: https://github.com/MISP/MISP/issues/4867
-        pythonify = False
         if attribute:
             attribute_id = self.__get_uuid_or_id_from_abstract_misp(attribute)
             new_sighting = self._prepare_request('POST', f'sightings/add/{attribute_id}', data=sighting)

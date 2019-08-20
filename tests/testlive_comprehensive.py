@@ -42,6 +42,8 @@ except ImportError as e:
 
 urllib3.disable_warnings()
 
+fast_mode = True
+
 
 class TestComprehensive(unittest.TestCase):
 
@@ -50,12 +52,17 @@ class TestComprehensive(unittest.TestCase):
         cls.maxDiff = None
         # Connect as admin
         cls.admin_misp_connector = ExpandedPyMISP(url, key, verifycert, debug=False)
-        r = cls.admin_misp_connector.update_misp()
-        print(r)
+        if not fast_mode:
+            r = cls.admin_misp_connector.update_misp()
+            print(r)
         # Creates an org
         organisation = MISPOrganisation()
         organisation.name = 'Test Org'
         cls.test_org = cls.admin_misp_connector.add_organisation(organisation, pythonify=True)
+        # Create an org to delegate to
+        organisation = MISPOrganisation()
+        organisation.name = 'Test Org - delegate'
+        cls.test_org_delegate = cls.admin_misp_connector.add_organisation(organisation, pythonify=True)
         # Set the refault role (id 3 on the VM)
         cls.admin_misp_connector.set_default_role(3)
         # Creates a user
@@ -72,12 +79,13 @@ class TestComprehensive(unittest.TestCase):
         user.role_id = 4
         cls.test_pub = cls.admin_misp_connector.add_user(user, pythonify=True)
         cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey, verifycert)
-        # Update all json stuff
-        cls.admin_misp_connector.update_object_templates()
-        cls.admin_misp_connector.update_galaxies()
-        cls.admin_misp_connector.update_noticelists()
-        cls.admin_misp_connector.update_warninglists()
-        cls.admin_misp_connector.update_taxonomies()
+        if not fast_mode:
+            # Update all json stuff
+            cls.admin_misp_connector.update_object_templates()
+            cls.admin_misp_connector.update_galaxies()
+            cls.admin_misp_connector.update_noticelists()
+            cls.admin_misp_connector.update_warninglists()
+            cls.admin_misp_connector.update_taxonomies()
 
     @classmethod
     def tearDownClass(cls):
@@ -87,6 +95,7 @@ class TestComprehensive(unittest.TestCase):
         cls.admin_misp_connector.delete_user(cls.test_usr)
         # Delete org
         cls.admin_misp_connector.delete_organisation(cls.test_org)
+        cls.admin_misp_connector.delete_organisation(cls.test_org_delegate)
 
     def create_simple_event(self, force_timestamps=False):
         mispevent = MISPEvent(force_timestamps=force_timestamps)
@@ -809,19 +818,15 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
 
             current_ts = int(time.time())
-            # NOTE: no pythonify available yet
-            # r = self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             r = self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
-            self.assertEqual(r['message'], 'Sighting added')
+            self.assertEqual(int(r.attribute_id), first.attributes[0].id)
 
             s = MISPSighting()
             s.value = second.attributes[0].value
             s.source = 'Testcases'
             s.type = '1'
-            # NOTE: no pythonify available yet
-            # r = self.user_misp_connector.add_sighting(s, second.attributes[0])
             r = self.user_misp_connector.add_sighting(s, second.attributes[0])
-            self.assertEqual(r['message'], 'Sighting added')
+            self.assertEqual(r.source, 'Testcases')
 
             s = self.user_misp_connector.search_sightings(publish_timestamp=current_ts, include_attribute=True,
                                                           include_event_meta=True, pythonify=True)
@@ -864,10 +869,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(isinstance(s, list))
             self.assertEqual(int(s[0].attribute_id), first.attributes[0].id)
 
-            # NOTE: no pythonify available yet
-            # r = self.admin_misp_connector.add_sighting(s, second.attributes[0].id, pythonify=True)
-            r = self.admin_misp_connector.add_sighting(s, second.attributes[0])
-            self.assertEqual(r['message'], 'Sighting added')
+            self.admin_misp_connector.add_sighting(s, second.attributes[0])
             s = self.user_misp_connector.sightings(second.attributes[0])
             self.assertEqual(len(s), 2)
             s = self.user_misp_connector.sightings(second.attributes[0], self.test_org)

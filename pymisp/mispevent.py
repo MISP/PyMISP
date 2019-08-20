@@ -122,6 +122,7 @@ class MISPAttribute(AbstractMISP):
         self.__strict = strict
         self.uuid = str(uuid.uuid4())
         self.ShadowAttribute = []
+        self.Sighting = []
 
     @property
     def known_types(self):
@@ -147,6 +148,18 @@ class MISPAttribute(AbstractMISP):
         else:
             raise PyMISPError('All the attributes have to be of type MISPShadowAttribute.')
 
+    @property
+    def sightings(self):
+        return self.Sighting
+
+    @sightings.setter
+    def sightings(self, sightings):
+        """Set a list of prepared MISPShadowAttribute."""
+        if all(isinstance(x, MISPSighting) for x in sightings):
+            self.Sighting = sightings
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPSighting.')
+
     def delete(self):
         """Mark the attribute as deleted (soft delete)"""
         self.deleted = True
@@ -156,7 +169,7 @@ class MISPAttribute(AbstractMISP):
         return self.add_shadow_attribute(shadow_attribute, **kwargs)
 
     def add_shadow_attribute(self, shadow_attribute=None, **kwargs):
-        """Add a tag to the attribute (by name or a MISPTag object)"""
+        """Add a shadow attribute to the attribute (by name or a MISPShadowAttribute object)"""
         if isinstance(shadow_attribute, MISPShadowAttribute):
             misp_shadow_attribute = shadow_attribute
         elif isinstance(shadow_attribute, dict):
@@ -170,6 +183,22 @@ class MISPAttribute(AbstractMISP):
         self.shadow_attributes.append(misp_shadow_attribute)
         self.edited = True
         return misp_shadow_attribute
+
+    def add_sighting(self, sighting=None, **kwargs):
+        """Add a sighting to the attribute (by name or a MISPSighting object)"""
+        if isinstance(sighting, MISPSighting):
+            misp_sighting = sighting
+        elif isinstance(sighting, dict):
+            misp_sighting = MISPSighting()
+            misp_sighting.from_dict(**sighting)
+        elif kwargs:
+            misp_sighting = MISPSighting()
+            misp_sighting.from_dict(**kwargs)
+        else:
+            raise PyMISPError("The sighting is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(sighting))
+        self.sightings.append(misp_sighting)
+        self.edited = True
+        return misp_sighting
 
     def from_dict(self, **kwargs):
         if kwargs.get('Attribute'):
@@ -249,6 +278,9 @@ class MISPAttribute(AbstractMISP):
         if kwargs.get('Tag'):
             for tag in kwargs.pop('Tag'):
                 self.add_tag(tag)
+        if kwargs.get('Sighting'):
+            for sighting in kwargs.pop('Sighting'):
+                self.add_sighting(sighting)
         if kwargs.get('ShadowAttribute'):
             for s_attr in kwargs.pop('ShadowAttribute'):
                 self.add_shadow_attribute(s_attr)
@@ -1004,9 +1036,9 @@ class MISPSighting(AbstractMISP):
         if hasattr(self, 'value'):
             return '<{self.__class__.__name__}(value={self.value})'.format(self=self)
         if hasattr(self, 'id'):
-            return '<{self.__class__.__name__}(value={self.id})'.format(self=self)
+            return '<{self.__class__.__name__}(id={self.id})'.format(self=self)
         if hasattr(self, 'uuid'):
-            return '<{self.__class__.__name__}(value={self.uuid})'.format(self=self)
+            return '<{self.__class__.__name__}(uuid={self.uuid})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
