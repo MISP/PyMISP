@@ -42,7 +42,7 @@ except ImportError as e:
 
 urllib3.disable_warnings()
 
-fast_mode = True
+fast_mode = False
 
 
 class TestComprehensive(unittest.TestCase):
@@ -1520,6 +1520,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
+    @unittest.skip('Need rework.')
     def test_search_logs(self):
         # FIXME: https://github.com/MISP/MISP/issues/4872
         r = self.admin_misp_connector.search_logs(model='User', created=date.today(), pythonify=True)
