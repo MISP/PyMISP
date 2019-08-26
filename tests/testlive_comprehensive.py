@@ -79,6 +79,14 @@ class TestComprehensive(unittest.TestCase):
         user.role_id = 4
         cls.test_pub = cls.admin_misp_connector.add_user(user, pythonify=True)
         cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey, verifycert)
+        # Creates a user that can accept a delegation request
+        user = MISPUser()
+        user.email = 'testusr@delegate.recipient.local'
+        user.org_id = cls.test_org_delegate.id
+        user.role_id = 2
+        cls.test_usr_delegate = cls.admin_misp_connector.add_user(user, pythonify=True)
+        cls.delegate_user_misp_connector = ExpandedPyMISP(url, cls.test_usr_delegate.authkey, verifycert, debug=False)
+        cls.delegate_user_misp_connector.toggle_global_pythonify()
         if not fast_mode:
             # Update all json stuff
             cls.admin_misp_connector.update_object_templates()
@@ -93,6 +101,7 @@ class TestComprehensive(unittest.TestCase):
         cls.admin_misp_connector.delete_user(cls.test_pub)
         # Delete user
         cls.admin_misp_connector.delete_user(cls.test_usr)
+        cls.admin_misp_connector.delete_user(cls.test_usr_delegate)
         # Delete org
         cls.admin_misp_connector.delete_organisation(cls.test_org)
         cls.admin_misp_connector.delete_organisation(cls.test_org_delegate)
@@ -508,8 +517,9 @@ class TestComprehensive(unittest.TestCase):
             obj.add_attribute('filename', 'foo')
             first.add_object(obj)
             first = self.user_misp_connector.add_event(first)
-            r = self.user_misp_connector.delete_attribute(first.attributes[0].uuid)
-            self.assertEqual(r['message'], 'Attribute deleted.')
+            # FIXME: https://github.com/MISP/MISP/issues/5060
+            # r = self.user_misp_connector.delete_attribute(first.attributes[0].uuid)
+            # self.assertEqual(r['message'], 'Attribute deleted.')
             r = self.user_misp_connector.delete_object(first.objects[0].uuid)
             self.assertEqual(r['message'], 'Object deleted')
             r = self.user_misp_connector.delete_event(first.uuid)
@@ -1481,8 +1491,9 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(isinstance(attribute, MISPShadowAttribute), attribute)
             self.assertEqual(attribute.value, second.attributes[0].value)
             # Delete attribute owned by someone else
-            response = self.user_misp_connector.delete_attribute(second.attributes[1])
-            self.assertTrue(response['success'])
+            # FIXME: https://github.com/MISP/MISP/issues/5060
+            # response = self.user_misp_connector.delete_attribute(second.attributes[1])
+            # self.assertTrue(response['success'])
             # Delete attribute owned by user
             response = self.admin_misp_connector.delete_attribute(second.attributes[1])
             self.assertEqual(response['message'], 'Attribute deleted.')
@@ -1781,6 +1792,111 @@ class TestComprehensive(unittest.TestCase):
         # Delete
         r = self.admin_misp_connector.delete_server(server)
         self.assertEqual(r['name'], 'Server deleted')
+
+    def test_roles_expanded(self):
+        '''Test all possible things regarding roles
+        1. Use existing roles (ID in test VM):
+            * Read only (6):  Can only connect via API and see events visible by its organisation
+            * User (3): Same as readonly + create event, tag (using existing tags), add sighting
+            * Publisher (4): Same as User + publish (also on zmq and kafka), and delegate
+            * Org Admin (2): Same as publisher + admin org, audit, create tags, templates, sharing groups
+            * Sync user (5): Same as publisher + sync, create tag, sharing group
+            * admin (1): Same as Org admin and sync user + site admin, edit regexes, edit object templates
+        2. Create roles:
+            * No Auth key access
+            * Auth key (=> Read only)
+            * + tagger
+            * + sightings creator (=> User)
+            * +
+        '''
+        # Creates a test user for roles
+        user = MISPUser()
+        user.email = 'testusr-roles@user.local'
+        user.org_id = self.test_org.id
+        tag = MISPTag()
+        tag.name = 'tlp:white___test'
+        try:
+            test_roles_user = self.admin_misp_connector.add_user(user, pythonify=True)
+            test_tag = self.admin_misp_connector.add_tag(tag, pythonify=True)
+            test_roles_user_connector = ExpandedPyMISP(url, test_roles_user.authkey, verifycert, debug=False)
+            test_roles_user_connector.toggle_global_pythonify()
+            # ===== Read Only
+            self.admin_misp_connector.update_user({'role_id': 6}, test_roles_user)
+            base_event = MISPEvent()
+            base_event.info = 'Test Roles'
+            base_event.distribution = 0
+            base_event.add_attribute('ip-dst', '8.8.8.8')
+            base_event.add_attribute('ip-dst', '9.9.9.9')
+            base_event.attributes[0].add_tag('tlp:white___test')
+            r = test_roles_user_connector.add_event(base_event)
+            self.assertTrue(isinstance(r['errors'], tuple), r['errors'])
+            self.assertEqual(r['errors'][1]['message'], 'You do not have permission to use this functionality.', r)
+            try:
+                e = self.user_misp_connector.add_event(base_event, pythonify=True)
+                e = test_roles_user_connector.get_event(e)
+                self.assertEqual(e.info, 'Test Roles')
+                self.assertEqual(e.attributes[0].tags[0].name, 'tlp:white___test')
+                r = test_roles_user_connector.publish(e)
+                self.assertEqual(r['errors'][1]['message'], 'You do not have permission to use this functionality.', r)
+                r = test_roles_user_connector.tag(e.attributes[1], 'tlp:white___test')
+                self.assertEqual(r['errors'][1]['message'], 'You do not have permission to use this functionality.', r)
+                r = test_roles_user_connector.add_sighting({'name': 'foo'}, e.attributes[1])
+                self.assertEqual(r['errors'][1]['message'], 'You do not have permission to use this functionality.', r)
+
+                self.user_misp_connector.add_sighting({'source': 'blah'}, e.attributes[0])
+                sightings = test_roles_user_connector.sightings(e.attributes[0])
+                self.assertEqual(sightings[0].source, 'blah')
+
+                e = test_roles_user_connector.get_event(e)
+                self.assertEqual(e.attributes[0].sightings[0].source, 'blah')
+                # FIXME: http://github.com/MISP/MISP/issues/5022
+                # a = test_roles_user_connector.get_attribute(e.attributes[0])
+                # self.assertEqual(a.sightings[0].source, 'blah')
+
+                # ===== User (the capabilities were tested just before, only testing the publisher capabilities)
+                self.admin_misp_connector.update_user({'role_id': 3}, test_roles_user)
+                r = test_roles_user_connector.publish(e)
+                self.assertEqual(r['errors'][1]['message'], 'You do not have permission to use this functionality.', r)
+                r = test_roles_user_connector.delegate_event(e, self.test_org_delegate)
+                self.assertEqual(r['errors'][1]['message'], 'You do not have permission to use this functionality.', r)
+                # ===== Publisher
+                self.admin_misp_connector.update_user({'role_id': 4}, test_roles_user)
+                r = test_roles_user_connector.publish(e)
+                self.assertEqual(r['message'], 'Job queued', r)
+                delegation = test_roles_user_connector.delegate_event(e, self.test_org_delegate)
+                self.assertEqual(delegation.org_id, self.test_org_delegate.id)
+                self.assertEqual(delegation.requester_org_id, self.test_org.id)
+                r = test_roles_user_connector.accept_event_delegation(delegation.id)
+                self.assertEqual(r['errors'][1]['message'], 'You are not authorised to do that.', r)
+                # Test delegation
+                delegations = self.delegate_user_misp_connector.event_delegations()
+                self.assertEqual(delegations[0].id, delegation.id)
+                e = self.delegate_user_misp_connector.accept_event_delegation(delegation)
+                self.assertEqual(e.info, 'Test Roles')
+                self.assertEqual(e.org.name, 'Test Org - delegate')
+                r = self.delegate_user_misp_connector.delete_event(e)
+                self.assertEqual(r['message'], 'Event deleted.', r)
+                e = test_roles_user_connector.add_event(base_event)
+                delegation = test_roles_user_connector.delegate_event(e, self.test_org_delegate)
+                e = test_roles_user_connector.discard_event_delegation(delegation.id)
+                self.assertEqual(e.info, 'Test Roles')
+                self.assertEqual(e.org_id, int(self.test_org.id))
+            finally:
+                # time.sleep(200)
+                # NOTE: When the delegation will work, we need to delete as site admin.
+                self.user_misp_connector.delete_event(e)
+
+            # Publisher
+            self.admin_misp_connector.update_user({'role_id': 4}, test_roles_user)
+            # Org Admin
+            self.admin_misp_connector.update_user({'role_id': 2}, test_roles_user)
+            # Sync User
+            self.admin_misp_connector.update_user({'role_id': 5}, test_roles_user)
+            # Admin
+            self.admin_misp_connector.update_user({'role_id': 1}, test_roles_user)
+        finally:
+            self.admin_misp_connector.delete_user(test_roles_user)
+            self.admin_misp_connector.delete_tag(test_tag)
 
     @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_expansion(self):

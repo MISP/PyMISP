@@ -18,7 +18,7 @@ import sys
 from . import __version__
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPNotImplementedYet, PyMISPError, NoURL, NoKey
 from .api import everything_broken, PyMISP
-from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed
+from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation
 from .abstract import MISPEncode, MISPTag, AbstractMISP
 
 SearchType = TypeVar('SearchType', str, int)
@@ -624,8 +624,9 @@ class ExpandedPyMISP(PyMISP):
             tag_id = self.__get_uuid_or_id_from_abstract_misp(tag)
         else:
             tag_id = self.__get_uuid_or_id_from_abstract_misp(tag_id)
-        # FIXME: inconsistency in MISP: https://github.com/MISP/MISP/issues/4852
-        tag = {'Tag': tag}
+        if self._old_misp((2, 4, 114), '2020-01-01', sys._getframe().f_code.co_name):
+            # Inconsistency https://github.com/MISP/MISP/issues/4852
+            tag = {'Tag': tag}
         updated_tag = self._prepare_request('POST', f'tags/edit/{tag_id}', data=tag)
         updated_tag = self._check_response(updated_tag, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_tag:
@@ -1706,6 +1707,70 @@ class ExpandedPyMISP(PyMISP):
 
     # ## END Search methods ###
 
+    # ## BEGIN Event Delegation ###
+
+    def event_delegations(self, pythonify: bool=False):
+        """Get all the event delegations."""
+        delegations = self._prepare_request('GET', 'event_delegations')
+        delegations = self._check_response(delegations, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in delegations:
+            return delegations
+        to_return = []
+        for delegation in delegations:
+            d = MISPEventDelegation()
+            d.from_dict(**delegation)
+            to_return.append(d)
+        return to_return
+
+    def accept_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool=False):
+        delegation_id = self.__get_uuid_or_id_from_abstract_misp(delegation)
+        delegation = self._prepare_request('POST', f'event_delegations/acceptDelegation/{delegation_id}')
+        delegation = self._check_response(delegation, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in delegation:
+            return delegation
+        e = MISPEvent()
+        e.from_dict(**delegation)
+        return e
+
+    def discard_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool=False):
+        delegation_id = self.__get_uuid_or_id_from_abstract_misp(delegation)
+        delegation = self._prepare_request('POST', f'event_delegations/deleteDelegation/{delegation_id}')
+        delegation = self._check_response(delegation, expect_json=True)
+        if self._old_misp((2, 4, 114), '2020-01-01', sys._getframe().f_code.co_name) and isinstance(delegation, list):
+            # FIXME: https://github.com/MISP/MISP/issues/5056
+            delegation = delegation[0]
+        if not (self.global_pythonify or pythonify) or 'errors' in delegation:
+            return delegation
+        e = MISPEvent()
+        e.from_dict(**delegation)
+        return e
+
+    def delegate_event(self, event: Union[MISPEvent, int, str, UUID]=None,
+                       organisation: Union[MISPOrganisation, int, str, UUID]=None,
+                       event_delegation: MISPEventDelegation=None,
+                       distribution: int=-1, message: str='', pythonify: bool=False):
+        '''Note: distribution == -1 means recipient decides'''
+        if event and organisation:
+            event_id = self.__get_uuid_or_id_from_abstract_misp(event)
+            organisation_id = self.__get_uuid_or_id_from_abstract_misp(organisation)
+            if self._old_misp((2, 4, 114), '2020-01-01', sys._getframe().f_code.co_name):
+                # FIXME: https://github.com/MISP/MISP/issues/5055
+                organisation_id = organisation.id
+            data = {'event_id': event_id, 'org_id': organisation_id, 'distribution': distribution, 'message': message}
+        elif event_delegation:
+            data = event_delegation
+        else:
+            raise PyMISPError('Either event and organisation OR event_delegation are required.')
+        delegation = self._prepare_request('POST', f'event_delegations/delegateEvent/{event_id}', data=data)
+        delegation = self._check_response(delegation, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in delegation:
+            return delegation
+        d = MISPEventDelegation()
+        d.from_dict(**delegation)
+        return d
+
+    # ## END Event Delegation ###
+
     # ## BEGIN Others ###
 
     def push_event_to_ZMQ(self, event: Union[MISPEvent, int, str, UUID]):
@@ -1888,6 +1953,9 @@ class ExpandedPyMISP(PyMISP):
                 return obj['id']
         if isinstance(obj, MISPShadowAttribute):
             # A ShadowAttribute has the same UUID as the related Attribute, we *need* to use the ID
+            return obj['id']
+        if isinstance(obj, MISPEventDelegation):
+            # An EventDelegation doesn't have a uuid, we *need* to use the ID
             return obj['id']
         if 'uuid' in obj:
             return obj['uuid']

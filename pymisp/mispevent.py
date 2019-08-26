@@ -1013,6 +1013,20 @@ class MISPLog(AbstractMISP):
         return '<{self.__class__.__name__}({self.model}, {self.action}, {self.title})'.format(self=self)
 
 
+class MISPEventDelegation(AbstractMISP):
+
+    def __init__(self):
+        super(MISPEventDelegation, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('EventDelegation'):
+            kwargs = kwargs.get('EventDelegation')
+        super(MISPEventDelegation, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}(org_id={self.org_id}, requester_org_id={self.requester_org_id}, {self.event_id})'.format(self=self)
+
+
 class MISPSighting(AbstractMISP):
 
     def __init__(self):
