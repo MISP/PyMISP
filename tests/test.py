@@ -17,7 +17,7 @@ class TestBasic(unittest.TestCase):
 
     def setUp(self):
         self.maxDiff = None
-        self.misp = PyMISP(url, key, True, 'json')
+        self.misp = PyMISP(url, key, False, 'json')
         self.live_describe_types = self.misp.get_live_describe_types()
 
     def _clean_event(self, event):
@@ -51,8 +51,8 @@ class TestBasic(unittest.TestCase):
                                u'ShadowAttribute': [], u'published': False,
                                u'distribution': u'0', u'event_creator_email': u'admin@admin.test', u'Attribute': [], u'proposal_email_lock': False,
                                u'extends_uuid': '',
-                               u'Object': [], u'Org': {u'name': u'ORGNAME'},
-                               u'Orgc': {u'name': u'ORGNAME'},
+                               u'Object': [], u'Org': {'local': True, u'name': u'ORGNAME'},
+                               u'Orgc': {'local': True, u'name': u'ORGNAME'},
                                u'Galaxy': [],
                                u'threat_level_id': u'1'}}
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
@@ -76,8 +76,8 @@ class TestBasic(unittest.TestCase):
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': u'3', u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': False, u'distribution': u'0', u'event_creator_email': u'admin@admin.test',
-                               u'Org': {u'name': u'ORGNAME'},
-                               u'Orgc': {u'name': u'ORGNAME'},
+                               u'Org': {'local': True, u'name': u'ORGNAME'},
+                               u'Orgc': {'local': True, u'name': u'ORGNAME'},
                                u'Galaxy': [],
                                u'Attribute': [
                                    {u'category': u'Payload installation', u'comment': u'Fanny modules',
@@ -100,8 +100,8 @@ class TestBasic(unittest.TestCase):
         to_check = {u'Event': {u'info': u'This is a test', u'locked': False,
                                u'attribute_count': u'3', u'analysis': u'0',
                                u'ShadowAttribute': [], u'published': True, u'distribution': u'0', u'event_creator_email': u'admin@admin.test',
-                               u'Org': {u'name': u'ORGNAME'},
-                               u'Orgc': {u'name': u'ORGNAME'},
+                               u'Org': {'local': True, u'name': u'ORGNAME'},
+                               u'Orgc': {'local': True, u'name': u'ORGNAME'},
                                u'Galaxy': [],
                                u'Attribute': [
                                    {u'category': u'Payload installation', u'comment': u'Fanny modules',
