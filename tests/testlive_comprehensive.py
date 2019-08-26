@@ -1860,6 +1860,12 @@ class TestComprehensive(unittest.TestCase):
                 r = test_roles_user_connector.delegate_event(e, self.test_org_delegate)
                 self.assertEqual(r['errors'][1]['message'], 'You do not have permission to use this functionality.', r)
                 # ===== Publisher
+                # Make sure the delegation is enabled
+                r = self.admin_misp_connector.set_server_setting('MISP.delegation', True, force=True)
+                self.assertEqual(r['message'], 'Field updated', r)
+                setting = self.admin_misp_connector.get_server_setting('MISP.delegation')
+                self.assertTrue(setting['value'])
+                # ======
                 self.admin_misp_connector.update_user({'role_id': 4}, test_roles_user)
                 r = test_roles_user_connector.publish(e)
                 self.assertEqual(r['message'], 'Job queued', r)
