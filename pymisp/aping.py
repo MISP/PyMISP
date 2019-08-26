@@ -1754,7 +1754,7 @@ class ExpandedPyMISP(PyMISP):
             event_id = self.__get_uuid_or_id_from_abstract_misp(event)
             organisation_id = self.__get_uuid_or_id_from_abstract_misp(organisation)
             if self._old_misp((2, 4, 114), '2020-01-01', sys._getframe().f_code.co_name):
-                # FIXME: https://github.com/MISP/MISP/issues/5055
+                # https://github.com/MISP/MISP/issues/5055
                 organisation_id = organisation.id
             data = {'event_id': event_id, 'org_id': organisation_id, 'distribution': distribution, 'message': message}
         elif event_delegation:
