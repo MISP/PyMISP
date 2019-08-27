@@ -421,7 +421,7 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', f'attributes/delete/{attribute_id}')
         response = self._check_response(response, expect_json=True)
         if ('errors' in response and response['errors'][0] == 403
-                and response['errors'][1]['message'] == 'Attribute not found or not authorised.'):
+                and response['errors'][1]['message'] == 'You do not have permission to do that.'):
             # FIXME: https://github.com/MISP/MISP/issues/4913
             # At this point, we assume the user tried to delete an attribute on an event they don't own
             # Re-try with a proposal

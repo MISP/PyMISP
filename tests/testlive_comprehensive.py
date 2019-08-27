@@ -517,9 +517,8 @@ class TestComprehensive(unittest.TestCase):
             obj.add_attribute('filename', 'foo')
             first.add_object(obj)
             first = self.user_misp_connector.add_event(first)
-            # FIXME: https://github.com/MISP/MISP/issues/5060
-            # r = self.user_misp_connector.delete_attribute(first.attributes[0].uuid)
-            # self.assertEqual(r['message'], 'Attribute deleted.')
+            r = self.user_misp_connector.delete_attribute(first.attributes[0].uuid)
+            self.assertEqual(r['message'], 'Attribute deleted.')
             r = self.user_misp_connector.delete_object(first.objects[0].uuid)
             self.assertEqual(r['message'], 'Object deleted')
             r = self.user_misp_connector.delete_event(first.uuid)
@@ -1491,9 +1490,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(isinstance(attribute, MISPShadowAttribute), attribute)
             self.assertEqual(attribute.value, second.attributes[0].value)
             # Delete attribute owned by someone else
-            # FIXME: https://github.com/MISP/MISP/issues/5060
-            # response = self.user_misp_connector.delete_attribute(second.attributes[1])
-            # self.assertTrue(response['success'])
+            response = self.user_misp_connector.delete_attribute(second.attributes[1])
+            self.assertTrue(response['success'])
             # Delete attribute owned by user
             response = self.admin_misp_connector.delete_attribute(second.attributes[1])
             self.assertEqual(response['message'], 'Attribute deleted.')
@@ -1603,7 +1601,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(list(users_stats.keys()), ['flatData', 'treemap'])
 
             users_stats = self.admin_misp_connector.users_statistics(context='attributehistogram')
-            self.assertTrue(isinstance(users_stats, dict), users_stats)
+            self.assertTrue(isinstance(users_stats, list), users_stats)
 
             self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             users_stats = self.user_misp_connector.users_statistics(context='sightings')
