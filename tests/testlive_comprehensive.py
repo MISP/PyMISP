@@ -794,6 +794,9 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events[0].info, 'foo bar blah')
             self.assertEqual(events[0].attributes, [])
 
+            # Contact reporter
+            r = self.user_misp_connector.contact_event_reporter(events[0].id, 'This is a test')
+            self.assertEqual(r['message'], 'Email sent to the reporter.')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)

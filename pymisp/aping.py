@@ -241,6 +241,13 @@ class ExpandedPyMISP(PyMISP):
             response = self._prepare_request('POST', f'events/publish/{event_id}')
         return self._check_response(response, expect_json=True)
 
+    def contact_event_reporter(self, event: Union[MISPEvent, int, str, UUID], message: str):
+        """Send a message to the reporter of an event"""
+        event_id = self.__get_uuid_or_id_from_abstract_misp(event)
+        to_post = {'message': message}
+        response = self._prepare_request('POST', f'events/contact/{event_id}', data=to_post)
+        return self._check_response(response, expect_json=True)
+
     # ## END Event ###
 
     # ## BEGIN Object ###
