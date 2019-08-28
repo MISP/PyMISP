@@ -72,6 +72,10 @@ class TestMISPEvent(unittest.TestCase):
 
     def test_object_tag(self):
         self.mispevent.add_object(name='file', strict=True)
+        a = self.mispevent.objects[0].add_attribute('filename', value='')
+        self.assertEqual(a, None)
+        a = self.mispevent.objects[0].add_attribute('filename', value=None)
+        self.assertEqual(a, None)
         a = self.mispevent.objects[0].add_attribute('filename', value='bar', Tag=[{'name': 'blah'}])
         del a.uuid
         self.assertEqual(self.mispevent.objects[0].attributes[0].tags[0].name, 'blah')

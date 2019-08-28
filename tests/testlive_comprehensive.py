@@ -1529,12 +1529,16 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    @unittest.skip('Need rework.')
     def test_search_logs(self):
         # FIXME: https://github.com/MISP/MISP/issues/4872
+        r = self.admin_misp_connector.update_user({'email': 'testusr-changed@user.local'}, self.test_usr)
         r = self.admin_misp_connector.search_logs(model='User', created=date.today(), pythonify=True)
-        for entry in r[-2:]:
-            self.assertEqual(entry.action, 'add')
+        for entry in r[-1:]:
+            self.assertEqual(entry.action, 'edit')
+        r = self.admin_misp_connector.search_logs(email='admin@admin.test', created=date.today(), pythonify=True)
+        for entry in r[-1:]:
+            self.assertEqual(entry.action, 'edit')
+        r = self.admin_misp_connector.update_user({'email': 'testusr@user.local'}, self.test_usr)
 
     def test_live_acl(self):
         missing_acls = self.admin_misp_connector.remote_acl
