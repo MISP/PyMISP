@@ -18,7 +18,7 @@ import sys
 from . import __version__
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPNotImplementedYet, PyMISPError, NoURL, NoKey
 from .api import everything_broken, PyMISP
-from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation
+from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity
 from .abstract import MISPEncode, MISPTag, AbstractMISP
 
 SearchType = TypeVar('SearchType', str, int)
@@ -1713,6 +1713,39 @@ class ExpandedPyMISP(PyMISP):
         return to_return
 
     # ## END Search methods ###
+
+    # ## BEGIN Communities ###
+
+    def communities(self, pythonify: bool=False):
+        """Get all the communities."""
+        communities = self._prepare_request('GET', 'communities')
+        communities = self._check_response(communities, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in communities:
+            return communities
+        to_return = []
+        for community in communities:
+            c = MISPCommunity()
+            c.from_dict(**community)
+            to_return.append(c)
+        return to_return
+
+    def get_community(self, community: Union[MISPCommunity, int, str, UUID], pythonify: bool=False):
+        '''Get an community from a MISP instance'''
+        community_id = self.__get_uuid_or_id_from_abstract_misp(community)
+        community = self._prepare_request('GET', f'communities/view/{community_id}')
+        community = self._check_response(community, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in community:
+            return community
+        c = MISPCommunity()
+        c.from_dict(**community)
+        return c
+
+    def request_community_access(self, community: Union[MISPCommunity, int, str, UUID], sync: bool=False,
+                                 requestor_org_description: str='', requestor_email_user: str='',
+                                 message: str='', anonymise: bool=False):
+        pass
+
+    # ## END Communities ###
 
     # ## BEGIN Event Delegation ###
 

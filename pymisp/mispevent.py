@@ -1105,6 +1105,20 @@ class MISPShadowAttribute(AbstractMISP):
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
+class MISPCommunity(AbstractMISP):
+
+    def __init__(self):
+        super(MISPCommunity, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if kwargs.get('Community'):
+            kwargs = kwargs.get('Community')
+        super(MISPCommunity, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}(name={self.name}, uuid={self.uuid})'.format(self=self)
+
+
 class MISPObject(AbstractMISP):
 
     def __init__(self, name, strict=False, standalone=False, default_attributes_parameters={}, **kwargs):
