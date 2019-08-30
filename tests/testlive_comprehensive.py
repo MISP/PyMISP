@@ -1884,7 +1884,9 @@ class TestComprehensive(unittest.TestCase):
                 # Test delegation
                 delegations = self.delegate_user_misp_connector.event_delegations()
                 self.assertEqual(delegations[0].id, delegation.id)
-                e = self.delegate_user_misp_connector.accept_event_delegation(delegation)
+                r = self.delegate_user_misp_connector.accept_event_delegation(delegation)
+                self.assertEqual(r['message'], 'Event ownership transferred.')
+                e = self.delegate_user_misp_connector.get_event(e)
                 self.assertTrue(isinstance(e, MISPEvent), e)
                 self.assertEqual(e.info, 'Test Roles')
                 self.assertEqual(e.org.name, 'Test Org - delegate')
@@ -1892,13 +1894,14 @@ class TestComprehensive(unittest.TestCase):
                 self.assertEqual(r['message'], 'Event deleted.', r)
                 e = test_roles_user_connector.add_event(base_event)
                 delegation = test_roles_user_connector.delegate_event(e, self.test_org_delegate)
-                e = test_roles_user_connector.discard_event_delegation(delegation.id)
+                r = test_roles_user_connector.discard_event_delegation(delegation.id)
+                self.assertEqual(r['message'], 'Delegation request deleted.')
+
+                e = test_roles_user_connector.get_event(e)
                 self.assertTrue(isinstance(e, MISPEvent), e)
                 self.assertEqual(e.info, 'Test Roles')
                 self.assertEqual(e.org_id, int(self.test_org.id))
             finally:
-                # time.sleep(200)
-                # NOTE: When the delegation will work, we need to delete as site admin.
                 self.user_misp_connector.delete_event(e)
 
             # Publisher

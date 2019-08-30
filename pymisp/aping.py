@@ -1779,25 +1779,12 @@ class ExpandedPyMISP(PyMISP):
     def accept_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool=False):
         delegation_id = self.__get_uuid_or_id_from_abstract_misp(delegation)
         delegation = self._prepare_request('POST', f'event_delegations/acceptDelegation/{delegation_id}')
-        delegation = self._check_response(delegation, expect_json=True)
-        if not (self.global_pythonify or pythonify) or 'errors' in delegation:
-            return delegation
-        e = MISPEvent()
-        e.from_dict(**delegation)
-        return e
+        return self._check_response(delegation, expect_json=True)
 
     def discard_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool=False):
         delegation_id = self.__get_uuid_or_id_from_abstract_misp(delegation)
         delegation = self._prepare_request('POST', f'event_delegations/deleteDelegation/{delegation_id}')
-        delegation = self._check_response(delegation, expect_json=True)
-        if self._old_misp((2, 4, 114), '2020-01-01', sys._getframe().f_code.co_name) and isinstance(delegation, list):
-            # FIXME: https://github.com/MISP/MISP/issues/5056
-            delegation = delegation[0]
-        if not (self.global_pythonify or pythonify) or 'errors' in delegation:
-            return delegation
-        e = MISPEvent()
-        e.from_dict(**delegation)
-        return e
+        return self._check_response(delegation, expect_json=True)
 
     def delegate_event(self, event: Union[MISPEvent, int, str, UUID]=None,
                        organisation: Union[MISPOrganisation, int, str, UUID]=None,
