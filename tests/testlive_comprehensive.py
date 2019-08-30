@@ -1932,8 +1932,9 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(communities[0].name, 'CIRCL Private Sector Information Sharing Community - aka MISPPRIV')
         community = self.admin_misp_connector.get_community(communities[1], pythonify=True)
         self.assertEqual(community.name, 'CIRCL n/g CSIRT information sharing community - aka MISP')
-        r = self.admin_misp_connector.request_community_access(community, mock=False)
-        self.assertTrue(r['message'], 'Request sent.')
+        # FIXME: Add more tests later.
+        # r = self.admin_misp_connector.request_community_access(community, mock=False)
+        # self.assertTrue(r['message'], 'Request sent.')
         r = self.admin_misp_connector.request_community_access(community, mock=True)
         mail = email.message_from_string(r['headers'] + '\n' + r['message'])
         for k, v in mail.items():
