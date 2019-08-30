@@ -16,6 +16,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Temp disable tests for request_community_access. [Raphaël Vinot]
 - Disable test for now. [Raphaël Vinot]
 - Bump Changelog. [Raphaël Vinot]
@@ -33,6 +34,7 @@ Changes
 
 Fix
 ~~~
+- Event delegation was incorrect. [Raphaël Vinot]
 - Automatically skip empty string in add_attribute at object level.
   [Raphaël Vinot]
 
