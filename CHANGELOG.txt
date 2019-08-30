@@ -16,6 +16,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Dependencies. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Re-enable a few test cases. [Raphaël Vinot]
@@ -38,6 +39,10 @@ Fix
 - [Travis] User cannot create tag, Travis was right. [Raphaël Vinot]
 - Invalid tests in last commit. [Raphaël Vinot]
 - [Travis] Slight changes to help debug on Travis. [Raphaël Vinot]
+
+Other
+~~~~~
+- Bump Changelog. [Raphaël Vinot]
 
 
 v2.4.113 (2019-08-16)
