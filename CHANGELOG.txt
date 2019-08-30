@@ -2,6 +2,44 @@ Changelog
 =========
 
 
+v2.4.114 (2019-08-30)
+---------------------
+
+New
+~~~
+- [Community] Request access. [Raphaël Vinot]
+- Initial support for communities. [Raphaël Vinot]
+- Contact event reporter. [Raphaël Vinot]
+- Delegate Event. [Raphaël Vinot]
+
+  And more test cases
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Re-enable a few test cases. [Raphaël Vinot]
+- Make sure delegation is enabled while testing. [Raphaël Vinot]
+- [tests] Check the type of the response. [Raphaël Vinot]
+- New local key in Org/Orgc. [Raphaël Vinot]
+- [tests] Do not run in fast mode by default. [Raphaël Vinot]
+- Better handling of sightings. [Raphaël Vinot]
+- [Travis] Add more debug. [Raphaël Vinot]
+- Add test related to travis. [Raphaël Vinot]
+
+Fix
+~~~
+- Automatically skip empty string in add_attribute at object level.
+  [Raphaël Vinot]
+
+  Fix #439
+
+  Re-enable test cases.
+- [Travis] User cannot create tag, Travis was right. [Raphaël Vinot]
+- Invalid tests in last commit. [Raphaël Vinot]
+- [Travis] Slight changes to help debug on Travis. [Raphaël Vinot]
+
+
 v2.4.113 (2019-08-16)
 ---------------------
 
@@ -16,6 +54,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Improve test cases. [Raphaël Vinot]
 - Update and improve live testing. [Raphaël Vinot]
