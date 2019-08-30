@@ -17,6 +17,8 @@ import urllib3
 import time
 from uuid import uuid4
 
+import email
+
 import logging
 logging.disable(logging.CRITICAL)
 
@@ -1924,11 +1926,19 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
+    @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_communities(self):
         communities = self.admin_misp_connector.communities(pythonify=True)
         self.assertEqual(communities[0].name, 'CIRCL Private Sector Information Sharing Community - aka MISPPRIV')
         community = self.admin_misp_connector.get_community(communities[1], pythonify=True)
         self.assertEqual(community.name, 'CIRCL n/g CSIRT information sharing community - aka MISP')
+        r = self.admin_misp_connector.request_community_access(community, mock=False)
+        self.assertTrue(r['message'], 'Request sent.')
+        r = self.admin_misp_connector.request_community_access(community, mock=True)
+        mail = email.message_from_string(r['headers'] + '\n' + r['message'])
+        for k, v in mail.items():
+            if k == 'To':
+                self.assertEqual(v, 'info@circl.lu')
 
     def test_upload_stix(self):
         # FIXME https://github.com/MISP/MISP/issues/4892

@@ -1740,10 +1740,24 @@ class ExpandedPyMISP(PyMISP):
         c.from_dict(**community)
         return c
 
-    def request_community_access(self, community: Union[MISPCommunity, int, str, UUID], sync: bool=False,
-                                 requestor_org_description: str='', requestor_email_user: str='',
-                                 message: str='', anonymise: bool=False):
-        pass
+    def request_community_access(self, community: Union[MISPCommunity, int, str, UUID],
+                                 requestor_email_address: str=None,
+                                 requestor_gpg_key: str=None,
+                                 requestor_organisation_name: str=None,
+                                 requestor_organisation_uuid: str=None,
+                                 requestor_organisation_description: str=None,
+                                 message: str=None, sync: bool=False,
+                                 anonymise_requestor_server: bool=False,
+                                 mock: bool=False):
+        community_id = self.__get_uuid_or_id_from_abstract_misp(community)
+        to_post = {'org_name': requestor_organisation_name,
+                   'org_uuid': requestor_organisation_uuid,
+                   'org_description': requestor_organisation_description,
+                   'email': requestor_email_address, 'gpgkey': requestor_gpg_key,
+                   'message': message, 'anonymise': anonymise_requestor_server, 'sync': sync,
+                   'mock': mock}
+        r = self._prepare_request('POST', f'communities/requestAccess/{community_id}', data=to_post)
+        return self._check_response(r, expect_json=True)
 
     # ## END Communities ###
 
