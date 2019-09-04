@@ -41,6 +41,8 @@ if (3, 0) <= sys.version_info < (3, 6):
 else:
     OLD_PY3 = False
 
+if sys.version_info >= (3, 6):
+    from pathlib import Path
 
 try:
     from dateutil.parser import parse
@@ -120,6 +122,7 @@ class MISPAttribute(AbstractMISP):
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
         self.__strict = strict
+        self._data = None
         self.uuid = str(uuid.uuid4())
         self.ShadowAttribute = []
         self.Sighting = []
@@ -251,7 +254,6 @@ class MISPAttribute(AbstractMISP):
         # other possible values
         if kwargs.get('data'):
             self.data = kwargs.pop('data')
-            self._load_data()
         if kwargs.get('id'):
             self.id = int(kwargs.pop('id'))
         if kwargs.get('event_id'):
@@ -294,7 +296,7 @@ class MISPAttribute(AbstractMISP):
 
     def to_dict(self):
         to_return = super(MISPAttribute, self).to_dict()
-        if to_return.get('data'):
+        if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
         return to_return
 
@@ -328,9 +330,20 @@ class MISPAttribute(AbstractMISP):
             return False
         return True
 
-    def _load_data(self):
-        if not isinstance(self.data, BytesIO):
-            self.data = BytesIO(base64.b64decode(self.data))
+    @property
+    def data(self):
+        return self._data if self._data else None
+
+    @data.setter
+    def data(self, data):
+        if sys.version_info >= (3, 6):
+            if isinstance(data, Path):
+                with data.open('rb') as f:
+                    self._data = BytesIO(f.read())
+        if isinstance(data, (str, bytes)):
+            self._data = BytesIO(base64.b64decode(data))
+        elif isinstance(data, BytesIO):
+            self._data = data
         if self.type == 'malware-sample':
             try:
                 with ZipFile(self.data) as f:
