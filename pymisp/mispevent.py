@@ -336,6 +336,9 @@ class MISPAttribute(AbstractMISP):
 
     @data.setter
     def data(self, data):
+        if sys.version_info <= (3, ):
+            if isinstance(data, unicode):
+                self._data = BytesIO(base64.b64decode(data.encode()))
         if sys.version_info >= (3, 6):
             if isinstance(data, Path):
                 with data.open('rb') as f:
