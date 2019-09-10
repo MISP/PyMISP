@@ -114,6 +114,19 @@ logger = logging.getLogger('pymisp')
 logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', format=pymisp.FORMAT)
 ```
 
+## Test cases
+
+1. The content of `mispevent.py` is tested on every commit
+2. The tests cases that require a running MISP instance can be run the following way:
+
+
+```bash
+# From a pipenv
+
+nosetests-3.4 -s --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py:TestComprehensive.[test_name]
+
+```
+
 ## Documentation
 
 [PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/latest/pymisp.pdf).
