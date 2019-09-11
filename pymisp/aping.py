@@ -96,10 +96,11 @@ class ExpandedPyMISP(PyMISP):
         self.category_type_mapping = self.describe_types['category_type_mappings']
         self.sane_default = self.describe_types['sane_defaults']
 
-    @property
-    def remote_acl(self):
-        """This should return an empty list, unless the ACL is outdated."""
-        response = self._prepare_request('GET', 'events/queryACL.json')
+    def remote_acl(self, debug_type: str='findMissingFunctionNames'):
+        """This should return an empty list, unless the ACL is outdated.
+        debug_type can only be printAllFunctionNames, findMissingFunctionNames, or printRoleAccess
+        """
+        response = self._prepare_request('GET', f'events/queryACL/{debug_type}')
         return self._check_response(response, expect_json=True)
 
     @property
@@ -1343,6 +1344,7 @@ class ExpandedPyMISP(PyMISP):
                to_ids: Optional[Union[ToIDSType, List[ToIDSType]]]=None,
                deleted: Optional[str]=None,
                include_event_uuid: Optional[bool]=None, includeEventUuid: Optional[bool]=None,
+               include_event_tags: Optional[bool]=None, includeEventTags: Optional[bool]=None,
                event_timestamp: Optional[DateTypes]=None,
                sg_reference_only: Optional[bool]=None,
                eventinfo: Optional[str]=None,
@@ -1378,6 +1380,7 @@ class ExpandedPyMISP(PyMISP):
         :param to_ids: By default all attributes are returned that match the other filter parameters, irregardless of their to_ids setting. To restrict the returned data set to to_ids only attributes set this parameter to 1. 0 for the ones with to_ids set to False.
         :param deleted: If this parameter is set to 1, it will return soft-deleted attributes along with active ones. By using "only" as a parameter it will limit the returned data set to soft-deleted data only.
         :param include_event_uuid: Instead of just including the event ID, also include the event UUID in each of the attributes.
+        :param include_event_tags: Include the event level tags in each of the attributes.
         :param event_timestamp: Only return attributes from events that have received a modification after the given timestamp.
         :param sg_reference_only: If this flag is set, sharing group objects will not be included, instead only the sharing group ID is set.
         :param eventinfo: Filter on the event's info field.
@@ -1396,6 +1399,7 @@ class ExpandedPyMISP(PyMISP):
         :param last: synonym for publish_timestamp
         :param enforceWarninglist: synonym for enforce_warninglist
         :param includeEventUuid: synonym for include_event_uuid
+        :param includeEventTags: synonym for include_event_tags
         :param includeContext: synonym for include_context
 
         '''
@@ -1416,6 +1420,8 @@ class ExpandedPyMISP(PyMISP):
             enforce_warninglist = enforceWarninglist
         if includeEventUuid is not None:
             include_event_uuid = includeEventUuid
+        if includeEventTags is not None:
+            include_event_tags = includeEventTags
         if includeContext is not None:
             include_context = includeContext
         if includeCorrelations is not None:
@@ -1462,6 +1468,7 @@ class ExpandedPyMISP(PyMISP):
             query['to_ids'] = to_ids
         query['deleted'] = deleted
         query['includeEventUuid'] = self._make_misp_bool(include_event_uuid)
+        query['includeEventTags'] = self._make_misp_bool(include_event_tags)
         if event_timestamp is not None:
             if isinstance(event_timestamp, (list, tuple)):
                 query['event_timestamp'] = (self._make_timestamp(event_timestamp[0]), self._make_timestamp(event_timestamp[1]))
@@ -2035,7 +2042,11 @@ class ExpandedPyMISP(PyMISP):
 
         if 400 <= response.status_code < 500:
             # The server returns a json message with the error details
-            error_message = response.json()
+            try:
+                error_message = response.json()
+            except Exception:
+                raise MISPServerError(f'Error code {response.status_code}:\n{response.text}')
+
             logger.error(f'Something went wrong ({response.status_code}): {error_message}')
             return {'errors': (response.status_code, error_message)}
 

@@ -19,12 +19,15 @@ from uuid import uuid4
 
 import email
 
+from collections import defaultdict
+
 import logging
 logging.disable(logging.CRITICAL)
 
 try:
     from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
+    from pymisp.exceptions import MISPServerError
 except ImportError:
     if sys.version_info < (3, 6):
         print('This test suite requires Python 3.6+, breaking.')
@@ -632,6 +635,7 @@ class TestComprehensive(unittest.TestCase):
         # First has one text attribute
         second = self.create_simple_event()
         second.info = 'foo blah'
+        second.add_tag('tlp:amber___test')
         second.set_date('2018-09-01')
         second.add_attribute('ip-src', '8.8.8.8')
         # second has two attributes: text and ip-src
@@ -728,6 +732,9 @@ class TestComprehensive(unittest.TestCase):
             # include_event_uuid
             attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, include_event_uuid=True)
             self.assertEqual(attributes[0].event_uuid, second.uuid)
+            # include_event_tags
+            attributes = self.user_misp_connector.search(controller='attributes', eventid=second.id, include_event_tags=True)
+            self.assertEqual(attributes[0].tags[0].name, 'tlp:amber___test')
 
             # event_timestamp
             time.sleep(1)
@@ -1344,6 +1351,8 @@ class TestComprehensive(unittest.TestCase):
         for user in users:
             if user.email == users_email:
                 break
+        else:
+            raise Exception('Unable to find that user')
         self.assertEqual(user.email, users_email)
         # get user
         user = self.user_misp_connector.get_user(pythonify=True)
