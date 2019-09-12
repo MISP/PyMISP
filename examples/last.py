@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import ExpandedPyMISP
-from keys import misp_url, misp_key, misp_verifycert
+from keys import misp_url, misp_key, misp_verifycert, misp_client_cert
 import argparse
 import os
 
@@ -23,7 +23,12 @@ if __name__ == '__main__':
         print('Output file already exists, aborted.')
         exit(0)
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    if misp_client_cert == '':
+        misp_client_cert = None
+    else:
+        misp_client_cert = (misp_client_cert)
+
+    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, cert=misp_client_cert)
     result = misp.search(publish_timestamp=args.last, limit=args.limit, page=args.page, pythonify=True)
 
     if not result:
