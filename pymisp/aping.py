@@ -154,7 +154,9 @@ class ExpandedPyMISP(PyMISP):
 
     def update_misp(self):
         response = self._prepare_request('POST', '/servers/update')
-        return self._check_response(response, lenient_response_type=True)
+        if self._old_misp((2, 4, 116), '2020-01-01', sys._getframe().f_code.co_name):
+            return self._check_response(response, lenient_response_type=True)
+        return self._check_response(response, expect_json=True)
 
     def set_server_setting(self, setting: str, value: Union[str, int, bool], force: bool=False):
         data = {'value': value, 'force': force}
@@ -190,10 +192,14 @@ class ExpandedPyMISP(PyMISP):
             to_return.append(e)
         return to_return
 
-    def get_event(self, event: Union[MISPEvent, int, str, UUID], pythonify: bool=False):
+    def get_event(self, event: Union[MISPEvent, int, str, UUID], deleted: [bool, int, list]=False, pythonify: bool=False):
         '''Get an event from a MISP instance'''
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
-        event = self._prepare_request('GET', f'events/{event_id}')
+        if deleted:
+            data = {'deleted': deleted}
+            event = self._prepare_request('POST', f'events/view/{event_id}', data=data)
+        else:
+            event = self._prepare_request('GET', f'events/view/{event_id}')
         event = self._check_response(event, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in event:
             return event
@@ -423,10 +429,13 @@ class ExpandedPyMISP(PyMISP):
         a.from_dict(**updated_attribute)
         return a
 
-    def delete_attribute(self, attribute: Union[MISPAttribute, int, str, UUID]):
+    def delete_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], hard: bool=False):
         '''Delete an attribute from a MISP instance'''
         attribute_id = self.__get_uuid_or_id_from_abstract_misp(attribute)
-        response = self._prepare_request('POST', f'attributes/delete/{attribute_id}')
+        data = {}
+        if hard:
+            data['hard'] = 1
+        response = self._prepare_request('POST', f'attributes/delete/{attribute_id}', data=data)
         response = self._check_response(response, expect_json=True)
         if ('errors' in response and response['errors'][0] == 403
                 and response['errors'][1]['message'] == 'You do not have permission to do that.'):

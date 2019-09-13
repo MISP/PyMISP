@@ -1503,16 +1503,23 @@ class TestComprehensive(unittest.TestCase):
             attribute = self.user_misp_connector.update_attribute({'comment': 'blah'}, second.attributes[0].id)
             self.assertTrue(isinstance(attribute, MISPShadowAttribute), attribute)
             self.assertEqual(attribute.value, second.attributes[0].value)
+            second = self.admin_misp_connector.get_event(second, pythonify=True)
+            self.assertEqual(len(second.attributes), 3)
             # Delete attribute owned by someone else
             response = self.user_misp_connector.delete_attribute(second.attributes[1])
             self.assertTrue(response['success'])
             # Delete attribute owned by user
             response = self.admin_misp_connector.delete_attribute(second.attributes[1])
             self.assertEqual(response['message'], 'Attribute deleted.')
+            # Hard delete
+            response = self.admin_misp_connector.delete_attribute(second.attributes[0], hard=True)
+            self.assertEqual(response['message'], 'Attribute deleted.')
+            new_second = self.admin_misp_connector.get_event(second, deleted=[0, 1], pythonify=True)
+            self.assertEqual(len(new_second.attributes), 2)
 
             # Test attribute*S*
             attributes = self.admin_misp_connector.attributes()
-            self.assertEqual(len(attributes), 7)
+            self.assertEqual(len(attributes), 6)
             # attributes = self.user_misp_connector.attributes()
             # self.assertEqual(len(attributes), 5)
             # Test event*S*
@@ -1555,7 +1562,7 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.update_user({'email': 'testusr@user.local'}, self.test_usr)
 
     def test_live_acl(self):
-        missing_acls = self.admin_misp_connector.remote_acl
+        missing_acls = self.admin_misp_connector.remote_acl()
         self.assertEqual(missing_acls, [], msg=missing_acls)
 
     def test_roles(self):

@@ -446,7 +446,7 @@ class PyMISP(object):  # pragma: no cover
             url = urljoin(self.root_url, 'attributes/delete/{}/1'.format(attribute_id))
         else:
             url = urljoin(self.root_url, 'attributes/delete/{}'.format(attribute_id))
-        response = self._prepare_request('GET', url)
+        response = self._prepare_request('POST', url)
         return self._check_response(response)
 
     @deprecated(reason="Use ExpandedPyMISP.push_event_to_ZMQ", action='default')
