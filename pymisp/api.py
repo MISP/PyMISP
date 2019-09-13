@@ -75,7 +75,7 @@ class PyMISP(object):  # pragma: no cover
 
     warning_2020()
 
-    @deprecated(reason="Please use ExpandedPyMISP instead (requires Python 3.6+). This class will be an alias of ExpandedPyMISP early 2020 and your code will most probably fail.")
+    @deprecated(reason="Please use ExpandedPyMISP instead (requires Python 3.6+). This class will be an alias of ExpandedPyMISP early 2020 and your code will most probably fail.", action='default')
     def __init__(self, url, key, ssl=True, out_type='json', debug=None, proxies=None, cert=None, asynch=False, auth=None, tool=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
@@ -132,13 +132,13 @@ class PyMISP(object):  # pragma: no cover
     def __repr__(self):
         return '<{self.__class__.__name__}(url={self.root_url})'.format(self=self)
 
-    @deprecated(reason="Use ExpandedPyMISP.remote_acl", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.remote_acl", version='2.4.111', action='default')
     def get_live_query_acl(self):
         """This should return an empty list, unless the ACL is outdated."""
         response = self._prepare_request('GET', urljoin(self.root_url, 'events/queryACL.json'))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.describe_types_local", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.describe_types_local", version='2.4.110', action='default')
     def get_local_describe_types(self):
         with open(os.path.join(self.resources_path, 'describeTypes.json'), 'rb') as f:
             if OLD_PY3:
@@ -147,7 +147,7 @@ class PyMISP(object):  # pragma: no cover
                 describe_types = json.load(f)
         return describe_types['result']
 
-    @deprecated(reason="Use ExpandedPyMISP.describe_types_remote", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.describe_types_remote", version='2.4.110', action='default')
     def get_live_describe_types(self):
         response = self._prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
         describe_types = self._check_response(response)
@@ -334,7 +334,7 @@ class PyMISP(object):  # pragma: no cover
     # ############### Simple REST API ################
     # ################################################
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def test_connection(self):
         """Test the auth key"""
         response = self.get_version()
@@ -342,7 +342,7 @@ class PyMISP(object):  # pragma: no cover
             raise PyMISPError(response.get('errors')[0])
         return True
 
-    @deprecated(reason="Use ExpandedPyMISP.search_index")
+    @deprecated(reason="Use ExpandedPyMISP.search_index", action='default')
     def get_index(self, filters=None):
         """Return the index.
 
@@ -355,7 +355,7 @@ class PyMISP(object):  # pragma: no cover
             response = self._prepare_request('POST', url, json.dumps(filters))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_event")
+    @deprecated(reason="Use ExpandedPyMISP.get_event", action='default')
     def get_event(self, event_id):
         """Get an event
 
@@ -365,7 +365,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_object")
+    @deprecated(reason="Use ExpandedPyMISP.get_object", action='default')
     def get_object(self, obj_id):
         """Get an object
 
@@ -375,7 +375,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_attribute")
+    @deprecated(reason="Use ExpandedPyMISP.get_attribute", action='default')
     def get_attribute(self, att_id):
         """Get an attribute
 
@@ -385,7 +385,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_event")
+    @deprecated(reason="Use ExpandedPyMISP.add_event", action='default')
     def add_event(self, event):
         """Add a new event
 
@@ -399,7 +399,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, event)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_attribute")
+    @deprecated(reason="Use ExpandedPyMISP.update_attribute", action='default')
     def update_attribute(self, attribute_id, attribute):
         """Update an attribute
 
@@ -414,7 +414,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, attribute)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_event")
+    @deprecated(reason="Use ExpandedPyMISP.update_event", action='default')
     def update_event(self, event_id, event):
         """Update an event
 
@@ -429,7 +429,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, event)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.delete_event")
+    @deprecated(reason="Use ExpandedPyMISP.delete_event", action='default')
     def delete_event(self, event_id):
         """Delete an event
 
@@ -439,7 +439,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('DELETE', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.delete_attribute")
+    @deprecated(reason="Use ExpandedPyMISP.delete_attribute", action='default')
     def delete_attribute(self, attribute_id, hard_delete=False):
         """Delete an attribute by ID"""
         if hard_delete:
@@ -449,14 +449,14 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.push_event_to_ZMQ")
+    @deprecated(reason="Use ExpandedPyMISP.push_event_to_ZMQ", action='default')
     def pushEventToZMQ(self, event_id):
         """Force push an event on ZMQ"""
         url = urljoin(self.root_url, 'events/pushEventToZMQ/{}.json'.format(event_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.direct_call")
+    @deprecated(reason="Use ExpandedPyMISP.direct_call", action='default')
     def direct_call(self, url, data=None):
         '''Very lightweight call that posts a data blob (python dictionary or json string) on the URL'''
         url = urljoin(self.root_url, url)
@@ -472,12 +472,12 @@ class PyMISP(object):  # pragma: no cover
     # ############### Event handling ###############
     # ##############################################
 
-    @deprecated(reason="Use ExpandedPyMISP.get_event")
+    @deprecated(reason="Use ExpandedPyMISP.get_event", action='default')
     def get(self, eid):
         """Get an event by event ID"""
         return self.get_event(eid)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_event")
+    @deprecated(reason="Use ExpandedPyMISP.update_event", action='default')
     def update(self, event):
         """Update an event by ID"""
         e = self._make_mispevent(event)
@@ -487,7 +487,7 @@ class PyMISP(object):  # pragma: no cover
             eid = e.id
         return self.update_event(eid, e)
 
-    @deprecated(reason="Use ExpandedPyMISP.publish")
+    @deprecated(reason="Use ExpandedPyMISP.publish", action='default')
     def fast_publish(self, event_id, alert=False):
         """Does the same as the publish method, but just try to publish the event
         even with one single HTTP GET.
@@ -500,7 +500,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.publish")
+    @deprecated(reason="Use ExpandedPyMISP.publish", action='default')
     def publish(self, event, alert=True):
         """Publish event (with or without alert email)
         :param event: pass event or event id (as string or int) to publish
@@ -516,28 +516,28 @@ class PyMISP(object):  # pragma: no cover
             event_id = full_event.id
         return self.fast_publish(event_id, alert)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_event")
+    @deprecated(reason="Use ExpandedPyMISP.update_event", action='default')
     def change_threat_level(self, event, threat_level_id):
         """Change the threat level of an event"""
         e = self._make_mispevent(event)
         e.threat_level_id = threat_level_id
         return self.update(e)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_event")
+    @deprecated(reason="Use ExpandedPyMISP.update_event", action='default')
     def change_analysis_status(self, event, analysis_status):
         """Change the analysis status of an event"""
         e = self._make_mispevent(event)
         e.analysis = analysis_status
         return self.update(e)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_event")
+    @deprecated(reason="Use ExpandedPyMISP.update_event", action='default')
     def change_distribution(self, event, distribution):
         """Change the distribution of an event"""
         e = self._make_mispevent(event)
         e.distribution = distribution
         return self.update(e)
 
-    @deprecated(reason="Use ExpandedPyMISP.change_sharing_group_on_entity")
+    @deprecated(reason="Use ExpandedPyMISP.change_sharing_group_on_entity", action='default')
     def change_sharing_group(self, event, sharing_group_id):
         """Change the sharing group of an event"""
         e = self._make_mispevent(event)
@@ -547,13 +547,13 @@ class PyMISP(object):  # pragma: no cover
         e.sharing_group_id = sharing_group_id  # Set new sharing group id
         return self.update(e)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_event")
+    @deprecated(reason="Use ExpandedPyMISP.add_event", action='default')
     def new_event(self, distribution=None, threat_level_id=None, analysis=None, info=None, date=None, published=False, orgc_id=None, org_id=None, sharing_group_id=None):
         """Create and add a new event"""
         misp_event = self._prepare_full_event(distribution, threat_level_id, analysis, info, date, published, orgc_id, org_id, sharing_group_id)
         return self.add_event(misp_event)
 
-    @deprecated(reason="Use ExpandedPyMISP.tag", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.tag", version='2.4.111', action='default')
     def tag(self, uuid, tag):
         """Tag an event or an attribute"""
         if not self._valid_uuid(uuid):
@@ -563,7 +563,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.untag", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.untag", version='2.4.111', action='default')
     def untag(self, uuid, tag):
         """Untag an event or an attribute"""
         if not self._valid_uuid(uuid):
@@ -650,7 +650,7 @@ class PyMISP(object):  # pragma: no cover
                 event_id = e['uuid']
         return event_id
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_named_attribute(self, event, type_value, value, category=None, to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add one or more attributes to an existing event"""
         attributes = []
@@ -658,7 +658,7 @@ class PyMISP(object):  # pragma: no cover
             attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution, **kwargs))
         return self._send_attributes(event, attributes, proposal)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_hashes(self, event, category='Artifacts dropped', filename=None, md5=None, sha1=None, sha256=None, ssdeep=None, comment=None, to_ids=True, distribution=None, proposal=False, **kwargs):
         """Add hashe(s) to an existing event"""
 
@@ -679,22 +679,22 @@ class PyMISP(object):  # pragma: no cover
 
         return self._send_attributes(event, attributes, proposal)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def av_detection_link(self, event, link, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add AV detection link(s)"""
         return self.add_named_attribute(event, 'link', link, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_detection_name(self, event, name, category='Antivirus detection', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add AV detection name(s)"""
         return self.add_named_attribute(event, 'text', name, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_filename(self, event, filename, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add filename(s)"""
         return self.add_named_attribute(event, 'filename', filename, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_attachment(self, event, attachment, category='Artifacts dropped', to_ids=False, comment=None, distribution=None, proposal=False, filename=None, **kwargs):
         """Add an attachment to the MISP event
 
@@ -739,7 +739,7 @@ class PyMISP(object):  # pragma: no cover
         # Send it on its way
         return self.add_named_attribute(event, 'attachment', filename, category, to_ids, comment, distribution, proposal, data=encodedData, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_regkey(self, event, regkey, rvalue=None, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add a registry key"""
         if rvalue:
@@ -753,7 +753,7 @@ class PyMISP(object):  # pragma: no cover
         attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_regkeys(self, event, regkeys_values, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add a registry keys"""
         attributes = []
@@ -769,7 +769,7 @@ class PyMISP(object):  # pragma: no cover
             attributes.append(self._prepare_full_attribute(category, type_value, value, to_ids, comment, distribution))
         return self._send_attributes(event, attributes, proposal)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_pattern(self, event, pattern, in_file=True, in_memory=False, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add a pattern(s) in file or in memory"""
         if not (in_file or in_memory):
@@ -777,7 +777,7 @@ class PyMISP(object):  # pragma: no cover
         itemtype = 'pattern-in-file' if in_file else 'pattern-in-memory'
         return self.add_named_attribute(event, itemtype, pattern, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_pipe(self, event, named_pipe, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add pipes(s)"""
         def scrub(s):
@@ -787,7 +787,7 @@ class PyMISP(object):  # pragma: no cover
         attributes = list(map(scrub, self._one_or_more(named_pipe)))
         return self.add_named_attribute(event, 'named pipe', attributes, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_mutex(self, event, mutex, category='Artifacts dropped', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add mutex(es)"""
         def scrub(s):
@@ -797,34 +797,34 @@ class PyMISP(object):  # pragma: no cover
         attributes = list(map(scrub, self._one_or_more(mutex)))
         return self.add_named_attribute(event, 'mutex', attributes, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_yara(self, event, yara, category='Payload delivery', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add yara rule(es)"""
         return self.add_named_attribute(event, 'yara', yara, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Network attributes #####
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_ipdst(self, event, ipdst, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add destination IP(s)"""
         return self.add_named_attribute(event, 'ip-dst', ipdst, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_ipsrc(self, event, ipsrc, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add source IP(s)"""
         return self.add_named_attribute(event, 'ip-src', ipsrc, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_hostname(self, event, hostname, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add hostname(s)"""
         return self.add_named_attribute(event, 'hostname', hostname, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_domain(self, event, domain, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add domain(s)"""
         return self.add_named_attribute(event, 'domain', domain, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_domain_ip(self, event, domain, ip, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add domain|ip"""
         if isinstance(ip, str):
@@ -832,143 +832,143 @@ class PyMISP(object):  # pragma: no cover
         composed = list(map(lambda x: '%s|%s' % (domain, x), ip))
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_domains_ips(self, event, domain_ips, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add multiple domain|ip"""
         composed = list(map(lambda x: '%s|%s' % (x[0], x[1]), domain_ips.items()))
         return self.add_named_attribute(event, 'domain|ip', composed, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_url(self, event, url, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add url(s)"""
         return self.add_named_attribute(event, 'url', url, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_useragent(self, event, useragent, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add user agent(s)"""
         return self.add_named_attribute(event, 'user-agent', useragent, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_traffic_pattern(self, event, pattern, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add pattern(s) in traffic"""
         return self.add_named_attribute(event, 'pattern-in-traffic', pattern, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_snort(self, event, snort, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add SNORT rule(s)"""
         return self.add_named_attribute(event, 'snort', snort, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_asn(self, event, asn, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add network ASN"""
         return self.add_named_attribute(event, 'AS', asn, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_net_other(self, event, netother, category='Network activity', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add a free text entry"""
         return self.add_named_attribute(event, 'other', netother, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Email attributes #####
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_email_src(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add a source email"""
         return self.add_named_attribute(event, 'email-src', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_email_dst(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add a destination email"""
         return self.add_named_attribute(event, 'email-dst', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_email_subject(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an email subject"""
         return self.add_named_attribute(event, 'email-subject', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_email_attachment(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an email atachment"""
         return self.add_named_attribute(event, 'email-attachment', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_email_header(self, event, email, category='Payload delivery', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an email header"""
         return self.add_named_attribute(event, 'email-header', email, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Target attributes #####
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_target_email(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an target email"""
         return self.add_named_attribute(event, 'target-email', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_target_user(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an target user"""
         return self.add_named_attribute(event, 'target-user', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_target_machine(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an target machine"""
         return self.add_named_attribute(event, 'target-machine', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_target_org(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an target organisation"""
         return self.add_named_attribute(event, 'target-org', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_target_location(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an target location"""
         return self.add_named_attribute(event, 'target-location', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_target_external(self, event, target, category='Targeting data', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an target external"""
         return self.add_named_attribute(event, 'target-external', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Attribution attributes #####
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_threat_actor(self, event, target, category='Attribution', to_ids=True, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an threat actor"""
         return self.add_named_attribute(event, 'threat-actor', target, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Internal reference attributes #####
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_internal_link(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an internal link"""
         return self.add_named_attribute(event, 'link', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_internal_comment(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an internal comment"""
         return self.add_named_attribute(event, 'comment', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_internal_text(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an internal text"""
         return self.add_named_attribute(event, 'text', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_internal_other(self, event, reference, category='Internal reference', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add an internal reference (type other)"""
         return self.add_named_attribute(event, 'other', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
     # ##### Other attributes #####
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_other_comment(self, event, reference, category='Other', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add other comment"""
         return self.add_named_attribute(event, 'comment', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_other_counter(self, event, reference, category='Other', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add other counter"""
         return self.add_named_attribute(event, 'counter', reference, category, to_ids, comment, distribution, proposal, **kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute and MISPAttribute", action='default')
     def add_other_text(self, event, reference, category='Other', to_ids=False, comment=None, distribution=None, proposal=False, **kwargs):
         """Add other text"""
         return self.add_named_attribute(event, 'text', reference, category, to_ids, comment, distribution, proposal, **kwargs)
@@ -1023,7 +1023,7 @@ class PyMISP(object):  # pragma: no cover
             binblob = filepath_or_bytes
         return base64.b64encode(binblob).decode()
 
-    @deprecated(reason="Use MISPEvent.add_attribute with the expand='binary' key")
+    @deprecated(reason="Use MISPEvent.add_attribute with the expand='binary' key", action='default')
     def upload_sample(self, filename, filepath_or_bytes, event_id, distribution=None,
                       to_ids=True, category=None, comment=None, info=None,
                       analysis=None, threat_level_id=None, advanced_extraction=False):
@@ -1034,7 +1034,7 @@ class PyMISP(object):  # pragma: no cover
         to_post['request']['files'] = [{'filename': filename, 'data': self._encode_file_to_upload(filepath_or_bytes)}]
         return self._upload_sample(to_post, event_id)
 
-    @deprecated(reason="Use MISPEvent.add_attribute with the expand='binary' key")
+    @deprecated(reason="Use MISPEvent.add_attribute with the expand='binary' key", action='default')
     def upload_samplelist(self, filepaths, event_id, distribution=None,
                           to_ids=True, category=None, comment=None, info=None,
                           analysis=None, threat_level_id=None, advanced_extraction=False):
@@ -1075,7 +1075,7 @@ class PyMISP(object):  # pragma: no cover
             response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_attribute_proposal", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.get_attribute_proposal", version='2.4.111', action='default')
     def proposal_view(self, event_id=None, proposal_id=None):
         """View a proposal"""
         if proposal_id is not None and event_id is not None:
@@ -1086,22 +1086,22 @@ class PyMISP(object):  # pragma: no cover
             id = proposal_id
         return self.__query_proposal('view', id)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_attribute_proposal", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.add_attribute_proposal", version='2.4.111', action='default')
     def proposal_add(self, event_id, attribute):
         """Add a proposal"""
         return self.__query_proposal('add', event_id, attribute)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_attribute_proposal", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.update_attribute_proposal", version='2.4.111', action='default')
     def proposal_edit(self, attribute_id, attribute):
         """Edit a proposal"""
         return self.__query_proposal('edit', attribute_id, attribute)
 
-    @deprecated(reason="Use ExpandedPyMISP.accept_attribute_proposal", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.accept_attribute_proposal", version='2.4.111', action='default')
     def proposal_accept(self, proposal_id):
         """Accept a proposal"""
         return self.__query_proposal('accept', proposal_id)
 
-    @deprecated(reason="Use ExpandedPyMISP.discard_attribute_proposal", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.discard_attribute_proposal", version='2.4.111', action='default')
     def proposal_discard(self, proposal_id):
         """Discard a proposal"""
         return self.__query_proposal('discard', proposal_id)
@@ -1110,7 +1110,7 @@ class PyMISP(object):  # pragma: no cover
     # ###### Attribute update ######
     # ##############################
 
-    @deprecated(reason="Use ExpandedPyMISP.update_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.update_attribute and MISPAttribute", action='default')
     def change_toids(self, attribute_uuid, to_ids):
         """Change the toids flag"""
         if to_ids not in [0, 1]:
@@ -1118,13 +1118,13 @@ class PyMISP(object):  # pragma: no cover
         query = {"to_ids": to_ids}
         return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
 
-    @deprecated(reason="Use ExpandedPyMISP.update_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.update_attribute and MISPAttribute", action='default')
     def change_comment(self, attribute_uuid, comment):
         """Change the comment of attribute"""
         query = {"comment": comment}
         return self.__query('edit/{}'.format(attribute_uuid), query, controller='attributes')
 
-    @deprecated(reason="Use ExpandedPyMISP.update_attribute and MISPAttribute")
+    @deprecated(reason="Use ExpandedPyMISP.update_attribute and MISPAttribute", action='default')
     def change_disable_correlation(self, attribute_uuid, disable_correlation):
         """Change the disable_correlation flag"""
         possible_values = [0, 1, False, True]
@@ -1137,7 +1137,7 @@ class PyMISP(object):  # pragma: no cover
     # ###### Attribute update ######
     # ##############################
 
-    @deprecated(reason="Use ExpandedPyMISP.freetext", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.freetext", version='2.4.111', action='default')
     def freetext(self, event_id, string, adhereToWarninglists=False, distribution=None, returnMetaAttributes=False):
         """Pass a text to the freetext importer"""
         query = {"value": string}
@@ -1170,7 +1170,7 @@ class PyMISP(object):  # pragma: no cover
             response = self._prepare_request('POST', url, json.dumps(query))
             return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.search_index", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search_index", version='2.4.111', action='default')
     def search_index(self, published=None, eventid=None, tag=None, datefrom=None,
                      dateuntil=None, eventinfo=None, threatlevel=None, distribution=None,
                      analysis=None, attribute=None, org=None, async_callback=None, normalize=False,
@@ -1234,7 +1234,7 @@ class PyMISP(object):  # pragma: no cover
                 res = to_return
             return res
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def search_all(self, value):
         """Search a value in the whole database"""
         query = {'value': value, 'searchall': 1}
@@ -1259,7 +1259,7 @@ class PyMISP(object):  # pragma: no cover
                 to_return.append('!{}'.format(not_values))
         return to_return
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def search(self, controller='events', async_callback=None, **kwargs):
         """Search via the Rest API
 
@@ -1365,7 +1365,7 @@ class PyMISP(object):  # pragma: no cover
         # Create a session, make it async if and only if we have a callback
         return self.__query('restSearch', query, controller, async_callback)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_attribute", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.get_attribute", version='2.4.111', action='default')
     def get_attachment(self, attribute_id):
         """Get an attachement (not a malware sample) by attribute ID.
         Returns the attachment as a bytestream, or a dictionary containing the error message.
@@ -1382,7 +1382,7 @@ class PyMISP(object):  # pragma: no cover
             # content contains the attachment in binary
             return response.content
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def get_yara(self, event_id):
         """Get the yara rules from an event"""
         url = urljoin(self.root_url, 'attributes/restSearch')
@@ -1396,7 +1396,7 @@ class PyMISP(object):  # pragma: no cover
         rules = '\n\n'.join([a['value'] for a in result['response']['Attribute']])
         return True, rules
 
-    @deprecated(reason="Use ExpandedPyMISP.search. Open an issue if needed.", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search. Open an issue if needed.", version='2.4.111', action='default')
     def download_samples(self, sample_hash=None, event_id=None, all_samples=False, unzip=True):
         """Download samples, by hash or event ID. If there are multiple samples in one event, use the all_samples switch
 
@@ -1437,7 +1437,7 @@ class PyMISP(object):  # pragma: no cover
                 details.append([f['event_id'], "{0}.zip".format(f['filename']), zipped])
         return True, details
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def download_last(self, last):
         """Download the last published events.
 
@@ -1456,7 +1456,7 @@ class PyMISP(object):  # pragma: no cover
             timestamp = (pydate - datetime(1970, 1, 1, tzinfo=timezone.utc)).total_seconds()
         return timestamp
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def get_events_last_modified(self, search_from, search_to=None):
         """Download the last modified events.
 
@@ -1476,7 +1476,7 @@ class PyMISP(object):  # pragma: no cover
 
     # ########## Tags ##########
 
-    @deprecated(reason="Use ExpandedPyMISP.tags", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.tags", version='2.4.111', action='default')
     def get_all_tags(self, quiet=False):
         """Get all the tags used on the instance"""
         url = urljoin(self.root_url, 'tags')
@@ -1490,7 +1490,7 @@ class PyMISP(object):  # pragma: no cover
                 to_return.append(tag['name'])
             return to_return
 
-    @deprecated(reason="Use ExpandedPyMISP.add_tag", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.add_tag", version='2.4.111', action='default')
     def new_tag(self, name=None, colour="#00ace6", exportable=False, hide_tag=False):
         """Create a new tag"""
         to_post = {'Tag': {'name': name, 'colour': colour, 'exportable': exportable, 'hide_tag': hide_tag}}
@@ -1500,12 +1500,12 @@ class PyMISP(object):  # pragma: no cover
 
     # ########## Version ##########
 
-    @deprecated(reason="Use ExpandedPyMISP.version", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.version", version='2.4.110', action='default')
     def get_api_version(self):
         """Returns the current version of PyMISP installed on the system"""
         return {'version': __version__}
 
-    @deprecated(reason="Use ExpandedPyMISP.pymisp_version_master", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.pymisp_version_master", version='2.4.110', action='default')
     def get_api_version_master(self):
         """Get the most recent version of PyMISP from github"""
         r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/master/pymisp/__init__.py')
@@ -1515,21 +1515,21 @@ class PyMISP(object):  # pragma: no cover
         else:
             return {'error': 'Impossible to retrieve the version of the master branch.'}
 
-    @deprecated(reason="Use ExpandedPyMISP.recommended_pymisp_version", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.recommended_pymisp_version", version='2.4.110', action='default')
     def get_recommended_api_version(self):
         """Returns the recommended API version from the server"""
         url = urljoin(self.root_url, 'servers/getPyMISPVersion.json')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.misp_instance_version", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.misp_instance_version", version='2.4.110', action='default')
     def get_version(self):
         """Returns the version of the instance."""
         url = urljoin(self.root_url, 'servers/getVersion.json')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.misp_instance_version_master", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.misp_instance_version_master", version='2.4.110', action='default')
     def get_version_master(self):
         """Get the most recent version from github"""
         r = requests.get('https://raw.githubusercontent.com/MISP/MISP/2.4/VERSION.json')
@@ -1541,7 +1541,7 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Statistics ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.attributes_statistics", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.attributes_statistics", version='2.4.110', action='default')
     def get_attributes_statistics(self, context='type', percentage=None):
         """Get attributes statistics from the MISP instance"""
         if (context != 'category'):
@@ -1553,7 +1553,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.tags_statistics", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.tags_statistics", version='2.4.110', action='default')
     def get_tags_statistics(self, percentage=None, name_sort=None):
         """Get tags statistics from the MISP instance"""
         if percentage is not None:
@@ -1568,7 +1568,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.users_statistics", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.users_statistics", version='2.4.110', action='default')
     def get_users_statistics(self, context='data'):
         """Get users statistics from the MISP instance"""
         availables_contexts = ['data', 'orgs', 'users', 'tags', 'attributehistogram', 'sightings', 'attackMatrix']
@@ -1580,21 +1580,21 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Sightings ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.add_sighting", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.add_sighting", version='2.4.110', action='default')
     def sighting_per_id(self, attribute_id):
         """Add a sighting to an attribute (by attribute ID)"""
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_sighting", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.add_sighting", version='2.4.110', action='default')
     def sighting_per_uuid(self, attribute_uuid):
         """Add a sighting to an attribute (by attribute UUID)"""
         url = urljoin(self.root_url, 'sightings/add/{}'.format(attribute_uuid))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_sighting", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.add_sighting", version='2.4.110', action='default')
     def set_sightings(self, sightings):
         """Push a sighting (python dictionary or MISPSighting) or a list of sightings"""
         if not isinstance(sightings, list):
@@ -1608,14 +1608,14 @@ class PyMISP(object):  # pragma: no cover
             response = self._prepare_request('POST', url, to_post)
         return self._check_response(response)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def sighting_per_json(self, json_file):
         """Push a sighting (JSON file)"""
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
             return self.set_sightings(jdata)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_sighting", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.add_sighting", version='2.4.110', action='default')
     def sighting(self, value=None, uuid=None, id=None, source=None, type=None, timestamp=None, **kwargs):
         """ Set a single sighting.
         :value: Value of the attribute the sighting is related too. Pushing this object
@@ -1630,7 +1630,7 @@ class PyMISP(object):  # pragma: no cover
         s.from_dict(value=value, uuid=uuid, id=id, source=source, type=type, timestamp=timestamp, **kwargs)
         return self.set_sightings(s)
 
-    @deprecated(reason="Use ExpandedPyMISP.sightings", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.sightings", version='2.4.110', action='default')
     def sighting_list(self, element_id, scope="attribute", org_id=False):
         """Get the list of sighting.
         :param element_id: could be an event id or attribute id
@@ -1661,7 +1661,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.search_sightings", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.search_sightings", version='2.4.110', action='default')
     def search_sightings(self, context='', async_callback=None, **kwargs):
         """Search sightings via the REST API
         :context: The context of the search, could be attribute, event or False
@@ -1711,7 +1711,7 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Sharing Groups ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.sharing_groups", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.sharing_groups", version='2.4.110', action='default')
     def get_sharing_groups(self):
         """Get the existing sharing groups"""
         url = urljoin(self.root_url, 'sharing_groups.json')
@@ -1720,15 +1720,15 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Users ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.users", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.users", version='2.4.110', action='default')
     def get_users_list(self):
         return self._rest_list('admin/users')
 
-    @deprecated(reason="Use ExpandedPyMISP.get_user", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.get_user", version='2.4.110', action='default')
     def get_user(self, user_id='me'):
         return self._rest_view('users', user_id)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_user", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.add_user", version='2.4.110', action='default')
     def add_user(self, email, org_id=None, role_id=None, **kwargs):
         if isinstance(email, MISPUser):
             # Very dirty, allow to call that from ExpandedPyMISP
@@ -1738,7 +1738,7 @@ class PyMISP(object):  # pragma: no cover
             new_user.from_dict(email=email, org_id=org_id, role_id=role_id, **kwargs)
         return self._rest_add('admin/users', new_user)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def add_user_json(self, json_file):
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
@@ -1746,17 +1746,17 @@ class PyMISP(object):  # pragma: no cover
         new_user.from_dict(**jdata)
         return self._rest_add('admin/users', new_user)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def get_user_fields_list(self):
         return self._rest_get_parameters('admin/users')
 
-    @deprecated(reason="Use ExpandedPyMISP.update_user", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.update_user", version='2.4.110', action='default')
     def edit_user(self, user_id, **kwargs):
         edit_user = MISPUser()
         edit_user.from_dict(**kwargs)
         return self._rest_edit('admin/users', edit_user, user_id)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def edit_user_json(self, json_file, user_id):
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
@@ -1764,24 +1764,24 @@ class PyMISP(object):  # pragma: no cover
         new_user.from_dict(**jdata)
         return self._rest_edit('admin/users', new_user, user_id)
 
-    @deprecated(reason="Use ExpandedPyMISP.delete_user", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.delete_user", version='2.4.110', action='default')
     def delete_user(self, user_id):
         return self._rest_delete('admin/users', user_id)
 
     # ############## Organisations ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.organisations", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.organisations", version='2.4.110', action='default')
     def get_organisations_list(self, scope="local"):
         scope = scope.lower()
         if scope not in ["local", "external", "all"]:
             raise ValueError("Authorized fields are 'local','external' or 'all'")
         return self._rest_list('organisations/index/scope:{}'.format(scope))
 
-    @deprecated(reason="Use ExpandedPyMISP.get_organisation", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.get_organisation", version='2.4.110', action='default')
     def get_organisation(self, organisation_id):
         return self._rest_view('organisations', organisation_id)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_organisation", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.add_organisation", version='2.4.110', action='default')
     def add_organisation(self, name, **kwargs):
         if isinstance(name, MISPOrganisation):
             # Very dirty, allow to call that from ExpandedPyMISP
@@ -1795,7 +1795,7 @@ class PyMISP(object):  # pragma: no cover
                         raise PyMISPError('A remote org MUST have a valid uuid')
         return self._rest_add('admin/organisations', new_org)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def add_organisation_json(self, json_file):
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
@@ -1803,17 +1803,17 @@ class PyMISP(object):  # pragma: no cover
         new_org.from_dict(**jdata)
         return self._rest_add('admin/organisations', new_org)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def get_organisation_fields_list(self):
         return self._rest_get_parameters('admin/organisations')
 
-    @deprecated(reason="Use ExpandedPyMISP.update_organisation", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.update_organisation", version='2.4.110', action='default')
     def edit_organisation(self, org_id, **kwargs):
         edit_org = MISPOrganisation()
         edit_org.from_dict(**kwargs)
         return self._rest_edit('admin/organisations', edit_org, org_id)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def edit_organisation_json(self, json_file, org_id):
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
@@ -1821,7 +1821,7 @@ class PyMISP(object):  # pragma: no cover
         edit_org.from_dict(**jdata)
         return self._rest_edit('admin/organisations', edit_org, org_id)
 
-    @deprecated(reason="Use ExpandedPyMISP.delete_organisation", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.delete_organisation", version='2.4.110', action='default')
     def delete_organisation(self, org_id):
         return self._rest_delete('admin/organisations', org_id)
 
@@ -1879,7 +1879,7 @@ class PyMISP(object):  # pragma: no cover
             server['delete_client_cert'] = delete_client_cert
         return server
 
-    @deprecated(reason="Use ExpandedPyMISP.add_server", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.add_server", version='2.4.110', action='default')
     def add_server(self, url, name, authkey, organisation, internal=None, push=False,
                    pull=False, self_signed=False, push_rules="", pull_rules="",
                    submitted_cert=None, submitted_client_cert=None):
@@ -1890,7 +1890,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(new_server))
         return self._check_response(response)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def add_server_json(self, json_file):
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
@@ -1898,7 +1898,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(jdata))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_server", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.update_server", version='2.4.110', action='default')
     def edit_server(self, server_id, url=None, name=None, authkey=None, organisation=None, internal=None, push=False,
                     pull=False, self_signed=False, push_rules="", pull_rules="",
                     submitted_cert=None, submitted_client_cert=None, delete_cert=None, delete_client_cert=None):
@@ -1909,7 +1909,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(new_server))
         return self._check_response(response)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def edit_server_json(self, json_file, server_id):
         with open(json_file, 'rb') as f:
             jdata = json.load(f)
@@ -1917,7 +1917,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(jdata))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.server_pull", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.server_pull", version='2.4.110', action='default')
     def server_pull(self, server_id, event_id=None):
         url = urljoin(self.root_url, 'servers/pull/{}'.format(server_id))
         if event_id is not None:
@@ -1925,7 +1925,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.server_push", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.server_push", version='2.4.110', action='default')
     def server_push(self, server_id, event_id=None):
         url = urljoin(self.root_url, 'servers/push/{}'.format(server_id))
         if event_id is not None:
@@ -1933,7 +1933,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.servers", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.servers", version='2.4.110', action='default')
     def servers_index(self):
         url = urljoin(self.root_url, 'servers/index')
         response = self._prepare_request('GET', url)
@@ -1941,7 +1941,7 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Roles ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.roles", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.roles", version='2.4.110', action='default')
     def get_roles_list(self):
         """Get the list of existing roles"""
         url = urljoin(self.root_url, 'roles')
@@ -1950,14 +1950,14 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Tags ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.tags", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.tags", version='2.4.110', action='default')
     def get_tags_list(self):
         """Get the list of existing tags."""
         url = urljoin(self.root_url, 'tags')
         response = self._prepare_request('GET', url)
         return self._check_response(response)['Tag']
 
-    @deprecated(reason="Use ExpandedPyMISP.get_tag", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.get_tag", version='2.4.110', action='default')
     def get_tag(self, tag_id):
         """Get a tag by id."""
         url = urljoin(self.root_url, 'tags/view/{}'.format(tag_id))
@@ -1988,7 +1988,7 @@ class PyMISP(object):  # pragma: no cover
 
         return {'Tag': tag}
 
-    @deprecated(reason="Use ExpandedPyMISP.update_tag", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.update_tag", version='2.4.110', action='default')
     def edit_tag(self, tag_id, name=None, colour=None, exportable=None, hide_tag=None, org_id=None, count=None,
                  user_id=None, numerical_value=None, attribute_count=None):
         """Edit only the provided parameters of a tag."""
@@ -1999,7 +1999,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(new_tag))
         return self._check_response(response)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def edit_tag_json(self, json_file, tag_id):
         """Edit the tag using a json file."""
         with open(json_file, 'rb') as f:
@@ -2008,13 +2008,13 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(jdata))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.enable_tag", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.enable_tag", version='2.4.110', action='default')
     def enable_tag(self, tag_id):
         """Enable a tag by id."""
         response = self.edit_tag(tag_id, hide_tag=False)
         return response
 
-    @deprecated(reason="Use ExpandedPyMISP.disable_tag", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.disable_tag", version='2.4.110', action='default')
     def disable_tag(self, tag_id):
         """Disable a tag by id."""
         response = self.edit_tag(tag_id, hide_tag=True)
@@ -2022,35 +2022,35 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Taxonomies ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.taxonomies", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.taxonomies", version='2.4.110', action='default')
     def get_taxonomies_list(self):
         """Get all the taxonomies."""
         url = urljoin(self.root_url, 'taxonomies')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_taxonomy", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.get_taxonomy", version='2.4.110', action='default')
     def get_taxonomy(self, taxonomy_id):
         """Get a taxonomy by id."""
         url = urljoin(self.root_url, 'taxonomies/view/{}'.format(taxonomy_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_taxonomies", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.update_taxonomies", version='2.4.110', action='default')
     def update_taxonomies(self):
         """Update all the taxonomies."""
         url = urljoin(self.root_url, 'taxonomies/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.enable_taxonomy", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.enable_taxonomy", version='2.4.110', action='default')
     def enable_taxonomy(self, taxonomy_id):
         """Enable a taxonomy by id."""
         url = urljoin(self.root_url, 'taxonomies/enable/{}'.format(taxonomy_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.disable_taxonomy", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.disable_taxonomy", version='2.4.110', action='default')
     def disable_taxonomy(self, taxonomy_id):
         """Disable a taxonomy by id."""
         self.disable_taxonomy_tags(taxonomy_id)
@@ -2058,14 +2058,14 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_taxonomy", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.get_taxonomy", version='2.4.110', action='default')
     def get_taxonomy_tags_list(self, taxonomy_id):
         """Get all the tags of a taxonomy by id."""
         url = urljoin(self.root_url, 'taxonomies/view/{}'.format(taxonomy_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)["entries"]
 
-    @deprecated(reason="Use ExpandedPyMISP.enable_taxonomy_tags", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.enable_taxonomy_tags", version='2.4.110', action='default')
     def enable_taxonomy_tags(self, taxonomy_id):
         """Enable all the tags of a taxonomy by id."""
         enabled = self.get_taxonomy(taxonomy_id)['Taxonomy']['enabled']
@@ -2074,7 +2074,7 @@ class PyMISP(object):  # pragma: no cover
             response = self._prepare_request('POST', url)
             return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.disable_taxonomy_tags", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.disable_taxonomy_tags", version='2.4.110', action='default')
     def disable_taxonomy_tags(self, taxonomy_id):
         """Disable all the tags of a taxonomy by id."""
         url = urljoin(self.root_url, 'taxonomies/disableTag/{}'.format(taxonomy_id))
@@ -2083,28 +2083,28 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## WarningLists ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.warninglists", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.warninglists", version='2.4.110', action='default')
     def get_warninglists(self):
         """Get all the warninglists."""
         url = urljoin(self.root_url, 'warninglists')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_warninglist", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.get_warninglist", version='2.4.110', action='default')
     def get_warninglist(self, warninglist_id):
         """Get a warninglist by id."""
         url = urljoin(self.root_url, 'warninglists/view/{}'.format(warninglist_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_warninglists", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.update_warninglists", version='2.4.110', action='default')
     def update_warninglists(self):
         """Update all the warninglists."""
         url = urljoin(self.root_url, 'warninglists/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Please ExpandedPyMISP.toggle_warninglist instead.")
+    @deprecated(reason="Please ExpandedPyMISP.toggle_warninglist instead.", action='default')
     def toggle_warninglist(self, warninglist_id=None, warninglist_name=None, force_enable=None):
         '''Toggle (enable/disable) the status of a warninglist by ID.
         :param warninglist_id: ID of the WarningList
@@ -2127,17 +2127,17 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(query))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.enable_warninglist", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.enable_warninglist", version='2.4.110', action='default')
     def enable_warninglist(self, warninglist_id):
         """Enable a warninglist by id."""
         return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=True)
 
-    @deprecated(reason="Use ExpandedPyMISP.disable_warninglist", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.disable_warninglist", version='2.4.110', action='default')
     def disable_warninglist(self, warninglist_id):
         """Disable a warninglist by id."""
         return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=False)
 
-    @deprecated(reason='Use ExpandedPyMISP.values_in_warninglist', version='2.4.110')
+    @deprecated(reason='Use ExpandedPyMISP.values_in_warninglist', version='2.4.110', action='default')
     def check_warninglist(self, value):
         """Check if IOC values are in warninglist"""
         url = urljoin(self.root_url, 'warninglists/checkValue')
@@ -2146,35 +2146,35 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## NoticeLists ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.noticelists", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.noticelists", version='2.4.110', action='default')
     def get_noticelists(self):
         """Get all the noticelists."""
         url = urljoin(self.root_url, 'noticelists')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_noticelist", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.get_noticelist", version='2.4.110', action='default')
     def get_noticelist(self, noticelist_id):
         """Get a noticelist by id."""
         url = urljoin(self.root_url, 'noticelists/view/{}'.format(noticelist_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_noticelists", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.update_noticelists", version='2.4.110', action='default')
     def update_noticelists(self):
         """Update all the noticelists."""
         url = urljoin(self.root_url, 'noticelists/update')
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.enable_noticelist", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.enable_noticelist", version='2.4.110', action='default')
     def enable_noticelist(self, noticelist_id):
         """Enable a noticelist by id."""
         url = urljoin(self.root_url, 'noticelists/enableNoticelist/{}/true'.format(noticelist_id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.disable_noticelist", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.disable_noticelist", version='2.4.110', action='default')
     def disable_noticelist(self, noticelist_id):
         """Disable a noticelist by id."""
         url = urljoin(self.root_url, 'noticelists/enableNoticelist/{}'.format(noticelist_id))
@@ -2183,21 +2183,21 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Galaxies/Clusters ##################
 
-    @deprecated(reason="Use ExpandedPyMISP.galaxies", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.galaxies", version='2.4.110', action='default')
     def get_galaxies(self):
         """Get all the galaxies."""
         url = urljoin(self.root_url, 'galaxies')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_galaxy", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.get_galaxy", version='2.4.110', action='default')
     def get_galaxy(self, galaxy_id):
         """Get a galaxy by id."""
         url = urljoin(self.root_url, 'galaxies/view/{}'.format(galaxy_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_galaxies", version='2.4.110')
+    @deprecated(reason="Use ExpandedPyMISP.update_galaxies", version='2.4.110', action='default')
     def update_galaxies(self):
         """Update all the galaxies."""
         url = urljoin(self.root_url, 'galaxies/update')
@@ -2210,14 +2210,14 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Suricata ##############
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def download_all_suricata(self):
         """Download all suricata rules events."""
         url = urljoin(self.root_url, 'events/nids/suricata/download')
         response = self._prepare_request('GET', url, output_type='rules')
         return response
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def download_suricata_rule_event(self, event_id):
         """Download one suricata rule event.
 
@@ -2229,7 +2229,7 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## Text ###############
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def get_all_attributes_txt(self, type_attr, tags=False, eventId=False, allowNonIDS=False, date_from=False, date_to=False, last=False, enforceWarninglist=False, allowNotPublished=False):
         """Get all attributes from a specific type as plain text. Only published and IDS flagged attributes are exported, except if stated otherwise."""
         url = urljoin(self.root_url, 'attributes/text/download/%s/%s/%s/%s/%s/%s/%s/%s/%s' % (type_attr, tags, eventId, allowNonIDS, date_from, date_to, last, enforceWarninglist, allowNotPublished))
@@ -2238,7 +2238,7 @@ class PyMISP(object):  # pragma: no cover
 
     # ############## STIX ##############
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def get_stix_event(self, event_id=None, with_attachments=False, from_date=False, to_date=False, tags=False):
         """Get an event/events in STIX format"""
         if tags:
@@ -2250,11 +2250,11 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def get_stix(self, **kwargs):
         return self.get_stix_event(**kwargs)
 
-    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.search", version='2.4.111', action='default')
     def get_csv(self, eventid=None, attributes=[], object_attributes=[], misp_types=[], context=False, ignore=False, last=None):
         """Get MISP values in CSV format
         :param eventid: The event ID to query
@@ -2327,17 +2327,17 @@ class PyMISP(object):  # pragma: no cover
     # ########   Feed   #########
     # ###########################
 
-    @deprecated(reason="Use ExpandedPyMISP.feeds instead")
+    @deprecated(reason="Use ExpandedPyMISP.feeds instead", action='default')
     def get_feeds_list(self):
         """Get the content of all the feeds"""
         return self._rest_list('feeds')
 
-    @deprecated(reason="Use ExpandedPyMISP.get_feed instead")
+    @deprecated(reason="Use ExpandedPyMISP.get_feed instead", action='default')
     def get_feed(self, feed_id):
         """Get the content of a single feed"""
         return self._rest_view('feeds', feed_id)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_feed instead")
+    @deprecated(reason="Use ExpandedPyMISP.add_feed instead", action='default')
     def add_feed(self, source_format, url, name, input_source, provider, **kwargs):
         """Delete a feed"""
         new_feed = MISPFeed()
@@ -2345,70 +2345,70 @@ class PyMISP(object):  # pragma: no cover
                            input_source=input_source, provider=provider)
         return self._rest_add('feeds', new_feed)
 
-    @deprecated(reason="Not used, open an issue if required.", version='2.4.110')
+    @deprecated(reason="Not used, open an issue if required.", version='2.4.110', action='default')
     def get_feed_fields_list(self):
         return self._rest_get_parameters('feeds')
 
-    @deprecated(reason="Use ExpandedPyMISP.update_feed instead")
+    @deprecated(reason="Use ExpandedPyMISP.update_feed instead", action='default')
     def edit_feed(self, feed_id, **kwargs):
         """Delete a feed"""
         edit_feed = MISPFeed()
         edit_feed.from_dict(**kwargs)
         return self._rest_edit('feeds', edit_feed)
 
-    @deprecated(reason="Use ExpandedPyMISP.delete_feed instead")
+    @deprecated(reason="Use ExpandedPyMISP.delete_feed instead", action='default')
     def delete_feed(self, feed_id):
         """Delete a feed"""
         return self._rest_delete('feeds', feed_id)
 
-    @deprecated(reason="Use ExpandedPyMISP.fetch_feed instead")
+    @deprecated(reason="Use ExpandedPyMISP.fetch_feed instead", action='default')
     def fetch_feed(self, feed_id):
         """Fetch one single feed"""
         url = urljoin(self.root_url, 'feeds/fetchFromFeed/{}'.format(feed_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.cache_all_feeds instead")
+    @deprecated(reason="Use ExpandedPyMISP.cache_all_feeds instead", action='default')
     def cache_feeds_all(self):
         """ Cache all the feeds"""
         url = urljoin(self.root_url, 'feeds/cacheFeeds/all')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.cache_feeds instead")
+    @deprecated(reason="Use ExpandedPyMISP.cache_feeds instead", action='default')
     def cache_feed(self, feed_id):
         """Cache a specific feed"""
         url = urljoin(self.root_url, 'feeds/cacheFeeds/{}'.format(feed_id))
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.cache_freetext_feeds instead")
+    @deprecated(reason="Use ExpandedPyMISP.cache_freetext_feeds instead", action='default')
     def cache_feeds_freetext(self):
         """Cache all the freetext feeds"""
         url = urljoin(self.root_url, 'feeds/cacheFeeds/freetext')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.cache_misp_feeds instead")
+    @deprecated(reason="Use ExpandedPyMISP.cache_misp_feeds instead", action='default')
     def cache_feeds_misp(self):
         """Cache all the MISP feeds"""
         url = urljoin(self.root_url, 'feeds/cacheFeeds/misp')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.compare_feeds instead")
+    @deprecated(reason="Use ExpandedPyMISP.compare_feeds instead", action='default')
     def compare_feeds(self):
         """Generate the comparison matrix for all the MISP feeds"""
         url = urljoin(self.root_url, 'feeds/compareFeeds')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_feed instead")
+    @deprecated(reason="Use ExpandedPyMISP.get_feed instead", action='default')
     def view_feed(self, feed_ids):
         """Alias for get_feed"""
         return self.get_feed(feed_ids)
 
-    @deprecated(reason="Use ExpandedPyMISP.feeds instead")
+    @deprecated(reason="Use ExpandedPyMISP.feeds instead", action='default')
     def view_feeds(self):
         """Alias for get_feeds_list"""
         return self.get_feeds_list()
@@ -2417,7 +2417,7 @@ class PyMISP(object):  # pragma: no cover
     # ### Sharing Groups ###
     # ######################
 
-    @deprecated(reason="Use ExpandedPyMISP.add_sharing_group", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.add_sharing_group", version='2.4.111', action='default')
     def add_sharing_group(self, name, releasability, description, active=True):
         """Add a new sharing group, which includes the organisation associated
         with the API key and the local server
@@ -2433,7 +2433,7 @@ class PyMISP(object):  # pragma: no cover
                          description=description, active=active)
         return self._rest_add('sharing_groups', new_sg)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_org_to_sharing_group", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.add_org_to_sharing_group", version='2.4.111', action='default')
     def sharing_group_org_add(self, sharing_group, organisation, extend=False):
         '''Add an organisation to a sharing group.
         :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
@@ -2445,7 +2445,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.remove_org_from_sharing_group", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.remove_org_from_sharing_group", version='2.4.111', action='default')
     def sharing_group_org_remove(self, sharing_group, organisation):
         '''Remove an organisation from a sharing group.
         :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
@@ -2456,7 +2456,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_server_to_sharing_group", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.add_server_to_sharing_group", version='2.4.111', action='default')
     def sharing_group_server_add(self, sharing_group, server, all_orgs=False):
         '''Add a server to a sharing group.
         :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
@@ -2468,7 +2468,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.remove_server_from_sharing_group", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.remove_server_from_sharing_group", version='2.4.111', action='default')
     def sharing_group_server_remove(self, sharing_group, server):
         '''Remove a server from a sharing group.
         :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
@@ -2479,7 +2479,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(to_jsonify))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.delete_sharing_group", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.delete_sharing_group", version='2.4.111', action='default')
     def delete_sharing_group(self, sharing_group):
         """Delete a sharing group
         :sharing_group: Sharing group's local instance ID, or Sharing group's global uuid
@@ -2490,7 +2490,7 @@ class PyMISP(object):  # pragma: no cover
     # ###   Objects   ###
     # ###################
 
-    @deprecated(reason="Use ExpandedPyMISP.add_object", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.add_object", version='2.4.111', action='default')
     def add_object(self, event_id, *args, **kwargs):
         """Add an object
         :param event_id: Event ID of the event to attach the object to
@@ -2514,7 +2514,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, misp_object.to_json())
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.update_object", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.update_object", version='2.4.111', action='default')
     def edit_object(self, misp_object, object_id=None):
         """Edit an existing object"""
         if object_id:
@@ -2529,35 +2529,35 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, misp_object.to_json())
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.delete_object", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.delete_object", version='2.4.111', action='default')
     def delete_object(self, id):
         """Deletes an object"""
         url = urljoin(self.root_url, 'objects/delete/{}'.format(id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.add_object_reference", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.add_object_reference", version='2.4.111', action='default')
     def add_object_reference(self, misp_object_reference):
         """Add a reference to an object"""
         url = urljoin(self.root_url, 'object_references/add')
         response = self._prepare_request('POST', url, misp_object_reference.to_json())
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.delete_object_reference", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.delete_object_reference", version='2.4.111', action='default')
     def delete_object_reference(self, id):
         """Deletes a reference to an object"""
         url = urljoin(self.root_url, 'object_references/delete/{}'.format(id))
         response = self._prepare_request('POST', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.object_templates", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.object_templates", version='2.4.111', action='default')
     def get_object_templates_list(self):
         """Returns the list of Object templates available on the MISP instance"""
         url = urljoin(self.root_url, 'objectTemplates')
         response = self._prepare_request('GET', url)
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.get_object_template", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.get_object_template", version='2.4.111', action='default')
     def get_object_template(self, object_uuid):
         """Gets the full object template corresponting the UUID passed as parameter"""
         url = urljoin(self.root_url, 'objectTemplates/view/{}'.format(object_uuid))
@@ -2567,7 +2567,7 @@ class PyMISP(object):  # pragma: no cover
             return response['ObjectTemplate']['id']
         return response
 
-    @deprecated(reason="Use ExpandedPyMISP.get_object_template - open an issue if you really need this method.", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.get_object_template - open an issue if you really need this method.", version='2.4.111', action='default')
     def get_object_template_id(self, object_uuid):
         """Gets the template ID corresponting the UUID passed as parameter"""
         template = self.get_object_template(object_uuid)
@@ -2576,7 +2576,7 @@ class PyMISP(object):  # pragma: no cover
         # Contains the error message.
         return template
 
-    @deprecated(reason="Use ExpandedPyMISP.update_object_templates", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.update_object_templates", version='2.4.111', action='default')
     def update_object_templates(self):
         url = urljoin(self.root_url, 'objectTemplates/update')
         response = self._prepare_request('POST', url)
@@ -2586,7 +2586,7 @@ class PyMISP(object):  # pragma: no cover
     # ####### Deprecated ########
     # ###########################
 
-    @deprecated(reason="Use ExpandedPyMISP.tag", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.tag", version='2.4.111', action='default')
     def add_tag(self, event, tag, attribute=False):
         if attribute:
             to_post = {'request': {'Attribute': {'id': event['id'], 'tag': tag}}}
@@ -2601,7 +2601,7 @@ class PyMISP(object):  # pragma: no cover
         response = self._prepare_request('POST', url, json.dumps(to_post))
         return self._check_response(response)
 
-    @deprecated(reason="Use ExpandedPyMISP.untag", version='2.4.111')
+    @deprecated(reason="Use ExpandedPyMISP.untag", version='2.4.111', action='default')
     def remove_tag(self, event, tag, attribute=False):
         if attribute:
             to_post = {'request': {'Attribute': {'id': event['id'], 'tag': tag}}}
