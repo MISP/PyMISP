@@ -54,7 +54,6 @@ class TestBasic(unittest.TestCase):
                                u'Object': [], u'Org': {'local': True, u'name': u'ORGNAME'},
                                u'Orgc': {'local': True, u'name': u'ORGNAME'},
                                u'Galaxy': [],
-                               u'sighting_timestamp': '0',
                                u'threat_level_id': u'1'}}
         self.assertEqual(event, to_check, 'Failed at creating a new Event')
         return int(event_id)
