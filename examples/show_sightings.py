@@ -84,6 +84,7 @@ def search_sightings(misp, from_timestamp, end_timestamp):
                     try:
                         attribute = misp.get_attribute(attribute_id)
                     except Exception as e:
+                        print("Unable to fetch attribute")
                         continue
 
                     if 'Attribute' in attribute and 'uuid' in attribute['Attribute']:
@@ -119,17 +120,17 @@ if __name__ == '__main__':
 
     # Get all attribute sightings
     found_sightings = search_sightings(misp, start_timestamp, end_timestamp)
-    if found_sightings is not None and len(found_sightings) > 0:
+    if found_sightings:
         for s in found_sightings:
             if int(s['type']) == 0:
-                type = 'TP'
+                s_type = 'TP'
             else:
-                type = 'FP'
+                s_type = 'FP'
             date_sighting = datetime.fromtimestamp(int(s['date_sighting'])).strftime(ts_format)
             source = s['source']
             if not s['source']:
                 source = 'N/A'
-            report_sightings = report_sightings + '%s for [%s] (%s) in event [%s] (%s) on %s from %s\n' % (type, s['value'], s['attribute_id'], s['event_title'], s['event_id'], date_sighting, source)
+            report_sightings = report_sightings + '%s for [%s] (%s) in event [%s] (%s) on %s from %s\n' % (s_type, s['value'], s['attribute_id'], s['event_title'], s['event_id'], date_sighting, source)
 
         set_drift_timestamp(end_timestamp, drift_timestamp_path)
     else:
