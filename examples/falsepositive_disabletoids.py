@@ -74,7 +74,7 @@ if __name__ == '__main__':
             event_id = attribute['event_id']
 
             # Only do something if there is a sighting
-            if 'Sighting' in attribute and len(attribute['Sighting']) > 0:
+            if 'Sighting' in attribute:
 
                 for sighting in attribute['Sighting']:
                     if int(sighting['date_sighting']) > minimal_date_sighting:
@@ -99,7 +99,7 @@ if __name__ == '__main__':
                     misp.publish(event_id)
 
     # Only send/print the report if it contains content
-    if len(report_changes) > 0:
+    if report_changes:
         if args.mail:
             if args.mailoptions:
                 mailoptions = args.mailoptions.split(';')
