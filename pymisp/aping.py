@@ -1965,13 +1965,13 @@ class ExpandedPyMISP(PyMISP):
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: Union[AbstractMISP, str], tag: str):
+    def tag(self, misp_entity: Union[AbstractMISP, str], tag: str, local: bool=False):
         """Tag an event or an attribute. misp_entity can be a UUID"""
         if 'uuid' in misp_entity:
             uuid = misp_entity.uuid
         else:
             uuid = misp_entity
-        to_post = {'uuid': uuid, 'tag': tag}
+        to_post = {'uuid': uuid, 'tag': tag, 'local': local}
         response = self._prepare_request('POST', 'tags/attachTagToObject', data=to_post)
         return self._check_response(response, expect_json=True)
 
