@@ -1413,7 +1413,7 @@ class ExpandedPyMISP(PyMISP):
 
         '''
 
-        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2']
+        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings']
 
         if controller not in ['events', 'attributes', 'objects', 'sightings']:
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
@@ -1726,6 +1726,19 @@ class ExpandedPyMISP(PyMISP):
             ml = MISPLog()
             ml.from_dict(**l)
             to_return.append(ml)
+        return to_return
+
+    def search_feeds(self, value: Optional[SearchParameterTypes]=None, pythonify: Optional[bool]=False):
+        '''Search in the feeds cached on the servers'''
+        response = self._prepare_request('POST', '/feeds/searchCaches', data={'value': value})
+        normalized_response = self._check_response(response, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in normalized_response:
+            return normalized_response
+        to_return = []
+        for feed in normalized_response:
+            f = MISPFeed()
+            f.from_dict(**feed)
+            to_return.append(f)
         return to_return
 
     # ## END Search methods ###
