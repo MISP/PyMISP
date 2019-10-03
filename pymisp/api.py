@@ -19,7 +19,7 @@ from deprecated import deprecated
 from . import __version__, warning_2020
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject, MISPSharingGroup
-from .abstract import AbstractMISP, MISPEncode
+from .abstract import AbstractMISP, MISPEncode, MISPFileCache
 
 logger = logging.getLogger('pymisp')
 
@@ -37,11 +37,6 @@ try:
 except ImportError:
     HAVE_REQUESTS = False
 
-if (3, 0) <= sys.version_info < (3, 6):
-    OLD_PY3 = True
-else:
-    OLD_PY3 = False
-
 try:
     from requests_futures.sessions import FuturesSession
     ASYNC_OK = True
@@ -58,7 +53,7 @@ Response (if any):
 {}'''
 
 
-class PyMISP(object):  # pragma: no cover
+class PyMISP(MISPFileCache):  # pragma: no cover
     """Python API for MISP
 
     :param url: URL of the MISP instance you want to connect to
@@ -140,11 +135,7 @@ class PyMISP(object):  # pragma: no cover
 
     @deprecated(reason="Use ExpandedPyMISP.describe_types_local", version='2.4.110')
     def get_local_describe_types(self):
-        with open(os.path.join(self.resources_path, 'describeTypes.json'), 'rb') as f:
-            if OLD_PY3:
-                describe_types = json.loads(f.read().decode())
-            else:
-                describe_types = json.load(f)
+        describe_types = self._load_json(os.path.join(self.resources_path, 'describeTypes.json'))
         return describe_types['result']
 
     @deprecated(reason="Use ExpandedPyMISP.describe_types_remote", version='2.4.110')

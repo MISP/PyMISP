@@ -109,11 +109,7 @@ class MISPAttribute(AbstractMISP):
         super(MISPAttribute, self).__init__()
         if not describe_types:
             ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-                if OLD_PY3:
-                    t = json.loads(f.read().decode())
-                else:
-                    t = json.load(f)
+            t = self._load_json(os.path.join(ressources_path, 'describeTypes.json'))
             describe_types = t['result']
         self.__categories = describe_types['categories']
         self._types = describe_types['types']
@@ -411,26 +407,14 @@ class MISPEvent(AbstractMISP):
         super(MISPEvent, self).__init__(**kwargs)
         ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
-            with open(os.path.join(ressources_path, 'schema.json'), 'rb') as f:
-                if OLD_PY3:
-                    self.__json_schema = json.loads(f.read().decode())
-                else:
-                    self.__json_schema = json.load(f)
+            self.__json_schema = self._load_json(os.path.join(ressources_path, 'schema.json'))
         else:
-            with open(os.path.join(ressources_path, 'schema-lax.json'), 'rb') as f:
-                if OLD_PY3:
-                    self.__json_schema = json.loads(f.read().decode())
-                else:
-                    self.__json_schema = json.load(f)
+            self.__json_schema = self._load_json(os.path.join(ressources_path, 'schema-lax.json'))
         if describe_types:
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self._describe_types = describe_types
         else:
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-                if OLD_PY3:
-                    t = json.loads(f.read().decode())
-                else:
-                    t = json.load(f)
+            t = self._load_json(os.path.join(ressources_path, 'describeTypes.json'))
             self._describe_types = t['result']
 
         self._types = self._describe_types['types']
@@ -1190,11 +1174,7 @@ class MISPObject(AbstractMISP):
     def _load_template_path(self, template_path):
         if not os.path.exists(template_path):
             return False
-        with open(template_path, 'rb') as f:
-            if OLD_PY3:
-                self._definition = json.loads(f.read().decode())
-            else:
-                self._definition = json.load(f)
+        self._definition = self._load_json(template_path)
         setattr(self, 'meta-category', self._definition['meta-category'])
         self.template_uuid = self._definition['uuid']
         self.description = self._definition['description']

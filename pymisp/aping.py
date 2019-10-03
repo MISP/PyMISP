@@ -105,8 +105,7 @@ class ExpandedPyMISP(PyMISP):
     @property
     def describe_types_local(self):
         '''Returns the content of describe types from the package'''
-        with (self.resources_path / 'describeTypes.json').open() as f:
-            describe_types = json.load(f)
+        describe_types = self._load_json(str(self.resources_path / 'describeTypes.json'))
         return describe_types['result']
 
     @property
