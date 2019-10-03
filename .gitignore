@@ -6,8 +6,10 @@ examples/cudeso.py
 examples/feed-generator/output/*\.json
 examples/feed-generator/output/hashes\.csv
 examples/feed-generator/settings\.py
+tests/reportlab_testoutputs/*\.pdf
 build/*
 dist/*
 pymisp.egg-info/*
+.coverage
 .idea
 
