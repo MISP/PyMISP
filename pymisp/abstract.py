@@ -88,6 +88,12 @@ if sys.version_info >= (3, 6):
         with (resources_path / 'describeTypes.json').open() as f:
             dt = json.load(f)
         return dt['result']
+
+    def load_template(path):
+        with open(path) as f:
+            t = json.load(f)
+        return t
+
 else:
     import os
     if (3, 0) <= sys.version_info < (3, 6):
@@ -104,10 +110,19 @@ else:
                 t = json.load(f)
         return t['result']
 
+    def load_template(path):
+        with open(path, 'rb') as f:
+            if OLD_PY3:
+                t = json.loads(f.read().decode())
+            else:
+                t = json.load(f)
+        return t
+
 
 class AbstractMISP(MutableMapping):
 
     __describe_types = cache_describe_types()
+    __object_templates = {}
 
     def __init__(self, **kwargs):
         """Abstract class for all the MISP objects"""
@@ -132,6 +147,11 @@ class AbstractMISP(MutableMapping):
     @property
     def describe_types(self):
         return self.__describe_types
+
+    def get_template_definition(self, template_path):
+        if template_path not in self.__object_templates:
+            self.__object_templates[template_path] = load_template(template_path)
+        return self.__object_templates[template_path]
 
     @property
     def properties(self):

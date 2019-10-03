@@ -111,8 +111,8 @@ class MISPAttribute(AbstractMISP):
         super(MISPAttribute, self).__init__()
         if not describe_types:
             describe_types = self.describe_types
-        self.__categories = frozenset(describe_types['categories'])
-        self._types = frozenset(describe_types['types'])
+        self.__categories = describe_types['categories']
+        self._types = describe_types['types']
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
         self.__strict = strict
@@ -438,7 +438,7 @@ class MISPEvent(AbstractMISP):
         else:
             self._describe_types = self.describe_types
 
-        self._types = frozenset(self._describe_types['types'])
+        self._types = self._describe_types['types']
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
@@ -1195,11 +1195,7 @@ class MISPObject(AbstractMISP):
     def _load_template_path(self, template_path):
         if not os.path.exists(template_path):
             return False
-        with open(template_path, 'rb') as f:
-            if OLD_PY3:
-                self._definition = json.loads(f.read().decode())
-            else:
-                self._definition = json.load(f)
+        self._definition = self.get_template_definition(template_path)
         setattr(self, 'meta-category', self._definition['meta-category'])
         self.template_uuid = self._definition['uuid']
         self.description = self._definition['description']
