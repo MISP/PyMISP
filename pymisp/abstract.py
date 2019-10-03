@@ -107,12 +107,7 @@ class AbstractMISP(MutableMapping):
         """All the class public properties that will be dumped in the dictionary, and the JSON export.
         Note: all the properties starting with a `_` (private), or listed in __not_jsonable will be skipped.
         """
-        to_return = []
-        for prop, value in vars(self).items():
-            if prop.startswith('_') or prop in self.__not_jsonable:
-                continue
-            to_return.append(prop)
-        return to_return
+        return [k for k in vars(self).keys() if not (k[0] == '_' or k in self.__not_jsonable)]
 
     def from_dict(self, **kwargs):
         """Loading all the parameters as class properties, if they aren't `None`.
@@ -216,8 +211,9 @@ class AbstractMISP(MutableMapping):
             raise Exception('edited can only be True or False')
 
     def __setattr__(self, name, value):
-        if name in self.properties:
-            self.__edited = True
+        if name != '_AbstractMISP__edited':
+            if not self.__edited and name in self.properties:
+                self.__edited = True
         super(AbstractMISP, self).__setattr__(name, value)
 
     def _datetime_to_timestamp(self, d):
