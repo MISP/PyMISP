@@ -80,7 +80,34 @@ class MISPEncode(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
+if sys.version_info >= (3, 6):
+    from pathlib import Path
+
+    def cache_describe_types():
+        resources_path = Path(__file__).parent / 'data'
+        with (resources_path / 'describeTypes.json').open() as f:
+            dt = json.load(f)
+        return dt['result']
+else:
+    import os
+    if (3, 0) <= sys.version_info < (3, 6):
+        OLD_PY3 = True
+    else:
+        OLD_PY3 = False
+
+    def cache_describe_types():
+        ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+        with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
+            if OLD_PY3:
+                t = json.loads(f.read().decode())
+            else:
+                t = json.load(f)
+        return t['result']
+
+
 class AbstractMISP(MutableMapping):
+
+    __describe_types = cache_describe_types()
 
     def __init__(self, **kwargs):
         """Abstract class for all the MISP objects"""
@@ -101,6 +128,10 @@ class AbstractMISP(MutableMapping):
             self.Tag = []
             setattr(AbstractMISP, 'add_tag', AbstractMISP.__add_tag)
             setattr(AbstractMISP, 'tags', property(AbstractMISP.__get_tags, AbstractMISP.__set_tags))
+
+    @property
+    def describe_types(self):
+        return self.__describe_types
 
     @property
     def properties(self):

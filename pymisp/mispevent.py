@@ -110,15 +110,9 @@ class MISPAttribute(AbstractMISP):
         """
         super(MISPAttribute, self).__init__()
         if not describe_types:
-            ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-                if OLD_PY3:
-                    t = json.loads(f.read().decode())
-                else:
-                    t = json.load(f)
-            describe_types = t['result']
-        self.__categories = describe_types['categories']
-        self._types = describe_types['types']
+            describe_types = self.describe_types
+        self.__categories = frozenset(describe_types['categories'])
+        self._types = frozenset(describe_types['types'])
         self.__category_type_mapping = describe_types['category_type_mappings']
         self.__sane_default = describe_types['sane_defaults']
         self.__strict = strict
@@ -442,14 +436,9 @@ class MISPEvent(AbstractMISP):
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self._describe_types = describe_types
         else:
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-                if OLD_PY3:
-                    t = json.loads(f.read().decode())
-                else:
-                    t = json.load(f)
-            self._describe_types = t['result']
+            self._describe_types = self.describe_types
 
-        self._types = self._describe_types['types']
+        self._types = frozenset(self._describe_types['types'])
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
