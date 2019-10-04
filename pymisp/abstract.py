@@ -90,12 +90,12 @@ class MISPEncode(JSONEncoder):
 
 class MISPFileCache(object):
     # cache up to 150 JSON structures in class attribute
-    _file_cache = cachetools.LFUCache(150)
+    __file_cache = cachetools.LFUCache(150)
 
-    @staticmethod
-    def _load_json(path):
-        # use hard-coded root class attribute
-        file_cache = MISPFileCache._file_cache
+    @classmethod
+    def _load_json(cls, path):
+        # use root class attribute as global cache
+        file_cache = cls.__file_cache
         # use modified time with path as cache key
         mtime = os.path.getmtime(path)
         if path in file_cache:
