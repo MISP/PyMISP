@@ -11,6 +11,3 @@ else
 	pip install pipenv
 	pipenv update --dev
 fi
-pushd tests
-git clone https://github.com/viper-framework/viper-test-files.git
-popd
