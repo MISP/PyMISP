@@ -4,9 +4,11 @@
 import sys
 import datetime
 import json
+import os
 from json import JSONEncoder
 import logging
 from enum import Enum
+import cachetools
 
 from .exceptions import PyMISPInvalidFormat
 
@@ -36,6 +38,12 @@ if sys.version_info < (3, 0):
 
         def dst(self, dt):
             return timedelta(0)
+
+
+if (3, 0) <= sys.version_info < (3, 6):
+    OLD_PY3 = True
+else:
+    OLD_PY3 = False
 
 
 class Distribution(Enum):
@@ -80,7 +88,30 @@ class MISPEncode(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
-class AbstractMISP(MutableMapping):
+class MISPFileCache(object):
+    # cache up to 150 JSON structures in class attribute
+    __file_cache = cachetools.LFUCache(150)
+
+    @classmethod
+    def _load_json(cls, path):
+        # use root class attribute as global cache
+        file_cache = cls.__file_cache
+        # use modified time with path as cache key
+        mtime = os.path.getmtime(path)
+        if path in file_cache:
+            ctime, data = file_cache[path]
+            if ctime == mtime:
+                return data
+        with open(path, 'rb') as f:
+            if OLD_PY3:
+                data = json.loads(f.read().decode())
+            else:
+                data = json.load(f)
+        file_cache[path] = (mtime, data)
+        return data
+
+
+class AbstractMISP(MutableMapping, MISPFileCache):
 
     def __init__(self, **kwargs):
         """Abstract class for all the MISP objects"""
