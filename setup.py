@@ -41,7 +41,7 @@ setup(
     ],
     install_requires=['six', 'requests', 'python-dateutil', 'jsonschema',
                       'python-dateutil', 'enum34;python_version<"3.4"',
-                      'functools32;python_version<"3.0"', 'deprecated'],
+                      'functools32;python_version<"3.0"', 'deprecated', 'cachetools;python_version<"3.0"'],
     extras_require={'fileobjects': ['lief>=0.8,<0.10;python_version<"3.5"', 'lief>=0.10.0.dev0;python_version>"3.5"', 'python-magic', 'pydeep'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],

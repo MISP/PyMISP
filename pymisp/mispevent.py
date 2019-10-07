@@ -17,6 +17,7 @@ from deprecated import deprecated
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
+
 logger = logging.getLogger('pymisp')
 
 if sys.version_info < (3, 0):
@@ -109,12 +110,12 @@ class MISPAttribute(AbstractMISP):
             :strict: If false, fallback to sane defaults for the attribute type if the ones passed by the user are incorrect
         """
         super(MISPAttribute, self).__init__()
-        if not describe_types:
-            describe_types = self.describe_types
-        self.__categories = describe_types['categories']
-        self._types = describe_types['types']
-        self.__category_type_mapping = describe_types['category_type_mappings']
-        self.__sane_default = describe_types['sane_defaults']
+        if describe_types:
+            self.describe_types = describe_types
+        self.__categories = self.describe_types['categories']
+        self._types = self.describe_types['types']
+        self.__category_type_mapping = self.describe_types['category_type_mappings']
+        self.__sane_default = self.describe_types['sane_defaults']
         self.__strict = strict
         self._data = None
         self.uuid = str(uuid.uuid4())
@@ -419,26 +420,21 @@ class MISPEvent(AbstractMISP):
 
     def __init__(self, describe_types=None, strict_validation=False, **kwargs):
         super(MISPEvent, self).__init__(**kwargs)
-        ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
-            with open(os.path.join(ressources_path, 'schema.json'), 'rb') as f:
-                if OLD_PY3:
-                    self.__json_schema = json.loads(f.read().decode())
-                else:
-                    self.__json_schema = json.load(f)
+            if sys.version_info >= (3, 6):
+                self.__json_schema = self._load_json(self.resources_path / 'schema.json')
+            else:
+                self.__json_schema = self._load_json(os.path.join(self.resources_path, 'schema.json'))
         else:
-            with open(os.path.join(ressources_path, 'schema-lax.json'), 'rb') as f:
-                if OLD_PY3:
-                    self.__json_schema = json.loads(f.read().decode())
-                else:
-                    self.__json_schema = json.load(f)
+            if sys.version_info >= (3, 6):
+                self.__json_schema = self._load_json(self.resources_path / 'schema-lax.json')
+            else:
+                self.__json_schema = self._load_json(os.path.join(self.resources_path, 'schema-lax.json'))
         if describe_types:
             # This variable is used in add_attribute in order to avoid duplicating the structure
-            self._describe_types = describe_types
-        else:
-            self._describe_types = self.describe_types
+            self.describe_types = describe_types
 
-        self._types = self._describe_types['types']
+        self._types = self.describe_types['types']
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
@@ -709,7 +705,7 @@ class MISPEvent(AbstractMISP):
         if isinstance(value, list):
             attr_list = [self.add_attribute(type=type, value=a, **kwargs) for a in value]
         else:
-            attribute = MISPAttribute(describe_types=self._describe_types)
+            attribute = MISPAttribute(describe_types=self.describe_types)
             attribute.from_dict(type=type, value=value, **kwargs)
             self.attributes.append(attribute)
         self.edited = True
@@ -1146,12 +1142,17 @@ class MISPObject(AbstractMISP):
 
         if kwargs.get('misp_objects_path_custom'):
             # If misp_objects_path_custom is given, and an object with the given name exists, use that.
-            self._known_template = self._load_template_path(os.path.join(kwargs.get('misp_objects_path_custom'), self.name, 'definition.json'))
+            if sys.version_info >= (3, 6):
+                self._known_template = self._load_template_path(Path(kwargs.get('misp_objects_path_custom')) / self.name / 'definition.json')
+            else:
+                self._known_template = self._load_template_path(os.path.join(kwargs.get('misp_objects_path_custom'), self.name, 'definition.json'))
 
         if not self._known_template:
             # Check if the object is known in the default templates bundled in with PyMISP
-            misp_objects_path = os.path.join(os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)), 'data', 'misp-objects', 'objects')
-            self._known_template = self._load_template_path(os.path.join(misp_objects_path, self.name, 'definition.json'))
+            if sys.version_info >= (3, 6):
+                self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
+            else:
+                self._known_template = self._load_template_path(os.path.join(self.misp_objects_path, self.name, 'definition.json'))
 
         if not self._known_template and self._strict:
             raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
@@ -1195,7 +1196,7 @@ class MISPObject(AbstractMISP):
     def _load_template_path(self, template_path):
         if not os.path.exists(template_path):
             return False
-        self._definition = self.get_template_definition(template_path)
+        self._definition = self._load_json(template_path)
         setattr(self, 'meta-category', self._definition['meta-category'])
         self.template_uuid = self._definition['uuid']
         self.description = self._definition['description']
@@ -1205,7 +1206,10 @@ class MISPObject(AbstractMISP):
     def force_misp_objects_path_custom(self, misp_objects_path_custom, object_name=None):
         if object_name:
             self.name = object_name
-        template_path = os.path.join(misp_objects_path_custom, self.name, 'definition.json')
+        if sys.version_info >= (3, 6):
+            template_path = Path(misp_objects_path_custom) / self.name / 'definition.json'
+        else:
+            template_path = os.path.join(misp_objects_path_custom, self.name, 'definition.json')
 
         self._known_template = self._load_template_path(template_path)
         if not self._known_template:

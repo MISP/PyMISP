@@ -10,17 +10,19 @@ from enum import Enum
 
 from .exceptions import PyMISPInvalidFormat
 
-# Try to import MutableMapping the python 3.3+ way
-try:
-    from collections.abc import MutableMapping
-except Exception:
-    pass
-
 
 logger = logging.getLogger('pymisp')
 
+
 if sys.version_info < (3, 0):
     from collections import MutableMapping
+    import os
+    import cachetools
+
+    resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+    misp_objects_path = os.path.join(resources_path, 'misp-objects', 'objects')
+    with open(os.path.join(resources_path, 'describeTypes.json'), 'r') as f:
+        describe_types = json.load(f)['result']
 
     # This is required because Python 2 is a pain.
     from datetime import tzinfo, timedelta
@@ -36,6 +38,53 @@ if sys.version_info < (3, 0):
 
         def dst(self, dt):
             return timedelta(0)
+
+    class MISPFileCache(object):
+        # cache up to 150 JSON structures in class attribute
+        __file_cache = cachetools.LFUCache(150)
+
+        @classmethod
+        def _load_json(cls, path):
+            # use root class attribute as global cache
+            file_cache = cls.__file_cache
+            # use modified time with path as cache key
+            mtime = os.path.getmtime(path)
+            if path in file_cache:
+                ctime, data = file_cache[path]
+                if ctime == mtime:
+                    return data
+            with open(path, 'rb') as f:
+                if OLD_PY3:
+                    data = json.loads(f.read().decode())
+                else:
+                    data = json.load(f)
+            file_cache[path] = (mtime, data)
+            return data
+
+else:
+    from collections.abc import MutableMapping
+    from functools import lru_cache
+    from pathlib import Path
+
+    resources_path = Path(__file__).parent / 'data'
+    misp_objects_path = resources_path / 'misp-objects' / 'objects'
+    with (resources_path / 'describeTypes.json').open('rb') as f:
+        describe_types = json.load(f)['result']
+
+    class MISPFileCache(object):
+        # cache up to 150 JSON structures in class attribute
+
+        @classmethod
+        @lru_cache(maxsize=150)
+        def _load_json(cls, path: Path):
+            with path.open('rb') as f:
+                data = json.load(f)
+            return data
+
+if (3, 0) <= sys.version_info < (3, 6):
+    OLD_PY3 = True
+else:
+    OLD_PY3 = False
 
 
 class Distribution(Enum):
@@ -80,49 +129,11 @@ class MISPEncode(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
-if sys.version_info >= (3, 6):
-    from pathlib import Path
+class AbstractMISP(MutableMapping, MISPFileCache):
+    __resources_path = resources_path
+    __misp_objects_path = misp_objects_path
+    __describe_types = describe_types
 
-    def cache_describe_types():
-        resources_path = Path(__file__).parent / 'data'
-        with (resources_path / 'describeTypes.json').open() as f:
-            dt = json.load(f)
-        return dt['result']
-
-    def load_template(path):
-        with open(path) as f:
-            t = json.load(f)
-        return t
-
-else:
-    import os
-    if (3, 0) <= sys.version_info < (3, 6):
-        OLD_PY3 = True
-    else:
-        OLD_PY3 = False
-
-    def cache_describe_types():
-        ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-        with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-            if OLD_PY3:
-                t = json.loads(f.read().decode())
-            else:
-                t = json.load(f)
-        return t['result']
-
-    def load_template(path):
-        with open(path, 'rb') as f:
-            if OLD_PY3:
-                t = json.loads(f.read().decode())
-            else:
-                t = json.load(f)
-        return t
-
-
-class AbstractMISP(MutableMapping):
-
-    __describe_types = cache_describe_types()
-    __object_templates = {}
 
     def __init__(self, **kwargs):
         """Abstract class for all the MISP objects"""
@@ -148,10 +159,21 @@ class AbstractMISP(MutableMapping):
     def describe_types(self):
         return self.__describe_types
 
-    def get_template_definition(self, template_path):
-        if template_path not in self.__object_templates:
-            self.__object_templates[template_path] = load_template(template_path)
-        return self.__object_templates[template_path]
+    @describe_types.setter
+    def describe_types(self, describe_types):
+        self.__describe_types = describe_types
+
+    @property
+    def resources_path(self):
+        return self.__resources_path
+
+    @property
+    def misp_objects_path(self):
+        return self.__misp_objects_path
+
+    @misp_objects_path.setter
+    def misp_objects_path(self, misp_objects_path):
+        self.__misp_objects_path = misp_objects_path
 
     @property
     def properties(self):
