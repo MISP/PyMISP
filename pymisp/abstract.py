@@ -68,7 +68,7 @@ else:
 
     resources_path = Path(__file__).parent / 'data'
     misp_objects_path = resources_path / 'misp-objects' / 'objects'
-    with (resources_path / 'describeTypes.json').open('rb') as f:
+    with (resources_path / 'describeTypes.json').open('r') as f:
         describe_types = json.load(f)['result']
 
     class MISPFileCache(object):
@@ -76,7 +76,7 @@ else:
 
         @classmethod
         @lru_cache(maxsize=150)
-        def _load_json(cls, path: Path):
+        def _load_json(cls, path):
             with path.open('rb') as f:
                 data = json.load(f)
             return data
