@@ -113,7 +113,6 @@ class MISPAttribute(AbstractMISP):
         if describe_types:
             self.describe_types = describe_types
         self.__categories = self.describe_types['categories']
-        self.__types = self.describe_types['types']
         self.__category_type_mapping = self.describe_types['category_type_mappings']
         self.__sane_default = self.describe_types['sane_defaults']
         self.__strict = strict
@@ -125,7 +124,7 @@ class MISPAttribute(AbstractMISP):
     @property
     def known_types(self):
         """Returns a list of all the known MISP attributes types"""
-        return self.__types
+        return self.describe_types['types']
 
     @property
     def malware_binary(self):
@@ -421,20 +420,17 @@ class MISPEvent(AbstractMISP):
     def __init__(self, describe_types=None, strict_validation=False, **kwargs):
         super(MISPEvent, self).__init__(**kwargs)
         if strict_validation:
-            if sys.version_info >= (3, 6):
-                self.__json_schema = self._load_json(self.resources_path / 'schema.json')
-            else:
-                self.__json_schema = self._load_json(os.path.join(self.resources_path, 'schema.json'))
+            schema_file = 'schema.json'
         else:
-            if sys.version_info >= (3, 6):
-                self.__json_schema = self._load_json(self.resources_path / 'schema-lax.json')
-            else:
-                self.__json_schema = self._load_json(os.path.join(self.resources_path, 'schema-lax.json'))
+            schema_file = 'schema-lax.json'
+        if sys.version_info >= (3, 6):
+            self.__json_schema = self._load_json(self.resources_path / schema_file)
+        else:
+            self.__json_schema = self._load_json(os.path.join(self.resources_path, schema_file))
         if describe_types:
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self.describe_types = describe_types
 
-        self.__types = self.describe_types['types']
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
@@ -442,7 +438,7 @@ class MISPEvent(AbstractMISP):
 
     @property
     def known_types(self):
-        return self.__types
+        return self.describe_types['types']
 
     @property
     def org(self):
