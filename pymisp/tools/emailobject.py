@@ -13,6 +13,9 @@ logger = logging.getLogger('pymisp')
 class EMailObject(AbstractMISPObjectGenerator):
 
     def __init__(self, filepath=None, pseudofile=None, attach_original_email=True, standalone=True, **kwargs):
+        # PY3 way:
+        # super().__init__('file')
+        super(EMailObject, self).__init__('email', standalone=standalone, **kwargs)
         if filepath:
             with open(filepath, 'rb') as f:
                 self.__pseudofile = BytesIO(f.read())
@@ -20,9 +23,6 @@ class EMailObject(AbstractMISPObjectGenerator):
             self.__pseudofile = pseudofile
         else:
             raise InvalidMISPObject('File buffer (BytesIO) or a path is required.')
-        # PY3 way:
-        # super().__init__('file')
-        super(EMailObject, self).__init__('email', standalone=standalone, **kwargs)
         self.__email = message_from_bytes(self.__pseudofile.getvalue(), policy=policy.default)
         if attach_original_email:
             self.add_attribute('eml', value='Full email.eml', data=self.__pseudofile)

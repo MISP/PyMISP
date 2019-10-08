@@ -112,8 +112,8 @@ class ExpandedPyMISP(PyMISP):
     def describe_types_remote(self):
         '''Returns the content of describe types from the remote instance'''
         response = self._prepare_request('GET', 'attributes/describeTypes.json')
-        describe_types = self._check_response(response, expect_json=True)
-        return describe_types['result']
+        remote_describe_types = self._check_response(response, expect_json=True)
+        return remote_describe_types['result']
 
     @property
     def recommended_pymisp_version(self):

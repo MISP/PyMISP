@@ -140,14 +140,14 @@ class PyMISP(MISPFileCache):  # pragma: no cover
     @deprecated(reason="Use ExpandedPyMISP.describe_types_remote", version='2.4.110', action='default')
     def get_live_describe_types(self):
         response = self._prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
-        describe_types = self._check_response(response)
-        if describe_types.get('error'):
-            for e in describe_types.get('error'):
+        remote_describe_types = self._check_response(response)
+        if remote_describe_types.get('error'):
+            for e in remote_describe_types.get('error'):
                 raise PyMISPError('Failed: {}'.format(e))
-        describe_types = describe_types['result']
-        if not describe_types.get('sane_defaults'):
+        remote_describe_types = describe_types['result']
+        if not remote_describe_types.get('sane_defaults'):
             raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
-        return describe_types
+        return remote_describe_types
 
     def _prepare_request(self, request_type, url, data=None,
                          background_callback=None, output_type='json'):

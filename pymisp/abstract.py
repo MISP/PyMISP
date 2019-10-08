@@ -134,12 +134,12 @@ class AbstractMISP(MutableMapping, MISPFileCache):
     __misp_objects_path = misp_objects_path
     __describe_types = describe_types
 
-
     def __init__(self, **kwargs):
         """Abstract class for all the MISP objects"""
         super(AbstractMISP, self).__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
         self.__not_jsonable = []
+        self.__self_defined_describe_types = None
 
         if kwargs.get('force_timestamps') is not None:
             # Ignore the edited objects and keep the timestamps.
@@ -157,11 +157,13 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
     @property
     def describe_types(self):
+        if self.__self_defined_describe_types:
+            return self.__self_defined_describe_types
         return self.__describe_types
 
     @describe_types.setter
     def describe_types(self, describe_types):
-        self.__describe_types = describe_types
+        self.__self_defined_describe_types = describe_types
 
     @property
     def resources_path(self):
