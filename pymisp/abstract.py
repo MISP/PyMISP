@@ -74,9 +74,9 @@ else:
     class MISPFileCache(object):
         # cache up to 150 JSON structures in class attribute
 
-        @classmethod
+        @staticmethod
         @lru_cache(maxsize=150)
-        def _load_json(cls, path):
+        def _load_json(path):
             with path.open('rb') as f:
                 data = json.load(f)
             return data
@@ -173,6 +173,8 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
     @misp_objects_path.setter
     def misp_objects_path(self, misp_objects_path):
+        if sys.version_info >= (3, 0) and isinstance(misp_objects_path, str):
+            misp_objects_path = Path(misp_objects_path)
         self.__misp_objects_path = misp_objects_path
 
     @property

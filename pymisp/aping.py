@@ -19,7 +19,7 @@ from . import __version__
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPNotImplementedYet, PyMISPError, NoURL, NoKey
 from .api import everything_broken, PyMISP
 from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity
-from .abstract import MISPEncode, MISPTag, AbstractMISP
+from .abstract import MISPEncode, MISPTag, AbstractMISP, describe_types
 
 SearchType = TypeVar('SearchType', str, int)
 # str: string to search / list: values to search (OR) / dict: {'OR': [list], 'NOT': [list], 'AND': [list]}
@@ -106,8 +106,7 @@ class ExpandedPyMISP(PyMISP):
     @property
     def describe_types_local(self):
         '''Returns the content of describe types from the package'''
-        describe_types = self._load_json(str(self.resources_path / 'describeTypes.json'))
-        return describe_types['result']
+        return describe_types
 
     @property
     def describe_types_remote(self):

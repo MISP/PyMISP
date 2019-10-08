@@ -113,7 +113,7 @@ class MISPAttribute(AbstractMISP):
         if describe_types:
             self.describe_types = describe_types
         self.__categories = self.describe_types['categories']
-        self._types = self.describe_types['types']
+        self.__types = self.describe_types['types']
         self.__category_type_mapping = self.describe_types['category_type_mappings']
         self.__sane_default = self.describe_types['sane_defaults']
         self.__strict = strict
@@ -125,7 +125,7 @@ class MISPAttribute(AbstractMISP):
     @property
     def known_types(self):
         """Returns a list of all the known MISP attributes types"""
-        return self._types
+        return self.__types
 
     @property
     def malware_binary(self):
@@ -213,7 +213,7 @@ class MISPAttribute(AbstractMISP):
         if self.type is None:
             raise NewAttributeError('The type of the attribute is required.')
         if self.type not in self.known_types:
-            raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self._types))))
+            raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self.known_types))))
 
         type_defaults = self.__sane_default[self.type]
 
@@ -434,7 +434,7 @@ class MISPEvent(AbstractMISP):
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self.describe_types = describe_types
 
-        self._types = self.describe_types['types']
+        self.__types = self.describe_types['types']
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
@@ -442,7 +442,7 @@ class MISPEvent(AbstractMISP):
 
     @property
     def known_types(self):
-        return self._types
+        return self.__types
 
     @property
     def org(self):
@@ -1140,25 +1140,7 @@ class MISPObject(AbstractMISP):
         self.name = name
         self._known_template = False
 
-        if kwargs.get('misp_objects_path_custom'):
-            # If misp_objects_path_custom is given, and an object with the given name exists, use that.
-            if sys.version_info >= (3, 6):
-                self._known_template = self._load_template_path(Path(kwargs.get('misp_objects_path_custom')) / self.name / 'definition.json')
-            else:
-                self._known_template = self._load_template_path(os.path.join(kwargs.get('misp_objects_path_custom'), self.name, 'definition.json'))
-
-        if not self._known_template:
-            # Check if the object is known in the default templates bundled in with PyMISP
-            if sys.version_info >= (3, 6):
-                self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
-            else:
-                self._known_template = self._load_template_path(os.path.join(self.misp_objects_path, self.name, 'definition.json'))
-
-        if not self._known_template and self._strict:
-            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
-        else:
-            # Then we have no meta-category, template_uuid, description and template_version
-            pass
+        self._set_template(kwargs.get('misp_objects_path_custom'))
 
         self.uuid = str(uuid.uuid4())
         self.__fast_attribute_access = defaultdict(list)  # Hashtable object_relation: [attributes]
@@ -1206,14 +1188,24 @@ class MISPObject(AbstractMISP):
     def force_misp_objects_path_custom(self, misp_objects_path_custom, object_name=None):
         if object_name:
             self.name = object_name
-        if sys.version_info >= (3, 6):
-            template_path = Path(misp_objects_path_custom) / self.name / 'definition.json'
-        else:
-            template_path = os.path.join(misp_objects_path_custom, self.name, 'definition.json')
+        self._set_template(misp_objects_path_custom)
 
-        self._known_template = self._load_template_path(template_path)
-        if not self._known_template:
-            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory ({}).'.format(self.name, template_path))
+    def _set_template(self, misp_objects_path_custom=None):
+        if misp_objects_path_custom:
+            # If misp_objects_path_custom is given, and an object with the given name exists, use that.
+            self.misp_objects_path = misp_objects_path_custom
+
+        # Try to get the template
+        if sys.version_info >= (3, 6):
+            self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
+        else:
+            self._known_template = self._load_template_path(os.path.join(self.misp_objects_path, self.name, 'definition.json'))
+
+        if not self._known_template and self._strict:
+            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
+        else:
+            # Then we have no meta-category, template_uuid, description and template_version
+            pass
 
     @property
     def disable_validation(self):

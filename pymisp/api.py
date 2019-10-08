@@ -19,7 +19,7 @@ from deprecated import deprecated
 from . import __version__, warning_2020
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject, MISPSharingGroup
-from .abstract import AbstractMISP, MISPEncode, MISPFileCache
+from .abstract import AbstractMISP, MISPEncode, MISPFileCache, describe_types
 
 logger = logging.getLogger('pymisp')
 
@@ -135,8 +135,7 @@ class PyMISP(MISPFileCache):  # pragma: no cover
 
     @deprecated(reason="Use ExpandedPyMISP.describe_types_local", version='2.4.110', action='default')
     def get_local_describe_types(self):
-        describe_types = self._load_json(os.path.join(self.resources_path, 'describeTypes.json'))
-        return describe_types['result']
+        return describe_types
 
     @deprecated(reason="Use ExpandedPyMISP.describe_types_remote", version='2.4.110', action='default')
     def get_live_describe_types(self):
