@@ -19,7 +19,7 @@ from deprecated import deprecated
 from . import __version__, warning_2020
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject, MISPSharingGroup
-from .abstract import AbstractMISP, MISPEncode, MISPFileCache, describe_types
+from .abstract import AbstractMISP, pymisp_json_default, MISPFileCache, describe_types
 
 logger = logging.getLogger('pymisp')
 
@@ -162,7 +162,7 @@ class PyMISP(MISPFileCache):  # pragma: no cover
                 if isinstance(data, dict):
                     # Remove None values.
                     data = {k: v for k, v in data.items() if v is not None}
-                data = json.dumps(data, cls=MISPEncode)
+                data = json.dumps(data, default=pymisp_json_default)
             req = requests.Request(request_type, url, data=data)
         if self.asynch and background_callback is not None:
             local_session = FuturesSession
@@ -604,7 +604,7 @@ class PyMISP(MISPFileCache):  # pragma: no cover
             else:
                 data = attributes.to_json()
             # _prepare_request(...) returns a requests.Response Object
-            resp = self._prepare_request('POST', url, json.dumps(data, cls=MISPEncode))
+            resp = self._prepare_request('POST', url, json.dumps(data, default=pymisp_json_default))
             try:
                 responses.append(resp.json())
             except Exception:
@@ -1058,7 +1058,7 @@ class PyMISP(MISPFileCache):  # pragma: no cover
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
-            response = self._prepare_request('POST', url, json.dumps(query, cls=MISPEncode))
+            response = self._prepare_request('POST', url, json.dumps(query, default=pymisp_json_default))
         elif path == 'view':
             response = self._prepare_request('GET', url)
         else:  # accept or discard
