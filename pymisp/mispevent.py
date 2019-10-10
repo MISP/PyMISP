@@ -220,7 +220,14 @@ class MISPAttribute(AbstractMISP):
         if self.value is None:
             raise NewAttributeError('The value of the attribute is required.')
         if self.type == 'datetime' and isinstance(self.value, str):
-            self.value = parse(self.value)
+            try:
+                if '.' in self.value:
+                    self.value = datetime.datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f")
+                else:
+                    self.value = datetime.datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
+                # Slower, but if the other ones fail, that's a good fallback
+                self.value = parse(self.value)
 
         # Default values
         self.category = kwargs.pop('category', type_defaults['default_category'])

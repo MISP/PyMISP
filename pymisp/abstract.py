@@ -6,6 +6,7 @@ import datetime
 
 from deprecated import deprecated
 from json import JSONEncoder
+from uuid import UUID
 
 try:
     from rapidjson import load
@@ -123,6 +124,8 @@ class MISPEncode(JSONEncoder):
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
+        elif isinstance(obj, UUID):
+            return str(obj)
         return JSONEncoder.default(self, obj)
 
 
@@ -134,6 +137,8 @@ if HAS_RAPIDJSON:
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
+        elif isinstance(obj, UUID):
+            return str(obj)
         return rapidjson.default(obj)
 else:
     def pymisp_json_default(obj):
@@ -143,6 +148,8 @@ else:
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
+        elif isinstance(obj, UUID):
+            return str(obj)
         return json.default(obj)
 
 
