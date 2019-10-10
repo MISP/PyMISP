@@ -1577,7 +1577,7 @@ class TestComprehensive(unittest.TestCase):
         remote_types = remote.pop('types')
         remote_categories = remote.pop('categories')
         remote_category_type_mappings = remote.pop('category_type_mappings')
-        local = self.admin_misp_connector.describe_types_local
+        local = dict(self.admin_misp_connector.describe_types_local)
         local_types = local.pop('types')
         local_categories = local.pop('categories')
         local_category_type_mappings = local.pop('category_type_mappings')

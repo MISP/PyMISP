@@ -26,20 +26,20 @@ class TestMISPEvent(unittest.TestCase):
     def test_simple(self):
         with open('tests/mispevent_testfiles/simple.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_event(self):
         self.init_event()
         self.mispevent.publish()
         with open('tests/mispevent_testfiles/event.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_loadfile(self):
         self.mispevent.load_file('tests/mispevent_testfiles/event.json')
         with open('tests/mispevent_testfiles/event.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_event_tag(self):
         self.init_event()
@@ -50,7 +50,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.add_tag(new_tag)
         with open('tests/mispevent_testfiles/event_tags.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_attribute(self):
         self.init_event()
@@ -62,13 +62,13 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(attr_tags[0].name, 'osint')
         with open('tests/mispevent_testfiles/attribute.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
         # Fake setting an attribute ID for testing
         self.mispevent.attributes[0].id = 42
         self.mispevent.delete_attribute(42)
         with open('tests/mispevent_testfiles/attribute_del.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_object_tag(self):
         self.mispevent.add_object(name='file', strict=True)
@@ -90,7 +90,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(self.mispevent.objects[0].references[0].relationship_type, 'baz')
         with open('tests/mispevent_testfiles/event_obj_attr_tag.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     @unittest.skip("Not supported on MISP: https://github.com/MISP/MISP/issues/2638 - https://github.com/MISP/PyMISP/issues/168")
     def test_object_level_tag(self):
@@ -100,7 +100,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/event_obj_tag.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_malware(self):
         with open('tests/mispevent_testfiles/simple.json', 'rb') as f:
@@ -112,7 +112,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(attribute.malware_binary, pseudofile)
         with open('tests/mispevent_testfiles/malware.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_existing_malware(self):
         self.mispevent.load_file('tests/mispevent_testfiles/malware_exist.json')
@@ -127,19 +127,20 @@ class TestMISPEvent(unittest.TestCase):
         sighting.from_dict(value='1', type='bar', timestamp=11111111)
         with open('tests/mispevent_testfiles/sighting.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(sighting.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(sighting.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_existing_event(self):
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
         with open('tests/mispevent_testfiles/existing_event.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_shadow_attributes_existing(self):
         self.mispevent.load_file('tests/mispevent_testfiles/shadow.json')
         with open('tests/mispevent_testfiles/shadow.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     @unittest.skip("Not supported on MISP.")
     def test_shadow_attributes(self):
@@ -152,7 +153,7 @@ class TestMISPEvent(unittest.TestCase):
         del p.uuid
         with open('tests/mispevent_testfiles/proposals.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_default_attributes(self):
         self.mispevent.add_object(name='file', strict=True)
@@ -165,7 +166,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[1].uuid = 'b'
         with open('tests/mispevent_testfiles/event_obj_def_param.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_obj_default_values(self):
         self.init_event()
@@ -181,7 +182,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/def_param.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_event_not_edited(self):
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
@@ -246,7 +247,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertTrue(self.mispevent.edited)
         with open('tests/mispevent_testfiles/existing_event_edited.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_obj_by_id(self):
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
@@ -258,7 +259,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.add_object(name='test_object_template', strict=True, misp_objects_path_custom='tests/mispevent_testfiles')
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on required
-            self.mispevent.to_json()
+            self.mispevent.to_json(sort_keys=True, indent=2)
         if sys.version_info >= (3, ):
             self.assertEqual(e.exception.message, '{\'member3\'} are required.')
         else:
@@ -269,7 +270,7 @@ class TestMISPEvent(unittest.TestCase):
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on requiredOneOf
-            self.mispevent.to_json()
+            self.mispevent.to_json(sort_keys=True, indent=2)
         self.assertEqual(e.exception.message, 'At least one of the following attributes is required: member1, member2')
 
         a = self.mispevent.objects[0].add_attribute('member1', value='bar')
@@ -278,14 +279,14 @@ class TestMISPEvent(unittest.TestCase):
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # member1 is not a multiple
-            self.mispevent.to_json()
+            self.mispevent.to_json(sort_keys=True, indent=2)
         self.assertEqual(e.exception.message, 'Multiple occurrences of member1 is not allowed')
 
         self.mispevent.objects[0].attributes = self.mispevent.objects[0].attributes[:2]
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/misp_custom_obj.json', 'r') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(), json.dumps(ref_json, sort_keys=True, indent=2))
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
 
 if __name__ == '__main__':

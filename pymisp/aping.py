@@ -19,7 +19,7 @@ from . import __version__
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPNotImplementedYet, PyMISPError, NoURL, NoKey
 from .api import everything_broken, PyMISP
 from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity
-from .abstract import MISPEncode, MISPTag, AbstractMISP
+from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 SearchType = TypeVar('SearchType', str, int)
 # str: string to search / list: values to search (OR) / dict: {'OR': [list], 'NOT': [list], 'AND': [list]}
@@ -106,16 +106,14 @@ class ExpandedPyMISP(PyMISP):
     @property
     def describe_types_local(self):
         '''Returns the content of describe types from the package'''
-        with (self.resources_path / 'describeTypes.json').open() as f:
-            describe_types = json.load(f)
-        return describe_types['result']
+        return describe_types
 
     @property
     def describe_types_remote(self):
         '''Returns the content of describe types from the remote instance'''
         response = self._prepare_request('GET', 'attributes/describeTypes.json')
-        describe_types = self._check_response(response, expect_json=True)
-        return describe_types['result']
+        remote_describe_types = self._check_response(response, expect_json=True)
+        return remote_describe_types['result']
 
     @property
     def recommended_pymisp_version(self):
@@ -2111,7 +2109,7 @@ class ExpandedPyMISP(PyMISP):
                 if isinstance(data, dict):  # Else, we can directly json encode.
                     # Remove None values.
                     data = {k: v for k, v in data.items() if v is not None}
-                data = json.dumps(data, cls=MISPEncode)
+                data = json.dumps(data, default=pymisp_json_default)
 
         if kw_params:
             # CakePHP params in URL

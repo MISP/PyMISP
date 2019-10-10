@@ -12,6 +12,9 @@ logger = logging.getLogger('pymisp')
 class SSHAuthorizedKeysObject(AbstractMISPObjectGenerator):
 
     def __init__(self, authorized_keys_path=None, authorized_keys_pseudofile=None, standalone=True, **kwargs):
+        # PY3 way:
+        # super().__init__('file')
+        super(SSHAuthorizedKeysObject, self).__init__('ssh-authorized-keys', standalone=standalone, **kwargs)
         if authorized_keys_path:
             with open(authorized_keys_path, 'r') as f:
                 self.__pseudofile = StringIO(f.read())
@@ -19,9 +22,6 @@ class SSHAuthorizedKeysObject(AbstractMISPObjectGenerator):
             self.__pseudofile = authorized_keys_path
         else:
             raise InvalidMISPObject('File buffer (StringIO) or a path is required.')
-        # PY3 way:
-        # super().__init__('file')
-        super(SSHAuthorizedKeysObject, self).__init__('ssh-authorized-keys', standalone=standalone, **kwargs)
         self.__data = self.__pseudofile.getvalue()
         self.generate_attributes()
 

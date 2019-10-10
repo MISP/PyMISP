@@ -26,6 +26,9 @@ except ImportError:
 class MachOObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
+        # Python3 way
+        # super().__init__('elf')
+        super(MachOObject, self).__init__('macho', standalone=standalone, **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_LIEF:
@@ -45,9 +48,6 @@ class MachOObject(AbstractMISPObjectGenerator):
                 self.__macho = parsed
             else:
                 raise InvalidMISPObject('Not a lief.MachO.Binary: {}'.format(type(parsed)))
-        # Python3 way
-        # super().__init__('elf')
-        super(MachOObject, self).__init__('macho', standalone=standalone, **kwargs)
         self.generate_attributes()
 
     def generate_attributes(self):
