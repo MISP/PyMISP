@@ -1177,9 +1177,9 @@ class MISPObject(AbstractMISP):
             self.update_not_jsonable('ObjectReference')
 
     def _load_template_path(self, template_path):
-        if not os.path.exists(template_path):
-            return False
         self._definition = self._load_json(template_path)
+        if not self._definition:
+            return False
         setattr(self, 'meta-category', self._definition['meta-category'])
         self.template_uuid = self._definition['uuid']
         self.description = self._definition['description']

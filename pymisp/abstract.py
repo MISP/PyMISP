@@ -60,6 +60,8 @@ if sys.version_info < (3, 0):
         @staticmethod
         @cached(cache=LRUCache(maxsize=150))
         def _load_json(path):
+            if not os.path.exists(path):
+                return None
             with open(path, 'r') as f:
                 data = load(f)
             return data
@@ -80,6 +82,8 @@ else:
         @staticmethod
         @lru_cache(maxsize=150)
         def _load_json(path):
+            if not path.exists():
+                return None
             with path.open('r') as f:
                 data = load(f)
             return data
