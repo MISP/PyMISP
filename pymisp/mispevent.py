@@ -1074,10 +1074,9 @@ class MISPObjectAttribute(MISPAttribute):
             self.to_ids = self._definition.get('to_ids')
         if not self.type:
             raise NewAttributeError("The type of the attribute is required. Is the object template missing?")
-        if sys.version_info < (3, 5):
-            super(MISPObjectAttribute, self).from_dict(**dict(self, **kwargs))
-        else:
-            super(MISPObjectAttribute, self).from_dict(**{**self, **kwargs})
+        super(MISPObjectAttribute, self).from_dict(**dict(self, **kwargs))
+        # FIXME New syntax python3 only, keep for later.
+        # super(MISPObjectAttribute, self).from_dict(**{**self, **kwargs})
 
     def __repr__(self):
         if hasattr(self, 'value'):
@@ -1320,10 +1319,9 @@ class MISPObject(AbstractMISP):
         else:
             attribute = MISPObjectAttribute({})
         # Overwrite the parameters of self._default_attributes_parameters with the ones of value
-        if sys.version_info < (3, 5):
-            attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
-        else:
-            attribute.from_dict(object_relation=object_relation, **{**self._default_attributes_parameters, **value})
+        attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
+        # FIXME New syntax python3 only, keep for later.
+        # attribute.from_dict(object_relation=object_relation, **{**self._default_attributes_parameters, **value})
         self.__fast_attribute_access[object_relation].append(attribute)
         self.Attribute.append(attribute)
         self.edited = True
