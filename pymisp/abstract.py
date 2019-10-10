@@ -31,7 +31,7 @@ logger = logging.getLogger('pymisp')
 if sys.version_info < (3, 0):
     from collections import MutableMapping
     import os
-    import cachetools
+    from cachetools import cached, LRUCache
 
     resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
     misp_objects_path = os.path.join(resources_path, 'misp-objects', 'objects')
@@ -55,24 +55,12 @@ if sys.version_info < (3, 0):
 
     class MISPFileCache(object):
         # cache up to 150 JSON structures in class attribute
-        __file_cache = cachetools.LFUCache(150)
 
-        @classmethod
-        def _load_json(cls, path):
-            # use root class attribute as global cache
-            file_cache = cls.__file_cache
-            # use modified time with path as cache key
-            mtime = os.path.getmtime(path)
-            if path in file_cache:
-                ctime, data = file_cache[path]
-                if ctime == mtime:
-                    return data
-            with open(path, 'rb') as f:
-                if OLD_PY3:
-                    data = loads(f.read().decode())
-                else:
-                    data = load(f)
-            file_cache[path] = (mtime, data)
+        @staticmethod
+        @cached(cache=LRUCache(maxsize=150))
+        def _load_json(path):
+            with open(path, 'r') as f:
+                data = load(f)
             return data
 
 else:
@@ -91,14 +79,9 @@ else:
         @staticmethod
         @lru_cache(maxsize=150)
         def _load_json(path):
-            with path.open('rb') as f:
+            with path.open('r') as f:
                 data = load(f)
             return data
-
-if (3, 0) <= sys.version_info < (3, 6):
-    OLD_PY3 = True
-else:
-    OLD_PY3 = False
 
 
 class Distribution(Enum):

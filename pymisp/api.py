@@ -144,7 +144,7 @@ class PyMISP(MISPFileCache):  # pragma: no cover
         if remote_describe_types.get('error'):
             for e in remote_describe_types.get('error'):
                 raise PyMISPError('Failed: {}'.format(e))
-        remote_describe_types = describe_types['result']
+        remote_describe_types = describe_types
         if not remote_describe_types.get('sane_defaults'):
             raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
         return remote_describe_types
