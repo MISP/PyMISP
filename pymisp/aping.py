@@ -78,7 +78,7 @@ class ExpandedPyMISP(PyMISP):
                 if recommended_version_tup < pymisp_version_tup[:3]:
                     logger.info(f"The version of PyMISP recommended by the MISP instance (response['version']) is older than the one you're using now ({__version__}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.")
                 elif pymisp_version_tup[:3] < recommended_version_tup:
-                    logger.warning(f"The version of PyMISP recommended by the MI)SP instance ({response['version']}) is newer than the one you're using now ({__version__}). Please upgrade PyMISP.")
+                    logger.warning(f"The version of PyMISP recommended by the MISP instance ({response['version']}) is newer than the one you're using now ({__version__}). Please upgrade PyMISP.")
 
             misp_version = self.misp_instance_version
             if 'version' in misp_version:
