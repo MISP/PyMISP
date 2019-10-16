@@ -25,7 +25,7 @@ import logging
 logging.disable(logging.CRITICAL)
 
 try:
-    from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer
+    from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
     from pymisp.exceptions import MISPServerError
 except ImportError:
@@ -1945,6 +1945,60 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
+    def test_user_settings(self):
+        first = self.create_simple_event()
+        first.distribution = 3
+        first.add_tag('test_publish_filter')
+        first.add_tag('test_publish_filter_not')
+        second = self.create_simple_event()
+        second.distribution = 3
+        try:
+            # Set
+            setting = self.admin_misp_connector.set_user_setting('dashboard_access', 1, pythonify=True)
+            setting_value = {'Tag.name': 'test_publish_filter'}
+            setting = self.admin_misp_connector.set_user_setting('publish_alert_filter', setting_value, pythonify=True)
+            self.assertTrue(isinstance(setting, MISPUserSetting))
+            self.assertEqual(setting.value, setting_value)
+
+            # Get
+            # FIXME: https://github.com/MISP/MISP/issues/5297
+            # setting = self.admin_misp_connector.get_user_setting('dashboard_access', pythonify=True)
+
+            # Get All
+            user_settings = self.admin_misp_connector.user_settings(pythonify=True)
+            # TODO: Make that one better
+            self.assertTrue(isinstance(user_settings, list))
+
+            # Test if publish_alert_filter works
+            first = self.admin_misp_connector.add_event(first, pythonify=True)
+            second = self.admin_misp_connector.add_event(second, pythonify=True)
+            r = self.user_misp_connector.change_user_password('Password1234')
+            self.assertEqual(r['message'], 'Password Changed.')
+            self.test_usr.autoalert = True
+            self.test_usr.termsaccepted = True
+            user = self.user_misp_connector.update_user(self.test_usr, pythonify=True)
+            self.assertTrue(user.autoalert)
+            self.admin_misp_connector.publish(first, alert=True)
+            self.admin_misp_connector.publish(second, alert=True)
+            time.sleep(10)
+            # FIXME https://github.com/MISP/MISP/issues/4872
+            # mail_logs = self.admin_misp_connector.search_logs(model='User', action='email', limit=2, pythonify=True)
+            mail_logs = self.admin_misp_connector.search_logs(model='User', action='email', created=datetime.now() - timedelta(seconds=30), pythonify=True)
+            self.assertEqual(len(mail_logs), 3)
+            self.assertTrue(mail_logs[0].title.startswith(f'Email  to {self.admin_misp_connector._current_user.email}'), mail_logs[0].title)
+            self.assertTrue(mail_logs[1].title.startswith(f'Email  to {self.user_misp_connector._current_user.email}'), mail_logs[1].title)
+            self.assertTrue(mail_logs[2].title.startswith(f'Email  to {self.user_misp_connector._current_user.email}'), mail_logs[2].title)
+
+            # Delete
+            # FIXME: https://github.com/MISP/MISP/issues/5297
+            # response = self.admin_misp_connector.delete_user_setting('publish_alert_filter')
+        finally:
+            self.test_usr.autoalert = False
+            self.user_misp_connector.update_user(self.test_usr)
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+            self.admin_misp_connector.delete_event(second)
+
     @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_communities(self):
         communities = self.admin_misp_connector.communities(pythonify=True)
@@ -1977,7 +2031,7 @@ class TestComprehensive(unittest.TestCase):
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
-            self.admin_misp_connector.delete_event(second['Event']['id'])
+            self.admin_misp_connector.delete_event(second)
 
 
 if __name__ == '__main__':

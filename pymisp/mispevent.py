@@ -1121,6 +1121,20 @@ class MISPCommunity(AbstractMISP):
         return '<{self.__class__.__name__}(name={self.name}, uuid={self.uuid})'.format(self=self)
 
 
+class MISPUserSetting(AbstractMISP):
+
+    def __init__(self):
+        super(MISPUserSetting, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if 'UserSetting' in kwargs:
+            kwargs = kwargs['UserSetting']
+        super(MISPUserSetting, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}(name={self.setting}'.format(self=self)
+
+
 class MISPObject(AbstractMISP):
 
     def __init__(self, name, strict=False, standalone=False, default_attributes_parameters={}, **kwargs):
