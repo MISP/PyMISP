@@ -23,7 +23,7 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 import argparse
-
+import string
 
 def init(url, key, verifycert):
     '''
@@ -91,7 +91,8 @@ def search_sightings(misp, from_timestamp, end_timestamp):
                         event_details = misp.get_event(attribute['Attribute']['event_id'])
                         event_info = event_details['Event']['info']
                         attribute_uuid = attribute['Attribute']['uuid']
-                        completed_sightings.append({'attribute_uuid': attribute_uuid, 'date_sighting': sighting['date_sighting'], 'source': sighting['source'], 'type': sighting['type'], 'uuid': sighting['uuid'], 'event_id':  attribute['Attribute']['event_id'], 'value':  attribute['Attribute']['value'], 'attribute_id':  attribute['Attribute']['id'], 'event_title': event_info})
+                        to_ids = attribute['Attribute']['to_ids']
+                        completed_sightings.append({'attribute_uuid': attribute_uuid, 'date_sighting': sighting['date_sighting'], 'source': sighting['source'], 'type': sighting['type'], 'uuid': sighting['uuid'], 'event_id':  attribute['Attribute']['event_id'], 'value':  attribute['Attribute']['value'], 'attribute_id':  attribute['Attribute']['id'], 'event_title': event_info, 'to_ids': to_ids})
                     else:
                         continue
 
@@ -127,10 +128,12 @@ if __name__ == '__main__':
             else:
                 s_type = 'FP'
             date_sighting = datetime.fromtimestamp(int(s['date_sighting'])).strftime(ts_format)
+            s_title = s['event_title']
+            s_title = s_title.replace('\r','').replace('\n','').replace('\t','')
             source = s['source']
             if not s['source']:
                 source = 'N/A'
-            report_sightings = report_sightings + '%s for [%s] (%s) in event [%s] (%s) on %s from %s\n' % (s_type, s['value'], s['attribute_id'], s['event_title'], s['event_id'], date_sighting, source)
+            report_sightings = report_sightings + '%s for [%s] (%s) in event [%s] (%s) on %s from %s (to_ids flag: %s) \n' % ( s_type, s['value'], s['attribute_id'], s_title, s['event_id'], date_sighting, source, s['to_ids'])
 
         set_drift_timestamp(end_timestamp, drift_timestamp_path)
     else:
