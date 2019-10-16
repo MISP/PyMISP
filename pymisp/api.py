@@ -19,7 +19,7 @@ from deprecated import deprecated
 from . import __version__, warning_2020
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject, MISPSharingGroup
-from .abstract import AbstractMISP, pymisp_json_default, MISPFileCache, describe_types
+from .abstract import AbstractMISP, pymisp_json_default, describe_types
 
 logger = logging.getLogger('pymisp')
 
@@ -53,7 +53,7 @@ Response (if any):
 {}'''
 
 
-class PyMISP(MISPFileCache):  # pragma: no cover
+class PyMISP(object):  # pragma: no cover
     """Python API for MISP
 
     :param url: URL of the MISP instance you want to connect to
