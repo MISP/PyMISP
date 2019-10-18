@@ -427,7 +427,7 @@ class MISPEvent(AbstractMISP):
             schema_file = 'schema.json'
         else:
             schema_file = 'schema-lax.json'
-        if sys.version_info >= (3, 6):
+        if sys.version_info >= (3, 4):
             self.__json_schema = self._load_json(self.resources_path / schema_file)
         else:
             self.__json_schema = self._load_json(os.path.join(self.resources_path, schema_file))
@@ -1211,7 +1211,7 @@ class MISPObject(AbstractMISP):
             self.misp_objects_path = misp_objects_path_custom
 
         # Try to get the template
-        if sys.version_info >= (3, 6):
+        if sys.version_info >= (3, 4):
             self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
         else:
             self._known_template = self._load_template_path(os.path.join(self.misp_objects_path, self.name, 'definition.json'))

@@ -66,6 +66,28 @@ if sys.version_info < (3, 0):
                 data = load(f)
             return data
 
+elif sys.version_info < (3, 4):
+    from collections.abc import MutableMapping
+    from functools import lru_cache
+    import os
+
+    resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+    misp_objects_path = os.path.join(resources_path, 'misp-objects', 'objects')
+    with open(os.path.join(resources_path, 'describeTypes.json'), 'r') as f:
+        describe_types = load(f)['result']
+
+    class MISPFileCache(object):
+        # cache up to 150 JSON structures in class attribute
+
+        @staticmethod
+        @lru_cache(maxsize=150)
+        def _load_json(path):
+            if not os.path.exists(path):
+                return None
+            with open(path, 'r') as f:
+                data = load(f)
+            return data
+
 else:
     from collections.abc import MutableMapping
     from functools import lru_cache
