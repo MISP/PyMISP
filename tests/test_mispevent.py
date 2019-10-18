@@ -159,6 +159,9 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.add_object(name='file', strict=True)
         a = self.mispevent.objects[0].add_attribute('filename', value='bar', Tag=[{'name': 'blah'}])
         del a.uuid
+        a = self.mispevent.objects[0].add_attribute('pattern-in-file', value='baz')
+        self.assertEqual(a.category, 'Artifacts dropped')
+        del a.uuid
         self.mispevent.add_object(name='file', strict=False, default_attributes_parameters=self.mispevent.objects[0].attributes[0])
         a = self.mispevent.objects[1].add_attribute('filename', value='baz')
         del a.uuid

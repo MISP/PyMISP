@@ -14,6 +14,14 @@
           "to_ids": true,
           "type": "filename",
           "value": "bar"
+        },
+        {
+          "category": "Artifacts dropped",
+          "disable_correlation": false,
+          "object_relation": "pattern-in-file",
+          "to_ids": true,
+          "type": "pattern-in-file",
+          "value": "baz"
         }
       ],
       "description": "File object describing a file with meta-information",

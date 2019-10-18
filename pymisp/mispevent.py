@@ -1070,6 +1070,9 @@ class MISPObjectAttribute(MISPAttribute):
         self.type = kwargs.pop('type', None)
         if self.type is None:
             self.type = self._definition.get('misp-attribute')
+        if 'category' not in kwargs and 'categories' in self._definition:
+            # Get first category in the list from the object template as default
+            self.category = self._definition['categories'][0]
         self.disable_correlation = kwargs.pop('disable_correlation', None)
         if self.disable_correlation is None:
             # The correlation can be disabled by default in the object definition.
@@ -1331,7 +1334,7 @@ class MISPObject(AbstractMISP):
             logger.warning("The value of the attribute you're trying to add is None or empty string, skipping it. Object relation: {}".format(object_relation))
             return None
         if self._known_template:
-            if self._definition['attributes'].get(object_relation):
+            if object_relation in self._definition['attributes']:
                 attribute = MISPObjectAttribute(self._definition['attributes'][object_relation])
             else:
                 # Woopsie, this object_relation is unknown, no sane defaults for you.
