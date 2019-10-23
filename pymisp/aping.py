@@ -1390,7 +1390,7 @@ class ExpandedPyMISP(PyMISP):
                **kwargs):
         '''Search in the MISP instance
 
-        :param returnFormat: Set the return format of the search (Currently supported: json, xml, openioc, suricata, snort - more formats are being moved to restSearch with the goal being that all searches happen through this API). Can be passed as the first parameter after restSearch or via the JSON payload.
+        :param return_format: Set the return format of the search (Currently supported: json, xml, openioc, suricata, snort - more formats are being moved to restSearch with the goal being that all searches happen through this API). Can be passed as the first parameter after restSearch or via the JSON payload.
         :param limit: Limit the number of results returned, depending on the scope (for example 10 attributes or 10 full events).
         :param page: If a limit is set, sets the page to be returned. page 3, limit 100 will return records 201->300).
         :param value: Search for the given value in the attributes' value field.
