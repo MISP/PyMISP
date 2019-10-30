@@ -2,6 +2,14 @@ Changelog
 =========
 
 
+v2.4.117.2 (2019-10-30)
+-----------------------
+
+Fix
+~~~
+- Avoid exception on legacy MISP. [Raphaël Vinot]
+
+
 v2.4.117.1 (2019-10-30)
 -----------------------
 
@@ -11,6 +19,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Use default category from template. [Raphaël Vinot]
