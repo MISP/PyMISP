@@ -52,7 +52,7 @@ def make_macho_objects(lief_parsed, misp_file, standalone=True, default_attribut
 def make_binary_objects(filepath=None, pseudofile=None, filename=None, standalone=True, default_attributes_parameters={}):
     misp_file = FileObject(filepath=filepath, pseudofile=pseudofile, filename=filename,
                            standalone=standalone, default_attributes_parameters=default_attributes_parameters)
-    if HAS_LIEF and filepath or (pseudofile and filename):
+    if HAS_LIEF and (filepath or (pseudofile and filename)):
         try:
             if filepath:
                 lief_parsed = lief.parse(filepath=filepath)
