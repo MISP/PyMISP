@@ -2,6 +2,46 @@ Changelog
 =========
 
 
+v2.4.117.1 (2019-10-30)
+-----------------------
+
+New
+~~~
+- Add support for UserSettings. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Use default category from template. [Raphaël Vinot]
+
+  Fix #477
+- Skip usersettings tests when emails are disabled. [Raphaël Vinot]
+
+Fix
+~~~
+- [examples] typo uuid. [Jean-Louis Huynen]
+
+  give me a hoodie.
+- Prevents exception when lief is not installed. [Christophe Vandeplas]
+- Python <3.4 should work again.... [Raphaël Vinot]
+
+  Fix #482
+- Remote_describe_types response was invalid. [Raphaël Vinot]
+- Missing file in last commit. [Raphaël Vinot]
+- Remove overwrite of remote_describe_types. [Raphaël Vinot]
+
+Other
+~~~~~
+- Added example for checking sync servers. [wotschel]
+- Corrected docstring. [Shortfinga]
+- Include to_ids and replace newlines in title. [Koen Van Impe]
+- Update aping.py. [ater49]
+
+  Just fixing a typo
+- Remove unused MISPFileCache from PyMISP class. [Marc Hoersken]
+
+
 v2.4.117 (2019-10-10)
 ---------------------
 
@@ -14,6 +54,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Test if json exists in cached method. [Raphaël Vinot]
 - Decode datetime without dateutils if possible. [Raphaël Vinot]
