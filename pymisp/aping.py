@@ -1280,6 +1280,8 @@ class ExpandedPyMISP(PyMISP):
         if not expanded:
             return u
         else:
+            if self._old_misp((2, 4, 117), '2020-01-01', sys._getframe().f_code.co_name):
+                return u, None, None
             r = MISPRole()
             r.from_dict(**user['Role'])
             usersettings = []
