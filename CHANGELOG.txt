@@ -2,6 +2,152 @@ Changelog
 =========
 
 
+v2.4.117.2 (2019-10-30)
+-----------------------
+
+Fix
+~~~
+- Avoid exception on legacy MISP. [Raphaël Vinot]
+
+
+v2.4.117.1 (2019-10-30)
+-----------------------
+
+New
+~~~
+- Add support for UserSettings. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Use default category from template. [Raphaël Vinot]
+
+  Fix #477
+- Skip usersettings tests when emails are disabled. [Raphaël Vinot]
+
+Fix
+~~~
+- [examples] typo uuid. [Jean-Louis Huynen]
+
+  give me a hoodie.
+- Prevents exception when lief is not installed. [Christophe Vandeplas]
+- Python <3.4 should work again.... [Raphaël Vinot]
+
+  Fix #482
+- Remote_describe_types response was invalid. [Raphaël Vinot]
+- Missing file in last commit. [Raphaël Vinot]
+- Remove overwrite of remote_describe_types. [Raphaël Vinot]
+
+Other
+~~~~~
+- Added example for checking sync servers. [wotschel]
+- Corrected docstring. [Shortfinga]
+- Include to_ids and replace newlines in title. [Koen Van Impe]
+- Update aping.py. [ater49]
+
+  Just fixing a typo
+- Remove unused MISPFileCache from PyMISP class. [Marc Hoersken]
+
+
+v2.4.117 (2019-10-10)
+---------------------
+
+New
+~~~
+- Better handling of delete(d) attributes. [Raphaël Vinot]
+
+  * Hard delete on attribute
+  * Get the deleted attributes within an event
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Test if json exists in cached method. [Raphaël Vinot]
+- Decode datetime without dateutils if possible. [Raphaël Vinot]
+- Add support for rapidjson, refactoring and code cleanup. [Raphaël
+  Vinot]
+- Cleanups. [Raphaël Vinot]
+- Cleanups and improvements. [Raphaël Vinot]
+- [types] updated to the latest version. [Christophe Vandeplas]
+
+  now using the gen_misp_types_categories using jq
+- [describeTypes] updated to the latest version. [Alexandre Dulaunoy]
+- Bump dependencies. [Raphaël Vinot]
+- Add missing return formats in restsearch, bump objects. [Raphaël
+  Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Update search examples. [Raphaël Vinot]
+- Update main notebook. [Raphaël Vinot]
+- [test] remove attribute field which was not foreseen in 2.4 branch.
+  [Alexandre Dulaunoy]
+- Fix travis tests due to sighting_timestamp. [Raphaël Vinot]
+- Use default for warnings. [Raphaël Vinot]
+
+  fix: #453
+- Dump dependencies, update tests. [Raphaël Vinot]
+- Bump readme. [Raphaël Vinot]
+- Update upload malware/attachment example script. [Raphaël Vinot]
+
+  Fix #447
+
+  Make data at attibute level more generic with getter/setter methods
+
+Fix
+~~~
+- [Python2] Use LRU cache decorator, fix call to describe_types in
+  PyMISP. [Raphaël Vinot]
+- Python2 SyntaxError... [Raphaël Vinot]
+- Objects helpers were broken, do not overwrite describe_types. [Raphaël
+  Vinot]
+- Support for legacy python versions. [Raphaël Vinot]
+
+  90 days and counting, folks.
+- Cache object templates at AbstractMISP level. [Raphaël Vinot]
+
+  Related #468 and  #471
+- Cache describeTypes at AbstractMISP level. [Raphaël Vinot]
+- Big speed improvment when loading MISPEvent. [Raphaël Vinot]
+
+  1. `properties` is a list comprehension
+  2. Massively reduce the amount of calls to `properties`
+- Python 2.7 support. [Raphaël Vinot]
+
+  I want a cookie.
+
+Other
+~~~~~
+- Use classmethod instead of staticmethod and avoid hard-coded
+  reference. [Marc Hoersken]
+- Cache JSON definitions in memory LFU cache provided by cachetools.
+  [Marc Hoersken]
+
+  - Path and modified time of JSON file are used as the cache key
+  - Global state is hidden away inside a root-class for re-use
+  - Maximum size is 150 considering the number of JSON definitions
+
+  During my tests the memory usage of the test suites was halved.
+- Fix mixed whitespace in the travis helper script files. [Marc
+  Hoersken]
+- Remove explicit clonce as the viper-test-files are now a Git
+  submodule. [Marc Hoersken]
+- Add viper-test-files repository as Git submodule. [Marc Hoersken]
+- Update .gitignore to exclude files produced during tests. [Marc
+  Hoersken]
+- Code cleanup. [Koen Van Impe]
+- Update type and code cleanup. [Koen Van Impe]
+- List all the sightings - show_sightings.py. [Koen Van Impe]
+- Disable to_ids based on false positive sightings reporting. [Koen Van
+  Impe]
+- Adds support to add local tags. [Antoine Cailliau]
+
+  Requires https://github.com/MISP/MISP/pull/5215 to be merged first.
+- Minor grammar errors. [Miroslav Stampar]
+- Make client_certs out of the box friendly. [Campbell McKenzie]
+
+
 v2.4.114 (2019-08-30)
 ---------------------
 
@@ -16,6 +162,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump Changelog. [Raphaël Vinot]
 - Temp disable tests for request_community_access. [Raphaël Vinot]
 - Disable test for now. [Raphaël Vinot]

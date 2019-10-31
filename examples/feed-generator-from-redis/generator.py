@@ -281,7 +281,7 @@ class FeedGenerator:
         # reference org
         org_dict = {}
         org_dict['name'] = settings.org_name
-        org_dict['uui'] = settings.org_uuid
+        org_dict['uuid'] = settings.org_uuid
         event['Orgc'] = org_dict
 
         # save event on disk

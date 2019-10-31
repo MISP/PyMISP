@@ -18,8 +18,11 @@ import sys
 from . import __version__
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPNotImplementedYet, PyMISPError, NoURL, NoKey
 from .api import everything_broken, PyMISP
-from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity
-from .abstract import MISPEncode, MISPTag, AbstractMISP
+from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, \
+    MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, \
+    MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
+    MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting
+from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 SearchType = TypeVar('SearchType', str, int)
 # str: string to search / list: values to search (OR) / dict: {'OR': [list], 'NOT': [list], 'AND': [list]}
@@ -78,11 +81,14 @@ class ExpandedPyMISP(PyMISP):
                 if recommended_version_tup < pymisp_version_tup[:3]:
                     logger.info(f"The version of PyMISP recommended by the MISP instance (response['version']) is older than the one you're using now ({__version__}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.")
                 elif pymisp_version_tup[:3] < recommended_version_tup:
-                    logger.warning(f"The version of PyMISP recommended by the MI)SP instance ({response['version']}) is newer than the one you're using now ({__version__}). Please upgrade PyMISP.")
+                    logger.warning(f"The version of PyMISP recommended by the MISP instance ({response['version']}) is newer than the one you're using now ({__version__}). Please upgrade PyMISP.")
 
             misp_version = self.misp_instance_version
             if 'version' in misp_version:
                 self._misp_version = tuple(int(v) for v in misp_version['version'].split('.'))
+
+            # Get the user information
+            self._current_user, self._current_role, self._current_user_settings = self.get_user(pythonify=True, expanded=True)
         except Exception as e:
             raise PyMISPError(f'Unable to connect to MISP ({self.root_url}). Please make sure the API key and the URL are correct (http/https is required): {e}')
 
@@ -106,16 +112,14 @@ class ExpandedPyMISP(PyMISP):
     @property
     def describe_types_local(self):
         '''Returns the content of describe types from the package'''
-        with (self.resources_path / 'describeTypes.json').open() as f:
-            describe_types = json.load(f)
-        return describe_types['result']
+        return describe_types
 
     @property
     def describe_types_remote(self):
         '''Returns the content of describe types from the remote instance'''
         response = self._prepare_request('GET', 'attributes/describeTypes.json')
-        describe_types = self._check_response(response, expect_json=True)
-        return describe_types['result']
+        remote_describe_types = self._check_response(response, expect_json=True)
+        return remote_describe_types['result']
 
     @property
     def recommended_pymisp_version(self):
@@ -1263,8 +1267,9 @@ class ExpandedPyMISP(PyMISP):
             to_return.append(u)
         return to_return
 
-    def get_user(self, user: Union[MISPUser, int, str, UUID]='me', pythonify: bool=False):
-        '''Get a user. `me` means the owner of the API key doing the query.'''
+    def get_user(self, user: Union[MISPUser, int, str, UUID]='me', pythonify: bool=False, expanded: bool=False):
+        '''Get a user. `me` means the owner of the API key doing the query.
+        expanded also returns a MISPRole and a MISPUserSetting'''
         user_id = self.__get_uuid_or_id_from_abstract_misp(user)
         user = self._prepare_request('GET', f'users/view/{user_id}')
         user = self._check_response(user, expect_json=True)
@@ -1272,7 +1277,20 @@ class ExpandedPyMISP(PyMISP):
             return user
         u = MISPUser()
         u.from_dict(**user)
-        return u
+        if not expanded:
+            return u
+        else:
+            if self._old_misp((2, 4, 117), '2020-01-01', sys._getframe().f_code.co_name):
+                return u, None, None
+            r = MISPRole()
+            r.from_dict(**user['Role'])
+            usersettings = []
+            if user['UserSetting']:
+                for name, value in user['UserSetting'].items():
+                    us = MISPUserSetting()
+                    us.from_dict(**{'name': name, 'value': value})
+                    usersettings.append(us)
+            return u, r, usersettings
 
     def add_user(self, user: MISPUser, pythonify: bool=False):
         '''Add a new user'''
@@ -1290,7 +1308,10 @@ class ExpandedPyMISP(PyMISP):
             user_id = self.__get_uuid_or_id_from_abstract_misp(user)
         else:
             user_id = self.__get_uuid_or_id_from_abstract_misp(user_id)
-        updated_user = self._prepare_request('POST', f'admin/users/edit/{user_id}', data=user)
+        url = f'users/edit/{user_id}'
+        if self._current_role.perm_admin or self._current_role.perm_site_admin:
+            url = f'admin/{url}'
+        updated_user = self._prepare_request('POST', url, data=user)
         updated_user = self._check_response(updated_user, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_user:
             return updated_user
@@ -1303,6 +1324,10 @@ class ExpandedPyMISP(PyMISP):
         # NOTE: MISP in inconsistent and currently require "delete" in the path and doesn't support HTTP DELETE
         user_id = self.__get_uuid_or_id_from_abstract_misp(user)
         response = self._prepare_request('POST', f'admin/users/delete/{user_id}')
+        return self._check_response(response, expect_json=True)
+
+    def change_user_password(self, new_password: str, user: Union[MISPUser, int, str, UUID]=None):
+        response = self._prepare_request('POST', f'users/change_pw', data={'password': new_password})
         return self._check_response(response, expect_json=True)
 
     # ## END User ###
@@ -1367,7 +1392,7 @@ class ExpandedPyMISP(PyMISP):
                **kwargs):
         '''Search in the MISP instance
 
-        :param returnFormat: Set the return format of the search (Currently supported: json, xml, openioc, suricata, snort - more formats are being moved to restSearch with the goal being that all searches happen through this API). Can be passed as the first parameter after restSearch or via the JSON payload.
+        :param return_format: Set the return format of the search (Currently supported: json, xml, openioc, suricata, snort - more formats are being moved to restSearch with the goal being that all searches happen through this API). Can be passed as the first parameter after restSearch or via the JSON payload.
         :param limit: Limit the number of results returned, depending on the scope (for example 10 attributes or 10 full events).
         :param page: If a limit is set, sets the page to be returned. page 3, limit 100 will return records 201->300).
         :param value: Search for the given value in the attributes' value field.
@@ -1413,7 +1438,7 @@ class ExpandedPyMISP(PyMISP):
 
         '''
 
-        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2']
+        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings']
 
         if controller not in ['events', 'attributes', 'objects', 'sightings']:
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
@@ -1728,6 +1753,19 @@ class ExpandedPyMISP(PyMISP):
             to_return.append(ml)
         return to_return
 
+    def search_feeds(self, value: Optional[SearchParameterTypes]=None, pythonify: Optional[bool]=False):
+        '''Search in the feeds cached on the servers'''
+        response = self._prepare_request('POST', '/feeds/searchCaches', data={'value': value})
+        normalized_response = self._check_response(response, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in normalized_response:
+            return normalized_response
+        to_return = []
+        for feed in normalized_response:
+            f = MISPFeed()
+            f.from_dict(**feed)
+            to_return.append(f)
+        return to_return
+
     # ## END Search methods ###
 
     # ## BEGIN Communities ###
@@ -1933,6 +1971,61 @@ class ExpandedPyMISP(PyMISP):
 
     # ## END Statistics ###
 
+    # ## BEGIN User Settings ###
+
+    def user_settings(self, pythonify: bool=False):
+        """Get all the user settings."""
+        user_settings = self._prepare_request('GET', 'user_settings')
+        user_settings = self._check_response(user_settings, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in user_settings:
+            return user_settings
+        to_return = []
+        for user_setting in user_settings:
+            u = MISPUserSetting()
+            u.from_dict(**user_setting)
+            to_return.append(u)
+        return to_return
+
+    def get_user_setting(self, user_setting: str, user: Union[MISPUser, int, str, UUID]=None, pythonify: bool=False):
+        '''Get an user setting'''
+        query = {'setting': user_setting}
+        if user:
+            query['user_id'] = self.__get_uuid_or_id_from_abstract_misp(user)
+        response = self._prepare_request('POST', f'user_settings/getSetting')
+        user_setting = self._check_response(response, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in user_setting:
+            return user_setting
+        u = MISPUserSetting()
+        u.from_dict(**user_setting)
+        return u
+
+    def set_user_setting(self, user_setting: str, value: Union[str, dict], user: Union[MISPUser, int, str, UUID]=None, pythonify: bool=False):
+        '''Get an user setting'''
+        query = {'setting': user_setting}
+        if isinstance(value, dict):
+            value = json.dumps(value)
+        query['value'] = value
+        if user:
+            query['user_id'] = self.__get_uuid_or_id_from_abstract_misp(user)
+        response = self._prepare_request('POST', f'user_settings/setSetting', data=query)
+        user_setting = self._check_response(response, expect_json=True)
+        if not (self.global_pythonify or pythonify) or 'errors' in user_setting:
+            return user_setting
+        u = MISPUserSetting()
+        u.from_dict(**user_setting)
+        return u
+
+    def delete_user_setting(self, user_setting: str, user: Union[MISPUser, int, str, UUID]=None):
+        '''Delete a user setting'''
+        query = {'setting': user_setting}
+        if user:
+            query['user_id'] = self.__get_uuid_or_id_from_abstract_misp(user)
+        response = self._prepare_request('POST', f'user_settings/delete', data=query)
+        return self._check_response(response, expect_json=True)
+
+
+    # ## END User Settings ###
+
     # ## BEGIN Global helpers ###
 
     def change_sharing_group_on_entity(self, misp_entity: AbstractMISP, sharing_group_id, pythonify: bool=False):
@@ -1952,13 +2045,13 @@ class ExpandedPyMISP(PyMISP):
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: Union[AbstractMISP, str], tag: str):
+    def tag(self, misp_entity: Union[AbstractMISP, str], tag: str, local: bool=False):
         """Tag an event or an attribute. misp_entity can be a UUID"""
         if 'uuid' in misp_entity:
             uuid = misp_entity.uuid
         else:
             uuid = misp_entity
-        to_post = {'uuid': uuid, 'tag': tag}
+        to_post = {'uuid': uuid, 'tag': tag, 'local': local}
         response = self._prepare_request('POST', 'tags/attachTagToObject', data=to_post)
         return self._check_response(response, expect_json=True)
 
@@ -2005,6 +2098,12 @@ class ExpandedPyMISP(PyMISP):
             return str(obj)
         if isinstance(obj, (int, str)):
             return obj
+
+        if isinstance(obj, dict) and len(obj.keys()) == 1:
+            # We have an object in that format: {'Event': {'id': 2, ...}}
+            # We need to get the content of that dictionary
+            obj = obj[list(obj.keys())[0]]
+
         if self._old_misp((2, 4, 113), '2020-01-01', sys._getframe().f_code.co_name, message='MISP now accepts UUIDs to access entiries, usinf it is a lot safer across instances. Just update your MISP instance, plz.'):
             if 'id' in obj:
                 return obj['id']
@@ -2098,7 +2197,7 @@ class ExpandedPyMISP(PyMISP):
                 if isinstance(data, dict):  # Else, we can directly json encode.
                     # Remove None values.
                     data = {k: v for k, v in data.items() if v is not None}
-                data = json.dumps(data, cls=MISPEncode)
+                data = json.dumps(data, default=pymisp_json_default)
 
         if kw_params:
             # CakePHP params in URL

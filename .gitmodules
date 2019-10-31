@@ -4,3 +4,6 @@
 [submodule "pymisp/tools/pdf_fonts"]
 	path = pymisp/tools/pdf_fonts
 	url = https://github.com/MISP/pdf_fonts
+[submodule "tests/viper-test-files"]
+	path = tests/viper-test-files
+	url = https://github.com/viper-framework/viper-test-files.git

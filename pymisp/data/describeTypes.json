@@ -159,6 +159,7 @@
         "btc",
         "cc-number",
         "comment",
+        "dash",
         "hex",
         "iban",
         "other",
@@ -534,6 +535,10 @@
       "cpe": {
         "default_category": "Other",
         "to_ids": 0
+      },
+      "dash": {
+        "default_category": "Financial fraud",
+        "to_ids": 1
       },
       "date-of-birth": {
         "default_category": "Person",
@@ -1111,6 +1116,7 @@
       "counter",
       "country-of-residence",
       "cpe",
+      "dash",
       "date-of-birth",
       "datetime",
       "dns-soa-email",

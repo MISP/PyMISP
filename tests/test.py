@@ -6,7 +6,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'https://localhost:8443'
-    key = 'K5yV0CcxdnklzDfCKlnPniIxrMX41utQ2dG13zZ3'
+    key = 'd6OmdDFvU3Seau3UjwvHS1y3tFQbaRNhJhDX0tjh'
 
 import time
 

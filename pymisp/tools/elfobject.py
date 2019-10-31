@@ -25,6 +25,7 @@ except ImportError:
 class ELFObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
+        super(ELFObject, self).__init__('elf', standalone=standalone, **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_LIEF:
@@ -44,7 +45,6 @@ class ELFObject(AbstractMISPObjectGenerator):
                 self.__elf = parsed
             else:
                 raise InvalidMISPObject('Not a lief.ELF.Binary: {}'.format(type(parsed)))
-        super(ELFObject, self).__init__('elf', standalone=standalone, **kwargs)
         self.generate_attributes()
 
     def generate_attributes(self):

@@ -3,24 +3,41 @@
 
 import sys
 import datetime
-import json
+
+from deprecated import deprecated
 from json import JSONEncoder
+from uuid import UUID
+
+try:
+    from rapidjson import load
+    from rapidjson import loads
+    from rapidjson import dumps
+    import rapidjson
+    HAS_RAPIDJSON = True
+except ImportError:
+    from json import load
+    from json import loads
+    from json import dumps
+    import json
+    HAS_RAPIDJSON = False
+
 import logging
 from enum import Enum
 
 from .exceptions import PyMISPInvalidFormat
-
-# Try to import MutableMapping the python 3.3+ way
-try:
-    from collections.abc import MutableMapping
-except Exception:
-    pass
 
 
 logger = logging.getLogger('pymisp')
 
 if sys.version_info < (3, 0):
     from collections import MutableMapping
+    import os
+    from cachetools import cached, LRUCache
+
+    resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+    misp_objects_path = os.path.join(resources_path, 'misp-objects', 'objects')
+    with open(os.path.join(resources_path, 'describeTypes.json'), 'r') as f:
+        describe_types = load(f)['result']
 
     # This is required because Python 2 is a pain.
     from datetime import tzinfo, timedelta
@@ -36,6 +53,62 @@ if sys.version_info < (3, 0):
 
         def dst(self, dt):
             return timedelta(0)
+
+    class MISPFileCache(object):
+        # cache up to 150 JSON structures in class attribute
+
+        @staticmethod
+        @cached(cache=LRUCache(maxsize=150))
+        def _load_json(path):
+            if not os.path.exists(path):
+                return None
+            with open(path, 'r') as f:
+                data = load(f)
+            return data
+
+elif sys.version_info < (3, 4):
+    from collections.abc import MutableMapping
+    from functools import lru_cache
+    import os
+
+    resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
+    misp_objects_path = os.path.join(resources_path, 'misp-objects', 'objects')
+    with open(os.path.join(resources_path, 'describeTypes.json'), 'r') as f:
+        describe_types = load(f)['result']
+
+    class MISPFileCache(object):
+        # cache up to 150 JSON structures in class attribute
+
+        @staticmethod
+        @lru_cache(maxsize=150)
+        def _load_json(path):
+            if not os.path.exists(path):
+                return None
+            with open(path, 'r') as f:
+                data = load(f)
+            return data
+
+else:
+    from collections.abc import MutableMapping
+    from functools import lru_cache
+    from pathlib import Path
+
+    resources_path = Path(__file__).parent / 'data'
+    misp_objects_path = resources_path / 'misp-objects' / 'objects'
+    with (resources_path / 'describeTypes.json').open('r') as f:
+        describe_types = load(f)['result']
+
+    class MISPFileCache(object):
+        # cache up to 150 JSON structures in class attribute
+
+        @staticmethod
+        @lru_cache(maxsize=150)
+        def _load_json(path):
+            if not path.exists():
+                return None
+            with path.open('r') as f:
+                data = load(f)
+            return data
 
 
 class Distribution(Enum):
@@ -68,8 +141,8 @@ def _int_to_str(d):
     return d
 
 
+@deprecated(reason=" Use method default=pymisp_json_default instead of cls=MISPEncode", version='2.4.117', action='default')
 class MISPEncode(JSONEncoder):
-
     def default(self, obj):
         if isinstance(obj, AbstractMISP):
             return obj.jsonable()
@@ -77,16 +150,46 @@ class MISPEncode(JSONEncoder):
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
+        elif isinstance(obj, UUID):
+            return str(obj)
         return JSONEncoder.default(self, obj)
 
 
-class AbstractMISP(MutableMapping):
+if HAS_RAPIDJSON:
+    def pymisp_json_default(obj):
+        if isinstance(obj, AbstractMISP):
+            return obj.jsonable()
+        elif isinstance(obj, (datetime.datetime, datetime.date)):
+            return obj.isoformat()
+        elif isinstance(obj, Enum):
+            return obj.value
+        elif isinstance(obj, UUID):
+            return str(obj)
+        return rapidjson.default(obj)
+else:
+    def pymisp_json_default(obj):
+        if isinstance(obj, AbstractMISP):
+            return obj.jsonable()
+        elif isinstance(obj, (datetime.datetime, datetime.date)):
+            return obj.isoformat()
+        elif isinstance(obj, Enum):
+            return obj.value
+        elif isinstance(obj, UUID):
+            return str(obj)
+        return json.default(obj)
+
+
+class AbstractMISP(MutableMapping, MISPFileCache):
+    __resources_path = resources_path
+    __misp_objects_path = misp_objects_path
+    __describe_types = describe_types
 
     def __init__(self, **kwargs):
         """Abstract class for all the MISP objects"""
         super(AbstractMISP, self).__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
         self.__not_jsonable = []
+        self.__self_defined_describe_types = None
 
         if kwargs.get('force_timestamps') is not None:
             # Ignore the edited objects and keep the timestamps.
@@ -103,16 +206,28 @@ class AbstractMISP(MutableMapping):
             setattr(AbstractMISP, 'tags', property(AbstractMISP.__get_tags, AbstractMISP.__set_tags))
 
     @property
-    def properties(self):
-        """All the class public properties that will be dumped in the dictionary, and the JSON export.
-        Note: all the properties starting with a `_` (private), or listed in __not_jsonable will be skipped.
-        """
-        to_return = []
-        for prop, value in vars(self).items():
-            if prop.startswith('_') or prop in self.__not_jsonable:
-                continue
-            to_return.append(prop)
-        return to_return
+    def describe_types(self):
+        if self.__self_defined_describe_types:
+            return self.__self_defined_describe_types
+        return self.__describe_types
+
+    @describe_types.setter
+    def describe_types(self, describe_types):
+        self.__self_defined_describe_types = describe_types
+
+    @property
+    def resources_path(self):
+        return self.__resources_path
+
+    @property
+    def misp_objects_path(self):
+        return self.__misp_objects_path
+
+    @misp_objects_path.setter
+    def misp_objects_path(self, misp_objects_path):
+        if sys.version_info >= (3, 0) and isinstance(misp_objects_path, str):
+            misp_objects_path = Path(misp_objects_path)
+        self.__misp_objects_path = misp_objects_path
 
     def from_dict(self, **kwargs):
         """Loading all the parameters as class properties, if they aren't `None`.
@@ -137,21 +252,21 @@ class AbstractMISP(MutableMapping):
 
     def from_json(self, json_string):
         """Load a JSON string"""
-        self.from_dict(**json.loads(json_string))
+        self.from_dict(**loads(json_string))
 
     def to_dict(self):
-        """Dump the lass to a dictionary.
+        """Dump the class to a dictionary.
         This method automatically removes the timestamp recursively in every object
         that has been edited is order to let MISP update the event accordingly."""
+        is_edited = self.edited
         to_return = {}
-        for attribute in self.properties:
-            val = getattr(self, attribute, None)
+        for attribute, val in self.items():
             if val is None:
                 continue
             elif isinstance(val, list) and len(val) == 0:
                 continue
             if attribute == 'timestamp':
-                if not self.__force_timestamps and self.edited:
+                if not self.__force_timestamps and is_edited:
                     # In order to be accepted by MISP, the timestamp of an object
                     # needs to be either newer, or None.
                     # If the current object is marked as edited, the easiest is to
@@ -167,13 +282,15 @@ class AbstractMISP(MutableMapping):
         """This method is used by the JSON encoder"""
         return self.to_dict()
 
-    def to_json(self):
+    def to_json(self, sort_keys=False, indent=None):
         """Dump recursively any class of type MISPAbstract to a json string"""
-        return json.dumps(self, cls=MISPEncode, sort_keys=True, indent=2)
+        return dumps(self, default=pymisp_json_default, sort_keys=sort_keys, indent=indent)
 
     def __getitem__(self, key):
         try:
-            return getattr(self, key)
+            if key[0] != '_' and key not in self.__not_jsonable:
+                return self.__dict__[key]
+            raise KeyError
         except AttributeError:
             # Expected by pop and other dict-related methods
             raise KeyError
@@ -185,10 +302,10 @@ class AbstractMISP(MutableMapping):
         delattr(self, key)
 
     def __iter__(self):
-        return iter(self.to_dict())
+        return iter({k: v for k, v in self.__dict__.items() if not (k[0] == '_' or k in self.__not_jsonable)})
 
     def __len__(self):
-        return len(self.to_dict())
+        return len([k for k in self.__dict__.keys() if not (k[0] == '_' or k in self.__not_jsonable)])
 
     @property
     def edited(self):
@@ -196,15 +313,14 @@ class AbstractMISP(MutableMapping):
         to the parent objects"""
         if self.__edited:
             return self.__edited
-        for p in self.properties:
-            if self.__edited:
-                break
-            val = getattr(self, p)
+        for p, val in self.items():
             if isinstance(val, AbstractMISP) and val.edited:
                 self.__edited = True
+                break
             elif isinstance(val, list) and all(isinstance(a, AbstractMISP) for a in val):
                 if any(a.edited for a in val):
                     self.__edited = True
+                    break
         return self.__edited
 
     @edited.setter
@@ -216,7 +332,9 @@ class AbstractMISP(MutableMapping):
             raise Exception('edited can only be True or False')
 
     def __setattr__(self, name, value):
-        if name in self.properties:
+        if name[0] != '_' and not self.__edited and name in self.keys():
+            # The private members don't matter
+            # If we already have a key with that name, we're modifying it.
             self.__edited = True
         super(AbstractMISP, self).__setattr__(name, value)
 

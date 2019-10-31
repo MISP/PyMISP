@@ -17,6 +17,7 @@ from deprecated import deprecated
 from .abstract import AbstractMISP
 from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
 
+
 logger = logging.getLogger('pymisp')
 
 if sys.version_info < (3, 0):
@@ -109,18 +110,11 @@ class MISPAttribute(AbstractMISP):
             :strict: If false, fallback to sane defaults for the attribute type if the ones passed by the user are incorrect
         """
         super(MISPAttribute, self).__init__()
-        if not describe_types:
-            ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-                if OLD_PY3:
-                    t = json.loads(f.read().decode())
-                else:
-                    t = json.load(f)
-            describe_types = t['result']
-        self.__categories = describe_types['categories']
-        self._types = describe_types['types']
-        self.__category_type_mapping = describe_types['category_type_mappings']
-        self.__sane_default = describe_types['sane_defaults']
+        if describe_types:
+            self.describe_types = describe_types
+        self.__categories = self.describe_types['categories']
+        self.__category_type_mapping = self.describe_types['category_type_mappings']
+        self.__sane_default = self.describe_types['sane_defaults']
         self.__strict = strict
         self._data = None
         self.uuid = str(uuid.uuid4())
@@ -130,7 +124,7 @@ class MISPAttribute(AbstractMISP):
     @property
     def known_types(self):
         """Returns a list of all the known MISP attributes types"""
-        return self._types
+        return self.describe_types['types']
 
     @property
     def malware_binary(self):
@@ -204,8 +198,8 @@ class MISPAttribute(AbstractMISP):
         return misp_sighting
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Attribute'):
-            kwargs = kwargs.get('Attribute')
+        if 'Attribute' in kwargs:
+            kwargs = kwargs['Attribute']
         if kwargs.get('type') and kwargs.get('category'):
             if kwargs['type'] not in self.__category_type_mapping[kwargs['category']]:
                 if self.__strict:
@@ -218,7 +212,7 @@ class MISPAttribute(AbstractMISP):
         if self.type is None:
             raise NewAttributeError('The type of the attribute is required.')
         if self.type not in self.known_types:
-            raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self._types))))
+            raise NewAttributeError('{} is invalid, type has to be in {}'.format(self.type, (', '.join(self.known_types))))
 
         type_defaults = self.__sane_default[self.type]
 
@@ -226,7 +220,14 @@ class MISPAttribute(AbstractMISP):
         if self.value is None:
             raise NewAttributeError('The value of the attribute is required.')
         if self.type == 'datetime' and isinstance(self.value, str):
-            self.value = parse(self.value)
+            try:
+                if '.' in self.value:
+                    self.value = datetime.datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f")
+                else:
+                    self.value = datetime.datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
+                # Slower, but if the other ones fail, that's a good fallback
+                self.value = parse(self.value)
 
         # Default values
         self.category = kwargs.pop('category', type_defaults['default_category'])
@@ -278,14 +279,11 @@ class MISPAttribute(AbstractMISP):
                 raise NewAttributeError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
 
         if kwargs.get('Tag'):
-            for tag in kwargs.pop('Tag'):
-                self.add_tag(tag)
+            [self.add_tag(tag) for tag in kwargs.pop('Tag')]
         if kwargs.get('Sighting'):
-            for sighting in kwargs.pop('Sighting'):
-                self.add_sighting(sighting)
+            [self.add_sighting(sighting) for sighting in kwargs.pop('Sighting')]
         if kwargs.get('ShadowAttribute'):
-            for s_attr in kwargs.pop('ShadowAttribute'):
-                self.add_shadow_attribute(s_attr)
+            [self.add_shadow_attribute(s_attr) for s_attr in kwargs.pop('ShadowAttribute')]
 
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.pop("disable_correlation", False)
@@ -425,31 +423,18 @@ class MISPEvent(AbstractMISP):
 
     def __init__(self, describe_types=None, strict_validation=False, **kwargs):
         super(MISPEvent, self).__init__(**kwargs)
-        ressources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if strict_validation:
-            with open(os.path.join(ressources_path, 'schema.json'), 'rb') as f:
-                if OLD_PY3:
-                    self.__json_schema = json.loads(f.read().decode())
-                else:
-                    self.__json_schema = json.load(f)
+            schema_file = 'schema.json'
         else:
-            with open(os.path.join(ressources_path, 'schema-lax.json'), 'rb') as f:
-                if OLD_PY3:
-                    self.__json_schema = json.loads(f.read().decode())
-                else:
-                    self.__json_schema = json.load(f)
+            schema_file = 'schema-lax.json'
+        if sys.version_info >= (3, 4):
+            self.__json_schema = self._load_json(self.resources_path / schema_file)
+        else:
+            self.__json_schema = self._load_json(os.path.join(self.resources_path, schema_file))
         if describe_types:
             # This variable is used in add_attribute in order to avoid duplicating the structure
-            self._describe_types = describe_types
-        else:
-            with open(os.path.join(ressources_path, 'describeTypes.json'), 'rb') as f:
-                if OLD_PY3:
-                    t = json.loads(f.read().decode())
-                else:
-                    t = json.load(f)
-            self._describe_types = t['result']
+            self.describe_types = describe_types
 
-        self._types = self._describe_types['types']
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
@@ -457,7 +442,7 @@ class MISPEvent(AbstractMISP):
 
     @property
     def known_types(self):
-        return self._types
+        return self.describe_types['types']
 
     @property
     def org(self):
@@ -554,8 +539,8 @@ class MISPEvent(AbstractMISP):
                 raise NewEventError('Invalid format for the date: {} - {}'.format(date, type(date)))
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Event'):
-            kwargs = kwargs.get('Event')
+        if 'Event' in kwargs:
+            kwargs = kwargs['Event']
         # Required value
         self.info = kwargs.pop('info', None)
         if self.info is None:
@@ -587,8 +572,7 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('date'):
             self.set_date(kwargs.pop('date'))
         if kwargs.get('Attribute'):
-            for a in kwargs.pop('Attribute'):
-                self.add_attribute(**a)
+            [self.add_attribute(**a) for a in kwargs.pop('Attribute')]
 
         # All other keys
         if kwargs.get('id'):
@@ -615,11 +599,9 @@ class MISPEvent(AbstractMISP):
                 sub_event.load(rel_event)
                 self.RelatedEvent.append({'Event': sub_event})
         if kwargs.get('Tag'):
-            for tag in kwargs.pop('Tag'):
-                self.add_tag(tag)
+            [self.add_tag(tag) for tag in kwargs.pop('Tag')]
         if kwargs.get('Object'):
-            for obj in kwargs.pop('Object'):
-                self.add_object(obj)
+            [self.add_object(obj) for obj in kwargs.pop('Object')]
         if kwargs.get('Org'):
             self.Org = MISPOrganisation()
             self.Org.from_dict(**kwargs.pop('Org'))
@@ -720,7 +702,7 @@ class MISPEvent(AbstractMISP):
         if isinstance(value, list):
             attr_list = [self.add_attribute(type=type, value=a, **kwargs) for a in value]
         else:
-            attribute = MISPAttribute(describe_types=self._describe_types)
+            attribute = MISPAttribute(describe_types=self.describe_types)
             attribute.from_dict(type=type, value=value, **kwargs)
             self.attributes.append(attribute)
         self.edited = True
@@ -879,8 +861,8 @@ class MISPObjectReference(AbstractMISP):
         super(MISPObjectReference, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('ObjectReference'):
-            kwargs = kwargs.get('ObjectReference')
+        if 'ObjectReference' in kwargs:
+            kwargs = kwargs['ObjectReference']
         super(MISPObjectReference, self).from_dict(**kwargs)
 
     def __repr__(self):
@@ -895,8 +877,8 @@ class MISPObjectTemplate(AbstractMISP):
         super(MISPObjectTemplate, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('ObjectTemplate'):
-            kwargs = kwargs.get('ObjectTemplate')
+        if 'ObjectTemplate' in kwargs:
+            kwargs = kwargs['ObjectTemplate']
         super(MISPObjectTemplate, self).from_dict(**kwargs)
 
 
@@ -906,8 +888,8 @@ class MISPUser(AbstractMISP):
         super(MISPUser, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('User'):
-            kwargs = kwargs.get('User')
+        if 'User' in kwargs:
+            kwargs = kwargs['User']
         super(MISPUser, self).from_dict(**kwargs)
 
     def __repr__(self):
@@ -922,8 +904,8 @@ class MISPOrganisation(AbstractMISP):
         super(MISPOrganisation, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Organisation'):
-            kwargs = kwargs.get('Organisation')
+        if 'Organisation' in kwargs:
+            kwargs = kwargs['Organisation']
         super(MISPOrganisation, self).from_dict(**kwargs)
 
 
@@ -933,8 +915,8 @@ class MISPFeed(AbstractMISP):
         super(MISPFeed, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Feed'):
-            kwargs = kwargs.get('Feed')
+        if 'Feed' in kwargs:
+            kwargs = kwargs['Feed']
         super(MISPFeed, self).from_dict(**kwargs)
 
 
@@ -944,8 +926,8 @@ class MISPWarninglist(AbstractMISP):
         super(MISPWarninglist, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Warninglist'):
-            kwargs = kwargs.get('Warninglist')
+        if 'Warninglist' in kwargs:
+            kwargs = kwargs['Warninglist']
         super(MISPWarninglist, self).from_dict(**kwargs)
 
 
@@ -955,8 +937,8 @@ class MISPTaxonomy(AbstractMISP):
         super(MISPTaxonomy, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Taxonomy'):
-            kwargs = kwargs.get('Taxonomy')
+        if 'Taxonomy' in kwargs:
+            kwargs = kwargs['Taxonomy']
         super(MISPTaxonomy, self).from_dict(**kwargs)
 
 
@@ -966,8 +948,8 @@ class MISPGalaxy(AbstractMISP):
         super(MISPGalaxy, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Galaxy'):
-            kwargs = kwargs.get('Galaxy')
+        if 'Galaxy' in kwargs:
+            kwargs = kwargs['Galaxy']
         super(MISPGalaxy, self).from_dict(**kwargs)
 
 
@@ -977,8 +959,8 @@ class MISPNoticelist(AbstractMISP):
         super(MISPNoticelist, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Noticelist'):
-            kwargs = kwargs.get('Noticelist')
+        if 'Noticelist' in kwargs:
+            kwargs = kwargs['Noticelist']
         super(MISPNoticelist, self).from_dict(**kwargs)
 
 
@@ -988,8 +970,8 @@ class MISPRole(AbstractMISP):
         super(MISPRole, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Role'):
-            kwargs = kwargs.get('Role')
+        if 'Role' in kwargs:
+            kwargs = kwargs['Role']
         super(MISPRole, self).from_dict(**kwargs)
 
 
@@ -999,8 +981,8 @@ class MISPServer(AbstractMISP):
         super(MISPServer, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Server'):
-            kwargs = kwargs.get('Server')
+        if 'Server' in kwargs:
+            kwargs = kwargs['Server']
         super(MISPServer, self).from_dict(**kwargs)
 
 
@@ -1010,8 +992,8 @@ class MISPSharingGroup(AbstractMISP):
         super(MISPSharingGroup, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('SharingGroup'):
-            kwargs = kwargs.get('SharingGroup')
+        if 'SharingGroup' in kwargs:
+            kwargs = kwargs['SharingGroup']
         super(MISPSharingGroup, self).from_dict(**kwargs)
 
 
@@ -1021,8 +1003,8 @@ class MISPLog(AbstractMISP):
         super(MISPLog, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Log'):
-            kwargs = kwargs.get('Log')
+        if 'Log' in kwargs:
+            kwargs = kwargs['Log']
         super(MISPLog, self).from_dict(**kwargs)
 
     def __repr__(self):
@@ -1035,8 +1017,8 @@ class MISPEventDelegation(AbstractMISP):
         super(MISPEventDelegation, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('EventDelegation'):
-            kwargs = kwargs.get('EventDelegation')
+        if 'EventDelegation' in kwargs:
+            kwargs = kwargs['EventDelegation']
         super(MISPEventDelegation, self).from_dict(**kwargs)
 
     def __repr__(self):
@@ -1058,8 +1040,8 @@ class MISPSighting(AbstractMISP):
         :type: Type of the sighting
         :timestamp: Timestamp associated to the sighting
         """
-        if kwargs.get('Sighting'):
-            kwargs = kwargs.get('Sighting')
+        if 'Sighting' in kwargs:
+            kwargs = kwargs['Sighting']
         super(MISPSighting, self).from_dict(**kwargs)
 
     def __repr__(self):
@@ -1081,11 +1063,16 @@ class MISPObjectAttribute(MISPAttribute):
     def from_dict(self, object_relation, value, **kwargs):
         self.object_relation = object_relation
         self.value = value
+        if 'Attribute' in kwargs:
+            kwargs = kwargs['Attribute']
         # Initialize the new MISPAttribute
         # Get the misp attribute type from the definition
         self.type = kwargs.pop('type', None)
         if self.type is None:
             self.type = self._definition.get('misp-attribute')
+        if 'category' not in kwargs and 'categories' in self._definition:
+            # Get first category in the list from the object template as default
+            self.category = self._definition['categories'][0]
         self.disable_correlation = kwargs.pop('disable_correlation', None)
         if self.disable_correlation is None:
             # The correlation can be disabled by default in the object definition.
@@ -1098,6 +1085,8 @@ class MISPObjectAttribute(MISPAttribute):
         if not self.type:
             raise NewAttributeError("The type of the attribute is required. Is the object template missing?")
         super(MISPObjectAttribute, self).from_dict(**dict(self, **kwargs))
+        # FIXME New syntax python3 only, keep for later.
+        # super(MISPObjectAttribute, self).from_dict(**{**self, **kwargs})
 
     def __repr__(self):
         if hasattr(self, 'value'):
@@ -1111,8 +1100,8 @@ class MISPShadowAttribute(AbstractMISP):
         super(MISPShadowAttribute, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('ShadowAttribute'):
-            kwargs = kwargs.get('ShadowAttribute')
+        if 'ShadowAttribute' in kwargs:
+            kwargs = kwargs['ShadowAttribute']
         super(MISPShadowAttribute, self).from_dict(**kwargs)
 
     def __repr__(self):
@@ -1127,12 +1116,26 @@ class MISPCommunity(AbstractMISP):
         super(MISPCommunity, self).__init__()
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Community'):
-            kwargs = kwargs.get('Community')
+        if 'Community' in kwargs:
+            kwargs = kwargs['Community']
         super(MISPCommunity, self).from_dict(**kwargs)
 
     def __repr__(self):
         return '<{self.__class__.__name__}(name={self.name}, uuid={self.uuid})'.format(self=self)
+
+
+class MISPUserSetting(AbstractMISP):
+
+    def __init__(self):
+        super(MISPUserSetting, self).__init__()
+
+    def from_dict(self, **kwargs):
+        if 'UserSetting' in kwargs:
+            kwargs = kwargs['UserSetting']
+        super(MISPUserSetting, self).from_dict(**kwargs)
+
+    def __repr__(self):
+        return '<{self.__class__.__name__}(name={self.setting}'.format(self=self)
 
 
 class MISPObject(AbstractMISP):
@@ -1155,20 +1158,7 @@ class MISPObject(AbstractMISP):
         self.name = name
         self._known_template = False
 
-        if kwargs.get('misp_objects_path_custom'):
-            # If misp_objects_path_custom is given, and an object with the given name exists, use that.
-            self._known_template = self._load_template_path(os.path.join(kwargs.get('misp_objects_path_custom'), self.name, 'definition.json'))
-
-        if not self._known_template:
-            # Check if the object is known in the default templates bundled in with PyMISP
-            misp_objects_path = os.path.join(os.path.abspath(os.path.dirname(sys.modules['pymisp'].__file__)), 'data', 'misp-objects', 'objects')
-            self._known_template = self._load_template_path(os.path.join(misp_objects_path, self.name, 'definition.json'))
-
-        if not self._known_template and self._strict:
-            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
-        else:
-            # Then we have no meta-category, template_uuid, description and template_version
-            pass
+        self._set_template(kwargs.get('misp_objects_path_custom'))
 
         self.uuid = str(uuid.uuid4())
         self.__fast_attribute_access = defaultdict(list)  # Hashtable object_relation: [attributes]
@@ -1204,13 +1194,9 @@ class MISPObject(AbstractMISP):
             self.update_not_jsonable('ObjectReference')
 
     def _load_template_path(self, template_path):
-        if not os.path.exists(template_path):
+        self._definition = self._load_json(template_path)
+        if not self._definition:
             return False
-        with open(template_path, 'rb') as f:
-            if OLD_PY3:
-                self._definition = json.loads(f.read().decode())
-            else:
-                self._definition = json.load(f)
         setattr(self, 'meta-category', self._definition['meta-category'])
         self.template_uuid = self._definition['uuid']
         self.description = self._definition['description']
@@ -1220,11 +1206,24 @@ class MISPObject(AbstractMISP):
     def force_misp_objects_path_custom(self, misp_objects_path_custom, object_name=None):
         if object_name:
             self.name = object_name
-        template_path = os.path.join(misp_objects_path_custom, self.name, 'definition.json')
+        self._set_template(misp_objects_path_custom)
 
-        self._known_template = self._load_template_path(template_path)
-        if not self._known_template:
-            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory ({}).'.format(self.name, template_path))
+    def _set_template(self, misp_objects_path_custom=None):
+        if misp_objects_path_custom:
+            # If misp_objects_path_custom is given, and an object with the given name exists, use that.
+            self.misp_objects_path = misp_objects_path_custom
+
+        # Try to get the template
+        if sys.version_info >= (3, 4):
+            self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
+        else:
+            self._known_template = self._load_template_path(os.path.join(self.misp_objects_path, self.name, 'definition.json'))
+
+        if not self._known_template and self._strict:
+            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
+        else:
+            # Then we have no meta-category, template_uuid, description and template_version
+            pass
 
     @property
     def disable_validation(self):
@@ -1254,8 +1253,8 @@ class MISPObject(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPObjectReference.')
 
     def from_dict(self, **kwargs):
-        if kwargs.get('Object'):
-            kwargs = kwargs.get('Object')
+        if 'Object' in kwargs:
+            kwargs = kwargs['Object']
         if self._known_template:
             if kwargs.get('template_uuid') and kwargs['template_uuid'] != self.template_uuid:
                 if self._strict:
@@ -1283,11 +1282,9 @@ class MISPObject(AbstractMISP):
             else:
                 self.timestamp = datetime.datetime.fromtimestamp(int(ts), UTC())
         if kwargs.get('Attribute'):
-            for a in kwargs.pop('Attribute'):
-                self.add_attribute(**a)
+            [self.add_attribute(**a) for a in kwargs.pop('Attribute')]
         if kwargs.get('ObjectReference'):
-            for r in kwargs.pop('ObjectReference'):
-                self.add_reference(**r)
+            [self.add_reference(**r) for r in kwargs.pop('ObjectReference')]
 
         # Not supported yet - https://github.com/MISP/PyMISP/issues/168
         # if kwargs.get('Tag'):
@@ -1337,7 +1334,7 @@ class MISPObject(AbstractMISP):
             logger.warning("The value of the attribute you're trying to add is None or empty string, skipping it. Object relation: {}".format(object_relation))
             return None
         if self._known_template:
-            if self._definition['attributes'].get(object_relation):
+            if object_relation in self._definition['attributes']:
                 attribute = MISPObjectAttribute(self._definition['attributes'][object_relation])
             else:
                 # Woopsie, this object_relation is unknown, no sane defaults for you.
@@ -1347,6 +1344,8 @@ class MISPObject(AbstractMISP):
             attribute = MISPObjectAttribute({})
         # Overwrite the parameters of self._default_attributes_parameters with the ones of value
         attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
+        # FIXME New syntax python3 only, keep for later.
+        # attribute.from_dict(object_relation=object_relation, **{**self._default_attributes_parameters, **value})
         self.__fast_attribute_access[object_relation].append(attribute)
         self.Attribute.append(attribute)
         self.edited = True

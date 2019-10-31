@@ -19,7 +19,7 @@ from deprecated import deprecated
 from . import __version__, warning_2020
 from .exceptions import PyMISPError, SearchError, NoURL, NoKey, PyMISPEmptyResponse
 from .mispevent import MISPEvent, MISPAttribute, MISPUser, MISPOrganisation, MISPSighting, MISPFeed, MISPObject, MISPSharingGroup
-from .abstract import AbstractMISP, MISPEncode
+from .abstract import AbstractMISP, pymisp_json_default, describe_types
 
 logger = logging.getLogger('pymisp')
 
@@ -36,11 +36,6 @@ try:
     HAVE_REQUESTS = True
 except ImportError:
     HAVE_REQUESTS = False
-
-if (3, 0) <= sys.version_info < (3, 6):
-    OLD_PY3 = True
-else:
-    OLD_PY3 = False
 
 try:
     from requests_futures.sessions import FuturesSession
@@ -140,24 +135,19 @@ class PyMISP(object):  # pragma: no cover
 
     @deprecated(reason="Use ExpandedPyMISP.describe_types_local", version='2.4.110', action='default')
     def get_local_describe_types(self):
-        with open(os.path.join(self.resources_path, 'describeTypes.json'), 'rb') as f:
-            if OLD_PY3:
-                describe_types = json.loads(f.read().decode())
-            else:
-                describe_types = json.load(f)
-        return describe_types['result']
+        return describe_types
 
     @deprecated(reason="Use ExpandedPyMISP.describe_types_remote", version='2.4.110', action='default')
     def get_live_describe_types(self):
         response = self._prepare_request('GET', urljoin(self.root_url, 'attributes/describeTypes.json'))
-        describe_types = self._check_response(response)
-        if describe_types.get('error'):
-            for e in describe_types.get('error'):
+        remote_describe_types = self._check_response(response)
+        if remote_describe_types.get('error'):
+            for e in remote_describe_types.get('error'):
                 raise PyMISPError('Failed: {}'.format(e))
-        describe_types = describe_types['result']
-        if not describe_types.get('sane_defaults'):
+        remote_describe_types = remote_describe_types['result']
+        if not remote_describe_types.get('sane_defaults'):
             raise PyMISPError('The MISP server your are trying to reach is outdated (<2.4.52). Please use PyMISP v2.4.51.1 (pip install -I PyMISP==v2.4.51.1) and/or contact your administrator.')
-        return describe_types
+        return remote_describe_types
 
     def _prepare_request(self, request_type, url, data=None,
                          background_callback=None, output_type='json'):
@@ -172,7 +162,7 @@ class PyMISP(object):  # pragma: no cover
                 if isinstance(data, dict):
                     # Remove None values.
                     data = {k: v for k, v in data.items() if v is not None}
-                data = json.dumps(data, cls=MISPEncode)
+                data = json.dumps(data, default=pymisp_json_default)
             req = requests.Request(request_type, url, data=data)
         if self.asynch and background_callback is not None:
             local_session = FuturesSession
@@ -614,7 +604,7 @@ class PyMISP(object):  # pragma: no cover
             else:
                 data = attributes.to_json()
             # _prepare_request(...) returns a requests.Response Object
-            resp = self._prepare_request('POST', url, json.dumps(data, cls=MISPEncode))
+            resp = self._prepare_request('POST', url, json.dumps(data, default=pymisp_json_default))
             try:
                 responses.append(resp.json())
             except Exception:
@@ -1068,7 +1058,7 @@ class PyMISP(object):  # pragma: no cover
         url = urljoin(self.root_url, 'shadow_attributes/{}/{}'.format(path, id))
         if path in ['add', 'edit']:
             query = {'request': {'ShadowAttribute': attribute}}
-            response = self._prepare_request('POST', url, json.dumps(query, cls=MISPEncode))
+            response = self._prepare_request('POST', url, json.dumps(query, default=pymisp_json_default))
         elif path == 'view':
             response = self._prepare_request('GET', url)
         else:  # accept or discard

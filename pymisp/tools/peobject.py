@@ -26,6 +26,9 @@ except ImportError:
 class PEObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
+        # Python3 way
+        # super().__init__('pe')
+        super(PEObject, self).__init__('pe', standalone=standalone, **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_LIEF:
@@ -45,9 +48,6 @@ class PEObject(AbstractMISPObjectGenerator):
                 self.__pe = parsed
             else:
                 raise InvalidMISPObject('Not a lief.PE.Binary: {}'.format(type(parsed)))
-        # Python3 way
-        # super().__init__('pe')
-        super(PEObject, self).__init__('pe', standalone=standalone, **kwargs)
         self.generate_attributes()
 
     def _is_exe(self):
