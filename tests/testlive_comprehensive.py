@@ -1757,7 +1757,7 @@ class TestComprehensive(unittest.TestCase):
                 break
         # Get
         botvrij = self.admin_misp_connector.get_feed(feed, pythonify=True)
-        self.assertEqual(botvrij.url, "http://www.botvrij.eu/data/feed-osint")
+        self.assertEqual(botvrij.url, "https://www.botvrij.eu/data/feed-osint")
         # Enable
         # MISP OSINT
         feed = self.admin_misp_connector.enable_feed(feeds[0].id, pythonify=True)
