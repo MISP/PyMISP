@@ -1561,6 +1561,10 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(entry.action, 'edit')
         r = self.admin_misp_connector.update_user({'email': 'testusr@user.local'}, self.test_usr)
 
+    def test_db_schema(self):
+        diag = self.admin_misp_connector.db_schema_diagnostic()
+        self.assertEqual(diag['actual_db_version'], diag['expected_db_version'], diag)
+
     def test_live_acl(self):
         missing_acls = self.admin_misp_connector.remote_acl()
         self.assertEqual(missing_acls, [], msg=missing_acls)

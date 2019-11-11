@@ -179,6 +179,10 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', f'/servers/restartWorkers')
         return self._check_response(response, expect_json=True)
 
+    def db_schema_diagnostic(self):
+        response = self._prepare_request('GET', f'/servers/dbSchemaDiagnostic')
+        return self._check_response(response, expect_json=True)
+
     def toggle_global_pythonify(self):
         self.global_pythonify = not self.global_pythonify
 
