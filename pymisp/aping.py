@@ -2193,16 +2193,17 @@ class ExpandedPyMISP(PyMISP):
                          kw_params: dict={}, output_type: str='json'):
         '''Prepare a request for python-requests'''
         url = urljoin(self.root_url, url)
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'{request_type} - {url}')
-            if data is not None:
-                logger.debug(data)
         if data:
             if not isinstance(data, str):  # Else, we already have a text blob to send
                 if isinstance(data, dict):  # Else, we can directly json encode.
                     # Remove None values.
                     data = {k: v for k, v in data.items() if v is not None}
                 data = json.dumps(data, default=pymisp_json_default)
+
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'{request_type} - {url}')
+            if data is not None:
+                logger.debug(data)
 
         if kw_params:
             # CakePHP params in URL
