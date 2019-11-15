@@ -5,6 +5,7 @@ import unittest
 import json
 import sys
 from io import BytesIO
+import glob
 
 from pymisp import MISPEvent, MISPSighting, MISPTag
 from pymisp.exceptions import InvalidMISPObject
@@ -290,6 +291,26 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/misp_custom_obj.json', 'r') as f:
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
+    def test_object_templates(self):
+        me = MISPEvent()
+        for template in glob.glob(str(me.misp_objects_path / '*' / 'definition.json')):
+            with open(template) as f:
+                t_json = json.load(f)
+                if 'requiredOneOf' in t_json:
+                    obj_relations = set(t_json['attributes'].keys())
+                    subset = set(t_json['requiredOneOf']).issubset(obj_relations)
+                    self.assertTrue(subset, f'{t_json["name"]}')
+                if 'required' in t_json:
+                    obj_relations = set(t_json['attributes'].keys())
+                    subset = set(t_json['required']).issubset(obj_relations)
+                    self.assertTrue(subset, f'{t_json["name"]}')
+                for obj_relation, entry in t_json['attributes'].items():
+                    self.assertTrue(entry['misp-attribute'] in me.describe_types['types'])
+                    if 'categories' in entry:
+                        subset = set(entry['categories']).issubset(me.describe_types['categories'])
+                        self.assertTrue(subset, f'{t_json["name"]} - {obj_relation}')
 
 
 if __name__ == '__main__':
