@@ -1370,10 +1370,10 @@ class MISPObject(AbstractMISP):
             self._validate()
         return super(MISPObject, self).to_dict()
 
-    def to_json(self, strict=False):
+    def to_json(self, strict=False, sort_keys=False, indent=None):
         if strict or self._strict and self._known_template:
             self._validate()
-        return super(MISPObject, self).to_json()
+        return super(MISPObject, self).to_json(sort_keys=sort_keys, indent=indent)
 
     def _validate(self):
         """Make sure the object we're creating has the required fields"""
