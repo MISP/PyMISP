@@ -282,6 +282,15 @@ class AbstractMISP(MutableMapping, MISPFileCache):
         """This method is used by the JSON encoder"""
         return self.to_dict()
 
+    def _to_feed(self):
+        if not hasattr(self, '_fields_for_feed'):
+            raise Exception('Unable to export in the feed format, _fields_for_feed is missing.')
+        to_return = {}
+        for field in self._fields_for_feed:
+            if getattr(self, field, None):
+                to_return[field] = getattr(self, field)
+        return to_return
+
     def to_json(self, sort_keys=False, indent=None):
         """Dump recursively any class of type MISPAbstract to a json string"""
         return dumps(self, default=pymisp_json_default, sort_keys=sort_keys, indent=indent)
@@ -393,6 +402,9 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
 
 class MISPTag(AbstractMISP):
+
+    _fields_for_feed = {'name', 'colour', 'exportable'}
+
     def __init__(self):
         super(MISPTag, self).__init__()
 

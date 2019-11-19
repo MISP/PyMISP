@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 import datetime
@@ -11,6 +10,7 @@ import sys
 import uuid
 from collections import defaultdict
 import logging
+import hashlib
 
 from deprecated import deprecated
 
@@ -103,6 +103,8 @@ def make_bool(value):
 
 
 class MISPAttribute(AbstractMISP):
+    _fields_for_feed = {'uuid', 'value', 'category', 'type', 'comment', 'data',
+                        'timestamp', 'to_ids', 'object_relation', 'disable_correlation'}
 
     def __init__(self, describe_types=None, strict=False):
         """Represents an Attribute
@@ -120,6 +122,24 @@ class MISPAttribute(AbstractMISP):
         self.uuid = str(uuid.uuid4())
         self.ShadowAttribute = []
         self.Sighting = []
+
+    def _to_feed(self, valid_distributions):
+        if (hasattr(self, 'distribution') and self.distribution is not None
+                and self.distribution not in valid_distributions):
+            return False
+        to_return = super(MISPAttribute, self)._to_feed()
+        to_return['Tag'] = [tag._to_feed() for tag in self.tags]
+        # Compute the hash of every values for fast lookups
+        hashes = []
+        if '|' in self.type or self.type == 'malware-sample':
+            hashes = [hashlib.md5(v.encode("utf-8")).hexdigest() for v in self.value.split('|')]
+        else:
+            to_encode = self.value
+            if not isinstance(to_encode, str):
+                to_encode = str(to_encode)
+            hashes = [hashlib.md5(to_encode.encode("utf-8")).hexdigest()]
+        to_return['_hashes'] = hashes
+        return to_return
 
     @property
     def known_types(self):
@@ -421,6 +441,9 @@ class MISPAttribute(AbstractMISP):
 
 class MISPEvent(AbstractMISP):
 
+    _fields_for_feed = {'uuid', 'info', 'threat_level_id', 'analysis', 'timestamp',
+                        'publish_timestamp', 'published', 'date', 'extends_uuid'}
+
     def __init__(self, describe_types=None, strict_validation=False, **kwargs):
         super(MISPEvent, self).__init__(**kwargs)
         if strict_validation:
@@ -435,10 +458,64 @@ class MISPEvent(AbstractMISP):
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self.describe_types = describe_types
 
+        self.uuid = str(uuid.uuid4())
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
         self.ShadowAttribute = []
+
+    def to_feed(self, date=None, uuid=None, analysis=2, threat_level_id=4, valid_distributions=[0, 1, 2, 3, 4, 5]):
+        """ Generate a json output for MISP Feed.
+        Notes:
+            * valid_distributions only makes sense if the distribution key is set (i.e. the event is exported from a MISP instance)
+            * analysis: 0 means initial, 1 ongoing, 2 completed
+            * threat_level_id 4 means undefine. Tags are recommended.
+        """
+        if hasattr(self, 'distribution') and self.distribution not in valid_distributions:
+            raise PyMISPError('Invalid event distribution ({}). Not in {}'.format(self.distribution, ', '.join(valid_distributions)))
+
+        if date:
+            self.set_date(date)
+        elif not hasattr(self, 'date'):
+            self.set_date(datetime.date.today())
+
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = int(datetime.datetime.timestamp(datetime.datetime.now()))
+
+        if uuid:
+            self.uuid = uuid
+        elif not hasattr(self, 'uuid'):
+            self.uuid = str(uuid.uuid4())
+
+        if analysis:
+            self.analysis = analysis
+        if threat_level_id:
+            self.threat_level_id = threat_level_id
+
+        to_return = super(MISPEvent, self)._to_feed()
+        to_return['date'] = to_return['date'].isoformat()
+        to_return['Orgc'] = self.Orgc._to_feed()
+        to_return['Tag'] = [tag._to_feed() for tag in self.tags]
+        to_return['Attribute'] = [attribute._to_feed() for attribute in self.attributes if attribute.distribution in valid_distributions]
+        # Get the hash of every values for fast lookups
+        to_return['_hashes'] = []
+        for attribute in to_return['Attribute']:
+            to_return['_hashes'] += attribute.pop('_hashes')
+        to_return['Object'] = [o for o in [obj._to_feed(valid_distributions) for obj in self.objects] if o]
+        for obj in to_return['Object']:
+            to_return['_hashes'] += obj.pop('_hashes')
+        to_return['_manifest'] = {
+            self.uuid: {
+                'Orgc': to_return['Orgc'],
+                'Tag': to_return['Tag'],
+                'info': self.info,
+                'date': self.date.isoformat(),
+                'analysis': self.analysis,
+                'threat_level_id': self.threat_level_id,
+                'timestamp': self.timestamp
+            }
+        }
+        return to_return
 
     @property
     def known_types(self):
@@ -857,6 +934,9 @@ class MISPEvent(AbstractMISP):
 
 class MISPObjectReference(AbstractMISP):
 
+    _fields_for_feed = {'uuid', 'timestamp', 'relationship_type', 'comment',
+                        'object_uuid', 'referenced_uuid'}
+
     def __init__(self):
         super(MISPObjectReference, self).__init__()
 
@@ -899,6 +979,8 @@ class MISPUser(AbstractMISP):
 
 
 class MISPOrganisation(AbstractMISP):
+
+    _fields_for_feed = {'name', 'uuid'}
 
     def __init__(self):
         super(MISPOrganisation, self).__init__()
@@ -1140,6 +1222,10 @@ class MISPUserSetting(AbstractMISP):
 
 class MISPObject(AbstractMISP):
 
+    _fields_for_feed = {'name', 'meta-category', 'description', 'template_uuid',
+                        'template_version', 'uuid', 'timestamp', 'distribution',
+                        'sharing_group_id', 'comment'}
+
     def __init__(self, name, strict=False, standalone=False, default_attributes_parameters={}, **kwargs):
         ''' Master class representing a generic MISP object
         :name: Name of the object
@@ -1202,6 +1288,18 @@ class MISPObject(AbstractMISP):
         self.description = self._definition['description']
         self.template_version = self._definition['version']
         return True
+
+    def _to_feed(self, valid_distributions):
+        if hasattr(self, 'distribution') and self.distribution not in valid_distributions:
+            return False
+        to_return = super(MISPObject, self)._to_feed()
+        to_return['Attribute'] = [a for a in [attribute._to_feed(valid_distributions) for attribute in self.attributes] if a]
+        # Get the hash of every values for fast lookups
+        to_return['_hashes'] = []
+        for attribute in to_return['Attribute']:
+            to_return['_hashes'] += attribute.pop('_hashes')
+        to_return['ObjectReference'] = [reference._to_feed() for reference in self.references]
+        return to_return
 
     def force_misp_objects_path_custom(self, misp_objects_path_custom, object_name=None):
         if object_name:
