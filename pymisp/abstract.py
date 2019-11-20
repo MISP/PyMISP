@@ -288,7 +288,12 @@ class AbstractMISP(MutableMapping, MISPFileCache):
         to_return = {}
         for field in self._fields_for_feed:
             if getattr(self, field, None):
-                to_return[field] = getattr(self, field)
+                if field in ['timestamp', 'publish_timestamp']:
+                    to_return[field] = self._datetime_to_timestamp(getattr(self, field))
+                elif field == 'date':
+                    to_return[field] = getattr(self, field).isoformat()
+                else:
+                    to_return[field] = getattr(self, field)
         return to_return
 
     def to_json(self, sort_keys=False, indent=None):
@@ -403,7 +408,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
 class MISPTag(AbstractMISP):
 
-    _fields_for_feed = {'name', 'colour', 'exportable'}
+    _fields_for_feed = {'name', 'colour'}
 
     def __init__(self):
         super(MISPTag, self).__init__()
@@ -412,3 +417,8 @@ class MISPTag(AbstractMISP):
         if kwargs.get('Tag'):
             kwargs = kwargs.get('Tag')
         super(MISPTag, self).from_dict(**kwargs)
+
+    def _to_feed(self):
+        if hasattr(self, 'exportable') and not self.exportable:
+            return False
+        return super(MISPTag, self)._to_feed()

@@ -128,7 +128,10 @@ class MISPAttribute(AbstractMISP):
                 and self.distribution not in valid_distributions):
             return False
         to_return = super(MISPAttribute, self)._to_feed()
-        to_return['Tag'] = [tag._to_feed() for tag in self.tags]
+        if self.data:
+            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
+        if self.tags:
+            to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
         # Compute the hash of every values for fast lookups
         hashes = []
         if '|' in self.type or self.type == 'malware-sample':
@@ -479,30 +482,36 @@ class MISPEvent(AbstractMISP):
             self.set_date(datetime.date.today())
 
         if not hasattr(self, 'timestamp'):
-            self.timestamp = int(datetime.datetime.timestamp(datetime.datetime.now()))
+            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 
         if uuid:
             self.uuid = uuid
         elif not hasattr(self, 'uuid'):
             self.uuid = str(uuid.uuid4())
 
-        if analysis:
+        if not hasattr(self, 'analysis'):
             self.analysis = analysis
-        if threat_level_id:
+        if not hasattr(self, 'threat_level_id'):
             self.threat_level_id = threat_level_id
 
         to_return = super(MISPEvent, self)._to_feed()
-        to_return['date'] = to_return['date'].isoformat()
         to_return['Orgc'] = self.Orgc._to_feed()
-        to_return['Tag'] = [tag._to_feed() for tag in self.tags]
-        to_return['Attribute'] = [attribute._to_feed() for attribute in self.attributes if attribute.distribution in valid_distributions]
-        # Get the hash of every values for fast lookups
+        to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
+
         to_return['_hashes'] = []
-        for attribute in to_return['Attribute']:
-            to_return['_hashes'] += attribute.pop('_hashes')
-        to_return['Object'] = [o for o in [obj._to_feed(valid_distributions) for obj in self.objects] if o]
-        for obj in to_return['Object']:
-            to_return['_hashes'] += obj.pop('_hashes')
+
+        if self.attributes:
+            to_return['Attribute'] = list(filter(None, [attribute._to_feed(valid_distributions) for attribute in self.attributes]))
+            # Get the hash of every values for fast lookups
+            for attribute in to_return['Attribute']:
+                to_return['_hashes'] += attribute.pop('_hashes')
+
+        if self.objects:
+            to_return['Object'] = list(filter(None, [obj._to_feed(valid_distributions) for obj in self.objects]))
+            # Get the hash of every values for fast lookups
+            for obj in to_return['Object']:
+                to_return['_hashes'] += obj.pop('_hashes')
+
         to_return['_manifest'] = {
             self.uuid: {
                 'Orgc': to_return['Orgc'],
@@ -511,7 +520,7 @@ class MISPEvent(AbstractMISP):
                 'date': self.date.isoformat(),
                 'analysis': self.analysis,
                 'threat_level_id': self.threat_level_id,
-                'timestamp': self.timestamp
+                'timestamp': self._datetime_to_timestamp(self.timestamp)
             }
         }
         return to_return
@@ -1292,12 +1301,13 @@ class MISPObject(AbstractMISP):
         if hasattr(self, 'distribution') and self.distribution not in valid_distributions:
             return False
         to_return = super(MISPObject, self)._to_feed()
-        to_return['Attribute'] = [a for a in [attribute._to_feed(valid_distributions) for attribute in self.attributes] if a]
+        to_return['Attribute'] = list(filter(None, [attribute._to_feed(valid_distributions) for attribute in self.attributes]))
         # Get the hash of every values for fast lookups
         to_return['_hashes'] = []
         for attribute in to_return['Attribute']:
             to_return['_hashes'] += attribute.pop('_hashes')
-        to_return['ObjectReference'] = [reference._to_feed() for reference in self.references]
+        if self.references:
+            to_return['ObjectReference'] = [reference._to_feed() for reference in self.references]
         return to_return
 
     def force_misp_objects_path_custom(self, misp_objects_path_custom, object_name=None):
