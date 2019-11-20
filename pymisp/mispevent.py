@@ -458,7 +458,6 @@ class MISPEvent(AbstractMISP):
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self.describe_types = describe_types
 
-        self.uuid = str(uuid.uuid4())
         self.Attribute = []
         self.Object = []
         self.RelatedEvent = []
