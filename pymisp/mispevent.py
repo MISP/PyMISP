@@ -123,6 +123,25 @@ class MISPAttribute(AbstractMISP):
         self.ShadowAttribute = []
         self.Sighting = []
 
+    def hash_values(self, algorithm='sha512'):
+        """Compute the hash of every values for fast lookups"""
+        if algorithm not in hashlib.algorithms_available:
+            raise PyMISPError('The algorithm {} is not available for hashing.'.format(algorithm))
+        if '|' in self.type or self.type == 'malware-sample':
+            hashes = []
+            for v in self.value.split('|'):
+                h = hashlib.new(algorithm)
+                h.update(v.encode("utf-8"))
+                hashes.append(h.hexdigest())
+            return hashes
+        else:
+            h = hashlib.new(algorithm)
+            to_encode = self.value
+            if not isinstance(to_encode, str):
+                to_encode = str(to_encode)
+            h.update(to_encode.encode("utf-8"))
+            return [h.hexdigest()]
+
     def _to_feed(self, valid_distributions):
         if (hasattr(self, 'distribution') and self.distribution is not None
                 and self.distribution not in valid_distributions):
@@ -132,16 +151,6 @@ class MISPAttribute(AbstractMISP):
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
         if self.tags:
             to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
-        # Compute the hash of every values for fast lookups
-        hashes = []
-        if '|' in self.type or self.type == 'malware-sample':
-            hashes = [hashlib.md5(v.encode("utf-8")).hexdigest() for v in self.value.split('|')]
-        else:
-            to_encode = self.value
-            if not isinstance(to_encode, str):
-                to_encode = str(to_encode)
-            hashes = [hashlib.md5(to_encode.encode("utf-8")).hexdigest()]
-        to_return['_hashes'] = hashes
         return to_return
 
     @property
@@ -466,56 +475,34 @@ class MISPEvent(AbstractMISP):
         self.RelatedEvent = []
         self.ShadowAttribute = []
 
-    def to_feed(self, date=None, uuid=None, analysis=2, threat_level_id=4, valid_distributions=[0, 1, 2, 3, 4, 5]):
-        """ Generate a json output for MISP Feed.
-        Notes:
-            * valid_distributions only makes sense if the distribution key is set (i.e. the event is exported from a MISP instance)
-            * analysis: 0 means initial, 1 ongoing, 2 completed
-            * threat_level_id 4 means undefine. Tags are recommended.
-        """
-        if hasattr(self, 'distribution') and self.distribution not in valid_distributions:
-            raise PyMISPError('Invalid event distribution ({}). Not in {}'.format(self.distribution, ', '.join(valid_distributions)))
-
-        if date:
-            self.set_date(date)
-        elif not hasattr(self, 'date'):
+    def _set_default(self):
+        """There are a few keys that could be set by default"""
+        if not hasattr(self, 'uuid'):
+            self.uuid = str(uuid.uuid4())
+        if not hasattr(self, 'date'):
             self.set_date(datetime.date.today())
-
         if not hasattr(self, 'timestamp'):
             self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
-
-        if uuid:
-            self.uuid = uuid
-        elif not hasattr(self, 'uuid'):
-            self.uuid = str(uuid.uuid4())
-
         if not hasattr(self, 'analysis'):
-            self.analysis = analysis
+            # analysis: 0 means initial, 1 ongoing, 2 completed
+            self.analysis = 2
         if not hasattr(self, 'threat_level_id'):
-            self.threat_level_id = threat_level_id
+            # threat_level_id 4 means undefined. Tags are recommended.
+            self.threat_level_id = 4
 
-        to_return = super(MISPEvent, self)._to_feed()
-        to_return['Orgc'] = self.Orgc._to_feed()
-        to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
+    @property
+    def manifest(self):
+        required = ['info', 'Orgc']
+        for r in required:
+            if not hasattr(self, r):
+                raise PyMISPError('The field {} is required to generate the event manifest.')
 
-        to_return['_hashes'] = []
+        self._set_default()
 
-        if self.attributes:
-            to_return['Attribute'] = list(filter(None, [attribute._to_feed(valid_distributions) for attribute in self.attributes]))
-            # Get the hash of every values for fast lookups
-            for attribute in to_return['Attribute']:
-                to_return['_hashes'] += attribute.pop('_hashes')
-
-        if self.objects:
-            to_return['Object'] = list(filter(None, [obj._to_feed(valid_distributions) for obj in self.objects]))
-            # Get the hash of every values for fast lookups
-            for obj in to_return['Object']:
-                to_return['_hashes'] += obj.pop('_hashes')
-
-        to_return['_manifest'] = {
+        return {
             self.uuid: {
-                'Orgc': to_return['Orgc'],
-                'Tag': to_return['Tag'],
+                'Orgc': self.Orgc._to_feed(),
+                'Tag': list(filter(None, [tag._to_feed() for tag in self.tags])),
                 'info': self.info,
                 'date': self.date.isoformat(),
                 'analysis': self.analysis,
@@ -523,6 +510,60 @@ class MISPEvent(AbstractMISP):
                 'timestamp': self._datetime_to_timestamp(self.timestamp)
             }
         }
+
+    def attributes_hashes(self, algorithm='sha512'):
+        to_return = []
+        for attribute in self.attributes:
+            to_return += attribute.hash_values(algorithm)
+        for obj in self.objects:
+            for attribute in obj.attributes:
+                to_return += attribute.hash_values(algorithm)
+        return to_return
+
+    def to_feed(self, valid_distributions=[0, 1, 2, 3, 4, 5], with_meta=False):
+        """ Generate a json output for MISP Feed.
+        Notes:
+            * valid_distributions only makes sense if the distribution key is set (i.e. the event is exported from a MISP instance)
+        """
+        required = ['info', 'Orgc']
+        for r in required:
+            if not hasattr(self, r):
+                raise PyMISPError('The field {} is required to generate the event feed output.')
+
+        if hasattr(self, 'distribution') and int(self.distribution) not in valid_distributions:
+            return
+
+        self._set_default()
+
+        to_return = super(MISPEvent, self)._to_feed()
+        if with_meta:
+            to_return['_hashes'] = []
+            to_return['_manifest'] = self.manifest
+
+        to_return['Orgc'] = self.Orgc._to_feed()
+        to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
+        if self.attributes:
+            to_return['Attribute'] = []
+            for attribute in self.attributes:
+                if (valid_distributions and attribute.get('distribution') is not None and attribute.distribution not in valid_distributions):
+                    continue
+                to_return['Attribute'].append(attribute._to_feed(valid_distributions))
+                if with_meta:
+                    to_return['_hashes'] += attribute.hash_values('md5')
+
+        if self.objects:
+            to_return['Object']['Attribute'] = []
+            for obj in self.objects:
+                if (valid_distributions and obj.get('distribution') is not None and obj.distribution not in valid_distributions):
+                    continue
+                to_return['Object'] = obj._to_feed()
+                for attribute in obj.attributes:
+                    if (valid_distributions and attribute.get('distribution') is not None and attribute.distribution not in valid_distributions):
+                        continue
+                    to_return['Object']['Attribute'].append(attribute._to_feed(valid_distributions))
+                    if with_meta:
+                        to_return['_hashes'] += attribute.hash_values('md5')
+
         return to_return
 
     @property
@@ -1297,15 +1338,8 @@ class MISPObject(AbstractMISP):
         self.template_version = self._definition['version']
         return True
 
-    def _to_feed(self, valid_distributions):
-        if hasattr(self, 'distribution') and self.distribution not in valid_distributions:
-            return False
+    def _to_feed(self):
         to_return = super(MISPObject, self)._to_feed()
-        to_return['Attribute'] = list(filter(None, [attribute._to_feed(valid_distributions) for attribute in self.attributes]))
-        # Get the hash of every values for fast lookups
-        to_return['_hashes'] = []
-        for attribute in to_return['Attribute']:
-            to_return['_hashes'] += attribute.pop('_hashes')
         if self.references:
             to_return['ObjectReference'] = [reference._to_feed() for reference in self.references]
         return to_return

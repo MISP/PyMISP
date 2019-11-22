@@ -287,7 +287,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
             raise Exception('Unable to export in the feed format, _fields_for_feed is missing.')
         to_return = {}
         for field in self._fields_for_feed:
-            if getattr(self, field, None):
+            if getattr(self, field, None) is not None:
                 if field in ['timestamp', 'publish_timestamp']:
                     to_return[field] = self._datetime_to_timestamp(getattr(self, field))
                 elif field == 'date':

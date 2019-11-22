@@ -21,3 +21,4 @@ if sys.version_info >= (3, 6):
     from .vehicleobject import VehicleObject  # noqa
     from .csvloader import CSVLoader  # noqa
     from .sshauthkeyobject import SSHAuthorizedKeysObject  # noqa
+    from .feed_meta_generator import feed_meta_generator  # noqa

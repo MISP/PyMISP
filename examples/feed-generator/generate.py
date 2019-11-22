@@ -14,9 +14,9 @@ def init():
     # If we have an old settings.py file then this variable won't exist
     global valid_attribute_distributions
     try:
-        valid_attribute_distributions = valid_attribute_distribution_levels
+        valid_attribute_distributions = [int(v) for v in valid_attribute_distribution_levels]
     except Exception:
-        valid_attribute_distributions = ['0', '1', '2', '3', '4', '5']
+        valid_attribute_distributions = [0, 1, 2, 3, 4, 5]
     return ExpandedPyMISP(url, key, ssl)
 
 
@@ -64,7 +64,10 @@ if __name__ == '__main__':
     total = len(events)
     for event in events:
         e = misp.get_event(event.uuid, pythonify=True)
-        e_feed = e.to_feed()
+        e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True)
+        if not e_feed:
+            print(f'Invalid distribution {e.distribution}, skipping')
+            continue
         hashes += [[h, e.uuid] for h in e_feed.pop('_hashes')]
         manifest.update(e_feed.pop('_manifest'))
         saveEvent(e_feed)
