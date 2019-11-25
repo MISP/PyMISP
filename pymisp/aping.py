@@ -1392,6 +1392,7 @@ class ExpandedPyMISP(PyMISP):
                headerless: Optional[bool]=None,
                include_sightings: Optional[bool]=None, includeSightings: Optional[bool]=None,
                include_correlations: Optional[bool]=None, includeCorrelations: Optional[bool]=None,
+               include_decay_score: Optional[bool] = None, includeDecayScore: Optional[bool] = None,
                pythonify: Optional[bool]=False,
                **kwargs):
         '''Search in the MISP instance
@@ -1466,6 +1467,8 @@ class ExpandedPyMISP(PyMISP):
             include_correlations = includeCorrelations
         if includeSightings is not None:
             include_sightings = includeSightings
+        if includeDecayScore is not None:
+            include_decay_score = includeDecayScore
         # Add all the parameters in kwargs are aimed at modules, or other 3rd party components, and cannot be sanitized.
         # They are passed as-is.
         query = kwargs
@@ -1520,6 +1523,7 @@ class ExpandedPyMISP(PyMISP):
         query['headerless'] = self._make_misp_bool(headerless)
         query['includeSightings'] = self._make_misp_bool(include_sightings)
         query['includeCorrelations'] = self._make_misp_bool(include_correlations)
+        query['includeDecayScore'] = self._make_misp_bool(include_decay_score)
         url = urljoin(self.root_url, f'{controller}/restSearch')
         response = self._prepare_request('POST', url, data=query)
         if return_format == 'json':
