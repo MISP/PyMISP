@@ -290,7 +290,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
             if getattr(self, field, None) is not None:
                 if field in ['timestamp', 'publish_timestamp']:
                     to_return[field] = self._datetime_to_timestamp(getattr(self, field))
-                elif field == 'date':
+                elif isinstance(getattr(self, field), (datetime.datetime, datetime.date)):
                     to_return[field] = getattr(self, field).isoformat()
                 else:
                     to_return[field] = getattr(self, field)
@@ -354,7 +354,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
     def _datetime_to_timestamp(self, d):
         """Convert a datetime.datetime object to a timestamp (int)"""
-        if isinstance(d, (int, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
+        if isinstance(d, (int, float, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
             # Assume we already have a timestamp
             return int(d)
         if sys.version_info >= (3, 3):

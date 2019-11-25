@@ -142,10 +142,7 @@ class MISPAttribute(AbstractMISP):
             h.update(to_encode.encode("utf-8"))
             return [h.hexdigest()]
 
-    def _to_feed(self, valid_distributions):
-        if (hasattr(self, 'distribution') and self.distribution is not None
-                and self.distribution not in valid_distributions):
-            return False
+    def _to_feed(self):
         to_return = super(MISPAttribute, self)._to_feed()
         if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
@@ -530,7 +527,9 @@ class MISPEvent(AbstractMISP):
             if not hasattr(self, r):
                 raise PyMISPError('The field {} is required to generate the event feed output.')
 
-        if hasattr(self, 'distribution') and int(self.distribution) not in valid_distributions:
+        if (hasattr(self, 'distribution')
+                and self.distribution is not None
+                and int(self.distribution) not in valid_distributions):
             return
 
         self._set_default()
@@ -547,22 +546,24 @@ class MISPEvent(AbstractMISP):
             for attribute in self.attributes:
                 if (valid_distributions and attribute.get('distribution') is not None and attribute.distribution not in valid_distributions):
                     continue
-                to_return['Attribute'].append(attribute._to_feed(valid_distributions))
+                to_return['Attribute'].append(attribute._to_feed())
                 if with_meta:
                     to_return['_hashes'] += attribute.hash_values('md5')
 
         if self.objects:
-            to_return['Object']['Attribute'] = []
+            to_return['Object'] = []
             for obj in self.objects:
                 if (valid_distributions and obj.get('distribution') is not None and obj.distribution not in valid_distributions):
                     continue
-                to_return['Object'] = obj._to_feed()
+                obj_to_attach = obj._to_feed()
+                obj_to_attach['Attribute'] = []
                 for attribute in obj.attributes:
                     if (valid_distributions and attribute.get('distribution') is not None and attribute.distribution not in valid_distributions):
                         continue
-                    to_return['Object']['Attribute'].append(attribute._to_feed(valid_distributions))
+                    obj_to_attach['Attribute'].append(attribute._to_feed())
                     if with_meta:
                         to_return['_hashes'] += attribute.hash_values('md5')
+                to_return['Object'].append(obj_to_attach)
 
         return to_return
 
