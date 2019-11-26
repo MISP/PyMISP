@@ -1392,6 +1392,7 @@ class ExpandedPyMISP(PyMISP):
                headerless: Optional[bool]=None,
                include_sightings: Optional[bool]=None, includeSightings: Optional[bool]=None,
                include_correlations: Optional[bool]=None, includeCorrelations: Optional[bool]=None,
+               sharinggroup: Optional[SearchType]=None,
                pythonify: Optional[bool]=False,
                **kwargs):
         '''Search in the MISP instance
@@ -1585,6 +1586,7 @@ class ExpandedPyMISP(PyMISP):
                      analysis: Optional[List[SearchType]]=None,
                      org: Optional[SearchParameterTypes]=None,
                      timestamp: Optional[DateInterval]=None,
+                     sharinggroup: Optional[SearchType]=None,
                      pythonify: Optional[bool]=None):
         """Search only at the index level. Using ! in front of a value means NOT (default is OR)
 

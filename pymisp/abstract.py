@@ -422,3 +422,7 @@ class MISPTag(AbstractMISP):
         if hasattr(self, 'exportable') and not self.exportable:
             return False
         return super(MISPTag, self)._to_feed()
+
+    def delete(self):
+        self.deleted = True
+        self.edited = True
