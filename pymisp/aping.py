@@ -1895,7 +1895,7 @@ class ExpandedPyMISP(PyMISP):
         if adhereToWarninglists in wl_params:
             query['adhereToWarninglists'] = adhereToWarninglists
         else:
-            raise Exception('Invalid parameter, adhereToWarninglists Can only be {}'.format(', '.join(wl_params)))
+            raise PyMISPError('Invalid parameter, adhereToWarninglists Can only be {}'.format(', '.join(wl_params)))
         if distribution is not None:
             query['distribution'] = distribution
         if returnMetaAttributes:

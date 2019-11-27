@@ -99,7 +99,7 @@ def make_bool(value):
             return False
         return True
     else:
-        raise Exception('Unable to convert {} to a boolean.'.format(value))
+        raise PyMISPError('Unable to convert {} to a boolean.'.format(value))
 
 
 class MISPAttribute(AbstractMISP):
@@ -378,7 +378,7 @@ class MISPAttribute(AbstractMISP):
             try:
                 with ZipFile(self.data) as f:
                     if not self.__is_misp_encrypted_file(f):
-                        raise Exception('Not an existing malware sample')
+                        raise PyMISPError('Not an existing malware sample')
                     for name in f.namelist():
                         if name.endswith('.filename.txt'):
                             with f.open(name, pwd=b'infected') as unpacked:
@@ -798,7 +798,7 @@ class MISPEvent(AbstractMISP):
                 attributes.append(a)
 
         if not attributes:
-            raise Exception('No attribute with identifier {} found.'.format(attribute_identifier))
+            raise PyMISPError('No attribute with identifier {} found.'.format(attribute_identifier))
         self.edited = True
         return attributes
 
@@ -820,7 +820,7 @@ class MISPEvent(AbstractMISP):
                 found = True
                 break
         if not found:
-            raise Exception('No attribute with UUID/ID {} found.'.format(attribute_id))
+            raise PyMISPError('No attribute with UUID/ID {} found.'.format(attribute_id))
 
     def add_attribute(self, type, value, **kwargs):
         """Add an attribute. type and value are required but you can pass all

@@ -24,7 +24,7 @@ except ImportError:
 import logging
 from enum import Enum
 
-from .exceptions import PyMISPInvalidFormat
+from .exceptions import PyMISPInvalidFormat, PyMISPError
 
 
 logger = logging.getLogger('pymisp')
@@ -284,7 +284,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
     def _to_feed(self):
         if not hasattr(self, '_fields_for_feed'):
-            raise Exception('Unable to export in the feed format, _fields_for_feed is missing.')
+            raise PyMISPError('Unable to export in the feed format, _fields_for_feed is missing.')
         to_return = {}
         for field in self._fields_for_feed:
             if getattr(self, field, None) is not None:
@@ -343,7 +343,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
         if isinstance(val, bool):
             self.__edited = val
         else:
-            raise Exception('edited can only be True or False')
+            raise PyMISPError('edited can only be True or False')
 
     def __setattr__(self, name, value):
         if name[0] != '_' and not self.__edited and name in self.keys():
