@@ -1021,6 +1021,8 @@ class MISPUser(AbstractMISP):
         if 'User' in kwargs:
             kwargs = kwargs['User']
         super(MISPUser, self).from_dict(**kwargs)
+        if hasattr(self, 'password') and set(self.password) == set(['*']):
+            self.password = None
 
     def __repr__(self):
         if hasattr(self, 'email'):

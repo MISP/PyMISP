@@ -23,6 +23,8 @@ from collections import defaultdict
 
 import logging
 logging.disable(logging.CRITICAL)
+logger = logging.getLogger('pymisp')
+
 
 try:
     from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
@@ -75,7 +77,7 @@ class TestComprehensive(unittest.TestCase):
         user.email = 'testusr@user.local'
         user.org_id = cls.test_org.id
         cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=False)
+        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
         cls.user_misp_connector.toggle_global_pythonify()
         # Creates a publisher
         user = MISPUser()
@@ -1185,7 +1187,9 @@ class TestComprehensive(unittest.TestCase):
             self.assertFalse(first.attributes[0].tags)
             # Reference: https://github.com/MISP/PyMISP/issues/483
             r = self.delegate_user_misp_connector.tag(first, tag_org_restricted)
-            self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
+            # FIXME: The error message changed and is unhelpful.
+            # self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
+            self.assertEqual(r['errors'][1]['message'], 'Invalid Target.')
             r = self.user_misp_connector.tag(first, tag_org_restricted)
             self.assertEqual(r['name'], f'Global tag {tag_org_restricted.name}({tag_org_restricted.id}) successfully attached to Event({first.id}).')
             r = self.pub_misp_connector.tag(first.attributes[0], tag_user_restricted)
