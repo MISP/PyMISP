@@ -624,7 +624,11 @@ class ExpandedPyMISP(PyMISP):
         return t
 
     def add_tag(self, tag: MISPTag, pythonify: bool=False):
-        '''Add a new tag on a MISP instance'''
+        '''Add a new tag on a MISP instance
+        Notes:
+            * The user calling this method needs the Tag Editor permission
+            * It doesn't add a tag to an event, simply create it on a MISP instance.
+        '''
         new_tag = self._prepare_request('POST', 'tags/add', data=tag)
         new_tag = self._check_response(new_tag, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in new_tag:
@@ -2048,8 +2052,8 @@ class ExpandedPyMISP(PyMISP):
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: Union[AbstractMISP, str], tag: Union[MISPTag, int, str], local: bool=False):
-        """Tag an event or an attribute. misp_entity can be a UUID"""
+    def tag(self, misp_entity: Union[AbstractMISP, str], tag: Union[MISPTag, str], local: bool=False):
+        """Tag an event or an attribute. misp_entity can be a MISPEvent, a MISP Attribute, or a UUID"""
         if 'uuid' in misp_entity:
             uuid = misp_entity.uuid
         else:
@@ -2060,12 +2064,14 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', 'tags/attachTagToObject', data=to_post)
         return self._check_response(response, expect_json=True)
 
-    def untag(self, misp_entity: Union[AbstractMISP, str], tag: str):
+    def untag(self, misp_entity: Union[AbstractMISP, str], tag: Union[MISPTag, str]):
         """Untag an event or an attribute. misp_entity can be a UUID"""
         if 'uuid' in misp_entity:
             uuid = misp_entity.uuid
         else:
             uuid = misp_entity
+        if isinstance(tag, MISPTag):
+            tag = tag.name
         to_post = {'uuid': uuid, 'tag': tag}
         response = self._prepare_request('POST', 'tags/removeTagFromObject', data=to_post)
         return self._check_response(response, expect_json=True)

@@ -185,7 +185,12 @@ class AbstractMISP(MutableMapping, MISPFileCache):
     __describe_types = describe_types
 
     def __init__(self, **kwargs):
-        """Abstract class for all the MISP objects"""
+        """Abstract class for all the MISP objects.
+        NOTE: Every method in every classes inheriting this one are doing
+              changes in memory and  do not modify data on a remote MISP instance.
+              To do so, you need to call the respective add_* or update_*
+              methods in ExpandedPyMISP/PyMISP.
+        """
         super(AbstractMISP, self).__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
         self.__not_jsonable = []
