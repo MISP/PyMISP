@@ -2,6 +2,23 @@ Changelog
 =========
 
 
+v2.4.119 (2019-12-02)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+
+Fix
+~~~
+- Bump lief to 0.10.1. [Raphaël Vinot]
+- Update tests. [Raphaël Vinot]
+- Raise PyMISPError instead of Exception. [Raphaël Vinot]
+- Rename feed_meta_generator so it clearly fails with python<3.6.
+  [Raphaël Vinot]
+
+
 v2.4.117.3 (2019-11-25)
 -----------------------
 
@@ -22,6 +39,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
 - Require stable version of lief again. [Raphaël Vinot]
