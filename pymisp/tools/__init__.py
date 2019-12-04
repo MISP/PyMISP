@@ -22,3 +22,8 @@ if sys.version_info >= (3, 6):
     from .csvloader import CSVLoader  # noqa
     from .sshauthkeyobject import SSHAuthorizedKeysObject  # noqa
     from .feed import feed_meta_generator  # noqa
+    try:
+        from .urlobject import URLObject  # noqa
+    except ImportError:
+        # Requires faup, which is a bit difficult to install
+        pass
