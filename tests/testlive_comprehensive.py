@@ -23,6 +23,8 @@ from collections import defaultdict
 
 import logging
 logging.disable(logging.CRITICAL)
+logger = logging.getLogger('pymisp')
+
 
 try:
     from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
@@ -75,7 +77,7 @@ class TestComprehensive(unittest.TestCase):
         user.email = 'testusr@user.local'
         user.org_id = cls.test_org.id
         cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=False)
+        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
         cls.user_misp_connector.toggle_global_pythonify()
         # Creates a publisher
         user = MISPUser()
@@ -1166,12 +1168,34 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(non_exportable_tag.exportable)
         first = self.create_simple_event()
         first.attributes[0].add_tag('non-exportable tag')
+        # Add tag restricted to an org
+        tag = MISPTag()
+        tag.name = f'restricted to org {self.test_org.id}'
+        tag.org_id = self.test_org.id
+        tag_org_restricted = self.admin_misp_connector.add_tag(tag, pythonify=True)
+        self.assertEqual(tag_org_restricted.org_id, tag.org_id)
+        # Add tag restricted to a user
+        tag.name = f'restricted to user {self.test_usr.id}'
+        tag.user_id = self.test_usr.id
+        tag_user_restricted = self.admin_misp_connector.add_tag(tag, pythonify=True)
+        self.assertEqual(tag_user_restricted.user_id, tag.user_id)
         try:
             first = self.user_misp_connector.add_event(first)
             self.assertFalse(first.attributes[0].tags)
             first = self.admin_misp_connector.get_event(first, pythonify=True)
             # Reference: https://github.com/MISP/MISP/issues/1394
             self.assertFalse(first.attributes[0].tags)
+            # Reference: https://github.com/MISP/PyMISP/issues/483
+            r = self.delegate_user_misp_connector.tag(first, tag_org_restricted)
+            # FIXME: The error message changed and is unhelpful.
+            # self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
+            self.assertEqual(r['errors'][1]['message'], 'Invalid Target.')
+            r = self.user_misp_connector.tag(first, tag_org_restricted)
+            self.assertEqual(r['name'], f'Global tag {tag_org_restricted.name}({tag_org_restricted.id}) successfully attached to Event({first.id}).')
+            r = self.pub_misp_connector.tag(first.attributes[0], tag_user_restricted)
+            self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed user.')
+            r = self.user_misp_connector.tag(first.attributes[0], tag_user_restricted)
+            self.assertEqual(r['name'], f'Global tag {tag_user_restricted.name}({tag_user_restricted.id}) successfully attached to Attribute({first.attributes[0].id}).')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1181,6 +1205,8 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(response['message'], 'Tag deleted.')
         response = self.admin_misp_connector.delete_tag(non_exportable_tag)
         self.assertEqual(response['message'], 'Tag deleted.')
+        response = self.admin_misp_connector.delete_tag(tag_org_restricted)
+        response = self.admin_misp_connector.delete_tag(tag_user_restricted)
 
     def test_add_event_with_attachment_object_controller(self):
         first = self.create_simple_event()
@@ -1560,6 +1586,10 @@ class TestComprehensive(unittest.TestCase):
         for entry in r[-1:]:
             self.assertEqual(entry.action, 'edit')
         r = self.admin_misp_connector.update_user({'email': 'testusr@user.local'}, self.test_usr)
+
+    def test_db_schema(self):
+        diag = self.admin_misp_connector.db_schema_diagnostic()
+        self.assertEqual(diag['actual_db_version'], diag['expected_db_version'], diag)
 
     def test_live_acl(self):
         missing_acls = self.admin_misp_connector.remote_acl()

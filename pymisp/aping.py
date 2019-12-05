@@ -179,6 +179,10 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', f'/servers/restartWorkers')
         return self._check_response(response, expect_json=True)
 
+    def db_schema_diagnostic(self):
+        response = self._prepare_request('GET', f'/servers/dbSchemaDiagnostic')
+        return self._check_response(response, expect_json=True)
+
     def toggle_global_pythonify(self):
         self.global_pythonify = not self.global_pythonify
 
@@ -620,7 +624,11 @@ class ExpandedPyMISP(PyMISP):
         return t
 
     def add_tag(self, tag: MISPTag, pythonify: bool=False):
-        '''Add a new tag on a MISP instance'''
+        '''Add a new tag on a MISP instance
+        Notes:
+            * The user calling this method needs the Tag Editor permission
+            * It doesn't add a tag to an event, simply create it on a MISP instance.
+        '''
         new_tag = self._prepare_request('POST', 'tags/add', data=tag)
         new_tag = self._check_response(new_tag, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in new_tag:
@@ -1891,7 +1899,7 @@ class ExpandedPyMISP(PyMISP):
         if adhereToWarninglists in wl_params:
             query['adhereToWarninglists'] = adhereToWarninglists
         else:
-            raise Exception('Invalid parameter, adhereToWarninglists Can only be {}'.format(', '.join(wl_params)))
+            raise PyMISPError('Invalid parameter, adhereToWarninglists Can only be {}'.format(', '.join(wl_params)))
         if distribution is not None:
             query['distribution'] = distribution
         if returnMetaAttributes:
@@ -2023,7 +2031,6 @@ class ExpandedPyMISP(PyMISP):
         response = self._prepare_request('POST', f'user_settings/delete', data=query)
         return self._check_response(response, expect_json=True)
 
-
     # ## END User Settings ###
 
     # ## BEGIN Global helpers ###
@@ -2045,22 +2052,26 @@ class ExpandedPyMISP(PyMISP):
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: Union[AbstractMISP, str], tag: str, local: bool=False):
-        """Tag an event or an attribute. misp_entity can be a UUID"""
+    def tag(self, misp_entity: Union[AbstractMISP, str], tag: Union[MISPTag, str], local: bool=False):
+        """Tag an event or an attribute. misp_entity can be a MISPEvent, a MISP Attribute, or a UUID"""
         if 'uuid' in misp_entity:
             uuid = misp_entity.uuid
         else:
             uuid = misp_entity
+        if isinstance(tag, MISPTag):
+            tag = tag.name
         to_post = {'uuid': uuid, 'tag': tag, 'local': local}
         response = self._prepare_request('POST', 'tags/attachTagToObject', data=to_post)
         return self._check_response(response, expect_json=True)
 
-    def untag(self, misp_entity: Union[AbstractMISP, str], tag: str):
+    def untag(self, misp_entity: Union[AbstractMISP, str], tag: Union[MISPTag, str]):
         """Untag an event or an attribute. misp_entity can be a UUID"""
         if 'uuid' in misp_entity:
             uuid = misp_entity.uuid
         else:
             uuid = misp_entity
+        if isinstance(tag, MISPTag):
+            tag = tag.name
         to_post = {'uuid': uuid, 'tag': tag}
         response = self._prepare_request('POST', 'tags/removeTagFromObject', data=to_post)
         return self._check_response(response, expect_json=True)
@@ -2188,16 +2199,17 @@ class ExpandedPyMISP(PyMISP):
                          kw_params: dict={}, output_type: str='json'):
         '''Prepare a request for python-requests'''
         url = urljoin(self.root_url, url)
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'{request_type} - {url}')
-            if data is not None:
-                logger.debug(data)
         if data:
             if not isinstance(data, str):  # Else, we already have a text blob to send
                 if isinstance(data, dict):  # Else, we can directly json encode.
                     # Remove None values.
                     data = {k: v for k, v in data.items() if v is not None}
                 data = json.dumps(data, default=pymisp_json_default)
+
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'{request_type} - {url}')
+            if data is not None:
+                logger.debug(data)
 
         if kw_params:
             # CakePHP params in URL

@@ -24,7 +24,7 @@ except ImportError:
 import logging
 from enum import Enum
 
-from .exceptions import PyMISPInvalidFormat
+from .exceptions import PyMISPInvalidFormat, PyMISPError
 
 
 logger = logging.getLogger('pymisp')
@@ -185,7 +185,12 @@ class AbstractMISP(MutableMapping, MISPFileCache):
     __describe_types = describe_types
 
     def __init__(self, **kwargs):
-        """Abstract class for all the MISP objects"""
+        """Abstract class for all the MISP objects.
+        NOTE: Every method in every classes inheriting this one are doing
+              changes in memory and  do not modify data on a remote MISP instance.
+              To do so, you need to call the respective add_* or update_*
+              methods in ExpandedPyMISP/PyMISP.
+        """
         super(AbstractMISP, self).__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
         self.__not_jsonable = []
@@ -282,6 +287,20 @@ class AbstractMISP(MutableMapping, MISPFileCache):
         """This method is used by the JSON encoder"""
         return self.to_dict()
 
+    def _to_feed(self):
+        if not hasattr(self, '_fields_for_feed'):
+            raise PyMISPError('Unable to export in the feed format, _fields_for_feed is missing.')
+        to_return = {}
+        for field in self._fields_for_feed:
+            if getattr(self, field, None) is not None:
+                if field in ['timestamp', 'publish_timestamp']:
+                    to_return[field] = self._datetime_to_timestamp(getattr(self, field))
+                elif isinstance(getattr(self, field), (datetime.datetime, datetime.date)):
+                    to_return[field] = getattr(self, field).isoformat()
+                else:
+                    to_return[field] = getattr(self, field)
+        return to_return
+
     def to_json(self, sort_keys=False, indent=None):
         """Dump recursively any class of type MISPAbstract to a json string"""
         return dumps(self, default=pymisp_json_default, sort_keys=sort_keys, indent=indent)
@@ -329,7 +348,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
         if isinstance(val, bool):
             self.__edited = val
         else:
-            raise Exception('edited can only be True or False')
+            raise PyMISPError('edited can only be True or False')
 
     def __setattr__(self, name, value):
         if name[0] != '_' and not self.__edited and name in self.keys():
@@ -340,7 +359,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
     def _datetime_to_timestamp(self, d):
         """Convert a datetime.datetime object to a timestamp (int)"""
-        if isinstance(d, (int, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
+        if isinstance(d, (int, float, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
             # Assume we already have a timestamp
             return int(d)
         if sys.version_info >= (3, 3):
@@ -393,6 +412,9 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
 
 class MISPTag(AbstractMISP):
+
+    _fields_for_feed = {'name', 'colour'}
+
     def __init__(self):
         super(MISPTag, self).__init__()
 
@@ -400,3 +422,8 @@ class MISPTag(AbstractMISP):
         if kwargs.get('Tag'):
             kwargs = kwargs.get('Tag')
         super(MISPTag, self).from_dict(**kwargs)
+
+    def _to_feed(self):
+        if hasattr(self, 'exportable') and not self.exportable:
+            return False
+        return super(MISPTag, self)._to_feed()

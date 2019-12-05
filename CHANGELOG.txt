@@ -2,8 +2,79 @@ Changelog
 =========
 
 
+v2.4.119 (2019-12-02)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+
+Fix
+~~~
+- Bump lief to 0.10.1. [Raphaël Vinot]
+- Update tests. [Raphaël Vinot]
+- Raise PyMISPError instead of Exception. [Raphaël Vinot]
+- Rename feed_meta_generator so it clearly fails with python<3.6.
+  [Raphaël Vinot]
+
+
+v2.4.117.3 (2019-11-25)
+-----------------------
+
+New
+~~~
+- Script to generate the metadata of a feed out of a directory. [Raphaël
+  Vinot]
+- Add to_feed export to MISPEvent. [Raphaël Vinot]
+- Validate object templates. [Raphaël Vinot]
+
+  fix https://github.com/MISP/misp-objects/issues/199
+- Test cases for restricted tags. [Raphaël Vinot]
+
+  Fix #483
+- Get Database Schema Diagnostic. [Raphaël Vinot]
+
+  Fix #492
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Require stable version of lief again. [Raphaël Vinot]
+- Few more improvements on the feed export. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Make the feed generator more generic. [Raphaël Vinot]
+- Use New version of PyMISP in the feed generator. [Raphaël Vinot]
+- Bump misp-object. [Raphaël Vinot]
+- Allow to sort and indent the json output for objects. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- [test] feed test updated as botvrij is now TLS by default. [Alexandre
+  Dulaunoy]
+
+Fix
+~~~
+- Improve stability of feed output. [Raphaël Vinot]
+- Do not unitialize the uuid in MISPEvent. [Raphaël Vinot]
+- Bump url template version in test cases. [Raphaël Vinot]
+- Python 2.7 tests. [Raphaël Vinot]
+- Print the full json blob in debug mode. [Raphaël Vinot]
+
+  Related https://github.com/MISP/PyMISP/issues/462
+
+Other
+~~~~~
+- Cch: Bump misp-objects. [Raphaël Vinot]
+
+
 v2.4.117.2 (2019-10-30)
 -----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 
 Fix
 ~~~
