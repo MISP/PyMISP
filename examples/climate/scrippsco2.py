@@ -476,7 +476,7 @@ class Scrippts:
 
 
 if __name__ == '__main__':
-    output_dir = 'scrippsc02_feed'
+    output_dir = 'scrippsco2_feed'
 
     i = Scrippts(output_dir=output_dir)
     i.import_daily_co2_all()
