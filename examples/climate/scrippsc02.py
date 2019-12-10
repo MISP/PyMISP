@@ -4,18 +4,38 @@
 from dateutil.parser import parse
 import csv
 from pathlib import Path
+import json
+from uuid import uuid4
 import requests
 
-from pymisp import MISPEvent, MISPObject, MISPTag
-
-from keys import misp_url, misp_key, misp_verifycert
-from pymisp import ExpandedPyMISP
+from pymisp import MISPEvent, MISPObject, MISPTag, MISPOrganisation
+from pymisp.tools import feed_meta_generator
 
 
 class Scrippts:
 
-    def __init__(self):
-        self.misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    def __init__(self, output_dir: str= 'output', org_name: str='CIRCL',
+                 org_uuid: str='55f6ea5e-2c60-40e5-964f-47a8950d210f'):
+        self.misp_org = MISPOrganisation()
+        self.misp_org.name = org_name
+        self.misp_org.uuid = org_uuid
+
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(exist_ok=True)
+
+        self.data_dir = self.output_dir / 'data'
+        self.data_dir.mkdir(exist_ok=True)
+
+        self.scrippts_meta_file = self.output_dir / '.meta_scrippts'
+        self.scrippts_meta = {}
+        if self.scrippts_meta_file.exists():
+            # Format: <infofield>,<uuid>.json
+            with self.scrippts_meta_file.open() as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    self.scrippts_meta[row[0]] = row[1]
+        else:
+            self.scrippts_meta_file.touch()
 
     def geolocation_alt(self) -> MISPObject:
         # Alert, NWT, Canada
@@ -200,9 +220,7 @@ class Scrippts:
         return tag
 
     def fetch(self, url):
-        filepath = Path('scrippts') / Path(url).name
-        if filepath.exists():
-            return filepath
+        filepath = self.data_dir / Path(url).name
         r = requests.get(url)
         if r.status_code != 200 or r.text[0] != '"':
             print(url)
@@ -211,42 +229,42 @@ class Scrippts:
             f.write(r.text)
         return filepath
 
-    def get_existing_event_to_update(self, infofield):
-        found = self.misp.search(eventinfo=infofield, pythonify=True)
-        if found:
-            event = found[0]
-            return event
-        return False
-
     def import_all(self, stations_short_names, interval, data_type):
         object_creator = getattr(self, f'{interval}_flask_{data_type}')
         if data_type == 'co2':
-            base_url = 'http://scrippsco2.ucsd.edu/assets/data/atmospheric/stations/flask_co2/'
+            base_url = 'https://scrippsco2.ucsd.edu/assets/data/atmospheric/stations/flask_co2/'
         elif data_type in ['c13', 'o18']:
-            base_url = 'http://scrippsco2.ucsd.edu/assets/data/atmospheric/stations/flask_isotopic/'
+            base_url = 'https://scrippsco2.ucsd.edu/assets/data/atmospheric/stations/flask_isotopic/'
         for station in stations_short_names:
             url = f'{base_url}/{interval}/{interval}_flask_{data_type}_{station}.csv'
             infofield = f'[{station.upper()}] {interval} average atmospheric {data_type} concentrations'
             filepath = self.fetch(url)
             if not filepath:
                 continue
-            update = True
-            event = self.get_existing_event_to_update(infofield)
-            if event:
-                location = event.get_objects_by_name('geolocation')[0]
-            if not event:
+            if infofield in self.scrippts_meta:
                 event = MISPEvent()
+                event.load_file(str(self.output_dir / self.scrippts_meta[infofield]))
+                location = event.get_objects_by_name('geolocation')[0]
+                update = True
+            else:
+                event = MISPEvent()
+                event.uuid = str(uuid4())
                 event.info = infofield
+                event.Orgc = self.misp_org
                 event.add_tag(getattr(self, f'tag_{station}')())
                 location = getattr(self, f'geolocation_{station}')()
                 event.add_object(location)
-                event.add_attribute('link', f'http://scrippsco2.ucsd.edu/data/atmospheric_co2/{station}')
+                event.add_attribute('link', f'https://scrippsco2.ucsd.edu/data/atmospheric_co2/{station}')
                 update = False
+                with self.scrippts_meta_file.open('a') as f:
+                    writer = csv.writer(f)
+                    writer.writerow([infofield, f'{event.uuid}.json'])
+
             object_creator(event, location, filepath, update)
-            if update:
-                self.misp.update_event(event)
-            else:
-                self.misp.add_event(event)
+            feed_output = event.to_feed(with_meta=False)
+            with (self.output_dir / f'{event.uuid}.json').open('w') as f:
+                # json.dump(feed_output, f, indent=2, sort_keys=True)  # For testing
+                json.dump(feed_output, f)
 
     def import_monthly_co2_all(self):
         to_import = ['alt', 'ptb', 'stp', 'ljo', 'bcs', 'mlo', 'kum', 'chr', 'sam', 'ker', 'nzd']
@@ -458,10 +476,14 @@ class Scrippts:
 
 
 if __name__ == '__main__':
-    i = Scrippts()
+    output_dir = 'scrippsc02_feed'
+
+    i = Scrippts(output_dir=output_dir)
     i.import_daily_co2_all()
     i.import_daily_c13_all()
     i.import_daily_o18_all()
     i.import_monthly_co2_all()
     i.import_monthly_c13_all()
     i.import_monthly_o18_all()
+
+    feed_meta_generator(Path(output_dir))

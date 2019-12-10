@@ -474,6 +474,8 @@ class MISPEvent(AbstractMISP):
 
     def _set_default(self):
         """There are a few keys that could be set by default"""
+        if not hasattr(self, 'published'):
+            self.published = True
         if not hasattr(self, 'uuid'):
             self.uuid = str(uuid.uuid4())
         if not hasattr(self, 'date'):
@@ -623,14 +625,14 @@ class MISPEvent(AbstractMISP):
         else:
             raise PyMISPError('All the attributes have to be of type MISPObject.')
 
-    def load_file(self, event_path):
+    def load_file(self, event_path, validate=False, metadata_only=False):
         """Load a JSON dump from a file on the disk"""
         if not os.path.exists(event_path):
             raise PyMISPError('Invalid path, unable to load the event.')
         with open(event_path, 'rb') as f:
-            self.load(f)
+            self.load(f, validate, metadata_only)
 
-    def load(self, json_event, validate=False):
+    def load(self, json_event, validate=False, metadata_only=False):
         """Load a JSON dump from a pseudo file or a JSON string"""
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
@@ -645,6 +647,9 @@ class MISPEvent(AbstractMISP):
             event = json_event
         if not event:
             raise PyMISPError('Invalid event')
+        if metadata_only:
+            event.pop('Attribute', None)
+            event.pop('Object', None)
         self.from_dict(**event)
         if validate:
             jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
@@ -718,6 +723,11 @@ class MISPEvent(AbstractMISP):
                 self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), datetime.timezone.utc)
             else:
                 self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), UTC())
+        if kwargs.get('sighting_timestamp'):
+            if sys.version_info >= (3, 3):
+                self.sighting_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('sighting_timestamp')), datetime.timezone.utc)
+            else:
+                self.sighting_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('sighting_timestamp')), UTC())
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('RelatedEvent'):
@@ -747,6 +757,8 @@ class MISPEvent(AbstractMISP):
             to_return['date'] = self.date.isoformat()
         if to_return.get('publish_timestamp'):
             to_return['publish_timestamp'] = self._datetime_to_timestamp(self.publish_timestamp)
+        if to_return.get('sighting_timestamp'):
+            to_return['sighting_timestamp'] = self._datetime_to_timestamp(self.sighting_timestamp)
 
         return to_return
 
