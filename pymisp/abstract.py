@@ -290,6 +290,8 @@ class AbstractMISP(MutableMapping, MISPFileCache):
     def _to_feed(self):
         if not hasattr(self, '_fields_for_feed'):
             raise PyMISPError('Unable to export in the feed format, _fields_for_feed is missing.')
+        if hasattr(self, '_set_default') and callable(self._set_default):
+            self._set_default()
         to_return = {}
         for field in self._fields_for_feed:
             if getattr(self, field, None) is not None:
@@ -299,6 +301,11 @@ class AbstractMISP(MutableMapping, MISPFileCache):
                     to_return[field] = getattr(self, field).isoformat()
                 else:
                     to_return[field] = getattr(self, field)
+            else:
+                if field == 'data':
+                    # data in attribute is special
+                    continue
+                raise PyMISPError('The field {} is required in {} when generating a feed.'.format(field, self.__class__.__name__))
         return to_return
 
     def to_json(self, sort_keys=False, indent=None):
@@ -422,6 +429,10 @@ class MISPTag(AbstractMISP):
         if kwargs.get('Tag'):
             kwargs = kwargs.get('Tag')
         super(MISPTag, self).from_dict(**kwargs)
+
+    def _set_default(self):
+        if not hasattr(self, 'colour'):
+            self.colour = '#ffffff'
 
     def _to_feed(self):
         if hasattr(self, 'exportable') and not self.exportable:

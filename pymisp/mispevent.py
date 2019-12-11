@@ -104,7 +104,7 @@ def make_bool(value):
 
 class MISPAttribute(AbstractMISP):
     _fields_for_feed = {'uuid', 'value', 'category', 'type', 'comment', 'data',
-                        'timestamp', 'to_ids', 'object_relation', 'disable_correlation'}
+                        'timestamp', 'to_ids', 'disable_correlation'}
 
     def __init__(self, describe_types=None, strict=False):
         """Represents an Attribute
@@ -141,6 +141,12 @@ class MISPAttribute(AbstractMISP):
                 to_encode = str(to_encode)
             h.update(to_encode.encode("utf-8"))
             return [h.hexdigest()]
+
+    def _set_default(self):
+        if not hasattr(self, 'comment'):
+            self.comment = ''
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 
     def _to_feed(self):
         to_return = super(MISPAttribute, self)._to_feed()
@@ -473,15 +479,19 @@ class MISPEvent(AbstractMISP):
         self.ShadowAttribute = []
 
     def _set_default(self):
-        """There are a few keys that could be set by default"""
+        """There are a few keys that could, or need to be set by default for the feed generator"""
         if not hasattr(self, 'published'):
             self.published = True
         if not hasattr(self, 'uuid'):
             self.uuid = str(uuid.uuid4())
+        if not hasattr(self, 'extends_uuid'):
+            self.extends_uuid = ''
         if not hasattr(self, 'date'):
             self.set_date(datetime.date.today())
         if not hasattr(self, 'timestamp'):
             self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+        if not hasattr(self, 'publish_timestamp'):
+            self.publish_timestamp = datetime.datetime.timestamp(datetime.datetime.now())
         if not hasattr(self, 'analysis'):
             # analysis: 0 means initial, 1 ongoing, 2 completed
             self.analysis = 2
@@ -534,8 +544,6 @@ class MISPEvent(AbstractMISP):
                 and int(self.distribution) not in valid_distributions):
             return
 
-        self._set_default()
-
         to_return = super(MISPEvent, self)._to_feed()
         if with_meta:
             to_return['_hashes'] = []
@@ -567,7 +575,7 @@ class MISPEvent(AbstractMISP):
                         to_return['_hashes'] += attribute.hash_values('md5')
                 to_return['Object'].append(obj_to_attach)
 
-        return to_return
+        return {'Event': to_return}
 
     @property
     def known_types(self):
@@ -1001,6 +1009,13 @@ class MISPObjectReference(AbstractMISP):
 
     def __init__(self):
         super(MISPObjectReference, self).__init__()
+        self.uuid = str(uuid.uuid4())
+
+    def _set_default(self):
+        if not hasattr(self, 'comment'):
+            self.comment = ''
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 
     def from_dict(self, **kwargs):
         if 'ObjectReference' in kwargs:
@@ -1202,6 +1217,9 @@ class MISPSighting(AbstractMISP):
 
 class MISPObjectAttribute(MISPAttribute):
 
+    _fields_for_feed = {'uuid', 'object_relation', 'value', 'category', 'type',
+                        'comment', 'data', 'timestamp', 'to_ids', 'disable_correlation'}
+
     def __init__(self, definition):
         super(MISPObjectAttribute, self).__init__()
         self._definition = definition
@@ -1352,6 +1370,12 @@ class MISPObject(AbstractMISP):
         self.description = self._definition['description']
         self.template_version = self._definition['version']
         return True
+
+    def _set_default(self):
+        if not hasattr(self, 'comment'):
+            self.comment = ''
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 
     def _to_feed(self):
         to_return = super(MISPObject, self)._to_feed()
