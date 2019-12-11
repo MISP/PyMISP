@@ -1489,6 +1489,7 @@ class MISPObject(AbstractMISP):
                             relationship_type=relationship_type, comment=comment, **kwargs)
         self.ObjectReference.append(reference)
         self.edited = True
+        return reference
 
     def get_attributes_by_relation(self, object_relation):
         '''Returns the list of attributes with the given object relation in the object'''

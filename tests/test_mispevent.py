@@ -87,7 +87,8 @@ class TestMISPEvent(unittest.TestCase):
         del a.uuid
         self.mispevent.objects[0].uuid = 'a'
         self.mispevent.objects[1].uuid = 'b'
-        self.mispevent.objects[0].add_reference(self.mispevent.objects[1], 'baz', comment='foo')
+        reference = self.mispevent.objects[0].add_reference(self.mispevent.objects[1], 'baz', comment='foo')
+        del reference.uuid
         self.assertEqual(self.mispevent.objects[0].references[0].relationship_type, 'baz')
         with open('tests/mispevent_testfiles/event_obj_attr_tag.json', 'r') as f:
             ref_json = json.load(f)
