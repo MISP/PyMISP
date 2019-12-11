@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import datetime
 from dateutil.parser import parse
 import csv
 from pathlib import Path
@@ -261,6 +262,9 @@ class Scrippts:
                     writer.writerow([infofield, f'{event.uuid}.json'])
 
             object_creator(event, location, filepath, update)
+            if update:
+                # Bump the publish timestamp
+                event.publish_timestamp = datetime.datetime.timestamp(datetime.datetime.now())
             feed_output = event.to_feed(with_meta=False)
             with (self.output_dir / f'{event.uuid}.json').open('w') as f:
                 # json.dump(feed_output, f, indent=2, sort_keys=True)  # For testing
