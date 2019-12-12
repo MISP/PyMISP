@@ -841,6 +841,7 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
 
             current_ts = int(time.time())
+            time.sleep(5)
             r = self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             self.assertEqual(int(r.attribute_id), first.attributes[0].id)
 
