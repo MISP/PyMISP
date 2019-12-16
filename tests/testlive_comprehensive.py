@@ -1075,7 +1075,11 @@ class TestComprehensive(unittest.TestCase):
             file_object = first.get_objects_by_name('file')[0]
             file_object.force_misp_objects_path_custom('tests/mispevent_testfiles', 'overwrite_file')
             file_object.add_attribute('test_overwrite', 'blah')
-            obj = self.admin_misp_connector.update_object(file_object, pythonify=True)
+            obj_json = self.admin_misp_connector.update_object(file_object)
+            self.assertTrue('Object' in obj_json, obj_json)
+            self.assertTrue('name' in obj_json['Object'], obj_json)
+            obj = MISPObject(obj_json['Object']['name'])
+            obj.from_dict(**obj_json)
             self.assertEqual(obj.get_attributes_by_relation('test_overwrite')[0].value, 'blah')
         finally:
             # Delete event
