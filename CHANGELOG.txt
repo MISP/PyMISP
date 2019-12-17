@@ -2,11 +2,43 @@ Changelog
 =========
 
 
+v2.4.119.1 (2019-12-17)
+-----------------------
+
+New
+~~~
+- URLObject (requires pyfaup) [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Version bump. [Raphaël Vinot]
+- Bump test files. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Debug travis error message. [Raphaël Vinot]
+- [types] eppn type added. [Alexandre Dulaunoy]
+- Fix typo. [Raphaël Vinot]
+- Move scrippsco2 feed generator to a sub directory. [Raphaël Vinot]
+- Update documentation. [Raphaël Vinot]
+
+  Fix #396
+- Bump objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly test custom objects. [Raphaël Vinot]
+- Adding a sighting takes a little bit of time. [Raphaël Vinot]
+- Test case on reference. [Raphaël Vinot]
+- Add missing fields to event & attribute for the feed output. [Raphaël
+  Vinot]
+- Make sure the publish timestamp is bumped on update. [Raphaël Vinot]
+
+
 v2.4.119 (2019-12-02)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
 
