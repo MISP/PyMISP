@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 import datetime
 
 from deprecated import deprecated
@@ -27,88 +26,29 @@ from enum import Enum
 from .exceptions import PyMISPInvalidFormat, PyMISPError
 
 
+from collections.abc import MutableMapping
+from functools import lru_cache
+from pathlib import Path
+
 logger = logging.getLogger('pymisp')
 
-if sys.version_info < (3, 0):
-    from collections import MutableMapping
-    import os
-    from cachetools import cached, LRUCache
+resources_path = Path(__file__).parent / 'data'
+misp_objects_path = resources_path / 'misp-objects' / 'objects'
+with (resources_path / 'describeTypes.json').open('r') as f:
+    describe_types = load(f)['result']
 
-    resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-    misp_objects_path = os.path.join(resources_path, 'misp-objects', 'objects')
-    with open(os.path.join(resources_path, 'describeTypes.json'), 'r') as f:
-        describe_types = load(f)['result']
 
-    # This is required because Python 2 is a pain.
-    from datetime import tzinfo, timedelta
+class MISPFileCache(object):
+    # cache up to 150 JSON structures in class attribute
 
-    class UTC(tzinfo):
-        """UTC"""
-
-        def utcoffset(self, dt):
-            return timedelta(0)
-
-        def tzname(self, dt):
-            return "UTC"
-
-        def dst(self, dt):
-            return timedelta(0)
-
-    class MISPFileCache(object):
-        # cache up to 150 JSON structures in class attribute
-
-        @staticmethod
-        @cached(cache=LRUCache(maxsize=150))
-        def _load_json(path):
-            if not os.path.exists(path):
-                return None
-            with open(path, 'r') as f:
-                data = load(f)
-            return data
-
-elif sys.version_info < (3, 4):
-    from collections.abc import MutableMapping
-    from functools import lru_cache
-    import os
-
-    resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
-    misp_objects_path = os.path.join(resources_path, 'misp-objects', 'objects')
-    with open(os.path.join(resources_path, 'describeTypes.json'), 'r') as f:
-        describe_types = load(f)['result']
-
-    class MISPFileCache(object):
-        # cache up to 150 JSON structures in class attribute
-
-        @staticmethod
-        @lru_cache(maxsize=150)
-        def _load_json(path):
-            if not os.path.exists(path):
-                return None
-            with open(path, 'r') as f:
-                data = load(f)
-            return data
-
-else:
-    from collections.abc import MutableMapping
-    from functools import lru_cache
-    from pathlib import Path
-
-    resources_path = Path(__file__).parent / 'data'
-    misp_objects_path = resources_path / 'misp-objects' / 'objects'
-    with (resources_path / 'describeTypes.json').open('r') as f:
-        describe_types = load(f)['result']
-
-    class MISPFileCache(object):
-        # cache up to 150 JSON structures in class attribute
-
-        @staticmethod
-        @lru_cache(maxsize=150)
-        def _load_json(path):
-            if not path.exists():
-                return None
-            with path.open('r') as f:
-                data = load(f)
-            return data
+    @staticmethod
+    @lru_cache(maxsize=150)
+    def _load_json(path):
+        if not path.exists():
+            return None
+        with path.open('r') as f:
+            data = load(f)
+        return data
 
 
 class Distribution(Enum):
@@ -191,7 +131,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
               To do so, you need to call the respective add_* or update_*
               methods in ExpandedPyMISP/PyMISP.
         """
-        super(AbstractMISP, self).__init__()
+        super().__init__()
         self.__edited = True  # As we create a new object, we assume it is edited
         self.__not_jsonable = []
         self.__self_defined_describe_types = None
@@ -230,7 +170,7 @@ class AbstractMISP(MutableMapping, MISPFileCache):
 
     @misp_objects_path.setter
     def misp_objects_path(self, misp_objects_path):
-        if sys.version_info >= (3, 0) and isinstance(misp_objects_path, str):
+        if isinstance(misp_objects_path, str):
             misp_objects_path = Path(misp_objects_path)
         self.__misp_objects_path = misp_objects_path
 
@@ -362,17 +302,14 @@ class AbstractMISP(MutableMapping, MISPFileCache):
             # The private members don't matter
             # If we already have a key with that name, we're modifying it.
             self.__edited = True
-        super(AbstractMISP, self).__setattr__(name, value)
+        super().__setattr__(name, value)
 
     def _datetime_to_timestamp(self, d):
         """Convert a datetime.datetime object to a timestamp (int)"""
-        if isinstance(d, (int, float, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
+        if isinstance(d, (int, float, str)):
             # Assume we already have a timestamp
             return int(d)
-        if sys.version_info >= (3, 3):
-            return int(d.timestamp())
-        else:
-            return int((d - datetime.datetime.fromtimestamp(0, UTC())).total_seconds())
+        return int(d.timestamp())
 
     def __add_tag(self, tag=None, **kwargs):
         """Add a tag to the attribute (by name or a MISPTag object)"""
@@ -422,13 +359,10 @@ class MISPTag(AbstractMISP):
 
     _fields_for_feed = {'name', 'colour'}
 
-    def __init__(self):
-        super(MISPTag, self).__init__()
-
     def from_dict(self, **kwargs):
         if kwargs.get('Tag'):
             kwargs = kwargs.get('Tag')
-        super(MISPTag, self).from_dict(**kwargs)
+        super().from_dict(**kwargs)
 
     def _set_default(self):
         if not hasattr(self, 'colour'):
@@ -437,4 +371,4 @@ class MISPTag(AbstractMISP):
     def _to_feed(self):
         if hasattr(self, 'exportable') and not self.exportable:
             return False
-        return super(MISPTag, self)._to_feed()
+        return super()._to_feed()

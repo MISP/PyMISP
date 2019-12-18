@@ -12,12 +12,6 @@ addons:
 
 matrix:
     include:
-        - name: "Python 2.7 - legacy"
-          python: 2.7
-          env: LEGACY=true
-        - name: "Python 3.5"
-          python: 3.5
-          dist: xenial
         - name: "Python 3.6"
           python: 3.6
           dist: xenial

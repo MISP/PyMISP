@@ -1,5 +1,3 @@
-import sys
-
 from .vtreportobject import VTReportObject  # noqa
 from .neo4j import Neo4j  # noqa
 from .fileobject import FileObject  # noqa
@@ -16,14 +14,13 @@ from .domainipobject import DomainIPObject  # noqa
 from .asnobject import ASNObject  # noqa
 from .geolocationobject import GeolocationObject  # noqa
 
-if sys.version_info >= (3, 6):
-    from .emailobject import EMailObject  # noqa
-    from .vehicleobject import VehicleObject  # noqa
-    from .csvloader import CSVLoader  # noqa
-    from .sshauthkeyobject import SSHAuthorizedKeysObject  # noqa
-    from .feed import feed_meta_generator  # noqa
-    try:
-        from .urlobject import URLObject  # noqa
-    except ImportError:
-        # Requires faup, which is a bit difficult to install
-        pass
+from .emailobject import EMailObject  # noqa
+from .vehicleobject import VehicleObject  # noqa
+from .csvloader import CSVLoader  # noqa
+from .sshauthkeyobject import SSHAuthorizedKeysObject  # noqa
+from .feed import feed_meta_generator  # noqa
+try:
+    from .urlobject import URLObject  # noqa
+except ImportError:
+    # Requires faup, which is a bit difficult to install
+    pass
