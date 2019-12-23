@@ -22,7 +22,7 @@ def init():
 
 def saveEvent(event):
     try:
-        with open(os.path.join(outputdir, f'{event["uuid"]}.json'), 'w') as f:
+        with open(os.path.join(outputdir, f'{event["Event"]["uuid"]}.json'), 'w') as f:
             json.dump(event, f, indent=2)
     except Exception as e:
         print(e)
@@ -68,9 +68,8 @@ if __name__ == '__main__':
         if not e_feed:
             print(f'Invalid distribution {e.distribution}, skipping')
             continue
-        if '_hashes' in e_feed:
-            hashes += [[h, e.uuid] for h in e_feed.pop('_hashes')]
-        manifest.update(e_feed.pop('_manifest'))
+        hashes += [[h, e.uuid] for h in e_feed['Event'].pop('_hashes')]
+        manifest.update(e_feed['Event'].pop('_manifest'))
         saveEvent(e_feed)
         print("Event " + str(counter) + "/" + str(total) + " exported.")
         counter += 1
