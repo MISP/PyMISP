@@ -30,7 +30,7 @@
       "name": "file",
       "sharing_group_id": "0",
       "template_uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
-      "template_version": "17",
+      "template_version": "18",
       "uuid": "a"
     },
     {
@@ -50,7 +50,7 @@
       "name": "url",
       "sharing_group_id": "0",
       "template_uuid": "60efb77b-40b5-4c46-871b-ed1ed999fce5",
-      "template_version": "7",
+      "template_version": "8",
       "uuid": "b"
     }
   ]

@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 import datetime
@@ -11,6 +10,7 @@ import sys
 import uuid
 from collections import defaultdict
 import logging
+import hashlib
 
 from deprecated import deprecated
 
@@ -99,10 +99,12 @@ def make_bool(value):
             return False
         return True
     else:
-        raise Exception('Unable to convert {} to a boolean.'.format(value))
+        raise PyMISPError('Unable to convert {} to a boolean.'.format(value))
 
 
 class MISPAttribute(AbstractMISP):
+    _fields_for_feed = {'uuid', 'value', 'category', 'type', 'comment', 'data',
+                        'timestamp', 'to_ids', 'disable_correlation'}
 
     def __init__(self, describe_types=None, strict=False):
         """Represents an Attribute
@@ -120,6 +122,39 @@ class MISPAttribute(AbstractMISP):
         self.uuid = str(uuid.uuid4())
         self.ShadowAttribute = []
         self.Sighting = []
+
+    def hash_values(self, algorithm='sha512'):
+        """Compute the hash of every values for fast lookups"""
+        if algorithm not in hashlib.algorithms_available:
+            raise PyMISPError('The algorithm {} is not available for hashing.'.format(algorithm))
+        if '|' in self.type or self.type == 'malware-sample':
+            hashes = []
+            for v in self.value.split('|'):
+                h = hashlib.new(algorithm)
+                h.update(v.encode("utf-8"))
+                hashes.append(h.hexdigest())
+            return hashes
+        else:
+            h = hashlib.new(algorithm)
+            to_encode = self.value
+            if not isinstance(to_encode, str):
+                to_encode = str(to_encode)
+            h.update(to_encode.encode("utf-8"))
+            return [h.hexdigest()]
+
+    def _set_default(self):
+        if not hasattr(self, 'comment'):
+            self.comment = ''
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+
+    def _to_feed(self):
+        to_return = super(MISPAttribute, self)._to_feed()
+        if self.data:
+            to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
+        if self.tags:
+            to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
+        return to_return
 
     @property
     def known_types(self):
@@ -349,7 +384,7 @@ class MISPAttribute(AbstractMISP):
             try:
                 with ZipFile(self.data) as f:
                     if not self.__is_misp_encrypted_file(f):
-                        raise Exception('Not an existing malware sample')
+                        raise PyMISPError('Not an existing malware sample')
                     for name in f.namelist():
                         if name.endswith('.filename.txt'):
                             with f.open(name, pwd=b'infected') as unpacked:
@@ -421,6 +456,9 @@ class MISPAttribute(AbstractMISP):
 
 class MISPEvent(AbstractMISP):
 
+    _fields_for_feed = {'uuid', 'info', 'threat_level_id', 'analysis', 'timestamp',
+                        'publish_timestamp', 'published', 'date', 'extends_uuid'}
+
     def __init__(self, describe_types=None, strict_validation=False, **kwargs):
         super(MISPEvent, self).__init__(**kwargs)
         if strict_validation:
@@ -439,6 +477,105 @@ class MISPEvent(AbstractMISP):
         self.Object = []
         self.RelatedEvent = []
         self.ShadowAttribute = []
+
+    def _set_default(self):
+        """There are a few keys that could, or need to be set by default for the feed generator"""
+        if not hasattr(self, 'published'):
+            self.published = True
+        if not hasattr(self, 'uuid'):
+            self.uuid = str(uuid.uuid4())
+        if not hasattr(self, 'extends_uuid'):
+            self.extends_uuid = ''
+        if not hasattr(self, 'date'):
+            self.set_date(datetime.date.today())
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+        if not hasattr(self, 'publish_timestamp'):
+            self.publish_timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+        if not hasattr(self, 'analysis'):
+            # analysis: 0 means initial, 1 ongoing, 2 completed
+            self.analysis = 2
+        if not hasattr(self, 'threat_level_id'):
+            # threat_level_id 4 means undefined. Tags are recommended.
+            self.threat_level_id = 4
+
+    @property
+    def manifest(self):
+        required = ['info', 'Orgc']
+        for r in required:
+            if not hasattr(self, r):
+                raise PyMISPError('The field {} is required to generate the event manifest.')
+
+        self._set_default()
+
+        return {
+            self.uuid: {
+                'Orgc': self.Orgc._to_feed(),
+                'Tag': list(filter(None, [tag._to_feed() for tag in self.tags])),
+                'info': self.info,
+                'date': self.date.isoformat(),
+                'analysis': self.analysis,
+                'threat_level_id': self.threat_level_id,
+                'timestamp': self._datetime_to_timestamp(self.timestamp)
+            }
+        }
+
+    def attributes_hashes(self, algorithm='sha512'):
+        to_return = []
+        for attribute in self.attributes:
+            to_return += attribute.hash_values(algorithm)
+        for obj in self.objects:
+            for attribute in obj.attributes:
+                to_return += attribute.hash_values(algorithm)
+        return to_return
+
+    def to_feed(self, valid_distributions=[0, 1, 2, 3, 4, 5], with_meta=False):
+        """ Generate a json output for MISP Feed.
+        Notes:
+            * valid_distributions only makes sense if the distribution key is set (i.e. the event is exported from a MISP instance)
+        """
+        required = ['info', 'Orgc']
+        for r in required:
+            if not hasattr(self, r):
+                raise PyMISPError('The field {} is required to generate the event feed output.')
+
+        if (hasattr(self, 'distribution')
+                and self.distribution is not None
+                and int(self.distribution) not in valid_distributions):
+            return
+
+        to_return = super(MISPEvent, self)._to_feed()
+        if with_meta:
+            to_return['_hashes'] = []
+            to_return['_manifest'] = self.manifest
+
+        to_return['Orgc'] = self.Orgc._to_feed()
+        to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
+        if self.attributes:
+            to_return['Attribute'] = []
+            for attribute in self.attributes:
+                if (valid_distributions and attribute.get('distribution') is not None and attribute.distribution not in valid_distributions):
+                    continue
+                to_return['Attribute'].append(attribute._to_feed())
+                if with_meta:
+                    to_return['_hashes'] += attribute.hash_values('md5')
+
+        if self.objects:
+            to_return['Object'] = []
+            for obj in self.objects:
+                if (valid_distributions and obj.get('distribution') is not None and obj.distribution not in valid_distributions):
+                    continue
+                obj_to_attach = obj._to_feed()
+                obj_to_attach['Attribute'] = []
+                for attribute in obj.attributes:
+                    if (valid_distributions and attribute.get('distribution') is not None and attribute.distribution not in valid_distributions):
+                        continue
+                    obj_to_attach['Attribute'].append(attribute._to_feed())
+                    if with_meta:
+                        to_return['_hashes'] += attribute.hash_values('md5')
+                to_return['Object'].append(obj_to_attach)
+
+        return {'Event': to_return}
 
     @property
     def known_types(self):
@@ -496,14 +633,14 @@ class MISPEvent(AbstractMISP):
         else:
             raise PyMISPError('All the attributes have to be of type MISPObject.')
 
-    def load_file(self, event_path):
+    def load_file(self, event_path, validate=False, metadata_only=False):
         """Load a JSON dump from a file on the disk"""
         if not os.path.exists(event_path):
             raise PyMISPError('Invalid path, unable to load the event.')
         with open(event_path, 'rb') as f:
-            self.load(f)
+            self.load(f, validate, metadata_only)
 
-    def load(self, json_event, validate=False):
+    def load(self, json_event, validate=False, metadata_only=False):
         """Load a JSON dump from a pseudo file or a JSON string"""
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
@@ -518,6 +655,9 @@ class MISPEvent(AbstractMISP):
             event = json_event
         if not event:
             raise PyMISPError('Invalid event')
+        if metadata_only:
+            event.pop('Attribute', None)
+            event.pop('Object', None)
         self.from_dict(**event)
         if validate:
             jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
@@ -591,6 +731,11 @@ class MISPEvent(AbstractMISP):
                 self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), datetime.timezone.utc)
             else:
                 self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), UTC())
+        if kwargs.get('sighting_timestamp'):
+            if sys.version_info >= (3, 3):
+                self.sighting_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('sighting_timestamp')), datetime.timezone.utc)
+            else:
+                self.sighting_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('sighting_timestamp')), UTC())
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('RelatedEvent'):
@@ -620,6 +765,8 @@ class MISPEvent(AbstractMISP):
             to_return['date'] = self.date.isoformat()
         if to_return.get('publish_timestamp'):
             to_return['publish_timestamp'] = self._datetime_to_timestamp(self.publish_timestamp)
+        if to_return.get('sighting_timestamp'):
+            to_return['sighting_timestamp'] = self._datetime_to_timestamp(self.sighting_timestamp)
 
         return to_return
 
@@ -671,7 +818,7 @@ class MISPEvent(AbstractMISP):
                 attributes.append(a)
 
         if not attributes:
-            raise Exception('No attribute with identifier {} found.'.format(attribute_identifier))
+            raise PyMISPError('No attribute with identifier {} found.'.format(attribute_identifier))
         self.edited = True
         return attributes
 
@@ -693,7 +840,7 @@ class MISPEvent(AbstractMISP):
                 found = True
                 break
         if not found:
-            raise Exception('No attribute with UUID/ID {} found.'.format(attribute_id))
+            raise PyMISPError('No attribute with UUID/ID {} found.'.format(attribute_id))
 
     def add_attribute(self, type, value, **kwargs):
         """Add an attribute. type and value are required but you can pass all
@@ -857,8 +1004,18 @@ class MISPEvent(AbstractMISP):
 
 class MISPObjectReference(AbstractMISP):
 
+    _fields_for_feed = {'uuid', 'timestamp', 'relationship_type', 'comment',
+                        'object_uuid', 'referenced_uuid'}
+
     def __init__(self):
         super(MISPObjectReference, self).__init__()
+        self.uuid = str(uuid.uuid4())
+
+    def _set_default(self):
+        if not hasattr(self, 'comment'):
+            self.comment = ''
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
 
     def from_dict(self, **kwargs):
         if 'ObjectReference' in kwargs:
@@ -891,6 +1048,8 @@ class MISPUser(AbstractMISP):
         if 'User' in kwargs:
             kwargs = kwargs['User']
         super(MISPUser, self).from_dict(**kwargs)
+        if hasattr(self, 'password') and set(self.password) == set(['*']):
+            self.password = None
 
     def __repr__(self):
         if hasattr(self, 'email'):
@@ -899,6 +1058,8 @@ class MISPUser(AbstractMISP):
 
 
 class MISPOrganisation(AbstractMISP):
+
+    _fields_for_feed = {'name', 'uuid'}
 
     def __init__(self):
         super(MISPOrganisation, self).__init__()
@@ -1056,6 +1217,9 @@ class MISPSighting(AbstractMISP):
 
 class MISPObjectAttribute(MISPAttribute):
 
+    _fields_for_feed = {'uuid', 'object_relation', 'value', 'category', 'type',
+                        'comment', 'data', 'timestamp', 'to_ids', 'disable_correlation'}
+
     def __init__(self, definition):
         super(MISPObjectAttribute, self).__init__()
         self._definition = definition
@@ -1140,6 +1304,10 @@ class MISPUserSetting(AbstractMISP):
 
 class MISPObject(AbstractMISP):
 
+    _fields_for_feed = {'name', 'meta-category', 'description', 'template_uuid',
+                        'template_version', 'uuid', 'timestamp', 'distribution',
+                        'sharing_group_id', 'comment'}
+
     def __init__(self, name, strict=False, standalone=False, default_attributes_parameters={}, **kwargs):
         ''' Master class representing a generic MISP object
         :name: Name of the object
@@ -1202,6 +1370,18 @@ class MISPObject(AbstractMISP):
         self.description = self._definition['description']
         self.template_version = self._definition['version']
         return True
+
+    def _set_default(self):
+        if not hasattr(self, 'comment'):
+            self.comment = ''
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+
+    def _to_feed(self):
+        to_return = super(MISPObject, self)._to_feed()
+        if self.references:
+            to_return['ObjectReference'] = [reference._to_feed() for reference in self.references]
+        return to_return
 
     def force_misp_objects_path_custom(self, misp_objects_path_custom, object_name=None):
         if object_name:
@@ -1309,6 +1489,7 @@ class MISPObject(AbstractMISP):
                             relationship_type=relationship_type, comment=comment, **kwargs)
         self.ObjectReference.append(reference)
         self.edited = True
+        return reference
 
     def get_attributes_by_relation(self, object_relation):
         '''Returns the list of attributes with the given object relation in the object'''
@@ -1370,10 +1551,10 @@ class MISPObject(AbstractMISP):
             self._validate()
         return super(MISPObject, self).to_dict()
 
-    def to_json(self, strict=False):
+    def to_json(self, strict=False, sort_keys=False, indent=None):
         if strict or self._strict and self._known_template:
             self._validate()
-        return super(MISPObject, self).to_json()
+        return super(MISPObject, self).to_json(sort_keys=sort_keys, indent=indent)
 
     def _validate(self):
         """Make sure the object we're creating has the required fields"""

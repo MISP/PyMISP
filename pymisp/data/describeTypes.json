@@ -187,7 +187,9 @@
         "domain",
         "domain|ip",
         "email-dst",
+        "email-src",
         "email-subject",
+        "eppn",
         "hassh-md5",
         "hasshserver-md5",
         "hex",
@@ -418,6 +420,7 @@
         "comment",
         "email-dst",
         "email-src",
+        "eppn",
         "github-organisation",
         "github-repository",
         "github-username",
@@ -611,6 +614,10 @@
       "email-x-mailer": {
         "default_category": "Payload delivery",
         "to_ids": 0
+      },
+      "eppn": {
+        "default_category": "Network activity",
+        "to_ids": 1
       },
       "filename": {
         "default_category": "Payload delivery",
@@ -1135,6 +1142,7 @@
       "email-subject",
       "email-thread-index",
       "email-x-mailer",
+      "eppn",
       "filename",
       "filename|authentihash",
       "filename|impfuzzy",

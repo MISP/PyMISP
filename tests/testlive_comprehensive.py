@@ -23,6 +23,8 @@ from collections import defaultdict
 
 import logging
 logging.disable(logging.CRITICAL)
+logger = logging.getLogger('pymisp')
+
 
 try:
     from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
@@ -75,7 +77,7 @@ class TestComprehensive(unittest.TestCase):
         user.email = 'testusr@user.local'
         user.org_id = cls.test_org.id
         cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=False)
+        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
         cls.user_misp_connector.toggle_global_pythonify()
         # Creates a publisher
         user = MISPUser()
@@ -839,6 +841,7 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
 
             current_ts = int(time.time())
+            time.sleep(5)
             r = self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             self.assertEqual(int(r.attribute_id), first.attributes[0].id)
 
@@ -1072,8 +1075,24 @@ class TestComprehensive(unittest.TestCase):
             file_object = first.get_objects_by_name('file')[0]
             file_object.force_misp_objects_path_custom('tests/mispevent_testfiles', 'overwrite_file')
             file_object.add_attribute('test_overwrite', 'blah')
-            obj = self.admin_misp_connector.update_object(file_object, pythonify=True)
+            obj_json = self.admin_misp_connector.update_object(file_object)
+            self.assertTrue('Object' in obj_json, obj_json)
+            self.assertTrue('name' in obj_json['Object'], obj_json)
+            obj = MISPObject(obj_json['Object']['name'])
+            obj.from_dict(**obj_json)
             self.assertEqual(obj.get_attributes_by_relation('test_overwrite')[0].value, 'blah')
+
+            # FULL object add & update with custom template
+            new_object = MISPObject('overwrite_file', misp_objects_path_custom='tests/mispevent_testfiles')
+            new_object.add_attribute('test_overwrite', 'barbaz')
+            new_object.add_attribute('filename', 'barbaz.exe')
+            new_object = self.admin_misp_connector.add_object(first, new_object, pythonify=True)
+            self.assertEqual(new_object.get_attributes_by_relation('test_overwrite')[0].value, 'barbaz', new_object)
+
+            new_object.force_misp_objects_path_custom('tests/mispevent_testfiles', 'overwrite_file')
+            new_object.add_attribute('filename', 'foobar.exe')
+            new_object = self.admin_misp_connector.update_object(new_object, pythonify=True)
+            self.assertEqual(new_object.get_attributes_by_relation('filename')[1].value, 'foobar.exe', new_object)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1166,12 +1185,34 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(non_exportable_tag.exportable)
         first = self.create_simple_event()
         first.attributes[0].add_tag('non-exportable tag')
+        # Add tag restricted to an org
+        tag = MISPTag()
+        tag.name = f'restricted to org {self.test_org.id}'
+        tag.org_id = self.test_org.id
+        tag_org_restricted = self.admin_misp_connector.add_tag(tag, pythonify=True)
+        self.assertEqual(tag_org_restricted.org_id, tag.org_id)
+        # Add tag restricted to a user
+        tag.name = f'restricted to user {self.test_usr.id}'
+        tag.user_id = self.test_usr.id
+        tag_user_restricted = self.admin_misp_connector.add_tag(tag, pythonify=True)
+        self.assertEqual(tag_user_restricted.user_id, tag.user_id)
         try:
             first = self.user_misp_connector.add_event(first)
             self.assertFalse(first.attributes[0].tags)
             first = self.admin_misp_connector.get_event(first, pythonify=True)
             # Reference: https://github.com/MISP/MISP/issues/1394
             self.assertFalse(first.attributes[0].tags)
+            # Reference: https://github.com/MISP/PyMISP/issues/483
+            r = self.delegate_user_misp_connector.tag(first, tag_org_restricted)
+            # FIXME: The error message changed and is unhelpful.
+            # self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
+            self.assertEqual(r['errors'][1]['message'], 'Invalid Target.')
+            r = self.user_misp_connector.tag(first, tag_org_restricted)
+            self.assertEqual(r['name'], f'Global tag {tag_org_restricted.name}({tag_org_restricted.id}) successfully attached to Event({first.id}).')
+            r = self.pub_misp_connector.tag(first.attributes[0], tag_user_restricted)
+            self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed user.')
+            r = self.user_misp_connector.tag(first.attributes[0], tag_user_restricted)
+            self.assertEqual(r['name'], f'Global tag {tag_user_restricted.name}({tag_user_restricted.id}) successfully attached to Attribute({first.attributes[0].id}).')
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1181,6 +1222,8 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(response['message'], 'Tag deleted.')
         response = self.admin_misp_connector.delete_tag(non_exportable_tag)
         self.assertEqual(response['message'], 'Tag deleted.')
+        response = self.admin_misp_connector.delete_tag(tag_org_restricted)
+        response = self.admin_misp_connector.delete_tag(tag_user_restricted)
 
     def test_add_event_with_attachment_object_controller(self):
         first = self.create_simple_event()
@@ -1561,6 +1604,10 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(entry.action, 'edit')
         r = self.admin_misp_connector.update_user({'email': 'testusr@user.local'}, self.test_usr)
 
+    def test_db_schema(self):
+        diag = self.admin_misp_connector.db_schema_diagnostic()
+        self.assertEqual(diag['actual_db_version'], diag['expected_db_version'], diag)
+
     def test_live_acl(self):
         missing_acls = self.admin_misp_connector.remote_acl()
         self.assertEqual(missing_acls, [], msg=missing_acls)
@@ -1757,7 +1804,7 @@ class TestComprehensive(unittest.TestCase):
                 break
         # Get
         botvrij = self.admin_misp_connector.get_feed(feed, pythonify=True)
-        self.assertEqual(botvrij.url, "http://www.botvrij.eu/data/feed-osint")
+        self.assertEqual(botvrij.url, "https://www.botvrij.eu/data/feed-osint")
         # Enable
         # MISP OSINT
         feed = self.admin_misp_connector.enable_feed(feeds[0].id, pythonify=True)

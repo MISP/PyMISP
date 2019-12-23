@@ -449,9 +449,9 @@
       ]
     }
   },
-  "version": 17,
+  "version": 1,
   "description": "File object describing a file with meta-information",
   "meta-category": "file",
-  "uuid": "688c46fb-5edb-40a3-8273-1af7923e2215",
-  "name": "file"
+  "uuid": "688c46fb-5edb-40a3-8273-1af7923e0000",
+  "name": "overwrite_file"
 }
