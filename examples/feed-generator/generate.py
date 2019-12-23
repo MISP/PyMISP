@@ -68,7 +68,8 @@ if __name__ == '__main__':
         if not e_feed:
             print(f'Invalid distribution {e.distribution}, skipping')
             continue
-        hashes += [[h, e.uuid] for h in e_feed.pop('_hashes')]
+        if '_hashes' in e_feed:
+            hashes += [[h, e.uuid] for h in e_feed.pop('_hashes')]
         manifest.update(e_feed.pop('_manifest'))
         saveEvent(e_feed)
         print("Event " + str(counter) + "/" + str(total) + " exported.")
