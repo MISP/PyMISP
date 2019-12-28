@@ -54,6 +54,7 @@
         "hex",
         "impfuzzy",
         "imphash",
+        "kusto-query",
         "malware-sample",
         "md5",
         "mime-type",
@@ -779,6 +780,10 @@
         "default_category": "Social network",
         "to_ids": 0
       },
+      "kusto-query": {
+        "default_category": "Artifacts dropped",
+        "to_ids": 0
+      },
       "last-name": {
         "default_category": "Person",
         "to_ids": 0
@@ -1183,6 +1188,7 @@
       "issue-date-of-the-visa",
       "ja3-fingerprint-md5",
       "jabber-id",
+      "kusto-query",
       "last-name",
       "link",
       "mac-address",
