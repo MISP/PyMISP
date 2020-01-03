@@ -11,6 +11,7 @@ requests-mock = "*"
 pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal", "pdfexport", "docs"],path = "."}
 docutils = "==0.15"
 memory-profiler = "*"
+mypy = "*"
 
 [packages]
 pymisp = {editable = true,extras = ["fileobjects", "openioc", "virustotal", "pdfexport"],path = "."}
