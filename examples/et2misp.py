@@ -71,7 +71,7 @@ def update_et_event(name):
         for k,v in et_attr.items():
             r = mymisp.delete_attribute(v)
             if r.get('errors'):
-                print "Error deleting attribute {} ({}): {}\n".format(v,k,r['errors'])
+                print("Error deleting attribute {} ({}): {}\n".format(v,k,r['errors']))
 
         # Weed out ips already in the MISP event
         for k,v in et_ips.items():
@@ -102,9 +102,9 @@ def update_et_event(name):
 def echeck(r, eid=None):
     if r.get('errors'):
         if eid:
-            print "Processing event {} failed: {}".format(eid, r['errors'])
+            print("Processing event {} failed: {}".format(eid, r['errors']))
         else:
-            print r['errors']
+            print(r['errors'])
         sys.exit(1)
 
 if __name__ == '__main__':
