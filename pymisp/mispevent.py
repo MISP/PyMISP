@@ -926,7 +926,7 @@ class MISPEvent(AbstractMISP):
         with open(event_path, 'rb') as f:
             self.load(f, validate, metadata_only)
 
-    def load(self, json_event: Union[IO, str, bytes], validate: bool=False, metadata_only: bool=False):
+    def load(self, json_event: Union[IO, str, bytes, dict], validate: bool=False, metadata_only: bool=False):
         """Load a JSON dump from a pseudo file or a JSON string"""
         if hasattr(json_event, 'read'):
             # python2 and python3 compatible to find if we have a file
