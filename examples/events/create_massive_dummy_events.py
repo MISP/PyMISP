@@ -4,6 +4,7 @@
 from pymisp import ExpandedPyMISP
 try:
     from keys import url, key
+    verifycert = False
 except ImportError:
     url = 'https://localhost:8443'
     key = 'd6OmdDFvU3Seau3UjwvHS1y3tFQbaRNhJhDX0tjh'
