@@ -5,8 +5,9 @@ from pymisp import ExpandedPyMISP
 try:
     from keys import url, key
 except ImportError:
-    url = 'http://localhost:8080'
-    key = '8h0gHbhS0fv6JUOlTED0AznLXFbf83TYtQrCycqb'
+    url = 'https://localhost:8443'
+    key = 'd6OmdDFvU3Seau3UjwvHS1y3tFQbaRNhJhDX0tjh'
+    verifycert = False
 import argparse
 import tools
 
@@ -17,7 +18,7 @@ if __name__ == '__main__':
     parser.add_argument("-a", "--attribute", type=int, help="Number of attributes per event (default 3000)")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(url, key, True)
+    misp = ExpandedPyMISP(url, key, verifycert)
     misp.toggle_global_pythonify()
 
     if args.limit is None:
