@@ -9,21 +9,13 @@ addons:
       - libstdc++6
       - libfuzzy-dev
 
-
-matrix:
-    include:
-        - name: "Python 3.6"
-          python: 3.6
-          dist: xenial
-        - name: "Python 3.6 - Dev"
-          python: 3.6-dev
-          dist: xenial
-        - name: "Python 3.7"
-          python: 3.7
-          dist: xenial
-        - name: "Python 3.7 - Dev"
-          python: 3.7-dev
-          dist: xenial
+python:
+  - "3.6"
+  - "3.6-dev"
+  - "3.7"
+  - "3.7-dev"
+  - "3.8"
+  - "3.8-dev"
 
 install:
     - bash travis/install_travis.sh
