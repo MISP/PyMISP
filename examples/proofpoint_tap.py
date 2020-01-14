@@ -3,10 +3,6 @@ import json
 from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation
 from keys import misp_url, misp_key, misp_verifycert, proofpoint_key
 
-# TODO:
-# messages:
-#   if messagesBlocked; quarantineFolder & quarantineRule
-
 # initialize PyMISP and set url for Panorama
 misp = ExpandedPyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
 
@@ -56,9 +52,8 @@ for alert in alertType:
             sender = event.add_attribute('email-src', messages["sender"])
             sender.comment = 'sender address'
 
-            fromAddress = event.add_attribute('email-src-display-name', messages["fromAddress"])
-            # for reasons unbeknownst to me, uncommenting the following line breaks this attribute from posting
-            # fromAddress.comment = 'from address'
+            if messages["fromAddress"] is not None and messages["fromAddress"] != "" :
+                fromAddress = event.add_attribute('email-src-display-name', messages["fromAddress"])
 
             headerFrom = event.add_attribute('email-header', messages["headerFrom"])
             headerFrom.comment = 'email header from'
@@ -68,6 +63,14 @@ for alert in alertType:
 
             subject = event.add_attribute('email-subject', messages["subject"])
             subject.comment = 'email subject'
+
+            if messages["quarantineFolder"] is not None and messages["quarantineFolder"] != "":
+                quarantineFolder = event.add_attribute('comment', messages["quarantineFolder"])
+                quarantineFolder.comment = 'quarantine folder'
+
+            if messages["quarantineRule"] is not None and messages["quarantineRule"] != "":
+                quarantineRule = event.add_attribute('comment', messages["quarantineRule"])
+                quarantineRule.comment = 'quarantine rule'
 
             messageSize = event.add_attribute('size-in-bytes', messages["messageSize"])
             messageSize.comment = 'size of email in bytes'
@@ -131,16 +134,19 @@ for alert in alertType:
                 disposition.comment = 'email body or attachment'
 
                 # sha256 hash of threat
-                sha256 = event.add_attribute('sha256', parts["sha256"])
-                sha256.comment = 'sha256 hash'
+                if parts["sha256"] is not None and parts["sha256"] != "":
+                    sha256 = event.add_attribute('sha256', parts["sha256"])
+                    sha256.comment = 'sha256 hash'
 
                 # md5 hash of threat
-                md5 = event.add_attribute('md5', parts["md5"])
-                md5.comment = 'md5 hash'
+                if parts["md5"] is not None and parts["md5"] != "":
+                    md5 = event.add_attribute('md5', parts["md5"])
+                    md5.comment = 'md5 hash'
 
                 # filename of threat
-                filename = event.add_attribute('filename', parts["filename"])
-                filename.comment = 'filename'
+                if parts["filename"] is not None and parts["filename"] != "":
+                    filename = event.add_attribute('filename', parts["filename"])
+                    filename.comment = 'filename'
 
             misp.add_event(event.to_json())
 
@@ -149,7 +155,7 @@ for alert in alertType:
                 print(alert + " is a permitted click")
                 event.info = alert
                 event.distribution = 0  # Optional, defaults to MISP.default_event_distribution in MISP config
-                event.threat_level_id = 2  # setting this to 0 breaks the integration 
+                event.threat_level_id = 2  # setting this to 0 breaks the integration
                 event.analysis = 0  # Optional, defaults to 0 (initial analysis)
             else:
                 print(alert + " is a blocked click")
