@@ -16,6 +16,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Bump dependencies, add debug. [Raphaël Vinot]
 - Upate dummy events creator. [Raphaël Vinot]
