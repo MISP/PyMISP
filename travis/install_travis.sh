@@ -4,5 +4,5 @@ set -e
 set -x
 
 # We're in python3, installing with pipenv.
-pip install pipenv
+pip3 install pipenv
 pipenv update --dev
