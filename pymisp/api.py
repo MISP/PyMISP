@@ -1035,7 +1035,7 @@ class PyMISP:
 
     def add_server(self, server: MISPServer, pythonify: bool=False) -> Union[dict, MISPServer]:
         """Add a server to synchronise with.
-        Note: You probably fant to use ExpandedPyMISP.get_sync_config and ExpandedPyMISP.import_server instead"""
+        Note: You probably want to use ExpandedPyMISP.get_sync_config and ExpandedPyMISP.import_server instead"""
         server = self._prepare_request('POST', f'servers/add', data=server)
         server = self._check_response(server, expect_json=True)
         if not (self.global_pythonify or pythonify) or 'errors' in server:
