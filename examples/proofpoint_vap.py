@@ -63,4 +63,3 @@ for alert in jsonDataVap["users"]:
     event.add_tag("VAP")
 
     misp.add_event(event.to_json())
-
