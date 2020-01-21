@@ -240,6 +240,7 @@
         "attachment",
         "authentihash",
         "cdhash",
+        "chrome-extension-id",
         "comment",
         "domain",
         "email-attachment",
@@ -321,6 +322,7 @@
         "attachment",
         "authentihash",
         "cdhash",
+        "chrome-extension-id",
         "comment",
         "filename",
         "filename|authentihash",
@@ -509,6 +511,10 @@
         "to_ids": 1
       },
       "cdhash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "chrome-extension-id": {
         "default_category": "Payload delivery",
         "to_ids": 1
       },
@@ -1121,6 +1127,7 @@
       "campaign-name",
       "cc-number",
       "cdhash",
+      "chrome-extension-id",
       "comment",
       "community-id",
       "cookie",
