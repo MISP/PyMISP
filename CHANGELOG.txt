@@ -2,6 +2,71 @@ Changelog
 =========
 
 
+v2.4.120 (2020-01-17)
+---------------------
+
+New
+~~~
+- [attribute type] kusto-query attribute type. [Alexandre Dulaunoy]
+
+  Kusto query is the query language for the Kusto services in Azure used
+  to search large dataset. It's used in Windows Defender ATP Hunting-Queries
+  and also Azure Sentinel (Cloud-native SIEM).
+- Remove python < 3.6 support. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump dependencies, add debug. [Raphaël Vinot]
+- Upate dummy events creator. [Raphaël Vinot]
+- Add tests on more version of Python. [Raphaël Vinot]
+- Search with the STIX output returns a json STIX. [Raphaël Vinot]
+
+  Was XML before.
+- Bump dependencies. [Raphaël Vinot]
+- Add more typing information. [Raphaël Vinot]
+- Add typing markup. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump Dependencies. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Add missing variable in dummy creator. [Raphaël Vinot]
+- Et2misp was python2 only. [Raphaël Vinot]
+- Feed generator was broken. [Raphaël Vinot]
+
+  Fix #506
+- Event without hashable attribute. [Raphaël Vinot]
+
+  Related #506
+
+Other
+~~~~~
+- Update api.py. [AaronK]
+
+  minor typo, can;t help it noticing those. sorry,
+- Fixed TODO, added quarantineFolder/quarantineRule from
+  messagesBlocked, added some error handling to prevent empty attributes
+  from trying to be added. [th3jiv3r]
+- Scrape proofpoint tap api for messages blocked/delivered & clicks
+  blocked/permitted  and create misp events. [th3jiv3r]
+- Add variable for proofpoint tap api auth. [th3jiv3r]
+- Update README.md. [AaronK]
+
+  minor typo
+- Define the number of entries to output. [AndreC10002]
+
+  Allow for defining in the settings.py file the number of entries to output
+- Update generate.py. [AndreC10002]
+- Cleanup of code and 'quick-n-dirty' sanitizing of tags. [Koen Van
+  Impe]
+- Sync. [Koen Van Impe]
+- Update README.md. [Raphaël Vinot]
+
+
 v2.4.119.1 (2019-12-17)
 -----------------------
 
@@ -11,6 +76,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Version bump. [Raphaël Vinot]
 - Bump test files. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]

@@ -9,7 +9,6 @@ import unittest
 from pymisp.tools import make_binary_objects
 from datetime import datetime, timedelta, date
 from io import BytesIO
-import re
 import json
 from pathlib import Path
 
@@ -993,10 +992,9 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.user_misp_connector.add_event(first)
             stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
-            found = re.findall('8.8.8.8', stix)
-            self.assertTrue(found)
+            self.assertTrue(stix['related_packages'][0]['package']['incidents'][0]['related_indicators']['indicators'][0]['indicator']['observable']['object']['properties']['address_value']['value'], '8.8.8.8')
             stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
-            json.dumps(stix2, indent=2)
+            print(json.dumps(stix2, indent=2))
             self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
         finally:
             # Delete event
