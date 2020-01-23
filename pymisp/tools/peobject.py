@@ -7,17 +7,19 @@ from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 from datetime import datetime
 import logging
+from typing import Optional, Union
+from pathlib import Path
 
 logger = logging.getLogger('pymisp')
 
 try:
-    import lief
+    import lief  # type: ignore
     HAS_LIEF = True
 except ImportError:
     HAS_LIEF = False
 
 try:
-    import pydeep
+    import pydeep  # type: ignore
     HAS_PYDEEP = True
 except ImportError:
     HAS_PYDEEP = False
@@ -25,7 +27,7 @@ except ImportError:
 
 class PEObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
+    def __init__(self, parsed: Optional[lief.PE.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, standalone: bool=True, **kwargs):
         # Python3 way
         # super().__init__('pe')
         super(PEObject, self).__init__('pe', standalone=standalone, **kwargs)
@@ -117,7 +119,7 @@ class PEObject(AbstractMISPObjectGenerator):
 
 class PESectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section, standalone=True, **kwargs):
+    def __init__(self, section: lief.PE.Section, standalone: bool=True, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
         super(PESectionObject, self).__init__('pe-section', standalone=standalone, **kwargs)

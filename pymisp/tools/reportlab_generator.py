@@ -20,17 +20,17 @@ logger = logging.getLogger('pymisp')
 
 # Potentially not installed imports
 try:
-    from reportlab.pdfgen import canvas
-    from reportlab.pdfbase.pdfmetrics import stringWidth, registerFont
-    from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.lib import colors
-    from reportlab.lib.pagesizes import A4
+    from reportlab.pdfgen import canvas  # type: ignore
+    from reportlab.pdfbase.pdfmetrics import stringWidth, registerFont  # type: ignore
+    from reportlab.pdfbase.ttfonts import TTFont  # type: ignore
+    from reportlab.lib import colors  # type: ignore
+    from reportlab.lib.pagesizes import A4  # type: ignore
 
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Table, TableStyle, Flowable, Image, Indenter
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Table, TableStyle, Flowable, Image, Indenter  # type: ignore
 
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.units import mm
-    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle  # type: ignore
+    from reportlab.lib.units import mm  # type: ignore
+    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT  # type: ignore
 
     HAS_REPORTLAB = True
 except ImportError:

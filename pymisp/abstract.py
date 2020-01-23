@@ -21,7 +21,7 @@ except ImportError:
 
 import logging
 from enum import Enum
-from typing import Union, Optional
+from typing import Union, Optional, List
 
 from .exceptions import PyMISPInvalidFormat, PyMISPError
 
@@ -112,20 +112,13 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         self.__not_jsonable: list = []
         self._fields_for_feed: set = {}
         self.__self_defined_describe_types: Union[dict, None] = None
+        self.uuid: str
 
         if kwargs.get('force_timestamps') is not None:
             # Ignore the edited objects and keep the timestamps.
             self.__force_timestamps: bool = True
         else:
             self.__force_timestamps: bool = False
-
-        # List of classes having tags
-        from .mispevent import MISPAttribute, MISPEvent
-        self.__has_tags = (MISPAttribute, MISPEvent)
-        if isinstance(self, self.__has_tags):
-            self.Tag = []
-            setattr(AbstractMISP, 'add_tag', AbstractMISP.__add_tag)
-            setattr(AbstractMISP, 'tags', property(AbstractMISP.__get_tags, AbstractMISP.__set_tags))
 
     @property
     def describe_types(self) -> dict:
@@ -288,7 +281,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             return int(d)
         return int(d.timestamp())
 
-    def __add_tag(self, tag=None, **kwargs):
+    def _add_tag(self, tag=None, **kwargs):
         """Add a tag to the attribute (by name or a MISPTag object)"""
         if isinstance(tag, str):
             misp_tag = MISPTag()
@@ -308,11 +301,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             self.edited = True
         return misp_tag
 
-    def __get_tags(self):
-        """Returns a lost of tags associated to this Attribute"""
-        return self.Tag
-
-    def __set_tags(self, tags):
+    def _set_tags(self, tags):
         """Set a list of prepared MISPTag."""
         if all(isinstance(x, MISPTag) for x in tags):
             self.Tag = tags
@@ -336,6 +325,10 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
 class MISPTag(AbstractMISP):
 
     _fields_for_feed: set = {'name', 'colour'}
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.name: str
 
     def from_dict(self, **kwargs):
         if kwargs.get('Tag'):

@@ -6,13 +6,15 @@ from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 import logging
 from email import message_from_bytes, policy
+from pathlib import Path
+from typing import Union
 
 logger = logging.getLogger('pymisp')
 
 
 class EMailObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath=None, pseudofile=None, attach_original_email=True, standalone=True, **kwargs):
+    def __init__(self, filepath: Union[Path, str]=None, pseudofile: BytesIO=None, attach_original_email: bool=True, standalone: bool=True, **kwargs):
         # PY3 way:
         # super().__init__('file')
         super(EMailObject, self).__init__('email', standalone=standalone, **kwargs)

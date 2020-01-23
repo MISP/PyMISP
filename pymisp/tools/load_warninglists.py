@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 try:
-    from pymispwarninglists import WarningLists
+    from pymispwarninglists import WarningLists  # type: ignore
     has_pymispwarninglists = True
 except ImportError:
     has_pymispwarninglists = False

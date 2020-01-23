@@ -3,7 +3,7 @@
 
 from .abstractgenerator import AbstractMISPObjectGenerator
 import logging
-from pyfaup.faup import Faup
+from pyfaup.faup import Faup  # type: ignore
 from urllib.parse import unquote_plus
 
 logger = logging.getLogger('pymisp')
@@ -13,7 +13,7 @@ faup = Faup()
 
 class URLObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, url, standalone=True, **kwargs):
+    def __init__(self, url: str, standalone: bool=True, **kwargs):
         # PY3 way:
         # super().__init__('file')
         super(URLObject, self).__init__('url', standalone=standalone, **kwargs)

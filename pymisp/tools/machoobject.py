@@ -6,18 +6,20 @@ from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import logging
+from typing import Optional, Union
+from pathlib import Path
 
 logger = logging.getLogger('pymisp')
 
 
 try:
-    import lief
+    import lief  # type: ignore
     HAS_LIEF = True
 except ImportError:
     HAS_LIEF = False
 
 try:
-    import pydeep
+    import pydeep  # type: ignore
     HAS_PYDEEP = True
 except ImportError:
     HAS_PYDEEP = False
@@ -25,7 +27,7 @@ except ImportError:
 
 class MachOObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
+    def __init__(self, parsed: Optional[lief.MachO.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, standalone: bool=True, **kwargs):
         # Python3 way
         # super().__init__('elf')
         super(MachOObject, self).__init__('macho', standalone=standalone, **kwargs)
@@ -70,7 +72,7 @@ class MachOObject(AbstractMISPObjectGenerator):
 
 class MachOSectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section, standalone=True, **kwargs):
+    def __init__(self, section: lief.MachO.Section, standalone: bool=True, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
         super(MachOSectionObject, self).__init__('macho-section', standalone=standalone, **kwargs)

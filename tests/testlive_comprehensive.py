@@ -12,7 +12,7 @@ from io import BytesIO
 import json
 from pathlib import Path
 
-import urllib3
+import urllib3  # type: ignore
 import time
 from uuid import uuid4
 
@@ -37,7 +37,7 @@ except ImportError:
         raise
 
 try:
-    from keys import url, key
+    from keys import url, key  # type: ignore
     verifycert = False
 except ImportError as e:
     print(e)

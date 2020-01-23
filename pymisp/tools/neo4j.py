@@ -5,7 +5,7 @@ import os
 from .. import MISPEvent
 
 try:
-    from py2neo import authenticate, Graph, Node, Relationship
+    from py2neo import authenticate, Graph, Node, Relationship  # type: ignore
     has_py2neo = True
 except ImportError:
     has_py2neo = False

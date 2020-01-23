@@ -4,11 +4,12 @@
 from pathlib import Path
 from pymisp import MISPEvent
 import json
+from typing import List
 
 
 def feed_meta_generator(path: Path):
     manifests = {}
-    hashes = []
+    hashes: List[str] = []
 
     for f_name in path.glob('*.json'):
         if str(f_name.name) == 'manifest.json':

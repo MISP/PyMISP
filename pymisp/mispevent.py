@@ -77,6 +77,14 @@ class MISPOrganisation(AbstractMISP):
             kwargs = kwargs['Organisation']
         super(MISPOrganisation, self).from_dict(**kwargs)
 
+class MISPSharingGroup(AbstractMISP):
+
+    def from_dict(self, **kwargs):
+        if 'SharingGroup' in kwargs:
+            kwargs = kwargs['SharingGroup']
+        super().from_dict(**kwargs)
+
+
 
 class MISPShadowAttribute(AbstractMISP):
 
@@ -133,10 +141,29 @@ class MISPAttribute(AbstractMISP):
         self.__category_type_mapping: dict = self.describe_types['category_type_mappings']
         self.__sane_default: dict = self.describe_types['sane_defaults']
         self.__strict: bool = strict
-        self._data = None
+        self._data: Optional[BytesIO] = None
         self.uuid: str = str(uuid.uuid4())
         self.ShadowAttribute: List[MISPShadowAttribute] = []
+        self.SharingGroup: MISPSharingGroup
         self.Sighting: List[MISPSighting] = []
+        self.Tag: List[MISPTag] = []
+
+        # For search
+        self.Event: MISPEvent
+        self.RelatedAttribute: List[MISPAttribute]
+
+    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]], **kwargs) -> MISPTag:
+        return super()._add_tag(tag, **kwargs)
+
+    @property
+    def tags(self) -> List[MISPTag]:
+        """Returns a lost of tags associated to this Attribute"""
+        return self.Tag
+
+    @tags.setter
+    def tags(self, tags: List[MISPTag]):
+        """Set a list of prepared MISPTag."""
+        super()._set_tags(tags)
 
     def hash_values(self, algorithm: str='sha512') -> List[str]:
         """Compute the hash of every values for fast lookups"""
@@ -333,6 +360,10 @@ class MISPAttribute(AbstractMISP):
         if kwargs.get('ShadowAttribute'):
             [self.add_shadow_attribute(s_attr) for s_attr in kwargs.pop('ShadowAttribute')]
 
+        if kwargs.get('SharingGroup'):
+            for sg in kwargs.pop('SharingGroup'):
+                self.SharingGroup = MISPSharingGroup()
+                self.SharingGroup.from_dict(**sg)
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.pop("disable_correlation", False)
         if self.disable_correlation is None:
@@ -383,8 +414,8 @@ class MISPAttribute(AbstractMISP):
     @data.setter
     def data(self, data: Union[Path, str, bytes, BytesIO]):
         if isinstance(data, Path):
-            with data.open('rb') as f:
-                self._data = BytesIO(f.read())
+            with data.open('rb') as f_temp:
+                self._data = BytesIO(f_temp.read())
         if isinstance(data, (str, bytes)):
             self._data = BytesIO(base64.b64decode(data))
         elif isinstance(data, BytesIO):
@@ -451,6 +482,9 @@ class MISPObjectReference(AbstractMISP):
     def __init__(self):
         super().__init__()
         self.uuid = str(uuid.uuid4())
+        self.object_uuid: str
+        self.referenced_uuid: str
+        self.relationship_type: str
 
     def _set_default(self):
         if not hasattr(self, 'comment'):
@@ -492,6 +526,7 @@ class MISPObject(AbstractMISP):
         self._strict: bool = strict
         self.name: str = name
         self._known_template: bool = False
+        self.id: int
 
         self._set_template(kwargs.get('misp_objects_path_custom'))
 
@@ -499,11 +534,13 @@ class MISPObject(AbstractMISP):
         self.__fast_attribute_access: dict = defaultdict(list)  # Hashtable object_relation: [attributes]
         self.ObjectReference: List[MISPObjectReference] = []
         self.Attribute: List[MISPAttribute] = []
+        self.SharingGroup: MISPSharingGroup
+        self._default_attributes_parameters: dict
         if isinstance(default_attributes_parameters, MISPAttribute):
             # Just make sure we're not modifying an existing MISPAttribute
-            self._default_attributes_parameters: dict = default_attributes_parameters.to_dict()
+            self._default_attributes_parameters = default_attributes_parameters.to_dict()
         else:
-            self._default_attributes_parameters: dict = default_attributes_parameters
+            self._default_attributes_parameters = default_attributes_parameters
         if self._default_attributes_parameters:
             # Let's clean that up
             self._default_attributes_parameters.pop('value', None)  # duh
@@ -558,7 +595,10 @@ class MISPObject(AbstractMISP):
     def _set_template(self, misp_objects_path_custom: Optional[Union[Path, str]]=None):
         if misp_objects_path_custom:
             # If misp_objects_path_custom is given, and an object with the given name exists, use that.
-            self.misp_objects_path = misp_objects_path_custom
+            if isinstance(misp_objects_path_custom, str):
+                self.misp_objects_path = Path(misp_objects_path_custom)
+            else:
+                self.misp_objects_path = misp_objects_path_custom
 
         # Try to get the template
         self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
@@ -628,6 +668,10 @@ class MISPObject(AbstractMISP):
         if kwargs.get('ObjectReference'):
             [self.add_reference(**r) for r in kwargs.pop('ObjectReference')]
 
+        if kwargs.get('SharingGroup'):
+            for sg in kwargs.pop('SharingGroup'):
+                self.SharingGroup = MISPSharingGroup()
+                self.SharingGroup.from_dict(**sg)
         # Not supported yet - https://github.com/MISP/PyMISP/issues/168
         # if kwargs.get('Tag'):
         #    for tag in kwargs.pop('Tag'):
@@ -763,6 +807,21 @@ class MISPEvent(AbstractMISP):
         self.Object: List[MISPObject] = []
         self.RelatedEvent: List[MISPEvent] = []
         self.ShadowAttribute: List[MISPShadowAttribute] = []
+        self.SharingGroup: MISPSharingGroup
+        self.Tag: List[MISPTag] = []
+
+    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]], **kwargs) -> MISPTag:
+        return super()._add_tag(tag, **kwargs)
+
+    @property
+    def tags(self) -> List[MISPTag]:
+        """Returns a lost of tags associated to this Event"""
+        return self.Tag
+
+    @tags.setter
+    def tags(self, tags: List[MISPTag]):
+        """Set a list of prepared MISPTag."""
+        super()._set_tags(tags)
 
     def _set_default(self):
         """There are a few keys that could, or need to be set by default for the feed generator"""
@@ -928,13 +987,14 @@ class MISPEvent(AbstractMISP):
 
     def load(self, json_event: Union[IO, str, bytes, dict], validate: bool=False, metadata_only: bool=False):
         """Load a JSON dump from a pseudo file or a JSON string"""
-        if hasattr(json_event, 'read'):
+        if isinstance(json_event, IO):
             # python2 and python3 compatible to find if we have a file
             json_event = json_event.read()
         if isinstance(json_event, (str, bytes)):
             json_event = json.loads(json_event)
-        if json_event.get('response'):
-            event = json_event.get('response')[0]
+
+        if isinstance(json_event, dict) and 'response' in json_event and isinstance(json_event['response'], list):
+            event = json_event['response'][0]
         else:
             event = json_event
         if not event:
@@ -1028,7 +1088,9 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('Orgc'):
             self.Orgc = MISPOrganisation()
             self.Orgc.from_dict(**kwargs.pop('Orgc'))
-
+        if kwargs.get('SharingGroup'):
+            self.SharingGroup = MISPSharingGroup()
+            self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
         super(MISPEvent, self).from_dict(**kwargs)
 
     def to_dict(self) -> dict:
@@ -1276,6 +1338,10 @@ class MISPObjectTemplate(AbstractMISP):
 
 class MISPUser(AbstractMISP):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.email: str
+
     def from_dict(self, **kwargs):
         if 'User' in kwargs:
             kwargs = kwargs['User']
@@ -1331,6 +1397,11 @@ class MISPNoticelist(AbstractMISP):
 
 class MISPRole(AbstractMISP):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.perm_admin: int
+        self.perm_site_admin: int
+
     def from_dict(self, **kwargs):
         if 'Role' in kwargs:
             kwargs = kwargs['Role']
@@ -1345,15 +1416,13 @@ class MISPServer(AbstractMISP):
         super().from_dict(**kwargs)
 
 
-class MISPSharingGroup(AbstractMISP):
-
-    def from_dict(self, **kwargs):
-        if 'SharingGroup' in kwargs:
-            kwargs = kwargs['SharingGroup']
-        super().from_dict(**kwargs)
-
-
 class MISPLog(AbstractMISP):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.model: str
+        self.action: str
+        self.title: str
 
     def from_dict(self, **kwargs):
         if 'Log' in kwargs:
@@ -1365,6 +1434,12 @@ class MISPLog(AbstractMISP):
 
 
 class MISPEventDelegation(AbstractMISP):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.org_id: int
+        self.requester_org_id: int
+        self.event_id: int
 
     def from_dict(self, **kwargs):
         if 'EventDelegation' in kwargs:
@@ -1384,7 +1459,9 @@ class MISPObjectAttribute(MISPAttribute):
         super().__init__()
         self._definition = definition
 
-    def from_dict(self, object_relation: str, value: Union[str, int, float], **kwargs):
+
+    def from_dict(self, object_relation: str, value: Union[str, int, float], **kwargs):  # type: ignore
+        # NOTE: Signature of "from_dict" incompatible with supertype "MISPAttribute"
         self.object_relation = object_relation
         self.value = value
         if 'Attribute' in kwargs:

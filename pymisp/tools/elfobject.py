@@ -6,17 +6,19 @@ from ..exceptions import InvalidMISPObject
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import logging
+from typing import Union
+from pathlib import Path
 
 logger = logging.getLogger('pymisp')
 
 try:
-    import lief
+    import lief  # type: ignore
     HAS_LIEF = True
 except ImportError:
     HAS_LIEF = False
 
 try:
-    import pydeep
+    import pydeep  # type: ignore
     HAS_PYDEEP = True
 except ImportError:
     HAS_PYDEEP = False
@@ -24,7 +26,7 @@ except ImportError:
 
 class ELFObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
+    def __init__(self, parsed: lief.ELF.Binary=None, filepath: Union[Path, str]=None, pseudofile: Union[BytesIO, bytes]=None, standalone: bool=True, **kwargs):
         super(ELFObject, self).__init__('elf', standalone=standalone, **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
@@ -67,7 +69,7 @@ class ELFObject(AbstractMISPObjectGenerator):
 
 class ELFSectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section, standalone=True, **kwargs):
+    def __init__(self, section: lief.ELF.Section, standalone: bool=True, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
         super(ELFSectionObject, self).__init__('elf-section', standalone=standalone, **kwargs)

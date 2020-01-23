@@ -8,7 +8,7 @@ class SBSignatureObject(AbstractMISPObjectGenerator):
     '''
     Sandbox Analyzer
     '''
-    def __init__(self, software, report, standalone=True, **kwargs):
+    def __init__(self, software: str, report: list, standalone: bool=True, **kwargs):
         super(SBSignatureObject, self).__init__("sb-signature", **kwargs)
         self._software = software
         self._report = report

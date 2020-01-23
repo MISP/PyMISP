@@ -9,18 +9,20 @@ from hashlib import md5, sha1, sha256, sha512
 import math
 from collections import Counter
 import logging
+from pathlib import Path
+from typing import Union
 
 logger = logging.getLogger('pymisp')
 
 
 try:
-    import pydeep
+    import pydeep  # type: ignore
     HAS_PYDEEP = True
 except ImportError:
     HAS_PYDEEP = False
 
 try:
-    import magic
+    import magic  # type: ignore
     HAS_MAGIC = True
 except ImportError:
     HAS_MAGIC = False
@@ -28,7 +30,7 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath=None, pseudofile=None, filename=None, standalone=True, **kwargs):
+    def __init__(self, filepath: Union[Path, str]=None, pseudofile: BytesIO=None, filename: str=None, standalone: bool=True, **kwargs):
         # PY3 way:
         # super().__init__('file')
         super(FileObject, self).__init__('file', standalone=standalone, **kwargs)
@@ -70,7 +72,7 @@ class FileObject(AbstractMISPObjectGenerator):
             if HAS_PYDEEP:
                 self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode())
 
-    def __entropy_H(self, data):
+    def __entropy_H(self, data: bytes) -> float:
         """Calculate the entropy of a chunk of data."""
         # NOTE: copy of the entropy function from pefile
 
@@ -79,7 +81,7 @@ class FileObject(AbstractMISPObjectGenerator):
 
         occurences = Counter(bytearray(data))
 
-        entropy = 0
+        entropy = 0.0
         for x in occurences.values():
             p_x = float(x) / len(data)
             entropy -= p_x * math.log(p_x, 2)

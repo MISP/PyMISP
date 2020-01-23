@@ -5,7 +5,7 @@ import os
 
 from .. import MISPEvent
 try:
-    from bs4 import BeautifulSoup
+    from bs4 import BeautifulSoup  # type: ignore
     has_bs4 = True
 except ImportError:
     has_bs4 = False

@@ -5,11 +5,11 @@ from .. import MISPObject
 from ..exceptions import InvalidMISPObject
 from datetime import datetime, date
 from dateutil.parser import parse
-
+from typing import Union, Optional
 
 class AbstractMISPObjectGenerator(MISPObject):
 
-    def _detect_epoch(self, timestamp):
+    def _detect_epoch(self, timestamp: Union[str, int, float]) -> bool:
         try:
             tmp = float(timestamp)
             if tmp < 30000000:
@@ -20,7 +20,7 @@ class AbstractMISPObjectGenerator(MISPObject):
         except ValueError:
             return False
 
-    def _sanitize_timestamp(self, timestamp):
+    def _sanitize_timestamp(self, timestamp: Optional[Union[datetime, date, dict, str, int, float]]=None) -> datetime:
         if not timestamp:
             return datetime.now()
 
@@ -31,12 +31,14 @@ class AbstractMISPObjectGenerator(MISPObject):
         elif isinstance(timestamp, dict):
             if not isinstance(timestamp['value'], datetime):
                 timestamp['value'] = parse(timestamp['value'])
-            return timestamp
-        elif not isinstance(timestamp, datetime):  # Supported: float/int/string
-            if self._detect_epoch(timestamp):
+            return timestamp['value']
+        else:  # Supported: float/int/string
+            if isinstance(timestamp, (str, int, float)) and self._detect_epoch(timestamp):
                 return datetime.fromtimestamp(float(timestamp))
-            return parse(timestamp)
-        return timestamp
+            elif isinstance(timestamp, str):
+                return parse(timestamp)
+            else:
+                raise Exception(f'Unable to convert {timestamp} to a datetime.')
 
     def generate_attributes(self):
         """Contains the logic where all the values of the object are gathered"""
