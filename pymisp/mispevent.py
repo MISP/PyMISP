@@ -4,7 +4,7 @@ import datetime
 import json
 import os
 import base64
-from io import BytesIO
+from io import BytesIO, IOBase
 from zipfile import ZipFile
 import uuid
 from collections import defaultdict
@@ -152,7 +152,7 @@ class MISPAttribute(AbstractMISP):
         self.Event: MISPEvent
         self.RelatedAttribute: List[MISPAttribute]
 
-    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]], **kwargs) -> MISPTag:
+    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]]=None, **kwargs) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
@@ -810,7 +810,7 @@ class MISPEvent(AbstractMISP):
         self.SharingGroup: MISPSharingGroup
         self.Tag: List[MISPTag] = []
 
-    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]], **kwargs) -> MISPTag:
+    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]]=None, **kwargs) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
@@ -987,7 +987,7 @@ class MISPEvent(AbstractMISP):
 
     def load(self, json_event: Union[IO, str, bytes, dict], validate: bool=False, metadata_only: bool=False):
         """Load a JSON dump from a pseudo file or a JSON string"""
-        if isinstance(json_event, IO):
+        if isinstance(json_event, IOBase):
             # python2 and python3 compatible to find if we have a file
             json_event = json_event.read()
         if isinstance(json_event, (str, bytes)):
