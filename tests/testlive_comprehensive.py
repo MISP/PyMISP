@@ -7,7 +7,7 @@ import sys
 import unittest
 
 from pymisp.tools import make_binary_objects
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from io import BytesIO
 import json
 from pathlib import Path
@@ -1977,7 +1977,6 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_user(test_roles_user)
             self.admin_misp_connector.delete_tag(test_tag)
 
-    @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_expansion(self):
         first = self.create_simple_event()
         try:
@@ -2046,7 +2045,6 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_communities(self):
         communities = self.admin_misp_connector.communities(pythonify=True)
         self.assertEqual(communities[0].name, 'CIRCL Private Sector Information Sharing Community - aka MISPPRIV')
@@ -2079,6 +2077,30 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
+
+    def test_first_last_seen(self):
+        event = MISPEvent()
+        event.info = 'Test First Last seen'
+        event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-04', last_seen='2020-01-04T12:30:34.323242+8:00')
+        obj = event.add_object(name='file', first_seen=1580147259.268763, last_seen=1580147300)
+        attr = obj.add_attribute('filename', 'blah.exe')
+        attr.first_seen = '2022-01-30'
+        attr.last_seen = '2022-02-23'
+        try:
+            first = self.admin_misp_connector.add_event(event, pythonify=True)
+            # Simple attribute
+            self.assertEqual(first.attributes[0].first_seen, datetime(2020, 1, 3, 23, 0, tzinfo=timezone.utc))
+            self.assertEqual(first.attributes[0].last_seen, datetime(2020, 1, 4, 4, 30, 34, 323242, tzinfo=timezone.utc))
+
+            # Object
+            self.assertEqual(first.objects[0].first_seen, datetime(2020, 1, 27, 17, 47, 39, 268763, tzinfo=timezone.utc))
+            self.assertEqual(first.objects[0].last_seen, datetime(2020, 1, 27, 17, 48, 20, tzinfo=timezone.utc))
+
+            # Object attribute
+            self.assertEqual(first.objects[0].attributes[0].first_seen, datetime(2022, 1, 29, 23, 0, tzinfo=timezone.utc))
+            self.assertEqual(first.objects[0].attributes[0].last_seen, datetime(2022, 2, 22, 23, 0, tzinfo=timezone.utc))
+        finally:
+            self.admin_misp_connector.delete_event(first)
 
 
 if __name__ == '__main__':

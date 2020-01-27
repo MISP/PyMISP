@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+from datetime import timezone, datetime, date
 import json
 import os
 import base64
@@ -88,6 +88,11 @@ class MISPSharingGroup(AbstractMISP):
 
 class MISPShadowAttribute(AbstractMISP):
 
+    def __init__(self):
+        super().__init__()
+        self.type: str
+        self.value: str
+
     def from_dict(self, **kwargs):
         if 'ShadowAttribute' in kwargs:
             kwargs = kwargs['ShadowAttribute']
@@ -95,11 +100,16 @@ class MISPShadowAttribute(AbstractMISP):
 
     def __repr__(self) -> str:
         if hasattr(self, 'value'):
-            return f'<{self.__class__.__name__}(type={self.type}, value={self.value})'  # type: ignore
+            return f'<{self.__class__.__name__}(type={self.type}, value={self.value})'
         return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPSighting(AbstractMISP):
+
+    def __init__(self):
+        super().__init__()
+        self.id: int
+        self.value: str
 
     def from_dict(self, **kwargs):
         """Initialize the MISPSighting from a dictionary
@@ -117,11 +127,11 @@ class MISPSighting(AbstractMISP):
 
     def __repr__(self) -> str:
         if hasattr(self, 'value'):
-            return '<{self.__class__.__name__}(value={self.value})'.format(self=self)  # type: ignore
+            return '<{self.__class__.__name__}(value={self.value})'.format(self=self)
         if hasattr(self, 'id'):
-            return '<{self.__class__.__name__}(id={self.id})'.format(self=self)  # type: ignore
+            return '<{self.__class__.__name__}(id={self.id})'.format(self=self)
         if hasattr(self, 'uuid'):
-            return '<{self.__class__.__name__}(uuid={self.uuid})'.format(self=self)  # type: ignore
+            return '<{self.__class__.__name__}(uuid={self.uuid})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
@@ -142,6 +152,8 @@ class MISPAttribute(AbstractMISP):
         self.__sane_default: dict = self.describe_types['sane_defaults']
         self.__strict: bool = strict
         self._data: Optional[BytesIO] = None
+        self.first_seen: datetime
+        self.last_seen: datetime
         self.uuid: str = str(uuid.uuid4())
         self.ShadowAttribute: List[MISPShadowAttribute] = []
         self.SharingGroup: MISPSharingGroup
@@ -164,6 +176,30 @@ class MISPAttribute(AbstractMISP):
     def tags(self, tags: List[MISPTag]):
         """Set a list of prepared MISPTag."""
         super()._set_tags(tags)
+
+    def __setattr__(self, name, value):
+        if name in ['first_seen', 'last_seen']:
+            if isinstance(value, (int, float)):
+                # Timestamp
+                value = datetime.fromtimestamp(value)
+            elif isinstance(value, str):
+                value = parse(value)
+            elif isinstance(value, date):
+                value = datetime.combine(falue, datetime.min.time())
+            elif isinstance(value, datetime):
+                pass
+            else:
+               raise PyMISPError(f'Invalid format for {name}: {type(value)}.')
+
+            if not value.tzinfo:
+                # set localtimezone if not present
+                value = value.astimezone()
+
+            if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > value:
+                raise PyMISPError('last_seen ({value}) has to be after first_seen ({self.first_seen})')
+            if name == 'first_seen' and hasattr(self, 'last_seen') and self.last_seen < value:
+                raise PyMISPError('first_seen ({value}) has to be before last_seen ({self.last_seen})')
+        super().__setattr__(name, value)
 
     def hash_values(self, algorithm: str='sha512') -> List[str]:
         """Compute the hash of every values for fast lookups"""
@@ -188,14 +224,14 @@ class MISPAttribute(AbstractMISP):
         if not hasattr(self, 'comment'):
             self.comment = ''
         if not hasattr(self, 'timestamp'):
-            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+            self.timestamp = datetime.timestamp(datetime.now())
 
     def _to_feed(self) -> dict:
         to_return = super()._to_feed()
         if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
-        if self.tags:  # type: ignore
-            to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))  # type: ignore
+        if self.tags:
+            to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
         return to_return
 
     @property
@@ -298,10 +334,12 @@ class MISPAttribute(AbstractMISP):
             raise NewAttributeError('The value of the attribute is required.')
         if self.type == 'datetime' and isinstance(self.value, str):
             try:
-                if '.' in self.value:
-                    self.value = datetime.datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f")
+                if '+' in self.value or '-' in self.value:
+                    self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f%z")
+                elif '.' in self.value:
+                    self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f")
                 else:
-                    self.value = datetime.datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S")
+                    self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S")
             except ValueError:
                 # Slower, but if the other ones fail, that's a good fallback
                 self.value = parse(self.value)
@@ -338,10 +376,28 @@ class MISPAttribute(AbstractMISP):
             self.event_id = int(kwargs.pop('event_id'))
         if kwargs.get('timestamp'):
             ts = kwargs.pop('timestamp')
-            if isinstance(ts, datetime.datetime):
+            if isinstance(ts, datetime):
                 self.timestamp = ts
             else:
-                self.timestamp = datetime.datetime.fromtimestamp(int(ts), datetime.timezone.utc)
+                self.timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
+        if kwargs.get('first_seen'):
+            fs = kwargs.pop('first_seen')
+            try:
+                # Faster
+                self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
+            except:
+                # Use __setattr__
+                self.first_seen = fs
+
+        if kwargs.get('last_seen'):
+            ls = kwargs.pop('last_seen')
+            try:
+                # Faster
+                self.last_seen = datetime.strptime(kwargs.pop('last_seen'), "%Y-%m-%dT%H:%M:%S.%f%z")
+            except:
+                # Use __setattr__
+                self.last_seen = ls
+
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
 
@@ -490,7 +546,7 @@ class MISPObjectReference(AbstractMISP):
         if not hasattr(self, 'comment'):
             self.comment = ''
         if not hasattr(self, 'timestamp'):
-            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+            self.timestamp = datetime.timestamp(datetime.now())
 
     def from_dict(self, **kwargs):
         if 'ObjectReference' in kwargs:
@@ -531,6 +587,8 @@ class MISPObject(AbstractMISP):
         self._set_template(kwargs.get('misp_objects_path_custom'))
 
         self.uuid: str = str(uuid.uuid4())
+        self.first_seen: datetime
+        self.last_seen: datetime
         self.__fast_attribute_access: dict = defaultdict(list)  # Hashtable object_relation: [attributes]
         self.ObjectReference: List[MISPObjectReference] = []
         self.Attribute: List[MISPAttribute] = []
@@ -579,13 +637,37 @@ class MISPObject(AbstractMISP):
         if not hasattr(self, 'comment'):
             self.comment = ''
         if not hasattr(self, 'timestamp'):
-            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+            self.timestamp = datetime.timestamp(datetime.now())
 
     def _to_feed(self) -> dict:
         to_return = super(MISPObject, self)._to_feed()
         if self.references:
             to_return['ObjectReference'] = [reference._to_feed() for reference in self.references]
         return to_return
+
+    def __setattr__(self, name, value):
+        if name in ['first_seen', 'last_seen']:
+            if isinstance(value, datetime):
+                pass
+            elif isinstance(value, (int, float)):
+                # Timestamp
+                value = datetime.fromtimestamp(value)
+            elif isinstance(value, str):
+                value = parse(value)
+            elif isinstance(value, date):
+                value = datetime.combine(falue, datetime.min.time())
+            else:
+                raise PyMISPError(f'Invalid format for {name}: {type(value)}.')
+
+            if not value.tzinfo:
+                # set localtimezone if not present
+                value = value.astimezone()
+
+            if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > value:
+                raise PyMISPError('last_seen ({value}) has to be after first_seen ({self.first_seen})')
+            if name == 'first_seen' and hasattr(self, 'last_seen') and self.last_seen < value:
+                raise PyMISPError('first_seen ({value}) has to be before last_seen ({self.last_seen})')
+        super().__setattr__(name, value)
 
     def force_misp_objects_path_custom(self, misp_objects_path_custom: Union[Path, str], object_name: Optional[str]=None):
         if object_name:
@@ -659,10 +741,29 @@ class MISPObject(AbstractMISP):
 
         if kwargs.get('timestamp'):
             ts = kwargs.pop('timestamp')
-            if isinstance(ts, datetime.datetime):
+            if isinstance(ts, datetime):
                 self.timestamp = ts
             else:
-                self.timestamp = datetime.datetime.fromtimestamp(int(ts), datetime.timezone.utc)
+                self.timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
+
+        if kwargs.get('first_seen'):
+            fs = kwargs.pop('first_seen')
+            try:
+                # Faster
+                self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
+            except:
+                # Use __setattr__
+                self.first_seen = fs
+
+        if kwargs.get('last_seen'):
+            ls = kwargs.pop('last_seen')
+            try:
+                # Faster
+                self.last_seen = datetime.strptime(kwargs.pop('last_seen'), "%Y-%m-%dT%H:%M:%S.%f%z")
+            except:
+                # Use __setattr__
+                self.last_seen = ls
+
         if kwargs.get('Attribute'):
             [self.add_attribute(**a) for a in kwargs.pop('Attribute')]
         if kwargs.get('ObjectReference'):
@@ -803,6 +904,7 @@ class MISPEvent(AbstractMISP):
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self.describe_types = describe_types
 
+        self.date: date
         self.Attribute: List[MISPAttribute] = []
         self.Object: List[MISPObject] = []
         self.RelatedEvent: List[MISPEvent] = []
@@ -832,11 +934,11 @@ class MISPEvent(AbstractMISP):
         if not hasattr(self, 'extends_uuid'):
             self.extends_uuid = ''
         if not hasattr(self, 'date'):
-            self.set_date(datetime.date.today())
+            self.set_date(date.today())
         if not hasattr(self, 'timestamp'):
-            self.timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+            self.timestamp = datetime.timestamp(datetime.now())
         if not hasattr(self, 'publish_timestamp'):
-            self.publish_timestamp = datetime.datetime.timestamp(datetime.datetime.now())
+            self.publish_timestamp = datetime.timestamp(datetime.now())
         if not hasattr(self, 'analysis'):
             # analysis: 0 means initial, 1 ongoing, 2 completed
             self.analysis = 2
@@ -1006,21 +1108,28 @@ class MISPEvent(AbstractMISP):
         if validate:
             jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
 
-    def set_date(self, date: Union[str, int, datetime.datetime, datetime.date, None], ignore_invalid: bool=False):
-        """Set a date for the event (string, datetime, or date object)"""
-        if isinstance(date, str):
-            self.date = parse(date).date()
-        elif isinstance(date, int):
-            self.date = datetime.datetime.utcfromtimestamp(date).date()
-        elif isinstance(date, datetime.datetime):
-            self.date = date.date()
-        elif isinstance(date, datetime.date):
-            self.date = date
-        else:
-            if ignore_invalid:
-                self.date = datetime.date.today()
+    def __setattr__(self, name, value):
+        if name in ['date']:
+            if isinstance(value, date):
+                pass
+            elif isinstance(value, str):
+                value = parse(value).date()
+            elif isinstance(value, (int, float)):
+                value = date.fromtimestamp(value)
+            elif isinstance(value, datetime):
+                value = value.date()
             else:
-                raise NewEventError('Invalid format for the date: {} - {}'.format(date, type(date)))
+                raise NewEventError(f'Invalid format for the date: {type(value)} - {value}')
+        super().__setattr__(name, value)
+
+    def set_date(self, d: Optional[Union[str, int, float, datetime, date]]=None, ignore_invalid: bool=False):
+        """Set a date for the event (string, datetime, or date object)"""
+        if isinstance(d, (str, int, float, datetime, date)):
+            self.date = d # type: ignore
+        elif ignore_invalid:
+            self.date = date.today()
+        else:
+            raise NewEventError(f'Invalid format for the date: {type(d)} - {d}')
 
     def from_dict(self, **kwargs):
         if 'Event' in kwargs:
@@ -1066,11 +1175,11 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('org_id'):
             self.org_id = int(kwargs.pop('org_id'))
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('timestamp')), datetime.timezone.utc)
+            self.timestamp = datetime.fromtimestamp(int(kwargs.pop('timestamp')), timezone.utc)
         if kwargs.get('publish_timestamp'):
-            self.publish_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), datetime.timezone.utc)
+            self.publish_timestamp = datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), timezone.utc)
         if kwargs.get('sighting_timestamp'):
-            self.sighting_timestamp = datetime.datetime.fromtimestamp(int(kwargs.pop('sighting_timestamp')), datetime.timezone.utc)
+            self.sighting_timestamp = datetime.fromtimestamp(int(kwargs.pop('sighting_timestamp')), timezone.utc)
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('RelatedEvent'):
@@ -1097,7 +1206,7 @@ class MISPEvent(AbstractMISP):
         to_return = super().to_dict()
 
         if to_return.get('date'):
-            if isinstance(self.date, datetime.datetime):
+            if isinstance(self.date, datetime):
                 self.date = self.date.date()
             to_return['date'] = self.date.isoformat()
         if to_return.get('publish_timestamp'):

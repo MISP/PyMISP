@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import datetime
+from datetime import date, datetime, timezone
 
 from deprecated import deprecated  # type: ignore
 from json import JSONEncoder
@@ -86,7 +86,7 @@ class MISPEncode(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, AbstractMISP):
             return obj.jsonable()
-        elif isinstance(obj, (datetime.datetime, datetime.date)):
+        elif isinstance(obj, (datetime, date)):
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
@@ -189,6 +189,12 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
                     continue
                 else:
                     val = self._datetime_to_timestamp(val)
+            if (attribute in ['first_seen', 'last_seen', 'datetime']
+                    and isinstance(val, datetime)
+                    and not val.tzinfo):
+                # Need to make sure the timezone is set. Otherwise, it will be processed as UTC on the server
+                val = val.astimezone()
+
             to_return[attribute] = val
         to_return = _int_to_str(to_return)
         return to_return
@@ -207,7 +213,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             if getattr(self, field, None) is not None:
                 if field in ['timestamp', 'publish_timestamp']:
                     to_return[field] = self._datetime_to_timestamp(getattr(self, field))
-                elif isinstance(getattr(self, field), (datetime.datetime, datetime.date)):
+                elif isinstance(getattr(self, field), (datetime, date)):
                     to_return[field] = getattr(self, field).isoformat()
                 else:
                     to_return[field] = getattr(self, field)
@@ -274,8 +280,8 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             self.__edited = True
         super().__setattr__(name, value)
 
-    def _datetime_to_timestamp(self, d: Union[int, float, str, datetime.datetime]) -> int:
-        """Convert a datetime.datetime object to a timestamp (int)"""
+    def _datetime_to_timestamp(self, d: Union[int, float, str, datetime]) -> int:
+        """Convert a datetime object to a timestamp (int)"""
         if isinstance(d, (int, float, str)):
             # Assume we already have a timestamp
             return int(d)
@@ -346,20 +352,20 @@ class MISPTag(AbstractMISP):
 
 
 if HAS_RAPIDJSON:
-    def pymisp_json_default(obj: Union[AbstractMISP, datetime.datetime, datetime.date, Enum, UUID]) -> Union[dict, str]:
+    def pymisp_json_default(obj: Union[AbstractMISP, datetime, date, Enum, UUID]) -> Union[dict, str]:
         if isinstance(obj, AbstractMISP):
             return obj.jsonable()
-        elif isinstance(obj, (datetime.datetime, datetime.date)):
+        elif isinstance(obj, (datetime, date)):
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
         elif isinstance(obj, UUID):
             return str(obj)
 else:
-    def pymisp_json_default(obj: Union[AbstractMISP, datetime.datetime, datetime.date, Enum, UUID]) -> Union[dict, str]:
+    def pymisp_json_default(obj: Union[AbstractMISP, datetime, date, Enum, UUID]) -> Union[dict, str]:
         if isinstance(obj, AbstractMISP):
             return obj.jsonable()
-        elif isinstance(obj, (datetime.datetime, datetime.date)):
+        elif isinstance(obj, (datetime, date)):
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
