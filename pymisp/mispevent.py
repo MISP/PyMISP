@@ -4,6 +4,7 @@ from datetime import timezone, datetime, date
 import json
 import os
 import base64
+import sys
 from io import BytesIO, IOBase
 from zipfile import ZipFile
 import uuid
@@ -50,6 +51,42 @@ def _int_to_str(d: dict):
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             d[k] = str(v)
     return d
+
+def _make_datetime(value) -> datetime:
+    if isinstance(value, (int, float)):
+        # Timestamp
+        value = datetime.fromtimestamp(value)
+    elif isinstance(value, str):
+        if sys.version_info >= (3, 7):
+            try:
+                # faster
+                value = datetime.fromisoformat(value)
+            except Exception:
+                value = parse(value)
+        else:
+            try:
+                # faster
+                if '+' in value or '-' in value:
+                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f%z")
+                elif '.' in value:
+                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                elif 'T' in value:
+                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
+                else:
+                    value = datetime.strptime(value, "%Y-%m-%d")
+            except Exception:
+                value = parse(value)
+    elif isinstance(value, date):
+        value = datetime.combine(value, datetime.min.time())
+    elif isinstance(value, datetime):
+        pass
+    else:
+       raise PyMISPError(f'Invalid format for {value}: {type(value)}.')
+
+    if not value.tzinfo:
+        # set localtimezone if not present
+        value = value.astimezone()
+    return value
 
 
 def make_bool(value: Union[bool, int, str, dict, list, None]) -> bool:
@@ -179,21 +216,7 @@ class MISPAttribute(AbstractMISP):
 
     def __setattr__(self, name, value):
         if name in ['first_seen', 'last_seen']:
-            if isinstance(value, (int, float)):
-                # Timestamp
-                value = datetime.fromtimestamp(value)
-            elif isinstance(value, str):
-                value = parse(value)
-            elif isinstance(value, date):
-                value = datetime.combine(falue, datetime.min.time())
-            elif isinstance(value, datetime):
-                pass
-            else:
-               raise PyMISPError(f'Invalid format for {name}: {type(value)}.')
-
-            if not value.tzinfo:
-                # set localtimezone if not present
-                value = value.astimezone()
+            value = _make_datetime(value)
 
             if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > value:
                 raise PyMISPError('last_seen ({value}) has to be after first_seen ({self.first_seen})')
@@ -334,12 +357,16 @@ class MISPAttribute(AbstractMISP):
             raise NewAttributeError('The value of the attribute is required.')
         if self.type == 'datetime' and isinstance(self.value, str):
             try:
-                if '+' in self.value or '-' in self.value:
-                    self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f%z")
-                elif '.' in self.value:
-                    self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f")
+                # Faster
+                if sys.version_info >= (3, 7):
+                    self.value = datetime.fromisoformat(self.value)
                 else:
-                    self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S")
+                    if '+' in self.value or '-' in self.value:
+                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f%z")
+                    elif '.' in self.value:
+                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f")
+                    else:
+                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S")
             except ValueError:
                 # Slower, but if the other ones fail, that's a good fallback
                 self.value = parse(self.value)
@@ -384,7 +411,10 @@ class MISPAttribute(AbstractMISP):
             fs = kwargs.pop('first_seen')
             try:
                 # Faster
-                self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
+                if sys.version_info >= (3, 7):
+                    self.first_seen = datetime.fromisoformat(fs)
+                else:
+                    self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
             except:
                 # Use __setattr__
                 self.first_seen = fs
@@ -393,7 +423,10 @@ class MISPAttribute(AbstractMISP):
             ls = kwargs.pop('last_seen')
             try:
                 # Faster
-                self.last_seen = datetime.strptime(kwargs.pop('last_seen'), "%Y-%m-%dT%H:%M:%S.%f%z")
+                if sys.version_info >= (3, 7):
+                    self.last_seen = datetime.fromisoformat(ls)
+                else:
+                    self.last_seen = datetime.strptime(ls, "%Y-%m-%dT%H:%M:%S.%f%z")
             except:
                 # Use __setattr__
                 self.last_seen = ls
@@ -647,21 +680,7 @@ class MISPObject(AbstractMISP):
 
     def __setattr__(self, name, value):
         if name in ['first_seen', 'last_seen']:
-            if isinstance(value, datetime):
-                pass
-            elif isinstance(value, (int, float)):
-                # Timestamp
-                value = datetime.fromtimestamp(value)
-            elif isinstance(value, str):
-                value = parse(value)
-            elif isinstance(value, date):
-                value = datetime.combine(falue, datetime.min.time())
-            else:
-                raise PyMISPError(f'Invalid format for {name}: {type(value)}.')
-
-            if not value.tzinfo:
-                # set localtimezone if not present
-                value = value.astimezone()
+            value = _make_datetime(value)
 
             if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > value:
                 raise PyMISPError('last_seen ({value}) has to be after first_seen ({self.first_seen})')
@@ -750,8 +769,11 @@ class MISPObject(AbstractMISP):
             fs = kwargs.pop('first_seen')
             try:
                 # Faster
-                self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
-            except:
+                if sys.version_info >= (3, 7):
+                    self.first_seen = datetime.fromisoformat(fs)
+                else:
+                    self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
+            except Exception:
                 # Use __setattr__
                 self.first_seen = fs
 
@@ -759,8 +781,11 @@ class MISPObject(AbstractMISP):
             ls = kwargs.pop('last_seen')
             try:
                 # Faster
-                self.last_seen = datetime.strptime(kwargs.pop('last_seen'), "%Y-%m-%dT%H:%M:%S.%f%z")
-            except:
+                if sys.version_info >= (3, 7):
+                    self.last_seen = datetime.fromisoformat(ls)
+                else:
+                    self.last_seen = datetime.strptime(ls, "%Y-%m-%dT%H:%M:%S.%f%z")
+            except Exception:
                 # Use __setattr__
                 self.last_seen = ls
 
@@ -1113,7 +1138,14 @@ class MISPEvent(AbstractMISP):
             if isinstance(value, date):
                 pass
             elif isinstance(value, str):
-                value = parse(value).date()
+                if sys.version_info >= (3, 7):
+                    try:
+                        # faster
+                        value = date.fromisoformat(fs)
+                    except Exception:
+                        value = parse(value).date()
+                else:
+                    value = parse(value).date()
             elif isinstance(value, (int, float)):
                 value = date.fromtimestamp(value)
             elif isinstance(value, datetime):
