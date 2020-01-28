@@ -318,12 +318,15 @@ class TestMISPEvent(unittest.TestCase):
         org.uuid = '123478'
         me.Orgc = org
         me.add_attribute('ip-dst', '8.8.8.8')
+        obj = me.add_object(name='file')
+        obj.add_attributes('filename', *['foo.exe', 'bar.exe'])
         h = hashlib.new('md5')
         h.update(b'8.8.8.8')
         hash_attr_val = h.hexdigest()
         feed = me.to_feed(with_meta=True)
         self.assertEqual(feed['Event']['_hashes'][0], hash_attr_val)
         self.assertEqual(feed['Event']['_manifest'][me.uuid]['info'], 'Test feed')
+        self.assertEqual(len(feed['Event']['Object'][0]['Attribute']), 2)
 
     def test_object_templates(self):
         me = MISPEvent()
