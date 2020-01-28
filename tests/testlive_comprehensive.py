@@ -2079,10 +2079,10 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
 
     def test_first_last_seen(self):
+        local_tz = datetime.now(timezone.utc).astimezone().tzinfo
         event = MISPEvent()
         event.info = 'Test First Last seen'
         event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-04', last_seen='2020-01-04T12:30:34.323242+8:00')
-        print(event.attributes)
         obj = event.add_object(name='file', first_seen=1580147259.268763, last_seen=1580147300)
         attr = obj.add_attribute('filename', 'blah.exe')
         attr.first_seen = '2022-01-30'
@@ -2090,7 +2090,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.admin_misp_connector.add_event(event, pythonify=True)
             # Simple attribute
-            self.assertEqual(first.attributes[0].first_seen, datetime(2020, 1, 3, 23, 0, tzinfo=timezone.utc))
+            self.assertEqual(first.attributes[0].first_seen, datetime(2020, 1, 4, 0, 0, tzinfo=local_tz))
             self.assertEqual(first.attributes[0].last_seen, datetime(2020, 1, 4, 4, 30, 34, 323242, tzinfo=timezone.utc))
 
             # Object
@@ -2098,8 +2098,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(first.objects[0].last_seen, datetime(2020, 1, 27, 17, 48, 20, tzinfo=timezone.utc))
 
             # Object attribute
-            self.assertEqual(first.objects[0].attributes[0].first_seen, datetime(2022, 1, 29, 23, 0, tzinfo=timezone.utc))
-            self.assertEqual(first.objects[0].attributes[0].last_seen, datetime(2022, 2, 22, 23, 0, tzinfo=timezone.utc))
+            self.assertEqual(first.objects[0].attributes[0].first_seen, datetime(2022, 1, 30, 0, 0, tzinfo=local_tz))
+            self.assertEqual(first.objects[0].attributes[0].last_seen, datetime(2022, 2, 23, 0, 0, tzinfo=local_tz))
 
             # Update values
             # Attribute in full event
