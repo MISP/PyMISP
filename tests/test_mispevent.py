@@ -6,8 +6,10 @@ import json
 import sys
 from io import BytesIO
 import glob
+import hashlib
+from datetime import date, datetime
 
-from pymisp import MISPEvent, MISPSighting, MISPTag
+from pymisp import MISPEvent, MISPSighting, MISPTag, MISPOrganisation
 from pymisp.exceptions import InvalidMISPObject
 
 
@@ -293,9 +295,36 @@ class TestMISPEvent(unittest.TestCase):
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
-'''
-    # Reenable that the 1st of jan 2020.
-    @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
+    def test_first_last_seen(self):
+        me = MISPEvent()
+        me.info = 'Test First and Last Seen'
+        me.date = '2020.01.12'
+        self.assertEqual(me.date.day, 12)
+        me.add_attribute('ip-dst', '8.8.8.8', first_seen='06-21-1998', last_seen=1580213607.469571)
+        self.assertEqual(me.attributes[0].first_seen.year, 1998)
+        self.assertEqual(me.attributes[0].last_seen.year, 2020)
+        today = date.today()
+        me.attributes[0].first_seen = today
+        now = datetime.now().astimezone()
+        me.attributes[0].last_seen = now
+        self.assertEqual(me.attributes[0].first_seen.year, today.year)
+        self.assertEqual(me.attributes[0].last_seen, now)
+
+    def test_feed(self):
+        me = MISPEvent()
+        me.info = 'Test feed'
+        org = MISPOrganisation()
+        org.name = 'TestOrg'
+        org.uuid = '123478'
+        me.Orgc = org
+        me.add_attribute('ip-dst', '8.8.8.8')
+        h = hashlib.new('md5')
+        h.update(b'8.8.8.8')
+        hash_attr_val = h.hexdigest()
+        feed = me.to_feed(with_meta=True)
+        self.assertEqual(feed['Event']['_hashes'][0], hash_attr_val)
+        self.assertEqual(feed['Event']['_manifest'][me.uuid]['info'], 'Test feed')
+
     def test_object_templates(self):
         me = MISPEvent()
         for template in glob.glob(str(me.misp_objects_path / '*' / 'definition.json')):
@@ -314,7 +343,7 @@ class TestMISPEvent(unittest.TestCase):
                     if 'categories' in entry:
                         subset = set(entry['categories']).issubset(me.describe_types['categories'])
                         self.assertTrue(subset, f'{t_json["name"]} - {obj_relation}')
-'''
+
 
 if __name__ == '__main__':
     unittest.main()

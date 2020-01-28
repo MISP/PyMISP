@@ -22,7 +22,6 @@ install:
 
 script:
     - bash travis/test_travis.sh
-    - mypy tests/testlive_comprehensive.py tests/test_mispevent.py tests/testlive_sync.py pymisp
 
 after_success:
     - pipenv run codecov
