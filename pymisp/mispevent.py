@@ -52,6 +52,7 @@ def _int_to_str(d: dict):
             d[k] = str(v)
     return d
 
+
 def _make_datetime(value) -> datetime:
     if isinstance(value, (int, float)):
         # Timestamp
@@ -76,12 +77,12 @@ def _make_datetime(value) -> datetime:
                     value = datetime.strptime(value, "%Y-%m-%d")
             except Exception:
                 value = parse(value)
-    elif isinstance(value, date):
-        value = datetime.combine(value, datetime.min.time())
     elif isinstance(value, datetime):
         pass
+    elif isinstance(value, date):  # NOTE: date has to be *after* datetime, or it will be overwritten
+        value = datetime.combine(value, datetime.min.time())
     else:
-       raise PyMISPError(f'Invalid format for {value}: {type(value)}.')
+        raise PyMISPError(f'Invalid format for {value}: {type(value)}.')
 
     if not value.tzinfo:
         # set localtimezone if not present
@@ -114,13 +115,13 @@ class MISPOrganisation(AbstractMISP):
             kwargs = kwargs['Organisation']
         super(MISPOrganisation, self).from_dict(**kwargs)
 
+
 class MISPSharingGroup(AbstractMISP):
 
     def from_dict(self, **kwargs):
         if 'SharingGroup' in kwargs:
             kwargs = kwargs['SharingGroup']
         super().from_dict(**kwargs)
-
 
 
 class MISPShadowAttribute(AbstractMISP):
@@ -415,7 +416,7 @@ class MISPAttribute(AbstractMISP):
                     self.first_seen = datetime.fromisoformat(fs)
                 else:
                     self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
-            except:
+            except Exception:
                 # Use __setattr__
                 self.first_seen = fs
 
@@ -427,7 +428,7 @@ class MISPAttribute(AbstractMISP):
                     self.last_seen = datetime.fromisoformat(ls)
                 else:
                     self.last_seen = datetime.strptime(ls, "%Y-%m-%dT%H:%M:%S.%f%z")
-            except:
+            except Exception:
                 # Use __setattr__
                 self.last_seen = ls
 
@@ -1009,7 +1010,7 @@ class MISPEvent(AbstractMISP):
         required = ['info', 'Orgc']
         for r in required:
             if not hasattr(self, r):
-                raise PyMISPError('The field {} is required to generate the event feed output.')
+                raise PyMISPError(f'The field {r} is required to generate the event feed output.')
 
         if (hasattr(self, 'distribution')
                 and self.distribution is not None
@@ -1141,7 +1142,7 @@ class MISPEvent(AbstractMISP):
                 if sys.version_info >= (3, 7):
                     try:
                         # faster
-                        value = date.fromisoformat(fs)
+                        value = date.fromisoformat(value)
                     except Exception:
                         value = parse(value).date()
                 else:
@@ -1157,7 +1158,7 @@ class MISPEvent(AbstractMISP):
     def set_date(self, d: Optional[Union[str, int, float, datetime, date]]=None, ignore_invalid: bool=False):
         """Set a date for the event (string, datetime, or date object)"""
         if isinstance(d, (str, int, float, datetime, date)):
-            self.date = d # type: ignore
+            self.date = d  # type: ignore
         elif ignore_invalid:
             self.date = date.today()
         else:
@@ -1599,7 +1600,6 @@ class MISPObjectAttribute(MISPAttribute):
     def __init__(self, definition):
         super().__init__()
         self._definition = definition
-
 
     def from_dict(self, object_relation: str, value: Union[str, int, float], **kwargs):  # type: ignore
         # NOTE: Signature of "from_dict" incompatible with supertype "MISPAttribute"

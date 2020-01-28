@@ -110,7 +110,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         super().__init__()
         self.__edited: bool = True  # As we create a new object, we assume it is edited
         self.__not_jsonable: list = []
-        self._fields_for_feed: set = {}
+        self._fields_for_feed: set
         self.__self_defined_describe_types: Union[dict, None] = None
         self.uuid: str
 
