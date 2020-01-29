@@ -303,10 +303,10 @@ class TestMISPEvent(unittest.TestCase):
         me.add_attribute('ip-dst', '8.8.8.8', first_seen='06-21-1998', last_seen=1580213607.469571)
         self.assertEqual(me.attributes[0].first_seen.year, 1998)
         self.assertEqual(me.attributes[0].last_seen.year, 2020)
-        today = date.today()
-        me.attributes[0].first_seen = today
         now = datetime.now().astimezone()
         me.attributes[0].last_seen = now
+        today = date.today()
+        me.attributes[0].first_seen = today
         self.assertEqual(me.attributes[0].first_seen.year, today.year)
         self.assertEqual(me.attributes[0].last_seen, now)
 
