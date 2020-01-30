@@ -1354,15 +1354,15 @@ class PyMISP:
                publish_timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
                                            Tuple[Union[datetime, date, int, str, float, None],
                                                  Union[datetime, date, int, str, float, None]]
-                                           ]]=None,
+                                                 ]]=None,
                last: Optional[Union[Union[datetime, date, int, str, float, None],
                               Tuple[Union[datetime, date, int, str, float, None],
                                     Union[datetime, date, int, str, float, None]]
-                              ]]=None,
+                                    ]]=None,
                timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
                                    Tuple[Union[datetime, date, int, str, float, None],
                                          Union[datetime, date, int, str, float, None]]
-                                   ]]=None,
+                                         ]]=None,
                published: Optional[bool]=None,
                enforce_warninglist: Optional[bool]=None, enforceWarninglist: Optional[bool]=None,
                to_ids: Optional[Union[ToIDSType, List[ToIDSType]]]=None,
@@ -1575,7 +1575,7 @@ class PyMISP:
                      timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
                                          Tuple[Union[datetime, date, int, str, float, None],
                                                Union[datetime, date, int, str, float, None]]
-                                         ]]=None,
+                                               ]]=None,
                      pythonify: Optional[bool]=None) -> Union[dict, List[MISPEvent]]:
         """Search only at the index level. Using ! in front of a value means NOT (default is OR)
 
@@ -1628,11 +1628,11 @@ class PyMISP:
                          publish_timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
                                                      Tuple[Union[datetime, date, int, str, float, None],
                                                            Union[datetime, date, int, str, float, None]]
-                                                     ]]=None,
+                                                           ]]=None,
                          last: Optional[Union[Union[datetime, date, int, str, float, None],
                                         Tuple[Union[datetime, date, int, str, float, None],
                                               Union[datetime, date, int, str, float, None]]
-                                        ]]=None,
+                                              ]]=None,
                          org: Optional[SearchType]=None,
                          source: Optional[str]=None,
                          include_attribute: Optional[bool]=None,
@@ -2044,10 +2044,12 @@ class PyMISP:
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: Union[AbstractMISP, str], tag: Union[MISPTag, str], local: bool=False) -> dict:
+    def tag(self, misp_entity: Union[AbstractMISP, str, dict], tag: Union[MISPTag, str], local: bool=False) -> dict:
         """Tag an event or an attribute. misp_entity can be a MISPEvent, a MISP Attribute, or a UUID"""
         if isinstance(misp_entity, AbstractMISP) and 'uuid' in misp_entity:
             uuid = misp_entity.uuid
+        elif isinstance(misp_entity, dict) and 'uuid' in misp_entity:
+            uuid = misp_entity['uuid']
         elif isinstance(misp_entity, str):
             uuid = misp_entity
         if isinstance(tag, MISPTag):
@@ -2056,10 +2058,12 @@ class PyMISP:
         response = self._prepare_request('POST', 'tags/attachTagToObject', data=to_post)
         return self._check_json_response(response)
 
-    def untag(self, misp_entity: Union[AbstractMISP, str], tag: Union[MISPTag, str]) -> dict:
+    def untag(self, misp_entity: Union[AbstractMISP, str, dict], tag: Union[MISPTag, str]) -> dict:
         """Untag an event or an attribute. misp_entity can be a UUID"""
         if isinstance(misp_entity, AbstractMISP) and 'uuid' in misp_entity:
             uuid = misp_entity.uuid
+        elif isinstance(misp_entity, dict) and 'uuid' in misp_entity:
+            uuid = misp_entity['uuid']
         elif isinstance(misp_entity, str):
             uuid = misp_entity
         if isinstance(tag, MISPTag):
