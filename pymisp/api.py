@@ -1378,6 +1378,7 @@ class PyMISP:
                headerless: Optional[bool]=None,
                include_sightings: Optional[bool]=None, includeSightings: Optional[bool]=None,
                include_correlations: Optional[bool]=None, includeCorrelations: Optional[bool]=None,
+               include_decay_score: Optional[bool] = None, includeDecayScore: Optional[bool] = None,
                pythonify: Optional[bool]=False,
                **kwargs) -> Union[dict, str, List[Union[MISPEvent, MISPAttribute]]]:
         '''Search in the MISP instance
@@ -1413,6 +1414,7 @@ class PyMISP:
         :param include_context: [Attribute only] Include the event data with each attribute.
         :param headerless: [CSV Only] The CSV created when this setting is set to true will not contain the header row.
         :param include_sightings: [JSON Only - Attribute] Include the sightings of the matching attributes.
+        :param include_decay_score: Include the decay score at attribute level.
         :param include_correlations: [JSON Only - attribute] Include the correlations of the matching attributes.
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
 
@@ -1448,6 +1450,8 @@ class PyMISP:
             include_event_tags = includeEventTags
         if includeContext is not None:
             include_context = includeContext
+        if includeDecayScore is not None:
+            include_decay_score = includeDecayScore
         if includeCorrelations is not None:
             include_correlations = includeCorrelations
         if includeSightings is not None:
@@ -1505,6 +1509,7 @@ class PyMISP:
         query['includeContext'] = self._make_misp_bool(include_context)
         query['headerless'] = self._make_misp_bool(headerless)
         query['includeSightings'] = self._make_misp_bool(include_sightings)
+        query['includeDecayScore'] = self._make_misp_bool(include_decay_score)
         query['includeCorrelations'] = self._make_misp_bool(include_correlations)
         url = urljoin(self.root_url, f'{controller}/restSearch')
         response = self._prepare_request('POST', url, data=query)
