@@ -84,10 +84,10 @@ class PEObject(AbstractMISPObjectGenerator):
         self.add_attribute('compilation-timestamp', value=datetime.utcfromtimestamp(self.__pe.header.time_date_stamps).isoformat())
         # self.imphash = self.__pe.get_imphash()
         try:
-            if (self.__pe.has_resources and
-                    self.__pe.resources_manager.has_version and
-                    self.__pe.resources_manager.version.has_string_file_info and
-                    self.__pe.resources_manager.version.string_file_info.langcode_items):
+            if (self.__pe.has_resources
+                    and self.__pe.resources_manager.has_version
+                    and self.__pe.resources_manager.version.has_string_file_info
+                    and self.__pe.resources_manager.version.string_file_info.langcode_items):
                 fileinfo = dict(self.__pe.resources_manager.version.string_file_info.langcode_items[0].items.items())
                 self.add_attribute('original-filename', value=fileinfo.get('OriginalFilename'))
                 self.add_attribute('internal-filename', value=fileinfo.get('InternalName'))
@@ -108,8 +108,8 @@ class PEObject(AbstractMISPObjectGenerator):
             for section in self.__pe.sections:
                 s = PESectionObject(section, self._standalone, default_attributes_parameters=self._default_attributes_parameters)
                 self.add_reference(s.uuid, 'includes', 'Section {} of PE'.format(pos))
-                if ((self.__pe.entrypoint >= section.virtual_address) and
-                        (self.__pe.entrypoint < (section.virtual_address + section.virtual_size))):
+                if ((self.__pe.entrypoint >= section.virtual_address)
+                        and (self.__pe.entrypoint < (section.virtual_address + section.virtual_size))):
                     self.add_attribute('entrypoint-section-at-position', value='{}|{}'.format(section.name, pos))
                 pos += 1
                 self.sections.append(s)

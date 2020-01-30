@@ -1,7 +1,5 @@
 __version__ = '2.4.120'
 import logging
-import warnings
-import sys
 
 FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
 formatter = logging.Formatter(FORMAT)

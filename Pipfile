@@ -12,6 +12,7 @@ pymisp = {editable = true,extras = ["fileobjects", "neo", "openioc", "virustotal
 docutils = "==0.15"
 memory-profiler = "*"
 mypy = "*"
+flake8 = "*"
 
 [packages]
 pymisp = {editable = true,extras = ["fileobjects", "openioc", "virustotal", "pdfexport"],path = "."}

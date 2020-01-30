@@ -7,6 +7,7 @@ from datetime import datetime, date
 from dateutil.parser import parse
 from typing import Union, Optional
 
+
 class AbstractMISPObjectGenerator(MISPObject):
 
     def _detect_epoch(self, timestamp: Union[str, int, float]) -> bool:

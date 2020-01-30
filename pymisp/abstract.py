@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 
 from deprecated import deprecated  # type: ignore
 from json import JSONEncoder
@@ -21,7 +21,7 @@ except ImportError:
 
 import logging
 from enum import Enum
-from typing import Union, Optional, List
+from typing import Union, Optional
 
 from .exceptions import PyMISPInvalidFormat, PyMISPError
 

@@ -481,13 +481,16 @@ def get_clusters_table_styles():
 def safe_string(bad_str):
     return escape(str(bad_str))
 
+
 def is_safe_value(value):
     return (value is not None
             and value != "")
 
+
 def is_safe_table(value):
     return (value is not None
             and value != [])
+
 
 def is_safe_attribute(curr_object, attribute_name):
     return (hasattr(curr_object, attribute_name)
@@ -660,7 +663,7 @@ class Value_Formatter():
 
         return self.get_unoverflowable_paragraph(answer)
 
-    def get_threat_value(self, threat_level = None):
+    def get_threat_value(self, threat_level=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event threat
         :param threat_level: MISP_EVENT threat level (int) to be formatted
@@ -671,9 +674,9 @@ class Value_Formatter():
         if is_safe_value(threat_level) and str(threat_level) in threat_map:
             answer = threat_map[safe_string(threat_level)]
 
-        return self.get_unoverflowable_paragraph(answer,do_escape_string=False)
+        return self.get_unoverflowable_paragraph(answer, do_escape_string=False)
 
-    def get_analysis_value(self, analysis_level = None):
+    def get_analysis_value(self, analysis_level=None):
         '''
         Returns a flowable paragraph to add to the pdf given the misp_event analysis
         :param analysis_level: MISP_EVENT analysis level (int) to be formatted
@@ -684,7 +687,7 @@ class Value_Formatter():
         if is_safe_value(analysis_level) and str(analysis_level) in analysis_map:
             answer = analysis_map[safe_string(analysis_level)]
 
-        return self.get_unoverflowable_paragraph(answer,do_escape_string=False)
+        return self.get_unoverflowable_paragraph(answer, do_escape_string=False)
 
     def get_timestamp_value(self, timestamp=None):
         '''
@@ -764,7 +767,7 @@ class Value_Formatter():
 
         try:
             # Get the image
-            buf = image_buffer # TODO : Do verification on the buffer ?
+            buf = image_buffer  # TODO : Do verification on the buffer ?
 
             # Create image within a bounded box (to allow pdf creation)
             img = Image(buf, width=FRAME_PICTURE_MAX_WIDTH, height=FRAME_PICTURE_MAX_HEIGHT, kind='bound')
@@ -821,8 +824,8 @@ class Value_Formatter():
 
         if is_safe_dict_attribute(misp_galaxy, 'name'):
             answer = '{} <i>from</i> {}:{}'.format(safe_string(misp_galaxy['name']),
-                                                      safe_string(misp_galaxy["namespace"]),
-                                                      safe_string(misp_galaxy["type"]))
+                                                   safe_string(misp_galaxy["namespace"]),
+                                                   safe_string(misp_galaxy["type"]))
 
         return self.get_unoverflowable_paragraph(answer, do_small=True)
 
@@ -866,7 +869,7 @@ class Event_Metadata():
     ########################################################################
     # General Event's Attributes formater
 
-    def create_flowable_table_from_event(self, misp_event ):
+    def create_flowable_table_from_event(self, misp_event):
         '''
         Returns Table presenting a MISP event
         :param misp_event: A misp event (complete or not)
@@ -879,8 +882,8 @@ class Event_Metadata():
         # Manual addition
         # UUID
         data.append([self.value_formatter.get_col1_paragraph("UUID"),
-                     self.value_formatter.get_value_link_to_event(uuid=misp_event.get('uuid',None),
-                                                                  text=misp_event.get('uuid',None))])
+                     self.value_formatter.get_value_link_to_event(uuid=misp_event.get('uuid', None),
+                                                                  text=misp_event.get('uuid', None))])
 
         # Date
         data.append({self.value_formatter.get_col1_paragraph("Date"),
@@ -888,48 +891,48 @@ class Event_Metadata():
 
         # Owner
         data.append([self.value_formatter.get_col1_paragraph("Owner org"),
-                     self.value_formatter.get_owner_value(owner=misp_event.get('owner',None))])
+                     self.value_formatter.get_owner_value(owner=misp_event.get('owner', None))])
 
         # Threat
         data.append([self.value_formatter.get_col1_paragraph("Threat level"),
-                     self.value_formatter.get_threat_value(threat_level=misp_event.get('threat_level_id',None))])
+                     self.value_formatter.get_threat_value(threat_level=misp_event.get('threat_level_id', None))])
 
         # Analysis
         data.append([self.value_formatter.get_col1_paragraph("Analysis"),
-                     self.value_formatter.get_analysis_value(analysis_level=misp_event.get('analysis',None))])
+                     self.value_formatter.get_analysis_value(analysis_level=misp_event.get('analysis', None))])
 
         # Info
         data.append([self.value_formatter.get_col1_paragraph("Info"),
-                     self.value_formatter.get_value_link_to_event(uuid=misp_event.get('uuid',None),
-                                                                  text=misp_event.get('info',None))])
+                     self.value_formatter.get_value_link_to_event(uuid=misp_event.get('uuid', None),
+                                                                  text=misp_event.get('info', None))])
 
         # Timestamp
         data.append([self.value_formatter.get_col1_paragraph("Event date"),
-                     self.value_formatter.get_timestamp_value(timestamp=misp_event.get('timestamp',None))])
+                     self.value_formatter.get_timestamp_value(timestamp=misp_event.get('timestamp', None))])
 
         # Published
         data.append([self.value_formatter.get_col1_paragraph("Published"),
-                     self.value_formatter.get_published_value(published_bool=misp_event.get('published',None),
-                                                              published_timestamp=misp_event.get('publish_timestamp',None))])
+                     self.value_formatter.get_published_value(published_bool=misp_event.get('published', None),
+                                                              published_timestamp=misp_event.get('publish_timestamp', None))])
 
         # Creator organisation
         data.append([self.value_formatter.get_col1_paragraph("Creator Org"),
-                     self.value_formatter.get_creator_organisation_value(creator=misp_event.get('Orgc',None))])
+                     self.value_formatter.get_creator_organisation_value(creator=misp_event.get('Orgc', None))])
 
         # Number of Attributes
         data.append([self.value_formatter.get_col1_paragraph("# Attributes"),
-                     self.value_formatter.get_attributes_number_value(attributes=misp_event.get('Attribute',None))])
+                     self.value_formatter.get_attributes_number_value(attributes=misp_event.get('Attribute', None))])
 
         # Tags
         curr_Tags = Tags(self.config, self.value_formatter)
         data.append([self.value_formatter.get_col1_paragraph("Tags"),
-                     curr_Tags.get_tag_value(tags=misp_event.get('Tag',None))])
+                     curr_Tags.get_tag_value(tags=misp_event.get('Tag', None))])
 
         flowable_table.append(create_flowable_table_from_data(data))
 
         # Correlation
-        if is_safe_table(misp_event.get('RelatedEvent',None)) and is_in_config(self.config, 4):
-            flowable_table += self.get_correlation_values(related_events=misp_event.get('RelatedEvent',None))
+        if is_safe_table(misp_event.get('RelatedEvent', None)) and is_in_config(self.config, 4):
+            flowable_table += self.get_correlation_values(related_events=misp_event.get('RelatedEvent', None))
 
         # Galaxies
         if is_safe_attribute_table(misp_event, "Related Galaxies") and is_in_config(self.config, 3):
@@ -952,17 +955,17 @@ class Event_Metadata():
         # Manual addition
         # UUID
         data.append([self.value_formatter.get_col1_paragraph("UUID"),
-                     self.value_formatter.get_value_link_to_event(uuid=misp_event.get('uuid',None),
-                                                                  text=misp_event.get('uuid',None))])
+                     self.value_formatter.get_value_link_to_event(uuid=misp_event.get('uuid', None),
+                                                                  text=misp_event.get('uuid', None))])
 
         # Info
         data.append([self.value_formatter.get_col1_paragraph("Info"),
-                     self.value_formatter.get_value_link_to_event(uuid=misp_event.get('uuid',None),
-                                                                  text=misp_event.get('info',None))])
+                     self.value_formatter.get_value_link_to_event(uuid=misp_event.get('uuid', None),
+                                                                  text=misp_event.get('info', None))])
 
         # Timestamp
         data.append([self.value_formatter.get_col1_paragraph("Event date"),
-                     self.value_formatter.get_timestamp_value(timestamp=misp_event.get('timestamp',None))])
+                     self.value_formatter.get_timestamp_value(timestamp=misp_event.get('timestamp', None))])
 
         flowable_table.append(create_flowable_table_from_data(data))
 
@@ -1167,10 +1170,10 @@ class Attributes():
             # data.append([Paragraph(item[0], col1_style), Paragraph(item[2], col2_style)])
 
         # Handle Special case for links (Value) - There were not written in the previous loop
-        if not STANDARD_TYPE and is_safe_value(misp_attribute.get('value',None)):
+        if not STANDARD_TYPE and is_safe_value(misp_attribute.get('value', None)):
             data.append([self.value_formatter.get_col1_paragraph("Value"),
-                         self.value_formatter.get_good_or_bad_link(value=misp_attribute.get('value',None),
-                                                                   type=misp_attribute.get('type',None))])
+                         self.value_formatter.get_good_or_bad_link(value=misp_attribute.get('value', None),
+                                                                   type=misp_attribute.get('type', None))])
 
         # Handle pictures
         if is_safe_value(misp_attribute.get('data', None)) and misp_attribute.type == IMAGE_TYPE:
@@ -1190,7 +1193,7 @@ class Attributes():
 
         if is_safe_table(misp_attribute.get('Sighting', None)):
             data.append([self.value_formatter.get_col1_paragraph("Sighting"),
-                         curr_Sighting.create_flowable_paragraph_from_sightings(sightings=misp_attribute.get('Sighting',None))])
+                         curr_Sighting.create_flowable_paragraph_from_sightings(sightings=misp_attribute.get('Sighting', None))])
 
         flowable_table.append(create_flowable_table_from_data(data))
 
@@ -1399,7 +1402,7 @@ class Object():
         data = [create_flowable_table_from_data(data)]
 
         # Handle all the attributes
-        if is_safe_value(misp_object.get("Attribute",None)):
+        if is_safe_value(misp_object.get("Attribute", None)):
             curr_attributes = Attributes(self.config, self.value_formatter)
             data.append(Indenter(left=INDENT_SIZE))
             data += curr_attributes.create_flowable_table_from_attributes(misp_object)
@@ -1674,8 +1677,8 @@ def collect_parts(misp_event, config=None):
     # Create stuff
     title_style = ParagraphStyle(name='Column_1', parent=sample_style_sheet['Heading1'],
                                  fontName=FIRST_COL_FONT, alignment=TA_CENTER)
-    title = curr_val_f.get_value_link_to_event(uuid=misp_event.get('uuid',None),
-                                               text=misp_event.get('info',None),
+    title = curr_val_f.get_value_link_to_event(uuid=misp_event.get('uuid', None),
+                                               text=misp_event.get('info', None),
                                                curr_style=title_style, color=False)
     # Add all parts to final PDF
     flowables.append(title)
@@ -1708,7 +1711,7 @@ def collect_parts(misp_event, config=None):
         flowables.append(PageBreak())
 
     event_objects_title = Paragraph("Objects", sample_style_sheet['Heading2'])
-    table_objects = curr_object.create_flowable_table_from_objects(objects=misp_event.get("Object",None))
+    table_objects = curr_object.create_flowable_table_from_objects(objects=misp_event.get("Object", None))
     flowables.append(event_objects_title)
     flowables += table_objects
 

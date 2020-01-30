@@ -1,10 +1,7 @@
 #!/usr/bin/python3
 
-import sys
-import getopt
 import requests
 import json
-from pymisp import MISPObject
 
 from .abstractgenerator import AbstractMISPObjectGenerator
 
