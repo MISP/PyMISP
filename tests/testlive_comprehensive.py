@@ -2082,7 +2082,7 @@ class TestComprehensive(unittest.TestCase):
         local_tz = datetime.now(timezone.utc).astimezone().tzinfo
         event = MISPEvent()
         event.info = 'Test First Last seen'
-        event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-04', last_seen='2020-01-04T12:30:34.323242+8:00')
+        event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-04', last_seen='2020-01-04T12:30:34.323242+0800')
         obj = event.add_object(name='file', first_seen=1580147259.268763, last_seen=1580147300)
         attr = obj.add_attribute('filename', 'blah.exe')
         attr.first_seen = '2022-01-30'

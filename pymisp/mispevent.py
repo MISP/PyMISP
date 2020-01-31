@@ -67,7 +67,7 @@ def _make_datetime(value) -> datetime:
         else:
             try:
                 # faster
-                if '+' in value or '-' in value:
+                if '+' in value or value.find('-', 10) > -1:  # date contains `-` char
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f%z")
                 elif '.' in value:
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
