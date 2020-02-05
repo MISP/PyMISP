@@ -1172,7 +1172,6 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('threat_level_id') is not None:
             self.threat_level_id = int(kwargs.pop('threat_level_id'))
             if self.threat_level_id not in [1, 2, 3, 4]:
-                print(kwargs)
                 raise NewEventError(f'{self.info}: {self.threat_level_id} is invalid, the threat_level_id has to be in 1, 2, 3, 4')
 
         if kwargs.get('analysis') is not None:
