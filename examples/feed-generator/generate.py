@@ -63,8 +63,12 @@ if __name__ == '__main__':
     counter = 1
     total = len(events)
     for event in events:
-        e = misp.get_event(event.uuid, pythonify=True)
-        e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True)
+        try:
+            e = misp.get_event(event.uuid, pythonify=True)
+            e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True)
+        except Exception as e:
+            print(e, event.uuid)
+            continue
         if not e_feed:
             print(f'Invalid distribution {e.distribution}, skipping')
             continue
