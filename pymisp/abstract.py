@@ -76,7 +76,9 @@ class Analysis(Enum):
 def _int_to_str(d: dict) -> dict:
     # transform all integer back to string
     for k, v in d.items():
-        if isinstance(v, (int, float)) and not isinstance(v, bool):
+        if isinstance(v, dict):
+            d[k] = _int_to_str(v)
+        elif isinstance(v, int) and not isinstance(v, bool):
             d[k] = str(v)
     return d
 
@@ -222,6 +224,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
                     # data in attribute is special
                     continue
                 raise PyMISPError('The field {} is required in {} when generating a feed.'.format(field, self.__class__.__name__))
+        to_return = _int_to_str(to_return)
         return to_return
 
     def to_json(self, sort_keys: bool=False, indent: Optional[int]=None):

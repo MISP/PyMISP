@@ -45,14 +45,6 @@ except ImportError:
         has_pyme = False
 
 
-def _int_to_str(d: dict):
-    # transform all integer back to string
-    for k, v in d.items():
-        if isinstance(v, (int, float)) and not isinstance(v, bool):
-            d[k] = str(v)
-    return d
-
-
 def _make_datetime(value) -> datetime:
     if isinstance(value, (int, float)):
         # Timestamp
@@ -451,9 +443,8 @@ class MISPAttribute(AbstractMISP):
             [self.add_shadow_attribute(s_attr) for s_attr in kwargs.pop('ShadowAttribute')]
 
         if kwargs.get('SharingGroup'):
-            for sg in kwargs.pop('SharingGroup'):
-                self.SharingGroup = MISPSharingGroup()
-                self.SharingGroup.from_dict(**sg)
+            self.SharingGroup = MISPSharingGroup()
+            self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
         # If the user wants to disable correlation, let them. Defaults to False.
         self.disable_correlation = kwargs.pop("disable_correlation", False)
         if self.disable_correlation is None:
@@ -796,9 +787,8 @@ class MISPObject(AbstractMISP):
             [self.add_reference(**r) for r in kwargs.pop('ObjectReference')]
 
         if kwargs.get('SharingGroup'):
-            for sg in kwargs.pop('SharingGroup'):
-                self.SharingGroup = MISPSharingGroup()
-                self.SharingGroup.from_dict(**sg)
+            self.SharingGroup = MISPSharingGroup()
+            self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
         # Not supported yet - https://github.com/MISP/PyMISP/issues/168
         # if kwargs.get('Tag'):
         #    for tag in kwargs.pop('Tag'):
@@ -1177,17 +1167,18 @@ class MISPEvent(AbstractMISP):
         if self.distribution is not None:
             self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4]:
-                raise NewEventError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4'.format(self.distribution))
+                raise NewEventError(f'{self.info}: {self.distribution} is invalid, the distribution has to be in 0, 1, 2, 3, 4')
 
         if kwargs.get('threat_level_id') is not None:
             self.threat_level_id = int(kwargs.pop('threat_level_id'))
             if self.threat_level_id not in [1, 2, 3, 4]:
-                raise NewEventError('{} is invalid, the threat_level has to be in 1, 2, 3, 4'.format(self.threat_level_id))
+                print(kwargs)
+                raise NewEventError(f'{self.info}: {self.threat_level_id} is invalid, the threat_level_id has to be in 1, 2, 3, 4')
 
         if kwargs.get('analysis') is not None:
             self.analysis = int(kwargs.pop('analysis'))
             if self.analysis not in [0, 1, 2]:
-                raise NewEventError('{} is invalid, the analysis has to be in 0, 1, 2'.format(self.analysis))
+                raise NewEventError(f'{self.info}: {self.analysis} is invalid, the analysis has to be in 0, 1, 2')
 
         self.published = kwargs.pop('published', None)
         if self.published is True:
