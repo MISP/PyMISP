@@ -2,6 +2,65 @@ Changelog
 =========
 
 
+v2.4.121 (2020-02-06)
+---------------------
+
+New
+~~~
+- Add includeDecayScore to rest search. [VVX7]
+- Support for first_seen/last_seen. [Raphaël Vinot]
+
+  Cleaner import of datetime
+- [attributes] chrome-extension-id added. [Alexandre Dulaunoy]
+
+Changes
+~~~~~~~
+- Do not install neo by default. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- More flexible when an event is in a weird state. [Raphaël Vinot]
+- Str to int, properly load SharingGroup. [Raphaël Vinot]
+
+  Fix #535
+- Bump deps, add pep8 test. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Support dict in tag/untag. [Raphaël Vinot]
+- Test update last seen. [Raphaël Vinot]
+- Add test cases in feed. [Raphaël Vinot]
+- Add test cases. [Raphaël Vinot]
+- Normalize to_datetime conversion. [Raphaël Vinot]
+- Trustar example uses objects. [Raphaël Vinot]
+- Add lief in the generic requirements. [Raphaël Vinot]
+- Refactorize typing, validate. [Raphaël Vinot]
+
+Fix
+~~~
+- Issue with readme. [Raphaël Vinot]
+- Remove debugging. [Raphaël Vinot]
+- [*-seen] Consider that `-` can also be in the date component while
+  parsing. [mokaddem]
+- First seen was after last seen, trigerring the exception. [Raphaël
+  Vinot]
+- Tests failing if local tz was not CET. [Raphaël Vinot]
+- Syntax and typos. [Raphaël Vinot]
+- Bugs introduced by last commit. [Raphaël Vinot]
+
+Other
+~~~~~
+- Doc: fix Search-FullOverview.ipynb code example. [Bernhard E. Reiter]
+- Chore: delete old examples. [Manabu Niseki]
+
+  Delete examples which use deprecated/deleted methods
+- Scrape trustar intel platform reports and create misp events.
+  [th3jiv3r]
+- Configuration for trustar integration. [th3jiv3r]
+- Fixed trailing lines. [turtlefac3]
+- Fixed trailing lines. [turtlefac3]
+- Custom integration written in python to scrape Proofpoint VAP API for
+  metrics of top Very Attacked Persons and create MISP events.
+  [turtlefac3]
+- Fix typos on FullOverview.ipynb. [Bernhard E. Reiter]
+
+
 v2.4.120 (2020-01-17)
 ---------------------
 
@@ -16,6 +75,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump Changelog. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
@@ -34,6 +94,7 @@ Changes
 
 Fix
 ~~~
+- Bump template_version in test cases. [Raphaël Vinot]
 - Add missing variable in dummy creator. [Raphaël Vinot]
 - Et2misp was python2 only. [Raphaël Vinot]
 - Feed generator was broken. [Raphaël Vinot]
