@@ -2,11 +2,20 @@ Changelog
 =========
 
 
+%%version%% (unreleased)
+------------------------
+
+Changes
+~~~~~~~
+- Bump objects. [Raphaël Vinot]
+
+
 v2.4.121.1 (2020-02-07)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 
 Fix
