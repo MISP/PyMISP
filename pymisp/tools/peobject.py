@@ -10,19 +10,26 @@ import logging
 from typing import Optional, Union
 from pathlib import Path
 
-logger = logging.getLogger('pymisp')
+from . import FileObject
 
-try:
-    import lief  # type: ignore
-    HAS_LIEF = True
-except ImportError:
-    HAS_LIEF = False
+import lief  # type: ignore
 
 try:
     import pydeep  # type: ignore
     HAS_PYDEEP = True
 except ImportError:
     HAS_PYDEEP = False
+
+logger = logging.getLogger('pymisp')
+
+
+def make_pe_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
+    pe_object = PEObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
+    misp_file.add_reference(pe_object.uuid, 'includes', 'PE indicators')
+    pe_sections = []
+    for s in pe_object.sections:
+        pe_sections.append(s)
+    return misp_file, pe_object, pe_sections
 
 
 class PEObject(AbstractMISPObjectGenerator):
@@ -33,8 +40,6 @@ class PEObject(AbstractMISPObjectGenerator):
         super(PEObject, self).__init__('pe', standalone=standalone, **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
-        if not HAS_LIEF:
-            raise ImportError('Please install lief, documentation here: https://github.com/lief-project/LIEF')
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
                 self.__pe = lief.PE.parse(raw=pseudofile.getvalue())

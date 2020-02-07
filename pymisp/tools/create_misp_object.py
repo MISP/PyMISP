@@ -4,7 +4,7 @@
 import sys
 from io import BytesIO
 
-from . import FileObject, PEObject, ELFObject, MachOObject
+from . import FileObject
 from ..exceptions import MISPObjectException
 import logging
 from typing import Optional
@@ -16,39 +16,17 @@ try:
     from lief import Logger  # type: ignore
     Logger.disable()
     HAS_LIEF = True
+
+    from .peobject import make_pe_objects
+    from .elfobject import make_elf_objects
+    from .machoobject import make_macho_objects
+
 except ImportError:
     HAS_LIEF = False
 
 
 class FileTypeNotImplemented(MISPObjectException):
     pass
-
-
-def make_pe_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
-    pe_object = PEObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
-    misp_file.add_reference(pe_object.uuid, 'includes', 'PE indicators')
-    pe_sections = []
-    for s in pe_object.sections:
-        pe_sections.append(s)
-    return misp_file, pe_object, pe_sections
-
-
-def make_elf_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
-    elf_object = ELFObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
-    misp_file.add_reference(elf_object.uuid, 'includes', 'ELF indicators')
-    elf_sections = []
-    for s in elf_object.sections:
-        elf_sections.append(s)
-    return misp_file, elf_object, elf_sections
-
-
-def make_macho_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
-    macho_object = MachOObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
-    misp_file.add_reference(macho_object.uuid, 'includes', 'MachO indicators')
-    macho_sections = []
-    for s in macho_object.sections:
-        macho_sections.append(s)
-    return misp_file, macho_object, macho_sections
 
 
 def make_binary_objects(filepath: Optional[str]=None, pseudofile: Optional[BytesIO]=None, filename: Optional[str]=None, standalone: bool=True, default_attributes_parameters: dict={}):
