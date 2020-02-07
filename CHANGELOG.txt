@@ -2,6 +2,20 @@ Changelog
 =========
 
 
+v2.4.121.1 (2020-02-07)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+
+Fix
+~~~
+- Make lief optional again. [Raphaël Vinot]
+
+  fix #538
+
+
 v2.4.121 (2020-02-06)
 ---------------------
 
@@ -15,6 +29,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump version. [Raphaël Vinot]
 - Do not install neo by default. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - More flexible when an event is in a weird state. [Raphaël Vinot]
@@ -34,6 +49,7 @@ Changes
 
 Fix
 ~~~
+- Bump objects. [Raphaël Vinot]
 - Issue with readme. [Raphaël Vinot]
 - Remove debugging. [Raphaël Vinot]
 - [*-seen] Consider that `-` can also be in the date component while
