@@ -1488,6 +1488,7 @@ class ExpandedPyMISP(PyMISP):
         query['eventid'] = eventid
         query['withAttachments'] = self._make_misp_bool(with_attachments)
         query['metadata'] = self._make_misp_bool(metadata)
+        query['sharinggroup'] = sharinggroup
         query['uuid'] = uuid
         if publish_timestamp is not None:
             if isinstance(publish_timestamp, (list, tuple)):
@@ -1586,7 +1587,7 @@ class ExpandedPyMISP(PyMISP):
                      analysis: Optional[List[SearchType]]=None,
                      org: Optional[SearchParameterTypes]=None,
                      timestamp: Optional[DateInterval]=None,
-                     sharinggroup: Optional[SearchType]=None,
+                     sharinggroup: Optional[List[SearchType]]=None,
                      pythonify: Optional[bool]=None):
         """Search only at the index level. Using ! in front of a value means NOT (default is OR)
 
@@ -1610,7 +1611,8 @@ class ExpandedPyMISP(PyMISP):
             query['datefrom'] = self._make_timestamp(query.pop('date_from'))
         if query.get('date_to'):
             query['dateuntil'] = self._make_timestamp(query.pop('date_to'))
-
+        if isinstance(query.get('sharinggroup'), list):
+            query['sharinggroup'] = '|'.join([str(sg) for sg in query['sharinggroup']])
         if query.get('timestamp') is not None:
             timestamp = query.pop('timestamp')
             if isinstance(timestamp, (list, tuple)):
