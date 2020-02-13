@@ -1379,7 +1379,6 @@ class PyMISP:
                include_sightings: Optional[bool]=None, includeSightings: Optional[bool]=None,
                include_correlations: Optional[bool]=None, includeCorrelations: Optional[bool]=None,
                include_decay_score: Optional[bool] = None, includeDecayScore: Optional[bool] = None,
-               sharinggroup: Optional[SearchType]=None,
                pythonify: Optional[bool]=False,
                **kwargs) -> Union[dict, str, List[Union[MISPEvent, MISPAttribute]]]:
         '''Search in the MISP instance
@@ -1417,7 +1416,6 @@ class PyMISP:
         :param include_sightings: [JSON Only - Attribute] Include the sightings of the matching attributes.
         :param include_decay_score: Include the decay score at attribute level.
         :param include_correlations: [JSON Only - attribute] Include the correlations of the matching attributes.
-        :param sharinggroup: Restrict by a sharing group
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
@@ -1479,7 +1477,6 @@ class PyMISP:
         query['eventid'] = eventid
         query['withAttachments'] = self._make_misp_bool(with_attachments)
         query['metadata'] = self._make_misp_bool(metadata)
-        query['sharinggroup'] = sharinggroup
         query['uuid'] = uuid
         if publish_timestamp is not None:
             if isinstance(publish_timestamp, (list, tuple)):
@@ -1599,6 +1596,7 @@ class PyMISP:
         :param analysis: Analysis level(s) (0,1,2) | list
         :param org: Search by the creator organisation by supplying the organisation identifier.
         :param timestamp: Restrict the results by the timestamp (last edit). Any event with a timestamp newer than the given timestamp will be returned. In case you are dealing with /attributes as scope, the attribute's timestamp will be used for the lookup.
+        :param sharinggroup: Restrict by a sharing group | list
         :param pythonify: Returns a list of PyMISP Objects instead or the plain json output. Warning: it might use a lot of RAM
         """
         query = locals()
