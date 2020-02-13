@@ -6,30 +6,36 @@ from ..exceptions import InvalidMISPObject
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import logging
+from typing import Union
+from pathlib import Path
+from . import FileObject
 
-logger = logging.getLogger('pymisp')
-
-try:
-    import lief
-    HAS_LIEF = True
-except ImportError:
-    HAS_LIEF = False
+import lief  # type: ignore
 
 try:
-    import pydeep
+    import pydeep  # type: ignore
     HAS_PYDEEP = True
 except ImportError:
     HAS_PYDEEP = False
 
+logger = logging.getLogger('pymisp')
+
+
+def make_elf_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
+    elf_object = ELFObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
+    misp_file.add_reference(elf_object.uuid, 'includes', 'ELF indicators')
+    elf_sections = []
+    for s in elf_object.sections:
+        elf_sections.append(s)
+    return misp_file, elf_object, elf_sections
+
 
 class ELFObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
+    def __init__(self, parsed: lief.ELF.Binary=None, filepath: Union[Path, str]=None, pseudofile: Union[BytesIO, bytes]=None, standalone: bool=True, **kwargs):
         super(ELFObject, self).__init__('elf', standalone=standalone, **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
-        if not HAS_LIEF:
-            raise ImportError('Please install lief, documentation here: https://github.com/lief-project/LIEF')
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
                 self.__elf = lief.ELF.parse(raw=pseudofile.getvalue())
@@ -67,7 +73,7 @@ class ELFObject(AbstractMISPObjectGenerator):
 
 class ELFSectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section, standalone=True, **kwargs):
+    def __init__(self, section: lief.ELF.Section, standalone: bool=True, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
         super(ELFSectionObject, self).__init__('elf-section', standalone=standalone, **kwargs)

@@ -7,32 +7,39 @@ from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 from datetime import datetime
 import logging
+from typing import Optional, Union
+from pathlib import Path
 
-logger = logging.getLogger('pymisp')
+from . import FileObject
 
-try:
-    import lief
-    HAS_LIEF = True
-except ImportError:
-    HAS_LIEF = False
+import lief  # type: ignore
 
 try:
-    import pydeep
+    import pydeep  # type: ignore
     HAS_PYDEEP = True
 except ImportError:
     HAS_PYDEEP = False
 
+logger = logging.getLogger('pymisp')
+
+
+def make_pe_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
+    pe_object = PEObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
+    misp_file.add_reference(pe_object.uuid, 'includes', 'PE indicators')
+    pe_sections = []
+    for s in pe_object.sections:
+        pe_sections.append(s)
+    return misp_file, pe_object, pe_sections
+
 
 class PEObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed=None, filepath=None, pseudofile=None, standalone=True, **kwargs):
+    def __init__(self, parsed: Optional[lief.PE.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, standalone: bool=True, **kwargs):
         # Python3 way
         # super().__init__('pe')
         super(PEObject, self).__init__('pe', standalone=standalone, **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
-        if not HAS_LIEF:
-            raise ImportError('Please install lief, documentation here: https://github.com/lief-project/LIEF')
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
                 self.__pe = lief.PE.parse(raw=pseudofile.getvalue())
@@ -82,10 +89,10 @@ class PEObject(AbstractMISPObjectGenerator):
         self.add_attribute('compilation-timestamp', value=datetime.utcfromtimestamp(self.__pe.header.time_date_stamps).isoformat())
         # self.imphash = self.__pe.get_imphash()
         try:
-            if (self.__pe.has_resources and
-                    self.__pe.resources_manager.has_version and
-                    self.__pe.resources_manager.version.has_string_file_info and
-                    self.__pe.resources_manager.version.string_file_info.langcode_items):
+            if (self.__pe.has_resources
+                    and self.__pe.resources_manager.has_version
+                    and self.__pe.resources_manager.version.has_string_file_info
+                    and self.__pe.resources_manager.version.string_file_info.langcode_items):
                 fileinfo = dict(self.__pe.resources_manager.version.string_file_info.langcode_items[0].items.items())
                 self.add_attribute('original-filename', value=fileinfo.get('OriginalFilename'))
                 self.add_attribute('internal-filename', value=fileinfo.get('InternalName'))
@@ -106,8 +113,8 @@ class PEObject(AbstractMISPObjectGenerator):
             for section in self.__pe.sections:
                 s = PESectionObject(section, self._standalone, default_attributes_parameters=self._default_attributes_parameters)
                 self.add_reference(s.uuid, 'includes', 'Section {} of PE'.format(pos))
-                if ((self.__pe.entrypoint >= section.virtual_address) and
-                        (self.__pe.entrypoint < (section.virtual_address + section.virtual_size))):
+                if ((self.__pe.entrypoint >= section.virtual_address)
+                        and (self.__pe.entrypoint < (section.virtual_address + section.virtual_size))):
                     self.add_attribute('entrypoint-section-at-position', value='{}|{}'.format(section.name, pos))
                 pos += 1
                 self.sections.append(s)
@@ -117,7 +124,7 @@ class PEObject(AbstractMISPObjectGenerator):
 
 class PESectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section, standalone=True, **kwargs):
+    def __init__(self, section: lief.PE.Section, standalone: bool=True, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
         super(PESectionObject, self).__init__('pe-section', standalone=standalone, **kwargs)

@@ -7,13 +7,12 @@ import sys
 import unittest
 
 from pymisp.tools import make_binary_objects
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from io import BytesIO
-import re
 import json
 from pathlib import Path
 
-import urllib3
+import urllib3  # type: ignore
 import time
 from uuid import uuid4
 
@@ -23,6 +22,8 @@ from collections import defaultdict
 
 import logging
 logging.disable(logging.CRITICAL)
+logger = logging.getLogger('pymisp')
+
 
 try:
     from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
@@ -36,7 +37,7 @@ except ImportError:
         raise
 
 try:
-    from keys import url, key
+    from keys import url, key  # type: ignore
     verifycert = False
 except ImportError as e:
     print(e)
@@ -75,7 +76,7 @@ class TestComprehensive(unittest.TestCase):
         user.email = 'testusr@user.local'
         user.org_id = cls.test_org.id
         cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=False)
+        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
         cls.user_misp_connector.toggle_global_pythonify()
         # Creates a publisher
         user = MISPUser()
@@ -839,6 +840,7 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
 
             current_ts = int(time.time())
+            time.sleep(5)
             r = self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             self.assertEqual(int(r.attribute_id), first.attributes[0].id)
 
@@ -990,10 +992,9 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.user_misp_connector.add_event(first)
             stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
-            found = re.findall('8.8.8.8', stix)
-            self.assertTrue(found)
+            self.assertTrue(stix['related_packages'][0]['package']['incidents'][0]['related_indicators']['indicators'][0]['indicator']['observable']['object']['properties']['address_value']['value'], '8.8.8.8')
             stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
-            json.dumps(stix2, indent=2)
+            print(json.dumps(stix2, indent=2))
             self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
         finally:
             # Delete event
@@ -1072,8 +1073,24 @@ class TestComprehensive(unittest.TestCase):
             file_object = first.get_objects_by_name('file')[0]
             file_object.force_misp_objects_path_custom('tests/mispevent_testfiles', 'overwrite_file')
             file_object.add_attribute('test_overwrite', 'blah')
-            obj = self.admin_misp_connector.update_object(file_object, pythonify=True)
+            obj_json = self.admin_misp_connector.update_object(file_object)
+            self.assertTrue('Object' in obj_json, obj_json)
+            self.assertTrue('name' in obj_json['Object'], obj_json)
+            obj = MISPObject(obj_json['Object']['name'])
+            obj.from_dict(**obj_json)
             self.assertEqual(obj.get_attributes_by_relation('test_overwrite')[0].value, 'blah')
+
+            # FULL object add & update with custom template
+            new_object = MISPObject('overwrite_file', misp_objects_path_custom='tests/mispevent_testfiles')
+            new_object.add_attribute('test_overwrite', 'barbaz')
+            new_object.add_attribute('filename', 'barbaz.exe')
+            new_object = self.admin_misp_connector.add_object(first, new_object, pythonify=True)
+            self.assertEqual(new_object.get_attributes_by_relation('test_overwrite')[0].value, 'barbaz', new_object)
+
+            new_object.force_misp_objects_path_custom('tests/mispevent_testfiles', 'overwrite_file')
+            new_object.add_attribute('filename', 'foobar.exe')
+            new_object = self.admin_misp_connector.update_object(new_object, pythonify=True)
+            self.assertEqual(new_object.get_attributes_by_relation('filename')[1].value, 'foobar.exe', new_object)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1185,7 +1202,9 @@ class TestComprehensive(unittest.TestCase):
             self.assertFalse(first.attributes[0].tags)
             # Reference: https://github.com/MISP/PyMISP/issues/483
             r = self.delegate_user_misp_connector.tag(first, tag_org_restricted)
-            self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
+            # FIXME: The error message changed and is unhelpful.
+            # self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
+            self.assertEqual(r['errors'][1]['message'], 'Invalid Target.')
             r = self.user_misp_connector.tag(first, tag_org_restricted)
             self.assertEqual(r['name'], f'Global tag {tag_org_restricted.name}({tag_org_restricted.id}) successfully attached to Event({first.id}).')
             r = self.pub_misp_connector.tag(first.attributes[0], tag_user_restricted)
@@ -1958,7 +1977,6 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_user(test_roles_user)
             self.admin_misp_connector.delete_tag(test_tag)
 
-    @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_expansion(self):
         first = self.create_simple_event()
         try:
@@ -2027,7 +2045,6 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    @unittest.skipIf(sys.version_info < (3, 6), 'Not supported on python < 3.6')
     def test_communities(self):
         communities = self.admin_misp_connector.communities(pythonify=True)
         self.assertEqual(communities[0].name, 'CIRCL Private Sector Information Sharing Community - aka MISPPRIV')
@@ -2060,6 +2077,51 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
+
+    def test_first_last_seen(self):
+        local_tz = datetime.now(timezone.utc).astimezone().tzinfo
+        event = MISPEvent()
+        event.info = 'Test First Last seen'
+        event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-04', last_seen='2020-01-04T12:30:34.323242+0800')
+        obj = event.add_object(name='file', first_seen=1580147259.268763, last_seen=1580147300)
+        attr = obj.add_attribute('filename', 'blah.exe')
+        attr.first_seen = '2022-01-30'
+        attr.last_seen = '2022-02-23'
+        try:
+            first = self.admin_misp_connector.add_event(event, pythonify=True)
+            # Simple attribute
+            self.assertEqual(first.attributes[0].first_seen, datetime(2020, 1, 4, 0, 0, tzinfo=local_tz))
+            self.assertEqual(first.attributes[0].last_seen, datetime(2020, 1, 4, 4, 30, 34, 323242, tzinfo=timezone.utc))
+
+            # Object
+            self.assertEqual(first.objects[0].first_seen, datetime(2020, 1, 27, 17, 47, 39, 268763, tzinfo=timezone.utc))
+            self.assertEqual(first.objects[0].last_seen, datetime(2020, 1, 27, 17, 48, 20, tzinfo=timezone.utc))
+
+            # Object attribute
+            self.assertEqual(first.objects[0].attributes[0].first_seen, datetime(2022, 1, 30, 0, 0, tzinfo=local_tz))
+            self.assertEqual(first.objects[0].attributes[0].last_seen, datetime(2022, 2, 23, 0, 0, tzinfo=local_tz))
+
+            # Update values
+            # Attribute in full event
+            now = datetime.now().astimezone()
+            first.attributes[0].last_seen = now
+            first = self.admin_misp_connector.update_event(first, pythonify=True)
+            self.assertEqual(first.attributes[0].last_seen, now)
+            # Object only
+            now = datetime.now().astimezone()
+            obj = first.objects[0]
+            obj.last_seen = now
+            obj = self.admin_misp_connector.update_object(obj, pythonify=True)
+            self.assertEqual(obj.last_seen, now)
+            # Attribute in object only
+            now = datetime.now().astimezone()
+            attr = obj.attributes[0]
+            attr.last_seen = now
+            attr = self.admin_misp_connector.update_attribute(attr, pythonify=True)
+            self.assertEqual(attr.last_seen, now)
+
+        finally:
+            self.admin_misp_connector.delete_event(first)
 
 
 if __name__ == '__main__':

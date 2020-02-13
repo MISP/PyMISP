@@ -6,13 +6,15 @@ from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 import logging
 from email import message_from_bytes, policy
+from pathlib import Path
+from typing import Union
 
 logger = logging.getLogger('pymisp')
 
 
 class EMailObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath=None, pseudofile=None, attach_original_email=True, standalone=True, **kwargs):
+    def __init__(self, filepath: Union[Path, str]=None, pseudofile: BytesIO=None, attach_original_email: bool=True, standalone: bool=True, **kwargs):
         # PY3 way:
         # super().__init__('file')
         super(EMailObject, self).__init__('email', standalone=standalone, **kwargs)
@@ -50,17 +52,30 @@ class EMailObject(AbstractMISPObjectGenerator):
         if 'Message-ID' in self.__email:
             self.add_attribute('message-id', value=self.__email['Message-ID'])
         if 'To' in self.__email:
+            # TODO: split name and email address
             to_add = [to.strip() for to in self.__email['To'].split(',')]
             self.add_attributes('to', *to_add)
         if 'Cc' in self.__email:
+            # TODO: split name and email address
             to_add = [to.strip() for to in self.__email['Cc'].split(',')]
             self.add_attributes('cc', *to_add)
         if 'Subject' in self.__email:
             self.add_attribute('subject', value=self.__email['Subject'])
         if 'From' in self.__email:
+            # TODO: split name and email address
             to_add = [to.strip() for to in self.__email['From'].split(',')]
             self.add_attributes('from', *to_add)
         if 'Return-Path' in self.__email:
+            # TODO: split name and email address
             self.add_attribute('return-path', value=self.__email['Return-Path'])
         if 'User-Agent' in self.__email:
             self.add_attribute('user-agent', value=self.__email['User-Agent'])
+        if self.__email.get_boundary():
+            self.add_attribute('mime-boundary', value=self.__email.get_boundary())
+        if 'X-Mailer' in self.__email:
+            self.add_attribute('x-mailer', value=self.__email['X-Mailer'])
+        if 'Thread-Index' in self.__email:
+            self.add_attribute('thread-index', value=self.__email['Thread-Index'])
+        # TODO: email-header: all headers in one bloc
+        # TODO: BCC?
+        # TODO: received headers sometimes have TO email addresses

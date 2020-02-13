@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from pymisp import ExpandedPyMISP
-from keys import misp_url, misp_key, misp_verifycert, misp_client_cert
+from keys import misp_url, misp_key, misp_verifycert
+try:
+    from keys import misp_client_cert
+except ImportError:
+    misp_client_cert = ''
 import argparse
 import os
 

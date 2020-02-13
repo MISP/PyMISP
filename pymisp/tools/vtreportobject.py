@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import re
+from typing import Optional
 
 import requests
 try:
-    import validators
+    import validators  # type: ignore
     has_validators = True
 except ImportError:
     has_validators = False
@@ -23,7 +24,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
     :indicator: IOC to search VirusTotal for
     '''
-    def __init__(self, apikey, indicator, vt_proxies=None, standalone=True, **kwargs):
+    def __init__(self, apikey: str, indicator: str, vt_proxies: Optional[dict]=None, standalone: bool=True, **kwargs):
         # PY3 way:
         # super().__init__("virustotal-report")
         super(VTReportObject, self).__init__("virustotal-report", standalone=standalone, **kwargs)
@@ -47,7 +48,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
         ratio = "{}/{}".format(self._report["positives"], self._report["total"])
         self.add_attribute("detection-ratio", value=ratio)
 
-    def __validate_resource(self, ioc):
+    def __validate_resource(self, ioc: str):
         '''
         Validate the data type of an indicator.
         Domains and IP addresses aren't supported because
@@ -63,7 +64,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
             return "file"
         return False
 
-    def __query_virustotal(self, apikey, resource):
+    def __query_virustotal(self, apikey: str, resource: str):
         '''
         Query VirusTotal for information about an indicator
 
@@ -78,9 +79,9 @@ class VTReportObject(AbstractMISPObjectGenerator):
             report = requests.get(url, params=params, proxies=self._proxies)
         else:
             report = requests.get(url, params=params)
-        report = report.json()
-        if report["response_code"] == 1:
+        report_json = report.json()
+        if report_json["response_code"] == 1:
             return report
         else:
-            error_msg = "{}: {}".format(resource, report["verbose_msg"])
+            error_msg = "{}: {}".format(resource, report_json["verbose_msg"])
             raise InvalidMISPObject(error_msg)

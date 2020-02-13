@@ -4,7 +4,7 @@
 import random
 from random import randint
 import string
-from pymisp import MISPEvent
+from pymisp import MISPEvent, MISPAttribute
 
 
 def randomStringGenerator(size, chars=string.ascii_lowercase + string.digits):
@@ -15,32 +15,34 @@ def randomIpGenerator():
     return str(randint(0, 255)) + '.' + str(randint(0, 255)) + '.' + str(randint(0, 255)) + '.' + str(randint(0, 255))
 
 
+def _attribute(category, type, value):
+    attribute = MISPAttribute()
+    attribute.category = category
+    attribute.type = type
+    attribute.value = value
+    return attribute
+
+
 def floodtxt(misp, event, maxlength=255):
     text = randomStringGenerator(randint(1, maxlength))
-    textfunctions = [misp.add_internal_comment, misp.add_internal_text, misp.add_internal_other, misp.add_email_subject, misp.add_mutex, misp.add_filename]
-    textfunctions[randint(0, 5)](event, text)
+    choose_from = [('Internal reference', 'comment', text), ('Internal reference', 'text', text),
+                   ('Internal reference', 'other', text), ('Network activity', 'email-subject', text),
+                   ('Artifacts dropped', 'mutex', text), ('Artifacts dropped', 'filename', text)]
+    misp.add_attribute(event, _attribute(*random.choice(choose_from)))
 
 
 def floodip(misp, event):
     ip = randomIpGenerator()
-    ipfunctions = [misp.add_ipsrc, misp.add_ipdst]
-    ipfunctions[randint(0, 1)](event, ip)
+    choose_from = [('Network activity', 'ip-src', ip), ('Network activity', 'ip-dst', ip)]
+    misp.add_attribute(event, _attribute(*random.choice(choose_from)))
 
 
 def flooddomain(misp, event, maxlength=25):
     a = randomStringGenerator(randint(1, maxlength))
     b = randomStringGenerator(randint(2, 3), chars=string.ascii_lowercase)
     domain = a + '.' + b
-    domainfunctions = [misp.add_hostname, misp.add_domain]
-    domainfunctions[randint(0, 1)](event, domain)
-
-
-def flooddomainip(misp, event, maxlength=25):
-    a = randomStringGenerator(randint(1, maxlength))
-    b = randomStringGenerator(randint(2, 3), chars=string.ascii_lowercase)
-    domain = a + '.' + b
-    ip = randomIpGenerator()
-    misp.add_domain_ip(event, domain, ip)
+    choose_from = [('Network activity', 'domain', domain), ('Network activity', 'hostname', domain)]
+    misp.add_attribute(event, _attribute(*random.choice(choose_from)))
 
 
 def floodemail(misp, event, maxlength=25):
@@ -48,19 +50,12 @@ def floodemail(misp, event, maxlength=25):
     b = randomStringGenerator(randint(1, maxlength))
     c = randomStringGenerator(randint(2, 3), chars=string.ascii_lowercase)
     email = a + '@' + b + '.' + c
-    emailfunctions = [misp.add_email_src, misp.add_email_dst]
-    emailfunctions[randint(0, 1)](event, email)
-
-
-def floodattachment(misp, eventid, distribution, to_ids, category, comment, info, analysis, threat_level_id):
-    filename = randomStringGenerator(randint(1, 128))
-    misp.upload_sample(filename, 'dummy', eventid, distribution, to_ids, category, comment, info, analysis, threat_level_id)
+    choose_from = [('Network activity', 'email-dst', email), ('Network activity', 'email-src', email)]
+    misp.add_attribute(event, _attribute(*random.choice(choose_from)))
 
 
 def create_dummy_event(misp):
-    event = misp.new_event(0, 4, 0, 'dummy event')
-    flooddomainip(misp, event)
-    floodattachment(misp, event['Event']['id'], event['Event']['distribution'], False, 'Payload delivery', '', event['Event']['info'], event['Event']['analysis'], event['Event']['threat_level_id'])
+    return misp.new_event(0, 4, 0, 'dummy event')
 
 
 def create_massive_dummy_events(misp, nbattribute):
@@ -68,12 +63,6 @@ def create_massive_dummy_events(misp, nbattribute):
     event.info = 'massive dummy event'
     event = misp.add_event(event)
     print(event)
-    eventid = event.id
-    distribution = '0'
-    functions = [floodtxt, floodip, flooddomain, flooddomainip, floodemail, floodattachment]
+    functions = [floodtxt, floodip, flooddomain, floodemail]
     for i in range(nbattribute):
-        choice = randint(0, 5)
-        if choice == 5:
-            floodattachment(misp, eventid, distribution, False, 'Payload delivery', '', event.info, event.analysis, event.threat_level_id)
-        else:
-            functions[choice](misp, event)
+        functions[random.randint(0, len(functions) - 1)](misp, event)

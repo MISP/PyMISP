@@ -4,7 +4,7 @@
 from pymisp import ExpandedPyMISP
 from pymisp.tools import EMailObject
 import traceback
-from keys import misp_url, misp_key, misp_verifycert
+from keys import misp_url, misp_key, misp_verifycert  # type: ignore
 import glob
 import argparse
 

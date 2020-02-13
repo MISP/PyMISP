@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 try:
-    from pymispgalaxies import Clusters
+    from pymispgalaxies import Clusters  # type: ignore
     has_pymispgalaxies = True
 except ImportError:
     has_pymispgalaxies = False
 
 try:
-    from pytaxonomies import Taxonomies
+    from pytaxonomies import Taxonomies  # type: ignore
     has_pymispgalaxies = True
 except ImportError:
     has_pymispgalaxies = False

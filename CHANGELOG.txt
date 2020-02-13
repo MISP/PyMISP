@@ -2,8 +2,263 @@ Changelog
 =========
 
 
+%%version%% (unreleased)
+------------------------
+
+Changes
+~~~~~~~
+- Bump objects. [Raphaël Vinot]
+
+
+v2.4.121.1 (2020-02-07)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+
+Fix
+~~~
+- Make lief optional again. [Raphaël Vinot]
+
+  fix #538
+
+
+v2.4.121 (2020-02-06)
+---------------------
+
+New
+~~~
+- Add includeDecayScore to rest search. [VVX7]
+- Support for first_seen/last_seen. [Raphaël Vinot]
+
+  Cleaner import of datetime
+- [attributes] chrome-extension-id added. [Alexandre Dulaunoy]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Do not install neo by default. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- More flexible when an event is in a weird state. [Raphaël Vinot]
+- Str to int, properly load SharingGroup. [Raphaël Vinot]
+
+  Fix #535
+- Bump deps, add pep8 test. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Support dict in tag/untag. [Raphaël Vinot]
+- Test update last seen. [Raphaël Vinot]
+- Add test cases in feed. [Raphaël Vinot]
+- Add test cases. [Raphaël Vinot]
+- Normalize to_datetime conversion. [Raphaël Vinot]
+- Trustar example uses objects. [Raphaël Vinot]
+- Add lief in the generic requirements. [Raphaël Vinot]
+- Refactorize typing, validate. [Raphaël Vinot]
+
+Fix
+~~~
+- Bump objects. [Raphaël Vinot]
+- Issue with readme. [Raphaël Vinot]
+- Remove debugging. [Raphaël Vinot]
+- [*-seen] Consider that `-` can also be in the date component while
+  parsing. [mokaddem]
+- First seen was after last seen, trigerring the exception. [Raphaël
+  Vinot]
+- Tests failing if local tz was not CET. [Raphaël Vinot]
+- Syntax and typos. [Raphaël Vinot]
+- Bugs introduced by last commit. [Raphaël Vinot]
+
+Other
+~~~~~
+- Doc: fix Search-FullOverview.ipynb code example. [Bernhard E. Reiter]
+- Chore: delete old examples. [Manabu Niseki]
+
+  Delete examples which use deprecated/deleted methods
+- Scrape trustar intel platform reports and create misp events.
+  [th3jiv3r]
+- Configuration for trustar integration. [th3jiv3r]
+- Fixed trailing lines. [turtlefac3]
+- Fixed trailing lines. [turtlefac3]
+- Custom integration written in python to scrape Proofpoint VAP API for
+  metrics of top Very Attacked Persons and create MISP events.
+  [turtlefac3]
+- Fix typos on FullOverview.ipynb. [Bernhard E. Reiter]
+
+
+v2.4.120 (2020-01-17)
+---------------------
+
+New
+~~~
+- [attribute type] kusto-query attribute type. [Alexandre Dulaunoy]
+
+  Kusto query is the query language for the Kusto services in Azure used
+  to search large dataset. It's used in Windows Defender ATP Hunting-Queries
+  and also Azure Sentinel (Cloud-native SIEM).
+- Remove python < 3.6 support. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump dependencies, add debug. [Raphaël Vinot]
+- Upate dummy events creator. [Raphaël Vinot]
+- Add tests on more version of Python. [Raphaël Vinot]
+- Search with the STIX output returns a json STIX. [Raphaël Vinot]
+
+  Was XML before.
+- Bump dependencies. [Raphaël Vinot]
+- Add more typing information. [Raphaël Vinot]
+- Add typing markup. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump Dependencies. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Bump template_version in test cases. [Raphaël Vinot]
+- Add missing variable in dummy creator. [Raphaël Vinot]
+- Et2misp was python2 only. [Raphaël Vinot]
+- Feed generator was broken. [Raphaël Vinot]
+
+  Fix #506
+- Event without hashable attribute. [Raphaël Vinot]
+
+  Related #506
+
+Other
+~~~~~
+- Update api.py. [AaronK]
+
+  minor typo, can;t help it noticing those. sorry,
+- Fixed TODO, added quarantineFolder/quarantineRule from
+  messagesBlocked, added some error handling to prevent empty attributes
+  from trying to be added. [th3jiv3r]
+- Scrape proofpoint tap api for messages blocked/delivered & clicks
+  blocked/permitted  and create misp events. [th3jiv3r]
+- Add variable for proofpoint tap api auth. [th3jiv3r]
+- Update README.md. [AaronK]
+
+  minor typo
+- Define the number of entries to output. [AndreC10002]
+
+  Allow for defining in the settings.py file the number of entries to output
+- Update generate.py. [AndreC10002]
+- Cleanup of code and 'quick-n-dirty' sanitizing of tags. [Koen Van
+  Impe]
+- Sync. [Koen Van Impe]
+- Update README.md. [Raphaël Vinot]
+
+
+v2.4.119.1 (2019-12-17)
+-----------------------
+
+New
+~~~
+- URLObject (requires pyfaup) [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- Bump test files. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Debug travis error message. [Raphaël Vinot]
+- [types] eppn type added. [Alexandre Dulaunoy]
+- Fix typo. [Raphaël Vinot]
+- Move scrippsco2 feed generator to a sub directory. [Raphaël Vinot]
+- Update documentation. [Raphaël Vinot]
+
+  Fix #396
+- Bump objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly test custom objects. [Raphaël Vinot]
+- Adding a sighting takes a little bit of time. [Raphaël Vinot]
+- Test case on reference. [Raphaël Vinot]
+- Add missing fields to event & attribute for the feed output. [Raphaël
+  Vinot]
+- Make sure the publish timestamp is bumped on update. [Raphaël Vinot]
+
+
+v2.4.119 (2019-12-02)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+
+Fix
+~~~
+- Bump lief to 0.10.1. [Raphaël Vinot]
+- Update tests. [Raphaël Vinot]
+- Raise PyMISPError instead of Exception. [Raphaël Vinot]
+- Rename feed_meta_generator so it clearly fails with python<3.6.
+  [Raphaël Vinot]
+
+
+v2.4.117.3 (2019-11-25)
+-----------------------
+
+New
+~~~
+- Script to generate the metadata of a feed out of a directory. [Raphaël
+  Vinot]
+- Add to_feed export to MISPEvent. [Raphaël Vinot]
+- Validate object templates. [Raphaël Vinot]
+
+  fix https://github.com/MISP/misp-objects/issues/199
+- Test cases for restricted tags. [Raphaël Vinot]
+
+  Fix #483
+- Get Database Schema Diagnostic. [Raphaël Vinot]
+
+  Fix #492
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Require stable version of lief again. [Raphaël Vinot]
+- Few more improvements on the feed export. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Make the feed generator more generic. [Raphaël Vinot]
+- Use New version of PyMISP in the feed generator. [Raphaël Vinot]
+- Bump misp-object. [Raphaël Vinot]
+- Allow to sort and indent the json output for objects. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- [test] feed test updated as botvrij is now TLS by default. [Alexandre
+  Dulaunoy]
+
+Fix
+~~~
+- Improve stability of feed output. [Raphaël Vinot]
+- Do not unitialize the uuid in MISPEvent. [Raphaël Vinot]
+- Bump url template version in test cases. [Raphaël Vinot]
+- Python 2.7 tests. [Raphaël Vinot]
+- Print the full json blob in debug mode. [Raphaël Vinot]
+
+  Related https://github.com/MISP/PyMISP/issues/462
+
+Other
+~~~~~
+- Cch: Bump misp-objects. [Raphaël Vinot]
+
+
 v2.4.117.2 (2019-10-30)
 -----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 
 Fix
 ~~~

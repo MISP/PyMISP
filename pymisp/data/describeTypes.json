@@ -54,6 +54,7 @@
         "hex",
         "impfuzzy",
         "imphash",
+        "kusto-query",
         "malware-sample",
         "md5",
         "mime-type",
@@ -187,7 +188,9 @@
         "domain",
         "domain|ip",
         "email-dst",
+        "email-src",
         "email-subject",
+        "eppn",
         "hassh-md5",
         "hasshserver-md5",
         "hex",
@@ -237,6 +240,7 @@
         "attachment",
         "authentihash",
         "cdhash",
+        "chrome-extension-id",
         "comment",
         "domain",
         "email-attachment",
@@ -318,6 +322,7 @@
         "attachment",
         "authentihash",
         "cdhash",
+        "chrome-extension-id",
         "comment",
         "filename",
         "filename|authentihash",
@@ -418,6 +423,7 @@
         "comment",
         "email-dst",
         "email-src",
+        "eppn",
         "github-organisation",
         "github-repository",
         "github-username",
@@ -505,6 +511,10 @@
         "to_ids": 1
       },
       "cdhash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "chrome-extension-id": {
         "default_category": "Payload delivery",
         "to_ids": 1
       },
@@ -611,6 +621,10 @@
       "email-x-mailer": {
         "default_category": "Payload delivery",
         "to_ids": 0
+      },
+      "eppn": {
+        "default_category": "Network activity",
+        "to_ids": 1
       },
       "filename": {
         "default_category": "Payload delivery",
@@ -770,6 +784,10 @@
       },
       "jabber-id": {
         "default_category": "Social network",
+        "to_ids": 0
+      },
+      "kusto-query": {
+        "default_category": "Artifacts dropped",
         "to_ids": 0
       },
       "last-name": {
@@ -1109,6 +1127,7 @@
       "campaign-name",
       "cc-number",
       "cdhash",
+      "chrome-extension-id",
       "comment",
       "community-id",
       "cookie",
@@ -1135,6 +1154,7 @@
       "email-subject",
       "email-thread-index",
       "email-x-mailer",
+      "eppn",
       "filename",
       "filename|authentihash",
       "filename|impfuzzy",
@@ -1175,6 +1195,7 @@
       "issue-date-of-the-visa",
       "ja3-fingerprint-md5",
       "jabber-id",
+      "kusto-query",
       "last-name",
       "link",
       "mac-address",

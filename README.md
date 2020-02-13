@@ -1,3 +1,5 @@
+**IMPORTANT NOTE**: This library will require **at least** python 3.6 starting the 1st of January 2020. If you have to legacy versions of python, please use PyMISP v2.4.119.1, and consider updating your system(s). Anything released within the last 2 years will do, starting with Ubuntu 18.04.
+
 README
 ======
 
@@ -29,7 +31,7 @@ pip3 install pymisp
 ```
 git clone https://github.com/MISP/PyMISP.git && cd PyMISP
 git submodule update --init
-pip3 install -I .[fileobjects,neo,openioc,virustotal]
+pip3 install -I .[fileobjects,openioc,virustotal]
 ```
 
 ## Installing it with virtualenv
@@ -38,10 +40,10 @@ It is recommended to use virtualenv to not polute your OS python envirenment.
 ```
 pip3 install virtualenv
 git clone https://github.com/MISP/PyMISP.git && cd PyMISP
-python3 -m venv ./
+python3 -m venv ./venv
 source venv/bin/activate
 git submodule update --init
-pip3 install -I .[fileobjects,neo,openioc,virustotal]
+pip3 install -I .[fileobjects,openioc,virustotal]
 ```
 
 ## Running the tests

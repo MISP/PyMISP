@@ -6,7 +6,7 @@ import sys
 import unittest
 import subprocess
 
-import urllib3
+import urllib3  # type: ignore
 import logging
 logging.disable(logging.CRITICAL)
 
