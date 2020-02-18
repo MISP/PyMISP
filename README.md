@@ -16,44 +16,36 @@ PyMISP is a Python library to access [MISP](https://github.com/MISP/MISP) platfo
 
 PyMISP allows you to fetch events, add or update events/attributes, add or update samples or search for attributes.
 
-## Requirements
-
- * [requests](http://docs.python-requests.org)
-
 ## Install from pip
 
+**It is strongly recommended to use a virtual environment**
+
+If you want to know more about virtual environments, (python has you covered)[https://docs.python.org/3/tutorial/venv.html]
+
+Only basic dependencies:
 ```
 pip3 install pymisp
 ```
 
-## Install the latest version from repo
+With optional dependencies:
+```
+pip3 install pymisp[fileobjects,openioc,virustotal]
+```
+
+## Install the latest version from repo from developemnt purposes
+
+**Note**: poetry is required
 
 ```
 git clone https://github.com/MISP/PyMISP.git && cd PyMISP
 git submodule update --init
-pip3 install -I .[fileobjects,openioc,virustotal]
+poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport
 ```
 
-## Installing it with virtualenv
-
-It is recommended to use virtualenv to not polute your OS python envirenment.
-```
-pip3 install virtualenv
-git clone https://github.com/MISP/PyMISP.git && cd PyMISP
-python3 -m venv ./venv
-source venv/bin/activate
-git submodule update --init
-pip3 install -I .[fileobjects,openioc,virustotal]
-```
-
-## Running the tests
+### Running the tests
 
 ```bash
-pip3 install -U nose pip setuptools coveralls codecov requests-mock
-pip3 install git+https://github.com/kbandla/pydeep.git
-
-git clone https://github.com/viper-framework/viper-test-files.git tests/viper-test-files
-nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
+poetry run nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
 ```
 
 If you have a MISP instance to test against, you can also run the live ones:
@@ -61,7 +53,7 @@ If you have a MISP instance to test against, you can also run the live ones:
 **Note**: You need to update the key in `tests/testlive_comprehensive.py` to the automation key of your admin account.
 
 ```bash
-nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py
+poetry run nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py
 ```
 
 ## Samples and how to use PyMISP

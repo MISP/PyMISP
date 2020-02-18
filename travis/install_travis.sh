@@ -4,5 +4,5 @@ set -e
 set -x
 
 # We're in python3, installing with pipenv.
-pip3 install pipenv
-pipenv update --dev
+pip3 install poetry
+poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport
