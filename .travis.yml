@@ -1,12 +1,12 @@
+dist: bionic
+
 language: python
 
 cache: pip
 
 addons:
   apt:
-    sources: [ 'ubuntu-toolchain-r-test' ]
     packages:
-      - libstdc++6
       - libfuzzy-dev
 
 python:
