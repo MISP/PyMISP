@@ -32,7 +32,7 @@ With optional dependencies:
 pip3 install pymisp[fileobjects,openioc,virustotal]
 ```
 
-## Install the latest version from repo from developemnt purposes
+## Install the latest version from repo from development purposes
 
 **Note**: poetry is required
 
