@@ -20,7 +20,7 @@ PyMISP allows you to fetch events, add or update events/attributes, add or updat
 
 **It is strongly recommended to use a virtual environment**
 
-If you want to know more about virtual environments, (python has you covered)[https://docs.python.org/3/tutorial/venv.html]
+If you want to know more about virtual environments, [python has you covered](https://docs.python.org/3/tutorial/venv.html)
 
 Only basic dependencies:
 ```
