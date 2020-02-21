@@ -167,7 +167,7 @@ class MISPSighting(AbstractMISP):
 
 class MISPAttribute(AbstractMISP):
     _fields_for_feed: set = {'uuid', 'value', 'category', 'type', 'comment', 'data',
-                             'timestamp', 'to_ids', 'disable_correlation'}
+                             'timestamp', 'to_ids', 'disable_correlation', 'first_seen', 'last_seen'}
 
     def __init__(self, describe_types: Optional[dict]=None, strict: bool=False):
         """Represents an Attribute
@@ -588,7 +588,7 @@ class MISPObject(AbstractMISP):
 
     _fields_for_feed: set = {'name', 'meta-category', 'description', 'template_uuid',
                              'template_version', 'uuid', 'timestamp', 'distribution',
-                             'sharing_group_id', 'comment'}
+                             'sharing_group_id', 'comment', 'first_seen', 'last_seen'}
 
     def __init__(self, name: str, strict: bool=False, standalone: bool=False, default_attributes_parameters: dict={}, **kwargs):
         ''' Master class representing a generic MISP object
@@ -920,6 +920,7 @@ class MISPEvent(AbstractMISP):
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self.describe_types = describe_types
 
+        self.uuid: str = str(uuid.uuid4())
         self.date: date
         self.Attribute: List[MISPAttribute] = []
         self.Object: List[MISPObject] = []

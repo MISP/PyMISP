@@ -220,8 +220,8 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
                 else:
                     to_return[field] = getattr(self, field)
             else:
-                if field == 'data':
-                    # data in attribute is special
+                if field in ['data', 'first_seen', 'last_seen']:
+                    # special fields
                     continue
                 raise PyMISPError('The field {} is required in {} when generating a feed.'.format(field, self.__class__.__name__))
         to_return = _int_to_str(to_return)

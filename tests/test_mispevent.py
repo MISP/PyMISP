@@ -29,6 +29,7 @@ class TestMISPEvent(unittest.TestCase):
     def test_simple(self):
         with open('tests/mispevent_testfiles/simple.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_event(self):
@@ -36,12 +37,14 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.publish()
         with open('tests/mispevent_testfiles/event.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_loadfile(self):
         self.mispevent.load_file('tests/mispevent_testfiles/event.json')
         with open('tests/mispevent_testfiles/event.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_event_tag(self):
@@ -53,6 +56,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.add_tag(new_tag)
         with open('tests/mispevent_testfiles/event_tags.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_attribute(self):
@@ -65,6 +69,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(attr_tags[0].name, 'osint')
         with open('tests/mispevent_testfiles/attribute.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
         # Fake setting an attribute ID for testing
         self.mispevent.attributes[0].id = 42
@@ -94,6 +99,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(self.mispevent.objects[0].references[0].relationship_type, 'baz')
         with open('tests/mispevent_testfiles/event_obj_attr_tag.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     @unittest.skip("Not supported on MISP: https://github.com/MISP/MISP/issues/2638 - https://github.com/MISP/PyMISP/issues/168")
@@ -116,6 +122,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(attribute.malware_binary, pseudofile)
         with open('tests/mispevent_testfiles/malware.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_existing_malware(self):
@@ -173,6 +180,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[1].uuid = 'b'
         with open('tests/mispevent_testfiles/event_obj_def_param.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_obj_default_values(self):
@@ -189,6 +197,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/def_param.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_event_not_edited(self):
@@ -293,6 +302,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/misp_custom_obj.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_first_last_seen(self):
