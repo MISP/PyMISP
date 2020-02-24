@@ -224,7 +224,8 @@ class MISPAttribute(AbstractMISP):
 
         if self.type == 'malware-sample':
             try:
-                with ZipFile(self.data) as f:
+                # Ignore type, if data is None -> exception
+                with ZipFile(self.data) as f:  # type: ignore
                     if not self.__is_misp_encrypted_file(f):
                         raise PyMISPError('Not an existing malware sample')
                     for name in f.namelist():

@@ -249,7 +249,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
     def __iter__(self):
         return iter({k: v for k, v in self.__dict__.items() if not (k[0] == '_' or k in self.__not_jsonable)})
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len([k for k in self.__dict__.keys() if not (k[0] == '_' or k in self.__not_jsonable)])
 
     @property
@@ -269,15 +269,15 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         return self.__edited
 
     @edited.setter
-    def edited(self, val):
+    def edited(self, val: bool):
         """Set the edit flag"""
         if isinstance(val, bool):
             self.__edited = val
         else:
             raise PyMISPError('edited can only be True or False')
 
-    def __setattr__(self, name, value):
-        if name[0] != '_' and not self.__edited and name in self.keys():
+    def __setattr__(self, name: str, value):
+        if name[0] != '_' and not self.__edited and name in self:
             # The private members don't matter
             # If we already have a key with that name, we're modifying it.
             self.__edited = True
@@ -317,7 +317,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         else:
             raise PyMISPInvalidFormat('All the attributes have to be of type MISPTag.')
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, AbstractMISP):
             return self.to_dict() == other.to_dict()
         elif isinstance(other, dict):
@@ -325,10 +325,8 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         else:
             return False
 
-    def __repr__(self):
-        if hasattr(self, 'name'):
-            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+    def __repr__(self) -> str:
+        return '<{self.__class__.__name__} - please define me'.format(self=self)
 
 
 class MISPTag(AbstractMISP):
