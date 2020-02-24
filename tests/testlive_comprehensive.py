@@ -1953,6 +1953,8 @@ class TestComprehensive(unittest.TestCase):
                 self.assertEqual(e.org.name, 'Test Org - delegate')
                 r = self.delegate_user_misp_connector.delete_event(e)
                 self.assertEqual(r['message'], 'Event deleted.', r)
+                # Change base_event UUID do we can add it
+                base_event.uuid = str(uuid4())
                 e = test_roles_user_connector.add_event(base_event)
                 delegation = test_roles_user_connector.delegate_event(e, self.test_org_delegate)
                 r = test_roles_user_connector.discard_event_delegation(delegation.id)

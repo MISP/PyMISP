@@ -181,7 +181,7 @@ class MISPAttribute(AbstractMISP):
         self.__category_type_mapping: dict = self.describe_types['category_type_mappings']
         self.__sane_default: dict = self.describe_types['sane_defaults']
         self.__strict: bool = strict
-        self._data: Optional[BytesIO] = None
+        self.data: Optional[BytesIO] = None
         self.first_seen: datetime
         self.last_seen: datetime
         self.uuid: str = str(uuid.uuid4())
@@ -207,6 +207,37 @@ class MISPAttribute(AbstractMISP):
         """Set a list of prepared MISPTag."""
         super()._set_tags(tags)
 
+    def _prepare_data(self, data: Union[Path, str, bytes, BytesIO, None]):
+        if not data:
+            super().__setattr__('data', None)
+            return
+
+        if isinstance(data, BytesIO):
+            super().__setattr__('data', data)
+        elif isinstance(data, Path):
+            with data.open('rb') as f_temp:
+                super().__setattr__('data', BytesIO(f_temp.read()))
+        elif isinstance(data, (str, bytes)):
+            super().__setattr__('data', BytesIO(base64.b64decode(data)))
+        else:
+            raise PyMISPError(f'Invalid type ({type(data)}) for the data key: {data}')
+
+        if self.type == 'malware-sample':
+            try:
+                with ZipFile(self.data) as f:
+                    if not self.__is_misp_encrypted_file(f):
+                        raise PyMISPError('Not an existing malware sample')
+                    for name in f.namelist():
+                        if name.endswith('.filename.txt'):
+                            with f.open(name, pwd=b'infected') as unpacked:
+                                self.malware_filename = unpacked.read().decode().strip()
+                        else:
+                            with f.open(name, pwd=b'infected') as unpacked:
+                                self._malware_binary = BytesIO(unpacked.read())
+            except Exception:
+                # not a encrypted zip file, assuming it is a new malware sample
+                self._prepare_new_malware_sample()
+
     def __setattr__(self, name, value):
         if name in ['first_seen', 'last_seen']:
             value = _make_datetime(value)
@@ -215,7 +246,11 @@ class MISPAttribute(AbstractMISP):
                 raise PyMISPError('last_seen ({value}) has to be after first_seen ({self.first_seen})')
             if name == 'first_seen' and hasattr(self, 'last_seen') and self.last_seen < value:
                 raise PyMISPError('first_seen ({value}) has to be before last_seen ({self.last_seen})')
-        super().__setattr__(name, value)
+            super().__setattr__(name, value)
+        elif name == 'data':
+            self._prepare_data(value)
+        else:
+            super().__setattr__(name, value)
 
     def hash_values(self, algorithm: str='sha512') -> List[str]:
         """Compute the hash of every values for fast lookups"""
@@ -487,35 +522,6 @@ class MISPAttribute(AbstractMISP):
         if not md5_from_filename or not md5_from_file or md5_from_filename != md5_from_file:
             return False
         return True
-
-    @property
-    def data(self):
-        return self._data if self._data else None
-
-    @data.setter
-    def data(self, data: Union[Path, str, bytes, BytesIO]):
-        if isinstance(data, Path):
-            with data.open('rb') as f_temp:
-                self._data = BytesIO(f_temp.read())
-        if isinstance(data, (str, bytes)):
-            self._data = BytesIO(base64.b64decode(data))
-        elif isinstance(data, BytesIO):
-            self._data = data
-        if self.type == 'malware-sample':
-            try:
-                with ZipFile(self.data) as f:
-                    if not self.__is_misp_encrypted_file(f):
-                        raise PyMISPError('Not an existing malware sample')
-                    for name in f.namelist():
-                        if name.endswith('.filename.txt'):
-                            with f.open(name, pwd=b'infected') as unpacked:
-                                self.malware_filename = unpacked.read().decode().strip()
-                        else:
-                            with f.open(name, pwd=b'infected') as unpacked:
-                                self._malware_binary = BytesIO(unpacked.read())
-            except Exception:
-                # not a encrypted zip file, assuming it is a new malware sample
-                self._prepare_new_malware_sample()
 
     def __repr__(self):
         if hasattr(self, 'value'):
