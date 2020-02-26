@@ -14,6 +14,10 @@ New
 
 Changes
 ~~~~~~~
+- Comments were still referencing pipenv. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
@@ -24,6 +28,7 @@ Changes
 
 Fix
 ~~~
+- Test cases & template version. [Raphaël Vinot]
 - Mypy, more typing. [Raphaël Vinot]
 - Do not skip data in add_attribute methods. [Raphaël Vinot]
 - Remove references to the old API. [Raphaël Vinot]
