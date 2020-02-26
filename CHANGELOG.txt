@@ -2,12 +2,35 @@ Changelog
 =========
 
 
-%%version%% (unreleased)
-------------------------
+v2.4.122 (2020-02-26)
+---------------------
+
+New
+~~~
+- Add uuid by default in MISPEvent, add F/L seen in feed output.
+  [Raphaël Vinot]
+- Admin script to setup a sync server. [Raphaël Vinot]
+- Add feed generation example in notebook. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
-- Bump objects. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump dep. [Raphaël Vinot]
+- Fix typo in readme. [Raphaël Vinot]
+- Use bionic on travis. [Raphaël Vinot]
+- Add poetry support. [Raphaël Vinot]
+
+Fix
+~~~
+- Mypy, more typing. [Raphaël Vinot]
+- Do not skip data in add_attribute methods. [Raphaël Vinot]
+- Remove references to the old API. [Raphaël Vinot]
+
+Other
+~~~~~
+- Use poetry everywhere, fix readme. [Raphaël Vinot]
 
 
 v2.4.121.1 (2020-02-07)
@@ -15,6 +38,8 @@ v2.4.121.1 (2020-02-07)
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 
