@@ -115,7 +115,7 @@ logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', for
 
 
 ```bash
-# From a pipenv
+# From poetry
 
 nosetests-3.4 -s --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py:TestComprehensive.[test_name]
 
