@@ -8,6 +8,7 @@ from datetime import datetime
 from dateutil.parser import parse
 import json
 from pymisp.tools import feed_meta_generator
+from io import BytesIO
 
 make_feed = False
 
@@ -27,6 +28,8 @@ for p in path.glob('**/*.csv'):
     event = MISPEvent()
     event.info = f"[{d.isoformat()}] CSSE COVID-19 daily report"
     event.date = d
+    event.distribution = 3
+    event.add_tag('tlp:white')
     if make_feed:
         event.orgc = org
     else:
@@ -34,6 +37,8 @@ for p in path.glob('**/*.csv'):
         if e:
             # Already added.
             continue
+    event.add_attribute('attachment', p.name, data=BytesIO(p.open('rb').read()))
+    event.add_attribute('link', f'https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports/{p.name}', comment='Source')
     with p.open() as f:
         reader = DictReader(f)
         for row in reader:
