@@ -1411,7 +1411,7 @@ class PyMISP:
         :param eventinfo: Filter on the event's info field.
         :param searchall: Search for a full or a substring (delimited by % for substrings) in the event info, event tags, attribute tags, attribute values or attribute comment fields.
         :param requested_attributes: [CSV only] Select the fields that you wish to include in the CSV export. By setting event level fields additionally, includeContext is not required to get event metadata.
-        :param include_context: [Attribute only] Include the event data with each attribute.
+        :param include_context: [Attribute only] Include the event data with each attribute. [CSV output] Add event level metadata in every line of the CSV.
         :param headerless: [CSV Only] The CSV created when this setting is set to true will not contain the header row.
         :param include_sightings: [JSON Only - Attribute] Include the sightings of the matching attributes.
         :param include_decay_score: Include the decay score at attribute level.
