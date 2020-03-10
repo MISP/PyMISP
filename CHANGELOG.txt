@@ -12,6 +12,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - JSON files are UTF8. [Raphaël Vinot]
