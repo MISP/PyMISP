@@ -2,6 +2,26 @@ Changelog
 =========
 
 
+v2.4.123 (2020-03-10)
+---------------------
+
+New
+~~~
+- Add import script for dxy data. [Raphaël Vinot]
+- Csse covid19 daily report importer. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump dependencies. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- JSON files are UTF8. [Raphaël Vinot]
+
+  Bump dev deps, update comment
+- Add tag, set distribution, add file and source (CSSE importer)
+  [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+
+
 v2.4.122 (2020-02-26)
 ---------------------
 
@@ -14,6 +34,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Comments were still referencing pipenv. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
