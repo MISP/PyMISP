@@ -1,4 +1,4 @@
-__version__ = '2.4.122'
+__version__ = '2.4.123'
 import logging
 
 FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
