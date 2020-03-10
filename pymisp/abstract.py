@@ -329,7 +329,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             return False
 
     def __repr__(self) -> str:
-        return '<{self.__class__.__name__} - please define me'.format(self=self)
+        return '<{self.__class__.__name__} - please define me>'.format(self=self)
 
 
 class MISPTag(AbstractMISP):
