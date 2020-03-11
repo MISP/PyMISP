@@ -30,11 +30,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def get_vmray_config(url, key, misp_verifycert, default_wait_period):
-    '''
-        Fetch configuration settings from MISP
-        Includes VMRay API and modules URL
-    '''
-
     try:
         misp_headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': key}
         req = requests.get(url + 'servers/serverSettings.json', verify=misp_verifycert, headers=misp_headers)
@@ -80,19 +75,13 @@ def get_vmray_config(url, key, misp_verifycert, default_wait_period):
 
         if vmray_import_enabled and vmray_api and vmray_url and module_import_port and module_import_url:
             return {'vmray_wait_period': vmray_wait_period, 'vmray_api': vmray_api, 'vmray_url': vmray_url, 'module_import_port': module_import_port, 'module_import_url': module_import_url}
-        else:
-            sys.exit('Did not receive all the necessary configuration information from MISP')
+        sys.exit('Did not receive all the necessary configuration information from MISP')
 
     except Exception as e:
         sys.exit('Unable to get VMRay config from MISP')
 
 
 def search_vmray_incomplete(m, url, wait_period, module_import_url, module_import_port, vmray_url, vmray_api, vmray_attribute_category, vmray_include_analysisid, vmray_include_imphash_ssdeep, vmray_include_extracted_files, vmray_include_analysisdetails, vmray_include_vtidetails, custom_tags_incomplete, custom_tags_complete):
-    '''
-       Search for the events with VMRay samples that are marked incomplete
-       and then update these events
-    '''
-
     controller = 'attributes'
     vmray_value = 'VMRay Sample ID:'  # How sample IDs are stored in MISP
     req = None
@@ -148,7 +137,7 @@ def search_vmray_incomplete(m, url, wait_period, module_import_url, module_impor
                             continue
                         else:
                             results = req_json["results"]
-                    
+
                             # Walk through all results in the misp-module reply
                             for el in results:
                                 to_ids = True
