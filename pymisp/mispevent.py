@@ -1290,7 +1290,7 @@ class MISPEvent(AbstractMISP):
             if ((hasattr(a, 'id') and a.id == attribute_identifier)
                     or (hasattr(a, 'uuid') and a.uuid == attribute_identifier)
                     or (hasattr(a, 'value') and attribute_identifier == a.value
-                        or attribute_identifier in a.value.split('|'))):
+                        or (isinstance(a.value, str) and attribute_identifier in a.value.split('|')))):
                 a.add_tag(tag)
                 attributes.append(a)
 
