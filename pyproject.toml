@@ -19,18 +19,22 @@ classifiers=[
     'Intended Audience :: Telecommunications Industry',
     'Intended Audience :: Information Technology',
     'Programming Language :: Python :: 3.6',
-	'Programming Language :: Python :: 3.7',
-	'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
     'Topic :: Security',
     'Topic :: Internet'
 ]
 
-include = ["pymisp/data/*.json",
-		   "pymisp/data/misp-objects/schema_objects.json",
-		   "pymisp/data/misp-objects/schema_relationships.json",
-		   "pymisp/data/misp-objects/objects/*/definition.json",
-		   "pymisp/data/misp-objects/relationships/definition.json",
-		   "pymisp/tools/pdf_fonts/Noto_TTF/*"]
+include = [
+    "CHANGELOG.txt",
+    "README.md",
+    "pymisp/data/*.json",
+    "pymisp/data/misp-objects/schema_objects.json",
+    "pymisp/data/misp-objects/schema_relationships.json",
+    "pymisp/data/misp-objects/objects/*/definition.json",
+    "pymisp/data/misp-objects/relationships/definition.json",
+    "pymisp/tools/pdf_fonts/Noto_TTF/*"
+]
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/MISP/PyMISP/issues"
