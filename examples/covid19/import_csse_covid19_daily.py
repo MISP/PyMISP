@@ -64,7 +64,8 @@ for p in path.glob('**/*.csv'):
         with (Path('output') / f'{event.uuid}.json').open('w') as _w:
             json.dump(event.to_feed(), _w)
     else:
-        misp.add_event(event)
+        event = misp.add_event(event)
+        misp.publish(event)
 
 if make_feed:
     feed_meta_generator(Path('output'))
