@@ -185,6 +185,8 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
                 continue
             elif isinstance(val, list) and len(val) == 0:
                 continue
+            elif isinstance(val, str):
+                val = val.strip()
             if attribute == 'timestamp':
                 if not self.__force_timestamps and is_edited:
                     # In order to be accepted by MISP, the timestamp of an object
