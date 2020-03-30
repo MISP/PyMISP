@@ -2,6 +2,41 @@ Changelog
 =========
 
 
+v2.4.124 (2020-03-30)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add option to aggregare by country. [Raphaël Vinot]
+- [CSSE COVID] Publish the event immediately. [Raphaël Vinot]
+- Add changelog and readme in the package. [Raphaël Vinot]
+- Bump version in pyproject. [Raphaël Vinot]
+
+Fix
+~~~
+- Strip every string in AbstractMISP. [Raphaël Vinot]
+
+  fix #546
+- Incorrect expectation of attribute value to be a str - take 2.
+  [Raphaël Vinot]
+
+  Related #553
+- Incorrect expectation of attribute value to be a str. [Raphaël Vinot]
+
+  Fix #553
+
+Other
+~~~~~
+- Dos2unix examples/stats_report.py. [Sebastian Wagner]
+- Cytomic Orion API access. [Koen Van Impe]
+- Add organisations from CSV. [Koen Van Impe]
+- Minor updates to vmray_automation for travis. [Koen Van Impe]
+- VMRay Automation with ExpandedPyMISP. [Koen Van Impe]
+
+
 v2.4.123 (2020-03-10)
 ---------------------
 
@@ -12,6 +47,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
