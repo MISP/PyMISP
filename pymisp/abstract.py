@@ -46,7 +46,7 @@ class MISPFileCache(object):
     def _load_json(path: Path) -> Union[dict, None]:
         if not path.exists():
             return None
-        with path.open('r') as f:
+        with path.open('r', encoding='utf-8') as f:
             if HAS_RAPIDJSON:
                 data = load(f)
             else:
