@@ -81,7 +81,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
             report = requests.get(url, params=params)
         report_json = report.json()
         if report_json["response_code"] == 1:
-            return report
+            return report_json
         else:
             error_msg = "{}: {}".format(resource, report_json["verbose_msg"])
             raise InvalidMISPObject(error_msg)
