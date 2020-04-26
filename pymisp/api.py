@@ -239,6 +239,17 @@ class PyMISP:
         e.load(updated_event)
         return e
 
+    def extend_event(self, event: MISPEvent, event_id: int, pythonify: bool=False) -> Union[dict, MISPEvent]:
+        '''Extends an event on a MISP instance'''
+        eid = self.__get_uuid_or_id_from_abstract_misp(event_id)
+        r = self._prepare_request('POST', f'events/add/extends/{eid}', data=event)
+        updated_event = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
+            return updated_event
+        e = MISPEvent()
+        e.load(updated_event)
+        return e
+
     def delete_event(self, event: Union[MISPEvent, int, str, UUID]) -> dict:
         '''Delete an event from a MISP instance'''
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
