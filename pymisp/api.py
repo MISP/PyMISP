@@ -200,11 +200,18 @@ class PyMISP:
             to_return.append(e)
         return to_return
 
-    def get_event(self, event: Union[MISPEvent, int, str, UUID], deleted: Union[bool, int, list]=False, pythonify: bool=False) -> Union[dict, MISPEvent]:
+    def get_event(self, event: Union[MISPEvent, int, str, UUID],
+                  deleted: Union[bool, int, list]=False,
+                  extended: Union[bool, int]=False,
+                  pythonify: bool=False) -> Union[dict, MISPEvent]:
         '''Get an event from a MISP instance'''
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
+        data = {}
         if deleted:
-            data = {'deleted': deleted}
+            data['deleted'] = deleted
+        if extended:
+            data['extended'] = deleted
+        if data:
             r = self._prepare_request('POST', f'events/view/{event_id}', data=data)
         else:
             r = self._prepare_request('GET', f'events/view/{event_id}')
