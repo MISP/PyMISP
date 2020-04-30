@@ -2,11 +2,44 @@ Changelog
 =========
 
 
+v2.4.125 (2020-04-30)
+---------------------
+
+New
+~~~
+- Extended option on get event. [Raphaël Vinot]
+
+  Related to #567
+
+Changes
+~~~~~~~
+- Bump objects, deps. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Remove old suricata script, keep reference to old code. [Raphaël
+  Vinot]
+
+Fix
+~~~
+- Enable autoalert on admin user. [Raphaël Vinot]
+- [abstract] Forces file to be read with utf8 encoding. [mokaddem]
+- Properly handle timezone in tests. [Raphaël Vinot]
+
+Other
+~~~~~
+- Update up.py. [Raphaël Vinot]
+
+  Fix #563
+- Fixed __query_virustotal return type. [DocArmoryTech]
+
+  __query_virustotal returned a Response object and not the json expected; modified so that report_json is returned instead of report.
+
+
 v2.4.124 (2020-03-30)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
