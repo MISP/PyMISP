@@ -13,6 +13,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump version in pyproject. [Raphaël Vinot]
+- Bump CHANGELOG. [Raphaël Vinot]
 - Bump objects, deps. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
 - Remove old suricata script, keep reference to old code. [Raphaël
