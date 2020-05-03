@@ -200,20 +200,21 @@ class PyMISP:
             to_return.append(e)
         return to_return
 
-    def get_event(self, event: Union[MISPEvent, int, str, UUID], deleted: Union[bool, int, list]=False, extended: bool = False, pythonify: bool=False) -> Union[dict, MISPEvent]:
+    def get_event(self, event: Union[MISPEvent, int, str, UUID],
+                  deleted: Union[bool, int, list]=False,
+                  extended: Union[bool, int]=False,
+                  pythonify: bool=False) -> Union[dict, MISPEvent]:
         '''Get an event from a MISP instance'''
         event_id = self.__get_uuid_or_id_from_abstract_misp(event)
+        data = {}
         if deleted:
-            data = {'deleted': deleted}
-            if extended:
-                r = self._prepare_request('POST', f'events/view/{event_id}/extended:{event_id}', data=data)
-            else:
-                r = self._prepare_request('POST', f'events/view/{event_id}', data=data)
+            data['deleted'] = deleted
+        if extended:
+            data['extended'] = deleted
+        if data:
+            r = self._prepare_request('POST', f'events/view/{event_id}', data=data)
         else:
-            if extended:
-                r = self._prepare_request('GET', f'events/view/{event_id}/extended:{event_id}')
-            else:
-                r = self._prepare_request('GET', f'events/view/{event_id}')
+            r = self._prepare_request('GET', f'events/view/{event_id}')
         event_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in event_r:
             return event_r
@@ -238,17 +239,6 @@ class PyMISP:
         else:
             eid = self.__get_uuid_or_id_from_abstract_misp(event_id)
         r = self._prepare_request('POST', f'events/{eid}', data=event)
-        updated_event = self._check_json_response(r)
-        if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
-            return updated_event
-        e = MISPEvent()
-        e.load(updated_event)
-        return e
-
-    def extend_event(self, event: MISPEvent, event_id: int, pythonify: bool=False) -> Union[dict, MISPEvent]:
-        '''Extends an event on a MISP instance'''
-        eid = self.__get_uuid_or_id_from_abstract_misp(event_id)
-        r = self._prepare_request('POST', f'events/add/extends/{eid}', data=event)
         updated_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
             return updated_event

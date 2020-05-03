@@ -1640,7 +1640,7 @@ class MISPCommunity(AbstractMISP):
         super().from_dict(**kwargs)
 
     def __repr__(self):
-        return '<{self.__class__.__name__}(name={self.name}, uuid={self.uuid})'.format(self=self)
+        return f'<{self.__class__.__name__}(name={self.name}, uuid={self.uuid})'
 
 
 class MISPUserSetting(AbstractMISP):
@@ -1651,4 +1651,4 @@ class MISPUserSetting(AbstractMISP):
         super().from_dict(**kwargs)
 
     def __repr__(self):
-        return '<{self.__class__.__name__}(name={self.setting}'.format(self=self)
+        return f'<{self.__class__.__name__}(name={self.setting}'

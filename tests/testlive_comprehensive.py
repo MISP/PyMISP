@@ -2016,6 +2016,11 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(isinstance(user_settings, list))
 
             # Test if publish_alert_filter works
+            # # Enable autoalert on admin
+            self.admin_misp_connector._current_user.autoalert = True
+            self.admin_misp_connector._current_user.termsaccepted = True
+            self.user_misp_connector.update_user(self.admin_misp_connector._current_user)
+
             first = self.admin_misp_connector.add_event(first, pythonify=True)
             second = self.admin_misp_connector.add_event(second, pythonify=True)
             r = self.user_misp_connector.change_user_password('Password1234')
