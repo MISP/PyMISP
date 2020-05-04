@@ -824,11 +824,10 @@ class TestComprehensive(unittest.TestCase):
         second.add_attribute('ip-src', '9.9.9.9')
         try:
             first = self.user_misp_connector.add_event(first)
-            extended_event = self.user_misp_connector.extend_event(event=second, event_id=first.id, pythonify=True)
-            self.assertTrue(isinstance(extended_event, MISPEvent), extended_event)
-            extended_event = self.user_misp_connector.get_event(event=first.id, extended=True, pythonify=True)
-            self.assertTrue(isinstance(extended_event, MISPEvent), extended_event)
-            self.assertEqual(extended_event.extensionEvents[second.id]['info'], second.info)
+            second = self.user_misp_connector.add_event(second)
+            first_extended = self.user_misp_connector.update_event({'extends_uuid': second.uuid}, event_id=first, pythonify=True)
+            self.assertTrue(isinstance(first_extended, MISPEvent), first_extended)
+            self.assertEqual(first_extended.extends_uuid, second.uuid)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
