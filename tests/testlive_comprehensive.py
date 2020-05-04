@@ -829,7 +829,6 @@ class TestComprehensive(unittest.TestCase):
             extended_event = self.user_misp_connector.get_event(event=first.id, extended=True, pythonify=True)
             self.assertTrue(isinstance(extended_event, MISPEvent), extended_event)
             self.assertEqual(extended_event.extensionEvents[second.id]['info'], second.info)
-            self.assertEqual(extended_event.extensionEvents[second.id]['info'], second.info)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
