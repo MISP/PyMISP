@@ -812,6 +812,27 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
+    def test_extend_event(self):
+        first = self.create_simple_event()
+        first.info = 'parent event'
+        first.add_tag('tlp:amber___test')
+        first.set_date('2018-09-01')
+        second = self.create_simple_event()
+        second.info = 'event extension'
+        second.add_tag('tlp:amber___test')
+        second.set_date('2018-09-01')
+        second.add_attribute('ip-src', '9.9.9.9')
+        try:
+            first = self.user_misp_connector.add_event(first)
+            second = self.user_misp_connector.add_event(second)
+            first_extended = self.user_misp_connector.update_event({'extends_uuid': second.uuid}, event_id=first, pythonify=True)
+            self.assertTrue(isinstance(first_extended, MISPEvent), first_extended)
+            self.assertEqual(first_extended.extends_uuid, second.uuid)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+            self.admin_misp_connector.delete_event(second)
+
     def test_edit_attribute(self):
         first = self.create_simple_event()
         try:

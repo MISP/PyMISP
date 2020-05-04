@@ -210,7 +210,7 @@ class PyMISP:
         if deleted:
             data['deleted'] = deleted
         if extended:
-            data['extended'] = deleted
+            data['extended'] = extended
         if data:
             r = self._prepare_request('POST', f'events/view/{event_id}', data=data)
         else:
