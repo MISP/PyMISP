@@ -26,7 +26,7 @@ logger = logging.getLogger('pymisp')
 
 
 try:
-    from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
+    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
     from pymisp.exceptions import MISPServerError
 except ImportError:
@@ -57,7 +57,8 @@ class TestComprehensive(unittest.TestCase):
     def setUpClass(cls):
         cls.maxDiff = None
         # Connect as admin
-        cls.admin_misp_connector = ExpandedPyMISP(url, key, verifycert, debug=False)
+        cls.admin_misp_connector = PyMISP(url, key, verifycert, debug=False)
+        cls.admin_misp_connector.set_server_setting('Security.allow_self_registration', True, force=True)
         if not fast_mode:
             r = cls.admin_misp_connector.update_misp()
             print(r)
@@ -76,7 +77,7 @@ class TestComprehensive(unittest.TestCase):
         user.email = 'testusr@user.local'
         user.org_id = cls.test_org.id
         cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
+        cls.user_misp_connector = PyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
         cls.user_misp_connector.toggle_global_pythonify()
         # Creates a publisher
         user = MISPUser()
@@ -84,14 +85,14 @@ class TestComprehensive(unittest.TestCase):
         user.org_id = cls.test_org.id
         user.role_id = 4
         cls.test_pub = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey, verifycert)
+        cls.pub_misp_connector = PyMISP(url, cls.test_pub.authkey, verifycert)
         # Creates a user that can accept a delegation request
         user = MISPUser()
         user.email = 'testusr@delegate.recipient.local'
         user.org_id = cls.test_org_delegate.id
         user.role_id = 2
         cls.test_usr_delegate = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.delegate_user_misp_connector = ExpandedPyMISP(url, cls.test_usr_delegate.authkey, verifycert, debug=False)
+        cls.delegate_user_misp_connector = PyMISP(url, cls.test_usr_delegate.authkey, verifycert, debug=False)
         cls.delegate_user_misp_connector.toggle_global_pythonify()
         if not fast_mode:
             # Update all json stuff
@@ -1907,7 +1908,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             test_roles_user = self.admin_misp_connector.add_user(user, pythonify=True)
             test_tag = self.admin_misp_connector.add_tag(tag, pythonify=True)
-            test_roles_user_connector = ExpandedPyMISP(url, test_roles_user.authkey, verifycert, debug=False)
+            test_roles_user_connector = PyMISP(url, test_roles_user.authkey, verifycert, debug=False)
             test_roles_user_connector.toggle_global_pythonify()
             # ===== Read Only
             self.admin_misp_connector.update_user({'role_id': 6}, test_roles_user)
@@ -2149,6 +2150,36 @@ class TestComprehensive(unittest.TestCase):
 
         finally:
             self.admin_misp_connector.delete_event(first)
+
+    def test_registrations(self):
+        r = register_user(url, 'self_register@user.local', organisation=self.test_org,
+                          org_name=self.test_org.name, verify=verifycert)
+        self.assertTrue(r['saved'])
+
+        r = register_user(url, 'discard@tesst.de', verify=verifycert)
+        self.assertTrue(r['saved'])
+
+        registrations = self.admin_misp_connector.user_registrations(pythonify=True)
+        self.assertTrue(len(registrations), 2)
+        self.assertEqual(registrations[0].data['email'], 'self_register@user.local')
+        self.assertEqual(registrations[0].data['org_name'], 'Test Org')
+        self.assertEqual(registrations[1].data['email'], 'discard@tesst.de')
+
+        m = self.admin_misp_connector.accept_user_registration(registrations[0], unsafe_fallback=True)
+        self.assertTrue(m['saved'])
+
+        # delete new user
+        for user in self.admin_misp_connector.users(pythonify=True):
+            if user.email == registrations[0].data['email']:
+                self.admin_misp_connector.delete_user(user)
+                break
+
+        # Expected: accept registration fails because the orgname is missing
+        m = self.admin_misp_connector.accept_user_registration(registrations[1], unsafe_fallback=True)
+        self.assertEqual(m['errors'][1]['message'], 'No organisation selected. Supply an Organisation ID')
+
+        m = self.admin_misp_connector.discard_user_registration(registrations[1].id)
+        self.assertEqual(m['name'], '1 registration(s) discarded.')
 
 
 if __name__ == '__main__':
