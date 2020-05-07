@@ -66,7 +66,6 @@ def register_user(misp_url: str, email: str,
     data = copy.deepcopy(locals())
     if organisation:
         data['org_uuid'] = get_uuid_or_id_from_abstract_misp(data.pop('organisation'))
-    print(data)
 
     url = urljoin(data.pop('misp_url'), '/users/register')
     user_agent = f'PyMISP {__version__} - no login -  Python {".".join(str(x) for x in sys.version_info[:2])}'
