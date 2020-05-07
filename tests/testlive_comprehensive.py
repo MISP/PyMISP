@@ -293,6 +293,24 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
+    def test_search_objects(self):
+        '''Search for objects'''
+        try:
+            first = self.create_simple_event()
+            obj = MISPObject('file')
+            obj.add_attribute('filename', 'foo')
+            first.add_object(obj)
+            first = self.user_misp_connector.add_event(first)
+            logger = logging.getLogger('pymisp')
+            logger.setLevel(logging.DEBUG)
+            objects = self.user_misp_connector.search(controller='objects',
+                                                      object_name='file', pythonify=True)
+            self.assertEqual(len(objects), 1)
+            self.assertEqual(objects[0].attributes[0].value, 'foo')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+
     def test_search_type_attribute(self):
         '''Search multiple attributes, search attributes with specific types'''
         try:

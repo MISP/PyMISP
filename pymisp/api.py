@@ -1494,6 +1494,7 @@ class PyMISP:
                include_sightings: Optional[bool]=None, includeSightings: Optional[bool]=None,
                include_correlations: Optional[bool]=None, includeCorrelations: Optional[bool]=None,
                include_decay_score: Optional[bool] = None, includeDecayScore: Optional[bool] = None,
+               object_name: Optional[str]=None,
                pythonify: Optional[bool]=False,
                **kwargs) -> Union[Dict, str, List[Union[MISPEvent, MISPAttribute, MISPObject]]]:
         '''Search in the MISP instance
@@ -1531,6 +1532,7 @@ class PyMISP:
         :param include_sightings: [JSON Only - Attribute] Include the sightings of the matching attributes.
         :param include_decay_score: Include the decay score at attribute level.
         :param include_correlations: [JSON Only - attribute] Include the correlations of the matching attributes.
+        :param object_name: [objects controller only] Search for objects with that name
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
@@ -1547,8 +1549,8 @@ class PyMISP:
 
         return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings']
 
-        if controller not in ['events', 'attributes', 'objects', 'sightings']:
-            raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects', 'sightings'])))
+        if controller not in ['events', 'attributes', 'objects']:
+            raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
 
         # Deprecated stuff / synonyms
         if quickFilter is not None:
@@ -1626,6 +1628,7 @@ class PyMISP:
         query['includeSightings'] = self._make_misp_bool(include_sightings)
         query['includeDecayScore'] = self._make_misp_bool(include_decay_score)
         query['includeCorrelations'] = self._make_misp_bool(include_correlations)
+        query['object_name'] = object_name
         url = urljoin(self.root_url, f'{controller}/restSearch')
         response = self._prepare_request('POST', url, data=query)
 
