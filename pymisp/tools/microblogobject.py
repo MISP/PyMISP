@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp.tools.abstractgenerator import AbstractMISPObjectGenerator
+from .abstractgenerator import AbstractMISPObjectGenerator
+import logging
 
+logger = logging.getLogger('pymisp')
 
 class MicroblogObject(AbstractMISPObjectGenerator):
 
