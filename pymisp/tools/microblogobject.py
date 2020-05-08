@@ -28,7 +28,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
 
         # Original URL location of the microblog post (potentially malicious.
         if self._parameters.get('url'):
-            if type(self._parameters.get('url')) is list:
+            if isinstance(self._parameters.get('url'), list):
                 for i in self._parameters.get('url'):
                     self.add_attribute('url', value=i)
             else:
@@ -36,7 +36,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
 
         # Archive of the original document (Internet Archive, Archive.is, etc).
         if self._parameters.get('archive'):
-            if type(self._parameters.get('archive')) == list:
+            if isinstance(self._parameters.get('archive'), list):
                 for i in self._parameters.get('archive'):
                     self.add_attribute('archive', value=i)
             else:
@@ -71,7 +71,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         type_allowed_values = ["Twitter", "Facebook", "LinkedIn", "Reddit", "Google+",
                                "Instagram", "Forum", "Other"]
         if self._parameters.get('type'):
-            if type(self._parameters.get('type')) == list:
+            if isinstance(self._parameters.get('type'), list):
                 for i in self._parameters.get('type'):
                     if i in type_allowed_values:
                         self.add_attribute('type', value=i)
@@ -82,7 +82,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         # State of the microblog post.
         type_allowed_values = ["Informative", "Malicious", "Misinformation", "Disinformation", "Unknown"]
         if self._parameters.get('state'):
-            if type(self._parameters.get('state')) == list:
+            if isinstance(self._parameters.get('state'), list):
                 for i in self._parameters.get('state'):
                     if i in type_allowed_values:
                         self.add_attribute('state', value=i)
@@ -97,7 +97,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         # == the username account verified by the operator of the microblog platform.
         type_allowed_values = ["Verified", "Unverified", "Unknown"]
         if self._parameters.get('verified-username'):
-            if type(self._parameters.get('verified-username')) == list:
+            if isinstance(self._parameters.get('verified-username'), list):
                 for i in self._parameters.get('verified-username'):
                     if i in type_allowed_values:
                         self.add_attribute('verified-username', value=i)
@@ -107,7 +107,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
 
         # embedded-link.
         if self._parameters.get('embedded-link'):
-            if type(self._parameters.get('embedded-link')) == list:
+            if isinstance(self._parameters.get('embedded-link'), list):
                 for i in self._parameters.get('embedded-link'):
                     self.add_attribute('embedded-link', value=i)
             else:
@@ -115,7 +115,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
 
         # embedded-safe-link
         if self._parameters.get('embedded-safe-link'):
-            if type(self._parameters.get('embedded-safe-link')) == list:
+            if isinstance(self._parameters.get('embedded-safe-link'), list):
                 for i in self._parameters.get('embedded-safe-link'):
                     self.add_attribute('embedded-safe-link', value=i)
             else:
@@ -123,7 +123,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
 
         # Hashtag into the microblog post.
         if self._parameters.get('hashtag'):
-            if type(self._parameters.get('hashtag')) == list:
+            if isinstance(self._parameters.get('hashtag'), list):
                 for i in self._parameters.get('hashtag'):
                     self.add_attribute('hashtag', value=i)
             else:
@@ -131,7 +131,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
 
         # username quoted
         if self._parameters.get('username-quoted'):
-            if type(self._parameters.get('username-quoted')) == list:
+            if isinstance(self._parameters.get('username-quoted'), list):
                 for i in self._parameters.get('username-quoted'):
                     self.add_attribute('username-quoted', value=i)
             else:
