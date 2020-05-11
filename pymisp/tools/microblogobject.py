@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger('pymisp')
 
+
 class MicroblogObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parameters: dict, strict: bool = True, standalone: bool = True, **kwargs):
