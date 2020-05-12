@@ -34,7 +34,7 @@ class CSVLoader():
                     self.fieldnames = fieldnames
 
             if not self.fieldnames:
-                raise Exception(f'No fieldnames, impossible to create objects.')
+                raise Exception('No fieldnames, impossible to create objects.')
             else:
                 # Check if the CSV file has a header, and if it matches with the object template
                 tmp_object = MISPObject(self.template_name)

@@ -28,7 +28,7 @@ class SSHAuthorizedKeysObject(AbstractMISPObjectGenerator):
         self.generate_attributes()
 
     def generate_attributes(self):
-        for l in self.__pseudofile:
-            if l.startswith('ssh') or l.startswith('ecdsa'):
-                key = l.split(' ')[1]
+        for line in self.__pseudofile:
+            if line.startswith('ssh') or line.startswith('ecdsa'):
+                key = line.split(' ')[1]
                 self.add_attribute('key', key)
