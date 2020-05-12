@@ -966,6 +966,8 @@ class PyMISP:
             f = MISPFeed()
             f.id = feed_id
             f.enabled = True
+        else:
+            f = feed
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def disable_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPFeed]:
@@ -975,6 +977,8 @@ class PyMISP:
             f = MISPFeed()
             f.id = feed_id
             f.enabled = False
+        else:
+            f = feed
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def enable_feed_cache(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPFeed]:
@@ -984,6 +988,8 @@ class PyMISP:
             f = MISPFeed()
             f.id = feed_id
             f.caching_enabled = True
+        else:
+            f = feed
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def disable_feed_cache(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPFeed]:
@@ -993,6 +999,8 @@ class PyMISP:
             f = MISPFeed()
             f.id = feed_id
             f.caching_enabled = False
+        else:
+            f = feed
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def update_feed(self, feed: MISPFeed, feed_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPFeed]:
@@ -1046,6 +1054,11 @@ class PyMISP:
     def compare_feeds(self) -> Dict:
         """Generate the comparison matrix for all the MISP feeds"""
         response = self._prepare_request('GET', 'feeds/compareFeeds')
+        return self._check_json_response(response)
+
+    def load_default_feeds(self) -> Dict:
+        """Load all the default feeds."""
+        response = self._prepare_request('POST', 'feeds/loadDefaultFeeds')
         return self._check_json_response(response)
 
     # ## END Feed ###

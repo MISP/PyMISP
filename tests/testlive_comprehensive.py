@@ -101,6 +101,7 @@ class TestComprehensive(unittest.TestCase):
             cls.admin_misp_connector.update_noticelists()
             cls.admin_misp_connector.update_warninglists()
             cls.admin_misp_connector.update_taxonomies()
+            cls.admin_misp_connector.load_default_feeds()
 
     @classmethod
     def tearDownClass(cls):
@@ -1880,6 +1881,20 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(feed.enabled)
         feed = self.admin_misp_connector.disable_feed_cache(botvrij.id, pythonify=True)
         self.assertFalse(feed.enabled)
+        # Test enable csv feed - https://github.com/MISP/PyMISP/issues/574
+        feeds = self.admin_misp_connector.feeds(pythonify=True)
+        for feed in feeds:
+            if feed.name == 'blockrules of rules.emergingthreats.net':
+                e_thread_csv_feed = feed
+                break
+        updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed, pythonify=True)
+        self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
+        updated_feed = self.admin_misp_connector.disable_feed(e_thread_csv_feed, pythonify=True)
+        self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
+        # Fails, partial update of the feed deletes the settigns
+        # https://github.com/MISP/MISP/issues/5896
+        # updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed.id, pythonify=True)
+        # self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
 
     def test_servers(self):
         # add
