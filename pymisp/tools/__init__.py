@@ -21,6 +21,9 @@ try:
 except ImportError:
     # Requires faup, which is a bit difficult to install
     pass
+except OSError:
+    # faup requires liblua-5.3
+    pass
 
 try:
     from .peobject import PEObject, PESectionObject  # noqa
