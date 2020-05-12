@@ -679,6 +679,14 @@ python-versions = "*"
 version = "0.4"
 
 [[package]]
+category = "main"
+description = "Python bindings for the faup library"
+name = "pyfaup"
+optional = true
+python-versions = "*"
+version = "1.2"
+
+[[package]]
 category = "dev"
 description = "passive checker of Python programs"
 name = "pyflakes"
@@ -1108,10 +1116,11 @@ docs = ["sphinx-autodoc-typehints", "recommonmark"]
 fileobjects = ["python-magic", "pydeep", "lief"]
 openioc = ["beautifulsoup4"]
 pdfexport = ["reportlab"]
+url = ["pyfaup"]
 virustotal = ["validators"]
 
 [metadata]
-content-hash = "603a5c7a0c7a08f327cdb84a058c06b1e92abf768178a8a8f31ea4f227df707b"
+content-hash = "a2bf3a2d2162cc76563904258ac8b667801f14c3f3ff9df310b4d5c23d4e13d9"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -1436,6 +1445,10 @@ pycodestyle = [
 ]
 pydeep = [
     {file = "pydeep-0.4.tar.gz", hash = "sha256:22866eb422d1d5907f8076ee792da65caecb172425d27576274e2a8eacf6afc1"},
+]
+pyfaup = [
+    {file = "pyfaup-1.2-py2.py3-none-any.whl", hash = "sha256:75f96f7da86ffb5402d3fcc2dbf98a511e792cf9100c159e34cdba8996ddc7f9"},
+    {file = "pyfaup-1.2.tar.gz", hash = "sha256:5648bc3ebd80239aec927aedfc218c3a6ff36de636cc53822bfeb70b0869b1e7"},
 ]
 pyflakes = [
     {file = "pyflakes-2.2.0-py2.py3-none-any.whl", hash = "sha256:0d94e0e05a19e57a99444b6ddcf9a6eb2e5c68d3ca1e98e90707af8152c90a92"},
