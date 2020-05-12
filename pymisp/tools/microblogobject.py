@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# NOTE: Reference on how this module is used: https://vvx7.io/posts/2020/05/misp-slack-bot/
+
 from .abstractgenerator import AbstractMISPObjectGenerator
 import logging
 
