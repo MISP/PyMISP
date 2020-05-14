@@ -82,7 +82,7 @@ class PyMISP:
 
     :param url: URL of the MISP instance you want to connect to
     :param key: API key of the user you want to use
-    :param ssl: can be True or False (to check ot not the validity of the certificate. Or a CA_BUNDLE in case of self signed certificate (the concatenation of all the *.crt of the chain)
+    :param ssl: can be True or False (to check or to not check the validity of the certificate. Or a CA_BUNDLE in case of self signed or other certificate (the concatenation of all the *.crt of the chain)
     :param debug: Write all the debug information to stderr
     :param proxies: Proxy dict as describes here: http://docs.python-requests.org/en/master/user/advanced/#proxies
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#client-side-certificates
