@@ -21,7 +21,7 @@ except ImportError:
 
 import logging
 from enum import Enum
-from typing import Union, Optional, Any, Dict, Iterable, List, Set
+from typing import Union, Optional, Any, Dict, List, Set, Mapping
 
 from .exceptions import PyMISPInvalidFormat, PyMISPError
 
@@ -252,7 +252,15 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         delattr(self, key)
 
     def __iter__(self):
-        return iter({k: v for k, v in self.__dict__.items() if not (k[0] == '_' or k in self.__not_jsonable)})
+        '''When we call **self, skip keys:
+            * starting with _
+            * in __not_jsonable
+            * timestamp if the object is edited *unless* it is forced
+        '''
+        return iter({k: v for k, v in self.__dict__.items()
+                     if not (k[0] == '_'
+                             or k in self.__not_jsonable
+                             or (not self.__force_timestamps and (k == 'timestamp' and self.__edited)))})
 
     def __len__(self) -> int:
         return len([k for k in self.__dict__.keys() if not (k[0] == '_' or k in self.__not_jsonable)])
@@ -295,7 +303,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             return int(d)
         return int(d.timestamp())
 
-    def _add_tag(self, tag=None, **kwargs):
+    def _add_tag(self, tag: Optional[Union[str, 'MISPTag', Mapping]]=None, **kwargs):
         """Add a tag to the attribute (by name or a MISPTag object)"""
         if isinstance(tag, str):
             misp_tag = MISPTag()
@@ -310,12 +318,12 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             misp_tag.from_dict(**kwargs)
         else:
             raise PyMISPInvalidFormat(f"The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {tag}")
-        if misp_tag not in self.tags:
+        if misp_tag not in self.tags:  # type: ignore
             self.Tag.append(misp_tag)
             self.edited = True
         return misp_tag
 
-    def _set_tags(self, tags: Iterable['MISPTag']):
+    def _set_tags(self, tags: List['MISPTag']):
         """Set a list of prepared MISPTag."""
         if all(isinstance(x, MISPTag) for x in tags):
             self.Tag = tags
@@ -356,6 +364,11 @@ class MISPTag(AbstractMISP):
         if hasattr(self, 'exportable') and not self.exportable:
             return {}
         return super()._to_feed()
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'name'):
+            return '<{self.__class__.__name__}(name={self.name})>'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)>'.format(self=self)
 
 
 if HAS_RAPIDJSON:
