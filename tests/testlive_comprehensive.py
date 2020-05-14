@@ -2263,6 +2263,55 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_tag(tag)
 
+    def test_search_workflow_ts(self):
+        first = self.create_simple_event()
+        first.add_attribute('domain', 'google.com')
+        tag = MISPTag()
+        tag.name = 'my_tag'
+        try:
+            # Note: attribute 0 doesn't matter
+            # Attribute 1 = google.com, no tag
+            # Init tag and event
+            tag = self.admin_misp_connector.add_tag(tag, pythonify=True)
+            self.assertEqual(tag.name, 'my_tag')
+            first = self.user_misp_connector.add_event(first, pythonify=True)
+            time.sleep(10)
+            # Add tag to attribute 1, add attribute 2, update
+            first.attributes[1].add_tag(tag)
+            first.add_attribute('domain', 'google.fr')
+            # Attribute 1 = google.com, tag
+            # Attribute 2 = google.fr, no tag
+            first = self.user_misp_connector.update_event(first, pythonify=True)
+            self.assertEqual(first.attributes[1].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[2].tags, [])
+            updated_attrs = self.user_misp_connector.search(controller='attributes', eventid=first.id, timestamp=first.timestamp.timestamp(), pythonify=True)
+            # Get two attributes, 0 (google.com) has a tag, 1 (google.fr) doesn't
+            self.assertEqual(len(updated_attrs), 2)
+            self.assertEqual(updated_attrs[0].tags[0].name, 'my_tag')
+            self.assertEqual(updated_attrs[1].value, 'google.fr')
+            self.assertEqual(updated_attrs[1].tags, [])
+            # Get the metadata only of the event
+            first_meta_only = self.user_misp_connector.search(eventid=first.id, metadata=True, pythonify=True)
+
+            # Add tag to attribute 1 (google.fr)
+            attr_to_update = updated_attrs[1]
+            attr_to_update.add_tag(tag)
+            # attr_to_update.pop('timestamp')
+            # Add new attribute to event with metadata only
+            first_meta_only[0].add_attribute('domain', 'google.lu')
+            # Add tag to new attribute
+            first_meta_only[0].attributes[0].add_tag('my_tag')
+            # Re-add attribute 1 (google.fr), newly tagged
+            first_meta_only[0].add_attribute(**attr_to_update)
+            # When we push, all the attributes should be tagged
+            first = self.user_misp_connector.update_event(first_meta_only[0], pythonify=True)
+            self.assertEqual(first.attributes[1].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[2].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[3].tags[0].name, 'my_tag')
+        finally:
+            self.admin_misp_connector.delete_event(first)
+            self.admin_misp_connector.delete_tag(tag)
+
 
 if __name__ == '__main__':
     unittest.main()
