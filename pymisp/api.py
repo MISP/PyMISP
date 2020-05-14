@@ -2215,15 +2215,15 @@ class PyMISP:
 
     def build_complex_query(self, or_parameters: Optional[List[SearchType]]=None,
                             and_parameters: Optional[List[SearchType]]=None,
-                            not_parameters: Optional[List[SearchType]]=None) -> Dict:
+                            not_parameters: Optional[List[SearchType]]=None) -> Dict[str, List[SearchType]]:
         '''Build a complex search query. MISP expects a dictionary with AND, OR and NOT keys.'''
         to_return = {}
         if and_parameters:
-            to_return['AND'] = and_parameters
+            to_return['AND'] = [p for p in and_parameters if p]
         if not_parameters:
-            to_return['NOT'] = not_parameters
+            to_return['NOT'] = [p for p in not_parameters if p]
         if or_parameters:
-            to_return['OR'] = or_parameters
+            to_return['OR'] = [p for p in or_parameters if p]
         return to_return
 
     # ## END Global helpers ###
