@@ -1891,10 +1891,10 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
         updated_feed = self.admin_misp_connector.disable_feed(e_thread_csv_feed, pythonify=True)
         self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
-        # Fails, partial update of the feed deletes the settigns
-        # https://github.com/MISP/MISP/issues/5896
-        # updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed.id, pythonify=True)
-        # self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
+
+        # Test partial update
+        updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed.id, pythonify=True)
+        self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
 
     def test_servers(self):
         # add
