@@ -1315,14 +1315,12 @@ class MISPEvent(AbstractMISP):
 
     def delete_attribute(self, attribute_id: str):
         """Delete an attribute, you can search by ID or UUID"""
-        found = False
         for a in self.attributes:
             if ((hasattr(a, 'id') and a.id == attribute_id)
                     or (hasattr(a, 'uuid') and a.uuid == attribute_id)):
                 a.delete()
-                found = True
                 break
-        if not found:
+        else:
             raise PyMISPError('No attribute with UUID/ID {} found.'.format(attribute_id))
 
     def add_attribute(self, type: str, value: Union[str, int, float], **kwargs) -> Union[MISPAttribute, List[MISPAttribute]]:
