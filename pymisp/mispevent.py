@@ -1505,7 +1505,8 @@ class MISPFeed(AbstractMISP):
         if 'Feed' in kwargs:
             kwargs = kwargs['Feed']
         super().from_dict(**kwargs)
-        self.settings = json.loads(self.settings)
+        if hasattr(self, 'settings'):
+            self.settings = json.loads(self.settings)
 
 
 class MISPWarninglist(AbstractMISP):
