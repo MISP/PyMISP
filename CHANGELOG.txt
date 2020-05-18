@@ -2,6 +2,62 @@ Changelog
 =========
 
 
+v2.4.126 (2020-05-18)
+---------------------
+
+New
+~~~
+- Test search with timestamp. [Raphaël Vinot]
+- Add testcase for updating partial event. [Raphaël Vinot]
+- Add pyfaup as optional dependency. [Raphaël Vinot]
+- [dev] add microblog object tool. [VVX7]
+- Very simple test case for rest search on objects. [Raphaël Vinot]
+- Self registration, object level search (initial) [Raphaël Vinot]
+- [dev] add flag to get extended misp event. [VVX7]
+- [dev] add flag to get extended misp event. [VVX7]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-object. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Add test for feed partial update. [Raphaël Vinot]
+- Strip empty parameters in build_complex_query. [Raphaël Vinot]
+
+  Fix #577
+- Simplify delete_attribute. [Raphaël Vinot]
+- Bump travis install. [Raphaël Vinot]
+- Add comment in microblog object. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- [dev] clean up how keys are accessed in self._parameters. [VVX7]
+- [dev] use isinstance() type check. [VVX7]
+- [dev] fix abstract generator import. add logger. [VVX7]
+- [dev] change type() == list. [VVX7]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- [dev] remove duplicate line. [VVX7]
+- [dev] add extend_event() test. chg typo in get_event() [VVX7]
+- Re-Bump CHANGELOG. [Raphaël Vinot]
+
+Fix
+~~~
+- Settings is not required in MISPFeed. [Raphaël Vinot]
+- Properly skip timestamp in __iter__ when needed. [Raphaël Vinot]
+- Catch exception when liblua-5.3 is not present. [Raphaël Vinot]
+- Make flake8 happy. [Raphaël Vinot]
+- Properly load feeds, fix undefined variable. [Raphaël Vinot]
+- Make flake8 happy. [Raphaël Vinot]
+- Remove extra print. [Raphaël Vinot]
+- Typo, add test for extended event. [Raphaël Vinot]
+
+Other
+~~~~~
+- Update docstring in api.py. [Bernhard E. Reiter]
+
+  * remove typo in ssl parameter docstring.
+   * Add hint that other certs (which are not in the default CAs, but also are not self signed in a strict sense) can also use the CA_BUNDLE function of the ssl parameter.
+
+
 v2.4.125 (2020-04-30)
 ---------------------
 
