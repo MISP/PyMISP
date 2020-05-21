@@ -105,7 +105,7 @@ class PyMISP:
         self.cert: Optional[Tuple[str, tuple]] = cert
         self.auth: Optional[AuthBase] = auth
         self.tool: str = tool
-        self.timeout: Optional[float, Tuple[float, float]] = timeout
+        self.timeout: Optional[float, Tuple[float, float], None] = timeout
 
         self.global_pythonify = False
 
