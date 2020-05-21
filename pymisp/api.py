@@ -88,10 +88,11 @@ class PyMISP:
     :param cert: Client certificate, as described there: http://docs.python-requests.org/en/master/user/advanced/#client-side-certificates
     :param auth: The auth parameter is passed directly to requests, as described here: http://docs.python-requests.org/en/master/user/authentication/
     :param tool: The software using PyMISP (string), used to set a unique user-agent
+    :param timeout: Timeout as described here: https://requests.readthedocs.io/en/master/user/advanced/#timeouts
     """
 
     def __init__(self, url: str, key: str, ssl: bool=True, debug: bool=False, proxies: Mapping={},
-                 cert: Tuple[str, tuple]=None, auth: AuthBase=None, tool: str=''):
+                 cert: Tuple[str, tuple]=None, auth: AuthBase=None, tool: str='', timeout: Union[float, tuple]=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -104,6 +105,7 @@ class PyMISP:
         self.cert: Optional[Tuple[str, tuple]] = cert
         self.auth: Optional[AuthBase] = auth
         self.tool: str = tool
+        self.timeout: float = timeout
 
         self.global_pythonify = False
 
@@ -2353,7 +2355,7 @@ class PyMISP:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(prepped.headers)
             settings = s.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None, verify=self.ssl, cert=self.cert)
-            return s.send(prepped, **settings)
+            return s.send(prepped, timeout=self.timeout, **settings)
 
     def _csv_to_dict(self, csv_content: str) -> List[dict]:
         '''Makes a list of dict out of a csv file (requires headers)'''
