@@ -92,7 +92,7 @@ class PyMISP:
     """
 
     def __init__(self, url: str, key: str, ssl: bool=True, debug: bool=False, proxies: Mapping={},
-                 cert: Tuple[str, tuple]=None, auth: AuthBase=None, tool: str='', timeout: Union[float, tuple]=None):
+                 cert: Tuple[str, tuple]=None, auth: AuthBase=None, tool: str='', timeout: Union[float, Tuple[float, float]]=None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
