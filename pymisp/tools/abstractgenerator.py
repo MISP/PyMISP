@@ -35,6 +35,7 @@ class AbstractMISPObjectGenerator(MISPObject):
             return timestamp['value']
         else:  # Supported: float/int/string
             if isinstance(timestamp, (str, int, float)) and self._detect_epoch(timestamp):
+                # It converts to the *local* datetime, which is consistent with the rest of the code.
                 return datetime.fromtimestamp(float(timestamp))
             elif isinstance(timestamp, str):
                 return parse(timestamp)

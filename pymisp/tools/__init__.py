@@ -10,6 +10,7 @@ from .fail2banobject import Fail2BanObject  # noqa
 from .domainipobject import DomainIPObject  # noqa
 from .asnobject import ASNObject  # noqa
 from .geolocationobject import GeolocationObject  # noqa
+from .git_vuln_finder_object import GitVulnFinderObject  # noqa
 
 from .emailobject import EMailObject  # noqa
 from .vehicleobject import VehicleObject  # noqa
@@ -22,7 +23,7 @@ except ImportError:
     # Requires faup, which is a bit difficult to install
     pass
 except OSError:
-    # faup requires liblua-5.3
+    # faup required liblua-5.3
     pass
 
 try:

@@ -11,6 +11,7 @@ from datetime import date, datetime
 
 from pymisp import MISPEvent, MISPSighting, MISPTag, MISPOrganisation
 from pymisp.exceptions import InvalidMISPObject
+from pymisp.tools import GitVulnFinderObject
 
 
 class TestMISPEvent(unittest.TestCase):
@@ -356,6 +357,15 @@ class TestMISPEvent(unittest.TestCase):
                     if 'categories' in entry:
                         subset = set(entry['categories']).issubset(me.describe_types['categories'])
                         self.assertTrue(subset, f'{t_json["name"]} - {obj_relation}')
+
+    def test_git_vuln_finder(self):
+        with open('tests/git-vuln-finder-quagga.json') as f:
+            dump = json.load(f)
+
+        for vuln in dump.values():
+            author = vuln['author']
+            vuln_finder = GitVulnFinderObject(vuln)
+            self.assertEqual(vuln_finder.get_attributes_by_relation('author')[0].value, author)
 
 
 if __name__ == '__main__':
