@@ -172,6 +172,7 @@
       "Internal reference": [
         "anonymised",
         "comment",
+        "git-commit-id",
         "hex",
         "link",
         "other",
@@ -706,6 +707,10 @@
         "default_category": "Artifacts dropped",
         "to_ids": 0
       },
+      "git-commit-id": {
+        "default_category": "Internal reference",
+        "to_ids": 0
+      },
       "github-organisation": {
         "default_category": "Social network",
         "to_ids": 0
@@ -1175,6 +1180,7 @@
       "frequent-flyer-number",
       "gender",
       "gene",
+      "git-commit-id",
       "github-organisation",
       "github-repository",
       "github-username",
