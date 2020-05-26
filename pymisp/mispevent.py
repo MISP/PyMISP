@@ -170,7 +170,7 @@ class MISPSighting(AbstractMISP):
 
 
 class MISPAttribute(AbstractMISP):
-    _fields_for_feed: set = {'uuid', 'value', 'category', 'type', 'comment', 'data',
+    _fields_for_feed: set = {'uuid', 'value', 'category', 'type', 'comment', 'data', 'deleted',
                              'timestamp', 'to_ids', 'disable_correlation', 'first_seen', 'last_seen'}
 
     def __init__(self, describe_types: Optional[Dict]=None, strict: bool=False):
