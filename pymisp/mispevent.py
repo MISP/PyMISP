@@ -850,10 +850,11 @@ class MISPObject(AbstractMISP):
             return None
         else:
             # Make sure we're not adding an empty value.
-            value['value'] = value['value'].strip()
-            if value['value'] == '':
-                logger.warning("The value of the attribute you're trying to add is an empty string, skipping it. Object relation: {}".format(object_relation))
-                return None
+            if isinstance(value['value'], str):
+                value['value'] = value['value'].strip()
+                if value['value'] == '':
+                    logger.warning("The value of the attribute you're trying to add is an empty string, skipping it. Object relation: {}".format(object_relation))
+                    return None
         if self._known_template and self._definition:
             if object_relation in self._definition['attributes']:
                 attribute = MISPObjectAttribute(self._definition['attributes'][object_relation])
