@@ -845,11 +845,15 @@ class MISPObject(AbstractMISP):
         dictionary with all the keys supported by MISPAttribute"""
         if simple_value is not None:  # /!\ The value *can* be 0
             value = {'value': simple_value}
-        # Make sure we're not adding an empty value.
-        value['value'] = value['value'].strip()
-        if value.get('value') in [None, '']:
-            logger.warning("The value of the attribute you're trying to add is None or empty string, skipping it. Object relation: {}".format(object_relation))
+        if value.get('value') is None:
+            logger.warning("The value of the attribute you're trying to add is None, skipping it. Object relation: {}".format(object_relation))
             return None
+        else:
+            # Make sure we're not adding an empty value.
+            value['value'] = value['value'].strip()
+            if value['value'] == '':
+                logger.warning("The value of the attribute you're trying to add is an empty string, skipping it. Object relation: {}".format(object_relation))
+                return None
         if self._known_template and self._definition:
             if object_relation in self._definition['attributes']:
                 attribute = MISPObjectAttribute(self._definition['attributes'][object_relation])
