@@ -1376,7 +1376,8 @@ class PyMISP:
         response = self._prepare_request('POST', f'admin/users/delete/{user_id}')
         return self._check_json_response(response)
 
-    def change_user_password(self, new_password: str, user: Optional[Union[MISPUser, int, str, UUID]]=None) -> Dict:
+    def change_user_password(self, new_password: str) -> Dict:
+        '''Thange the password of the curent user'''
         response = self._prepare_request('POST', 'users/change_pw', data={'password': new_password})
         return self._check_json_response(response)
 
