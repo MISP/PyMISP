@@ -68,7 +68,7 @@ class FileObject(AbstractMISPObjectGenerator):
             self.add_attribute('sha512', value=sha512(self.__data).hexdigest())
             self.add_attribute('malware-sample', value=self.__filename, data=self.__pseudofile)
             if HAS_MAGIC:
-                self.add_attribute('mimetype', value=magic.from_buffer(self.__data))
+                self.add_attribute('mimetype', value=magic.from_buffer(self.__data, mime=True))
             if HAS_PYDEEP:
                 self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode())
 
