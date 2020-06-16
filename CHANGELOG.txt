@@ -2,6 +2,64 @@ Changelog
 =========
 
 
+v2.4.127 (2020-06-16)
+---------------------
+
+New
+~~~
+- Add helper and test case for GitVulnFinderObject. [Raphaël Vinot]
+- Add git-commit-id type. [Raphaël Vinot]
+- Add deleted in field export. [Raphaël Vinot]
+
+  Fix #586
+- Timeout for connection/request, fixes #584. [Christophe Vandeplas]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Rename branches master -> main. [Raphaël Vinot]
+- Remove extra parameter in change_user_password. [Raphaël Vinot]
+
+Fix
+~~~
+- Do not fail if the attribute value is not a string. [Raphaël Vinot]
+- Properly strip value in MISPObject.add_attribute, take 2. [Raphaël
+  Vinot]
+
+  Fix #546
+- Properly strip value in MISPObject.add_attribute. [Raphaël Vinot]
+
+  Fix #546
+- Deleted is not always required in the feed export. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+
+  hail to Rafiot
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+
+Other
+~~~~~
+- Previously file object was reporting the libmagic description of a
+  file instead of the mimetype. According to [MISP
+  DataModels](https://www.misp-project.org/datamodels/#types) ``` mime-
+  type: A media type (also MIME type and content type) is a two-part
+  identifier for file formats and format contents transmitted on the
+  Internet ``` more precisely defined in
+  [RFC2045](https://tools.ietf.org/html/rfc2045) and others. [Troy Ross]
+
+  The description returned by libmagic is more useful than the generic mime-type,
+  but I did not find a place to put the description in the current data model.
+- Fix end of line encoding of examples/cytomic_orion.py. [Sebastian
+  Wagner]
+
+
 v2.4.126 (2020-05-18)
 ---------------------
 
@@ -18,6 +76,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-object. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
