@@ -170,8 +170,9 @@ class MISPSighting(AbstractMISP):
 
 
 class MISPAttribute(AbstractMISP):
-    _fields_for_feed: set = {'uuid', 'value', 'category', 'type', 'comment', 'data', 'deleted',
-                             'timestamp', 'to_ids', 'disable_correlation', 'first_seen', 'last_seen'}
+    _fields_for_feed: set = {'uuid', 'value', 'category', 'type', 'comment', 'data',
+                             'deleted', 'timestamp', 'to_ids', 'disable_correlation',
+                             'first_seen', 'last_seen'}
 
     def __init__(self, describe_types: Optional[Dict]=None, strict: bool=False):
         """Represents an Attribute
@@ -599,7 +600,8 @@ class MISPObject(AbstractMISP):
 
     _fields_for_feed: set = {'name', 'meta-category', 'description', 'template_uuid',
                              'template_version', 'uuid', 'timestamp', 'distribution',
-                             'sharing_group_id', 'comment', 'first_seen', 'last_seen'}
+                             'sharing_group_id', 'comment', 'first_seen', 'last_seen',
+                             'deleted'}
 
     def __init__(self, name: str, strict: bool=False, standalone: bool=False, default_attributes_parameters: dict={}, **kwargs):
         ''' Master class representing a generic MISP object
@@ -1605,8 +1607,9 @@ class MISPEventDelegation(AbstractMISP):
 
 class MISPObjectAttribute(MISPAttribute):
 
-    _fields_for_feed: set = {'uuid', 'object_relation', 'value', 'category', 'type',
-                             'comment', 'data', 'timestamp', 'to_ids', 'disable_correlation'}
+    _fields_for_feed: set = {'uuid', 'value', 'category', 'type', 'comment', 'data',
+                             'deleted', 'timestamp', 'to_ids', 'disable_correlation',
+                             'first_seen', 'last_seen', 'object_relation'}
 
     def __init__(self, definition):
         super().__init__()
