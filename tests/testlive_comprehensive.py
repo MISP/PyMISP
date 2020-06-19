@@ -550,6 +550,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(r['message'], 'Attribute deleted.')
             r = self.user_misp_connector.delete_object(first.objects[0].uuid)
             self.assertEqual(r['message'], 'Object deleted')
+            # Test deleted search
             r = self.user_misp_connector.search(event_id=first.id, deleted=[0, 1], pythonify=True)
             self.assertTrue(isinstance(r[0], MISPEvent))
             self.assertEqual(len(r[0].objects), 2)
@@ -557,6 +558,15 @@ class TestComprehensive(unittest.TestCase):
             self.assertFalse(r[0].objects[1].deleted)
             self.assertEqual(len(r[0].attributes), 1)
             self.assertTrue(r[0].attributes[0].deleted)
+            # Test deleted get
+            r = self.user_misp_connector.get_event(first, deleted=True, pythonify=True)
+            self.assertTrue(isinstance(r, MISPEvent))
+            self.assertEqual(len(r.objects), 2)
+            self.assertTrue(r.objects[0].deleted)
+            self.assertFalse(r.objects[1].deleted)
+            self.assertEqual(len(r.attributes), 1)
+            self.assertTrue(r.attributes[0].deleted)
+
             r = self.user_misp_connector.delete_event(first.uuid)
             self.assertEqual(r['message'], 'Event deleted.')
         finally:
