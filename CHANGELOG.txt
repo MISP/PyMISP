@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+v2.4.128 (2020-06-22)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Add a few test cases. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+
+
 v2.4.127.1 (2020-06-19)
 -----------------------
 
@@ -11,6 +21,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Add test case for get event deleted. [Raphaël Vinot]
