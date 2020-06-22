@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pymisp"
-version = "2.4.127.1"
+version = "2.4.128"
 description = "Python API for MISP."
 authors = ["Raphaël Vinot <raphael.vinot@circl.lu>"]
 license = "BSD-2-Clause"
