@@ -170,6 +170,14 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         """Set __not_jsonable to a new list"""
         self.__not_jsonable = args
 
+    def _remove_from_not_jsonable(self, *args) -> None:
+        """Remove the entries that are in the __not_jsonable list"""
+        for entry in args:
+            try:
+                self.__not_jsonable.remove(entry)
+            except ValueError:
+                pass
+
     def from_json(self, json_string: str) -> None:
         """Load a JSON string"""
         self.from_dict(**loads(json_string))
