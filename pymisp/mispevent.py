@@ -629,7 +629,7 @@ class MISPObject(AbstractMISP):
         self.last_seen: datetime
         self.__fast_attribute_access: dict = defaultdict(list)  # Hashtable object_relation: [attributes]
         self.ObjectReference: List[MISPObjectReference] = []
-        self._standalone: bool = standalone
+        self._standalone: bool = False
         self.Attribute: List[MISPObjectAttribute] = []
         self.SharingGroup: MISPSharingGroup
         self._default_attributes_parameters: dict
@@ -657,9 +657,7 @@ class MISPObject(AbstractMISP):
         else:
             self.distribution = 5  # Default to inherit
             self.sharing_group_id = 0
-        if self._standalone:
-            # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
-            self.update_not_jsonable('ObjectReference')
+        self.standalone = standalone
 
     def _load_template_path(self, template_path: Union[Path, str]) -> bool:
         self._definition: Optional[Dict] = self._load_json(template_path)
@@ -741,6 +739,21 @@ class MISPObject(AbstractMISP):
             self.ObjectReference = references
         else:
             raise PyMISPError('All the attributes have to be of type MISPObjectReference.')
+
+    @property
+    def standalone(self):
+        return self._standalone
+
+    @standalone.setter
+    def standalone(self, new_standalone: bool):
+        if self._standalone != new_standalone:
+            if new_standalone:
+                self.update_not_jsonable("ObjectReference")
+            else:
+                self._remove_from_not_jsonable("ObjectReference")
+            self._standalone = new_standalone
+        else:
+            pass
 
     def from_dict(self, **kwargs):
         if 'Object' in kwargs:
