@@ -629,6 +629,7 @@ class MISPObject(AbstractMISP):
         self.last_seen: datetime
         self.__fast_attribute_access: dict = defaultdict(list)  # Hashtable object_relation: [attributes]
         self.ObjectReference: List[MISPObjectReference] = []
+        self._standalone: bool = standalone
         self.Attribute: List[MISPObjectAttribute] = []
         self.SharingGroup: MISPSharingGroup
         self._default_attributes_parameters: dict
@@ -656,7 +657,6 @@ class MISPObject(AbstractMISP):
         else:
             self.distribution = 5  # Default to inherit
             self.sharing_group_id = 0
-        self._standalone = standalone
         if self._standalone:
             # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
             self.update_not_jsonable('ObjectReference')
