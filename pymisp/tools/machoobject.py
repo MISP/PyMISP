@@ -32,10 +32,10 @@ def make_macho_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalo
 
 class MachOObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: Optional[lief.MachO.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, standalone: bool=True, **kwargs):
+    def __init__(self, parsed: Optional[lief.MachO.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, **kwargs):
         # Python3 way
         # super().__init__('elf')
-        super(MachOObject, self).__init__('macho', standalone=standalone, **kwargs)
+        super(MachOObject, self).__init__('macho', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if pseudofile:
@@ -66,7 +66,7 @@ class MachOObject(AbstractMISPObjectGenerator):
         if self.__macho.sections:
             pos = 0
             for section in self.__macho.sections:
-                s = MachOSectionObject(section, self._standalone, default_attributes_parameters=self._default_attributes_parameters)
+                s = MachOSectionObject(section, standalone=self._standalone, default_attributes_parameters=self._default_attributes_parameters)
                 self.add_reference(s.uuid, 'includes', 'Section {} of MachO'.format(pos))
                 pos += 1
                 self.sections.append(s)
@@ -75,10 +75,10 @@ class MachOObject(AbstractMISPObjectGenerator):
 
 class MachOSectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section: lief.MachO.Section, standalone: bool=True, **kwargs):
+    def __init__(self, section: lief.MachO.Section, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
-        super(MachOSectionObject, self).__init__('macho-section', standalone=standalone, **kwargs)
+        super(MachOSectionObject, self).__init__('macho-section', **kwargs)
         self.__section = section
         self.__data = bytes(self.__section.content)
         self.generate_attributes()
