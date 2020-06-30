@@ -331,7 +331,7 @@ class PyMISP:
         misp_object_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in misp_object_r:
             return misp_object_r
-        o = MISPObject(misp_object_r['Object']['name'])
+        o = MISPObject(misp_object_r['Object']['name'], standalone=False)
         o.from_dict(**misp_object_r)
         return o
 
