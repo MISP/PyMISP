@@ -342,7 +342,7 @@ class PyMISP:
         new_object = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_object:
             return new_object
-        o = MISPObject(new_object['Object']['name'])
+        o = MISPObject(new_object['Object']['name'], standalone=False)
         o.from_dict(**new_object)
         return o
 
@@ -356,7 +356,7 @@ class PyMISP:
         updated_object = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_object:
             return updated_object
-        o = MISPObject(updated_object['Object']['name'])
+        o = MISPObject(updated_object['Object']['name'], standalone=False)
         o.from_dict(**updated_object)
         return o
 

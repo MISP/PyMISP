@@ -603,7 +603,7 @@ class MISPObject(AbstractMISP):
                              'sharing_group_id', 'comment', 'first_seen', 'last_seen',
                              'deleted'}
 
-    def __init__(self, name: str, strict: bool=False, standalone: bool=False, default_attributes_parameters: dict={}, **kwargs):
+    def __init__(self, name: str, strict: bool=False, standalone: bool=True, default_attributes_parameters: dict={}, **kwargs):
         ''' Master class representing a generic MISP object
         :name: Name of the object
 
@@ -1398,6 +1398,7 @@ class MISPEvent(AbstractMISP):
             misp_obj.from_dict(**kwargs)
         else:
             raise InvalidMISPObject("An object to add to an existing Event needs to be either a MISPObject, or a plain python dictionary")
+        misp_obj.standalone = False
         self.Object.append(misp_obj)
         self.edited = True
         return misp_obj
