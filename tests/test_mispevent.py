@@ -9,7 +9,8 @@ import glob
 import hashlib
 from datetime import date, datetime
 
-from pymisp import MISPEvent, MISPSighting, MISPTag, MISPOrganisation
+from pymisp import (MISPEvent, MISPSighting, MISPTag, MISPOrganisation,
+                    MISPObject)
 from pymisp.exceptions import InvalidMISPObject
 from pymisp.tools import GitVulnFinderObject
 
@@ -200,6 +201,19 @@ class TestMISPEvent(unittest.TestCase):
             ref_json = json.load(f)
         del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    def test_obj_references_export(self):
+        self.init_event()
+        obj1 = MISPObject(name="file")
+        obj2 = MISPObject(name="url", standalone=False)
+        obj1.add_reference(obj2, "downloads")
+        obj2.add_reference(obj1, "downloaded-by")
+        self.assertFalse("ObjectReference" in obj1.jsonable())
+        self.assertTrue("ObjectReference" in obj2.jsonable())
+        self.mispevent.add_object(obj1)
+        obj2.standalone = True
+        self.assertTrue("ObjectReference" in obj1.jsonable())
+        self.assertFalse("ObjectReference" in obj2.jsonable())
 
     def test_event_not_edited(self):
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
