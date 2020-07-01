@@ -603,7 +603,7 @@ class MISPObject(AbstractMISP):
                              'sharing_group_id', 'comment', 'first_seen', 'last_seen',
                              'deleted'}
 
-    def __init__(self, name: str, strict: bool=False, standalone: bool=False, default_attributes_parameters: dict={}, **kwargs):
+    def __init__(self, name: str, strict: bool=False, standalone: bool=True, default_attributes_parameters: dict={}, **kwargs):
         ''' Master class representing a generic MISP object
         :name: Name of the object
 
@@ -629,6 +629,7 @@ class MISPObject(AbstractMISP):
         self.last_seen: datetime
         self.__fast_attribute_access: dict = defaultdict(list)  # Hashtable object_relation: [attributes]
         self.ObjectReference: List[MISPObjectReference] = []
+        self._standalone: bool = False
         self.Attribute: List[MISPObjectAttribute] = []
         self.SharingGroup: MISPSharingGroup
         self._default_attributes_parameters: dict
@@ -656,10 +657,7 @@ class MISPObject(AbstractMISP):
         else:
             self.distribution = 5  # Default to inherit
             self.sharing_group_id = 0
-        self._standalone = standalone
-        if self._standalone:
-            # Mark as non_jsonable because we need to add the references manually after the object(s) have been created
-            self.update_not_jsonable('ObjectReference')
+        self.standalone = standalone
 
     def _load_template_path(self, template_path: Union[Path, str]) -> bool:
         self._definition: Optional[Dict] = self._load_json(template_path)
@@ -741,6 +739,21 @@ class MISPObject(AbstractMISP):
             self.ObjectReference = references
         else:
             raise PyMISPError('All the attributes have to be of type MISPObjectReference.')
+
+    @property
+    def standalone(self):
+        return self._standalone
+
+    @standalone.setter
+    def standalone(self, new_standalone: bool):
+        if self._standalone != new_standalone:
+            if new_standalone:
+                self.update_not_jsonable("ObjectReference")
+            else:
+                self._remove_from_not_jsonable("ObjectReference")
+            self._standalone = new_standalone
+        else:
+            pass
 
     def from_dict(self, **kwargs):
         if 'Object' in kwargs:
@@ -1385,6 +1398,7 @@ class MISPEvent(AbstractMISP):
             misp_obj.from_dict(**kwargs)
         else:
             raise InvalidMISPObject("An object to add to an existing Event needs to be either a MISPObject, or a plain python dictionary")
+        misp_obj.standalone = False
         self.Object.append(misp_obj)
         self.edited = True
         return misp_obj

@@ -17,8 +17,8 @@ class VehicleObject(AbstractMISPObjectGenerator):
         'uk': "http://www.regcheck.org.uk/api/reg.asmx/Check"
     }
 
-    def __init__(self, country: str, registration: str, username: str, standalone=True, **kwargs):
-        super(VehicleObject, self).__init__("vehicle", standalone=standalone, **kwargs)
+    def __init__(self, country: str, registration: str, username: str, **kwargs):
+        super(VehicleObject, self).__init__("vehicle", **kwargs)
         self._country = country
         self._registration = registration
         self._username = username

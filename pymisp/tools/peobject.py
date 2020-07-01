@@ -34,10 +34,10 @@ def make_pe_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone:
 
 class PEObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: Optional[lief.PE.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, standalone: bool=True, **kwargs):
+    def __init__(self, parsed: Optional[lief.PE.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, **kwargs):
         # Python3 way
         # super().__init__('pe')
-        super(PEObject, self).__init__('pe', standalone=standalone, **kwargs)
+        super(PEObject, self).__init__('pe', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if pseudofile:
@@ -111,7 +111,7 @@ class PEObject(AbstractMISPObjectGenerator):
         if self.__pe.sections:
             pos = 0
             for section in self.__pe.sections:
-                s = PESectionObject(section, self._standalone, default_attributes_parameters=self._default_attributes_parameters)
+                s = PESectionObject(section, standalone=self._standalone, default_attributes_parameters=self._default_attributes_parameters)
                 self.add_reference(s.uuid, 'includes', 'Section {} of PE'.format(pos))
                 if ((self.__pe.entrypoint >= section.virtual_address)
                         and (self.__pe.entrypoint < (section.virtual_address + section.virtual_size))):
@@ -124,10 +124,10 @@ class PEObject(AbstractMISPObjectGenerator):
 
 class PESectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section: lief.PE.Section, standalone: bool=True, **kwargs):
+    def __init__(self, section: lief.PE.Section, **kwargs):
         # Python3 way
         # super().__init__('pe-section')
-        super(PESectionObject, self).__init__('pe-section', standalone=standalone, **kwargs)
+        super(PESectionObject, self).__init__('pe-section', **kwargs)
         self.__section = section
         self.__data = bytes(self.__section.content)
         self.generate_attributes()

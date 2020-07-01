@@ -24,10 +24,10 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
     :indicator: IOC to search VirusTotal for
     '''
-    def __init__(self, apikey: str, indicator: str, vt_proxies: Optional[dict]=None, standalone: bool=True, **kwargs):
+    def __init__(self, apikey: str, indicator: str, vt_proxies: Optional[dict]=None, **kwargs):
         # PY3 way:
         # super().__init__("virustotal-report")
-        super(VTReportObject, self).__init__("virustotal-report", standalone=standalone, **kwargs)
+        super(VTReportObject, self).__init__("virustotal-report", **kwargs)
         indicator = indicator.strip()
         self._resource_type = self.__validate_resource(indicator)
         if self._resource_type:

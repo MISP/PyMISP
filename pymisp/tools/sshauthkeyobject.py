@@ -13,10 +13,10 @@ logger = logging.getLogger('pymisp')
 
 class SSHAuthorizedKeysObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, authorized_keys_path: Optional[Union[Path, str]]=None, authorized_keys_pseudofile: Optional[StringIO]=None, standalone: bool=True, **kwargs):
+    def __init__(self, authorized_keys_path: Optional[Union[Path, str]]=None, authorized_keys_pseudofile: Optional[StringIO]=None, **kwargs):
         # PY3 way:
         # super().__init__('file')
-        super(SSHAuthorizedKeysObject, self).__init__('ssh-authorized-keys', standalone=standalone, **kwargs)
+        super(SSHAuthorizedKeysObject, self).__init__('ssh-authorized-keys', **kwargs)
         if authorized_keys_path:
             with open(authorized_keys_path, 'r') as f:
                 self.__pseudofile = StringIO(f.read())
