@@ -1566,7 +1566,7 @@ class PyMISP:
 
         '''
 
-        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings']
+        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix-xml', 'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings']
 
         if controller not in ['events', 'attributes', 'objects']:
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
@@ -1598,7 +1598,10 @@ class PyMISP:
 
         if return_format not in return_formats:
             raise ValueError('return_format has to be in {}'.format(', '.join(return_formats)))
-        query['returnFormat'] = return_format
+        if return_format == 'stix-xml':
+            query['returnFormat'] = 'stix'
+        else:
+            query['returnFormat'] = return_format
 
         query['page'] = page
         query['limit'] = limit
@@ -1649,7 +1652,10 @@ class PyMISP:
         query['includeCorrelations'] = self._make_misp_bool(include_correlations)
         query['object_name'] = object_name
         url = urljoin(self.root_url, f'{controller}/restSearch')
-        response = self._prepare_request('POST', url, data=query)
+        if return_format == 'stix-xml':
+            response = self._prepare_request('POST', url, data=query, output_type='xml')
+        else:
+            response = self._prepare_request('POST', url, data=query)
 
         if return_format == 'csv':
             normalized_response_text = self._check_response(response)
@@ -1657,6 +1663,8 @@ class PyMISP:
                 return self._csv_to_dict(normalized_response_text)  # type: ignore
             else:
                 return normalized_response_text
+        elif return_format == 'stix-xml':
+            return self._check_response(response)
 
         normalized_response = self._check_json_response(response)
 
@@ -2312,7 +2320,7 @@ class PyMISP:
                 logger.debug(response.text)
             if expect_json:
                 raise PyMISPUnexpectedResponse(f'Unexpected response from server: {response.text}')
-            if lenient_response_type and not response.headers['content-type'].startswith('application/json'):
+            if lenient_response_type and not response.headers['Accept'].startswith('application/json'):
                 return response.text
             if not response.content:
                 # Empty response
@@ -2355,7 +2363,7 @@ class PyMISP:
             prepped.headers.update(
                 {'Authorization': self.key,
                  'Accept': f'application/{output_type}',
-                 'content-type': f'application/{output_type}',
+                 'content-type': 'application/json',
                  'User-Agent': user_agent})
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(prepped.headers)
