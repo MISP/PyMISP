@@ -123,13 +123,7 @@ nosetests-3.4 -s --with-coverage --cover-package=pymisp,tests --cover-tests test
 
 ## Documentation
 
-[PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/latest/pymisp.pdf).
-
-Documentation can be generated with epydoc:
-
-```
-epydoc --url https://github.com/MISP/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
-```
+The documentation is available [here](https://pymisp.readthedocs.io/en/latest/).
 
 ### Jupyter notebook
 
