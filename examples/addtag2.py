@@ -3,14 +3,10 @@
 from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
-import os
-import json
 
 
 def init(url, key):
     return PyMISP(url, key, misp_verifycert, 'json')
-
-    result = m.get_event(event)
 
 
 if __name__ == '__main__':
@@ -29,8 +25,7 @@ if __name__ == '__main__':
 
     if args.event and not args.attribute:
         result = misp.search(eventid=args.event)
-        data = result['response']
-        for event in data:
+        for event in result:
             uuid = event['Event']['uuid']
 
     if args.attribute:
@@ -38,8 +33,7 @@ if __name__ == '__main__':
             print("Please provide event ID also")
             exit()
         result = misp.search(eventid=args.event)
-        data = result['response']
-        for event in data:
+        for event in result:
             for attribute in event['Event']['Attribute']:
                 if attribute["id"] == args.attribute:
                     uuid = attribute["uuid"]
