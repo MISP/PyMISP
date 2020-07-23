@@ -127,7 +127,7 @@ The documentation is available [here](https://pymisp.readthedocs.io/en/latest/).
 
 ### Jupyter notebook
 
-A series of [Jupyter notebooks for PyMISP tutorial](https://github.com/MISP/PyMISP/tree/master/docs/tutorial) are available in the repository.
+A series of [Jupyter notebooks for PyMISP tutorial](https://github.com/MISP/PyMISP/tree/main/docs/tutorial) are available in the repository.
 
 ## Everything is a Mutable Mapping
 
