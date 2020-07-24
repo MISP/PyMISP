@@ -548,10 +548,9 @@ class TestComprehensive(unittest.TestCase):
             deleted_attribute = self.user_misp_connector.update_attribute(first.attributes[0], pythonify=True)
             self.assertTrue(deleted_attribute.deleted)
 
-            # FIXME: https://github.com/MISP/MISP/issues/6024
-            # first.objects[0].deleted = True
-            # deleted_object = self.user_misp_connector.update_object(first.objects[0], pythonify=True)
-            # self.assertTrue(deleted_object.deleted)
+            first.objects[0].deleted = True
+            deleted_object = self.user_misp_connector.update_object(first.objects[0], pythonify=True)
+            self.assertTrue(deleted_object.deleted)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1861,11 +1860,10 @@ class TestComprehensive(unittest.TestCase):
             second_object = self.admin_misp_connector.add_object(first.id, second_object, pythonify=True)
             self.assertEqual(second_object.attributes[0].sharing_group_id, int(sharing_group.id))
             # manual update
-            # FIXME: https://github.com/MISP/MISP/issues/6025
-            # first_object.add_attribute("tlsh", value='92a4b4a3d342a21fe1147474c19c9ab6a01717713a0248a2bb15affce77c1c14a79b93',
-            #                            category="Payload delivery", to_ids=True, distribution=4, sharing_group_id=sharing_group.id)
-            # first_object = self.admin_misp_connector.update_object(first_object, pythonify=True)
-            # self.assertEqual(first_object.attributes[-1].sharing_group_id, sharing_group.id)
+            first_object.add_attribute("tlsh", value='92a4b4a3d342a21fe1147474c19c9ab6a01717713a0248a2bb15affce77c1c14a79b93',
+                                       category="Payload delivery", to_ids=True, distribution=4, sharing_group_id=sharing_group.id)
+            first_object = self.admin_misp_connector.update_object(first_object, pythonify=True)
+            self.assertEqual(first_object.attributes[-1].sharing_group_id, int(sharing_group.id))
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
