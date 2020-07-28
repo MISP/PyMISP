@@ -21,7 +21,7 @@ except ImportError:
 logger = logging.getLogger('pymisp')
 
 
-def make_macho_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
+def make_macho_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
     macho_object = MachOObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(macho_object.uuid, 'includes', 'MachO indicators')
     macho_sections = []
@@ -32,7 +32,7 @@ def make_macho_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalo
 
 class MachOObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: Optional[lief.MachO.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, **kwargs):
+    def __init__(self, parsed: Optional[lief.MachO.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, **kwargs):
         # Python3 way
         # super().__init__('elf')
         super(MachOObject, self).__init__('macho', **kwargs)

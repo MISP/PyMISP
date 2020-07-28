@@ -21,7 +21,7 @@ class AbstractMISPObjectGenerator(MISPObject):
         except ValueError:
             return False
 
-    def _sanitize_timestamp(self, timestamp: Optional[Union[datetime, date, dict, str, int, float]]=None) -> datetime:
+    def _sanitize_timestamp(self, timestamp: Optional[Union[datetime, date, dict, str, int, float]] = None) -> datetime:
         if not timestamp:
             return datetime.now()
 

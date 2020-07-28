@@ -23,7 +23,7 @@ except ImportError:
 logger = logging.getLogger('pymisp')
 
 
-def make_pe_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
+def make_pe_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
     pe_object = PEObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(pe_object.uuid, 'includes', 'PE indicators')
     pe_sections = []
@@ -34,7 +34,7 @@ def make_pe_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone:
 
 class PEObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: Optional[lief.PE.Binary]=None, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None, **kwargs):
+    def __init__(self, parsed: Optional[lief.PE.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, **kwargs):
         # Python3 way
         # super().__init__('pe')
         super(PEObject, self).__init__('pe', **kwargs)

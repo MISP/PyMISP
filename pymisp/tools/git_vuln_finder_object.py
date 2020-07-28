@@ -9,7 +9,7 @@ logger = logging.getLogger('pymisp')
 
 class GitVulnFinderObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parameters: dict, strict: bool=True, **kwargs):
+    def __init__(self, parameters: dict, strict: bool = True, **kwargs):
         super(GitVulnFinderObject, self).__init__('git-vuln-finder', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()

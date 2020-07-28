@@ -9,7 +9,7 @@ logger = logging.getLogger('pymisp')
 
 class DomainIPObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parameters: dict, strict: bool=True, **kwargs):
+    def __init__(self, parameters: dict, strict: bool = True, **kwargs):
         super(DomainIPObject, self).__init__('domain-ip', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()

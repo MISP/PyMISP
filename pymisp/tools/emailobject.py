@@ -14,7 +14,7 @@ logger = logging.getLogger('pymisp')
 
 class EMailObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath: Union[Path, str]=None, pseudofile: BytesIO=None, attach_original_email: bool=True, **kwargs):
+    def __init__(self, filepath: Union[Path, str] = None, pseudofile: BytesIO = None, attach_original_email: bool = True, **kwargs):
         # PY3 way:
         # super().__init__('file')
         super(EMailObject, self).__init__('email', **kwargs)

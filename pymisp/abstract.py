@@ -240,7 +240,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         to_return = _int_to_str(to_return)
         return to_return
 
-    def to_json(self, sort_keys: bool=False, indent: Optional[int]=None):
+    def to_json(self, sort_keys: bool = False, indent: Optional[int] = None):
         """Dump recursively any class of type MISPAbstract to a json string"""
         return dumps(self, default=pymisp_json_default, sort_keys=sort_keys, indent=indent)
 
@@ -311,7 +311,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             return int(d)
         return int(d.timestamp())
 
-    def _add_tag(self, tag: Optional[Union[str, 'MISPTag', Mapping]]=None, **kwargs):
+    def _add_tag(self, tag: Optional[Union[str, 'MISPTag', Mapping]] = None, **kwargs):
         """Add a tag to the attribute (by name or a MISPTag object)"""
         if isinstance(tag, str):
             misp_tag = MISPTag()
