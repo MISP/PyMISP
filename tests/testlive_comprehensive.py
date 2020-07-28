@@ -829,7 +829,7 @@ class TestComprehensive(unittest.TestCase):
             events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
-            self.assertEqual(len(events[0].attributes), 3)
+            self.assertEqual(len(events[0].attributes), 4)
             response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%')  # disable ipv4 DNS.
             self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
 
