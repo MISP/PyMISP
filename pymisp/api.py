@@ -14,7 +14,6 @@ import re
 from uuid import UUID
 import warnings
 import sys
-import traceback
 import copy
 
 from . import __version__, everything_broken
@@ -137,7 +136,6 @@ class PyMISP:
             self._current_user_settings: List[MISPUserSetting]
             self._current_user, self._current_role, self._current_user_settings = self.get_user(pythonify=True, expanded=True)
         except Exception as e:
-            traceback.print_exc()
             raise PyMISPError(f'Unable to connect to MISP ({self.root_url}). Please make sure the API key and the URL are correct (http/https is required): {e}')
 
         try:
