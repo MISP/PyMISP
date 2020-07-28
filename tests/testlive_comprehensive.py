@@ -556,11 +556,11 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
 
     def test_get_non_exists_event(self):
-        with self.assertRaises(MISPServerError):
-            self.user_misp_connector.get_event(0)  # non exists id
+        event = self.user_misp_connector.get_event(0)  # non exists id
+        self.assertEqual(event['errors'][0], 404)
 
-        with self.assertRaises(MISPServerError):
-            self.user_misp_connector.get_event("ab2b6e28-fda5-4282-bf60-22b81de77851")  # non exists uuid
+        event = self.user_misp_connector.get_event("ab2b6e28-fda5-4282-bf60-22b81de77851")  # non exists uuid
+        self.assertEqual(event['errors'][0], 404)
 
     def test_delete_by_uuid(self):
         try:
