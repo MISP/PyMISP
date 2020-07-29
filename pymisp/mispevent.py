@@ -174,7 +174,7 @@ class MISPAttribute(AbstractMISP):
                              'deleted', 'timestamp', 'to_ids', 'disable_correlation',
                              'first_seen', 'last_seen'}
 
-    def __init__(self, describe_types: Optional[Dict]=None, strict: bool=False):
+    def __init__(self, describe_types: Optional[Dict] = None, strict: bool = False):
         """Represents an Attribute
             :describe_type: Use it is you want to overwrite the defualt describeTypes.json file (you don't)
             :strict: If false, fallback to sane defaults for the attribute type if the ones passed by the user are incorrect
@@ -199,7 +199,7 @@ class MISPAttribute(AbstractMISP):
         self.Event: MISPEvent
         self.RelatedAttribute: List[MISPAttribute]
 
-    def add_tag(self, tag: Optional[Union[str, MISPTag, Dict]]=None, **kwargs) -> MISPTag:
+    def add_tag(self, tag: Optional[Union[str, MISPTag, Dict]] = None, **kwargs) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
@@ -258,7 +258,7 @@ class MISPAttribute(AbstractMISP):
         else:
             super().__setattr__(name, value)
 
-    def hash_values(self, algorithm: str='sha512') -> List[str]:
+    def hash_values(self, algorithm: str = 'sha512') -> List[str]:
         """Compute the hash of every values for fast lookups"""
         if algorithm not in hashlib.algorithms_available:
             raise PyMISPError('The algorithm {} is not available for hashing.'.format(algorithm))
@@ -335,7 +335,7 @@ class MISPAttribute(AbstractMISP):
         """Alias for add_shadow_attribute"""
         return self.add_shadow_attribute(shadow_attribute, **kwargs)
 
-    def add_shadow_attribute(self, shadow_attribute: Optional[Union[MISPShadowAttribute, Dict]]=None, **kwargs) -> MISPShadowAttribute:
+    def add_shadow_attribute(self, shadow_attribute: Optional[Union[MISPShadowAttribute, Dict]] = None, **kwargs) -> MISPShadowAttribute:
         """Add a shadow attribute to the attribute (by name or a MISPShadowAttribute object)"""
         if isinstance(shadow_attribute, MISPShadowAttribute):
             misp_shadow_attribute = shadow_attribute
@@ -351,7 +351,7 @@ class MISPAttribute(AbstractMISP):
         self.edited = True
         return misp_shadow_attribute
 
-    def add_sighting(self, sighting: Optional[Union[MISPSighting, dict]]=None, **kwargs) -> MISPSighting:
+    def add_sighting(self, sighting: Optional[Union[MISPSighting, dict]] = None, **kwargs) -> MISPSighting:
         """Add a sighting to the attribute (by name or a MISPSighting object)"""
         if isinstance(sighting, MISPSighting):
             misp_sighting = sighting
@@ -603,7 +603,7 @@ class MISPObject(AbstractMISP):
                              'sharing_group_id', 'comment', 'first_seen', 'last_seen',
                              'deleted'}
 
-    def __init__(self, name: str, strict: bool=False, standalone: bool=True, default_attributes_parameters: dict={}, **kwargs):
+    def __init__(self, name: str, strict: bool = False, standalone: bool = True, default_attributes_parameters: dict = {}, **kwargs):
         ''' Master class representing a generic MISP object
         :name: Name of the object
 
@@ -691,12 +691,12 @@ class MISPObject(AbstractMISP):
                 raise PyMISPError('first_seen ({value}) has to be before last_seen ({self.last_seen})')
         super().__setattr__(name, value)
 
-    def force_misp_objects_path_custom(self, misp_objects_path_custom: Union[Path, str], object_name: Optional[str]=None):
+    def force_misp_objects_path_custom(self, misp_objects_path_custom: Union[Path, str], object_name: Optional[str] = None):
         if object_name:
             self.name = object_name
         self._set_template(misp_objects_path_custom)
 
-    def _set_template(self, misp_objects_path_custom: Optional[Union[Path, str]]=None):
+    def _set_template(self, misp_objects_path_custom: Optional[Union[Path, str]] = None):
         if misp_objects_path_custom:
             # If misp_objects_path_custom is given, and an object with the given name exists, use that.
             if isinstance(misp_objects_path_custom, str):
@@ -822,7 +822,7 @@ class MISPObject(AbstractMISP):
 
         super().from_dict(**kwargs)
 
-    def add_reference(self, referenced_uuid: Union[AbstractMISP, str], relationship_type: str, comment: Optional[str]=None, **kwargs) -> MISPObjectReference:
+    def add_reference(self, referenced_uuid: Union[AbstractMISP, str], relationship_type: str, comment: Optional[str] = None, **kwargs) -> MISPObjectReference:
         """Add a link (uuid) to an other object"""
         if isinstance(referenced_uuid, AbstractMISP):
             # Allow to pass an object or an attribute instead of its UUID
@@ -855,7 +855,7 @@ class MISPObject(AbstractMISP):
         '''True if all the relations in the list are defined in the object'''
         return all(relation in self._fast_attribute_access for relation in list_of_relations)
 
-    def add_attribute(self, object_relation: str, simple_value: Optional[Union[str, int, float]]=None, **value) -> Optional[MISPAttribute]:
+    def add_attribute(self, object_relation: str, simple_value: Optional[Union[str, int, float]] = None, **value) -> Optional[MISPAttribute]:
         """Add an attribute. object_relation is required and the value key is a
         dictionary with all the keys supported by MISPAttribute"""
         if simple_value is not None:  # /!\ The value *can* be 0
@@ -902,12 +902,12 @@ class MISPObject(AbstractMISP):
             to_return.append(a)
         return to_return
 
-    def to_dict(self, strict: bool=False) -> Dict:
+    def to_dict(self, strict: bool = False) -> Dict:
         if strict or self._strict and self._known_template:
             self._validate()
         return super(MISPObject, self).to_dict()
 
-    def to_json(self, sort_keys: bool=False, indent: Optional[int]=None, strict: bool=False):
+    def to_json(self, sort_keys: bool = False, indent: Optional[int] = None, strict: bool = False):
         if strict or self._strict and self._known_template:
             self._validate()
         return super(MISPObject, self).to_json(sort_keys=sort_keys, indent=indent)
@@ -944,7 +944,7 @@ class MISPEvent(AbstractMISP):
     _fields_for_feed: set = {'uuid', 'info', 'threat_level_id', 'analysis', 'timestamp',
                              'publish_timestamp', 'published', 'date', 'extends_uuid'}
 
-    def __init__(self, describe_types: Optional[Dict]=None, strict_validation: bool=False, **kwargs):
+    def __init__(self, describe_types: Optional[Dict] = None, strict_validation: bool = False, **kwargs):
         super().__init__(**kwargs)
         if strict_validation:
             schema_file = 'schema.json'
@@ -964,7 +964,7 @@ class MISPEvent(AbstractMISP):
         self.SharingGroup: MISPSharingGroup
         self.Tag: List[MISPTag] = []
 
-    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]]=None, **kwargs) -> MISPTag:
+    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]] = None, **kwargs) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
@@ -1019,7 +1019,7 @@ class MISPEvent(AbstractMISP):
             }
         }
 
-    def attributes_hashes(self, algorithm: str='sha512') -> List[str]:
+    def attributes_hashes(self, algorithm: str = 'sha512') -> List[str]:
         to_return: List[str] = []
         for attribute in self.attributes:
             to_return += attribute.hash_values(algorithm)
@@ -1028,7 +1028,7 @@ class MISPEvent(AbstractMISP):
                 to_return += attribute.hash_values(algorithm)
         return to_return
 
-    def to_feed(self, valid_distributions: List[int]=[0, 1, 2, 3, 4, 5], with_meta: bool=False) -> Dict:
+    def to_feed(self, valid_distributions: List[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False) -> Dict:
         """ Generate a json output for MISP Feed.
         Notes:
             * valid_distributions only makes sense if the distribution key is set (i.e. the event is exported from a MISP instance)
@@ -1132,14 +1132,14 @@ class MISPEvent(AbstractMISP):
         else:
             raise PyMISPError('All the attributes have to be of type MISPObject.')
 
-    def load_file(self, event_path: Union[Path, str], validate: bool=False, metadata_only: bool=False):
+    def load_file(self, event_path: Union[Path, str], validate: bool = False, metadata_only: bool = False):
         """Load a JSON dump from a file on the disk"""
         if not os.path.exists(event_path):
             raise PyMISPError('Invalid path, unable to load the event.')
         with open(event_path, 'rb') as f:
             self.load(f, validate, metadata_only)
 
-    def load(self, json_event: Union[IO, str, bytes, dict], validate: bool=False, metadata_only: bool=False):
+    def load(self, json_event: Union[IO, str, bytes, dict], validate: bool = False, metadata_only: bool = False):
         """Load a JSON dump from a pseudo file or a JSON string"""
         if isinstance(json_event, IOBase):
             # python2 and python3 compatible to find if we have a file
@@ -1181,7 +1181,7 @@ class MISPEvent(AbstractMISP):
                 raise NewEventError(f'Invalid format for the date: {type(value)} - {value}')
         super().__setattr__(name, value)
 
-    def set_date(self, d: Optional[Union[str, int, float, datetime, date]]=None, ignore_invalid: bool=False):
+    def set_date(self, d: Optional[Union[str, int, float, datetime, date]] = None, ignore_invalid: bool = False):
         """Set a date for the event (string, datetime, or date object)"""
         if isinstance(d, (str, int, float, datetime, date)):
             self.date = d  # type: ignore
@@ -1382,7 +1382,7 @@ class MISPEvent(AbstractMISP):
                 objects.append(obj)
         return objects
 
-    def add_object(self, obj: Union[MISPObject, dict, None]=None, **kwargs) -> MISPObject:
+    def add_object(self, obj: Union[MISPObject, dict, None] = None, **kwargs) -> MISPObject:
         """Add an object to the Event, either by passing a MISPObject, or a dictionary"""
         if isinstance(obj, MISPObject):
             misp_obj = obj

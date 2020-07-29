@@ -30,7 +30,7 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath: Union[Path, str]=None, pseudofile: BytesIO=None, filename: str=None, **kwargs):
+    def __init__(self, filepath: Union[Path, str] = None, pseudofile: BytesIO = None, filename: str = None, **kwargs):
         # PY3 way:
         # super().__init__('file')
         super(FileObject, self).__init__('file', **kwargs)

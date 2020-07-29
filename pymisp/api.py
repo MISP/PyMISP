@@ -56,11 +56,11 @@ def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID]) 
 
 
 def register_user(misp_url: str, email: str,
-                  organisation: Union[MISPOrganisation, int, str, UUID]=None,
-                  org_id: Optional[str]=None, org_name: Optional[str]=None,
-                  message: Optional[str]=None, custom_perms: Optional[str]=None,
-                  perm_sync: bool=False, perm_publish: bool=False, perm_admin: bool=False,
-                  verify: bool=True) -> Dict:
+                  organisation: Union[MISPOrganisation, int, str, UUID] = None,
+                  org_id: Optional[str] = None, org_name: Optional[str] = None,
+                  message: Optional[str] = None, custom_perms: Optional[str] = None,
+                  perm_sync: bool = False, perm_publish: bool = False, perm_admin: bool = False,
+                  verify: bool = True) -> Dict:
     """Ask for the creation of an account for the user with the given email address"""
     data = copy.deepcopy(locals())
     if organisation:
@@ -90,8 +90,8 @@ class PyMISP:
     :param timeout: Timeout as described here: https://requests.readthedocs.io/en/master/user/advanced/#timeouts
     """
 
-    def __init__(self, url: str, key: str, ssl: bool=True, debug: bool=False, proxies: Mapping={},
-                 cert: Tuple[str, tuple]=None, auth: AuthBase=None, tool: str='', timeout: Optional[Union[float, Tuple[float, float]]]=None):
+    def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Mapping = {},
+                 cert: Tuple[str, tuple] = None, auth: AuthBase = None, tool: str = '', timeout: Optional[Union[float, Tuple[float, float]]] = None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -148,7 +148,7 @@ class PyMISP:
         self.category_type_mapping = self.describe_types['category_type_mappings']
         self.sane_default = self.describe_types['sane_defaults']
 
-    def remote_acl(self, debug_type: str='findMissingFunctionNames') -> Dict:
+    def remote_acl(self, debug_type: str = 'findMissingFunctionNames') -> Dict:
         """This should return an empty list, unless the ACL is outdated.
         debug_type can only be printAllFunctionNames, findMissingFunctionNames, or printRoleAccess
         """
@@ -210,7 +210,7 @@ class PyMISP:
         response = self._prepare_request('POST', '/servers/update')
         return self._check_json_response(response)
 
-    def set_server_setting(self, setting: str, value: Union[str, int, bool], force: bool=False) -> Dict:
+    def set_server_setting(self, setting: str, value: Union[str, int, bool], force: bool = False) -> Dict:
         data = {'value': value, 'force': force}
         response = self._prepare_request('POST', f'/servers/serverSettingsEdit/{setting}', data=data)
         return self._check_json_response(response)
@@ -236,7 +236,7 @@ class PyMISP:
 
     # ## BEGIN Event ##
 
-    def events(self, pythonify: bool=False) -> Union[Dict, List[MISPEvent]]:
+    def events(self, pythonify: bool = False) -> Union[Dict, List[MISPEvent]]:
         r = self._prepare_request('GET', 'events')
         events_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in events_r:
@@ -249,9 +249,9 @@ class PyMISP:
         return to_return
 
     def get_event(self, event: Union[MISPEvent, int, str, UUID],
-                  deleted: Union[bool, int, list]=False,
-                  extended: Union[bool, int]=False,
-                  pythonify: bool=False) -> Union[Dict, MISPEvent]:
+                  deleted: Union[bool, int, list] = False,
+                  extended: Union[bool, int] = False,
+                  pythonify: bool = False) -> Union[Dict, MISPEvent]:
         '''Get an event from a MISP instance'''
         event_id = get_uuid_or_id_from_abstract_misp(event)
         data = {}
@@ -270,7 +270,7 @@ class PyMISP:
         e.load(event_r)
         return e
 
-    def add_event(self, event: MISPEvent, pythonify: bool=False) -> Union[Dict, MISPEvent]:
+    def add_event(self, event: MISPEvent, pythonify: bool = False) -> Union[Dict, MISPEvent]:
         '''Add a new event on a MISP instance'''
         r = self._prepare_request('POST', 'events', data=event)
         new_event = self._check_json_response(r)
@@ -280,7 +280,7 @@ class PyMISP:
         e.load(new_event)
         return e
 
-    def update_event(self, event: MISPEvent, event_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPEvent]:
+    def update_event(self, event: MISPEvent, event_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPEvent]:
         '''Update an event on a MISP instance'''
         if event_id is None:
             eid = get_uuid_or_id_from_abstract_misp(event)
@@ -300,7 +300,7 @@ class PyMISP:
         response = self._prepare_request('DELETE', f'events/delete/{event_id}')
         return self._check_json_response(response)
 
-    def publish(self, event: Union[MISPEvent, int, str, UUID], alert: bool=False) -> Dict:
+    def publish(self, event: Union[MISPEvent, int, str, UUID], alert: bool = False) -> Dict:
         """Publish the event with one single HTTP POST.
         The default is to not send a mail as it is assumed this method is called on update.
         """
@@ -322,7 +322,7 @@ class PyMISP:
 
     # ## BEGIN Object ###
 
-    def get_object(self, misp_object: Union[MISPObject, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPObject]:
+    def get_object(self, misp_object: Union[MISPObject, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPObject]:
         '''Get an object from the remote MISP instance'''
         object_id = get_uuid_or_id_from_abstract_misp(misp_object)
         r = self._prepare_request('GET', f'objects/view/{object_id}')
@@ -333,7 +333,7 @@ class PyMISP:
         o.from_dict(**misp_object_r)
         return o
 
-    def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool=False) -> Union[Dict, MISPObject]:
+    def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool = False) -> Union[Dict, MISPObject]:
         '''Add a MISP Object to an existing MISP event'''
         event_id = get_uuid_or_id_from_abstract_misp(event)
         r = self._prepare_request('POST', f'objects/add/{event_id}', data=misp_object)
@@ -344,7 +344,7 @@ class PyMISP:
         o.from_dict(**new_object)
         return o
 
-    def update_object(self, misp_object: MISPObject, object_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPObject]:
+    def update_object(self, misp_object: MISPObject, object_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPObject]:
         '''Update an object on a MISP instance'''
         if object_id is None:
             oid = get_uuid_or_id_from_abstract_misp(misp_object)
@@ -364,7 +364,7 @@ class PyMISP:
         response = self._prepare_request('POST', f'objects/delete/{object_id}')
         return self._check_json_response(response)
 
-    def add_object_reference(self, misp_object_reference: MISPObjectReference, pythonify: bool=False) -> Union[Dict, MISPObjectReference]:
+    def add_object_reference(self, misp_object_reference: MISPObjectReference, pythonify: bool = False) -> Union[Dict, MISPObjectReference]:
         """Add a reference to an object"""
         r = self._prepare_request('POST', 'object_references/add', misp_object_reference)
         object_reference = self._check_json_response(r)
@@ -382,7 +382,7 @@ class PyMISP:
 
     # Object templates
 
-    def object_templates(self, pythonify: bool=False) -> Union[Dict, List[MISPObjectTemplate]]:
+    def object_templates(self, pythonify: bool = False) -> Union[Dict, List[MISPObjectTemplate]]:
         """Get all the object templates."""
         r = self._prepare_request('GET', 'objectTemplates')
         templates = self._check_json_response(r)
@@ -395,7 +395,7 @@ class PyMISP:
             to_return.append(o)
         return to_return
 
-    def get_object_template(self, object_template: Union[MISPObjectTemplate, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPObjectTemplate]:
+    def get_object_template(self, object_template: Union[MISPObjectTemplate, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPObjectTemplate]:
         """Gets the full object template corresponting the UUID passed as parameter"""
         object_template_id = get_uuid_or_id_from_abstract_misp(object_template)
         r = self._prepare_request('GET', f'objectTemplates/view/{object_template_id}')
@@ -415,7 +415,7 @@ class PyMISP:
 
     # ## BEGIN Attribute ###
 
-    def attributes(self, pythonify: bool=False) -> Union[Dict, List[MISPAttribute]]:
+    def attributes(self, pythonify: bool = False) -> Union[Dict, List[MISPAttribute]]:
         r = self._prepare_request('GET', 'attributes/index')
         attributes_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in attributes_r:
@@ -427,7 +427,7 @@ class PyMISP:
             to_return.append(a)
         return to_return
 
-    def get_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPAttribute]:
+    def get_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPAttribute]:
         '''Get an attribute from a MISP instance'''
         attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
         r = self._prepare_request('GET', f'attributes/view/{attribute_id}')
@@ -438,7 +438,7 @@ class PyMISP:
         a.from_dict(**attribute_r)
         return a
 
-    def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool=False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
+    def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
         '''Add an attribute to an existing MISP event
         NOTE MISP 2.4.113+: you can pass a list of attributes.
         In that case, the pythonified response is the following: {'attributes': [MISPAttribute], 'errors': {errors by attributes}}'''
@@ -470,7 +470,7 @@ class PyMISP:
         a.from_dict(**new_attribute)
         return a
 
-    def update_attribute(self, attribute: MISPAttribute, attribute_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
+    def update_attribute(self, attribute: MISPAttribute, attribute_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
         '''Update an attribute on a MISP instance'''
         if attribute_id is None:
             aid = get_uuid_or_id_from_abstract_misp(attribute)
@@ -490,7 +490,7 @@ class PyMISP:
         a.from_dict(**updated_attribute)
         return a
 
-    def delete_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], hard: bool=False) -> Dict:
+    def delete_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], hard: bool = False) -> Dict:
         '''Delete an attribute from a MISP instance'''
         attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
         data = {}
@@ -510,7 +510,7 @@ class PyMISP:
 
     # ## BEGIN Attribute Proposal ###
 
-    def attribute_proposals(self, event: Optional[Union[MISPEvent, int, str, UUID]]=None, pythonify: bool=False) -> Union[Dict, List[MISPShadowAttribute]]:
+    def attribute_proposals(self, event: Optional[Union[MISPEvent, int, str, UUID]] = None, pythonify: bool = False) -> Union[Dict, List[MISPShadowAttribute]]:
         if event:
             event_id = get_uuid_or_id_from_abstract_misp(event)
             r = self._prepare_request('GET', f'shadow_attributes/index/{event_id}')
@@ -526,7 +526,7 @@ class PyMISP:
             to_return.append(a)
         return to_return
 
-    def get_attribute_proposal(self, proposal: Union[MISPShadowAttribute, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPShadowAttribute]:
+    def get_attribute_proposal(self, proposal: Union[MISPShadowAttribute, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPShadowAttribute]:
         proposal_id = get_uuid_or_id_from_abstract_misp(proposal)
         r = self._prepare_request('GET', f'shadow_attributes/view/{proposal_id}')
         attribute_proposal = self._check_json_response(r)
@@ -538,7 +538,7 @@ class PyMISP:
 
     # NOTE: the tree following method have a very specific meaning, look at the comments
 
-    def add_attribute_proposal(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool=False) -> Union[Dict, MISPShadowAttribute]:
+    def add_attribute_proposal(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool = False) -> Union[Dict, MISPShadowAttribute]:
         '''Propose a new attribute in an event'''
         event_id = get_uuid_or_id_from_abstract_misp(event)
         r = self._prepare_request('POST', f'shadow_attributes/add/{event_id}', data=attribute)
@@ -549,7 +549,7 @@ class PyMISP:
         a.from_dict(**new_attribute_proposal)
         return a
 
-    def update_attribute_proposal(self, initial_attribute: Union[MISPAttribute, int, str, UUID], attribute: MISPAttribute, pythonify: bool=False) -> Union[Dict, MISPShadowAttribute]:
+    def update_attribute_proposal(self, initial_attribute: Union[MISPAttribute, int, str, UUID], attribute: MISPAttribute, pythonify: bool = False) -> Union[Dict, MISPShadowAttribute]:
         '''Propose a change for an attribute'''
         initial_attribute_id = get_uuid_or_id_from_abstract_misp(initial_attribute)
         r = self._prepare_request('POST', f'shadow_attributes/edit/{initial_attribute_id}', data=attribute)
@@ -584,9 +584,9 @@ class PyMISP:
 
     # ## BEGIN Sighting ###
 
-    def sightings(self, misp_entity: Optional[AbstractMISP]=None,
-                  org: Optional[Union[MISPOrganisation, int, str, UUID]]=None,
-                  pythonify: bool=False) -> Union[Dict, List[MISPSighting]]:
+    def sightings(self, misp_entity: Optional[AbstractMISP] = None,
+                  org: Optional[Union[MISPOrganisation, int, str, UUID]] = None,
+                  pythonify: bool = False) -> Union[Dict, List[MISPSighting]]:
         """Get the list of sighting related to a MISPEvent or a MISPAttribute (depending on type of misp_entity)"""
         if isinstance(misp_entity, MISPEvent):
             url = 'sightings/listSightings'
@@ -614,8 +614,8 @@ class PyMISP:
         return to_return
 
     def add_sighting(self, sighting: MISPSighting,
-                     attribute: Optional[Union[MISPAttribute, int, str, UUID]]=None,
-                     pythonify: bool=False) -> Union[Dict, MISPSighting]:
+                     attribute: Optional[Union[MISPAttribute, int, str, UUID]] = None,
+                     pythonify: bool = False) -> Union[Dict, MISPSighting]:
         '''Add a new sighting (globally, or to a specific attribute)'''
         if attribute:
             attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
@@ -640,7 +640,7 @@ class PyMISP:
 
     # ## BEGIN Tags ###
 
-    def tags(self, pythonify: bool=False) -> Union[Dict, List[MISPTag]]:
+    def tags(self, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
         """Get the list of existing tags."""
         r = self._prepare_request('GET', 'tags')
         tags = self._check_json_response(r)
@@ -653,7 +653,7 @@ class PyMISP:
             to_return.append(t)
         return to_return
 
-    def get_tag(self, tag: Union[MISPTag, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPTag]:
+    def get_tag(self, tag: Union[MISPTag, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPTag]:
         """Get a tag by id."""
         tag_id = get_uuid_or_id_from_abstract_misp(tag)
         r = self._prepare_request('GET', f'tags/view/{tag_id}')
@@ -664,7 +664,7 @@ class PyMISP:
         t.from_dict(**tag_r)
         return t
 
-    def add_tag(self, tag: MISPTag, pythonify: bool=False) -> Union[Dict, MISPTag]:
+    def add_tag(self, tag: MISPTag, pythonify: bool = False) -> Union[Dict, MISPTag]:
         '''Add a new tag on a MISP instance
         Notes:
             * The user calling this method needs the Tag Editor permission
@@ -678,17 +678,17 @@ class PyMISP:
         t.from_dict(**new_tag)
         return t
 
-    def enable_tag(self, tag: MISPTag, pythonify: bool=False) -> Union[Dict, MISPTag]:
+    def enable_tag(self, tag: MISPTag, pythonify: bool = False) -> Union[Dict, MISPTag]:
         """Enable a tag."""
         tag.hide_tag = False
         return self.update_tag(tag, pythonify=pythonify)
 
-    def disable_tag(self, tag: MISPTag, pythonify: bool=False) -> Union[Dict, MISPTag]:
+    def disable_tag(self, tag: MISPTag, pythonify: bool = False) -> Union[Dict, MISPTag]:
         """Disable a tag."""
         tag.hide_tag = True
         return self.update_tag(tag, pythonify=pythonify)
 
-    def update_tag(self, tag: MISPTag, tag_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPTag]:
+    def update_tag(self, tag: MISPTag, tag_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPTag]:
         """Edit only the provided parameters of a tag."""
         if tag_id is None:
             tid = get_uuid_or_id_from_abstract_misp(tag)
@@ -712,7 +712,7 @@ class PyMISP:
 
     # ## BEGIN Taxonomies ###
 
-    def taxonomies(self, pythonify: bool=False) -> Union[Dict, List[MISPTaxonomy]]:
+    def taxonomies(self, pythonify: bool = False) -> Union[Dict, List[MISPTaxonomy]]:
         """Get all the taxonomies."""
         r = self._prepare_request('GET', 'taxonomies')
         taxonomies = self._check_json_response(r)
@@ -725,7 +725,7 @@ class PyMISP:
             to_return.append(t)
         return to_return
 
-    def get_taxonomy(self, taxonomy: Union[MISPTaxonomy, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPTaxonomy]:
+    def get_taxonomy(self, taxonomy: Union[MISPTaxonomy, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPTaxonomy]:
         """Get a taxonomy from a MISP instance."""
         taxonomy_id = get_uuid_or_id_from_abstract_misp(taxonomy)
         r = self._prepare_request('GET', f'taxonomies/view/{taxonomy_id}')
@@ -775,7 +775,7 @@ class PyMISP:
 
     # ## BEGIN Warninglists ###
 
-    def warninglists(self, pythonify: bool=False) -> Union[Dict, List[MISPWarninglist]]:
+    def warninglists(self, pythonify: bool = False) -> Union[Dict, List[MISPWarninglist]]:
         """Get all the warninglists."""
         r = self._prepare_request('GET', 'warninglists')
         warninglists = self._check_json_response(r)
@@ -788,7 +788,7 @@ class PyMISP:
             to_return.append(w)
         return to_return
 
-    def get_warninglist(self, warninglist: Union[MISPWarninglist, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPWarninglist]:
+    def get_warninglist(self, warninglist: Union[MISPWarninglist, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPWarninglist]:
         """Get a warninglist."""
         warninglist_id = get_uuid_or_id_from_abstract_misp(warninglist)
         r = self._prepare_request('GET', f'warninglists/view/{warninglist_id}')
@@ -799,7 +799,7 @@ class PyMISP:
         w.from_dict(**wl)
         return w
 
-    def toggle_warninglist(self, warninglist_id: Optional[Union[str, int, List[int]]]=None, warninglist_name: Optional[Union[str, List[str]]]=None, force_enable: bool=False) -> Dict:
+    def toggle_warninglist(self, warninglist_id: Optional[Union[str, int, List[int]]] = None, warninglist_name: Optional[Union[str, List[str]]] = None, force_enable: bool = False) -> Dict:
         '''Toggle (enable/disable) the status of a warninglist by ID.
         :param warninglist_id: ID of the WarningList
         :param force_enable: Force the warning list in the enabled state (does nothing is already enabled)
@@ -846,7 +846,7 @@ class PyMISP:
 
     # ## BEGIN Noticelist ###
 
-    def noticelists(self, pythonify: bool=False) -> Union[Dict, List[MISPNoticelist]]:
+    def noticelists(self, pythonify: bool = False) -> Union[Dict, List[MISPNoticelist]]:
         """Get all the noticelists."""
         r = self._prepare_request('GET', 'noticelists')
         noticelists = self._check_json_response(r)
@@ -859,7 +859,7 @@ class PyMISP:
             to_return.append(n)
         return to_return
 
-    def get_noticelist(self, noticelist: Union[MISPNoticelist, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPNoticelist]:
+    def get_noticelist(self, noticelist: Union[MISPNoticelist, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPNoticelist]:
         """Get a noticelist by id."""
         noticelist_id = get_uuid_or_id_from_abstract_misp(noticelist)
         r = self._prepare_request('GET', f'noticelists/view/{noticelist_id}')
@@ -895,7 +895,7 @@ class PyMISP:
 
     # ## BEGIN Galaxy ###
 
-    def galaxies(self, pythonify: bool=False) -> Union[Dict, List[MISPGalaxy]]:
+    def galaxies(self, pythonify: bool = False) -> Union[Dict, List[MISPGalaxy]]:
         """Get all the galaxies."""
         r = self._prepare_request('GET', 'galaxies')
         galaxies = self._check_json_response(r)
@@ -908,7 +908,7 @@ class PyMISP:
             to_return.append(g)
         return to_return
 
-    def get_galaxy(self, galaxy: Union[MISPGalaxy, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPGalaxy]:
+    def get_galaxy(self, galaxy: Union[MISPGalaxy, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPGalaxy]:
         """Get a galaxy by id."""
         galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
         r = self._prepare_request('GET', f'galaxies/view/{galaxy_id}')
@@ -928,7 +928,7 @@ class PyMISP:
 
     # ## BEGIN Feed ###
 
-    def feeds(self, pythonify: bool=False) -> Union[Dict, List[MISPFeed]]:
+    def feeds(self, pythonify: bool = False) -> Union[Dict, List[MISPFeed]]:
         """Get the list of existing feeds."""
         r = self._prepare_request('GET', 'feeds')
         feeds = self._check_json_response(r)
@@ -941,7 +941,7 @@ class PyMISP:
             to_return.append(f)
         return to_return
 
-    def get_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPFeed]:
+    def get_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
         """Get a feed by id."""
         feed_id = get_uuid_or_id_from_abstract_misp(feed)
         r = self._prepare_request('GET', f'feeds/view/{feed_id}')
@@ -952,7 +952,7 @@ class PyMISP:
         f.from_dict(**feed_j)
         return f
 
-    def add_feed(self, feed: MISPFeed, pythonify: bool=False) -> Union[Dict, MISPFeed]:
+    def add_feed(self, feed: MISPFeed, pythonify: bool = False) -> Union[Dict, MISPFeed]:
         '''Add a new feed on a MISP instance'''
         # FIXME: https://github.com/MISP/MISP/issues/4834
         r = self._prepare_request('POST', 'feeds/add', data={'Feed': feed})
@@ -963,7 +963,7 @@ class PyMISP:
         f.from_dict(**new_feed)
         return f
 
-    def enable_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPFeed]:
+    def enable_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
         '''Enable a feed (fetching it will create event(s)'''
         if not isinstance(feed, MISPFeed):
             feed_id = get_uuid_or_id_from_abstract_misp(feed)  # In case we have a UUID
@@ -974,7 +974,7 @@ class PyMISP:
             f = feed
         return self.update_feed(feed=f, pythonify=pythonify)
 
-    def disable_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPFeed]:
+    def disable_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
         '''Disable a feed'''
         if not isinstance(feed, MISPFeed):
             feed_id = get_uuid_or_id_from_abstract_misp(feed)  # In case we have a UUID
@@ -985,7 +985,7 @@ class PyMISP:
             f = feed
         return self.update_feed(feed=f, pythonify=pythonify)
 
-    def enable_feed_cache(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPFeed]:
+    def enable_feed_cache(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
         '''Enable the caching of a feed'''
         if not isinstance(feed, MISPFeed):
             feed_id = get_uuid_or_id_from_abstract_misp(feed)  # In case we have a UUID
@@ -996,7 +996,7 @@ class PyMISP:
             f = feed
         return self.update_feed(feed=f, pythonify=pythonify)
 
-    def disable_feed_cache(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPFeed]:
+    def disable_feed_cache(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
         '''Disable the caching of a feed'''
         if not isinstance(feed, MISPFeed):
             feed_id = get_uuid_or_id_from_abstract_misp(feed)  # In case we have a UUID
@@ -1007,7 +1007,7 @@ class PyMISP:
             f = feed
         return self.update_feed(feed=f, pythonify=pythonify)
 
-    def update_feed(self, feed: MISPFeed, feed_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPFeed]:
+    def update_feed(self, feed: MISPFeed, feed_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPFeed]:
         '''Update a feed on a MISP instance'''
         if feed_id is None:
             fid = get_uuid_or_id_from_abstract_misp(feed)
@@ -1069,7 +1069,7 @@ class PyMISP:
 
     # ## BEGIN Server ###
 
-    def servers(self, pythonify: bool=False) -> Union[Dict, List[MISPServer]]:
+    def servers(self, pythonify: bool = False) -> Union[Dict, List[MISPServer]]:
         """Get the existing servers the MISP instance can synchronise with"""
         r = self._prepare_request('GET', 'servers')
         servers = self._check_json_response(r)
@@ -1082,7 +1082,7 @@ class PyMISP:
             to_return.append(s)
         return to_return
 
-    def get_sync_config(self, pythonify: bool=False) -> Union[Dict, MISPServer]:
+    def get_sync_config(self, pythonify: bool = False) -> Union[Dict, MISPServer]:
         '''WARNING: This method only works if the user calling it is a sync user'''
         r = self._prepare_request('GET', 'servers/createSync')
         server = self._check_json_response(r)
@@ -1092,7 +1092,7 @@ class PyMISP:
         s.from_dict(**server)
         return s
 
-    def import_server(self, server: MISPServer, pythonify: bool=False) -> Union[Dict, MISPServer]:
+    def import_server(self, server: MISPServer, pythonify: bool = False) -> Union[Dict, MISPServer]:
         """Import a sync server config received from get_sync_config"""
         r = self._prepare_request('POST', 'servers/import', data=server)
         server_j = self._check_json_response(r)
@@ -1102,7 +1102,7 @@ class PyMISP:
         s.from_dict(**server_j)
         return s
 
-    def add_server(self, server: MISPServer, pythonify: bool=False) -> Union[Dict, MISPServer]:
+    def add_server(self, server: MISPServer, pythonify: bool = False) -> Union[Dict, MISPServer]:
         """Add a server to synchronise with.
         Note: You probably want to use ExpandedPyMISP.get_sync_config and ExpandedPyMISP.import_server instead"""
         r = self._prepare_request('POST', 'servers/add', data=server)
@@ -1113,7 +1113,7 @@ class PyMISP:
         s.from_dict(**server_j)
         return s
 
-    def update_server(self, server: MISPServer, server_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPServer]:
+    def update_server(self, server: MISPServer, server_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPServer]:
         '''Update a server to synchronise with'''
         if server_id is None:
             sid = get_uuid_or_id_from_abstract_misp(server)
@@ -1133,7 +1133,7 @@ class PyMISP:
         response = self._prepare_request('POST', f'servers/delete/{server_id}')
         return self._check_json_response(response)
 
-    def server_pull(self, server: Union[MISPServer, int, str, UUID], event: Optional[Union[MISPEvent, int, str, UUID]]=None) -> Dict:
+    def server_pull(self, server: Union[MISPServer, int, str, UUID], event: Optional[Union[MISPEvent, int, str, UUID]] = None) -> Dict:
         '''Initialize a pull from a sync server'''
         server_id = get_uuid_or_id_from_abstract_misp(server)
         if event:
@@ -1145,7 +1145,7 @@ class PyMISP:
         # FIXME: can we pythonify?
         return self._check_json_response(response)
 
-    def server_push(self, server: Union[MISPServer, int, str, UUID], event: Optional[Union[MISPEvent, int, str, UUID]]=None) -> Dict:
+    def server_push(self, server: Union[MISPServer, int, str, UUID], event: Optional[Union[MISPEvent, int, str, UUID]] = None) -> Dict:
         '''Initialize a push to a sync server'''
         server_id = get_uuid_or_id_from_abstract_misp(server)
         if event:
@@ -1166,7 +1166,7 @@ class PyMISP:
 
     # ## BEGIN Sharing group ###
 
-    def sharing_groups(self, pythonify: bool=False) -> Union[Dict, List[MISPSharingGroup]]:
+    def sharing_groups(self, pythonify: bool = False) -> Union[Dict, List[MISPSharingGroup]]:
         """Get the existing sharing groups"""
         r = self._prepare_request('GET', 'sharing_groups')
         sharing_groups = self._check_json_response(r)
@@ -1179,7 +1179,7 @@ class PyMISP:
             to_return.append(s)
         return to_return
 
-    def add_sharing_group(self, sharing_group: MISPSharingGroup, pythonify: bool=False) -> Union[Dict, MISPSharingGroup]:
+    def add_sharing_group(self, sharing_group: MISPSharingGroup, pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
         """Add a new sharing group"""
         r = self._prepare_request('POST', 'sharing_groups/add', data=sharing_group)
         sharing_group_j = self._check_json_response(r)
@@ -1196,7 +1196,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def add_org_to_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID],
-                                 organisation: Union[MISPOrganisation, int, str, UUID], extend: bool=False) -> Dict:
+                                 organisation: Union[MISPOrganisation, int, str, UUID], extend: bool = False) -> Dict:
         '''Add an organisation to a sharing group.
         :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
         :organisation: Organisation's local instance ID, or Organisation's global UUID, or Organisation's name as known to the curent instance
@@ -1221,7 +1221,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def add_server_to_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID],
-                                    server: Union[MISPServer, int, str, UUID], all_orgs: bool=False) -> Dict:
+                                    server: Union[MISPServer, int, str, UUID], all_orgs: bool = False) -> Dict:
         '''Add a server to a sharing group.
         :sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
         :server: Server's local instance ID, or URL of the Server, or Server's name as known to the curent instance
@@ -1249,7 +1249,7 @@ class PyMISP:
 
     # ## BEGIN Organisation ###
 
-    def organisations(self, scope="local", pythonify: bool=False) -> Union[Dict, List[MISPOrganisation]]:
+    def organisations(self, scope="local", pythonify: bool = False) -> Union[Dict, List[MISPOrganisation]]:
         """Get all the organisations."""
         r = self._prepare_request('GET', f'organisations/index/scope:{scope}')
         organisations = self._check_json_response(r)
@@ -1262,7 +1262,7 @@ class PyMISP:
             to_return.append(o)
         return to_return
 
-    def get_organisation(self, organisation: Union[MISPOrganisation, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPOrganisation]:
+    def get_organisation(self, organisation: Union[MISPOrganisation, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
         '''Get an organisation.'''
         organisation_id = get_uuid_or_id_from_abstract_misp(organisation)
         r = self._prepare_request('GET', f'organisations/view/{organisation_id}')
@@ -1273,7 +1273,7 @@ class PyMISP:
         o.from_dict(**organisation_j)
         return o
 
-    def add_organisation(self, organisation: MISPOrganisation, pythonify: bool=False) -> Union[Dict, MISPOrganisation]:
+    def add_organisation(self, organisation: MISPOrganisation, pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
         '''Add an organisation'''
         r = self._prepare_request('POST', 'admin/organisations/add', data=organisation)
         new_organisation = self._check_json_response(r)
@@ -1283,7 +1283,7 @@ class PyMISP:
         o.from_dict(**new_organisation)
         return o
 
-    def update_organisation(self, organisation: MISPOrganisation, organisation_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPOrganisation]:
+    def update_organisation(self, organisation: MISPOrganisation, organisation_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
         '''Update an organisation'''
         if organisation_id is None:
             oid = get_uuid_or_id_from_abstract_misp(organisation)
@@ -1308,7 +1308,7 @@ class PyMISP:
 
     # ## BEGIN User ###
 
-    def users(self, pythonify: bool=False) -> Union[Dict, List[MISPUser]]:
+    def users(self, pythonify: bool = False) -> Union[Dict, List[MISPUser]]:
         """Get all the users."""
         r = self._prepare_request('GET', 'admin/users')
         users = self._check_json_response(r)
@@ -1321,7 +1321,7 @@ class PyMISP:
             to_return.append(u)
         return to_return
 
-    def get_user(self, user: Union[MISPUser, int, str, UUID]='me', pythonify: bool=False, expanded: bool=False) -> Union[Dict, MISPUser, Tuple[MISPUser, MISPRole, List[MISPUserSetting]]]:
+    def get_user(self, user: Union[MISPUser, int, str, UUID] = 'me', pythonify: bool = False, expanded: bool = False) -> Union[Dict, MISPUser, Tuple[MISPUser, MISPRole, List[MISPUserSetting]]]:
         '''Get a user. `me` means the owner of the API key doing the query.
         expanded also returns a MISPRole and a MISPUserSetting'''
         user_id = get_uuid_or_id_from_abstract_misp(user)
@@ -1344,7 +1344,7 @@ class PyMISP:
                     usersettings.append(us)
             return u, role, usersettings
 
-    def add_user(self, user: MISPUser, pythonify: bool=False) -> Union[Dict, MISPUser]:
+    def add_user(self, user: MISPUser, pythonify: bool = False) -> Union[Dict, MISPUser]:
         '''Add a new user'''
         r = self._prepare_request('POST', 'admin/users/add', data=user)
         user_j = self._check_json_response(r)
@@ -1354,7 +1354,7 @@ class PyMISP:
         u.from_dict(**user_j)
         return u
 
-    def update_user(self, user: MISPUser, user_id: Optional[int]=None, pythonify: bool=False) -> Union[Dict, MISPUser]:
+    def update_user(self, user: MISPUser, user_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPUser]:
         '''Update an event on a MISP instance'''
         if user_id is None:
             uid = get_uuid_or_id_from_abstract_misp(user)
@@ -1383,7 +1383,7 @@ class PyMISP:
         response = self._prepare_request('POST', 'users/change_pw', data={'password': new_password})
         return self._check_json_response(response)
 
-    def user_registrations(self, pythonify: bool=False) -> Union[Dict, List[MISPInbox]]:
+    def user_registrations(self, pythonify: bool = False) -> Union[Dict, List[MISPInbox]]:
         """Get all the user registrations."""
         r = self._prepare_request('GET', 'users/registrations')
         registrations = self._check_json_response(r)
@@ -1397,10 +1397,10 @@ class PyMISP:
         return to_return
 
     def accept_user_registration(self, registration: Union[MISPInbox, int, str, UUID],
-                                 organisation: Optional[Union[MISPOrganisation, int, str, UUID]]=None,
-                                 role: Optional[Union[MISPRole, int, str]]=None,
-                                 perm_sync: bool=False, perm_publish: bool=False, perm_admin: bool=False,
-                                 unsafe_fallback: bool=False):
+                                 organisation: Optional[Union[MISPOrganisation, int, str, UUID]] = None,
+                                 role: Optional[Union[MISPRole, int, str]] = None,
+                                 perm_sync: bool = False, perm_publish: bool = False, perm_admin: bool = False,
+                                 unsafe_fallback: bool = False):
         registration_id = get_uuid_or_id_from_abstract_misp(registration)
         if role:
             role_id = role_id = get_uuid_or_id_from_abstract_misp(role)
@@ -1446,7 +1446,7 @@ class PyMISP:
 
     # ## BEGIN Role ###
 
-    def roles(self, pythonify: bool=False) -> Union[Dict, List[MISPRole]]:
+    def roles(self, pythonify: bool = False) -> Union[Dict, List[MISPRole]]:
         """Get the existing roles"""
         r = self._prepare_request('GET', 'roles')
         roles = self._check_json_response(r)
@@ -1469,50 +1469,50 @@ class PyMISP:
 
     # ## BEGIN Search methods ###
 
-    def search(self, controller: str='events', return_format: str='json',
-               limit: Optional[int]=None, page: Optional[int]=None,
-               value: Optional[SearchParameterTypes]=None,
-               type_attribute: Optional[SearchParameterTypes]=None,
-               category: Optional[SearchParameterTypes]=None,
-               org: Optional[SearchParameterTypes]=None,
-               tags: Optional[SearchParameterTypes]=None,
-               quick_filter: Optional[str]=None, quickFilter: Optional[str]=None,
-               date_from: Optional[Union[datetime, date, int, str, float, None]]=None,
-               date_to: Optional[Union[datetime, date, int, str, float, None]]=None,
-               eventid: Optional[SearchType]=None,
-               with_attachments: Optional[bool]=None, withAttachments: Optional[bool]=None,
-               metadata: Optional[bool]=None,
-               uuid: Optional[str]=None,
+    def search(self, controller: str = 'events', return_format: str = 'json',
+               limit: Optional[int] = None, page: Optional[int] = None,
+               value: Optional[SearchParameterTypes] = None,
+               type_attribute: Optional[SearchParameterTypes] = None,
+               category: Optional[SearchParameterTypes] = None,
+               org: Optional[SearchParameterTypes] = None,
+               tags: Optional[SearchParameterTypes] = None,
+               quick_filter: Optional[str] = None, quickFilter: Optional[str] = None,
+               date_from: Optional[Union[datetime, date, int, str, float, None]] = None,
+               date_to: Optional[Union[datetime, date, int, str, float, None]] = None,
+               eventid: Optional[SearchType] = None,
+               with_attachments: Optional[bool] = None, withAttachments: Optional[bool] = None,
+               metadata: Optional[bool] = None,
+               uuid: Optional[str] = None,
                publish_timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
                                            Tuple[Union[datetime, date, int, str, float, None],
                                                  Union[datetime, date, int, str, float, None]]
-                                                 ]]=None,
+                                                 ]] = None,
                last: Optional[Union[Union[datetime, date, int, str, float, None],
                               Tuple[Union[datetime, date, int, str, float, None],
                                     Union[datetime, date, int, str, float, None]]
-                                    ]]=None,
+                                    ]] = None,
                timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
                                    Tuple[Union[datetime, date, int, str, float, None],
                                          Union[datetime, date, int, str, float, None]]
-                                         ]]=None,
-               published: Optional[bool]=None,
-               enforce_warninglist: Optional[bool]=None, enforceWarninglist: Optional[bool]=None,
-               to_ids: Optional[Union[ToIDSType, List[ToIDSType]]]=None,
-               deleted: Optional[str]=None,
-               include_event_uuid: Optional[bool]=None, includeEventUuid: Optional[bool]=None,
-               include_event_tags: Optional[bool]=None, includeEventTags: Optional[bool]=None,
-               event_timestamp: Optional[Union[datetime, date, int, str, float, None]]=None,
-               sg_reference_only: Optional[bool]=None,
-               eventinfo: Optional[str]=None,
-               searchall: Optional[bool]=None,
-               requested_attributes: Optional[str]=None,
-               include_context: Optional[bool]=None, includeContext: Optional[bool]=None,
-               headerless: Optional[bool]=None,
-               include_sightings: Optional[bool]=None, includeSightings: Optional[bool]=None,
-               include_correlations: Optional[bool]=None, includeCorrelations: Optional[bool]=None,
+                                         ]] = None,
+               published: Optional[bool] = None,
+               enforce_warninglist: Optional[bool] = None, enforceWarninglist: Optional[bool] = None,
+               to_ids: Optional[Union[ToIDSType, List[ToIDSType]]] = None,
+               deleted: Optional[str] = None,
+               include_event_uuid: Optional[bool] = None, includeEventUuid: Optional[bool] = None,
+               include_event_tags: Optional[bool] = None, includeEventTags: Optional[bool] = None,
+               event_timestamp: Optional[Union[datetime, date, int, str, float, None]] = None,
+               sg_reference_only: Optional[bool] = None,
+               eventinfo: Optional[str] = None,
+               searchall: Optional[bool] = None,
+               requested_attributes: Optional[str] = None,
+               include_context: Optional[bool] = None, includeContext: Optional[bool] = None,
+               headerless: Optional[bool] = None,
+               include_sightings: Optional[bool] = None, includeSightings: Optional[bool] = None,
+               include_correlations: Optional[bool] = None, includeCorrelations: Optional[bool] = None,
                include_decay_score: Optional[bool] = None, includeDecayScore: Optional[bool] = None,
-               object_name: Optional[str]=None,
-               pythonify: Optional[bool]=False,
+               object_name: Optional[str] = None,
+               pythonify: Optional[bool] = False,
                **kwargs) -> Union[Dict, str, List[Union[MISPEvent, MISPAttribute, MISPObject]]]:
         '''Search in the MISP instance
 
@@ -1714,20 +1714,20 @@ class PyMISP:
 
         return normalized_response
 
-    def search_index(self, published: Optional[bool]=None, eventid: Optional[SearchType]=None,
-                     tags: Optional[SearchParameterTypes]=None,
-                     date_from: Optional[Union[datetime, date, int, str, float, None]]=None,
-                     date_to: Optional[Union[datetime, date, int, str, float, None]]=None,
-                     eventinfo: Optional[str]=None,
-                     threatlevel: Optional[List[SearchType]]=None,
-                     distribution: Optional[List[SearchType]]=None,
-                     analysis: Optional[List[SearchType]]=None,
-                     org: Optional[SearchParameterTypes]=None,
+    def search_index(self, published: Optional[bool] = None, eventid: Optional[SearchType] = None,
+                     tags: Optional[SearchParameterTypes] = None,
+                     date_from: Optional[Union[datetime, date, int, str, float, None]] = None,
+                     date_to: Optional[Union[datetime, date, int, str, float, None]] = None,
+                     eventinfo: Optional[str] = None,
+                     threatlevel: Optional[List[SearchType]] = None,
+                     distribution: Optional[List[SearchType]] = None,
+                     analysis: Optional[List[SearchType]] = None,
+                     org: Optional[SearchParameterTypes] = None,
                      timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
                                          Tuple[Union[datetime, date, int, str, float, None],
                                                Union[datetime, date, int, str, float, None]]
-                                               ]]=None,
-                     pythonify: Optional[bool]=None) -> Union[Dict, List[MISPEvent]]:
+                                               ]] = None,
+                     pythonify: Optional[bool] = None) -> Union[Dict, List[MISPEvent]]:
         """Search only at the index level. Using ! in front of a value means NOT (default is OR)
 
         :param published: Set whether published or unpublished events should be returned. Do not set the parameter if you want both.
@@ -1771,24 +1771,24 @@ class PyMISP:
             to_return.append(me)
         return to_return
 
-    def search_sightings(self, context: Optional[str]=None,
-                         context_id: Optional[SearchType]=None,
-                         type_sighting: Optional[str]=None,
-                         date_from: Optional[Union[datetime, date, int, str, float, None]]=None,
-                         date_to: Optional[Union[datetime, date, int, str, float, None]]=None,
+    def search_sightings(self, context: Optional[str] = None,
+                         context_id: Optional[SearchType] = None,
+                         type_sighting: Optional[str] = None,
+                         date_from: Optional[Union[datetime, date, int, str, float, None]] = None,
+                         date_to: Optional[Union[datetime, date, int, str, float, None]] = None,
                          publish_timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
                                                      Tuple[Union[datetime, date, int, str, float, None],
                                                            Union[datetime, date, int, str, float, None]]
-                                                           ]]=None,
+                                                           ]] = None,
                          last: Optional[Union[Union[datetime, date, int, str, float, None],
                                         Tuple[Union[datetime, date, int, str, float, None],
                                               Union[datetime, date, int, str, float, None]]
-                                              ]]=None,
-                         org: Optional[SearchType]=None,
-                         source: Optional[str]=None,
-                         include_attribute: Optional[bool]=None,
-                         include_event_meta: Optional[bool]=None,
-                         pythonify: Optional[bool]=False
+                                              ]] = None,
+                         org: Optional[SearchType] = None,
+                         source: Optional[str] = None,
+                         include_attribute: Optional[bool] = None,
+                         include_event_meta: Optional[bool] = None,
+                         pythonify: Optional[bool] = False
                          ) -> Union[Dict, List[Dict[str, Union[MISPEvent, MISPAttribute, MISPSighting]]]]:
         '''Search sightings
 
@@ -1862,13 +1862,13 @@ class PyMISP:
             return to_return
         return normalized_response
 
-    def search_logs(self, limit: Optional[int]=None, page: Optional[int]=None,
-                    log_id: Optional[int]=None, title: Optional[str]=None,
-                    created: Optional[Union[datetime, date, int, str, float, None]]=None, model: Optional[str]=None,
-                    action: Optional[str]=None, user_id: Optional[int]=None,
-                    change: Optional[str]=None, email: Optional[str]=None,
-                    org: Optional[str]=None, description: Optional[str]=None,
-                    ip: Optional[str]=None, pythonify: Optional[bool]=False) -> Union[Dict, List[MISPLog]]:
+    def search_logs(self, limit: Optional[int] = None, page: Optional[int] = None,
+                    log_id: Optional[int] = None, title: Optional[str] = None,
+                    created: Optional[Union[datetime, date, int, str, float, None]] = None, model: Optional[str] = None,
+                    action: Optional[str] = None, user_id: Optional[int] = None,
+                    change: Optional[str] = None, email: Optional[str] = None,
+                    org: Optional[str] = None, description: Optional[str] = None,
+                    ip: Optional[str] = None, pythonify: Optional[bool] = False) -> Union[Dict, List[MISPLog]]:
         '''Search in logs
 
         Note: to run substring queries simply append/prepend/encapsulate the search term with %
@@ -1906,7 +1906,7 @@ class PyMISP:
             to_return.append(ml)
         return to_return
 
-    def search_feeds(self, value: Optional[SearchParameterTypes]=None, pythonify: Optional[bool]=False) -> Union[Dict, List[MISPFeed]]:
+    def search_feeds(self, value: Optional[SearchParameterTypes] = None, pythonify: Optional[bool] = False) -> Union[Dict, List[MISPFeed]]:
         '''Search in the feeds cached on the servers'''
         response = self._prepare_request('POST', '/feeds/searchCaches', data={'value': value})
         normalized_response = self._check_json_response(response)
@@ -1923,7 +1923,7 @@ class PyMISP:
 
     # ## BEGIN Communities ###
 
-    def communities(self, pythonify: bool=False) -> Union[Dict, List[MISPCommunity]]:
+    def communities(self, pythonify: bool = False) -> Union[Dict, List[MISPCommunity]]:
         """Get all the communities."""
         r = self._prepare_request('GET', 'communities')
         communities = self._check_json_response(r)
@@ -1936,7 +1936,7 @@ class PyMISP:
             to_return.append(c)
         return to_return
 
-    def get_community(self, community: Union[MISPCommunity, int, str, UUID], pythonify: bool=False) -> Union[Dict, MISPCommunity]:
+    def get_community(self, community: Union[MISPCommunity, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPCommunity]:
         '''Get an community from a MISP instance'''
         community_id = get_uuid_or_id_from_abstract_misp(community)
         r = self._prepare_request('GET', f'communities/view/{community_id}')
@@ -1948,14 +1948,14 @@ class PyMISP:
         return c
 
     def request_community_access(self, community: Union[MISPCommunity, int, str, UUID],
-                                 requestor_email_address: Optional[str]=None,
-                                 requestor_gpg_key: Optional[str]=None,
-                                 requestor_organisation_name: Optional[str]=None,
-                                 requestor_organisation_uuid: Optional[str]=None,
-                                 requestor_organisation_description: Optional[str]=None,
-                                 message: Optional[str]=None, sync: bool=False,
-                                 anonymise_requestor_server: bool=False,
-                                 mock: bool=False) -> Dict:
+                                 requestor_email_address: Optional[str] = None,
+                                 requestor_gpg_key: Optional[str] = None,
+                                 requestor_organisation_name: Optional[str] = None,
+                                 requestor_organisation_uuid: Optional[str] = None,
+                                 requestor_organisation_description: Optional[str] = None,
+                                 message: Optional[str] = None, sync: bool = False,
+                                 anonymise_requestor_server: bool = False,
+                                 mock: bool = False) -> Dict:
         community_id = get_uuid_or_id_from_abstract_misp(community)
         to_post = {'org_name': requestor_organisation_name,
                    'org_uuid': requestor_organisation_uuid,
@@ -1970,7 +1970,7 @@ class PyMISP:
 
     # ## BEGIN Event Delegation ###
 
-    def event_delegations(self, pythonify: bool=False) -> Union[Dict, List[MISPEventDelegation]]:
+    def event_delegations(self, pythonify: bool = False) -> Union[Dict, List[MISPEventDelegation]]:
         """Get all the event delegations."""
         r = self._prepare_request('GET', 'event_delegations')
         delegations = self._check_json_response(r)
@@ -1983,20 +1983,20 @@ class PyMISP:
             to_return.append(d)
         return to_return
 
-    def accept_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool=False) -> Dict:
+    def accept_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool = False) -> Dict:
         delegation_id = get_uuid_or_id_from_abstract_misp(delegation)
         r = self._prepare_request('POST', f'event_delegations/acceptDelegation/{delegation_id}')
         return self._check_json_response(r)
 
-    def discard_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool=False) -> Dict:
+    def discard_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool = False) -> Dict:
         delegation_id = get_uuid_or_id_from_abstract_misp(delegation)
         r = self._prepare_request('POST', f'event_delegations/deleteDelegation/{delegation_id}')
         return self._check_json_response(r)
 
-    def delegate_event(self, event: Optional[Union[MISPEvent, int, str, UUID]]=None,
-                       organisation: Optional[Union[MISPOrganisation, int, str, UUID]]=None,
-                       event_delegation: Optional[MISPEventDelegation]=None,
-                       distribution: int=-1, message: str='', pythonify: bool=False) -> Union[Dict, MISPEventDelegation]:
+    def delegate_event(self, event: Optional[Union[MISPEvent, int, str, UUID]] = None,
+                       organisation: Optional[Union[MISPOrganisation, int, str, UUID]] = None,
+                       event_delegation: Optional[MISPEventDelegation] = None,
+                       distribution: int = -1, message: str = '', pythonify: bool = False) -> Union[Dict, MISPEventDelegation]:
         '''Note: distribution == -1 means recipient decides'''
         if event and organisation:
             event_id = get_uuid_or_id_from_abstract_misp(event)
@@ -2024,7 +2024,7 @@ class PyMISP:
         response = self._prepare_request('POST', f'events/pushEventToZMQ/{event_id}.json')
         return self._check_json_response(response)
 
-    def direct_call(self, url: str, data: Optional[Dict]=None, params: Mapping={}, kw_params: Mapping={}) -> Any:
+    def direct_call(self, url: str, data: Optional[Dict] = None, params: Mapping = {}, kw_params: Mapping = {}) -> Any:
         '''Very lightweight call that posts a data blob (python dictionary or json string) on the URL'''
         if data is None:
             response = self._prepare_request('GET', url, params=params, kw_params=kw_params)
@@ -2032,8 +2032,8 @@ class PyMISP:
             response = self._prepare_request('POST', url, data=data, params=params, kw_params=kw_params)
         return self._check_response(response, lenient_response_type=True)
 
-    def freetext(self, event: Union[MISPEvent, int, str, UUID], string: str, adhereToWarninglists: Union[bool, str]=False,
-                 distribution: Optional[int]=None, returnMetaAttributes: bool=False, pythonify: bool=False, **kwargs) -> Union[Dict, List[MISPAttribute]]:
+    def freetext(self, event: Union[MISPEvent, int, str, UUID], string: str, adhereToWarninglists: Union[bool, str] = False,
+                 distribution: Optional[int] = None, returnMetaAttributes: bool = False, pythonify: bool = False, **kwargs) -> Union[Dict, List[MISPAttribute]]:
         """Pass a text to the freetext importer"""
         event_id = get_uuid_or_id_from_abstract_misp(event)
         query: Dict[str, Any] = {"value": string}
@@ -2057,7 +2057,7 @@ class PyMISP:
             to_return.append(a)
         return to_return
 
-    def upload_stix(self, path, version: str='2'):
+    def upload_stix(self, path, version: str = '2'):
         """Upload a STIX file to MISP.
         :param path: Path to the STIX on the disk (can be a path-like object, or a pseudofile)
         :param version: Can be 1 or 2
@@ -2083,7 +2083,7 @@ class PyMISP:
 
     # ## BEGIN Statistics ###
 
-    def attributes_statistics(self, context: str='type', percentage: bool=False) -> Dict:
+    def attributes_statistics(self, context: str = 'type', percentage: bool = False) -> Dict:
         """Get attributes statistics from the MISP instance."""
         # FIXME: https://github.com/MISP/MISP/issues/4874
         if context not in ['type', 'category']:
@@ -2095,7 +2095,7 @@ class PyMISP:
         response = self._prepare_request('GET', path)
         return self._check_json_response(response)
 
-    def tags_statistics(self, percentage: bool=False, name_sort: bool=False) -> Dict:
+    def tags_statistics(self, percentage: bool = False, name_sort: bool = False) -> Dict:
         """Get tags statistics from the MISP instance"""
         # FIXME: https://github.com/MISP/MISP/issues/4874
         # NOTE: https://github.com/MISP/MISP/issues/4879
@@ -2110,7 +2110,7 @@ class PyMISP:
         response = self._prepare_request('GET', f'tags/tagStatistics/{p}/{ns}')
         return self._check_json_response(response)
 
-    def users_statistics(self, context: str='data') -> Dict:
+    def users_statistics(self, context: str = 'data') -> Dict:
         """Get users statistics from the MISP instance"""
         availables_contexts = ['data', 'orgs', 'users', 'tags', 'attributehistogram', 'sightings', 'galaxyMatrix']
         if context not in availables_contexts:
@@ -2122,7 +2122,7 @@ class PyMISP:
 
     # ## BEGIN User Settings ###
 
-    def user_settings(self, pythonify: bool=False) -> Union[Dict, List[MISPUserSetting]]:
+    def user_settings(self, pythonify: bool = False) -> Union[Dict, List[MISPUserSetting]]:
         """Get all the user settings."""
         r = self._prepare_request('GET', 'user_settings')
         user_settings = self._check_json_response(r)
@@ -2135,8 +2135,8 @@ class PyMISP:
             to_return.append(u)
         return to_return
 
-    def get_user_setting(self, user_setting: str, user: Optional[Union[MISPUser, int, str, UUID]]=None,
-                         pythonify: bool=False) -> Union[Dict, MISPUserSetting]:
+    def get_user_setting(self, user_setting: str, user: Optional[Union[MISPUser, int, str, UUID]] = None,
+                         pythonify: bool = False) -> Union[Dict, MISPUserSetting]:
         '''Get an user setting'''
         query: Dict[str, Any] = {'setting': user_setting}
         if user:
@@ -2149,8 +2149,8 @@ class PyMISP:
         u.from_dict(**user_setting_j)
         return u
 
-    def set_user_setting(self, user_setting: str, value: Union[str, dict], user: Optional[Union[MISPUser, int, str, UUID]]=None,
-                         pythonify: bool=False) -> Union[Dict, MISPUserSetting]:
+    def set_user_setting(self, user_setting: str, value: Union[str, dict], user: Optional[Union[MISPUser, int, str, UUID]] = None,
+                         pythonify: bool = False) -> Union[Dict, MISPUserSetting]:
         '''Get an user setting'''
         query: Dict[str, Any] = {'setting': user_setting}
         if isinstance(value, dict):
@@ -2166,7 +2166,7 @@ class PyMISP:
         u.from_dict(**user_setting_j)
         return u
 
-    def delete_user_setting(self, user_setting: str, user: Optional[Union[MISPUser, int, str, UUID]]=None) -> Dict:
+    def delete_user_setting(self, user_setting: str, user: Optional[Union[MISPUser, int, str, UUID]] = None) -> Dict:
         '''Delete a user setting'''
         query: Dict[str, Any] = {'setting': user_setting}
         if user:
@@ -2178,7 +2178,7 @@ class PyMISP:
 
     # ## BEGIN Global helpers ###
 
-    def change_sharing_group_on_entity(self, misp_entity: Union[MISPEvent, MISPAttribute, MISPObject], sharing_group_id, pythonify: bool=False) -> Union[Dict, MISPEvent, MISPObject, MISPAttribute, MISPShadowAttribute]:
+    def change_sharing_group_on_entity(self, misp_entity: Union[MISPEvent, MISPAttribute, MISPObject], sharing_group_id, pythonify: bool = False) -> Union[Dict, MISPEvent, MISPObject, MISPAttribute, MISPShadowAttribute]:
         """Change the sharing group of an event, an attribute, or an object"""
         misp_entity.distribution = 4      # Needs to be 'Sharing group'
         if 'SharingGroup' in misp_entity:  # Delete former SharingGroup information
@@ -2195,7 +2195,7 @@ class PyMISP:
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: Union[AbstractMISP, str, dict], tag: Union[MISPTag, str], local: bool=False) -> Dict:
+    def tag(self, misp_entity: Union[AbstractMISP, str, dict], tag: Union[MISPTag, str], local: bool = False) -> Dict:
         """Tag an event or an attribute. misp_entity can be a MISPEvent, a MISP Attribute, or a UUID"""
         if isinstance(misp_entity, AbstractMISP) and 'uuid' in misp_entity:
             uuid = misp_entity.uuid
@@ -2226,9 +2226,9 @@ class PyMISP:
         response = self._prepare_request('POST', 'tags/removeTagFromObject', data=to_post)
         return self._check_json_response(response)
 
-    def build_complex_query(self, or_parameters: Optional[List[SearchType]]=None,
-                            and_parameters: Optional[List[SearchType]]=None,
-                            not_parameters: Optional[List[SearchType]]=None) -> Dict[str, List[SearchType]]:
+    def build_complex_query(self, or_parameters: Optional[List[SearchType]] = None,
+                            and_parameters: Optional[List[SearchType]] = None,
+                            not_parameters: Optional[List[SearchType]] = None) -> Dict[str, List[SearchType]]:
         '''Build a complex search query. MISP expects a dictionary with AND, OR and NOT keys.'''
         to_return = {}
         if and_parameters:
@@ -2243,7 +2243,7 @@ class PyMISP:
 
     # ## Internal methods ###
 
-    def _old_misp(self, minimal_version_required: tuple, removal_date: Union[str, date, datetime], method: Optional[str]=None, message: Optional[str]=None) -> bool:
+    def _old_misp(self, minimal_version_required: tuple, removal_date: Union[str, date, datetime], method: Optional[str] = None, message: Optional[str] = None) -> bool:
         if self._misp_version >= minimal_version_required:
             return False
         if isinstance(removal_date, (datetime, date)):
@@ -2254,7 +2254,7 @@ class PyMISP:
         warnings.warn(to_print, DeprecationWarning)
         return True
 
-    def _make_misp_bool(self, parameter: Optional[Union[bool, str]]=None) -> int:
+    def _make_misp_bool(self, parameter: Optional[Union[bool, str]] = None) -> int:
         '''MISP wants 0 or 1 for bool, so we avoid True/False '0', '1' '''
         if parameter is None:
             return 0
@@ -2287,7 +2287,7 @@ class PyMISP:
             return r
         # Else: an exception was raised anyway
 
-    def _check_response(self, response: requests.Response, lenient_response_type: bool=False, expect_json: bool=False) -> Union[Dict, str]:
+    def _check_response(self, response: requests.Response, lenient_response_type: bool = False, expect_json: bool = False) -> Union[Dict, str]:
         """Check if the response from the server is not an unexpected error"""
         if response.status_code >= 500:
             logger.critical(everything_broken.format(response.request.headers, response.request.body, response.text))
@@ -2327,8 +2327,8 @@ class PyMISP:
     def __repr__(self):
         return f'<{self.__class__.__name__}(url={self.root_url})'
 
-    def _prepare_request(self, request_type: str, url: str, data: Union[str, Iterator, Mapping, AbstractMISP]={}, params: Mapping={},
-                         kw_params: Mapping={}, output_type: str='json') -> requests.Response:
+    def _prepare_request(self, request_type: str, url: str, data: Union[str, Iterator, Mapping, AbstractMISP] = {}, params: Mapping = {},
+                         kw_params: Mapping = {}, output_type: str = 'json') -> requests.Response:
         '''Prepare a request for python-requests'''
         url = urljoin(self.root_url, url)
         if data == {} or isinstance(data, str):

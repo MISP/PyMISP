@@ -8,8 +8,8 @@ from pymisp import MISPObject
 
 class CSVLoader():
 
-    def __init__(self, template_name: str, csv_path: Path, fieldnames: list=[], has_fieldnames=False,
-                 delimiter: str=',', quotechar: str='"'):
+    def __init__(self, template_name: str, csv_path: Path, fieldnames: list = [], has_fieldnames=False,
+                 delimiter: str = ',', quotechar: str = '"'):
         self.template_name = template_name
         self.delimiter = delimiter
         self.quotechar = quotechar

@@ -21,7 +21,7 @@ except ImportError:
 logger = logging.getLogger('pymisp')
 
 
-def make_elf_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool=True, default_attributes_parameters: dict={}):
+def make_elf_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
     elf_object = ELFObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(elf_object.uuid, 'includes', 'ELF indicators')
     elf_sections = []
@@ -32,7 +32,7 @@ def make_elf_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone
 
 class ELFObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: lief.ELF.Binary=None, filepath: Union[Path, str]=None, pseudofile: Union[BytesIO, bytes]=None, **kwargs):
+    def __init__(self, parsed: lief.ELF.Binary = None, filepath: Union[Path, str] = None, pseudofile: Union[BytesIO, bytes] = None, **kwargs):
         super(ELFObject, self).__init__('elf', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")

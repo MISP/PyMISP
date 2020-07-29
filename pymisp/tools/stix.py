@@ -9,7 +9,7 @@ except ImportError:
     has_misp_stix_converter = False
 
 
-def load_stix(stix, distribution: int=3, threat_level_id: int=2, analysis: int=0):
+def load_stix(stix, distribution: int = 3, threat_level_id: int = 2, analysis: int = 0):
     '''Returns a MISPEvent object from a STIX package'''
     if not has_misp_stix_converter:
         raise Exception('You need to install misp_stix_converter: pip install git+https://github.com/MISP/MISP-STIX-Converter.git')
@@ -18,7 +18,7 @@ def load_stix(stix, distribution: int=3, threat_level_id: int=2, analysis: int=0
                       threat_level_id=threat_level_id, analysis=analysis)
 
 
-def make_stix_package(misp_event, to_json: bool=False, to_xml: bool=False):
+def make_stix_package(misp_event, to_json: bool = False, to_xml: bool = False):
     '''Returns a STIXPackage from a MISPEvent.
 
        Optionally can return the package in json or xml.
