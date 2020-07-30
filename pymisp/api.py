@@ -194,7 +194,7 @@ class PyMISP:
     @property
     def misp_instance_version(self) -> Dict:
         """Returns the version of the instance."""
-        response = self._prepare_request('GET', 'servers/getVersion.json')
+        response = self._prepare_request('GET', 'servers/getVersion')
         return self._check_json_response(response)
 
     @property
@@ -207,28 +207,28 @@ class PyMISP:
         return {'error': 'Impossible to retrieve the version of the master branch.'}
 
     def update_misp(self) -> Dict:
-        response = self._prepare_request('POST', '/servers/update')
+        response = self._prepare_request('POST', 'servers/update')
         return self._check_json_response(response)
 
     def set_server_setting(self, setting: str, value: Union[str, int, bool], force: bool = False) -> Dict:
         data = {'value': value, 'force': force}
-        response = self._prepare_request('POST', f'/servers/serverSettingsEdit/{setting}', data=data)
+        response = self._prepare_request('POST', f'servers/serverSettingsEdit/{setting}', data=data)
         return self._check_json_response(response)
 
     def get_server_setting(self, setting: str) -> Dict:
-        response = self._prepare_request('GET', f'/servers/getSetting/{setting}')
+        response = self._prepare_request('GET', f'servers/getSetting/{setting}')
         return self._check_json_response(response)
 
     def server_settings(self) -> Dict:
-        response = self._prepare_request('GET', '/servers/serverSettings')
+        response = self._prepare_request('GET', 'servers/serverSettings')
         return self._check_json_response(response)
 
     def restart_workers(self) -> Dict:
-        response = self._prepare_request('POST', '/servers/restartWorkers')
+        response = self._prepare_request('POST', 'servers/restartWorkers')
         return self._check_json_response(response)
 
     def db_schema_diagnostic(self) -> Dict:
-        response = self._prepare_request('GET', '/servers/dbSchemaDiagnostic')
+        response = self._prepare_request('GET', 'servers/dbSchemaDiagnostic')
         return self._check_json_response(response)
 
     def toggle_global_pythonify(self) -> None:
@@ -237,7 +237,7 @@ class PyMISP:
     # ## BEGIN Event ##
 
     def events(self, pythonify: bool = False) -> Union[Dict, List[MISPEvent]]:
-        r = self._prepare_request('GET', 'events')
+        r = self._prepare_request('GET', 'events/index')
         events_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in events_r:
             return events_r
@@ -272,7 +272,7 @@ class PyMISP:
 
     def add_event(self, event: MISPEvent, pythonify: bool = False) -> Union[Dict, MISPEvent]:
         '''Add a new event on a MISP instance'''
-        r = self._prepare_request('POST', 'events', data=event)
+        r = self._prepare_request('POST', 'events/add', data=event)
         new_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_event:
             return new_event
@@ -286,7 +286,7 @@ class PyMISP:
             eid = get_uuid_or_id_from_abstract_misp(event)
         else:
             eid = get_uuid_or_id_from_abstract_misp(event_id)
-        r = self._prepare_request('POST', f'events/{eid}', data=event)
+        r = self._prepare_request('POST', f'events/edit/{eid}', data=event)
         updated_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
             return updated_event
@@ -297,7 +297,7 @@ class PyMISP:
     def delete_event(self, event: Union[MISPEvent, int, str, UUID]) -> Dict:
         '''Delete an event from a MISP instance'''
         event_id = get_uuid_or_id_from_abstract_misp(event)
-        response = self._prepare_request('DELETE', f'events/delete/{event_id}')
+        response = self._prepare_request('POST', f'events/delete/{event_id}')
         return self._check_json_response(response)
 
     def publish(self, event: Union[MISPEvent, int, str, UUID], alert: bool = False) -> Dict:
@@ -366,7 +366,7 @@ class PyMISP:
 
     def add_object_reference(self, misp_object_reference: MISPObjectReference, pythonify: bool = False) -> Union[Dict, MISPObjectReference]:
         """Add a reference to an object"""
-        r = self._prepare_request('POST', 'object_references/add', misp_object_reference)
+        r = self._prepare_request('POST', 'objectReferences/add', misp_object_reference)
         object_reference = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in object_reference:
             return object_reference
@@ -377,14 +377,14 @@ class PyMISP:
     def delete_object_reference(self, object_reference: Union[MISPObjectReference, int, str, UUID]) -> Dict:
         """Delete a reference to an object"""
         object_reference_id = get_uuid_or_id_from_abstract_misp(object_reference)
-        response = self._prepare_request('POST', f'object_references/delete/{object_reference_id}')
+        response = self._prepare_request('POST', f'objectReferences/delete/{object_reference_id}')
         return self._check_json_response(response)
 
     # Object templates
 
     def object_templates(self, pythonify: bool = False) -> Union[Dict, List[MISPObjectTemplate]]:
         """Get all the object templates."""
-        r = self._prepare_request('GET', 'objectTemplates')
+        r = self._prepare_request('GET', 'objectTemplates/index')
         templates = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in templates:
             return templates
@@ -513,9 +513,9 @@ class PyMISP:
     def attribute_proposals(self, event: Optional[Union[MISPEvent, int, str, UUID]] = None, pythonify: bool = False) -> Union[Dict, List[MISPShadowAttribute]]:
         if event:
             event_id = get_uuid_or_id_from_abstract_misp(event)
-            r = self._prepare_request('GET', f'shadow_attributes/index/{event_id}')
+            r = self._prepare_request('GET', f'shadowAttributes/index/{event_id}')
         else:
-            r = self._prepare_request('GET', 'shadow_attributes')
+            r = self._prepare_request('GET', 'shadowAttributes/index')
         attribute_proposals = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in attribute_proposals:
             return attribute_proposals
@@ -528,7 +528,7 @@ class PyMISP:
 
     def get_attribute_proposal(self, proposal: Union[MISPShadowAttribute, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPShadowAttribute]:
         proposal_id = get_uuid_or_id_from_abstract_misp(proposal)
-        r = self._prepare_request('GET', f'shadow_attributes/view/{proposal_id}')
+        r = self._prepare_request('GET', f'shadowAttributes/view/{proposal_id}')
         attribute_proposal = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in attribute_proposal:
             return attribute_proposal
@@ -541,7 +541,7 @@ class PyMISP:
     def add_attribute_proposal(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool = False) -> Union[Dict, MISPShadowAttribute]:
         '''Propose a new attribute in an event'''
         event_id = get_uuid_or_id_from_abstract_misp(event)
-        r = self._prepare_request('POST', f'shadow_attributes/add/{event_id}', data=attribute)
+        r = self._prepare_request('POST', f'shadowAttributes/add/{event_id}', data=attribute)
         new_attribute_proposal = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_attribute_proposal:
             return new_attribute_proposal
@@ -552,7 +552,7 @@ class PyMISP:
     def update_attribute_proposal(self, initial_attribute: Union[MISPAttribute, int, str, UUID], attribute: MISPAttribute, pythonify: bool = False) -> Union[Dict, MISPShadowAttribute]:
         '''Propose a change for an attribute'''
         initial_attribute_id = get_uuid_or_id_from_abstract_misp(initial_attribute)
-        r = self._prepare_request('POST', f'shadow_attributes/edit/{initial_attribute_id}', data=attribute)
+        r = self._prepare_request('POST', f'shadowAttributes/edit/{initial_attribute_id}', data=attribute)
         update_attribute_proposal = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in update_attribute_proposal:
             return update_attribute_proposal
@@ -563,7 +563,7 @@ class PyMISP:
     def delete_attribute_proposal(self, attribute: Union[MISPAttribute, int, str, UUID]) -> Dict:
         '''Propose the deletion of an attribute'''
         attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
-        response = self._prepare_request('POST', f'shadow_attributes/delete/{attribute_id}')
+        response = self._prepare_request('POST', f'shadowAttributes/delete/{attribute_id}')
         return self._check_json_response(response)
 
     # NOTE: You cannot modify an existing proposal, only accept/discard
@@ -571,13 +571,13 @@ class PyMISP:
     def accept_attribute_proposal(self, proposal: Union[MISPShadowAttribute, int, str, UUID]) -> Dict:
         '''Accept a proposal'''
         proposal_id = get_uuid_or_id_from_abstract_misp(proposal)
-        response = self._prepare_request('POST', f'shadow_attributes/accept/{proposal_id}')
+        response = self._prepare_request('POST', f'shadowAttributes/accept/{proposal_id}')
         return self._check_json_response(response)
 
     def discard_attribute_proposal(self, proposal: Union[MISPShadowAttribute, int, str, UUID]) -> Dict:
         '''Discard a proposal'''
         proposal_id = get_uuid_or_id_from_abstract_misp(proposal)
-        response = self._prepare_request('POST', f'shadow_attributes/discard/{proposal_id}')
+        response = self._prepare_request('POST', f'shadowAttributes/discard/{proposal_id}')
         return self._check_json_response(response)
 
     # ## END Attribute Proposal ###
@@ -595,7 +595,7 @@ class PyMISP:
             url = 'sightings/listSightings'
             to_post = {'context': 'attribute', 'id': misp_entity.id}
         else:
-            url = 'sightings'
+            url = 'sightings/index'
             to_post = {}
 
         if org is not None:
@@ -642,7 +642,7 @@ class PyMISP:
 
     def tags(self, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
         """Get the list of existing tags."""
-        r = self._prepare_request('GET', 'tags')
+        r = self._prepare_request('GET', 'tags/index')
         tags = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in tags:
             return tags['Tag']
@@ -714,7 +714,7 @@ class PyMISP:
 
     def taxonomies(self, pythonify: bool = False) -> Union[Dict, List[MISPTaxonomy]]:
         """Get all the taxonomies."""
-        r = self._prepare_request('GET', 'taxonomies')
+        r = self._prepare_request('GET', 'taxonomies/index')
         taxonomies = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in taxonomies:
             return taxonomies
@@ -777,7 +777,7 @@ class PyMISP:
 
     def warninglists(self, pythonify: bool = False) -> Union[Dict, List[MISPWarninglist]]:
         """Get all the warninglists."""
-        r = self._prepare_request('GET', 'warninglists')
+        r = self._prepare_request('GET', 'warninglists/index')
         warninglists = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in warninglists:
             return warninglists['Warninglists']
@@ -848,7 +848,7 @@ class PyMISP:
 
     def noticelists(self, pythonify: bool = False) -> Union[Dict, List[MISPNoticelist]]:
         """Get all the noticelists."""
-        r = self._prepare_request('GET', 'noticelists')
+        r = self._prepare_request('GET', 'noticelists/index')
         noticelists = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in noticelists:
             return noticelists
@@ -897,7 +897,7 @@ class PyMISP:
 
     def galaxies(self, pythonify: bool = False) -> Union[Dict, List[MISPGalaxy]]:
         """Get all the galaxies."""
-        r = self._prepare_request('GET', 'galaxies')
+        r = self._prepare_request('GET', 'galaxies/index')
         galaxies = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in galaxies:
             return galaxies
@@ -930,7 +930,7 @@ class PyMISP:
 
     def feeds(self, pythonify: bool = False) -> Union[Dict, List[MISPFeed]]:
         """Get the list of existing feeds."""
-        r = self._prepare_request('GET', 'feeds')
+        r = self._prepare_request('GET', 'feeds/index')
         feeds = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in feeds:
             return feeds
@@ -1071,7 +1071,7 @@ class PyMISP:
 
     def servers(self, pythonify: bool = False) -> Union[Dict, List[MISPServer]]:
         """Get the existing servers the MISP instance can synchronise with"""
-        r = self._prepare_request('GET', 'servers')
+        r = self._prepare_request('GET', 'servers/index')
         servers = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in servers:
             return servers
@@ -1168,7 +1168,7 @@ class PyMISP:
 
     def sharing_groups(self, pythonify: bool = False) -> Union[Dict, List[MISPSharingGroup]]:
         """Get the existing sharing groups"""
-        r = self._prepare_request('GET', 'sharing_groups')
+        r = self._prepare_request('GET', 'sharingGroups/index')
         sharing_groups = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in sharing_groups:
             return sharing_groups
@@ -1181,7 +1181,7 @@ class PyMISP:
 
     def add_sharing_group(self, sharing_group: MISPSharingGroup, pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
         """Add a new sharing group"""
-        r = self._prepare_request('POST', 'sharing_groups/add', data=sharing_group)
+        r = self._prepare_request('POST', 'sharingGroups/add', data=sharing_group)
         sharing_group_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in sharing_group_j:
             return sharing_group_j
@@ -1192,7 +1192,7 @@ class PyMISP:
     def delete_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> Dict:
         """Delete a sharing group"""
         sharing_group_id = get_uuid_or_id_from_abstract_misp(sharing_group)
-        response = self._prepare_request('POST', f'sharing_groups/delete/{sharing_group_id}')
+        response = self._prepare_request('POST', f'sharingGroups/delete/{sharing_group_id}')
         return self._check_json_response(response)
 
     def add_org_to_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID],
@@ -1310,7 +1310,7 @@ class PyMISP:
 
     def users(self, pythonify: bool = False) -> Union[Dict, List[MISPUser]]:
         """Get all the users."""
-        r = self._prepare_request('GET', 'admin/users')
+        r = self._prepare_request('GET', 'admin/users/index')
         users = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in users:
             return users
@@ -1385,7 +1385,7 @@ class PyMISP:
 
     def user_registrations(self, pythonify: bool = False) -> Union[Dict, List[MISPInbox]]:
         """Get all the user registrations."""
-        r = self._prepare_request('GET', 'users/registrations')
+        r = self._prepare_request('GET', 'users/registrations/index')
         registrations = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in registrations:
             return registrations
@@ -1448,7 +1448,7 @@ class PyMISP:
 
     def roles(self, pythonify: bool = False) -> Union[Dict, List[MISPRole]]:
         """Get the existing roles"""
-        r = self._prepare_request('GET', 'roles')
+        r = self._prepare_request('GET', 'roles/index')
         roles = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in roles:
             return roles
@@ -1925,7 +1925,7 @@ class PyMISP:
 
     def communities(self, pythonify: bool = False) -> Union[Dict, List[MISPCommunity]]:
         """Get all the communities."""
-        r = self._prepare_request('GET', 'communities')
+        r = self._prepare_request('GET', 'communities/index')
         communities = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in communities:
             return communities
@@ -1972,7 +1972,7 @@ class PyMISP:
 
     def event_delegations(self, pythonify: bool = False) -> Union[Dict, List[MISPEventDelegation]]:
         """Get all the event delegations."""
-        r = self._prepare_request('GET', 'event_delegations')
+        r = self._prepare_request('GET', 'eventDelegations')
         delegations = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in delegations:
             return delegations
@@ -1985,12 +1985,12 @@ class PyMISP:
 
     def accept_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool = False) -> Dict:
         delegation_id = get_uuid_or_id_from_abstract_misp(delegation)
-        r = self._prepare_request('POST', f'event_delegations/acceptDelegation/{delegation_id}')
+        r = self._prepare_request('POST', f'eventDelegations/acceptDelegation/{delegation_id}')
         return self._check_json_response(r)
 
     def discard_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool = False) -> Dict:
         delegation_id = get_uuid_or_id_from_abstract_misp(delegation)
-        r = self._prepare_request('POST', f'event_delegations/deleteDelegation/{delegation_id}')
+        r = self._prepare_request('POST', f'eventDelegations/deleteDelegation/{delegation_id}')
         return self._check_json_response(r)
 
     def delegate_event(self, event: Optional[Union[MISPEvent, int, str, UUID]] = None,
@@ -2002,9 +2002,9 @@ class PyMISP:
             event_id = get_uuid_or_id_from_abstract_misp(event)
             organisation_id = get_uuid_or_id_from_abstract_misp(organisation)
             data = {'event_id': event_id, 'org_id': organisation_id, 'distribution': distribution, 'message': message}
-            r = self._prepare_request('POST', f'event_delegations/delegateEvent/{event_id}', data=data)
+            r = self._prepare_request('POST', f'eventDelegations/delegateEvent/{event_id}', data=data)
         elif event_delegation:
-            r = self._prepare_request('POST', f'event_delegations/delegateEvent/{event_id}', data=event_delegation)
+            r = self._prepare_request('POST', f'eventDelegations/delegateEvent/{event_id}', data=event_delegation)
         else:
             raise PyMISPError('Either event and organisation OR event_delegation are required.')
         delegation_j = self._check_json_response(r)
@@ -2124,7 +2124,7 @@ class PyMISP:
 
     def user_settings(self, pythonify: bool = False) -> Union[Dict, List[MISPUserSetting]]:
         """Get all the user settings."""
-        r = self._prepare_request('GET', 'user_settings')
+        r = self._prepare_request('GET', 'userSettings/index')
         user_settings = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in user_settings:
             return user_settings
@@ -2141,7 +2141,7 @@ class PyMISP:
         query: Dict[str, Any] = {'setting': user_setting}
         if user:
             query['user_id'] = get_uuid_or_id_from_abstract_misp(user)
-        response = self._prepare_request('POST', 'user_settings/getSetting')
+        response = self._prepare_request('POST', 'userSettings/getSetting')
         user_setting_j = self._check_json_response(response)
         if not (self.global_pythonify or pythonify) or 'errors' in user_setting_j:
             return user_setting_j
@@ -2158,7 +2158,7 @@ class PyMISP:
         query['value'] = value
         if user:
             query['user_id'] = get_uuid_or_id_from_abstract_misp(user)
-        response = self._prepare_request('POST', 'user_settings/setSetting', data=query)
+        response = self._prepare_request('POST', 'userSettings/setSetting', data=query)
         user_setting_j = self._check_json_response(response)
         if not (self.global_pythonify or pythonify) or 'errors' in user_setting_j:
             return user_setting_j
@@ -2171,7 +2171,7 @@ class PyMISP:
         query: Dict[str, Any] = {'setting': user_setting}
         if user:
             query['user_id'] = get_uuid_or_id_from_abstract_misp(user)
-        response = self._prepare_request('POST', 'user_settings/delete', data=query)
+        response = self._prepare_request('POST', 'userSettings/delete', data=query)
         return self._check_json_response(response)
 
     # ## END User Settings ###
@@ -2240,6 +2240,37 @@ class PyMISP:
         return to_return
 
     # ## END Global helpers ###
+
+    # ## MISP internal tasks ###
+
+    def get_all_functions(self, not_implemented: bool = False):
+        '''Get all methods available vi the API allow to get the ones that are not implemented.'''
+        response = self._prepare_request('GET', '/servers/queryACL/printAllFunctionNames')
+        functions = self._check_json_response(response)
+        # Format as URLs
+        paths = []
+        for controller, methods in functions.items():
+            if controller == '*':
+                continue
+            for method in methods:
+                if method.startswith('admin_'):
+                    path = f'admin/{controller}/{method[6:]}'
+                else:
+                    path = f'{controller}/{method}'
+                paths.append(path)
+
+        if not not_implemented:
+            return path
+
+        with open(__file__) as f:
+            content = f.read()
+
+        not_implemented = []
+        for path in paths:
+            if path not in content:
+                not_implemented.append(path)
+
+        return not_implemented
 
     # ## Internal methods ###
 
