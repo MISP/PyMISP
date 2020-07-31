@@ -1122,7 +1122,7 @@ class TestComprehensive(unittest.TestCase):
 
             # Test generic Tag methods
             r = self.admin_misp_connector.tag(second, 'generic_tag_test')
-            self.assertTrue(r['message'].endswith(f'successfully attached to Event({second.id}).'), r['message'])
+            self.assertTrue('successfully' in r['message'].lower() and f'Event ({second.id})' in r['message'], r['message'])
             r = self.admin_misp_connector.untag(second, 'generic_tag_test')
             self.assertTrue(r['message'].endswith(f'successfully removed from Event({second.id}).'), r['message'])
             # NOTE: object tagging not supported yet
@@ -1131,7 +1131,7 @@ class TestComprehensive(unittest.TestCase):
             # r = self.admin_misp_connector.untag(second.objects[0].uuid, 'generic_tag_test')
             # self.assertTrue(r['message'].endswith(f'successfully removed from Object({second.objects[0].id}).'), r['message'])
             r = self.admin_misp_connector.tag(second.objects[0].attributes[0].uuid, 'generic_tag_test')
-            self.assertTrue(r['message'].endswith(f'successfully attached to Attribute({second.objects[0].attributes[0].id}).'), r['message'])
+            self.assertTrue('successfully' in r['message'].lower() and f'Attribute ({second.objects[0].attributes[0].id})' in r['message'], r['message'])
             r = self.admin_misp_connector.untag(second.objects[0].attributes[0].uuid, 'generic_tag_test')
             self.assertTrue(r['message'].endswith(f'successfully removed from Attribute({second.objects[0].attributes[0].id}).'), r['message'])
 
@@ -1294,11 +1294,11 @@ class TestComprehensive(unittest.TestCase):
             # self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
             self.assertEqual(r['errors'][1]['message'], 'Invalid Target.')
             r = self.user_misp_connector.tag(first, tag_org_restricted)
-            self.assertEqual(r['name'], f'Global tag {tag_org_restricted.name}({tag_org_restricted.id}) successfully attached to Event({first.id}).')
+            self.assertTrue('successfully' in r['message'].lower() and f'Event ({first.id})' in r['message'], r['message'])
             r = self.pub_misp_connector.tag(first.attributes[0], tag_user_restricted)
-            self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed user.')
+            self.assertIn('Invalid Tag. This tag can only be set by a fixed user.', r['errors'][1]['errors'])
             r = self.user_misp_connector.tag(first.attributes[0], tag_user_restricted)
-            self.assertEqual(r['name'], f'Global tag {tag_user_restricted.name}({tag_user_restricted.id}) successfully attached to Attribute({first.attributes[0].id}).')
+            self.assertTrue('successfully' in r['message'].lower() and f'Attribute ({first.attributes[0].id})' in r['message'], r['message'])
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
