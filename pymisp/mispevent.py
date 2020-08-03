@@ -1697,3 +1697,25 @@ class MISPInbox(AbstractMISP):
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(name={self.type})>'
+
+
+class MISPEventBlacklist(AbstractMISP):
+
+    def from_dict(self, **kwargs):
+        if 'EventBlacklist' in kwargs:
+            kwargs = kwargs['EventBlacklist']
+        super().from_dict(**kwargs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(event_uuid={self.event_uuid}'
+
+
+class MISPOrganisationBlacklist(AbstractMISP):
+
+    def from_dict(self, **kwargs):
+        if 'OrgBlacklist' in kwargs:
+            kwargs = kwargs['OrgBlacklist']
+        super().from_dict(**kwargs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(org_uuid={self.org_uuid}'

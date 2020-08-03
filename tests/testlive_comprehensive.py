@@ -26,7 +26,7 @@ logger = logging.getLogger('pymisp')
 
 
 try:
-    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
+    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlacklist
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
     from pymisp.exceptions import MISPServerError
 except ImportError:
@@ -2371,6 +2371,49 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_tag(tag)
 
+    def test_blacklists(self):
+        first = self.create_simple_event()
+        second = self.create_simple_event()
+        second.Orgc = self.test_org
+        to_delete = {'bl_events': [], 'bl_organisations': []}
+        try:
+            # test events BL
+            ebl = self.admin_misp_connector.add_event_blacklist(uuids=[first.uuid])
+            self.assertEqual(ebl['result']['successes'][0], first.uuid, ebl)
+            bl_events = self.admin_misp_connector.event_blacklists(pythonify=True)
+            for ble in bl_events:
+                if ble.event_uuid == first.uuid:
+                    to_delete['bl_events'].append(ble)
+                    break
+            else:
+                raise Exception('Unable to find UUID in Events blacklist')
+            first = self.user_misp_connector.add_event(first, pythonify=True)
+            self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+            # ble.comment = 'This is a test'
+            # ble.event_info = 'foo'
+            # ble.event_orgc = 'bar'
+            # ble = self.admin_misp_connector.update_event_blacklist(ble)
+            # print(ble.to_json(indent=2))
+            # self.assertEqual(ble.comment, 'This is a test')
+
+            # test Org BL
+            obl = self.admin_misp_connector.add_organisation_blacklist(uuids=[self.test_org.uuid])
+            self.assertEqual(ebl['result']['successes'][0], self.test_org.uuid, obl)
+            bl_orgs = self.admin_misp_connector.organisation_blacklists(pythonify=True)
+            for blo in bl_orgs:
+                if blo.org_uuid == self.test_org.uuid:
+                    to_delete['bl_organisations'].append(blo)
+                    break
+            else:
+                raise Exception('Unable to find UUID in Orgs blacklist')
+            first = self.user_misp_connector.add_event(first, pythonify=True)
+            self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+        finally:
+            for ble in to_delete['bl_events']:
+                self.admin_misp_connector.delete_event_blacklist(ble)
+            for blo in to_delete['bl_organisations']:
+                self.admin_misp_connector.delete_organisation_blacklist(blo)
+
     @unittest.skip("Internal use only")
     def missing_methods(self):
         skip = [
@@ -2392,6 +2435,7 @@ class TestComprehensive(unittest.TestCase):
             "attributes/bro",
             "attributes/reportValidationIssuesAttributes",
             "attributes/generateCorrelation",
+            "attributes/getMassEditForm",
             "attributes/fetchViewValue",
             "attributes/fetchEditForm",
             "attributes/attributeReplace",
@@ -2402,13 +2446,14 @@ class TestComprehensive(unittest.TestCase):
             "attributes/hoverEnrichment",
             "attributes/addTag",
             "attributes/removeTag",
-            "attributes/toggleCorrelation",  # TODO
-            "attributes/toggleToIDS",  # TODO
+            "attributes/toggleCorrelation",  # Use update attribute
+            "attributes/toggleToIDS",  # Use update attribute
             "attributes/checkAttachments",
             "attributes/exportSearch",
             'dashboards',
             'decayingModel',
-            'eventBlacklists',  # TODO
+            "eventBlacklists/edit",
+            "eventBlacklists/massDelete",
             "eventDelegations/view",
             "eventDelegations/index",
             "eventGraph/view",
@@ -2534,13 +2579,13 @@ class TestComprehensive(unittest.TestCase):
             "objects/orphanedObjectDiagnostics",
             "objects/proposeObjectsFromAttributes",
             "objects/groupAttributesIntoObject",
-            'orgBlacklists',  # TODO
             "admin/organisations/generateuuid",
             "organisations/landingpage",
             "organisations/fetchOrgsForSG",
             "organisations/fetchSGOrgRow",
             "organisations/getUUIDs",
             "admin/organisations/merge",
+            'orgBlacklists/edit',
             "pages/display",
             "posts/pushMessageToZMQ",
             "posts/add",
