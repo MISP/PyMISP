@@ -1701,6 +1701,10 @@ class MISPInbox(AbstractMISP):
 
 class MISPEventBlacklist(AbstractMISP):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.event_uuid: str
+
     def from_dict(self, **kwargs):
         if 'EventBlacklist' in kwargs:
             kwargs = kwargs['EventBlacklist']
@@ -1711,6 +1715,10 @@ class MISPEventBlacklist(AbstractMISP):
 
 
 class MISPOrganisationBlacklist(AbstractMISP):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.org_uuid: str
 
     def from_dict(self, **kwargs):
         if 'OrgBlacklist' in kwargs:

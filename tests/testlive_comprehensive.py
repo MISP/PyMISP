@@ -2389,16 +2389,17 @@ class TestComprehensive(unittest.TestCase):
                 raise Exception('Unable to find UUID in Events blacklist')
             first = self.user_misp_connector.add_event(first, pythonify=True)
             self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
-            # ble.comment = 'This is a test'
-            # ble.event_info = 'foo'
-            # ble.event_orgc = 'bar'
-            # ble = self.admin_misp_connector.update_event_blacklist(ble)
-            # print(ble.to_json(indent=2))
-            # self.assertEqual(ble.comment, 'This is a test')
+            ble.comment = 'This is a test'
+            ble.event_info = 'foo'
+            ble.event_orgc = 'bar'
+            ble = self.admin_misp_connector.update_event_blacklist(ble, pythonify=True)
+            self.assertEqual(ble.comment, 'This is a test')
+            r = self.admin_misp_connector.delete_event_blacklist(ble)
+            self.assertTrue(r['success'])
 
             # test Org BL
-            obl = self.admin_misp_connector.add_organisation_blacklist(uuids=[self.test_org.uuid])
-            self.assertEqual(ebl['result']['successes'][0], self.test_org.uuid, obl)
+            obl = self.admin_misp_connector.add_organisation_blacklist(uuids=self.test_org.uuid)
+            self.assertEqual(obl['result']['successes'][0], self.test_org.uuid, obl)
             bl_orgs = self.admin_misp_connector.organisation_blacklists(pythonify=True)
             for blo in bl_orgs:
                 if blo.org_uuid == self.test_org.uuid:
@@ -2408,6 +2409,14 @@ class TestComprehensive(unittest.TestCase):
                 raise Exception('Unable to find UUID in Orgs blacklist')
             first = self.user_misp_connector.add_event(first, pythonify=True)
             self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+
+            blo.comment = 'This is a test'
+            blo.org_name = 'bar'
+            blo = self.admin_misp_connector.update_organisation_blacklist(blo, pythonify=True)
+            self.assertEqual(blo.org_name, 'bar')
+            r = self.admin_misp_connector.delete_organisation_blacklist(blo)
+            self.assertTrue(r['success'])
+
         finally:
             for ble in to_delete['bl_events']:
                 self.admin_misp_connector.delete_event_blacklist(ble)
@@ -2452,7 +2461,6 @@ class TestComprehensive(unittest.TestCase):
             "attributes/exportSearch",
             'dashboards',
             'decayingModel',
-            "eventBlacklists/edit",
             "eventBlacklists/massDelete",
             "eventDelegations/view",
             "eventDelegations/index",
@@ -2585,7 +2593,6 @@ class TestComprehensive(unittest.TestCase):
             "organisations/fetchSGOrgRow",
             "organisations/getUUIDs",
             "admin/organisations/merge",
-            'orgBlacklists/edit',
             "pages/display",
             "posts/pushMessageToZMQ",
             "posts/add",
