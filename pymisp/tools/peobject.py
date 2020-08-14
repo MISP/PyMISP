@@ -136,10 +136,17 @@ class PESectionObject(AbstractMISPObjectGenerator):
         self.add_attribute('name', value=self.__section.name)
         size = self.add_attribute('size-in-bytes', value=self.__section.size)
         if int(size.value) > 0:
+            # zero-filled sections can create too many correlations
+            to_ids = float(self.__section.entropy) > 0
+            disable_correlation = not to_ids
             self.add_attribute('entropy', value=self.__section.entropy)
-            self.add_attribute('md5', value=md5(self.__data).hexdigest())
-            self.add_attribute('sha1', value=sha1(self.__data).hexdigest())
-            self.add_attribute('sha256', value=sha256(self.__data).hexdigest())
-            self.add_attribute('sha512', value=sha512(self.__data).hexdigest())
-            if HAS_PYDEEP:
-                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode())
+            self.add_attribute('md5', value=md5(self.__data).hexdigest(), disable_correlation=disable_correlation, to_ids=to_ids)
+            self.add_attribute('sha1', value=sha1(self.__data).hexdigest(), disable_correlation=disable_correlation, to_ids=to_ids)
+            self.add_attribute('sha256', value=sha256(self.__data).hexdigest(), disable_correlation=disable_correlation, to_ids=to_ids)
+            self.add_attribute('sha512', value=sha512(self.__data).hexdigest(), disable_correlation=disable_correlation, to_ids=to_ids)
+            if HAS_PYDEEP and float(self.__section.entropy) > 0:
+                if self.__section.name == '.rsrc':
+                    # ssdeep of .rsrc creates too many correlations
+                    disable_correlation = True
+                    to_ids = False
+                self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode(), disable_correlation=disable_correlation, to_ids=to_ids)
