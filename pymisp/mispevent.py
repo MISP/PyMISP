@@ -1632,7 +1632,12 @@ class MISPObjectAttribute(MISPAttribute):
     def from_dict(self, object_relation: str, value: Union[str, int, float], **kwargs):  # type: ignore
         # NOTE: Signature of "from_dict" incompatible with supertype "MISPAttribute"
         self.object_relation = object_relation
-        self.value = value
+        if type(value) is dict:
+            self.value = value["value"]
+            self.first_seen = value["first_seen"]
+            self.last_seen = value["last_seen"]
+        else:
+            self.value = value
         if 'Attribute' in kwargs:
             kwargs = kwargs['Attribute']
         # Initialize the new MISPAttribute
