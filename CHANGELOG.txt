@@ -2,11 +2,83 @@ Changelog
 =========
 
 
+v2.4.130 (2020-08-20)
+---------------------
+
+New
+~~~
+- Blacklist methods. [Raphaël Vinot]
+- Add list of missing calls. [Raphaël Vinot]
+- Add test_obj_references_export. [louis]
+- Add MISPObject.standalone property. [louis]
+
+  Setting MISPObject.standalone updates MISPObject._standalone and
+  add/removes "ObjectReference" from AbstractMISP.__not_jsonable using
+  update_not_jsonable/_remove_from_not_jsonable.
+- Add AbstractMISP._remove_from_not_jsonable. [louis]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump types. [Raphaël Vinot]
+- [testlive_comprehensive] Updated generic tagging method to match
+  changes in MISP. [mokaddem]
+- Cleanup blocklist methods. [Raphaël Vinot]
+- Remove outdated example. [Raphaël Vinot]
+
+  Fix #611
+- New test_get_non_exists_event. [Jakub Onderka]
+- Bump dependencies. [Raphaël Vinot]
+- Enable more tests. [Raphaël Vinot]
+- Make get_object return a not standalone object. [louis]
+- Remove standalone default value from MISPObject children c'tor.
+  [louis]
+
+  MISPObject.__init__ sets standalone=True by default, so there is no
+  need to do it in its child classes.
+- Make MISPObject standalone by default. [louis]
+
+  standalone defaults to True in MISPObject.__init__, and is set to False
+  when the object is added to an event.
+- Add MISPObject._standalone type. [louis]
+
+Fix
+~~~
+- Bump file template version. [Raphaël Vinot]
+- Test_get_non_exists_event. [Jakub Onderka]
+- IP removed from the public DNS list. [Raphaël Vinot]
+- Example using deprecated calls. [Raphaël Vinot]
+
+  fix #602
+- Add STIX XML output for the search. [Raphaël Vinot]
+
+  Use stix-xml as return_format.
+
+  Fix #600 https://github.com/MISP/MISP/issues/5618
+- Dummy event example. [Raphaël Vinot]
+
+  Fix #598
+
+Other
+~~~~~
+- Exclude section correlation .rsrc and zero-filled. [deku]
+- Linting/Add missing whitespace. [Paal Braathen]
+- Remove explicit loglevel checking. [Paal Braathen]
+- Remove explicit traceback printing. [Paal Braathen]
+- Master branch has been renamed to main. [Arcuri Davide]
+- Update README.md. [Raphaël Vinot]
+
+  fix: #599
+
+
 v2.4.128 (2020-06-22)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Add a few test cases. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
