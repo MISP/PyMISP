@@ -50,6 +50,7 @@
         "filename|sha512/256",
         "filename|ssdeep",
         "filename|tlsh",
+        "filename|vhash",
         "gene",
         "hex",
         "impfuzzy",
@@ -77,6 +78,7 @@
         "ssdeep",
         "stix2-pattern",
         "text",
+        "vhash",
         "windows-scheduled-task",
         "windows-service-displayname",
         "windows-service-name",
@@ -272,6 +274,7 @@
         "filename|sha512/256",
         "filename|ssdeep",
         "filename|tlsh",
+        "filename|vhash",
         "hassh-md5",
         "hasshserver-md5",
         "hex",
@@ -310,6 +313,7 @@
         "tlsh",
         "url",
         "user-agent",
+        "vhash",
         "vulnerability",
         "weakness",
         "whois-registrant-email",
@@ -340,6 +344,7 @@
         "filename|sha512/256",
         "filename|ssdeep",
         "filename|tlsh",
+        "filename|vhash",
         "hex",
         "impfuzzy",
         "imphash",
@@ -365,6 +370,7 @@
         "stix2-pattern",
         "text",
         "tlsh",
+        "vhash",
         "vulnerability",
         "weakness",
         "x509-fingerprint-md5",
@@ -684,6 +690,10 @@
         "to_ids": 1
       },
       "filename|tlsh": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "filename|vhash": {
         "default_category": "Payload delivery",
         "to_ids": 1
       },
@@ -1043,6 +1053,10 @@
         "default_category": "Network activity",
         "to_ids": 0
       },
+      "vhash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
       "visa-number": {
         "default_category": "Person",
         "to_ids": 0
@@ -1175,6 +1189,7 @@
       "filename|sha512/256",
       "filename|ssdeep",
       "filename|tlsh",
+      "filename|vhash",
       "first-name",
       "float",
       "frequent-flyer-number",
@@ -1264,6 +1279,7 @@
       "uri",
       "url",
       "user-agent",
+      "vhash",
       "visa-number",
       "vulnerability",
       "weakness",
