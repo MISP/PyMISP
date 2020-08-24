@@ -44,6 +44,10 @@
         "filename|sha1",
         "filename|sha224",
         "filename|sha256",
+        "filename|sha3-224",
+        "filename|sha3-256",
+        "filename|sha3-384",
+        "filename|sha3-512",
         "filename|sha384",
         "filename|sha512",
         "filename|sha512/224",
@@ -70,6 +74,10 @@
         "sha1",
         "sha224",
         "sha256",
+        "sha3-224",
+        "sha3-256",
+        "sha3-384",
+        "sha3-512",
         "sha384",
         "sha512",
         "sha512/224",
@@ -120,6 +128,10 @@
         "filename|md5",
         "filename|sha1",
         "filename|sha256",
+        "filename|sha3-224",
+        "filename|sha3-256",
+        "filename|sha3-384",
+        "filename|sha3-512",
         "github-repository",
         "hassh-md5",
         "hasshserver-md5",
@@ -142,6 +154,10 @@
         "regkey|value",
         "sha1",
         "sha256",
+        "sha3-224",
+        "sha3-256",
+        "sha3-384",
+        "sha3-512",
         "snort",
         "text",
         "url",
@@ -268,6 +284,10 @@
         "filename|sha1",
         "filename|sha224",
         "filename|sha256",
+        "filename|sha3-224",
+        "filename|sha3-256",
+        "filename|sha3-384",
+        "filename|sha3-512",
         "filename|sha384",
         "filename|sha512",
         "filename|sha512/224",
@@ -302,6 +322,10 @@
         "sha1",
         "sha224",
         "sha256",
+        "sha3-224",
+        "sha3-256",
+        "sha3-384",
+        "sha3-512",
         "sha384",
         "sha512",
         "sha512/224",
@@ -338,6 +362,10 @@
         "filename|sha1",
         "filename|sha224",
         "filename|sha256",
+        "filename|sha3-224",
+        "filename|sha3-256",
+        "filename|sha3-384",
+        "filename|sha3-512",
         "filename|sha384",
         "filename|sha512",
         "filename|sha512/224",
@@ -361,6 +389,10 @@
         "sha1",
         "sha224",
         "sha256",
+        "sha3-224",
+        "sha3-256",
+        "sha3-384",
+        "sha3-512",
         "sha384",
         "sha512",
         "sha512/224",
@@ -669,6 +701,22 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "filename|sha3-224": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "filename|sha3-256": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "filename|sha3-384": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "filename|sha3-512": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
       "filename|sha384": {
         "default_category": "Payload delivery",
         "to_ids": 1
@@ -957,6 +1005,22 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "sha3-224": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "sha3-256": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "sha3-384": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "sha3-512": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
       "sha384": {
         "default_category": "Payload delivery",
         "to_ids": 1
@@ -1183,6 +1247,10 @@
       "filename|sha1",
       "filename|sha224",
       "filename|sha256",
+      "filename|sha3-224",
+      "filename|sha3-256",
+      "filename|sha3-384",
+      "filename|sha3-512",
       "filename|sha384",
       "filename|sha512",
       "filename|sha512/224",
@@ -1255,6 +1323,10 @@
       "sha1",
       "sha224",
       "sha256",
+      "sha3-224",
+      "sha3-256",
+      "sha3-384",
+      "sha3-512",
       "sha384",
       "sha512",
       "sha512/224",
