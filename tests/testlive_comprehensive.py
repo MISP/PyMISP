@@ -26,7 +26,7 @@ logger = logging.getLogger('pymisp')
 
 
 try:
-    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlacklist
+    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlocklist
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
     from pymisp.exceptions import MISPServerError
 except ImportError:
@@ -2371,57 +2371,57 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_tag(tag)
 
-    def test_blacklists(self):
+    def test_blocklists(self):
         first = self.create_simple_event()
         second = self.create_simple_event()
         second.Orgc = self.test_org
         to_delete = {'bl_events': [], 'bl_organisations': []}
         try:
             # test events BL
-            ebl = self.admin_misp_connector.add_event_blacklist(uuids=[first.uuid])
+            ebl = self.admin_misp_connector.add_event_blocklist(uuids=[first.uuid])
             self.assertEqual(ebl['result']['successes'][0], first.uuid, ebl)
-            bl_events = self.admin_misp_connector.event_blacklists(pythonify=True)
+            bl_events = self.admin_misp_connector.event_blocklists(pythonify=True)
             for ble in bl_events:
                 if ble.event_uuid == first.uuid:
                     to_delete['bl_events'].append(ble)
                     break
             else:
-                raise Exception('Unable to find UUID in Events blacklist')
+                raise Exception('Unable to find UUID in Events blocklist')
             first = self.user_misp_connector.add_event(first, pythonify=True)
             self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
             ble.comment = 'This is a test'
             ble.event_info = 'foo'
             ble.event_orgc = 'bar'
-            ble = self.admin_misp_connector.update_event_blacklist(ble, pythonify=True)
+            ble = self.admin_misp_connector.update_event_blocklist(ble, pythonify=True)
             self.assertEqual(ble.comment, 'This is a test')
-            r = self.admin_misp_connector.delete_event_blacklist(ble)
+            r = self.admin_misp_connector.delete_event_blocklist(ble)
             self.assertTrue(r['success'])
 
             # test Org BL
-            obl = self.admin_misp_connector.add_organisation_blacklist(uuids=self.test_org.uuid)
+            obl = self.admin_misp_connector.add_organisation_blocklist(uuids=self.test_org.uuid)
             self.assertEqual(obl['result']['successes'][0], self.test_org.uuid, obl)
-            bl_orgs = self.admin_misp_connector.organisation_blacklists(pythonify=True)
+            bl_orgs = self.admin_misp_connector.organisation_blocklists(pythonify=True)
             for blo in bl_orgs:
                 if blo.org_uuid == self.test_org.uuid:
                     to_delete['bl_organisations'].append(blo)
                     break
             else:
-                raise Exception('Unable to find UUID in Orgs blacklist')
+                raise Exception('Unable to find UUID in Orgs blocklist')
             first = self.user_misp_connector.add_event(first, pythonify=True)
             self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
 
             blo.comment = 'This is a test'
             blo.org_name = 'bar'
-            blo = self.admin_misp_connector.update_organisation_blacklist(blo, pythonify=True)
+            blo = self.admin_misp_connector.update_organisation_blocklist(blo, pythonify=True)
             self.assertEqual(blo.org_name, 'bar')
-            r = self.admin_misp_connector.delete_organisation_blacklist(blo)
+            r = self.admin_misp_connector.delete_organisation_blocklist(blo)
             self.assertTrue(r['success'])
 
         finally:
             for ble in to_delete['bl_events']:
-                self.admin_misp_connector.delete_event_blacklist(ble)
+                self.admin_misp_connector.delete_event_blocklist(ble)
             for blo in to_delete['bl_organisations']:
-                self.admin_misp_connector.delete_organisation_blacklist(blo)
+                self.admin_misp_connector.delete_organisation_blocklist(blo)
 
     @unittest.skip("Internal use only")
     def missing_methods(self):
@@ -2461,7 +2461,7 @@ class TestComprehensive(unittest.TestCase):
             "attributes/exportSearch",
             'dashboards',
             'decayingModel',
-            "eventBlacklists/massDelete",
+            "eventBlocklists/massDelete",
             "eventDelegations/view",
             "eventDelegations/index",
             "eventGraph/view",

@@ -22,7 +22,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, \
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
-    MISPInbox, MISPEventBlacklist, MISPOrganisationBlacklist
+    MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 SearchType = TypeVar('SearchType', str, int)
@@ -52,10 +52,10 @@ def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID]) 
         # An EventDelegation doesn't have a uuid, we *need* to use the ID
         return obj['id']
 
-    # For the blacklists, we want to return a specific key.
-    if isinstance(obj, MISPEventBlacklist):
+    # For the blocklists, we want to return a specific key.
+    if isinstance(obj, MISPEventBlocklist):
         return obj.event_uuid
-    if isinstance(obj, MISPOrganisationBlacklist):
+    if isinstance(obj, MISPOrganisationBlocklist):
         return obj.org_uuid
 
     if 'uuid' in obj:
@@ -2184,41 +2184,41 @@ class PyMISP:
 
     # ## END User Settings ###
 
-    # ## BEGIN Blacklists ###
+    # ## BEGIN Blocklists ###
 
-    def event_blacklists(self, pythonify: bool = False) -> Union[Dict, List[MISPEventBlacklist]]:
-        """Get all the blacklisted events"""
-        r = self._prepare_request('GET', 'eventBlacklists/index')
-        event_blacklists = self._check_json_response(r)
-        if not (self.global_pythonify or pythonify) or 'errors' in event_blacklists:
-            return event_blacklists
+    def event_blocklists(self, pythonify: bool = False) -> Union[Dict, List[MISPEventBlocklist]]:
+        """Get all the blocklisted events"""
+        r = self._prepare_request('GET', 'eventBlocklists/index')
+        event_blocklists = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in event_blocklists:
+            return event_blocklists
         to_return = []
-        for event_blacklist in event_blacklists:
-            ebl = MISPEventBlacklist()
-            ebl.from_dict(**event_blacklist)
+        for event_blocklist in event_blocklists:
+            ebl = MISPEventBlocklist()
+            ebl.from_dict(**event_blocklist)
             to_return.append(ebl)
         return to_return
 
-    def organisation_blacklists(self, pythonify: bool = False) -> Union[Dict, List[MISPOrganisationBlacklist]]:
-        """Get all the blacklisted organisations"""
-        r = self._prepare_request('GET', 'orgBlacklists/index')
-        organisation_blacklists = self._check_json_response(r)
-        if not (self.global_pythonify or pythonify) or 'errors' in organisation_blacklists:
-            return organisation_blacklists
+    def organisation_blocklists(self, pythonify: bool = False) -> Union[Dict, List[MISPOrganisationBlocklist]]:
+        """Get all the blocklisted organisations"""
+        r = self._prepare_request('GET', 'orgBlocklists/index')
+        organisation_blocklists = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in organisation_blocklists:
+            return organisation_blocklists
         to_return = []
-        for organisation_blacklist in organisation_blacklists:
-            obl = MISPOrganisationBlacklist()
-            obl.from_dict(**organisation_blacklist)
+        for organisation_blocklist in organisation_blocklists:
+            obl = MISPOrganisationBlocklist()
+            obl.from_dict(**organisation_blocklist)
             to_return.append(obl)
         return to_return
 
-    def _add_entries_to_blacklist(self, blacklist_type: str, uuids: Union[str, List[str]], **kwargs) -> Dict:
-        if blacklist_type == 'event':
-            url = 'eventBlacklists/add'
-        elif blacklist_type == 'organisation':
-            url = 'orgBlacklists/add'
+    def _add_entries_to_blocklist(self, blocklist_type: str, uuids: Union[str, List[str]], **kwargs) -> Dict:
+        if blocklist_type == 'event':
+            url = 'eventBlocklists/add'
+        elif blocklist_type == 'organisation':
+            url = 'orgBlocklists/add'
         else:
-            raise PyMISPError('blacklist_type can only be "event" or "organisation"')
+            raise PyMISPError('blocklist_type can only be "event" or "organisation"')
         if isinstance(uuids, str):
             uuids = [uuids]
         data = {'uuids': uuids}
@@ -2227,66 +2227,66 @@ class PyMISP:
         r = self._prepare_request('POST', url, data=data)
         return self._check_json_response(r)
 
-    def add_event_blacklist(self, uuids: Union[str, List[str]], comment: Optional[str] = None,
+    def add_event_blocklist(self, uuids: Union[str, List[str]], comment: Optional[str] = None,
                             event_info: Optional[str] = None, event_orgc: Optional[str] = None) -> Dict:
-        '''Add a new event in the blacklist'''
-        return self._add_entries_to_blacklist('event', uuids=uuids, comment=comment, event_info=event_info, event_orgc=event_orgc)
+        '''Add a new event in the blocklist'''
+        return self._add_entries_to_blocklist('event', uuids=uuids, comment=comment, event_info=event_info, event_orgc=event_orgc)
 
-    def add_organisation_blacklist(self, uuids: Union[str, List[str]], comment: Optional[str] = None,
+    def add_organisation_blocklist(self, uuids: Union[str, List[str]], comment: Optional[str] = None,
                                    org_name: Optional[str] = None) -> Dict:
-        '''Add a new organisation in the blacklist'''
-        return self._add_entries_to_blacklist('organisation', uuids=uuids, comment=comment, org_name=org_name)
+        '''Add a new organisation in the blocklist'''
+        return self._add_entries_to_blocklist('organisation', uuids=uuids, comment=comment, org_name=org_name)
 
-    def _update_entries_in_blacklist(self, blacklist_type: str, uuid, **kwargs) -> Dict:
-        if blacklist_type == 'event':
-            url = f'eventBlacklists/edit/{uuid}'
-        elif blacklist_type == 'organisation':
-            url = f'orgBlacklists/edit/{uuid}'
+    def _update_entries_in_blocklist(self, blocklist_type: str, uuid, **kwargs) -> Dict:
+        if blocklist_type == 'event':
+            url = f'eventBlocklists/edit/{uuid}'
+        elif blocklist_type == 'organisation':
+            url = f'orgBlocklists/edit/{uuid}'
         else:
-            raise PyMISPError('blacklist_type can only be "event" or "organisation"')
+            raise PyMISPError('blocklist_type can only be "event" or "organisation"')
         data = {k: v for k, v in kwargs.items() if v}
         r = self._prepare_request('POST', url, data=data)
         return self._check_json_response(r)
 
-    def update_event_blacklist(self, event_blacklist: MISPEventBlacklist, event_blacklist_id: Optional[Union[int, str, UUID]] = None, pythonify: bool = False) -> Union[Dict, MISPEventBlacklist]:
-        '''Update an event in the blacklist'''
-        if event_blacklist_id is None:
-            eblid = get_uuid_or_id_from_abstract_misp(event_blacklist)
+    def update_event_blocklist(self, event_blocklist: MISPEventBlocklist, event_blocklist_id: Optional[Union[int, str, UUID]] = None, pythonify: bool = False) -> Union[Dict, MISPEventBlocklist]:
+        '''Update an event in the blocklist'''
+        if event_blocklist_id is None:
+            eblid = get_uuid_or_id_from_abstract_misp(event_blocklist)
         else:
-            eblid = get_uuid_or_id_from_abstract_misp(event_blacklist_id)
-        updated_event_blacklist = self._update_entries_in_blacklist('event', eblid, **event_blacklist)
-        if not (self.global_pythonify or pythonify) or 'errors' in updated_event_blacklist:
-            return updated_event_blacklist
-        e = MISPEventBlacklist()
-        e.from_dict(**updated_event_blacklist)
+            eblid = get_uuid_or_id_from_abstract_misp(event_blocklist_id)
+        updated_event_blocklist = self._update_entries_in_blocklist('event', eblid, **event_blocklist)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_event_blocklist:
+            return updated_event_blocklist
+        e = MISPEventBlocklist()
+        e.from_dict(**updated_event_blocklist)
         return e
 
-    def update_organisation_blacklist(self, organisation_blacklist: MISPOrganisationBlacklist, organisation_blacklist_id: Optional[Union[int, str, UUID]] = None, pythonify: bool = False) -> Union[Dict, MISPOrganisationBlacklist]:
-        '''Update an organisation in the blacklist'''
-        if organisation_blacklist_id is None:
-            oblid = get_uuid_or_id_from_abstract_misp(organisation_blacklist)
+    def update_organisation_blocklist(self, organisation_blocklist: MISPOrganisationBlocklist, organisation_blocklist_id: Optional[Union[int, str, UUID]] = None, pythonify: bool = False) -> Union[Dict, MISPOrganisationBlocklist]:
+        '''Update an organisation in the blocklist'''
+        if organisation_blocklist_id is None:
+            oblid = get_uuid_or_id_from_abstract_misp(organisation_blocklist)
         else:
-            oblid = get_uuid_or_id_from_abstract_misp(organisation_blacklist_id)
-        updated_organisation_blacklist = self._update_entries_in_blacklist('organisation', oblid, **organisation_blacklist)
-        if not (self.global_pythonify or pythonify) or 'errors' in updated_organisation_blacklist:
-            return updated_organisation_blacklist
-        o = MISPOrganisationBlacklist()
-        o.from_dict(**updated_organisation_blacklist)
+            oblid = get_uuid_or_id_from_abstract_misp(organisation_blocklist_id)
+        updated_organisation_blocklist = self._update_entries_in_blocklist('organisation', oblid, **organisation_blocklist)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_organisation_blocklist:
+            return updated_organisation_blocklist
+        o = MISPOrganisationBlocklist()
+        o.from_dict(**updated_organisation_blocklist)
         return o
 
-    def delete_event_blacklist(self, event_blacklist: Union[MISPEventBlacklist, str, UUID]) -> Dict:
-        '''Delete a blacklisted event'''
-        event_blacklist_id = get_uuid_or_id_from_abstract_misp(event_blacklist)
-        response = self._prepare_request('POST', f'eventBlacklists/delete/{event_blacklist_id}')
+    def delete_event_blocklist(self, event_blocklist: Union[MISPEventBlocklist, str, UUID]) -> Dict:
+        '''Delete a blocklisted event'''
+        event_blocklist_id = get_uuid_or_id_from_abstract_misp(event_blocklist)
+        response = self._prepare_request('POST', f'eventBlocklists/delete/{event_blocklist_id}')
         return self._check_json_response(response)
 
-    def delete_organisation_blacklist(self, organisation_blacklist: Union[MISPOrganisationBlacklist, str, UUID]) -> Dict:
-        '''Delete a blacklisted organisation'''
-        org_blacklist_id = get_uuid_or_id_from_abstract_misp(organisation_blacklist)
-        response = self._prepare_request('POST', f'orgBlacklists/delete/{org_blacklist_id}')
+    def delete_organisation_blocklist(self, organisation_blocklist: Union[MISPOrganisationBlocklist, str, UUID]) -> Dict:
+        '''Delete a blocklisted organisation'''
+        org_blocklist_id = get_uuid_or_id_from_abstract_misp(organisation_blocklist)
+        response = self._prepare_request('POST', f'orgBlocklists/delete/{org_blocklist_id}')
         return self._check_json_response(response)
 
-    # ## END Blacklists ###
+    # ## END Blocklists ###
 
     # ## BEGIN Global helpers ###
 
