@@ -1123,8 +1123,13 @@ class TestComprehensive(unittest.TestCase):
             # Test generic Tag methods
             r = self.admin_misp_connector.tag(second, 'generic_tag_test')
             self.assertTrue('successfully' in r['message'].lower() and f'Event ({second.id})' in r['message'], r['message'])
+            second = self.user_misp_connector.get_event(second.id, pythonify=True)
+            self.assertTrue('generic_tag_test' == second.tags[0].name)
+
             r = self.admin_misp_connector.untag(second, 'generic_tag_test')
             self.assertTrue(r['message'].endswith(f'successfully removed from Event({second.id}).'), r['message'])
+            second = self.user_misp_connector.get_event(second.id, pythonify=True)
+            self.assertFalse(second.tags)
             # NOTE: object tagging not supported yet
             # r = self.admin_misp_connector.tag(second.objects[0].uuid, 'generic_tag_test')
             # self.assertTrue(r['message'].endswith(f'successfully attached to Object({second.objects[0].id}).'), r['message'])
@@ -1132,8 +1137,15 @@ class TestComprehensive(unittest.TestCase):
             # self.assertTrue(r['message'].endswith(f'successfully removed from Object({second.objects[0].id}).'), r['message'])
             r = self.admin_misp_connector.tag(second.objects[0].attributes[0].uuid, 'generic_tag_test')
             self.assertTrue('successfully' in r['message'].lower() and f'Attribute ({second.objects[0].attributes[0].id})' in r['message'], r['message'])
+            attr = self.user_misp_connector.get_attribute(second.objects[0].attributes[0].uuid, pythonify=True)
+            self.assertTrue('generic_tag_test' == attr.tags[0].name)
             r = self.admin_misp_connector.untag(second.objects[0].attributes[0].uuid, 'generic_tag_test')
             self.assertTrue(r['message'].endswith(f'successfully removed from Attribute({second.objects[0].attributes[0].id}).'), r['message'])
+            second = self.user_misp_connector.get_event(second.id, pythonify=True)
+            for tag in second.objects[0].attributes[0].tags:
+                self.assertFalse('generic_tag_test' == tag.name)
+            attr = self.user_misp_connector.get_attribute(second.objects[0].attributes[0].uuid, pythonify=True)
+            self.assertFalse(attr.tags)
 
             # Delete tag to avoid polluting the db
             tags = self.admin_misp_connector.tags(pythonify=True)
