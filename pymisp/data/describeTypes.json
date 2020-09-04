@@ -623,7 +623,8 @@
         "to_ids": 1
       },
       "email": {
-        "default_category": "Social network"
+        "default_category": "Social network",
+        "to_ids": 1
       },
       "email-attachment": {
         "default_category": "Payload delivery",
