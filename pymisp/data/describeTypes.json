@@ -69,6 +69,8 @@
         "pattern-in-file",
         "pattern-in-memory",
         "pdb",
+        "pgp-private-key",
+        "pgp-public-key",
         "regkey",
         "regkey|value",
         "sha1",
@@ -101,6 +103,7 @@
         "campaign-name",
         "comment",
         "dns-soa-email",
+        "email",
         "other",
         "text",
         "threat-actor",
@@ -206,6 +209,7 @@
         "cookie",
         "domain",
         "domain|ip",
+        "email",
         "email-dst",
         "email-src",
         "email-subject",
@@ -248,6 +252,8 @@
         "float",
         "hex",
         "other",
+        "pgp-private-key",
+        "pgp-public-key",
         "phone-number",
         "port",
         "size-in-bytes",
@@ -262,6 +268,7 @@
         "chrome-extension-id",
         "comment",
         "domain",
+        "email",
         "email-attachment",
         "email-body",
         "email-dst",
@@ -431,6 +438,7 @@
         "comment",
         "country-of-residence",
         "date-of-birth",
+        "email",
         "first-name",
         "frequent-flyer-number",
         "gender",
@@ -445,6 +453,8 @@
         "passport-expiration",
         "passport-number",
         "payment-details",
+        "pgp-private-key",
+        "pgp-public-key",
         "phone-number",
         "place-of-birth",
         "place-port-of-clearance",
@@ -460,6 +470,7 @@
       "Social network": [
         "anonymised",
         "comment",
+        "email",
         "email-dst",
         "email-src",
         "eppn",
@@ -468,6 +479,8 @@
         "github-username",
         "jabber-id",
         "other",
+        "pgp-private-key",
+        "pgp-public-key",
         "text",
         "twitter-id",
         "whois-registrant-email"
@@ -608,6 +621,9 @@
       "domain|ip": {
         "default_category": "Network activity",
         "to_ids": 1
+      },
+      "email": {
+        "default_category": "Social network"
       },
       "email-attachment": {
         "default_category": "Payload delivery",
@@ -949,6 +965,14 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "pgp-private-key": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "pgp-public-key": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
       "phone-number": {
         "default_category": "Person",
         "to_ids": 0
@@ -1224,6 +1248,7 @@
       "dns-soa-email",
       "domain",
       "domain|ip",
+      "email",
       "email-attachment",
       "email-body",
       "email-dst",
@@ -1309,6 +1334,8 @@
       "payment-details",
       "pdb",
       "pehash",
+      "pgp-private-key",
+      "pgp-public-key",
       "phone-number",
       "place-of-birth",
       "place-port-of-clearance",
