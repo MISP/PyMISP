@@ -2,6 +2,36 @@ Changelog
 =========
 
 
+%%version%% (unreleased)
+------------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+
+
+v2.4.131 (2020-09-08)
+---------------------
+
+New
+~~~
+- [test] Validate tag removal. [Raphaël Vinot]
+- [describeTypes] sha3 added. [Alexandre Dulaunoy]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- [describeTypes] updated. [Alexandre Dulaunoy]
+- [describeTypes] updated. [Alexandre Dulaunoy]
+- Bump objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump file template version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Rename blacklist -> blocklist. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+
+
 v2.4.130 (2020-08-20)
 ---------------------
 
@@ -19,6 +49,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
