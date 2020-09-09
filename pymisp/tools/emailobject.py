@@ -58,7 +58,7 @@ class EMailObject(AbstractMISPObjectGenerator):
         except UnicodeDecodeError:
             logger.debug("EmailObject was passed a non-ASCII encoded binary blob.")
         try:
-            if _msg_bytes[:3] == b'\xef\xbb\xbf': # utf-8-sig byte-order mark (BOM)
+            if _msg_bytes[:3] == b'\xef\xbb\xbf':  # utf-8-sig byte-order mark (BOM)
                 # Set Pseudofile to correctly encoded email in case it is used at some later point.
                 self.__pseudofile = BytesIO(_msg_bytes.decode('utf_8_sig').encode("ASCII"))
                 self.__email = message_from_bytes(self.__pseudofile.getvalue(), policy=policy.default)
