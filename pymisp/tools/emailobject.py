@@ -26,6 +26,9 @@ class EMailObject(AbstractMISPObjectGenerator):
         else:
             raise InvalidMISPObject('File buffer (BytesIO) or a path is required.')
         self.__email = message_from_bytes(self.__pseudofile.getvalue(), policy=policy.default)
+        # Improperly encoded emails (utf-8-sig) fail silently. An empty email indicates this might be the case.
+        if len(self.__email) == 0:
+            self.attempt_decoding()
         if attach_original_email:
             self.add_attribute('eml', value='Full email.eml', data=self.__pseudofile)
         self.generate_attributes()
@@ -43,6 +46,24 @@ class EMailObject(AbstractMISPObjectGenerator):
                 content = content.encode()
             to_return.append((attachment.get_filename(), BytesIO(content)))
         return to_return
+
+    def attempt_decoding(self):
+        """Attempt to decode non-ascii encoded emails.
+        """
+        _msg_bytes = self.__pseudofile.getvalue()
+        try:
+            _msg_bytes.decode("ASCII")
+            logger.info("EmailObject failed to decode ASCII encoded email.")
+            return
+        except UnicodeDecodeError:
+            logger.debug("EmailObject was passed a non-ASCII encoded binary blob.")
+        try:
+            if _msg_bytes[:3] == b'\xef\xbb\xbf': # utf-8-sig byte-order mark (BOM)
+                # Set Pseudofile to correctly encoded email in case it is used at some later point.
+                self.__pseudofile = BytesIO(_msg_bytes.decode('utf_8_sig').encode("ASCII"))
+                self.__email = message_from_bytes(self.__pseudofile.getvalue(), policy=policy.default)
+        except UnicodeDecodeError:
+            logger.debug("EmailObject does not know how to decode binary blob passed to it. Object may not be an email. If this is an email please submit it as an issue to PyMISP so we can add support.")
 
     def generate_attributes(self):
         if self.__email.get_body(preferencelist=('html', 'plain')):
