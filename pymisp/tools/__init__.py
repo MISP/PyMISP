@@ -17,6 +17,7 @@ from .vehicleobject import VehicleObject  # noqa
 from .csvloader import CSVLoader  # noqa
 from .sshauthkeyobject import SSHAuthorizedKeysObject  # noqa
 from .feed import feed_meta_generator  # noqa
+from .update_objects import update_objects  # noqa
 try:
     from .urlobject import URLObject  # noqa
 except ImportError:

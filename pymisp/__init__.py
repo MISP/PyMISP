@@ -30,6 +30,7 @@ try:
     from .tools import stix  # noqa
     from .tools import openioc  # noqa
     from .tools import ext_lookups  # noqa
+    from .tools import update_objects  # noqa
 
     from .api import PyMISP, register_user  # noqa
     from .api import PyMISP as ExpandedPyMISP  # noqa
