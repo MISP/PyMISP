@@ -1,5 +1,5 @@
-pymisp
-======
+pymisp - Modules
+================
 
 .. toctree::
    :maxdepth: 4

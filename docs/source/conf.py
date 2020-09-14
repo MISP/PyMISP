@@ -40,6 +40,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.imgconverter',
+    'recommonmark',
 ]
 
 napoleon_google_docstring = False
@@ -131,6 +132,9 @@ pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# lief is a bit difficult to install
+autodoc_mock_imports = ["lief"]
 
 
 # -- Options for HTML output ----------------------------------------------

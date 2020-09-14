@@ -1030,8 +1030,7 @@ class MISPEvent(AbstractMISP):
 
     def to_feed(self, valid_distributions: List[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False) -> Dict:
         """ Generate a json output for MISP Feed.
-        Notes:
-            * valid_distributions only makes sense if the distribution key is set (i.e. the event is exported from a MISP instance)
+        Note: valid_distributions only makes sense if the distribution key is set; i.e., the event is exported from a MISP instance.
         """
         required = ['info', 'Orgc']
         for r in required:
