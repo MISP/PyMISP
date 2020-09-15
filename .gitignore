@@ -1,6 +1,7 @@
 *.swp
 *.pem
 *.pyc
+docs/build/
 examples/keys.py
 examples/cudeso.py
 examples/feed-generator/output/*\.json
