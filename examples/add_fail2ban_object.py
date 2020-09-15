@@ -49,7 +49,7 @@ if __name__ == '__main__':
     if args.force_new:
         me = create_new_event()
     else:
-        response = pymisp.search_index(tag=args.tag, timestamp='1h', pythonify=True)
+        response = pymisp.search_index(tags=args.tag, timestamp='1h', pythonify=True)
         if response:
             if args.disable_new:
                 event_id = response[0].id
