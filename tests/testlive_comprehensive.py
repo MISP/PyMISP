@@ -2752,11 +2752,11 @@ class TestComprehensive(unittest.TestCase):
             "warninglists/enableWarninglist",
             "warninglists/getToggleField",
             "warninglists/delete",
-            "admin/whitelists/add",
-            "admin/whitelists/index",
-            "admin/whitelists/edit",
-            "admin/whitelists/delete",
-            "whitelists/index"
+            "admin/allowedlists/add",
+            "admin/allowedlists/index",
+            "admin/allowedlists/edit",
+            "admin/allowedlists/delete",
+            "allowedlists/index"
         ]
         missing = self.admin_misp_connector.get_all_functions(True)
         with open('all_missing.json', 'w') as f:
