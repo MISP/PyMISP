@@ -35,6 +35,7 @@ logger = logging.getLogger('pymisp')
 
 
 def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID]) -> Union[str, int]:
+    """Extract the relevant ID accordingly to the given type passed as parameter"""
     if isinstance(obj, UUID):
         return str(obj)
     if isinstance(obj, (int, str)):
@@ -188,6 +189,7 @@ class PyMISP:
 
     @property
     def pymisp_version_master(self) -> Dict:
+        """PyMISP version as defined in the main repository"""
         return self.pymisp_version_main
 
     @property
@@ -215,36 +217,44 @@ class PyMISP:
         return {'error': 'Impossible to retrieve the version of the master branch.'}
 
     def update_misp(self) -> Dict:
+        """Trigger a server update"""
         response = self._prepare_request('POST', 'servers/update')
         return self._check_json_response(response)
 
     def set_server_setting(self, setting: str, value: Union[str, int, bool], force: bool = False) -> Dict:
+        """Set a setting on the MISP instance"""
         data = {'value': value, 'force': force}
         response = self._prepare_request('POST', f'servers/serverSettingsEdit/{setting}', data=data)
         return self._check_json_response(response)
 
     def get_server_setting(self, setting: str) -> Dict:
+        """Get a setting from the MISP instance"""
         response = self._prepare_request('GET', f'servers/getSetting/{setting}')
         return self._check_json_response(response)
 
     def server_settings(self) -> Dict:
+        """Get all the settings from the server"""
         response = self._prepare_request('GET', 'servers/serverSettings')
         return self._check_json_response(response)
 
     def restart_workers(self) -> Dict:
+        """Restart all the workers"""
         response = self._prepare_request('POST', 'servers/restartWorkers')
         return self._check_json_response(response)
 
     def db_schema_diagnostic(self) -> Dict:
+        """Get the schema diagnostic"""
         response = self._prepare_request('GET', 'servers/dbSchemaDiagnostic')
         return self._check_json_response(response)
 
     def toggle_global_pythonify(self) -> None:
+        """Toggle the pythonify variable for the class"""
         self.global_pythonify = not self.global_pythonify
 
     # ## BEGIN Event ##
 
     def events(self, pythonify: bool = False) -> Union[Dict, List[MISPEvent]]:
+        """Get all the events from the MISP instance"""
         r = self._prepare_request('GET', 'events/index')
         events_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in events_r:
@@ -424,6 +434,7 @@ class PyMISP:
     # ## BEGIN Attribute ###
 
     def attributes(self, pythonify: bool = False) -> Union[Dict, List[MISPAttribute]]:
+        """Get all the attributes from the MISP instance"""
         r = self._prepare_request('GET', 'attributes/index')
         attributes_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in attributes_r:
@@ -519,6 +530,7 @@ class PyMISP:
     # ## BEGIN Attribute Proposal ###
 
     def attribute_proposals(self, event: Optional[Union[MISPEvent, int, str, UUID]] = None, pythonify: bool = False) -> Union[Dict, List[MISPShadowAttribute]]:
+        """Get all the attribute proposals"""
         if event:
             event_id = get_uuid_or_id_from_abstract_misp(event)
             r = self._prepare_request('GET', f'shadowAttributes/index/{event_id}')
@@ -535,6 +547,7 @@ class PyMISP:
         return to_return
 
     def get_attribute_proposal(self, proposal: Union[MISPShadowAttribute, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPShadowAttribute]:
+        """Get an attribute proposal"""
         proposal_id = get_uuid_or_id_from_abstract_misp(proposal)
         r = self._prepare_request('GET', f'shadowAttributes/view/{proposal_id}')
         attribute_proposal = self._check_json_response(r)
@@ -1166,6 +1179,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def test_server(self, server: Union[MISPServer, int, str, UUID]) -> Dict:
+        """Test if a sync link is working as expected"""
         server_id = get_uuid_or_id_from_abstract_misp(server)
         response = self._prepare_request('POST', f'servers/testConnection/{server_id}')
         return self._check_json_response(response)
@@ -1409,6 +1423,7 @@ class PyMISP:
                                  role: Optional[Union[MISPRole, int, str]] = None,
                                  perm_sync: bool = False, perm_publish: bool = False, perm_admin: bool = False,
                                  unsafe_fallback: bool = False):
+        """Accept a user registration"""
         registration_id = get_uuid_or_id_from_abstract_misp(registration)
         if role:
             role_id = role_id = get_uuid_or_id_from_abstract_misp(role)
@@ -1446,6 +1461,7 @@ class PyMISP:
         return self._check_json_response(r)
 
     def discard_user_registration(self, registration: Union[MISPInbox, int, str, UUID]):
+        """Discard a user registration"""
         registration_id = get_uuid_or_id_from_abstract_misp(registration)
         r = self._prepare_request('POST', f'users/discardRegistrations/{registration_id}')
         return self._check_json_response(r)
@@ -1468,6 +1484,7 @@ class PyMISP:
         return to_return
 
     def set_default_role(self, role: Union[MISPRole, int, str, UUID]) -> Dict:
+        """Set a default role for the new user accounts"""
         role_id = get_uuid_or_id_from_abstract_misp(role)
         url = urljoin(self.root_url, f'/admin/roles/set_default/{role_id}')
         response = self._prepare_request('POST', url)
@@ -1964,6 +1981,7 @@ class PyMISP:
                                  message: Optional[str] = None, sync: bool = False,
                                  anonymise_requestor_server: bool = False,
                                  mock: bool = False) -> Dict:
+        """Request the access to a community"""
         community_id = get_uuid_or_id_from_abstract_misp(community)
         to_post = {'org_name': requestor_organisation_name,
                    'org_uuid': requestor_organisation_uuid,
@@ -1992,11 +2010,13 @@ class PyMISP:
         return to_return
 
     def accept_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool = False) -> Dict:
+        """Accept the delegation of an event"""
         delegation_id = get_uuid_or_id_from_abstract_misp(delegation)
         r = self._prepare_request('POST', f'eventDelegations/acceptDelegation/{delegation_id}')
         return self._check_json_response(r)
 
     def discard_event_delegation(self, delegation: Union[MISPEventDelegation, int, str], pythonify: bool = False) -> Dict:
+        """Discard the delegation of an event"""
         delegation_id = get_uuid_or_id_from_abstract_misp(delegation)
         r = self._prepare_request('POST', f'eventDelegations/deleteDelegation/{delegation_id}')
         return self._check_json_response(r)
@@ -2005,7 +2025,8 @@ class PyMISP:
                        organisation: Optional[Union[MISPOrganisation, int, str, UUID]] = None,
                        event_delegation: Optional[MISPEventDelegation] = None,
                        distribution: int = -1, message: str = '', pythonify: bool = False) -> Union[Dict, MISPEventDelegation]:
-        '''Note: distribution == -1 means recipient decides'''
+        '''Delegates an event.
+        Note: distribution == -1 means recipient decides'''
         if event and organisation:
             event_id = get_uuid_or_id_from_abstract_misp(event)
             organisation_id = get_uuid_or_id_from_abstract_misp(organisation)

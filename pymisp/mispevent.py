@@ -1529,7 +1529,11 @@ class MISPFeed(AbstractMISP):
             kwargs = kwargs['Feed']
         super().from_dict(**kwargs)
         if hasattr(self, 'settings'):
-            self.settings = json.loads(self.settings)
+            try:
+                self.settings = json.loads(self.settings)
+            except json.decoder.JSONDecodeError as e:
+                logger.error("Failed to parse feed settings: {}".format(self.settings))
+                raise e
 
 
 class MISPWarninglist(AbstractMISP):
