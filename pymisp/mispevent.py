@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import timezone, datetime, date
+import copy
 import json
 import os
 import base64
@@ -603,7 +604,7 @@ class MISPObject(AbstractMISP):
                              'sharing_group_id', 'comment', 'first_seen', 'last_seen',
                              'deleted'}
 
-    def __init__(self, name: str, strict: bool = False, standalone: bool = True, default_attributes_parameters: dict = {}, **kwargs):
+    def __init__(self, name: str, strict: bool = False, standalone: bool = True, default_attributes_parameters: Dict = {}, **kwargs):
         ''' Master class representing a generic MISP object
         :name: Name of the object
 
@@ -637,7 +638,7 @@ class MISPObject(AbstractMISP):
             # Just make sure we're not modifying an existing MISPAttribute
             self._default_attributes_parameters = default_attributes_parameters.to_dict()
         else:
-            self._default_attributes_parameters = default_attributes_parameters
+            self._default_attributes_parameters = copy.copy(default_attributes_parameters)
         if self._default_attributes_parameters:
             # Let's clean that up
             self._default_attributes_parameters.pop('value', None)  # duh
