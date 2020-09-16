@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
-from pymisp import ExpandedPyMISP
-from pymisp.tools import GenericObjectGenerator
+from pymisp import PyMISP
+from pymisp import MISPObject
 from pymisp.tools import update_objects
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
@@ -35,24 +34,21 @@ if __name__ == '__main__':
 
     r = requests.get("https://api.github.com/users/{}".format(args.username))
     if r.status_code != 200:
-       sys.exit("HTTP return is {} and not 200 as expected".format(r.status_code))
+        sys.exit("HTTP return is {} and not 200 as expected".format(r.status_code))
     if args.force_template_update:
-       print("Updating MISP Object templates...")
-       update_objects()
-    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+        print("Updating MISP Object templates...")
+        update_objects()
+    pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
-    misp_object = GenericObjectGenerator("github-user")
-    github_user = json.loads(r.text)
+    misp_object = MISPObject(name="github-user")
+    github_user = r.json()
     rfollowers = requests.get(github_user['followers_url'])
-    followers = json.loads(rfollowers.text)
+    followers = rfollowers.json()
     user_followers = []
     for follower in followers:
-        user_followers.append({"follower": follower['login']})
-    print(user_followers)
-    github_username = [{"bio": github_user['bio'],
-                        "link": github_user['html_url'],
-                        "user-fullname": github_user['name'],
-                        "username": github_user['login']
-                        }]
-    misp_object.generate_attributes(github_username)
+        misp_object.add_attribute("follower", follower['login'])
+    misp_object.add_attribute('bio', github_user['bio'])
+    misp_object.add_attribute('link', github_user['html_url'])
+    misp_object.add_attribute('user-fullname', github_user['name'])
+    misp_object.add_attribute('username', github_user['login'])
     retcode = pymisp.add_object(args.event, misp_object)
