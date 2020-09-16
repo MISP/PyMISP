@@ -148,3 +148,8 @@ Creating a new MISP object generator should be done using a pre-defined template
 Your new MISPObject generator must generate attributes and add them as class properties using `add_attribute`.
 
 When the object is sent to MISP, all the class properties will be exported to the JSON export.
+
+# License
+
+PyMISP is distributed under an [open source license](./LICENSE). A simplified 2-BSD license.
+
