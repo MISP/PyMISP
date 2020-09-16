@@ -13,4 +13,7 @@ class TestFileObject(unittest.TestCase):
         attributes = json.loads(file_object.to_json())['Attribute']
         mime = next(attr for attr in attributes if attr['object_relation'] == 'mimetype')
         # was "Python script, ASCII text executable"
-        self.assertEqual(mime['value'], 'text/x-python')
+        # libmagic on linux: 'text/x-python'
+        # libmagic on os x:  'text/x-script.python'
+        self.assertEqual(mime['value'][:7], 'text/x-')
+        self.assertEqual(mime['value'][-6:], 'python')
