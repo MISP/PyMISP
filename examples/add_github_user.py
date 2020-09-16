@@ -44,8 +44,10 @@ if __name__ == '__main__':
     github_user = r.json()
     rfollowers = requests.get(github_user['followers_url'])
     followers = rfollowers.json()
-    user_followers = []
+    rfollowing = requests.get("https://api.github.com/users/{}/following".format(args.username))
+    followings = rfollowing.json()
     misp_object.add_attributes("follower", *[follower['login'] for follower in followers])
+    misp_object.add_attributes("following", *[following['login'] for following in followings])
     misp_object.add_attribute('bio', github_user['bio'])
     misp_object.add_attribute('link', github_user['html_url'])
     misp_object.add_attribute('user-fullname', github_user['name'])
