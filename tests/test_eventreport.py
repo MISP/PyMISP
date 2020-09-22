@@ -235,7 +235,7 @@ class TestEventReportComprehensive(unittest.TestCase):
         addedReport = self.add_report(self.testReport, self.user_misp_connector)
         self.assertIn('errors', addedReport, msg="This user should not be able to add a report to an event he does not own")
         addedReport = self.add_report(self.testReport)
-        editedReport, returnedReport = self.edit_report(addedReport, self.user_misp_connector)
+        _, returnedReport = self.edit_report(addedReport, self.user_misp_connector)
         self.assertIn('errors', returnedReport, msg="This user should not be able to edit a report he does not own")
         deletedReport = self.soft_delete_report(addedReport, self.user_misp_connector)
         self.assertIn('errors', deletedReport, msg="This user should not be able to delete a report he does not own")
