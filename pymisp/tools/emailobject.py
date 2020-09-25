@@ -97,6 +97,8 @@ class EMailObject(AbstractMISPObjectGenerator):
             self.add_attribute('x-mailer', value=self.__email['X-Mailer'])
         if 'Thread-Index' in self.__email:
             self.add_attribute('thread-index', value=self.__email['Thread-Index'])
+        if 'Date' in self.__email:
+            self.add_attribute('send-date', self._sanitize_timestamp(self.__email['Date']))
         # TODO: email-header: all headers in one bloc
         # TODO: BCC?
         # TODO: received headers sometimes have TO email addresses
