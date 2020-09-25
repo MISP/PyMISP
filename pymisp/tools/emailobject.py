@@ -6,6 +6,7 @@ from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 import logging
 from email import message_from_bytes, policy
+import email.utils
 from pathlib import Path
 from typing import Union
 
@@ -73,9 +74,7 @@ class EMailObject(AbstractMISPObjectGenerator):
         if 'Message-ID' in self.__email:
             self.add_attribute('message-id', value=self.__email['Message-ID'])
         if 'To' in self.__email:
-            # TODO: split name and email address
-            to_add = [to.strip() for to in self.__email['To'].split(',')]
-            self.add_attributes('to', *to_add)
+            self._add_emails('to', self.__email['To'])
         if 'Cc' in self.__email:
             # TODO: split name and email address
             to_add = [to.strip() for to in self.__email['Cc'].split(',')]
@@ -83,9 +82,7 @@ class EMailObject(AbstractMISPObjectGenerator):
         if 'Subject' in self.__email:
             self.add_attribute('subject', value=self.__email['Subject'])
         if 'From' in self.__email:
-            # TODO: split name and email address
-            to_add = [to.strip() for to in self.__email['From'].split(',')]
-            self.add_attributes('from', *to_add)
+            self._add_emails('from', self.__email['From'])
         if 'Return-Path' in self.__email:
             # TODO: split name and email address
             self.add_attribute('return-path', value=self.__email['Return-Path'])
@@ -98,7 +95,27 @@ class EMailObject(AbstractMISPObjectGenerator):
         if 'Thread-Index' in self.__email:
             self.add_attribute('thread-index', value=self.__email['Thread-Index'])
         if 'Date' in self.__email:
-            self.add_attribute('send-date', self._sanitize_timestamp(self.__email['Date']))
+            self.add_attribute('send-date', value=self._sanitize_timestamp(self.__email['Date']))
         # TODO: email-header: all headers in one bloc
         # TODO: BCC?
         # TODO: received headers sometimes have TO email addresses
+
+    def _add_emails(self, type: str, data: str):
+        parts = [part.strip() for part in data.split(',')]
+        addresses = []
+        display_names = []
+        for part in parts:
+            realname, address = email.utils.parseaddr(part)
+            if address:  # parsing failed, insert original value
+                addresses.push({"value": part})
+            else:
+                addresses.push({"value": address, "comment": part})
+
+            if realname:
+                display_names.push({"value": realname, "comment": part})
+
+        if addresses:
+            self.add_attributes(type, *addresses)
+        if display_names:
+            self.add_attributes("{}-display-name".format(type), *display_names)
+
