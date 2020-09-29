@@ -551,6 +551,12 @@ class TestComprehensive(unittest.TestCase):
             first.objects[0].deleted = True
             deleted_object = self.user_misp_connector.update_object(first.objects[0], pythonify=True)
             self.assertTrue(deleted_object.deleted)
+
+            # Get event with deleted entries
+            first = self.user_misp_connector.get_event(first, deleted=True, pythonify=True)
+            self.assertTrue(first.attributes[0].deleted)
+            self.assertTrue(first.objects[0].deleted)
+
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
