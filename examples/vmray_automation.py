@@ -129,7 +129,7 @@ def search_vmray_incomplete(m, url, wait_period, module_import_url, module_impor
                     if module_DEBUG and req is not None:
                         print("Response code from submitting to MISP modules %s" % (req.status_code))
 
-                    # Succesful response from the misp modules?
+                    # Successful response from the misp modules?
                     if req.status_code == 200:
                         req_json = req.json()
                         if "error" in req_json:

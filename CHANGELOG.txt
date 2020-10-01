@@ -1295,7 +1295,7 @@ Other
   values, sanitization) [Falconieri]
 - Add: exportpdf tool working. [Falconieri]
 - General improvement : deisgn, exhaustiviness of mispEvent values
-  displayed, good pratice concerning paragraphe/table made. [Falconieri]
+  displayed, good practice concerning paragraphe/table made. [Falconieri]
 - Update with table basics. [Falconieri]
 - Structure of the improvements OK : test file, test folder, report
   generator. [Falconieri]
@@ -2219,7 +2219,7 @@ Changes
 - Bump CHANGELOG. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Update readme for new logging system. [Raphaël Vinot]
-- Small improvments in the logging system. [Raphaël Vinot]
+- Small improvements in the logging system. [Raphaël Vinot]
 - Properly use python logging module. [Raphaël Vinot]
 - Update asciidoctor generator. [Raphaël Vinot]
 - Remove warning if PyMISP is too new. [Raphaël Vinot]
@@ -2547,7 +2547,7 @@ Other
 - Cleanup warning function. [Raphaël Vinot]
 - Fix typos. [Raphaël Vinot]
 - Remove unused variable. [Tristan METAYER]
-- Remove category It will be automaticly detected
+- Remove category It will be automatically detected
   https://github.com/MISP/PyMISP/blob/master/pymisp/tools/openioc.py.
   [Tristan METAYER]
 - Revert tab to escape. [Tristan METAYER]
@@ -2756,7 +2756,7 @@ Other
 - Bump version. [Raphaël Vinot]
 - Add orgs managment. [Raphaël Vinot]
 - Run on more python versions. [Raphaël Vinot]
-- Exemple addtag (dirty) [Déborah Servili]
+- Example addtag (dirty) [Déborah Servili]
 - Fix last commit. [Raphaël Vinot]
 - Wrong use of API for dateuntil. [Koen Van Impe]
 
