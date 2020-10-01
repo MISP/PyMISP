@@ -4,8 +4,8 @@
 * It will also generate a html document with a table (attribute\_table.html) containing count for each type of attribute.
 * test\_attribute\_treemap.html is a quick page made to visualize both treemap and table at the same time.
 
-* tags\_count.py is a script that count the number of occurences of every tags in a fetched sample of Events in a given period of time.
-* tag\_search.py is a script that count the number of occurences of a given tag  in a fetched sample of Events in a given period of time.
+* tags\_count.py is a script that count the number of occurrences of every tags in a fetched sample of Events in a given period of time.
+* tag\_search.py is a script that count the number of occurrences of a given tag  in a fetched sample of Events in a given period of time.
     * Events will be fetched from _days_ days ago to today.
     * _begindate_ is the beginning of the studied period. If it is later than today, an error will be raised.
     * _enddate_ is the end of the studied period. If it is earlier than _begindate_, an error will be raised.
