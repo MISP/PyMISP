@@ -22,5 +22,16 @@ class TestEmailObject(unittest.TestCase):
             self.assertIsInstance(file_name, str)
             self.assertIsInstance(file_content, BytesIO)
 
-    def _get_values(self, obj: EMailObject, relation: str) -> List[str]:
+    def test_mail_1_msg(self):
+        email_object = EMailObject(Path("tests/email_testfiles/mail_1.msg"))
+        self.assertEqual(self._get_values(email_object, "subject")[0],
+                         "Newsletter Prüfung Personalwesen / Prüfung Eröffnungsbilanz")
+
+        self.assertIsInstance(email_object.email, EmailMessage)
+        for file_name, file_content in email_object.attachments:
+            self.assertIsInstance(file_name, str)
+            self.assertIsInstance(file_content, BytesIO)
+
+    @staticmethod
+    def _get_values(obj: EMailObject, relation: str) -> List[str]:
         return [attr.value for attr in obj.attributes if attr['object_relation'] == relation]

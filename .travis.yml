@@ -8,6 +8,7 @@ addons:
   apt:
     packages:
       - libfuzzy-dev
+      - libemail-outlook-message-perl
 
 python:
   - "3.6"
