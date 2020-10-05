@@ -11,7 +11,7 @@
 
 ````
 #  Feed generator
-git clone https://github.com/CIRCL/PyMISP
+git clone https://github.com/MISP/PyMISP
 cd examples/feed-generator-from-redis
 cp settings.default.py settings.py
 vi settings.py  # adjust your settings
