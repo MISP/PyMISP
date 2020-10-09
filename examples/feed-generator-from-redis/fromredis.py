@@ -107,7 +107,7 @@ class RedisToMISPFeed:
             # Suffix not provided, try to add anyway
             if settings.fallback_MISP_type == 'attribute':
                 new_key = key + self.SUFFIX_ATTR
-                # Add atribute type from the config
+                # Add attribute type from the config
                 if 'type' not in data and settings.fallback_attribute_type:
                     data['type'] = settings.fallback_attribute_type
                 else:

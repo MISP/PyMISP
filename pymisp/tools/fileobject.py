@@ -79,10 +79,10 @@ class FileObject(AbstractMISPObjectGenerator):
         if len(data) == 0:
             return 0.0
 
-        occurences = Counter(bytearray(data))
+        occurrences = Counter(bytearray(data))
 
         entropy = 0.0
-        for x in occurences.values():
+        for x in occurrences.values():
             p_x = float(x) / len(data)
             entropy -= p_x * math.log(p_x, 2)
 

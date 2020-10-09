@@ -36,6 +36,7 @@
         "comment",
         "cookie",
         "filename",
+        "filename-pattern",
         "filename|authentihash",
         "filename|impfuzzy",
         "filename|imphash",
@@ -128,6 +129,7 @@
         "domain",
         "domain|ip",
         "filename",
+        "filename-pattern",
         "filename|md5",
         "filename|sha1",
         "filename|sha256",
@@ -214,6 +216,7 @@
         "email-src",
         "email-subject",
         "eppn",
+        "filename-pattern",
         "hassh-md5",
         "hasshserver-md5",
         "hex",
@@ -283,6 +286,7 @@
         "email-thread-index",
         "email-x-mailer",
         "filename",
+        "filename-pattern",
         "filename|authentihash",
         "filename|impfuzzy",
         "filename|imphash",
@@ -361,6 +365,7 @@
         "chrome-extension-id",
         "comment",
         "filename",
+        "filename-pattern",
         "filename|authentihash",
         "filename|impfuzzy",
         "filename|imphash",
@@ -942,6 +947,10 @@
         "default_category": "Person",
         "to_ids": 0
       },
+      "pattern-filename": {
+        "default_category": "Payload installation",
+        "to_ids": 1
+      },
       "pattern-in-file": {
         "default_category": "Payload installation",
         "to_ids": 1
@@ -1329,6 +1338,7 @@
       "passport-country",
       "passport-expiration",
       "passport-number",
+      "pattern-filename",
       "pattern-in-file",
       "pattern-in-memory",
       "pattern-in-traffic",
