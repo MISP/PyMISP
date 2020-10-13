@@ -103,11 +103,16 @@ class EMailObject(AbstractMISPObjectGenerator):
     @property
     def attachments(self) -> List[Tuple[str, BytesIO]]:
         to_return = []
-        for attachment in self.email.iter_attachments():
-            content = attachment.get_content()  # type: ignore
-            if isinstance(content, str):
-                content = content.encode()
-            to_return.append((attachment.get_filename(), BytesIO(content)))
+        try:
+            for attachment in self.email.iter_attachments():
+                content = attachment.get_content()  # type: ignore
+                if isinstance(content, str):
+                    content = content.encode()
+                to_return.append((attachment.get_filename(), BytesIO(content)))
+        except AttributeError:
+            # ignore bug in Python3.6, that cause exception for empty email body,
+            # see https://stackoverflow.com/questions/56391306/attributeerror-str-object-has-no-attribute-copy-when-parsing-multipart-emai
+            pass
         return to_return
 
     def __generate_attributes(self):
