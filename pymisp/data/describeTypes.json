@@ -88,6 +88,7 @@
         "sigma",
         "ssdeep",
         "stix2-pattern",
+        "telfhash",
         "text",
         "vhash",
         "windows-scheduled-task",
@@ -344,6 +345,7 @@
         "sigma",
         "ssdeep",
         "stix2-pattern",
+        "telfhash",
         "text",
         "tlsh",
         "url",
@@ -412,6 +414,7 @@
         "sigma",
         "ssdeep",
         "stix2-pattern",
+        "telfhash",
         "text",
         "tlsh",
         "vhash",
@@ -1119,6 +1122,10 @@
         "default_category": "Targeting data",
         "to_ids": 0
       },
+      "telfhash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
       "text": {
         "default_category": "Other",
         "to_ids": 0
@@ -1381,6 +1388,7 @@
       "target-machine",
       "target-org",
       "target-user",
+      "telfhash",
       "text",
       "threat-actor",
       "tlsh",
