@@ -7,6 +7,11 @@ import os
 from pymisp import ExpandedPyMISP
 from settings import entries, url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
 
+try:
+    from settings import include_deleted
+except ImportError:
+    include_deleted = False
+
 valid_attribute_distributions = []
 
 
@@ -64,7 +69,7 @@ if __name__ == '__main__':
     total = len(events)
     for event in events:
         try:
-            e = misp.get_event(event.uuid, pythonify=True)
+            e = misp.get_event(event.uuid, deleted=include_deleted, pythonify=True)
             e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True)
         except Exception as e:
             print(e, event.uuid)

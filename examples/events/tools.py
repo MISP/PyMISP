@@ -55,7 +55,10 @@ def floodemail(misp, event, maxlength=25):
 
 
 def create_dummy_event(misp):
-    return misp.new_event(0, 4, 0, 'dummy event')
+    event = MISPEvent()
+    event.info = 'Dummy event'
+    event = misp.add_event(event, pythonify=True)
+    return event
 
 
 def create_massive_dummy_events(misp, nbattribute):

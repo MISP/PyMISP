@@ -36,6 +36,7 @@
         "comment",
         "cookie",
         "filename",
+        "filename-pattern",
         "filename|authentihash",
         "filename|impfuzzy",
         "filename|imphash",
@@ -44,12 +45,17 @@
         "filename|sha1",
         "filename|sha224",
         "filename|sha256",
+        "filename|sha3-224",
+        "filename|sha3-256",
+        "filename|sha3-384",
+        "filename|sha3-512",
         "filename|sha384",
         "filename|sha512",
         "filename|sha512/224",
         "filename|sha512/256",
         "filename|ssdeep",
         "filename|tlsh",
+        "filename|vhash",
         "gene",
         "hex",
         "impfuzzy",
@@ -64,11 +70,17 @@
         "pattern-in-file",
         "pattern-in-memory",
         "pdb",
+        "pgp-private-key",
+        "pgp-public-key",
         "regkey",
         "regkey|value",
         "sha1",
         "sha224",
         "sha256",
+        "sha3-224",
+        "sha3-256",
+        "sha3-384",
+        "sha3-512",
         "sha384",
         "sha512",
         "sha512/224",
@@ -76,7 +88,9 @@
         "sigma",
         "ssdeep",
         "stix2-pattern",
+        "telfhash",
         "text",
+        "vhash",
         "windows-scheduled-task",
         "windows-service-displayname",
         "windows-service-name",
@@ -91,6 +105,7 @@
         "campaign-name",
         "comment",
         "dns-soa-email",
+        "email",
         "other",
         "text",
         "threat-actor",
@@ -115,9 +130,14 @@
         "domain",
         "domain|ip",
         "filename",
+        "filename-pattern",
         "filename|md5",
         "filename|sha1",
         "filename|sha256",
+        "filename|sha3-224",
+        "filename|sha3-256",
+        "filename|sha3-384",
+        "filename|sha3-512",
         "github-repository",
         "hassh-md5",
         "hasshserver-md5",
@@ -140,6 +160,10 @@
         "regkey|value",
         "sha1",
         "sha256",
+        "sha3-224",
+        "sha3-256",
+        "sha3-384",
+        "sha3-512",
         "snort",
         "text",
         "url",
@@ -172,6 +196,7 @@
       "Internal reference": [
         "anonymised",
         "comment",
+        "git-commit-id",
         "hex",
         "link",
         "other",
@@ -187,10 +212,12 @@
         "cookie",
         "domain",
         "domain|ip",
+        "email",
         "email-dst",
         "email-src",
         "email-subject",
         "eppn",
+        "filename-pattern",
         "hassh-md5",
         "hasshserver-md5",
         "hex",
@@ -229,6 +256,8 @@
         "float",
         "hex",
         "other",
+        "pgp-private-key",
+        "pgp-public-key",
         "phone-number",
         "port",
         "size-in-bytes",
@@ -243,6 +272,7 @@
         "chrome-extension-id",
         "comment",
         "domain",
+        "email",
         "email-attachment",
         "email-body",
         "email-dst",
@@ -257,6 +287,7 @@
         "email-thread-index",
         "email-x-mailer",
         "filename",
+        "filename-pattern",
         "filename|authentihash",
         "filename|impfuzzy",
         "filename|imphash",
@@ -265,12 +296,17 @@
         "filename|sha1",
         "filename|sha224",
         "filename|sha256",
+        "filename|sha3-224",
+        "filename|sha3-256",
+        "filename|sha3-384",
+        "filename|sha3-512",
         "filename|sha384",
         "filename|sha512",
         "filename|sha512/224",
         "filename|sha512/256",
         "filename|ssdeep",
         "filename|tlsh",
+        "filename|vhash",
         "hassh-md5",
         "hasshserver-md5",
         "hex",
@@ -298,6 +334,10 @@
         "sha1",
         "sha224",
         "sha256",
+        "sha3-224",
+        "sha3-256",
+        "sha3-384",
+        "sha3-512",
         "sha384",
         "sha512",
         "sha512/224",
@@ -305,10 +345,12 @@
         "sigma",
         "ssdeep",
         "stix2-pattern",
+        "telfhash",
         "text",
         "tlsh",
         "url",
         "user-agent",
+        "vhash",
         "vulnerability",
         "weakness",
         "whois-registrant-email",
@@ -325,6 +367,7 @@
         "chrome-extension-id",
         "comment",
         "filename",
+        "filename-pattern",
         "filename|authentihash",
         "filename|impfuzzy",
         "filename|imphash",
@@ -333,12 +376,17 @@
         "filename|sha1",
         "filename|sha224",
         "filename|sha256",
+        "filename|sha3-224",
+        "filename|sha3-256",
+        "filename|sha3-384",
+        "filename|sha3-512",
         "filename|sha384",
         "filename|sha512",
         "filename|sha512/224",
         "filename|sha512/256",
         "filename|ssdeep",
         "filename|tlsh",
+        "filename|vhash",
         "hex",
         "impfuzzy",
         "imphash",
@@ -355,6 +403,10 @@
         "sha1",
         "sha224",
         "sha256",
+        "sha3-224",
+        "sha3-256",
+        "sha3-384",
+        "sha3-512",
         "sha384",
         "sha512",
         "sha512/224",
@@ -362,8 +414,10 @@
         "sigma",
         "ssdeep",
         "stix2-pattern",
+        "telfhash",
         "text",
         "tlsh",
+        "vhash",
         "vulnerability",
         "weakness",
         "x509-fingerprint-md5",
@@ -392,6 +446,7 @@
         "comment",
         "country-of-residence",
         "date-of-birth",
+        "email",
         "first-name",
         "frequent-flyer-number",
         "gender",
@@ -406,6 +461,8 @@
         "passport-expiration",
         "passport-number",
         "payment-details",
+        "pgp-private-key",
+        "pgp-public-key",
         "phone-number",
         "place-of-birth",
         "place-port-of-clearance",
@@ -421,6 +478,7 @@
       "Social network": [
         "anonymised",
         "comment",
+        "email",
         "email-dst",
         "email-src",
         "eppn",
@@ -429,6 +487,8 @@
         "github-username",
         "jabber-id",
         "other",
+        "pgp-private-key",
+        "pgp-public-key",
         "text",
         "twitter-id",
         "whois-registrant-email"
@@ -570,6 +630,10 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
+      "email": {
+        "default_category": "Social network",
+        "to_ids": 1
+      },
       "email-attachment": {
         "default_category": "Payload delivery",
         "to_ids": 1
@@ -662,6 +726,22 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "filename|sha3-224": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "filename|sha3-256": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "filename|sha3-384": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "filename|sha3-512": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
       "filename|sha384": {
         "default_category": "Payload delivery",
         "to_ids": 1
@@ -686,6 +766,10 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "filename|vhash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
       "first-name": {
         "default_category": "Person",
         "to_ids": 0
@@ -704,6 +788,10 @@
       },
       "gene": {
         "default_category": "Artifacts dropped",
+        "to_ids": 0
+      },
+      "git-commit-id": {
+        "default_category": "Internal reference",
         "to_ids": 0
       },
       "github-organisation": {
@@ -862,6 +950,10 @@
         "default_category": "Person",
         "to_ids": 0
       },
+      "pattern-filename": {
+        "default_category": "Payload installation",
+        "to_ids": 1
+      },
       "pattern-in-file": {
         "default_category": "Payload installation",
         "to_ids": 1
@@ -885,6 +977,14 @@
       "pehash": {
         "default_category": "Payload delivery",
         "to_ids": 1
+      },
+      "pgp-private-key": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "pgp-public-key": {
+        "default_category": "Person",
+        "to_ids": 0
       },
       "phone-number": {
         "default_category": "Person",
@@ -939,6 +1039,22 @@
         "to_ids": 1
       },
       "sha256": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "sha3-224": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "sha3-256": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "sha3-384": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "sha3-512": {
         "default_category": "Payload delivery",
         "to_ids": 1
       },
@@ -1006,6 +1122,10 @@
         "default_category": "Targeting data",
         "to_ids": 0
       },
+      "telfhash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
       "text": {
         "default_category": "Other",
         "to_ids": 0
@@ -1037,6 +1157,10 @@
       "user-agent": {
         "default_category": "Network activity",
         "to_ids": 0
+      },
+      "vhash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
       },
       "visa-number": {
         "default_category": "Person",
@@ -1141,6 +1265,7 @@
       "dns-soa-email",
       "domain",
       "domain|ip",
+      "email",
       "email-attachment",
       "email-body",
       "email-dst",
@@ -1164,17 +1289,23 @@
       "filename|sha1",
       "filename|sha224",
       "filename|sha256",
+      "filename|sha3-224",
+      "filename|sha3-256",
+      "filename|sha3-384",
+      "filename|sha3-512",
       "filename|sha384",
       "filename|sha512",
       "filename|sha512/224",
       "filename|sha512/256",
       "filename|ssdeep",
       "filename|tlsh",
+      "filename|vhash",
       "first-name",
       "float",
       "frequent-flyer-number",
       "gender",
       "gene",
+      "git-commit-id",
       "github-organisation",
       "github-repository",
       "github-username",
@@ -1214,12 +1345,15 @@
       "passport-country",
       "passport-expiration",
       "passport-number",
+      "pattern-filename",
       "pattern-in-file",
       "pattern-in-memory",
       "pattern-in-traffic",
       "payment-details",
       "pdb",
       "pehash",
+      "pgp-private-key",
+      "pgp-public-key",
       "phone-number",
       "place-of-birth",
       "place-port-of-clearance",
@@ -1234,6 +1368,10 @@
       "sha1",
       "sha224",
       "sha256",
+      "sha3-224",
+      "sha3-256",
+      "sha3-384",
+      "sha3-512",
       "sha384",
       "sha512",
       "sha512/224",
@@ -1250,6 +1388,7 @@
       "target-machine",
       "target-org",
       "target-user",
+      "telfhash",
       "text",
       "threat-actor",
       "tlsh",
@@ -1258,6 +1397,7 @@
       "uri",
       "url",
       "user-agent",
+      "vhash",
       "visa-number",
       "vulnerability",
       "weakness",

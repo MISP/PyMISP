@@ -11,7 +11,7 @@
 
 ````
 #  Feed generator
-git clone https://github.com/CIRCL/PyMISP
+git clone https://github.com/MISP/PyMISP
 cd examples/feed-generator-from-redis
 cp settings.default.py settings.py
 vi settings.py  # adjust your settings
@@ -66,7 +66,7 @@ python3 server.py
 >>> obj_data = { "session": "session_id", "username": "admin", "password": "admin", "protocol": "telnet" }
 >>> generator.add_object_to_event(obj_name, **obj_data)
 
-# Immediatly write the event to the disk (Bypassing the default flushing behavior)
+# Immediately write the event to the disk (Bypassing the default flushing behavior)
 >>> generator.flush_event()
 ```
 

@@ -24,6 +24,8 @@ entries = 200
 # tagged tlp:white and/or feed-export but exclude anything tagged privint
 filters = {'published':'true'}
 
+# Include deleted attributes and objects in the events
+include_deleted = False
 
 # By default all attributes will be included in the feed generation
 # Remove the levels that you do not wish to include in the feed

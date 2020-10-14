@@ -9,8 +9,8 @@ logger = logging.getLogger('pymisp')
 
 class GeolocationObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parameters: dict, strict: bool=True, standalone: bool=True, **kwargs):
-        super(GeolocationObject, self).__init__('asn', strict=strict, standalone=standalone, **kwargs)
+    def __init__(self, parameters: dict, strict: bool = True, **kwargs):
+        super(GeolocationObject, self).__init__('asn', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()
 

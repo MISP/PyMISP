@@ -9,8 +9,10 @@ import glob
 import hashlib
 from datetime import date, datetime
 
-from pymisp import MISPEvent, MISPSighting, MISPTag, MISPOrganisation
+from pymisp import (MISPEvent, MISPSighting, MISPTag, MISPOrganisation,
+                    MISPObject)
 from pymisp.exceptions import InvalidMISPObject
+from pymisp.tools import GitVulnFinderObject
 
 
 class TestMISPEvent(unittest.TestCase):
@@ -29,6 +31,7 @@ class TestMISPEvent(unittest.TestCase):
     def test_simple(self):
         with open('tests/mispevent_testfiles/simple.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_event(self):
@@ -36,12 +39,14 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.publish()
         with open('tests/mispevent_testfiles/event.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_loadfile(self):
         self.mispevent.load_file('tests/mispevent_testfiles/event.json')
         with open('tests/mispevent_testfiles/event.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_event_tag(self):
@@ -53,6 +58,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.add_tag(new_tag)
         with open('tests/mispevent_testfiles/event_tags.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_attribute(self):
@@ -65,6 +71,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(attr_tags[0].name, 'osint')
         with open('tests/mispevent_testfiles/attribute.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
         # Fake setting an attribute ID for testing
         self.mispevent.attributes[0].id = 42
@@ -94,6 +101,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(self.mispevent.objects[0].references[0].relationship_type, 'baz')
         with open('tests/mispevent_testfiles/event_obj_attr_tag.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     @unittest.skip("Not supported on MISP: https://github.com/MISP/MISP/issues/2638 - https://github.com/MISP/PyMISP/issues/168")
@@ -116,6 +124,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(attribute.malware_binary, pseudofile)
         with open('tests/mispevent_testfiles/malware.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_existing_malware(self):
@@ -173,6 +182,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[1].uuid = 'b'
         with open('tests/mispevent_testfiles/event_obj_def_param.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_obj_default_values(self):
@@ -189,7 +199,21 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/def_param.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    def test_obj_references_export(self):
+        self.init_event()
+        obj1 = MISPObject(name="file")
+        obj2 = MISPObject(name="url", standalone=False)
+        obj1.add_reference(obj2, "downloads")
+        obj2.add_reference(obj1, "downloaded-by")
+        self.assertFalse("ObjectReference" in obj1.jsonable())
+        self.assertTrue("ObjectReference" in obj2.jsonable())
+        self.mispevent.add_object(obj1)
+        obj2.standalone = True
+        self.assertTrue("ObjectReference" in obj1.jsonable())
+        self.assertFalse("ObjectReference" in obj2.jsonable())
 
     def test_event_not_edited(self):
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
@@ -293,6 +317,7 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/misp_custom_obj.json', 'r') as f:
             ref_json = json.load(f)
+        del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
     def test_first_last_seen(self):
@@ -346,6 +371,15 @@ class TestMISPEvent(unittest.TestCase):
                     if 'categories' in entry:
                         subset = set(entry['categories']).issubset(me.describe_types['categories'])
                         self.assertTrue(subset, f'{t_json["name"]} - {obj_relation}')
+
+    def test_git_vuln_finder(self):
+        with open('tests/git-vuln-finder-quagga.json') as f:
+            dump = json.load(f)
+
+        for vuln in dump.values():
+            author = vuln['author']
+            vuln_finder = GitVulnFinderObject(vuln)
+            self.assertEqual(vuln_finder.get_attributes_by_relation('author')[0].value, author)
 
 
 if __name__ == '__main__':

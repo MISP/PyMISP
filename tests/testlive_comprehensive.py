@@ -26,7 +26,7 @@ logger = logging.getLogger('pymisp')
 
 
 try:
-    from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting
+    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlocklist
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
     from pymisp.exceptions import MISPServerError
 except ImportError:
@@ -57,7 +57,8 @@ class TestComprehensive(unittest.TestCase):
     def setUpClass(cls):
         cls.maxDiff = None
         # Connect as admin
-        cls.admin_misp_connector = ExpandedPyMISP(url, key, verifycert, debug=False)
+        cls.admin_misp_connector = PyMISP(url, key, verifycert, debug=False)
+        cls.admin_misp_connector.set_server_setting('Security.allow_self_registration', True, force=True)
         if not fast_mode:
             r = cls.admin_misp_connector.update_misp()
             print(r)
@@ -76,7 +77,7 @@ class TestComprehensive(unittest.TestCase):
         user.email = 'testusr@user.local'
         user.org_id = cls.test_org.id
         cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.user_misp_connector = ExpandedPyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
+        cls.user_misp_connector = PyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
         cls.user_misp_connector.toggle_global_pythonify()
         # Creates a publisher
         user = MISPUser()
@@ -84,14 +85,14 @@ class TestComprehensive(unittest.TestCase):
         user.org_id = cls.test_org.id
         user.role_id = 4
         cls.test_pub = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.pub_misp_connector = ExpandedPyMISP(url, cls.test_pub.authkey, verifycert)
+        cls.pub_misp_connector = PyMISP(url, cls.test_pub.authkey, verifycert)
         # Creates a user that can accept a delegation request
         user = MISPUser()
         user.email = 'testusr@delegate.recipient.local'
         user.org_id = cls.test_org_delegate.id
         user.role_id = 2
         cls.test_usr_delegate = cls.admin_misp_connector.add_user(user, pythonify=True)
-        cls.delegate_user_misp_connector = ExpandedPyMISP(url, cls.test_usr_delegate.authkey, verifycert, debug=False)
+        cls.delegate_user_misp_connector = PyMISP(url, cls.test_usr_delegate.authkey, verifycert, debug=False)
         cls.delegate_user_misp_connector.toggle_global_pythonify()
         if not fast_mode:
             # Update all json stuff
@@ -100,6 +101,7 @@ class TestComprehensive(unittest.TestCase):
             cls.admin_misp_connector.update_noticelists()
             cls.admin_misp_connector.update_warninglists()
             cls.admin_misp_connector.update_taxonomies()
+            cls.admin_misp_connector.load_default_feeds()
 
     @classmethod
     def tearDownClass(cls):
@@ -291,6 +293,24 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
+
+    def test_search_objects(self):
+        '''Search for objects'''
+        try:
+            first = self.create_simple_event()
+            obj = MISPObject('file')
+            obj.add_attribute('filename', 'foo')
+            first.add_object(obj)
+            first = self.user_misp_connector.add_event(first)
+            logger = logging.getLogger('pymisp')
+            logger.setLevel(logging.DEBUG)
+            objects = self.user_misp_connector.search(controller='objects',
+                                                      object_name='file', pythonify=True)
+            self.assertEqual(len(objects), 1)
+            self.assertEqual(objects[0].attributes[0].value, 'foo')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
 
     def test_search_type_attribute(self):
         '''Search multiple attributes, search attributes with specific types'''
@@ -516,17 +536,69 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_delete_by_uuid(self):
+    def test_delete_with_update(self):
         try:
             first = self.create_simple_event()
             obj = MISPObject('file')
             obj.add_attribute('filename', 'foo')
             first.add_object(obj)
             first = self.user_misp_connector.add_event(first)
+
+            first.attributes[0].deleted = True
+            deleted_attribute = self.user_misp_connector.update_attribute(first.attributes[0], pythonify=True)
+            self.assertTrue(deleted_attribute.deleted)
+
+            first.objects[0].deleted = True
+            deleted_object = self.user_misp_connector.update_object(first.objects[0], pythonify=True)
+            self.assertTrue(deleted_object.deleted)
+
+            # Get event with deleted entries
+            first = self.user_misp_connector.get_event(first, deleted=True, pythonify=True)
+            self.assertTrue(first.attributes[0].deleted)
+            self.assertTrue(first.objects[0].deleted)
+
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+
+    def test_get_non_exists_event(self):
+        event = self.user_misp_connector.get_event(0)  # non exists id
+        self.assertEqual(event['errors'][0], 404)
+
+        event = self.user_misp_connector.get_event("ab2b6e28-fda5-4282-bf60-22b81de77851")  # non exists uuid
+        self.assertEqual(event['errors'][0], 404)
+
+    def test_delete_by_uuid(self):
+        try:
+            first = self.create_simple_event()
+            obj = MISPObject('file')
+            obj.add_attribute('filename', 'foo')
+            first.add_object(obj)
+            obj = MISPObject('file')
+            obj.add_attribute('filename', 'bar')
+            first.add_object(obj)
+            first = self.user_misp_connector.add_event(first)
             r = self.user_misp_connector.delete_attribute(first.attributes[0].uuid)
             self.assertEqual(r['message'], 'Attribute deleted.')
             r = self.user_misp_connector.delete_object(first.objects[0].uuid)
             self.assertEqual(r['message'], 'Object deleted')
+            # Test deleted search
+            r = self.user_misp_connector.search(event_id=first.id, deleted=[0, 1], pythonify=True)
+            self.assertTrue(isinstance(r[0], MISPEvent))
+            self.assertEqual(len(r[0].objects), 2)
+            self.assertTrue(r[0].objects[0].deleted)
+            self.assertFalse(r[0].objects[1].deleted)
+            self.assertEqual(len(r[0].attributes), 1)
+            self.assertTrue(r[0].attributes[0].deleted)
+            # Test deleted get
+            r = self.user_misp_connector.get_event(first, deleted=True, pythonify=True)
+            self.assertTrue(isinstance(r, MISPEvent))
+            self.assertEqual(len(r.objects), 2)
+            self.assertTrue(r.objects[0].deleted)
+            self.assertFalse(r.objects[1].deleted)
+            self.assertEqual(len(r.attributes), 1)
+            self.assertTrue(r.attributes[0].deleted)
+
             r = self.user_misp_connector.delete_event(first.uuid)
             self.assertEqual(r['message'], 'Event deleted.')
         finally:
@@ -770,7 +842,7 @@ class TestComprehensive(unittest.TestCase):
             events = self.user_misp_connector.search(eventid=second.id, enforce_warninglist=True)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
-            self.assertEqual(len(events[0].attributes), 3)
+            self.assertEqual(len(events[0].attributes), 4)
             response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%')  # disable ipv4 DNS.
             self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
 
@@ -807,6 +879,27 @@ class TestComprehensive(unittest.TestCase):
             # Contact reporter
             r = self.user_misp_connector.contact_event_reporter(events[0].id, 'This is a test')
             self.assertEqual(r['message'], 'Email sent to the reporter.')
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+            self.admin_misp_connector.delete_event(second)
+
+    def test_extend_event(self):
+        first = self.create_simple_event()
+        first.info = 'parent event'
+        first.add_tag('tlp:amber___test')
+        first.set_date('2018-09-01')
+        second = self.create_simple_event()
+        second.info = 'event extension'
+        second.add_tag('tlp:amber___test')
+        second.set_date('2018-09-01')
+        second.add_attribute('ip-src', '9.9.9.9')
+        try:
+            first = self.user_misp_connector.add_event(first)
+            second = self.user_misp_connector.add_event(second)
+            first_extended = self.user_misp_connector.update_event({'extends_uuid': second.uuid}, event_id=first, pythonify=True)
+            self.assertTrue(isinstance(first_extended, MISPEvent), first_extended)
+            self.assertEqual(first_extended.extends_uuid, second.uuid)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -994,8 +1087,9 @@ class TestComprehensive(unittest.TestCase):
             stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
             self.assertTrue(stix['related_packages'][0]['package']['incidents'][0]['related_indicators']['indicators'][0]['indicator']['observable']['object']['properties']['address_value']['value'], '8.8.8.8')
             stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
-            print(json.dumps(stix2, indent=2))
             self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
+            stix_xml = self.user_misp_connector.search(return_format='stix-xml', eventid=first.id)
+            self.assertTrue('<AddressObj:Address_Value condition="Equals">8.8.8.8</AddressObj:Address_Value>' in stix_xml)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1034,18 +1128,30 @@ class TestComprehensive(unittest.TestCase):
 
             # Test generic Tag methods
             r = self.admin_misp_connector.tag(second, 'generic_tag_test')
-            self.assertTrue(r['message'].endswith(f'successfully attached to Event({second.id}).'), r['message'])
+            self.assertTrue('successfully' in r['message'].lower() and f'Event ({second.id})' in r['message'], r['message'])
+            second = self.user_misp_connector.get_event(second.id, pythonify=True)
+            self.assertTrue('generic_tag_test' == second.tags[0].name)
+
             r = self.admin_misp_connector.untag(second, 'generic_tag_test')
             self.assertTrue(r['message'].endswith(f'successfully removed from Event({second.id}).'), r['message'])
+            second = self.user_misp_connector.get_event(second.id, pythonify=True)
+            self.assertFalse(second.tags)
             # NOTE: object tagging not supported yet
             # r = self.admin_misp_connector.tag(second.objects[0].uuid, 'generic_tag_test')
             # self.assertTrue(r['message'].endswith(f'successfully attached to Object({second.objects[0].id}).'), r['message'])
             # r = self.admin_misp_connector.untag(second.objects[0].uuid, 'generic_tag_test')
             # self.assertTrue(r['message'].endswith(f'successfully removed from Object({second.objects[0].id}).'), r['message'])
             r = self.admin_misp_connector.tag(second.objects[0].attributes[0].uuid, 'generic_tag_test')
-            self.assertTrue(r['message'].endswith(f'successfully attached to Attribute({second.objects[0].attributes[0].id}).'), r['message'])
+            self.assertTrue('successfully' in r['message'].lower() and f'Attribute ({second.objects[0].attributes[0].id})' in r['message'], r['message'])
+            attr = self.user_misp_connector.get_attribute(second.objects[0].attributes[0].uuid, pythonify=True)
+            self.assertTrue('generic_tag_test' == attr.tags[0].name)
             r = self.admin_misp_connector.untag(second.objects[0].attributes[0].uuid, 'generic_tag_test')
             self.assertTrue(r['message'].endswith(f'successfully removed from Attribute({second.objects[0].attributes[0].id}).'), r['message'])
+            second = self.user_misp_connector.get_event(second.id, pythonify=True)
+            for tag in second.objects[0].attributes[0].tags:
+                self.assertFalse('generic_tag_test' == tag.name)
+            attr = self.user_misp_connector.get_attribute(second.objects[0].attributes[0].uuid, pythonify=True)
+            self.assertFalse(attr.tags)
 
             # Delete tag to avoid polluting the db
             tags = self.admin_misp_connector.tags(pythonify=True)
@@ -1206,11 +1312,11 @@ class TestComprehensive(unittest.TestCase):
             # self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
             self.assertEqual(r['errors'][1]['message'], 'Invalid Target.')
             r = self.user_misp_connector.tag(first, tag_org_restricted)
-            self.assertEqual(r['name'], f'Global tag {tag_org_restricted.name}({tag_org_restricted.id}) successfully attached to Event({first.id}).')
+            self.assertTrue('successfully' in r['message'].lower() and f'Event ({first.id})' in r['message'], r['message'])
             r = self.pub_misp_connector.tag(first.attributes[0], tag_user_restricted)
-            self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed user.')
+            self.assertIn('Invalid Tag. This tag can only be set by a fixed user.', r['errors'][1]['errors'])
             r = self.user_misp_connector.tag(first.attributes[0], tag_user_restricted)
-            self.assertEqual(r['name'], f'Global tag {tag_user_restricted.name}({tag_user_restricted.id}) successfully attached to Attribute({first.attributes[0].id}).')
+            self.assertTrue('successfully' in r['message'].lower() and f'Attribute ({first.attributes[0].id})' in r['message'], r['message'])
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1761,6 +1867,10 @@ class TestComprehensive(unittest.TestCase):
         first = self.create_simple_event()
         o = first.add_object(name='file')
         o.add_attribute('filename', value='foo2.exe')
+        second_object = MISPObject('file')
+        second_object.add_attribute("tlsh", value='92a4b4a3d342a21fe1147474c19c9ab6a01717713a0248a2bb15affce77c1c14a79b93',
+                                    category="Payload delivery", to_ids=True, distribution=4, sharing_group_id=sharing_group.id)
+
         try:
             first = self.user_misp_connector.add_event(first)
             first = self.admin_misp_connector.change_sharing_group_on_entity(first, sharing_group.id, pythonify=True)
@@ -1771,6 +1881,14 @@ class TestComprehensive(unittest.TestCase):
             first_attribute = self.admin_misp_connector.change_sharing_group_on_entity(first.attributes[0], sharing_group.id, pythonify=True)
             self.assertEqual(first_attribute.distribution, 4)
             self.assertEqual(first_attribute.sharing_group_id, int(sharing_group.id))
+            # manual create
+            second_object = self.admin_misp_connector.add_object(first.id, second_object, pythonify=True)
+            self.assertEqual(second_object.attributes[0].sharing_group_id, int(sharing_group.id))
+            # manual update
+            first_object.add_attribute("tlsh", value='92a4b4a3d342a21fe1147474c19c9ab6a01717713a0248a2bb15affce77c1c14a79b93',
+                                       category="Payload delivery", to_ids=True, distribution=4, sharing_group_id=sharing_group.id)
+            first_object = self.admin_misp_connector.update_object(first_object, pythonify=True)
+            self.assertEqual(first_object.attributes[-1].sharing_group_id, int(sharing_group.id))
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1840,6 +1958,20 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(feed.enabled)
         feed = self.admin_misp_connector.disable_feed_cache(botvrij.id, pythonify=True)
         self.assertFalse(feed.enabled)
+        # Test enable csv feed - https://github.com/MISP/PyMISP/issues/574
+        feeds = self.admin_misp_connector.feeds(pythonify=True)
+        for feed in feeds:
+            if feed.name == 'blockrules of rules.emergingthreats.net':
+                e_thread_csv_feed = feed
+                break
+        updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed, pythonify=True)
+        self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
+        updated_feed = self.admin_misp_connector.disable_feed(e_thread_csv_feed, pythonify=True)
+        self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
+
+        # Test partial update
+        updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed.id, pythonify=True)
+        self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
 
     def test_servers(self):
         # add
@@ -1886,7 +2018,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             test_roles_user = self.admin_misp_connector.add_user(user, pythonify=True)
             test_tag = self.admin_misp_connector.add_tag(tag, pythonify=True)
-            test_roles_user_connector = ExpandedPyMISP(url, test_roles_user.authkey, verifycert, debug=False)
+            test_roles_user_connector = PyMISP(url, test_roles_user.authkey, verifycert, debug=False)
             test_roles_user_connector.toggle_global_pythonify()
             # ===== Read Only
             self.admin_misp_connector.update_user({'role_id': 6}, test_roles_user)
@@ -1953,6 +2085,8 @@ class TestComprehensive(unittest.TestCase):
                 self.assertEqual(e.org.name, 'Test Org - delegate')
                 r = self.delegate_user_misp_connector.delete_event(e)
                 self.assertEqual(r['message'], 'Event deleted.', r)
+                # Change base_event UUID do we can add it
+                base_event.uuid = str(uuid4())
                 e = test_roles_user_connector.add_event(base_event)
                 delegation = test_roles_user_connector.delegate_event(e, self.test_org_delegate)
                 r = test_roles_user_connector.discard_event_delegation(delegation.id)
@@ -2014,6 +2148,11 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(isinstance(user_settings, list))
 
             # Test if publish_alert_filter works
+            # # Enable autoalert on admin
+            self.admin_misp_connector._current_user.autoalert = True
+            self.admin_misp_connector._current_user.termsaccepted = True
+            self.user_misp_connector.update_user(self.admin_misp_connector._current_user)
+
             first = self.admin_misp_connector.add_event(first, pythonify=True)
             second = self.admin_misp_connector.add_event(second, pythonify=True)
             r = self.user_misp_connector.change_user_password('Password1234')
@@ -2079,7 +2218,6 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
 
     def test_first_last_seen(self):
-        local_tz = datetime.now(timezone.utc).astimezone().tzinfo
         event = MISPEvent()
         event.info = 'Test First Last seen'
         event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-04', last_seen='2020-01-04T12:30:34.323242+0800')
@@ -2090,7 +2228,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.admin_misp_connector.add_event(event, pythonify=True)
             # Simple attribute
-            self.assertEqual(first.attributes[0].first_seen, datetime(2020, 1, 4, 0, 0, tzinfo=local_tz))
+            self.assertEqual(first.attributes[0].first_seen, datetime(2020, 1, 4, 0, 0).astimezone())
             self.assertEqual(first.attributes[0].last_seen, datetime(2020, 1, 4, 4, 30, 34, 323242, tzinfo=timezone.utc))
 
             # Object
@@ -2098,8 +2236,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(first.objects[0].last_seen, datetime(2020, 1, 27, 17, 48, 20, tzinfo=timezone.utc))
 
             # Object attribute
-            self.assertEqual(first.objects[0].attributes[0].first_seen, datetime(2022, 1, 30, 0, 0, tzinfo=local_tz))
-            self.assertEqual(first.objects[0].attributes[0].last_seen, datetime(2022, 2, 23, 0, 0, tzinfo=local_tz))
+            self.assertEqual(first.objects[0].attributes[0].first_seen, datetime(2022, 1, 30, 0, 0).astimezone())
+            self.assertEqual(first.objects[0].attributes[0].last_seen, datetime(2022, 2, 23, 0, 0).astimezone())
 
             # Update values
             # Attribute in full event
@@ -2122,6 +2260,523 @@ class TestComprehensive(unittest.TestCase):
 
         finally:
             self.admin_misp_connector.delete_event(first)
+
+    def test_registrations(self):
+        r = register_user(url, 'self_register@user.local', organisation=self.test_org,
+                          org_name=self.test_org.name, verify=verifycert)
+        self.assertTrue(r['saved'])
+
+        r = register_user(url, 'discard@tesst.de', verify=verifycert)
+        self.assertTrue(r['saved'])
+
+        registrations = self.admin_misp_connector.user_registrations(pythonify=True)
+        self.assertTrue(len(registrations), 2)
+        self.assertEqual(registrations[0].data['email'], 'self_register@user.local')
+        self.assertEqual(registrations[0].data['org_name'], 'Test Org')
+        self.assertEqual(registrations[1].data['email'], 'discard@tesst.de')
+
+        m = self.admin_misp_connector.accept_user_registration(registrations[0], unsafe_fallback=True)
+        self.assertTrue(m['saved'])
+
+        # delete new user
+        for user in self.admin_misp_connector.users(pythonify=True):
+            if user.email == registrations[0].data['email']:
+                self.admin_misp_connector.delete_user(user)
+                break
+
+        # Expected: accept registration fails because the orgname is missing
+        m = self.admin_misp_connector.accept_user_registration(registrations[1], unsafe_fallback=True)
+        self.assertEqual(m['errors'][1]['message'], 'No organisation selected. Supply an Organisation ID')
+
+        m = self.admin_misp_connector.discard_user_registration(registrations[1].id)
+        self.assertEqual(m['name'], '1 registration(s) discarded.')
+
+    def test_search_workflow(self):
+        first = self.create_simple_event()
+        first.add_attribute('domain', 'google.com')
+        tag = MISPTag()
+        tag.name = 'my_tag'
+        try:
+            # Note: attribute 0 doesn't matter
+            # Attribute 1 = google.com, no tag
+            # Init tag and event
+            tag = self.admin_misp_connector.add_tag(tag, pythonify=True)
+            self.assertEqual(tag.name, 'my_tag')
+            first = self.user_misp_connector.add_event(first, pythonify=True)
+            time.sleep(10)
+            # Add tag to attribute 1, add attribute 2, update
+            first.attributes[1].add_tag(tag)
+            first.add_attribute('domain', 'google.fr')
+            # Attribute 1 = google.com, tag
+            # Attribute 2 = google.fr, no tag
+            first = self.user_misp_connector.update_event(first, pythonify=True)
+            self.assertEqual(first.attributes[1].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[2].tags, [])
+            updated_attrs = self.user_misp_connector.search(controller='attributes', eventid=first.id, timestamp='5s', pythonify=True)
+            # Get two attributes, 0 (google.com) has a tag, 1 (google.fr) doesn't
+            self.assertEqual(len(updated_attrs), 2)
+            self.assertEqual(updated_attrs[0].tags[0].name, 'my_tag')
+            self.assertEqual(updated_attrs[1].value, 'google.fr')
+            self.assertEqual(updated_attrs[1].tags, [])
+            # Get the metadata only of the event
+            first_meta_only = self.user_misp_connector.search(eventid=first.id, metadata=True, pythonify=True)
+
+            # Add tag to attribute 1 (google.fr)
+            attr_to_update = updated_attrs[1]
+            attr_to_update.add_tag(tag)
+            # attr_to_update.pop('timestamp')
+            # Add new attribute to event with metadata only
+            first_meta_only[0].add_attribute('domain', 'google.lu')
+            # Add tag to new attribute
+            first_meta_only[0].attributes[0].add_tag('my_tag')
+            # Re-add attribute 1 (google.fr), newly tagged
+            first_meta_only[0].add_attribute(**attr_to_update)
+            # When we push, all the attributes should be tagged
+            first = self.user_misp_connector.update_event(first_meta_only[0], pythonify=True)
+            self.assertEqual(first.attributes[1].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[2].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[3].tags[0].name, 'my_tag')
+        finally:
+            self.admin_misp_connector.delete_event(first)
+            self.admin_misp_connector.delete_tag(tag)
+
+    def test_search_workflow_ts(self):
+        first = self.create_simple_event()
+        first.add_attribute('domain', 'google.com')
+        tag = MISPTag()
+        tag.name = 'my_tag'
+        try:
+            # Note: attribute 0 doesn't matter
+            # Attribute 1 = google.com, no tag
+            # Init tag and event
+            tag = self.admin_misp_connector.add_tag(tag, pythonify=True)
+            self.assertEqual(tag.name, 'my_tag')
+            first = self.user_misp_connector.add_event(first, pythonify=True)
+            time.sleep(10)
+            # Add tag to attribute 1, add attribute 2, update
+            first.attributes[1].add_tag(tag)
+            first.add_attribute('domain', 'google.fr')
+            # Attribute 1 = google.com, tag
+            # Attribute 2 = google.fr, no tag
+            first = self.user_misp_connector.update_event(first, pythonify=True)
+            self.assertEqual(first.attributes[1].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[2].tags, [])
+            updated_attrs = self.user_misp_connector.search(controller='attributes', eventid=first.id, timestamp=first.timestamp.timestamp(), pythonify=True)
+            # Get two attributes, 0 (google.com) has a tag, 1 (google.fr) doesn't
+            self.assertEqual(len(updated_attrs), 2)
+            self.assertEqual(updated_attrs[0].tags[0].name, 'my_tag')
+            self.assertEqual(updated_attrs[1].value, 'google.fr')
+            self.assertEqual(updated_attrs[1].tags, [])
+            # Get the metadata only of the event
+            first_meta_only = self.user_misp_connector.search(eventid=first.id, metadata=True, pythonify=True)
+
+            # Add tag to attribute 1 (google.fr)
+            attr_to_update = updated_attrs[1]
+            attr_to_update.add_tag(tag)
+            # attr_to_update.pop('timestamp')
+            # Add new attribute to event with metadata only
+            first_meta_only[0].add_attribute('domain', 'google.lu')
+            # Add tag to new attribute
+            first_meta_only[0].attributes[0].add_tag('my_tag')
+            # Re-add attribute 1 (google.fr), newly tagged
+            first_meta_only[0].add_attribute(**attr_to_update)
+            # When we push, all the attributes should be tagged
+            first = self.user_misp_connector.update_event(first_meta_only[0], pythonify=True)
+            self.assertEqual(first.attributes[1].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[2].tags[0].name, 'my_tag')
+            self.assertEqual(first.attributes[3].tags[0].name, 'my_tag')
+        finally:
+            self.admin_misp_connector.delete_event(first)
+            self.admin_misp_connector.delete_tag(tag)
+
+    def test_blocklists(self):
+        first = self.create_simple_event()
+        second = self.create_simple_event()
+        second.Orgc = self.test_org
+        to_delete = {'bl_events': [], 'bl_organisations': []}
+        try:
+            # test events BL
+            ebl = self.admin_misp_connector.add_event_blocklist(uuids=[first.uuid])
+            self.assertEqual(ebl['result']['successes'][0], first.uuid, ebl)
+            bl_events = self.admin_misp_connector.event_blocklists(pythonify=True)
+            for ble in bl_events:
+                if ble.event_uuid == first.uuid:
+                    to_delete['bl_events'].append(ble)
+                    break
+            else:
+                raise Exception('Unable to find UUID in Events blocklist')
+            first = self.user_misp_connector.add_event(first, pythonify=True)
+            self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+            ble.comment = 'This is a test'
+            ble.event_info = 'foo'
+            ble.event_orgc = 'bar'
+            ble = self.admin_misp_connector.update_event_blocklist(ble, pythonify=True)
+            self.assertEqual(ble.comment, 'This is a test')
+            r = self.admin_misp_connector.delete_event_blocklist(ble)
+            self.assertTrue(r['success'])
+
+            # test Org BL
+            obl = self.admin_misp_connector.add_organisation_blocklist(uuids=self.test_org.uuid)
+            self.assertEqual(obl['result']['successes'][0], self.test_org.uuid, obl)
+            bl_orgs = self.admin_misp_connector.organisation_blocklists(pythonify=True)
+            for blo in bl_orgs:
+                if blo.org_uuid == self.test_org.uuid:
+                    to_delete['bl_organisations'].append(blo)
+                    break
+            else:
+                raise Exception('Unable to find UUID in Orgs blocklist')
+            first = self.user_misp_connector.add_event(first, pythonify=True)
+            self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+
+            blo.comment = 'This is a test'
+            blo.org_name = 'bar'
+            blo = self.admin_misp_connector.update_organisation_blocklist(blo, pythonify=True)
+            self.assertEqual(blo.org_name, 'bar')
+            r = self.admin_misp_connector.delete_organisation_blocklist(blo)
+            self.assertTrue(r['success'])
+
+        finally:
+            for ble in to_delete['bl_events']:
+                self.admin_misp_connector.delete_event_blocklist(ble)
+            for blo in to_delete['bl_organisations']:
+                self.admin_misp_connector.delete_organisation_blocklist(blo)
+
+    @unittest.skip("Internal use only")
+    def missing_methods(self):
+        skip = [
+            "attributes/download",
+            "attributes/add_attachment",
+            "attributes/add_threatconnect",
+            "attributes/editField",
+            "attributes/viewPicture",
+            "attributes/restore",
+            "attributes/deleteSelected",
+            "attributes/editSelected",
+            "attributes/search",
+            "attributes/searchAlternate",
+            "attributes/checkComposites",
+            "attributes/downloadAttachment",
+            "attributes/returnAttributes",
+            "attributes/text",
+            "attributes/rpz",
+            "attributes/bro",
+            "attributes/reportValidationIssuesAttributes",
+            "attributes/generateCorrelation",
+            "attributes/getMassEditForm",
+            "attributes/fetchViewValue",
+            "attributes/fetchEditForm",
+            "attributes/attributeReplace",
+            "attributes/downloadSample",
+            "attributes/pruneOrphanedAttributes",
+            "attributes/checkOrphanedAttributes",
+            "attributes/updateAttributeValues",
+            "attributes/hoverEnrichment",
+            "attributes/addTag",
+            "attributes/removeTag",
+            "attributes/toggleCorrelation",  # Use update attribute
+            "attributes/toggleToIDS",  # Use update attribute
+            "attributes/checkAttachments",
+            "attributes/exportSearch",
+            'dashboards',
+            'decayingModel',
+            "eventBlocklists/massDelete",
+            "eventDelegations/view",
+            "eventDelegations/index",
+            "eventGraph/view",
+            "eventGraph/add",
+            "eventGraph/delete",
+            "events/filterEventIndex",
+            "events/viewEventAttributes",
+            "events/removePivot",
+            "events/addIOC",
+            "events/add_misp_export",
+            "events/merge",
+            "events/unpublish",
+            "events/publishSightings",
+            "events/automation",
+            "events/export",
+            "events/downloadExport",
+            "events/xml",
+            "events/nids",
+            "events/hids",
+            "events/csv",
+            "events/downloadOpenIOCEvent",
+            "events/proposalEventIndex",
+            "events/reportValidationIssuesEvents",
+            "events/addTag",
+            "events/removeTag",
+            "events/saveFreeText",
+            "events/stix2",
+            "events/stix",
+            "events/filterEventIdsForPush",
+            "events/checkuuid",
+            "events/pushProposals",
+            "events/exportChoice",
+            "events/importChoice",
+            "events/upload_sample",
+            "events/viewGraph",
+            "events/viewEventGraph",
+            "events/updateGraph",
+            "events/genDistributionGraph",
+            "events/getEventTimeline",
+            "events/getDistributionGraph",
+            "events/getEventGraphReferences",
+            "events/getEventGraphTags",
+            "events/getEventGraphGeneric",
+            "events/getReferenceData",
+            "events/getObjectTemplate",
+            "events/viewGalaxyMatrix",
+            "events/delegation_index",
+            "events/queryEnrichment",
+            "events/handleModuleResults",
+            "events/importModule",
+            "events/exportModule",
+            "events/toggleCorrelation",  # TODO
+            "events/checkPublishedStatus",
+            "events/pushEventToKafka",
+            "events/getEventInfoById",
+            "events/enrichEvent",  # TODO
+            "events/checkLocks",
+            "events/getEditStrategy",
+            "events/upload_analysis_file",
+            "events/cullEmptyEvents",
+            "favouriteTags/toggle",  # TODO
+            "favouriteTags/getToggleField",  # TODO
+            "feeds/feedCoverage",
+            "feeds/importFeeds",
+            "feeds/fetchFromAllFeeds",
+            "feeds/getEvent",
+            "feeds/previewIndex",  # TODO
+            "feeds/previewEvent",  # TODO
+            "feeds/enable",
+            "feeds/disable",
+            "feeds/fetchSelectedFromFreetextIndex",
+            "feeds/toggleSelected",  # TODO
+            "galaxies/delete",
+            "galaxies/selectGalaxy",
+            "galaxies/selectGalaxyNamespace",
+            "galaxies/selectCluster",
+            "galaxies/attachCluster",
+            "galaxies/attachMultipleClusters",
+            "galaxies/viewGraph",
+            "galaxies/showGalaxies",
+            "galaxyClusters/index",
+            "galaxyClusters/view",
+            "galaxyClusters/attachToEvent",
+            "galaxyClusters/detach",
+            "galaxyClusters/delete",
+            "galaxyClusters/viewGalaxyMatrix",
+            "galaxyElements/index",
+            "jobs/index",
+            "jobs/getError",
+            "jobs/getGenerateCorrelationProgress",
+            "jobs/getProgress",
+            "jobs/cache",
+            "jobs/clearJobs",
+            "logs/event_index",
+            "admin/logs/search",
+            "logs/returnDates",
+            "logs/pruneUpdateLogs",
+            "logs/testForStolenAttributes",
+            "modules/queryEnrichment",
+            "modules/index",
+            "news/index",
+            "news/add",
+            "news/edit",
+            "news/delete",
+            "noticelists/toggleEnable",
+            "noticelists/getToggleField",
+            "noticelists/delete",
+            "objectReferences/view",
+            "objectTemplateElements/viewElements",
+            "objectTemplates/objectMetaChoice",
+            "objectTemplates/objectChoice",
+            "objectTemplates/delete",
+            "objectTemplates/viewElements",
+            "objectTemplates/activate",
+            "objectTemplates/getToggleField",
+            "objects/revise_object",
+            "objects/get_row",
+            "objects/editField",
+            "objects/fetchViewValue",
+            "objects/fetchEditForm",
+            "objects/quickFetchTemplateWithValidObjectAttributes",
+            "objects/quickAddAttributeForm",
+            "objects/orphanedObjectDiagnostics",
+            "objects/proposeObjectsFromAttributes",
+            "objects/groupAttributesIntoObject",
+            "admin/organisations/generateuuid",
+            "organisations/landingpage",
+            "organisations/fetchOrgsForSG",
+            "organisations/fetchSGOrgRow",
+            "organisations/getUUIDs",
+            "admin/organisations/merge",
+            "pages/display",
+            "posts/pushMessageToZMQ",
+            "posts/add",
+            "posts/edit",
+            "posts/delete",
+            "admin/regexp/add",
+            "admin/regexp/index",
+            "admin/regexp/edit",
+            "admin/regexp/delete",
+            "regexp/index",
+            "admin/regexp/clean",
+            "regexp/cleanRegexModifiers",
+            "restClientHistory/index",
+            "restClientHistory/delete",
+            "roles/view",
+            "admin/roles/add",  # TODO
+            "admin/roles/edit",  # TODO
+            "admin/roles/index",  # TODO
+            "admin/roles/delete",  # TODO
+            "servers/previewIndex",
+            "servers/previewEvent",
+            "servers/filterEventIndex",
+            "servers/eventBlockRule",
+            "servers/serverSettingsReloadSetting",
+            "servers/startWorker",  # TODO
+            "servers/stopWorker",  # TODO
+            "servers/getWorkers",  # TODO
+            "servers/getSubmodulesStatus",  # TODO,
+            "servers/restartDeadWorkers",  # TODO
+            "servers/deleteFile",
+            "servers/uploadFile",
+            "servers/fetchServersForSG",
+            "servers/postTest",
+            "servers/getRemoteUser",
+            "servers/startZeroMQServer",
+            "servers/stopZeroMQServer",
+            "servers/statusZeroMQServer",
+            "servers/purgeSessions",
+            "servers/clearWorkerQueue",  # TODO
+            "servers/getGit",
+            "servers/checkout",
+            "servers/ondemandAction",
+            "servers/updateProgress",
+            "servers/getSubmoduleQuickUpdateForm",
+            "servers/updateSubmodule",
+            "servers/getInstanceUUID",
+            "servers/getApiInfo",
+            "servers/cache",
+            "servers/updateJSON",
+            "servers/resetRemoteAuthKey",
+            "servers/changePriority",
+            "servers/releaseUpdateLock",
+            "servers/viewDeprecatedFunctionUse",
+            "shadowAttributes/download",
+            "shadowAttributes/add_attachment",
+            "shadowAttributes/discardSelected",
+            "shadowAttributes/acceptSelected",
+            "shadowAttributes/generateCorrelation",
+            "sharingGroups/edit",
+            "sharingGroups/view",
+            "sightingdb/add",
+            "sightingdb/edit",
+            "sightingdb/delete",
+            "sightingdb/index",
+            "sightingdb/requestStatus",
+            "sightingdb/search",
+            "sightings/advanced",
+            "sightings/quickAdd",
+            "sightings/quickDelete",
+            "sightings/viewSightings",
+            "sightings/bulkSaveSightings",
+            "tagCollections/add",
+            "tagCollections/import",
+            "tagCollections/view",
+            "tagCollections/edit",
+            "tagCollections/delete",
+            "tagCollections/addTag",
+            "tagCollections/removeTag",
+            "tagCollections/index",
+            "tagCollections/getRow",
+            "tags/quickAdd",
+            "tags/showEventTag",
+            "tags/showAttributeTag",
+            "tags/showTagControllerTag",
+            "tags/viewTag",
+            "tags/selectTaxonomy",
+            "tags/selectTag",
+            "tags/viewGraph",
+            "tags/search",
+            "tasks/index",
+            "tasks/setTask",
+            "taxonomies/hideTag",
+            "taxonomies/unhideTag",
+            "taxonomies/taxonomyMassConfirmation",
+            "taxonomies/taxonomyMassHide",
+            "taxonomies/taxonomyMassUnhide",
+            "taxonomies/delete",
+            "taxonomies/toggleRequired",
+            "templateElements/index",
+            "templateElements/templateElementAddChoices",
+            "templateElements/add",
+            "templateElements/edit",
+            "templateElements/delete",
+            "templates/index",
+            "templates/edit",
+            "templates/view",
+            "templates/add",
+            "templates/saveElementSorting",
+            "templates/delete",
+            "templates/templateChoices",
+            "templates/populateEventFromTemplate",
+            "templates/submitEventPopulation",
+            "templates/uploadFile",
+            "templates/deleteTemporaryFile",
+            "threads/viewEvent",
+            "threads/view",
+            "threads/index",
+            "userSettings/view",
+            "userSettings/setHomePage",
+            "users/request_API",
+            "admin/users/filterUserIndex",
+            "admin/users/view",
+            "admin/users/edit",
+            "users/updateLoginTime",
+            "users/login",
+            "users/routeafterlogin",
+            "users/logout",
+            "users/resetauthkey",
+            "users/resetAllSyncAuthKeys",
+            "users/histogram",
+            "users/terms",
+            "users/downloadTerms",
+            "users/checkAndCorrectPgps",
+            "admin/users/quickEmail",
+            "admin/users/email",
+            "users/initiatePasswordReset",
+            "users/email_otp",
+            "users/tagStatisticsGraph",
+            "users/verifyGPG",
+            "users/verifyCertificate",
+            "users/searchGpgKey",
+            "users/fetchGpgKey",
+            "users/checkIfLoggedIn",
+            "admin/users/monitor",
+            "warninglists/enableWarninglist",
+            "warninglists/getToggleField",
+            "warninglists/delete",
+            "admin/allowedlists/add",
+            "admin/allowedlists/index",
+            "admin/allowedlists/edit",
+            "admin/allowedlists/delete",
+            "allowedlists/index"
+        ]
+        missing = self.admin_misp_connector.get_all_functions(True)
+        with open('all_missing.json', 'w') as f:
+            json.dump(missing, f, indent=2)
+        final_missing = []
+        for m in missing:
+            if any(m.startswith(s) for s in skip):
+                continue
+            final_missing.append(m)
+        with open('plop', 'w') as f:
+            json.dump(final_missing, f, indent=2)
+        print(final_missing)
+        print(len(final_missing))
+        raise Exception()
 
 
 if __name__ == '__main__':

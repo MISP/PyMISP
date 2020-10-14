@@ -1,5 +1,5 @@
-pymisp
-======
+pymisp - Modules
+================
 
 .. toctree::
    :maxdepth: 4
@@ -12,12 +12,6 @@ PyMISP
 ------
 
 .. autoclass:: PyMISP
-    :members:
-
-PyMISPExpanded (Python 3.6+ only)
----------------------------------
-
-.. autoclass:: ExpandedPyMISP
     :members:
 
 MISPAbstract

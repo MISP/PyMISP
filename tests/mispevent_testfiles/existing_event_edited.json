@@ -2634,7 +2634,7 @@
           "uuid": "5a3d0143-c300-4118-8afe-4a2d950d210f"
         }
       ],
-      "comment": "Win32/Sednit.AX\t",
+      "comment": "Win32/Sednit.AX",
       "deleted": false,
       "description": "File object describing a file with meta-information",
       "distribution": "5",

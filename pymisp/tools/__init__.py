@@ -10,16 +10,21 @@ from .fail2banobject import Fail2BanObject  # noqa
 from .domainipobject import DomainIPObject  # noqa
 from .asnobject import ASNObject  # noqa
 from .geolocationobject import GeolocationObject  # noqa
+from .git_vuln_finder_object import GitVulnFinderObject  # noqa
 
 from .emailobject import EMailObject  # noqa
 from .vehicleobject import VehicleObject  # noqa
 from .csvloader import CSVLoader  # noqa
 from .sshauthkeyobject import SSHAuthorizedKeysObject  # noqa
 from .feed import feed_meta_generator  # noqa
+from .update_objects import update_objects  # noqa
 try:
     from .urlobject import URLObject  # noqa
 except ImportError:
     # Requires faup, which is a bit difficult to install
+    pass
+except OSError:
+    # faup required liblua-5.3
     pass
 
 try:

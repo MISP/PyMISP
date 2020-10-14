@@ -30,10 +30,10 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath: Union[Path, str]=None, pseudofile: BytesIO=None, filename: str=None, standalone: bool=True, **kwargs):
+    def __init__(self, filepath: Union[Path, str] = None, pseudofile: BytesIO = None, filename: str = None, **kwargs):
         # PY3 way:
         # super().__init__('file')
-        super(FileObject, self).__init__('file', standalone=standalone, **kwargs)
+        super(FileObject, self).__init__('file', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_MAGIC:
@@ -68,7 +68,7 @@ class FileObject(AbstractMISPObjectGenerator):
             self.add_attribute('sha512', value=sha512(self.__data).hexdigest())
             self.add_attribute('malware-sample', value=self.__filename, data=self.__pseudofile)
             if HAS_MAGIC:
-                self.add_attribute('mimetype', value=magic.from_buffer(self.__data))
+                self.add_attribute('mimetype', value=magic.from_buffer(self.__data, mime=True))
             if HAS_PYDEEP:
                 self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode())
 
@@ -79,10 +79,10 @@ class FileObject(AbstractMISPObjectGenerator):
         if len(data) == 0:
             return 0.0
 
-        occurences = Counter(bytearray(data))
+        occurrences = Counter(bytearray(data))
 
         entropy = 0.0
-        for x in occurences.values():
+        for x in occurrences.values():
             p_x = float(x) / len(data)
             entropy -= p_x * math.log(p_x, 2)
 

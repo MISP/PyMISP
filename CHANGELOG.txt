@@ -7,7 +7,382 @@ Changelog
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+
+
+v2.4.131 (2020-09-08)
+---------------------
+
+New
+~~~
+- [test] Validate tag removal. [Raphaël Vinot]
+- [describeTypes] sha3 added. [Alexandre Dulaunoy]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
+- [describeTypes] updated. [Alexandre Dulaunoy]
+- [describeTypes] updated. [Alexandre Dulaunoy]
+- Bump objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump file template version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Rename blacklist -> blocklist. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+
+
+v2.4.130 (2020-08-20)
+---------------------
+
+New
+~~~
+- Blacklist methods. [Raphaël Vinot]
+- Add list of missing calls. [Raphaël Vinot]
+- Add test_obj_references_export. [louis]
+- Add MISPObject.standalone property. [louis]
+
+  Setting MISPObject.standalone updates MISPObject._standalone and
+  add/removes "ObjectReference" from AbstractMISP.__not_jsonable using
+  update_not_jsonable/_remove_from_not_jsonable.
+- Add AbstractMISP._remove_from_not_jsonable. [louis]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump types. [Raphaël Vinot]
+- [testlive_comprehensive] Updated generic tagging method to match
+  changes in MISP. [mokaddem]
+- Cleanup blocklist methods. [Raphaël Vinot]
+- Remove outdated example. [Raphaël Vinot]
+
+  Fix #611
+- New test_get_non_exists_event. [Jakub Onderka]
+- Bump dependencies. [Raphaël Vinot]
+- Enable more tests. [Raphaël Vinot]
+- Make get_object return a not standalone object. [louis]
+- Remove standalone default value from MISPObject children c'tor.
+  [louis]
+
+  MISPObject.__init__ sets standalone=True by default, so there is no
+  need to do it in its child classes.
+- Make MISPObject standalone by default. [louis]
+
+  standalone defaults to True in MISPObject.__init__, and is set to False
+  when the object is added to an event.
+- Add MISPObject._standalone type. [louis]
+
+Fix
+~~~
+- Bump file template version. [Raphaël Vinot]
+- Test_get_non_exists_event. [Jakub Onderka]
+- IP removed from the public DNS list. [Raphaël Vinot]
+- Example using deprecated calls. [Raphaël Vinot]
+
+  fix #602
+- Add STIX XML output for the search. [Raphaël Vinot]
+
+  Use stix-xml as return_format.
+
+  Fix #600 https://github.com/MISP/MISP/issues/5618
+- Dummy event example. [Raphaël Vinot]
+
+  Fix #598
+
+Other
+~~~~~
+- Exclude section correlation .rsrc and zero-filled. [deku]
+- Linting/Add missing whitespace. [Paal Braathen]
+- Remove explicit loglevel checking. [Paal Braathen]
+- Remove explicit traceback printing. [Paal Braathen]
+- Master branch has been renamed to main. [Arcuri Davide]
+- Update README.md. [Raphaël Vinot]
+
+  fix: #599
+
+
+v2.4.128 (2020-06-22)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Add a few test cases. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+
+
+v2.4.127.1 (2020-06-19)
+-----------------------
+
+New
+~~~
+- Optionally include deleted attributes/objects in feed. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add test case for get event deleted. [Raphaël Vinot]
+- Add test case for search deleted. [Raphaël Vinot]
+- Update comments for search. [Raphaël Vinot]
+
+Fix
+~~~
+- Keep deleted key in MISPObject and MISPObjectAttribute. [Raphaël
+  Vinot]
+
+
+v2.4.127 (2020-06-16)
+---------------------
+
+New
+~~~
+- Add helper and test case for GitVulnFinderObject. [Raphaël Vinot]
+- Add git-commit-id type. [Raphaël Vinot]
+- Add deleted in field export. [Raphaël Vinot]
+
+  Fix #586
+- Timeout for connection/request, fixes #584. [Christophe Vandeplas]
+
+Changes
+~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
+- Rename master -> main. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Rename branches master -> main. [Raphaël Vinot]
+- Remove extra parameter in change_user_password. [Raphaël Vinot]
+
+Fix
+~~~
+- Do not fail if the attribute value is not a string. [Raphaël Vinot]
+- Properly strip value in MISPObject.add_attribute, take 2. [Raphaël
+  Vinot]
+
+  Fix #546
+- Properly strip value in MISPObject.add_attribute. [Raphaël Vinot]
+
+  Fix #546
+- Deleted is not always required in the feed export. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+
+  hail to Rafiot
+- Fixes bug in timeout change. [Christophe Vandeplas]
+- Fixes bug in timeout change. [Christophe Vandeplas]
+
+Other
+~~~~~
+- Previously file object was reporting the libmagic description of a
+  file instead of the mimetype. According to [MISP
+  DataModels](https://www.misp-project.org/datamodels/#types) ``` mime-
+  type: A media type (also MIME type and content type) is a two-part
+  identifier for file formats and format contents transmitted on the
+  Internet ``` more precisely defined in
+  [RFC2045](https://tools.ietf.org/html/rfc2045) and others. [Troy Ross]
+
+  The description returned by libmagic is more useful than the generic mime-type,
+  but I did not find a place to put the description in the current data model.
+- Fix end of line encoding of examples/cytomic_orion.py. [Sebastian
+  Wagner]
+
+
+v2.4.126 (2020-05-18)
+---------------------
+
+New
+~~~
+- Test search with timestamp. [Raphaël Vinot]
+- Add testcase for updating partial event. [Raphaël Vinot]
+- Add pyfaup as optional dependency. [Raphaël Vinot]
+- [dev] add microblog object tool. [VVX7]
+- Very simple test case for rest search on objects. [Raphaël Vinot]
+- Self registration, object level search (initial) [Raphaël Vinot]
+- [dev] add flag to get extended misp event. [VVX7]
+- [dev] add flag to get extended misp event. [VVX7]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-object. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Add test for feed partial update. [Raphaël Vinot]
+- Strip empty parameters in build_complex_query. [Raphaël Vinot]
+
+  Fix #577
+- Simplify delete_attribute. [Raphaël Vinot]
+- Bump travis install. [Raphaël Vinot]
+- Add comment in microblog object. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- [dev] clean up how keys are accessed in self._parameters. [VVX7]
+- [dev] use isinstance() type check. [VVX7]
+- [dev] fix abstract generator import. add logger. [VVX7]
+- [dev] change type() == list. [VVX7]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- [dev] remove duplicate line. [VVX7]
+- [dev] add extend_event() test. chg typo in get_event() [VVX7]
+- Re-Bump CHANGELOG. [Raphaël Vinot]
+
+Fix
+~~~
+- Settings is not required in MISPFeed. [Raphaël Vinot]
+- Properly skip timestamp in __iter__ when needed. [Raphaël Vinot]
+- Catch exception when liblua-5.3 is not present. [Raphaël Vinot]
+- Make flake8 happy. [Raphaël Vinot]
+- Properly load feeds, fix undefined variable. [Raphaël Vinot]
+- Make flake8 happy. [Raphaël Vinot]
+- Remove extra print. [Raphaël Vinot]
+- Typo, add test for extended event. [Raphaël Vinot]
+
+Other
+~~~~~
+- Update docstring in api.py. [Bernhard E. Reiter]
+
+  * remove typo in ssl parameter docstring.
+   * Add hint that other certs (which are not in the default CAs, but also are not self signed in a strict sense) can also use the CA_BUNDLE function of the ssl parameter.
+
+
+v2.4.125 (2020-04-30)
+---------------------
+
+New
+~~~
+- Extended option on get event. [Raphaël Vinot]
+
+  Related to #567
+
+Changes
+~~~~~~~
+- Bump version in pyproject. [Raphaël Vinot]
+- Bump CHANGELOG. [Raphaël Vinot]
+- Bump objects, deps. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Remove old suricata script, keep reference to old code. [Raphaël
+  Vinot]
+
+Fix
+~~~
+- Enable autoalert on admin user. [Raphaël Vinot]
+- [abstract] Forces file to be read with utf8 encoding. [mokaddem]
+- Properly handle timezone in tests. [Raphaël Vinot]
+
+Other
+~~~~~
+- Update up.py. [Raphaël Vinot]
+
+  Fix #563
+- Fixed __query_virustotal return type. [DocArmoryTech]
+
+  __query_virustotal returned a Response object and not the json expected; modified so that report_json is returned instead of report.
+
+
+v2.4.124 (2020-03-30)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add option to aggregare by country. [Raphaël Vinot]
+- [CSSE COVID] Publish the event immediately. [Raphaël Vinot]
+- Add changelog and readme in the package. [Raphaël Vinot]
+- Bump version in pyproject. [Raphaël Vinot]
+
+Fix
+~~~
+- Strip every string in AbstractMISP. [Raphaël Vinot]
+
+  fix #546
+- Incorrect expectation of attribute value to be a str - take 2.
+  [Raphaël Vinot]
+
+  Related #553
+- Incorrect expectation of attribute value to be a str. [Raphaël Vinot]
+
+  Fix #553
+
+Other
+~~~~~
+- Dos2unix examples/stats_report.py. [Sebastian Wagner]
+- Cytomic Orion API access. [Koen Van Impe]
+- Add organisations from CSV. [Koen Van Impe]
+- Minor updates to vmray_automation for travis. [Koen Van Impe]
+- VMRay Automation with ExpandedPyMISP. [Koen Van Impe]
+
+
+v2.4.123 (2020-03-10)
+---------------------
+
+New
+~~~
+- Add import script for dxy data. [Raphaël Vinot]
+- Csse covid19 daily report importer. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- JSON files are UTF8. [Raphaël Vinot]
+
+  Bump dev deps, update comment
+- Add tag, set distribution, add file and source (CSSE importer)
+  [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+
+
+v2.4.122 (2020-02-26)
+---------------------
+
+New
+~~~
+- Add uuid by default in MISPEvent, add F/L seen in feed output.
+  [Raphaël Vinot]
+- Admin script to setup a sync server. [Raphaël Vinot]
+- Add feed generation example in notebook. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Comments were still referencing pipenv. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Bump dep. [Raphaël Vinot]
+- Fix typo in readme. [Raphaël Vinot]
+- Use bionic on travis. [Raphaël Vinot]
+- Add poetry support. [Raphaël Vinot]
+
+Fix
+~~~
+- Test cases & template version. [Raphaël Vinot]
+- Mypy, more typing. [Raphaël Vinot]
+- Do not skip data in add_attribute methods. [Raphaël Vinot]
+- Remove references to the old API. [Raphaël Vinot]
+
+Other
+~~~~~
+- Use poetry everywhere, fix readme. [Raphaël Vinot]
 
 
 v2.4.121.1 (2020-02-07)
@@ -15,6 +390,8 @@ v2.4.121.1 (2020-02-07)
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 
@@ -918,7 +1295,7 @@ Other
   values, sanitization) [Falconieri]
 - Add: exportpdf tool working. [Falconieri]
 - General improvement : deisgn, exhaustiviness of mispEvent values
-  displayed, good pratice concerning paragraphe/table made. [Falconieri]
+  displayed, good practice concerning paragraphe/table made. [Falconieri]
 - Update with table basics. [Falconieri]
 - Structure of the improvements OK : test file, test folder, report
   generator. [Falconieri]
@@ -1842,7 +2219,7 @@ Changes
 - Bump CHANGELOG. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Update readme for new logging system. [Raphaël Vinot]
-- Small improvments in the logging system. [Raphaël Vinot]
+- Small improvements in the logging system. [Raphaël Vinot]
 - Properly use python logging module. [Raphaël Vinot]
 - Update asciidoctor generator. [Raphaël Vinot]
 - Remove warning if PyMISP is too new. [Raphaël Vinot]
@@ -2170,7 +2547,7 @@ Other
 - Cleanup warning function. [Raphaël Vinot]
 - Fix typos. [Raphaël Vinot]
 - Remove unused variable. [Tristan METAYER]
-- Remove category It will be automaticly detected
+- Remove category It will be automatically detected
   https://github.com/MISP/PyMISP/blob/master/pymisp/tools/openioc.py.
   [Tristan METAYER]
 - Revert tab to escape. [Tristan METAYER]
@@ -2379,7 +2756,7 @@ Other
 - Bump version. [Raphaël Vinot]
 - Add orgs managment. [Raphaël Vinot]
 - Run on more python versions. [Raphaël Vinot]
-- Exemple addtag (dirty) [Déborah Servili]
+- Example addtag (dirty) [Déborah Servili]
 - Fix last commit. [Raphaël Vinot]
 - Wrong use of API for dateuntil. [Koen Van Impe]
 

@@ -13,10 +13,10 @@ faup = Faup()
 
 class URLObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, url: str, standalone: bool=True, **kwargs):
+    def __init__(self, url: str, **kwargs):
         # PY3 way:
         # super().__init__('file')
-        super(URLObject, self).__init__('url', standalone=standalone, **kwargs)
+        super(URLObject, self).__init__('url', **kwargs)
         faup.decode(unquote_plus(url))
         self.generate_attributes()
 

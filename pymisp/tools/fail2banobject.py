@@ -9,8 +9,8 @@ logger = logging.getLogger('pymisp')
 
 class Fail2BanObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parameters: dict, strict: bool=True, standalone: bool=True, **kwargs):
-        super(Fail2BanObject, self).__init__('fail2ban', strict=strict, standalone=standalone, **kwargs)
+    def __init__(self, parameters: dict, strict: bool = True, **kwargs):
+        super(Fail2BanObject, self).__init__('fail2ban', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()
 

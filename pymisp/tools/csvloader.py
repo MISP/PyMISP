@@ -8,8 +8,8 @@ from pymisp import MISPObject
 
 class CSVLoader():
 
-    def __init__(self, template_name: str, csv_path: Path, fieldnames: list=[], has_fieldnames=False,
-                 delimiter: str=',', quotechar: str='"'):
+    def __init__(self, template_name: str, csv_path: Path, fieldnames: list = [], has_fieldnames=False,
+                 delimiter: str = ',', quotechar: str = '"'):
         self.template_name = template_name
         self.delimiter = delimiter
         self.quotechar = quotechar
@@ -34,7 +34,7 @@ class CSVLoader():
                     self.fieldnames = fieldnames
 
             if not self.fieldnames:
-                raise Exception(f'No fieldnames, impossible to create objects.')
+                raise Exception('No fieldnames, impossible to create objects.')
             else:
                 # Check if the CSV file has a header, and if it matches with the object template
                 tmp_object = MISPObject(self.template_name)

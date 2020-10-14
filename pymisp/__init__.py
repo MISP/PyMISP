@@ -1,4 +1,4 @@
-__version__ = '2.4.121.1'
+__version__ = '2.4.131'
 import logging
 
 FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
@@ -24,14 +24,15 @@ Response (if any):
 try:
     from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse  # noqa
     from .abstract import AbstractMISP, MISPEncode, pymisp_json_default, MISPTag, Distribution, ThreatLevel, Analysis  # noqa
-    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPUserSetting # noqa
+    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist # noqa
     from .tools import AbstractMISPObjectGenerator  # noqa
     from .tools import Neo4j  # noqa
     from .tools import stix  # noqa
     from .tools import openioc  # noqa
     from .tools import ext_lookups  # noqa
+    from .tools import update_objects  # noqa
 
-    from .api import PyMISP  # noqa
+    from .api import PyMISP, register_user  # noqa
     from .api import PyMISP as ExpandedPyMISP  # noqa
     from .tools import load_warninglists  # noqa
     # Let's not bother with old python

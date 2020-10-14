@@ -1,12 +1,12 @@
+dist: bionic
+
 language: python
 
 cache: pip
 
 addons:
   apt:
-    sources: [ 'ubuntu-toolchain-r-test' ]
     packages:
-      - libstdc++6
       - libfuzzy-dev
 
 python:
@@ -24,5 +24,5 @@ script:
     - bash travis/test_travis.sh
 
 after_success:
-    - pipenv run codecov
-    - pipenv run coveralls
+    - poetry run codecov
+    - poetry run coveralls

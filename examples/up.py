@@ -18,4 +18,4 @@ if __name__ == '__main__':
     me = MISPEvent()
     me.load_file(args.input)
 
-    result = misp.update_event(args.event, me)
+    result = misp.update_event(me, args.event)
