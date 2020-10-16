@@ -2109,6 +2109,7 @@ class PyMISP:
                                          Tuple[Union[datetime, date, int, str, float, None],
                                                Union[datetime, date, int, str, float, None]]
                                                ]] = None,
+                     sharinggroup: Optional[List[SearchType]] = None,
                      pythonify: Optional[bool] = None) -> Union[Dict, List[MISPEvent]]:
         """Search only at the index level. Using ! in front of a value means NOT (default is OR)
 
@@ -2123,6 +2124,7 @@ class PyMISP:
         :param analysis: Analysis level(s) (0,1,2) | list
         :param org: Search by the creator organisation by supplying the organisation identifier.
         :param timestamp: Restrict the results by the timestamp (last edit). Any event with a timestamp newer than the given timestamp will be returned. In case you are dealing with /attributes as scope, the attribute's timestamp will be used for the lookup.
+        :param sharinggroup: Restrict by a sharing group | list
         :param pythonify: Returns a list of PyMISP Objects instead or the plain json output. Warning: it might use a lot of RAM
         """
         query = locals()
@@ -2132,7 +2134,8 @@ class PyMISP:
             query['datefrom'] = self._make_timestamp(query.pop('date_from'))
         if query.get('date_to'):
             query['dateuntil'] = self._make_timestamp(query.pop('date_to'))
-
+        if isinstance(query.get('sharinggroup'), list):
+            query['sharinggroup'] = '|'.join([str(sg) for sg in query['sharinggroup']])
         if query.get('timestamp') is not None:
             timestamp = query.pop('timestamp')
             if isinstance(timestamp, (list, tuple)):

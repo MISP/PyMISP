@@ -373,6 +373,10 @@ class MISPTag(AbstractMISP):
             return {}
         return super()._to_feed()
 
+    def delete(self):
+        self.deleted = True
+        self.edited = True
+
     def __repr__(self) -> str:
         if hasattr(self, 'name'):
             return '<{self.__class__.__name__}(name={self.name})>'.format(self=self)
