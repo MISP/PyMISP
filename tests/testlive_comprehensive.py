@@ -1103,16 +1103,25 @@ class TestComprehensive(unittest.TestCase):
         try:
             # Update with full event
             first = self.user_misp_connector.add_event(first)
+            first.objects[0].attributes[0].to_ids = False
             first.objects[0].add_attribute('ip', value='8.9.9.8')
             first.objects[0].add_attribute('ip', '8.9.9.10')
             first = self.user_misp_connector.update_event(first)
+            self.assertFalse(first.objects[0].attributes[0].to_ids)
             self.assertEqual(first.objects[0].attributes[2].value, '8.9.9.8')
             self.assertEqual(first.objects[0].attributes[3].value, '8.9.9.10')
+            # Update object attribute with update_attribute
+            attr = first.objects[0].attributes[1]
+            attr.to_ids = False
+            new_attr = self.user_misp_connector.update_attribute(attr)
+            self.assertFalse(new_attr.to_ids)
             # Update object only
             misp_object = self.user_misp_connector.get_object(first.objects[0].id)
             misp_object.attributes[2].value = '8.9.9.9'
+            misp_object.attributes[2].to_ids = False
             misp_object = self.user_misp_connector.update_object(misp_object)
             self.assertEqual(misp_object.attributes[2].value, '8.9.9.9')
+            self.assertFalse(misp_object.attributes[2].to_ids)
             # Test with add_attributes
             second = self.create_simple_event()
             ip_dom = MISPObject('domain-ip')
@@ -1317,6 +1326,14 @@ class TestComprehensive(unittest.TestCase):
             self.assertIn('Invalid Tag. This tag can only be set by a fixed user.', r['errors'][1]['errors'])
             r = self.user_misp_connector.tag(first.attributes[0], tag_user_restricted)
             self.assertTrue('successfully' in r['message'].lower() and f'Attribute ({first.attributes[0].id})' in r['message'], r['message'])
+            first = self.user_misp_connector.get_event(first, pythonify=True)
+            self.assertTrue(len(first.attributes[0].tags) == 1)
+            # test delete tag on attribute edit
+            deleted_tag = first.attributes[0].tags[0]
+            first.attributes[0].tags[0].delete()
+            attribute = self.user_misp_connector.update_attribute(first.attributes[0], pythonify=True)
+            for tag in attribute.tags:
+                self.assertTrue(tag.name != deleted_tag.name)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1948,7 +1965,6 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.compare_feeds()
         # FIXME: https://github.com/MISP/MISP/issues/4834#issuecomment-511890466
         # self.assertEqual(r['message'], 'Feed caching job initiated.')
-        time.sleep(30)
         # Disable both feeds
         feed = self.admin_misp_connector.disable_feed(feeds[0].id, pythonify=True)
         self.assertFalse(feed.enabled)
