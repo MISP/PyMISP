@@ -2,12 +2,119 @@ Changelog
 =========
 
 
-%%version%% (unreleased)
-------------------------
+v2.4.133 (2020-10-16)
+---------------------
+
+New
+~~~
+- [attribute type] telfhash added. [Alexandre Dulaunoy]
+- [add_gitlab_user] new gitlab user fetch script to MISP object.
+  [Alexandre Dulaunoy]
+
+  usage: add_gitlab_user.py [-h] -e EVENT [-f] -u USERNAME [-l LINK]
+
+  Fetch GitLab user details and add it in object in MISP
+
+  optional arguments:
+    -h, --help            show this help message and exit
+    -e EVENT, --event EVENT
+                          Event ID to update
+    -f, --force-template-update
+    -u USERNAME, --username USERNAME
+                          GitLab username to add
+    -l LINK, --link LINK  Url to access the GitLab instance, Default is
+                          www.gitlab.com.
+- [example] add_github_user example - WiP. [Alexandre Dulaunoy]
+
+  usage: add_github_user.py [-h] -e EVENT [-f] -u USERNAME
+
+  Fetch GitHub user details and add it in object in MISP
+
+  optional arguments:
+    -h, --help            show this help message and exit
+    -e EVENT, --event EVENT
+                          Event ID to update
+    -f, --force-template-update
+    -u USERNAME, --username USERNAME
+                          GitHub username to add
+- Method to get the new version of the templates. [Raphaël Vinot]
+- Delete tags via update_attribute, search by sharing group. [Tom King]
 
 Changes
 ~~~~~~~
-- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump test cases. [Raphaël Vinot]
+- [type] updated. [Alexandre Dulaunoy]
+- Bump file obj version in tests. [Raphaël Vinot]
+- [data] misp-objects updated. [Alexandre Dulaunoy]
+- Bump build system to poetry 1.1. [Raphaël Vinot]
+- [type] new type added. [Alexandre Dulaunoy]
+- [add_github_user] add ssh keys of the user in the MISP object.
+  [Alexandre Dulaunoy]
+- [add_github_user] more fields added from the GitHub API. [Alexandre
+  Dulaunoy]
+- Bump deps, objects. [Raphaël Vinot]
+- Add test for delete=True in get_event. [Raphaël Vinot]
+- [add_github_user] add following to the MISP object. [Alexandre
+  Dulaunoy]
+- Bump dependencies. [Raphaël Vinot]
+- Pass a list to add_attributes. [Raphaël Vinot]
+- Use MISPObject instead of GenericObjectGenerator. [Raphaël Vinot]
+- [doc] add a reference to the license. [Alexandre Dulaunoy]
+- Add docstrings and extend conf.py for RTD. [Lott, Christopher
+  (cl778h)]
+
+  Add minimal docstrings to public methods so ReadTheDocs will display them.
+  Add autodoc mock import for lief so RTD can generate HTML for tools.
+
+  This fixes issue #626
+- Remove PyMISPExpanded from the docs. [Raphaël Vinot]
+- Add comments to ELF, PE, and MachO object generators. [Raphaël Vinot]
+- Improve error message, add comments, rename whitelist->allowedlist.
+  [Raphaël Vinot]
+- Remove SG search for search() func as this doesn't support SG
+  searching, but the index does. [Tom King]
+
+Fix
+~~~
+- Test on macosx. [Raphaël Vinot]
+
+  Fix #630
+- Do not modify default_attributes_parameters in MISPObject. [Raphaël
+  Vinot]
+- Wrong call to pymisp.search_index. [Raphaël Vinot]
+- Few outdated calls in the tutorial. [Raphaël Vinot]
+- Make flake8 happy. [Raphaël Vinot]
+- Merge SG params to allow search. [Tom King]
+
+Other
+~~~~~
+- Fix PyMISP repo URL. [garanews]
+
+  MISP/PyMISP vs  CIRCL/PyMISP
+- Fix typo. [garanews]
+
+  fix typo
+- Attempt to decode utf-8-sig encoded emails. [seamus tuohy]
+
+  eml files downloaded from Windows Online security on some Windows 11
+  systems are automatically encoded in UTF with a byte order mark (BOM)
+  at the front of the file. This will cause the email parser to fail.
+
+  This is a somewhat isolated problem. It only will affects a small
+  subset of Windows users who download and re-upload eml files. But,
+  this small subset of users is the target user-base for the MISP
+  email module: low expertiese users who wish to quickly share
+  high-value indicators on an ad-hoc basis.
+
+  While this fix could be tacked onto the MISP email module instead of
+  here, I beleive that this fix is more appropriate in the PyMISP object
+  code. As the "email" object parser this object should be built to
+  parse all manner of emails that it may encounter. This includes common
+  malformations such as this one and, even horrors such as, the .msg
+  format. This commit adds a generically named "attempt_decoding"
+  function which can be expanded to address all manner of sins that
+  are encountered in the future.
 
 
 v2.4.131 (2020-09-08)
@@ -20,6 +127,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - [describeTypes] updated. [Alexandre Dulaunoy]
@@ -1295,7 +1403,7 @@ Other
   values, sanitization) [Falconieri]
 - Add: exportpdf tool working. [Falconieri]
 - General improvement : deisgn, exhaustiviness of mispEvent values
-  displayed, good practice concerning paragraphe/table made. [Falconieri]
+  displayed, good pratice concerning paragraphe/table made. [Falconieri]
 - Update with table basics. [Falconieri]
 - Structure of the improvements OK : test file, test folder, report
   generator. [Falconieri]
@@ -2219,7 +2327,7 @@ Changes
 - Bump CHANGELOG. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Update readme for new logging system. [Raphaël Vinot]
-- Small improvements in the logging system. [Raphaël Vinot]
+- Small improvments in the logging system. [Raphaël Vinot]
 - Properly use python logging module. [Raphaël Vinot]
 - Update asciidoctor generator. [Raphaël Vinot]
 - Remove warning if PyMISP is too new. [Raphaël Vinot]
@@ -2547,7 +2655,7 @@ Other
 - Cleanup warning function. [Raphaël Vinot]
 - Fix typos. [Raphaël Vinot]
 - Remove unused variable. [Tristan METAYER]
-- Remove category It will be automatically detected
+- Remove category It will be automaticly detected
   https://github.com/MISP/PyMISP/blob/master/pymisp/tools/openioc.py.
   [Tristan METAYER]
 - Revert tab to escape. [Tristan METAYER]
@@ -2756,7 +2864,7 @@ Other
 - Bump version. [Raphaël Vinot]
 - Add orgs managment. [Raphaël Vinot]
 - Run on more python versions. [Raphaël Vinot]
-- Example addtag (dirty) [Déborah Servili]
+- Exemple addtag (dirty) [Déborah Servili]
 - Fix last commit. [Raphaël Vinot]
 - Wrong use of API for dateuntil. [Koen Van Impe]
 
