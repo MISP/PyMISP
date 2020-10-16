@@ -42,6 +42,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump object templates. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump test cases. [Raphaël Vinot]
 - [type] updated. [Alexandre Dulaunoy]
