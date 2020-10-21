@@ -1818,6 +1818,11 @@ class TestComprehensive(unittest.TestCase):
             event_get = MISPEvent()
             event_get.from_dict(**r)
             self.assertDictEqual(event.to_dict(), event_get.to_dict())
+            r = self.user_misp_connector.direct_call('events/restSearch', data={"returnFormat": "csv",
+                                                                                "type": {"AND": ["campaign-name", "threat-actor"]},
+                                                                                "category": "Attribution", "includeEventUuid": 1})
+            self.assertTrue(r.startswith('uuid,event_id,category,type,value'))
+
         finally:
             self.admin_misp_connector.delete_event(event)
 
