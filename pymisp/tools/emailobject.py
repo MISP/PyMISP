@@ -174,21 +174,19 @@ class EMailObject(AbstractMISPObjectGenerator):
         self.__generate_received()
 
     def __add_emails(self, typ: str, data: str, insert_display_names: bool = True):
-        parts = [part.strip() for part in data.split(",")]
         addresses = []
         display_names = []
 
-        for part in parts:
-            realname, address = email.utils.parseaddr(part)
+        for realname, address in email.utils.getaddresses([data]):
             if address and realname:
-                addresses.append({"value": address, "comment": part})
+                addresses.append({"value": address, "comment": "{} <{}>".format(realname, address)})
             elif address:
                 addresses.append({"value": address})
-            else:  # parsing failed, insert original value
-                addresses.append({"value": part})
+            else:  # parsing failed, skip
+                continue
 
             if realname:
-                display_names.append({"value": realname, "comment": part})
+                display_names.append({"value": realname, "comment": "{} <{}>".format(realname, address)})
 
         if addresses:
             self.add_attributes(typ, *addresses)

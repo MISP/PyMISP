@@ -34,6 +34,16 @@ class TestEmailObject(unittest.TestCase):
         self.assertIsInstance(email_object.email, EmailMessage)
         self.assertEqual(len(email_object.attachments), 0)
 
+    def test_mail_multiple_to(self):
+        email_object = EMailObject(Path("tests/email_testfiles/mail_multiple_to.eml"))
+
+        to = self._get_values(email_object, "to")
+        to_display_name = self._get_values(email_object, "to-display-name")
+        self.assertEqual(to[0], "jan.novak@example.com")
+        self.assertEqual(to_display_name[0], "Novak, Jan")
+        self.assertEqual(to[1], "jan.marek@example.com")
+        self.assertEqual(to_display_name[1], "Marek, Jan")
+
     def test_mail_1_msg(self):
         email_object = EMailObject(Path("tests/email_testfiles/mail_1.msg"))
         self.assertEqual(self._get_values(email_object, "subject")[0],
