@@ -2309,15 +2309,13 @@ class PyMISP:
 
         try:
             response_json = response.json()
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(response_json)
+            logger.debug(response_json)
             if isinstance(response_json, dict) and response_json.get('response') is not None:
                 # Cleanup.
                 response_json = response_json['response']
             return response_json
         except Exception:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(response.text)
+            logger.debug(response.text)
             if expect_json:
                 raise PyMISPUnexpectedResponse(f'Unexpected response from server: {response.text}')
             if lenient_response_type and not response.headers['Accept'].startswith('application/json'):
@@ -2365,8 +2363,7 @@ class PyMISP:
                  'Accept': f'application/{output_type}',
                  'content-type': 'application/json',
                  'User-Agent': user_agent})
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(prepped.headers)
+            logger.debug(prepped.headers)
             settings = s.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None, verify=self.ssl, cert=self.cert)
             return s.send(prepped, timeout=self.timeout, **settings)
 
