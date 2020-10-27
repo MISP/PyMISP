@@ -47,10 +47,7 @@ class MISPFileCache(object):
         if not path.exists():
             return None
         with path.open('r', encoding='utf-8') as f:
-            if HAS_RAPIDJSON:
-                data = load(f)
-            else:
-                data = load(f, encoding='utf-8')
+            data = load(f)
         return data
 
 
