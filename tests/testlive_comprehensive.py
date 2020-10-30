@@ -713,7 +713,9 @@ class TestComprehensive(unittest.TestCase):
         second.add_attribute('ip-src', '8.8.8.8')
         # second has two attributes: text and ip-src
         try:
+            self.assertFalse(self.user_misp_connector.event_exists(first))
             first = self.user_misp_connector.add_event(first)
+            self.assertTrue(self.user_misp_connector.event_exists(first))
             second = self.user_misp_connector.add_event(second)
             timeframe = [first.timestamp.timestamp() - 5, first.timestamp.timestamp() + 5]
             # Search event we just created in multiple ways. Make sure it doesn't catch it when it shouldn't

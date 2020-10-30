@@ -307,6 +307,15 @@ class PyMISP:
         e.load(event_r)
         return e
 
+    def event_exists(self, event: Union[MISPEvent, int, str, UUID]) -> bool:
+        """Fast check if event exists.
+
+        :param event: Event to check
+        """
+        event_id = get_uuid_or_id_from_abstract_misp(event)
+        r = self._prepare_request('HEAD', f'events/view/{event_id}')
+        return self._check_head_response(r)
+
     def add_event(self, event: MISPEvent, pythonify: bool = False) -> Union[Dict, MISPEvent]:
         """Add a new event on a MISP instance
 
@@ -2964,6 +2973,14 @@ class PyMISP:
         if isinstance(r, (dict, list)):
             return r
         # Else: an exception was raised anyway
+
+    def _check_head_response(self, response: requests.Response) -> bool:
+        if response.status_code == 200:
+            return True
+        elif response.status_code == 404:
+            return False
+        else:
+            raise MISPServerError(f'Error code {response.status_code} for HEAD request')
 
     def _check_response(self, response: requests.Response, lenient_response_type: bool = False, expect_json: bool = False) -> Union[Dict, str]:
         """Check if the response from the server is not an unexpected error"""
