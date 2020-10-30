@@ -316,13 +316,14 @@ class PyMISP:
         r = self._prepare_request('HEAD', f'events/view/{event_id}')
         return self._check_head_response(r)
 
-    def add_event(self, event: MISPEvent, pythonify: bool = False) -> Union[Dict, MISPEvent]:
+    def add_event(self, event: MISPEvent, pythonify: bool = False, metadata: bool = False) -> Union[Dict, MISPEvent]:
         """Add a new event on a MISP instance
 
         :param event: event to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
+        :param metadata: Return just event metadata after successful creating
         """
-        r = self._prepare_request('POST', 'events/add', data=event)
+        r = self._prepare_request('POST', 'events/add' + '/metadata:1' if metadata else '', data=event)
         new_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_event:
             return new_event
@@ -330,18 +331,20 @@ class PyMISP:
         e.load(new_event)
         return e
 
-    def update_event(self, event: MISPEvent, event_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPEvent]:
+    def update_event(self, event: MISPEvent, event_id: Optional[int] = None, pythonify: bool = False,
+                     metadata: bool = False) -> Union[Dict, MISPEvent]:
         """Update an event on a MISP instance'''
 
         :param event: event to update
         :param event_id: ID of event to update
         :param pythonify: Returns a PyMISP Object instead of the plain json output
+        :param metadata: Return just event metadata after successful update
         """
         if event_id is None:
             eid = get_uuid_or_id_from_abstract_misp(event)
         else:
             eid = get_uuid_or_id_from_abstract_misp(event_id)
-        r = self._prepare_request('POST', f'events/edit/{eid}', data=event)
+        r = self._prepare_request('POST', f'events/edit/{eid}' + '/metadata:1' if metadata else '', data=event)
         updated_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
             return updated_event

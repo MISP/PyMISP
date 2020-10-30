@@ -886,6 +886,19 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
+    def test_event_add_update_metadata(self):
+        event = self.create_simple_event()
+        event.add_attribute('ip-src', '9.9.9.9')
+        try:
+            response = self.user_misp_connector.add_event(event, metadata=True)
+            self.assertEqual(len(response.attributes), 0)  # response should contains zero attributes
+
+            event.info = "New name"
+            response = self.user_misp_connector.update_event(event, metadata=True)
+            self.assertEqual(len(response.attributes), 0)  # response should contains zero attributes
+        finally:  # cleanup
+            self.admin_misp_connector.delete_event(event)
+
     def test_extend_event(self):
         first = self.create_simple_event()
         first.info = 'parent event'
