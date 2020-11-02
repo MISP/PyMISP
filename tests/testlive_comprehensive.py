@@ -1338,6 +1338,14 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
+        # Search tag
+        # Partial search
+        tags = self.admin_misp_connector.search_tags(new_tag.name[:5], pythonify=True)
+        self.assertEqual(tags[0].name, 'this is a test tag')
+        # No tags found
+        tags = self.admin_misp_connector.search_tags('not a tag')
+        self.assertFalse(tags)
+
         # Delete tag
         response = self.admin_misp_connector.delete_tag(new_tag)
         self.assertEqual(response['message'], 'Tag deleted.')

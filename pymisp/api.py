@@ -880,6 +880,23 @@ class PyMISP:
         response = self._prepare_request('POST', f'tags/delete/{tag_id}')
         return self._check_json_response(response)
 
+    def search_tags(self, tag_name: str, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
+        """Search a tag by name.
+        :param tag_name: Name (can be a part of it) to search
+        """
+        r = self._prepare_request('GET', f'tags/index/searchall:{tag_name}')
+        tag_r = self._check_json_response(r)
+        if 'errors' in tag_r:
+            return tag_r
+        if not (self.global_pythonify or pythonify):
+            return tag_r['Tag']
+        to_return: List[MISPTag] = []
+        for tag in tag_r['Tag']:
+            t = MISPTag()
+            t.from_dict(**tag)
+            to_return.append(t)
+        return to_return
+
     # ## END Tags ###
 
     # ## BEGIN Taxonomies ###
