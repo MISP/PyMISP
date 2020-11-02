@@ -2,6 +2,43 @@ Changelog
 =========
 
 
+v2.4.134 (2020-11-02)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Keep connection alive between requests. [Jakub Onderka]
+- Bump deps. [Raphaël Vinot]
+- Format docstrings in mispevent.py. [Lott, Christopher (cl778h)]
+
+  Add ":param " prefix to parameters to improve ReadTheDocs output.
+  Fix some minor typos in docstrings.
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Remove duplicate check if debug logging is enabled. [Jakub Onderka]
+- Do now fail on requests returning plain text. [Raphaël Vinot]
+
+  Fix #639
+
+Other
+~~~~~
+- Revert "Update .travis.yml" [Raphaël Vinot]
+
+  lief isn't compatible with python 3.9
+
+  This reverts commit e10843fa33c9a08b7da4ef24cbce457be53a7459.
+- Update .travis.yml. [Raphaël Vinot]
+
+  Add python 3.9
+- Drop `encoding=` in Python 3.9. [Friedrich Lindenberg]
+
+
 v2.4.133 (2020-10-16)
 ---------------------
 
