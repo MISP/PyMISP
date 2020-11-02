@@ -881,7 +881,10 @@ class PyMISP:
         return self._check_json_response(response)
 
     def search_tags(self, tag_name: str, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
-        """Search a tag by name.
+        """Search for tags by name. Matches substrings (no '%' is required).
+        In the response, each tag has key 'count' with the number of tagged events
+        and key 'attribute_count' with the number of tagged attributes.
+
         :param tag_name: Name (can be a part of it) to search
         """
         r = self._prepare_request('GET', f'tags/index/searchall:{tag_name}')
