@@ -114,6 +114,7 @@ class PyMISP:
         self.auth: Optional[AuthBase] = auth
         self.tool: str = tool
         self.timeout: Optional[Union[float, Tuple[float, float]]] = timeout
+        self.__session = requests.Session()  # use one session to keep connection between requests
 
         self.global_pythonify = False
 
@@ -3005,21 +3006,22 @@ class PyMISP:
             # CakePHP params in URL
             to_append_url = '/'.join([f'{k}:{v}' for k, v in kw_params.items()])
             url = f'{url}/{to_append_url}'
+
         req = requests.Request(request_type, url, data=d, params=params)
-        with requests.Session() as s:
-            user_agent = f'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
-            if self.tool:
-                user_agent = f'{user_agent} - {self.tool}'
-            req.auth = self.auth
-            prepped = s.prepare_request(req)
-            prepped.headers.update(
-                {'Authorization': self.key,
-                 'Accept': f'application/{output_type}',
-                 'content-type': 'application/json',
-                 'User-Agent': user_agent})
-            logger.debug(prepped.headers)
-            settings = s.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None, verify=self.ssl, cert=self.cert)
-            return s.send(prepped, timeout=self.timeout, **settings)
+        user_agent = f'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
+        if self.tool:
+            user_agent = f'{user_agent} - {self.tool}'
+        req.auth = self.auth
+        prepped = self.__session.prepare_request(req)
+        prepped.headers.update(
+            {'Authorization': self.key,
+             'Accept': f'application/{output_type}',
+             'content-type': 'application/json',
+             'User-Agent': user_agent})
+        logger.debug(prepped.headers)
+        settings = self.__session.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None,
+                                                             verify=self.ssl, cert=self.cert)
+        return self.__session.send(prepped, timeout=self.timeout, **settings)
 
     def _csv_to_dict(self, csv_content: str) -> List[dict]:
         '''Makes a list of dict out of a csv file (requires headers)'''
