@@ -2541,6 +2541,9 @@ class PyMISP:
         else:
             raise MISPServerError("please fill path or data parameter")
 
+        if isinstance(to_post, bytes):
+            to_post = to_post.decode()  # type: ignore
+
         if str(version) == '1':
             url = urljoin(self.root_url, '/events/upload_stix')
             response = self._prepare_request('POST', url, data=to_post, output_type='xml')  # type: ignore
