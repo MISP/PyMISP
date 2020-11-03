@@ -15,6 +15,7 @@ from uuid import UUID
 import warnings
 import sys
 import copy
+from io import BytesIO, StringIO
 
 from . import __version__, everything_broken
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPError, NoURL, NoKey
@@ -2523,13 +2524,14 @@ class PyMISP:
             to_return.append(a)
         return to_return
 
-    def upload_stix(self, path = None, data = None, version: str = '2'):
+    def upload_stix(self, path: Optional[Union[str, Path, BytesIO, StringIO]] = None, data: Optional[Union[str, bytes]] = None, version: str = '2'):
         """Upload a STIX file to MISP.
 
         :param path: Path to the STIX on the disk (can be a path-like object, or a pseudofile)
         :param data: stix object
         :param version: Can be 1 or 2
         """
+        to_post: Union[str, bytes]
         if path is not None:
             if isinstance(path, (str, Path)):
                 with open(path, 'rb') as f:
@@ -2542,7 +2544,7 @@ class PyMISP:
             raise MISPServerError("please fill path or data parameter")
 
         if isinstance(to_post, bytes):
-            to_post = to_post.decode()  # type: ignore
+            to_post = to_post.decode()
 
         if str(version) == '1':
             url = urljoin(self.root_url, '/events/upload_stix')
