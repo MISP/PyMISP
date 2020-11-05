@@ -1340,7 +1340,7 @@ class TestComprehensive(unittest.TestCase):
 
         # Search tag
         # Partial search
-        tags = self.admin_misp_connector.search_tags(new_tag.name[:5], pythonify=True)
+        tags = self.admin_misp_connector.search_tags(f'{new_tag.name[:5]}%', pythonify=True)
         self.assertEqual(tags[0].name, 'this is a test tag')
         # No tags found
         tags = self.admin_misp_connector.search_tags('not a tag')

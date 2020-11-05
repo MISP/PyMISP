@@ -881,21 +881,19 @@ class PyMISP:
         response = self._prepare_request('POST', f'tags/delete/{tag_id}')
         return self._check_json_response(response)
 
-    def search_tags(self, tag_name: str, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
-        """Search for tags by name. Matches substrings (no '%' is required).
-        In the response, each tag has key 'count' with the number of tagged events
-        and key 'attribute_count' with the number of tagged attributes.
+    def search_tags(self, tagname: str, strict_tagname: bool = False, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
+        """Search for tags by name.
 
-        :param tag_name: Name (can be a part of it) to search
+        :param tag_name: Name to search, use % for substrings matches.
+        :param strict_tagname: only return tags matching exactly the tag name (so skipping synonyms and cluster's value)
         """
-        r = self._prepare_request('GET', f'tags/index/searchall:{tag_name}')
-        tag_r = self._check_json_response(r)
-        if 'errors' in tag_r:
-            return tag_r
-        if not (self.global_pythonify or pythonify):
-            return tag_r['Tag']
+        query = {'tagname': tagname, 'strict_tagname': strict_tagname}
+        response = self._prepare_request('POST', 'tags/search', data=query)
+        normalized_response = self._check_json_response(response)
+        if not (self.global_pythonify or pythonify) or 'errors' in normalized_response:
+            return normalized_response
         to_return: List[MISPTag] = []
-        for tag in tag_r['Tag']:
+        for tag in normalized_response:
             t = MISPTag()
             t.from_dict(**tag)
             to_return.append(t)
