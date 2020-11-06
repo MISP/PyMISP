@@ -257,9 +257,9 @@ class MISPAttribute(AbstractMISP):
             _datetime = _make_datetime(value)
 
             if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > _datetime:
-                raise PyMISPError('last_seen ({value}) has to be after first_seen ({self.first_seen})')
+                raise PyMISPError(f'last_seen ({value}) has to be after first_seen ({self.first_seen})')
             if name == 'first_seen' and hasattr(self, 'last_seen') and self.last_seen < _datetime:
-                raise PyMISPError('first_seen ({value}) has to be before last_seen ({self.last_seen})')
+                raise PyMISPError(f'first_seen ({value}) has to be before last_seen ({self.last_seen})')
             super().__setattr__(name, _datetime)
         elif name == 'data':
             self._prepare_data(value)
