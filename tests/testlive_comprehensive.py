@@ -2283,6 +2283,7 @@ class TestComprehensive(unittest.TestCase):
             # Attribute in object only
             now = datetime.now().astimezone()
             attr = obj.attributes[0]
+            attr.first_seen = '2020-01-04'
             attr.last_seen = now
             attr = self.admin_misp_connector.update_attribute(attr, pythonify=True)
             self.assertEqual(attr.last_seen, now)
