@@ -404,6 +404,15 @@ class PyMISP:
         o.from_dict(**misp_object_r)
         return o
 
+    def object_exists(self, misp_object: Union[MISPObject, int, str, UUID]) -> bool:
+        """Fast check if object exists.
+
+        :param misp_object: Attribute to check
+        """
+        object_id = get_uuid_or_id_from_abstract_misp(misp_object)
+        r = self._prepare_request('HEAD', f'objects/view/{object_id}')
+        return self._check_head_response(r)
+
     def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool = False) -> Union[Dict, MISPObject]:
         """Add a MISP Object to an existing MISP event
 
@@ -543,6 +552,15 @@ class PyMISP:
         a = MISPAttribute()
         a.from_dict(**attribute_r)
         return a
+
+    def attribute_exists(self, attribute: Union[MISPAttribute, int, str, UUID]) -> bool:
+        """Fast check if attribute exists.
+
+        :param attribute: Attribute to check
+        """
+        attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
+        r = self._prepare_request('HEAD', f'attributes/view/{attribute_id}')
+        return self._check_head_response(r)
 
     def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
         """Add an attribute to an existing MISP event
