@@ -686,6 +686,42 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
+    def test_exists(self):
+        """Check event, attribute and object existence"""
+        event = self.create_simple_event()
+        misp_object = MISPObject('domain-ip')
+        attribute = misp_object.add_attribute('domain', value='google.fr')
+        misp_object.add_attribute('ip', value='8.8.8.8')
+        event.add_object(misp_object)
+
+        # Event, attribute and object should not exists before event deletion
+        self.assertFalse(self.user_misp_connector.event_exists(event))
+        self.assertFalse(self.user_misp_connector.attribute_exists(attribute))
+        self.assertFalse(self.user_misp_connector.object_exists(misp_object))
+
+        try:
+            self.user_misp_connector.add_event(event)
+
+            self.assertTrue(self.user_misp_connector.event_exists(event))
+            self.assertTrue(self.user_misp_connector.event_exists(event.uuid))
+            self.assertTrue(self.user_misp_connector.event_exists(event.id))
+            self.assertTrue(self.user_misp_connector.attribute_exists(attribute))
+            self.assertTrue(self.user_misp_connector.attribute_exists(attribute.uuid))
+            self.assertTrue(self.user_misp_connector.attribute_exists(attribute.id))
+            self.assertTrue(self.user_misp_connector.object_exists(misp_object))
+            self.assertTrue(self.user_misp_connector.object_exists(misp_object.id))
+            self.assertTrue(self.user_misp_connector.object_exists(misp_object.uuid))
+        finally:
+            self.admin_misp_connector.delete_event(event)
+
+        # Event, attribute and object should not exists after event deletion
+        self.assertFalse(self.user_misp_connector.event_exists(event))
+        self.assertFalse(self.user_misp_connector.event_exists(event.id))
+        self.assertFalse(self.user_misp_connector.attribute_exists(attribute))
+        self.assertFalse(self.user_misp_connector.attribute_exists(attribute.id))
+        self.assertFalse(self.user_misp_connector.object_exists(misp_object))
+        self.assertFalse(self.user_misp_connector.object_exists(misp_object.id))
+
     def test_simple_event(self):
         '''Search a bunch of parameters:
             * Value not existing
@@ -883,6 +919,19 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
+
+    def test_event_add_update_metadata(self):
+        event = self.create_simple_event()
+        event.add_attribute('ip-src', '9.9.9.9')
+        try:
+            response = self.user_misp_connector.add_event(event, metadata=True)
+            self.assertEqual(len(response.attributes), 0)  # response should contains zero attributes
+
+            event.info = "New name"
+            response = self.user_misp_connector.update_event(event, metadata=True)
+            self.assertEqual(len(response.attributes), 0)  # response should contains zero attributes
+        finally:  # cleanup
+            self.admin_misp_connector.delete_event(event)
 
     def test_extend_event(self):
         first = self.create_simple_event()

@@ -308,13 +308,23 @@ class PyMISP:
         e.load(event_r)
         return e
 
-    def add_event(self, event: MISPEvent, pythonify: bool = False) -> Union[Dict, MISPEvent]:
+    def event_exists(self, event: Union[MISPEvent, int, str, UUID]) -> bool:
+        """Fast check if event exists.
+
+        :param event: Event to check
+        """
+        event_id = get_uuid_or_id_from_abstract_misp(event)
+        r = self._prepare_request('HEAD', f'events/view/{event_id}')
+        return self._check_head_response(r)
+
+    def add_event(self, event: MISPEvent, pythonify: bool = False, metadata: bool = False) -> Union[Dict, MISPEvent]:
         """Add a new event on a MISP instance
 
         :param event: event to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
+        :param metadata: Return just event metadata after successful creating
         """
-        r = self._prepare_request('POST', 'events/add', data=event)
+        r = self._prepare_request('POST', 'events/add' + '/metadata:1' if metadata else '', data=event)
         new_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_event:
             return new_event
@@ -322,18 +332,20 @@ class PyMISP:
         e.load(new_event)
         return e
 
-    def update_event(self, event: MISPEvent, event_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPEvent]:
+    def update_event(self, event: MISPEvent, event_id: Optional[int] = None, pythonify: bool = False,
+                     metadata: bool = False) -> Union[Dict, MISPEvent]:
         """Update an event on a MISP instance'''
 
         :param event: event to update
         :param event_id: ID of event to update
         :param pythonify: Returns a PyMISP Object instead of the plain json output
+        :param metadata: Return just event metadata after successful update
         """
         if event_id is None:
             eid = get_uuid_or_id_from_abstract_misp(event)
         else:
             eid = get_uuid_or_id_from_abstract_misp(event_id)
-        r = self._prepare_request('POST', f'events/edit/{eid}', data=event)
+        r = self._prepare_request('POST', f'events/edit/{eid}' + '/metadata:1' if metadata else '', data=event)
         updated_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
             return updated_event
@@ -392,6 +404,15 @@ class PyMISP:
         o = MISPObject(misp_object_r['Object']['name'], standalone=False)
         o.from_dict(**misp_object_r)
         return o
+
+    def object_exists(self, misp_object: Union[MISPObject, int, str, UUID]) -> bool:
+        """Fast check if object exists.
+
+        :param misp_object: Attribute to check
+        """
+        object_id = get_uuid_or_id_from_abstract_misp(misp_object)
+        r = self._prepare_request('HEAD', f'objects/view/{object_id}')
+        return self._check_head_response(r)
 
     def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool = False) -> Union[Dict, MISPObject]:
         """Add a MISP Object to an existing MISP event
@@ -532,6 +553,15 @@ class PyMISP:
         a = MISPAttribute()
         a.from_dict(**attribute_r)
         return a
+
+    def attribute_exists(self, attribute: Union[MISPAttribute, int, str, UUID]) -> bool:
+        """Fast check if attribute exists.
+
+        :param attribute: Attribute to check
+        """
+        attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
+        r = self._prepare_request('HEAD', f'attributes/view/{attribute_id}')
+        return self._check_head_response(r)
 
     def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
         """Add an attribute to an existing MISP event
@@ -2970,6 +3000,14 @@ class PyMISP:
         if isinstance(r, (dict, list)):
             return r
         # Else: an exception was raised anyway
+
+    def _check_head_response(self, response: requests.Response) -> bool:
+        if response.status_code == 200:
+            return True
+        elif response.status_code == 404:
+            return False
+        else:
+            raise MISPServerError(f'Error code {response.status_code} for HEAD request')
 
     def _check_response(self, response: requests.Response, lenient_response_type: bool = False, expect_json: bool = False) -> Union[Dict, str]:
         """Check if the response from the server is not an unexpected error"""
