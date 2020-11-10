@@ -832,7 +832,11 @@ class MISPObject(AbstractMISP):
         if isinstance(referenced_uuid, AbstractMISP):
             # Allow to pass an object or an attribute instead of its UUID
             referenced_uuid = referenced_uuid.uuid
-        if kwargs.get('object_uuid'):
+        if 'object_uuid' in kwargs and not kwargs.get('object_uuid'):
+            # Unexplained None in object_uuid key -> https://github.com/MISP/PyMISP/issues/640
+            kwargs.pop('object_uuid')
+            object_uuid = self.uuid
+        elif kwargs.get('object_uuid'):
             # Load existing object
             object_uuid = kwargs.pop('object_uuid')
         else:
