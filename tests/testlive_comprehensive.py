@@ -59,6 +59,7 @@ class TestComprehensive(unittest.TestCase):
         # Connect as admin
         cls.admin_misp_connector = PyMISP(url, key, verifycert, debug=False)
         cls.admin_misp_connector.set_server_setting('Security.allow_self_registration', True, force=True)
+        cls.admin_misp_connector.set_server_setting('debug', 1, force=True)
         if not fast_mode:
             r = cls.admin_misp_connector.update_misp()
             print(r)
@@ -1394,6 +1395,11 @@ class TestComprehensive(unittest.TestCase):
         # No tags found
         tags = self.admin_misp_connector.search_tags('not a tag')
         self.assertFalse(tags)
+
+        # Update tag
+        non_exportable_tag.name = 'non-exportable tag - edit'
+        non_exportable_tag_edited = self.admin_misp_connector.update_tag(non_exportable_tag, pythonify=True)
+        self.assertTrue(non_exportable_tag_edited.name == 'non-exportable tag - edit', non_exportable_tag_edited.to_json(indent=2))
 
         # Delete tag
         response = self.admin_misp_connector.delete_tag(new_tag)
