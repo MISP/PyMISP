@@ -324,7 +324,7 @@ class PyMISP:
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         :param metadata: Return just event metadata after successful creating
         """
-        r = self._prepare_request('POST', 'events/add' + '/metadata:1' if metadata else '', data=event)
+        r = self._prepare_request('POST', 'events/add' + ('/metadata:1' if metadata else ''), data=event)
         new_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_event:
             return new_event
@@ -345,7 +345,7 @@ class PyMISP:
             eid = get_uuid_or_id_from_abstract_misp(event)
         else:
             eid = get_uuid_or_id_from_abstract_misp(event_id)
-        r = self._prepare_request('POST', f'events/edit/{eid}' + '/metadata:1' if metadata else '', data=event)
+        r = self._prepare_request('POST', f'events/edit/{eid}' + ('/metadata:1' if metadata else ''), data=event)
         updated_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
             return updated_event
