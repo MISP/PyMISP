@@ -701,8 +701,9 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(self.user_misp_connector.object_exists(misp_object))
 
         try:
-            self.user_misp_connector.add_event(event)
-
+            event = self.user_misp_connector.add_event(event, pythonify=True)
+            misp_object = event.objects[0]
+            attribute = misp_object.attributes[0]
             self.assertTrue(self.user_misp_connector.event_exists(event))
             self.assertTrue(self.user_misp_connector.event_exists(event.uuid))
             self.assertTrue(self.user_misp_connector.event_exists(event.id))
