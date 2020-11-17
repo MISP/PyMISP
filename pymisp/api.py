@@ -2915,11 +2915,20 @@ class PyMISP:
         '''Build a complex search query. MISP expects a dictionary with AND, OR and NOT keys.'''
         to_return = {}
         if and_parameters:
-            to_return['AND'] = [p for p in and_parameters if p]
+            if isinstance(and_parameters, str):
+                to_return['AND'] = [and_parameters]
+            else:
+                to_return['AND'] = [p for p in and_parameters if p]
         if not_parameters:
-            to_return['NOT'] = [p for p in not_parameters if p]
+            if isinstance(not_parameters, str):
+                to_return['NOT'] = [not_parameters]
+            else:
+                to_return['NOT'] = [p for p in not_parameters if p]
         if or_parameters:
-            to_return['OR'] = [p for p in or_parameters if p]
+            if isinstance(or_parameters, str):
+                to_return['OR'] = [or_parameters]
+            else:
+                to_return['OR'] = [p for p in or_parameters if p]
         return to_return
 
     # ## END Global helpers ###
