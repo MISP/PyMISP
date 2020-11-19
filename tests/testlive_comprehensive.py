@@ -908,10 +908,24 @@ class TestComprehensive(unittest.TestCase):
             self.assertIs(events[0].attributes[-1].malware_binary, None)
 
             # Search index
+            # # Timestamp
             events = self.user_misp_connector.search_index(timestamp=first.timestamp.timestamp(),
                                                            pythonify=True)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].info, 'foo bar blah')
+            self.assertEqual(events[0].attributes, [])
+
+            # # Info
+            complex_info = r'C:\Windows\System32\notepad.exe'
+            e = events[0]
+            e.info = complex_info
+            e = self.user_misp_connector.update_event(e, pythonify=True)
+            # Issue: https://github.com/MISP/MISP/issues/6616
+            complex_info_search = r'C:\\Windows\\System32\\notepad.exe'
+            events = self.user_misp_connector.search_index(eventinfo=complex_info_search,
+                                                           pythonify=True)
+            self.assertEqual(len(events), 1)
+            self.assertEqual(events[0].info, complex_info)
             self.assertEqual(events[0].attributes, [])
 
             # Contact reporter
