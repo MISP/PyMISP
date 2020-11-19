@@ -1,0 +1,15 @@
+Return-Path: <suvorov.s@nalg.ru>
+Delivered-To: kinney@noth.com
+Received: (qmail 11769 invoked from network); 22 Aug 2016 14:23:01 -0000
+X-Session-Marker: 6A64617A657940616C6578616E646572736D6974682E636F6D
+X-Spam-Summary: 69,4.5,0,,d41d8cd98f00b204,suvorov.s@nalg.ru,:,RULES_HIT:46:150:152:379:553:871:967:989:1000:1254:1260:1263:1313:1381:1516:1517:1520:1575:1594:1605:1676:1699:1730:1747:1764:1777:1792:1823:2044:2197:2199:2393:2525:2560:2563:2682:2685:2827:2859:2911:2933:2937:2939:2942:2945:2947:2951:2954:3022:3867:3872:3890:3934:3936:3938:3941:3944:3947:3950:3953:3956:3959:4425:5007:6001:6261:6506:6678:6747:6748:7281:7398:7688:8599:8824:8957:9009:9025:9388:10004:10848:11604:11638:11639:11783:11914:12043:12185:12445:12517:12519:12740:13026:14149:14381:14658:14659:14687:21080:21221:30054:30055:30065:30066,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:fn,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:5,LUA_SUMMARY:none
+X-HE-Tag: print38_7083d7fd63e24
+X-Filterd-Recvd-Size: 64695
+Received: from computer_3436 (unknown [43.230.105.145])
+	(Authenticated sender: jdazey@alexandersmith.com)
+	by omf06.b.hostedemail.com (Postfix) with ESMTPA
+	for <kinney@noth.com>; Mon, 22 Aug 2016 14:22:52 +0000 (UTC)
+From: =?UTF-8?B?0YHQu9GD0LbQsdCwINCk0J3QoSDQlNCw0L3QuNC40Lsg0KHRg9Cy0L7RgNC+0LI=?= <suvorov.s@nalg.ru>
+To: "Novak, Jan" <jan.novak@example.com>, "Marek, Jan" <jan.marek@example.com>
+Subject: =?UTF-8?B?0L/QuNGB0YzQvNC+INGD0LLQtdC00L7QvC3QtQ==?=
+Content-Type: multipart/mixed; boundary="2NqJR3m2cLnhEraiqXA4Q9hqnmihx7b7"
