@@ -2146,7 +2146,13 @@ class PyMISP:
 
         return normalized_response
 
-    def search_index(self, published: Optional[bool] = None, eventid: Optional[SearchType] = None,
+    def search_index(self,
+                     all: Optional[str] = None,
+                     attribute: Optional[str] = None,
+                     email: Optional[str] = None,
+                     published: Optional[bool] = None,
+                     hasproposal: Optional[bool] = None,
+                     eventid: Optional[SearchType] = None,
                      tags: Optional[SearchParameterTypes] = None,
                      date_from: Optional[Union[datetime, date, int, str, float, None]] = None,
                      date_to: Optional[Union[datetime, date, int, str, float, None]] = None,
@@ -2159,23 +2165,45 @@ class PyMISP:
                                          Tuple[Union[datetime, date, int, str, float, None],
                                                Union[datetime, date, int, str, float, None]]
                                                ]] = None,
+                     publish_timestamp: Optional[Union[Union[datetime, date, int, str, float, None],
+                                                 Tuple[Union[datetime, date, int, str, float, None],
+                                                       Union[datetime, date, int, str, float, None]]
+                                                       ]] = None,
                      sharinggroup: Optional[List[SearchType]] = None,
+                     minimal: Optional[bool] = None,
                      pythonify: Optional[bool] = None) -> Union[Dict, List[MISPEvent]]:
-        """Search only at the index level. Using ! in front of a value means NOT (default is OR)
+        """Search event metadata shown on the event index page. Using ! in front of a value
+        means NOT, except for parameters date_from, date_to and timestamp which cannot be negated.
+        Criteria are AND-ed together; values in lists are OR-ed together. Return matching events
+        with metadata but no attributes or objects; also see minimal parameter.
 
-        :param published: Set whether published or unpublished events should be returned. Do not set the parameter if you want both.
+        :param all: Search for a full or a substring (delimited by % for substrings) in the
+            event info, event tags, attribute tags, attribute values or attribute comment fields.
+        :param attribute: Filter on attribute's value.
+        :param email: Filter on user's email.
+        :param published: Set whether published or unpublished events should be returned.
+            Do not set the parameter if you want both.
+        :param hasproposal: Filter for events containing proposal(s).
         :param eventid: The events that should be included / excluded from the search
-        :param tags: Tags to search or to exclude. You can pass a list, or the output of `build_complex_query`
-        :param date_from: Events with the date set to a date after the one specified. This filter will use the date of the event.
-        :param date_to: Events with the date set to a date before the one specified. This filter will use the date of the event.
+        :param tags: Tags to search or to exclude. You can pass a list, or the output of
+            `build_complex_query`
+        :param date_from: Events with the date set to a date after the one specified.
+            This filter will use the date of the event.
+        :param date_to: Events with the date set to a date before the one specified.
+            This filter will use the date of the event.
         :param eventinfo: Filter on the event's info field.
         :param threatlevel: Threat level(s) (1,2,3,4) | list
         :param distribution: Distribution level(s) (0,1,2,3) | list
         :param analysis: Analysis level(s) (0,1,2) | list
         :param org: Search by the creator organisation by supplying the organisation identifier.
-        :param timestamp: Restrict the results by the timestamp (last edit). Any event with a timestamp newer than the given timestamp will be returned. In case you are dealing with /attributes as scope, the attribute's timestamp will be used for the lookup.
+        :param timestamp: Restrict the results by the timestamp (last edit). Any event with a
+            timestamp newer than the given timestamp will be returned. In case you are dealing
+            with /attributes as scope, the attribute's timestamp will be used for the lookup.
+        :param publish_timestamp: Filter on event's publish timestamp.
         :param sharinggroup: Restrict by a sharing group | list
-        :param pythonify: Returns a list of PyMISP Objects instead or the plain json output. Warning: it might use a lot of RAM
+        :param minimal: Return only event ID, UUID, timestamp, sighting_timestamp and published.
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output.
+            Warning: it might use a lot of RAM
         """
         query = locals()
         query.pop('self')
@@ -2321,7 +2349,7 @@ class PyMISP:
         :param org: Organisation of the User doing the action
         :param description: Description of the action
         :param ip: Origination IP of the User doing the action
-        :param pythonify: Returns a list of PyMISP Objects instead or the plain json output. Warning: it might use a lot of RAM
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         '''
         query = locals()
         query.pop('self')
