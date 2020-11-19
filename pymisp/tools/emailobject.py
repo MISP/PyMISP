@@ -21,6 +21,10 @@ except ImportError:
 logger = logging.getLogger('pymisp')
 
 
+class MISPMailObjectOutlookException(InvalidMISPObject):
+    pass
+
+
 class EMailObject(AbstractMISPObjectGenerator):
     def __init__(self, filepath: Union[Path, str] = None, pseudofile: BytesIO = None,
                  attach_original_email: bool = True, **kwargs):
@@ -49,7 +53,6 @@ class EMailObject(AbstractMISPObjectGenerator):
                     pseudofile = self.__convert_outlook_msg_format(temp)
                     os.unlink(temp)  # remove temporary file necessary to convert formats
                     converted = True
-
         else:
             raise InvalidMISPObject("File buffer (BytesIO) or a path is required.")
 
@@ -63,32 +66,43 @@ class EMailObject(AbstractMISPObjectGenerator):
 
     @staticmethod
     def __convert_outlook_msg_format(filepath: str) -> BytesIO:
-        converted_file, _ = msgconvert(filepath)
+        try:
+            converted_file, stdout = msgconvert(filepath)
+        except mailparser.exceptions.MailParserOSError as e:
+            logger.critical(e)
+            raise MISPMailObjectOutlookException('In order to process parse emails in Outlook format (.msg) you need the package "libemail-outlook-message-perl" and "libemail-address-perl" (on a debian system)')
+
         with open(converted_file, "rb") as f:
             pseudofile = BytesIO(f.read())
         os.remove(converted_file)  # delete temporary file
+        if pseudofile.getbuffer().nbytes == 0:
+            logger.critical('msgconvert created an empty file.')
+            if stdout:
+                # Probably empty, but in case it's not, let's show it
+                logger.critical(stdout)
+            raise MISPMailObjectOutlookException('You probably miss the package libemail-address-perl (on a debian system)')
         return pseudofile
 
     @staticmethod
     def attempt_decoding(bytes_io: BytesIO) -> EmailMessage:
         """Attempt to decode different king of emails, for example non-ascii encoded emails."""
-        bytes = bytes_io.getvalue()
+        content_in_bytes = bytes_io.getvalue()
 
-        message: EmailMessage = email.message_from_bytes(bytes, policy=policy.default)  # type: ignore
+        message: EmailMessage = email.message_from_bytes(content_in_bytes, policy=policy.default)  # type: ignore
 
         if len(message) != 0:
             return message
 
         # Improperly encoded emails (utf-8-sig) fail silently. An empty email indicates this might be the case.
         try:
-            bytes.decode("ASCII")
+            content_in_bytes.decode("ASCII")
             raise Exception("EmailObject failed to decode ASCII encoded email.")
         except UnicodeDecodeError:
             logger.debug("EmailObject was passed a non-ASCII encoded binary blob.")
         try:
-            if bytes[:3] == b'\xef\xbb\xbf':  # utf-8-sig byte-order mark (BOM)
-                bytes = bytes.decode("utf_8_sig").encode("ASCII")
-                message = email.message_from_bytes(bytes, policy=policy.default)  # type: ignore
+            if content_in_bytes[:3] == b'\xef\xbb\xbf':  # utf-8-sig byte-order mark (BOM)
+                content_in_bytes = content_in_bytes.decode("utf_8_sig").encode("ASCII")
+                message = email.message_from_bytes(content_in_bytes, policy=policy.default)  # type: ignore
                 return message
         except UnicodeDecodeError:
             pass
