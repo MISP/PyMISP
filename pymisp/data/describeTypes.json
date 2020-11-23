@@ -148,6 +148,7 @@
         "ip-src",
         "ip-src|port",
         "ja3-fingerprint-md5",
+        "jarm-fingerprint",
         "link",
         "mac-address",
         "mac-eui-64",
@@ -230,6 +231,7 @@
         "ip-src",
         "ip-src|port",
         "ja3-fingerprint-md5",
+        "jarm-fingerprint",
         "mac-address",
         "mac-eui-64",
         "other",
@@ -321,6 +323,7 @@
         "ip-src",
         "ip-src|port",
         "ja3-fingerprint-md5",
+        "jarm-fingerprint",
         "link",
         "mac-address",
         "mac-eui-64",
@@ -873,6 +876,10 @@
         "default_category": "Network activity",
         "to_ids": 1
       },
+      "jarm-fingerprint": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
       "jabber-id": {
         "default_category": "Social network",
         "to_ids": 0
@@ -1328,6 +1335,7 @@
       "ip-src|port",
       "issue-date-of-the-visa",
       "ja3-fingerprint-md5",
+      "jarm-fingerprint",
       "jabber-id",
       "kusto-query",
       "last-name",
