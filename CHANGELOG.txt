@@ -2,11 +2,75 @@ Changelog
 =========
 
 
+v2.4.135 (2020-11-23)
+---------------------
+
+New
+~~~
+- Test parsing just email header. [Jakub Onderka]
+- Test parsing outlook message format. [Jakub Onderka]
+- Add tests for EmailObject. [Jakub Onderka]
+- Refactored emailobject generator. [Jakub Onderka]
+- Export display name from email. [Jakub Onderka]
+- Parse date from email. [Jakub Onderka]
+- Method to check attribute and object existence. [Jakub Onderka]
+- Allow to get just event metadata after add_event and edit_event.
+  [Jakub Onderka]
+- Method to check event existence. [Jakub Onderka]
+- Add method to search for tags. [Raphaël Vinot]
+
+  fix #648
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Add search info field with "\" [Raphaël Vinot]
+- Improve documentation of search_index. [Raphaël Vinot]
+- Improve error handling for Outlook emails. [Raphaël Vinot]
+- Bump object templates. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
+- Update gitignore. [Raphaël Vinot]
+
+  fix #613
+- Do not split a string into a list in complex query builder. [Raphaël
+  Vinot]
+
+  fix #597
+- Force enable debug in test, test update tags. [Raphaël Vinot]
+- Use REST search for the tags. [Raphaël Vinot]
+
+  Related to comments on a1326f2cf2bcfd6e285188e0661b12076fe92747
+- Add typing meta. [Raphaël Vinot]
+
+Fix
+~~~
+- [emailobject] Correctly parse multiple addresses. [Jakub Onderka]
+- Test suite for exists calls. [Raphaël Vinot]
+- Path for event creating and editing. [Jakub Onderka]
+- Object_uuid could be None. [Raphaël Vinot]
+
+  Fix #640
+- Last_seen has to be after first_seen, and it should habe been failing
+  before. [Raphaël Vinot]
+- Missing f-string marker. [Raphaël Vinot]
+- Fix: Docstring improvment based on @chrisinmtown's feedback. [Raphaël
+  Vinot]
+
+Other
+~~~~~
+- We can now upload stix object directly. File is not necessary. [Remy
+  Dewailly]
+- We can now upload stix object directly. File is not necessary. [Remy
+  Dewailly]
+
+
 v2.4.134 (2020-11-02)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Keep connection alive between requests. [Jakub Onderka]
