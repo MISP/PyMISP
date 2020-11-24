@@ -367,7 +367,7 @@ class TestMISPEvent(unittest.TestCase):
                     subset = set(t_json['required']).issubset(obj_relations)
                     self.assertTrue(subset, f'{t_json["name"]}')
                 for obj_relation, entry in t_json['attributes'].items():
-                    self.assertTrue(entry['misp-attribute'] in me.describe_types['types'])
+                    self.assertTrue(entry['misp-attribute'] in me.describe_types['types'], f'Missing type: {entry["misp-attribute"]}')
                     if 'categories' in entry:
                         subset = set(entry['categories']).issubset(me.describe_types['categories'])
                         self.assertTrue(subset, f'{t_json["name"]} - {obj_relation}')
