@@ -1,0 +1,36 @@
+name: Python application
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{matrix.python-version}}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{matrix.python-version}}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt install libfuzzy-dev libemail-outlook-message-perl libemail-address-perl
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip poetry
+        poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport -E url -E email
+
+    - name: Test with nosetests
+      run: |
+        poetry run nosetests-3.4 --with-coverage --cover-xml --cover-package=pymisp,tests --cover-tests tests/test_*.py
+        poetry run mypy tests/testlive_comprehensive.py tests/test_mispevent.py tests/testlive_sync.py pymisp
+        poetry run flake8 --ignore=E501,W503,E226,E252 pymisp
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
