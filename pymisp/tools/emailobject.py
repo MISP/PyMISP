@@ -28,14 +28,12 @@ class MISPMailObjectOutlookException(InvalidMISPObject):
     pass
 
 
-if not mailparser:
-    raise MISPMailObjectOutlookException('mail-parser is required to use this module, you can install it by running pip3 install pymisp[email]')
-
-
 class EMailObject(AbstractMISPObjectGenerator):
     def __init__(self, filepath: Union[Path, str] = None, pseudofile: BytesIO = None,
                  attach_original_email: bool = True, **kwargs):
         super().__init__("email", **kwargs)
+        if not mailparser:
+            raise MISPMailObjectOutlookException('mail-parser is required to use this module, you can install it by running pip3 install pymisp[email]')
 
         converted = False
         if filepath:
