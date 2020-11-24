@@ -2,6 +2,21 @@ Changelog
 =========
 
 
+v2.4.135.3 (2020-11-24)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Improve typing. [Raphaël Vinot]
+- Improve add_attribute with a list. [Raphaël Vinot]
+
+Fix
+~~~
+- Do not fail on PyMISP import when mail-parser is not present. [Raphaël
+  Vinot]
+
+
 v2.4.135.2 (2020-11-24)
 -----------------------
 
@@ -11,6 +26,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Improve error message if a type in missing. [Raphaël Vinot]
 - [type] process-state added. [Alexandre Dulaunoy]
