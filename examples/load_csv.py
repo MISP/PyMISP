@@ -22,9 +22,14 @@ Example:
 
     load_csv.py -n file -p /tmp/foo.csv
 
+    CSV sample file: tests/csv_testfiles/valid_fieldnames.csv
+
+
 * If you want to force the fieldnames:
 
     load_csv.py -n file -p /tmp/foo.csv -f SHA1 fileName size-in-bytes
+
+    CSV sample file: tests/csv_testfiles/invalid_fieldnames.csv
 '''
 
 
