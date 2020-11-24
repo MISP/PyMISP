@@ -72,6 +72,7 @@
         "pdb",
         "pgp-private-key",
         "pgp-public-key",
+        "process-state",
         "regkey",
         "regkey|value",
         "sha1",
@@ -1024,6 +1025,10 @@
         "default_category": "Person",
         "to_ids": 0
       },
+      "process-state": {
+        "default_category": "Artifacts dropped",
+        "to_ids": 0
+      },
       "prtn": {
         "default_category": "Financial fraud",
         "to_ids": 1
@@ -1372,6 +1377,7 @@
       "place-port-of-original-embarkation",
       "port",
       "primary-residence",
+      "process-state",
       "prtn",
       "redress-number",
       "regkey",
