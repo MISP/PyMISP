@@ -2,11 +2,36 @@ Changelog
 =========
 
 
+v2.4.135.2 (2020-11-24)
+-----------------------
+
+New
+~~~
+- Add Github workflow. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Improve error message if a type in missing. [Raphaël Vinot]
+- [type] process-state added. [Alexandre Dulaunoy]
+- Bump misp-objects. [Raphaël Vinot]
+- [misp-objects] updated. [Alexandre Dulaunoy]
+- Add path to CSV sample files. [Raphaël Vinot]
+- [types] jarm-fingerprint added. [Alexandre Dulaunoy]
+
+Fix
+~~~
+- Remove python 3.9 from action (lief not supported yet) [Raphaël Vinot]
+- Initialize submodules in gh action. [Raphaël Vinot]
+- Make mail-parser really optional. [Raphaël Vinot]
+
+
 v2.4.135.1 (2020-11-24)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version, travis install. [Raphaël Vinot]
 - Make mail-parser an optional dependency. [Raphaël Vinot]
 
