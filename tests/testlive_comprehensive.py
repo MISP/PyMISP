@@ -1650,6 +1650,13 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(similar_error['errors'][1]['errors']['value'][0], 'A similar attribute already exists for this event.')
 
             # Test add multiple attributes at once
+            attr0 = MISPAttribute()
+            attr0.value = '0.0.0.0'
+            attr0.type = 'ip-dst'
+            response = self.user_misp_connector.add_attribute(first, [attr0])
+            time.sleep(5)
+            self.assertTrue(isinstance(response['attributes'], list), response['attributes'])
+            self.assertEqual(response['attributes'][0].value, '0.0.0.0')
             attr1 = MISPAttribute()
             attr1.value = '1.2.3.4'
             attr1.type = 'ip-dst'
@@ -1761,7 +1768,7 @@ class TestComprehensive(unittest.TestCase):
 
             # Test attribute*S*
             attributes = self.admin_misp_connector.attributes()
-            self.assertEqual(len(attributes), 6)
+            self.assertEqual(len(attributes), 7)
             # attributes = self.user_misp_connector.attributes()
             # self.assertEqual(len(attributes), 5)
             # Test event*S*

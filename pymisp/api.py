@@ -563,12 +563,13 @@ class PyMISP:
         r = self._prepare_request('HEAD', f'attributes/view/{attribute_id}')
         return self._check_head_response(r)
 
-    def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: MISPAttribute, pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
+    def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: Union[MISPAttribute, list], pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
         """Add an attribute to an existing MISP event
 
         :param event: event to extend
-        :param attribute: attribute to add.  NOTE MISP 2.4.113+: you can pass a list of attributes.
-            In that case, the pythonified response is the following: {'attributes': [MISPAttribute], 'errors': {errors by attributes}}
+        :param attribute: attribute or (MISP version 2.4.113+) list of attributes to add.
+            If a list is passed, the pythonified response is a dict with the following structure:
+            {'attributes': [MISPAttribute], 'errors': {errors by attributes}}
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
         event_id = get_uuid_or_id_from_abstract_misp(event)
@@ -582,10 +583,17 @@ class PyMISP:
             if 'errors' in new_attribute:
                 to_return['errors'] = new_attribute['errors']
 
-            for new_attr in new_attribute['Attribute']:
-                a = MISPAttribute()
-                a.from_dict(**new_attr)
-                to_return['attributes'].append(a)
+            if len(attribute) == 1:
+                # input list size 1 yields dict, not list of size 1
+                if 'Attribute' in new_attribute:
+                    a = MISPAttribute()
+                    a.from_dict(**new_attribute['Attribute'])
+                    to_return['attributes'].append(a)
+            else:
+                for new_attr in new_attribute['Attribute']:
+                    a = MISPAttribute()
+                    a.from_dict(**new_attr)
+                    to_return['attributes'].append(a)
             return to_return
 
         if ('errors' in new_attribute and new_attribute['errors'][0] == 403
