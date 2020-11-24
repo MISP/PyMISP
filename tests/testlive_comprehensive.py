@@ -1740,7 +1740,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(isinstance(attribute, MISPShadowAttribute), attribute)
             # Test if add proposal without category works - https://github.com/MISP/MISP/issues/4868
             attribute = self.user_misp_connector.add_attribute(second.id, {'type': 'ip-dst', 'value': '123.43.32.22'})
-            self.assertTrue(isinstance(attribute, MISPShadowAttribute))
+            self.assertTrue(isinstance(attribute, MISPShadowAttribute), attribute)
             # Add attribute with the same value as an existing proposal
             prop_attr.uuid = str(uuid4())
             attribute = self.admin_misp_connector.add_attribute(second, prop_attr, pythonify=True)
