@@ -7,8 +7,11 @@ from typing import Union, List, Tuple
 import email.utils
 import ipaddress
 import logging
-import mailparser  # type: ignore
-from mailparser.utils import msgconvert  # type: ignore
+try:
+    import mailparser  # type: ignore
+    from mailparser.utils import msgconvert  # type: ignore
+except ImportError:
+    mailparser = None
 from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
 
@@ -23,6 +26,10 @@ logger = logging.getLogger('pymisp')
 
 class MISPMailObjectOutlookException(InvalidMISPObject):
     pass
+
+
+if not mailparser:
+    raise MISPMailObjectOutlookException('mail-parser is required to use this module, you can install it by running pip3 install pymisp[email]')
 
 
 class EMailObject(AbstractMISPObjectGenerator):
