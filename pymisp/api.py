@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import TypeVar, Optional, Tuple, List, Dict, Union, Any, Mapping, Iterator
+from typing import TypeVar, Optional, Tuple, List, Dict, Union, Any, Mapping, Iterable
 from datetime import date, datetime
 import csv
 from pathlib import Path
@@ -563,7 +563,7 @@ class PyMISP:
         r = self._prepare_request('HEAD', f'attributes/view/{attribute_id}')
         return self._check_head_response(r)
 
-    def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: Union[MISPAttribute, list], pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
+    def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: Union[MISPAttribute, Iterable], pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
         """Add an attribute to an existing MISP event
 
         :param event: event to extend
@@ -579,7 +579,7 @@ class PyMISP:
             # Multiple attributes were passed at once, the handling is totally different
             if not (self.global_pythonify or pythonify):
                 return new_attribute
-            to_return = {'attributes': []}
+            to_return: Dict[str, List[MISPAttribute]] = {'attributes': []}
             if 'errors' in new_attribute:
                 to_return['errors'] = new_attribute['errors']
 
@@ -600,7 +600,8 @@ class PyMISP:
                 and new_attribute['errors'][1]['message'] == 'You do not have permission to do that.'):
             # At this point, we assume the user tried to add an attribute on an event they don't own
             # Re-try with a proposal
-            return self.add_attribute_proposal(event_id, attribute, pythonify)
+            if isinstance(attribute, MISPAttribute):
+                return self.add_attribute_proposal(event_id, attribute, pythonify)
         if not (self.global_pythonify or pythonify) or 'errors' in new_attribute:
             return new_attribute
         a = MISPAttribute()
@@ -1094,7 +1095,7 @@ class PyMISP:
         warninglist_id = get_uuid_or_id_from_abstract_misp(warninglist)
         return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=False)
 
-    def values_in_warninglist(self, value: Iterator) -> Dict:
+    def values_in_warninglist(self, value: Iterable) -> Dict:
         """Check if IOC values are in warninglist
 
         :param value: iterator with values to check
@@ -3094,7 +3095,7 @@ class PyMISP:
     def __repr__(self):
         return f'<{self.__class__.__name__}(url={self.root_url})'
 
-    def _prepare_request(self, request_type: str, url: str, data: Union[str, Iterator, Mapping, AbstractMISP] = {}, params: Mapping = {},
+    def _prepare_request(self, request_type: str, url: str, data: Union[str, Iterable, Mapping, AbstractMISP] = {}, params: Mapping = {},
                          kw_params: Mapping = {}, output_type: str = 'json') -> requests.Response:
         '''Prepare a request for python-requests'''
         url = urljoin(self.root_url, url)
