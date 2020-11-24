@@ -2,6 +2,15 @@ Changelog
 =========
 
 
+v2.4.135.1 (2020-11-24)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump version, travis install. [Raphaël Vinot]
+- Make mail-parser an optional dependency. [Raphaël Vinot]
+
+
 v2.4.135 (2020-11-23)
 ---------------------
 
@@ -23,6 +32,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Add search info field with "\" [Raphaël Vinot]
