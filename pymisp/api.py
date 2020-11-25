@@ -601,7 +601,7 @@ class PyMISP:
             # At this point, we assume the user tried to add an attribute on an event they don't own
             # Re-try with a proposal
             if isinstance(attribute, (MISPAttribute, dict)):
-                return self.add_attribute_proposal(event_id, attribute, pythonify)
+                return self.add_attribute_proposal(event_id, attribute, pythonify)  # type: ignore
         if not (self.global_pythonify or pythonify) or 'errors' in new_attribute:
             return new_attribute
         a = MISPAttribute()
