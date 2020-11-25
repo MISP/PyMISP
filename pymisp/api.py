@@ -60,9 +60,10 @@ def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID]) 
     if isinstance(obj, MISPOrganisationBlocklist):
         return obj.org_uuid
 
-    if 'uuid' in obj:
-        return obj['uuid']
-    return obj['id']
+    # at this point, we must have an AbstractMISP
+    if 'uuid' in obj:  # type: ignore
+        return obj['uuid']  # type: ignore
+    return obj['id']  # type: ignore
 
 
 def register_user(misp_url: str, email: str,

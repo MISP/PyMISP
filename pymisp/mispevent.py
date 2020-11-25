@@ -6,7 +6,7 @@ import json
 import os
 import base64
 import sys
-from io import BytesIO, IOBase
+from io import BytesIO, RawIOBase
 from zipfile import ZipFile
 import uuid
 from collections import defaultdict
@@ -1150,9 +1150,9 @@ class MISPEvent(AbstractMISP):
 
     def load(self, json_event: Union[IO, str, bytes, dict], validate: bool = False, metadata_only: bool = False):
         """Load a JSON dump from a pseudo file or a JSON string"""
-        if isinstance(json_event, IOBase):
-            # python2 and python3 compatible to find if we have a file
-            json_event = json_event.read()
+        if isinstance(json_event, RawIOBase):
+            json_event = json_event.read()  # type: ignore
+
         if isinstance(json_event, (str, bytes)):
             json_event = json.loads(json_event)
 
