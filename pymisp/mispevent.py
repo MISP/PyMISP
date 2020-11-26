@@ -207,6 +207,9 @@ class MISPAttribute(AbstractMISP):
         self.Event: MISPEvent
         self.RelatedAttribute: List[MISPAttribute]
 
+        # For malware sample
+        self._malware_binary: Optional[BytesIO]
+
     def add_tag(self, tag: Optional[Union[str, MISPTag, Dict]] = None, **kwargs) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
@@ -246,8 +249,8 @@ class MISPAttribute(AbstractMISP):
                             with f.open(name, pwd=b'infected') as unpacked:
                                 self.malware_filename = unpacked.read().decode().strip()
                         else:
-                            with f.open(name, pwd=b'infected') as unpacked:
-                                self._malware_binary = BytesIO(unpacked.read())
+                            # decrypting a zipped file is extremely slow. We do it on-demand in self.malware_binary
+                            continue
             except Exception:
                 # not a encrypted zip file, assuming it is a new malware sample
                 self._prepare_new_malware_sample()
@@ -307,7 +310,19 @@ class MISPAttribute(AbstractMISP):
     @property
     def malware_binary(self) -> Optional[BytesIO]:
         """Returns a BytesIO of the malware (if the attribute has one, obvs)."""
+        if self.type != 'malware-sample':
+            # Not a malware sample
+            return None
         if hasattr(self, '_malware_binary'):
+            # Already unpacked
+            return self._malware_binary
+        elif hasattr(self, 'malware_filename'):
+            # Have a binary, but didn't decrypt it yet
+            with ZipFile(self.data) as f:  # type: ignore
+                for name in f.namelist():
+                    if not name.endswith('.filename.txt'):
+                        with f.open(name, pwd=b'infected') as unpacked:
+                            self._malware_binary = BytesIO(unpacked.read())
             return self._malware_binary
         return None
 
@@ -514,11 +529,7 @@ class MISPAttribute(AbstractMISP):
         else:
             # Assuming the user only passed the filename
             self.malware_filename = self.value
-        # m = hashlib.md5()
-        # m.update(self.data.getvalue())
         self.value = self.malware_filename
-        # md5 = m.hexdigest()
-        # self.value = '{}|{}'.format(self.malware_filename, md5)
         self._malware_binary = self.data
         self.encrypt = True
 

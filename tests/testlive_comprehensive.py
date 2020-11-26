@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, date, timezone
 from io import BytesIO
 import json
 from pathlib import Path
+import hashlib
 
 import urllib3  # type: ignore
 import time
@@ -2220,11 +2221,36 @@ class TestComprehensive(unittest.TestCase):
     def test_expansion(self):
         first = self.create_simple_event()
         try:
-            with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
-                first.add_attribute('malware-sample', value='whoami.exe', data=BytesIO(f.read()), expand='binary')
+            md5_disk = hashlib.md5()
+            with open('tests/viper-test-files/test_files/sample2.pe', 'rb') as f:
+                filecontent = f.read()
+                md5_disk.update(filecontent)
+                malware_sample_initial_attribute = first.add_attribute('malware-sample', value='Big PE sample', data=BytesIO(filecontent), expand='binary')
+            md5_init_attribute = hashlib.md5()
+            md5_init_attribute.update(malware_sample_initial_attribute.malware_binary.getvalue())
+            self.assertEqual(md5_init_attribute.digest(), md5_disk.digest())
+
             first.run_expansions()
             first = self.admin_misp_connector.add_event(first, pythonify=True)
-            self.assertEqual(len(first.objects), 7)
+            self.assertEqual(len(first.objects), 8, first.objects)
+            # Speed test
+            # # reference time
+            start = time.time()
+            self.admin_misp_connector.get_event(first.id, pythonify=False)
+            ref_time = time.time() - start
+            # # Speed test pythonify
+            start = time.time()
+            first = self.admin_misp_connector.get_event(first.id, pythonify=True)
+            pythonify_time = time.time() - start
+            self.assertTrue((pythonify_time - ref_time) <= 0.5, f'Pythonify too slow: {ref_time} vs. {pythonify_time}.')
+
+            # Test on demand decrypt malware binary
+            file_objects = first.get_objects_by_name('file')
+            samples = file_objects[0].get_attributes_by_relation('malware-sample')
+            binary = samples[0].malware_binary
+            md5_from_server = hashlib.md5()
+            md5_from_server.update(binary.getvalue())
+            self.assertEqual(md5_from_server.digest(), md5_disk.digest())
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
