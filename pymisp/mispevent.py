@@ -309,7 +309,10 @@ class MISPAttribute(AbstractMISP):
 
     @property
     def malware_binary(self) -> Optional[BytesIO]:
-        """Returns a BytesIO of the malware (if the attribute has one, obvs)."""
+        """Returns a BytesIO of the malware (if the attribute has one, obvs).
+        Note: The first call may be slow as it will decrypt the sample and this 
+        operation can be very slow, especially if the malware sample is big (~1s/MB).
+        """
         if self.type != 'malware-sample':
             # Not a malware sample
             return None
