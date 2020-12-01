@@ -634,6 +634,7 @@ class MISPObject(AbstractMISP):
             In this case the ObjectReference needs to be pushed manually and cannot be in the JSON dump.
         :param default_attributes_parameters: Used as template for the attributes if they are not overwritten in add_attribute
         :param misp_objects_path_custom: Path to custom object templates
+        :param misp_objects_template_custom: Template of the object. Expects the content of a template definition file, see repository MISP/misp-objects.
         '''
         super().__init__(**kwargs)
         self._strict: bool = strict
