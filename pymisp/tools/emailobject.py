@@ -217,6 +217,8 @@ class EMailObject(AbstractMISPObjectGenerator):
         Extract IP addresses from received headers that are not private.
         """
         for received in self.__parser.received:
+            if "from" not in received:
+                continue
             tokens = received["from"].split(" ")
             ip = None
             for token in tokens:
