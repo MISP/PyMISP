@@ -3,7 +3,6 @@
 
 import unittest
 import json
-import sys
 from io import BytesIO
 import glob
 import hashlib
@@ -285,17 +284,47 @@ class TestMISPEvent(unittest.TestCase):
         misp_obj = self.mispevent.get_object_by_id(1556)
         self.assertEqual(misp_obj.uuid, '5a3cd604-e11c-4de5-bbbf-c170950d210f')
 
-    def test_userdefined_object(self):
+    def test_userdefined_object_custom_template(self):
+        self.init_event()
+        with open('tests/mispevent_testfiles/test_object_template/definition.json') as f:
+            template = json.load(f)
+        self.mispevent.add_object(name='test_object_template', strict=True,
+                                  misp_objects_template_custom=template)
+        with self.assertRaises(InvalidMISPObject) as e:
+            # Fail on required
+            self.mispevent.to_json(sort_keys=True, indent=2)
+        self.assertEqual(e.exception.message, '{\'member3\'} are required.')
+
+        a = self.mispevent.objects[0].add_attribute('member3', value='foo')
+        del a.uuid
+        with self.assertRaises(InvalidMISPObject) as e:
+            # Fail on requiredOneOf
+            self.mispevent.to_json(sort_keys=True, indent=2)
+        self.assertEqual(e.exception.message, 'At least one of the following attributes is required: member1, member2')
+
+        a = self.mispevent.objects[0].add_attribute('member1', value='bar')
+        del a.uuid
+        a = self.mispevent.objects[0].add_attribute('member1', value='baz')
+        del a.uuid
+        with self.assertRaises(InvalidMISPObject) as e:
+            # member1 is not a multiple
+            self.mispevent.to_json(sort_keys=True, indent=2)
+        self.assertEqual(e.exception.message, 'Multiple occurrences of member1 is not allowed')
+
+        self.mispevent.objects[0].attributes = self.mispevent.objects[0].attributes[:2]
+        self.mispevent.objects[0].uuid = 'a'
+        with open('tests/mispevent_testfiles/misp_custom_obj.json', 'r') as f:
+            ref_json = json.load(f)
+        del self.mispevent.uuid
+        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    def test_userdefined_object_custom_dir(self):
         self.init_event()
         self.mispevent.add_object(name='test_object_template', strict=True, misp_objects_path_custom='tests/mispevent_testfiles')
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on required
             self.mispevent.to_json(sort_keys=True, indent=2)
-        if sys.version_info >= (3, ):
-            self.assertEqual(e.exception.message, '{\'member3\'} are required.')
-        else:
-            # Python2 bullshit
-            self.assertEqual(e.exception.message, 'set([u\'member3\']) are required.')
+        self.assertEqual(e.exception.message, '{\'member3\'} are required.')
 
         a = self.mispevent.objects[0].add_attribute('member3', value='foo')
         del a.uuid

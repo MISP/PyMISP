@@ -640,8 +640,15 @@ class MISPObject(AbstractMISP):
         self.name: str = name
         self._known_template: bool = False
         self.id: int
+        self._definition: Optional[Dict]
 
-        self._set_template(kwargs.get('misp_objects_path_custom'))
+        misp_objects_template_custom = kwargs.pop('misp_objects_template_custom', None)
+        misp_objects_path_custom = kwargs.pop('misp_objects_path_custom', None)
+        if misp_objects_template_custom:
+            self._set_template(misp_objects_template_custom=misp_objects_template_custom)
+        else:
+            # Fall back to default path if None
+            self._set_template(misp_objects_path_custom=misp_objects_path_custom)
 
         self.uuid: str = str(uuid.uuid4())
         self.first_seen: datetime
@@ -679,14 +686,19 @@ class MISPObject(AbstractMISP):
         self.standalone = standalone
 
     def _load_template_path(self, template_path: Union[Path, str]) -> bool:
-        self._definition: Optional[Dict] = self._load_json(template_path)
-        if not self._definition:
+        template = self._load_json(template_path)
+        if not template:
+            self._definition = None
             return False
+        self._load_template(template)
+        return True
+
+    def _load_template(self, template: Dict) -> None:
+        self._definition = template
         setattr(self, 'meta-category', self._definition['meta-category'])
         self.template_uuid = self._definition['uuid']
         self.description = self._definition['description']
         self.template_version = self._definition['version']
-        return True
 
     def _set_default(self):
         if not hasattr(self, 'comment'):
@@ -715,16 +727,21 @@ class MISPObject(AbstractMISP):
             self.name = object_name
         self._set_template(misp_objects_path_custom)
 
-    def _set_template(self, misp_objects_path_custom: Optional[Union[Path, str]] = None):
-        if misp_objects_path_custom:
-            # If misp_objects_path_custom is given, and an object with the given name exists, use that.
-            if isinstance(misp_objects_path_custom, str):
-                self.misp_objects_path = Path(misp_objects_path_custom)
-            else:
-                self.misp_objects_path = misp_objects_path_custom
+    def _set_template(self, misp_objects_path_custom: Optional[Union[Path, str]] = None, misp_objects_template_custom: Optional[Dict] = None):
+        if misp_objects_template_custom:
+            # A complete template was given to the constructor
+            self._load_template(misp_objects_template_custom)
+            self._known_template = True
+        else:
+            if misp_objects_path_custom:
+                # If misp_objects_path_custom is given, and an object with the given name exists, use that.
+                if isinstance(misp_objects_path_custom, str):
+                    self.misp_objects_path = Path(misp_objects_path_custom)
+                else:
+                    self.misp_objects_path = misp_objects_path_custom
 
-        # Try to get the template
-        self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
+            # Try to get the template
+            self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
 
         if not self._known_template and self._strict:
             raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
@@ -788,6 +805,10 @@ class MISPObject(AbstractMISP):
                     raise UnknownMISPObjectTemplate('Version of the object ({}) is different from the one of the template ({}).'.format(kwargs['template_version'], self.template_version))
                 else:
                     self._known_template = False
+
+        # depending on how the object is initialized, we may have a few keys to pop
+        kwargs.pop('misp_objects_template_custom', None)
+        kwargs.pop('misp_objects_path_custom', None)
 
         if 'distribution' in kwargs and kwargs['distribution'] is not None:
             self.distribution = kwargs.pop('distribution')
@@ -903,9 +924,7 @@ class MISPObject(AbstractMISP):
         else:
             attribute = MISPObjectAttribute({})
         # Overwrite the parameters of self._default_attributes_parameters with the ones of value
-        attribute.from_dict(object_relation=object_relation, **dict(self._default_attributes_parameters, **value))
-        # FIXME New syntax python3 only, keep for later.
-        # attribute.from_dict(object_relation=object_relation, **{**self._default_attributes_parameters, **value})
+        attribute.from_dict(object_relation=object_relation, **{**self._default_attributes_parameters, **value})
         self.__fast_attribute_access[object_relation].append(attribute)
         self.Attribute.append(attribute)
         self.edited = True
