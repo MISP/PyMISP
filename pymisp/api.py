@@ -454,14 +454,18 @@ class PyMISP:
         o.from_dict(**updated_object)
         return o
 
-    def delete_object(self, misp_object: Union[MISPObject, int, str, UUID]) -> Dict:
+    def delete_object(self, misp_object: Union[MISPObject, int, str, UUID], hard: bool = False) -> Dict:
         """Delete an object from a MISP instance
 
         :param misp_object: object to delete
+        :param hard: flag for hard delete
         """
         object_id = get_uuid_or_id_from_abstract_misp(misp_object)
-        response = self._prepare_request('POST', f'objects/delete/{object_id}')
-        return self._check_json_response(response)
+        data = {}
+        if hard:
+            data['hard'] = 1
+        r = self._prepare_request('POST', f'objects/delete/{object_id}', data=data)
+        return self._check_json_response(r)
 
     def add_object_reference(self, misp_object_reference: MISPObjectReference, pythonify: bool = False) -> Union[Dict, MISPObjectReference]:
         """Add a reference to an object
