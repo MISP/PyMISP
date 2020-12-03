@@ -1244,7 +1244,14 @@ class TestComprehensive(unittest.TestCase):
 
             # Test delete object
             r = self.user_misp_connector.delete_object(second.objects[0])
-            self.assertEqual(r['message'], 'Object deleted')
+            self.assertEqual(r['message'], 'Object deleted', r)
+            new_second = self.admin_misp_connector.get_event(second, deleted=[0, 1], pythonify=True)
+            self.assertEqual(len(new_second.objects), 1)
+            # Hard delete
+            response = self.admin_misp_connector.delete_object(second.objects[0], hard=True)
+            self.assertEqual(response['message'], 'Object deleted')
+            new_second = self.admin_misp_connector.get_event(second, deleted=[0, 1], pythonify=True)
+            self.assertEqual(len(new_second.objects), 0)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
