@@ -220,6 +220,7 @@
         "email-src",
         "email-subject",
         "eppn",
+        "favicon-mmh3",
         "filename-pattern",
         "hassh-md5",
         "hasshserver-md5",
@@ -694,6 +695,10 @@
         "to_ids": 0
       },
       "eppn": {
+        "default_category": "Network activity",
+        "to_ids": 1
+      },
+      "favicon-mmh3": {
         "default_category": "Network activity",
         "to_ids": 1
       },
@@ -1295,6 +1300,7 @@
       "email-thread-index",
       "email-x-mailer",
       "eppn",
+      "favicon-mmh3",
       "filename",
       "filename|authentihash",
       "filename|impfuzzy",
