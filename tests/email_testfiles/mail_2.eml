@@ -1,0 +1,32 @@
+MIME-Version: 1.0
+Date: Fri, 18 Dec 2020 21:20:15 -0500
+Message-ID: <ACKA6j_i8515X2_nbrEC3_cfv7NDeyG61VfMmitkfG0rcAnAP>
+Subject: multi-encoded-email
+From: Test Testerson <test@test.com>
+To: Try Tryerson <try@test.com>
+Cc: TryTwo Tryerson <trytwo@test.com>
+User-agent: mozilla/5.0 (windows nt 5.1; rv:11.0) gecko firefox/11.0 (via ggpht.com googleimageproxy)
+X-Mailer: Apple Mail (2.3445.9.1)
+Thread-Index: AQHT48oEYuOLpJgzCU+4lba9aw8zCA==
+Reply-To: maliciousreply@thebadguysdomainisthisone.com
+Content-Type: multipart/alternative; boundary="0000000000009cc2ea05b6c7dd56"
+
+--0000000000009cc2ea05b6c7dd56
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+6YCZ5piv5LiA5YCL5paH5pys5a2X56ym5LiyDQrXlteU15Ug157Xl9eo15XXlteqINeY16fXodeY
+Lg0KDQpUaGlzIGlzIHlvdXIgdGhpcmQgZW5jb2RpbmcuLi4uIG1heWJlPw0K
+--0000000000009cc2ea05b6c7dd56
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">=E9=80=99=E6=98=AF=E4=B8=80=E5=80=8B=E6=96=87=E6=9C=AC=E5=
+=AD=97=E7=AC=A6=E4=B8=B2<br>=D7=96=D7=94=D7=95 =D7=9E=D7=97=D7=A8=D7=95=D7=
+=96=D7=AA =D7=98=D7=A7=D7=A1=D7=98.<br clear=3D"all"><div><br></div><div di=
+r=3D"ltr" class=3D"gmail_signature" data-smartmail=3D"gmail_signature"><div=
+ dir=3D"ltr"><div><div dir=3D"ltr"><div><div dir=3D"ltr"><div dir=3D"ltr"><=
+div style=3D"font-size:12.8px">This is your third encoding.... maybe?</div>=
+</div></div></div></div></div></div></div></div>
+
+--0000000000009cc2ea05b6c7dd56--

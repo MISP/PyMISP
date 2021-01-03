@@ -11,12 +11,7 @@ from .domainipobject import DomainIPObject  # noqa
 from .asnobject import ASNObject  # noqa
 from .geolocationobject import GeolocationObject  # noqa
 from .git_vuln_finder_object import GitVulnFinderObject  # noqa
-
-try:
-    from .emailobject import EMailObject  # noqa
-except ImportError:
-    # Requires mail-parser, which requires perl packages, optional [email]
-    pass
+from .emailobject import EMailObject  # noqa
 
 from .vehicleobject import VehicleObject  # noqa
 from .csvloader import CSVLoader  # noqa
