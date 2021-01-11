@@ -11,13 +11,19 @@ from .domainipobject import DomainIPObject  # noqa
 from .asnobject import ASNObject  # noqa
 from .geolocationobject import GeolocationObject  # noqa
 from .git_vuln_finder_object import GitVulnFinderObject  # noqa
-from .emailobject import EMailObject  # noqa
 
 from .vehicleobject import VehicleObject  # noqa
 from .csvloader import CSVLoader  # noqa
 from .sshauthkeyobject import SSHAuthorizedKeysObject  # noqa
 from .feed import feed_meta_generator  # noqa
 from .update_objects import update_objects  # noqa
+
+try:
+    from .emailobject import EMailObject  # noqa
+except ImportError:
+    # Requires 'extract_msg', "RTFDE", "oletools"
+    # pymisp needs to be installed with the email parameter
+    pass
 
 try:
     from .urlobject import URLObject  # noqa
