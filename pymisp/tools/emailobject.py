@@ -269,7 +269,7 @@ class EMailObject(AbstractMISPObjectGenerator):
             if self.encapsulated_body == body.get_content_type():
                 comment += " De-Encapsulated from RTF in original msg."
             self.add_attribute("email-body",
-                               body.get_payload(decode=True).decode('utf8', 'surrogateescape'),
+                               body.get_content(),
                                comment=comment)
 
         headers = ["{}: {}".format(k, v) for k, v in message.items()]
