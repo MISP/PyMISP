@@ -23,7 +23,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, \
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
-    MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist
+    MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 SearchType = TypeVar('SearchType', str, int)
@@ -388,6 +388,75 @@ class PyMISP:
         return self._check_json_response(response)
 
     # ## END Event ###
+
+    # ## BEGIN Event Report ###
+
+    def get_event_report(self, event_report: Union[MISPEventReport, int, str, UUID],
+                         pythonify: bool = False) -> Union[Dict, MISPEventReport]:
+        """Get an event report from a MISP instance
+
+        :param event_report: event report to get
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        event_report_id = get_uuid_or_id_from_abstract_misp(event_report)
+        r = self._prepare_request('GET', f'eventReports/view/{event_report_id}')
+        event_report_r = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in event_report_r:
+            return event_report_r
+        er = MISPEventReport()
+        er.from_dict(**event_report_r)
+        return er
+
+    def add_event_report(self, event: Union[MISPEvent, int, str, UUID], event_report: MISPEventReport, pythonify: bool = False) -> Union[Dict, MISPEventReport]:
+        """Add an event report to an existing MISP event
+
+        :param event: event to extend
+        :param event_report: event report to add.
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        event_id = get_uuid_or_id_from_abstract_misp(event)
+        r = self._prepare_request('POST', f'eventReports/add/{event_id}', data=event_report)
+        new_event_report = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in new_event_report:
+            return new_event_report
+        er = MISPEventReport()
+        er.from_dict(**new_event_report)
+        return er
+
+    def update_event_report(self, event_report: MISPEventReport, event_report_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPEventReport]:
+        """Update an event report on a MISP instance
+
+        :param event_report: event report to update
+        :param event_report_id: event report ID to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        if event_report_id is None:
+            erid = get_uuid_or_id_from_abstract_misp(event_report)
+        else:
+            erid = get_uuid_or_id_from_abstract_misp(event_report_id)
+        r = self._prepare_request('POST', f'eventReports/edit/{erid}', data=event_report)
+        updated_event_report = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_event_report:
+            return updated_event_report
+        er = MISPEventReport()
+        er.from_dict(**updated_event_report)
+        return er
+
+    def delete_event_report(self, event_report: Union[MISPEventReport, int, str, UUID], hard: bool = False) -> Dict:
+        """Delete an event report from a MISP instance
+
+        :param event_report: event report to delete
+        :param hard: flag for hard delete
+        """
+        event_report_id = get_uuid_or_id_from_abstract_misp(event_report)
+        request_url = f'eventReports/delete/{event_report_id}'
+        if hard:
+            request_url += "/1"
+        r = self._prepare_request('POST', request_url)
+        response = self._check_json_response(r)
+        return response
+
+    # ## END Event Report ###
 
     # ## BEGIN Object ###
 
