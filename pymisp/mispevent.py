@@ -989,7 +989,6 @@ class MISPEventReport(AbstractMISP):
     def from_dict(self, **kwargs):
         if 'EventReport' in kwargs:
             kwargs = kwargs['EventReport']
-        super().from_dict(**kwargs)
 
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
@@ -1028,6 +1027,8 @@ class MISPEventReport(AbstractMISP):
                 self.timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
         if kwargs.get('deleted'):
             self.deleted = kwargs.pop('deleted')
+
+        super().from_dict(**kwargs)
 
     def __repr__(self) -> str:
         if hasattr(self, 'name'):
@@ -1374,6 +1375,7 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('SharingGroup'):
             self.SharingGroup = MISPSharingGroup()
             self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
+
         super(MISPEvent, self).from_dict(**kwargs)
 
     def to_dict(self) -> Dict:
@@ -1486,6 +1488,7 @@ class MISPEvent(AbstractMISP):
         event_report = MISPEventReport()
         event_report.from_dict(name=name, content=content, **kwargs)
         self.event_reports.append(event_report)
+        self.edited = True
         return event_report
 
     def get_object_by_id(self, object_id: Union[str, int]) -> MISPObject:
