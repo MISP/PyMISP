@@ -407,6 +407,24 @@ class PyMISP:
         er.from_dict(**event_report_r)
         return er
 
+    def get_event_reports(self, event_id: Union[int, str],
+                          pythonify: bool = False) -> Union[Dict, List[MISPEventReport]]:
+        """Get event report from a MISP instance that are attached to an event ID
+
+        :param event_id: event id to get the event reports for
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output.
+        """
+        r = self._prepare_request('GET', f'eventReports/index/event_id:{event_id}')
+        event_reports = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in event_reports:
+            return event_reports
+        to_return = []
+        for event_report in event_reports:
+            er = MISPEventReport()
+            er.from_dict(**event_report)
+            to_return.append(er)
+        return to_return
+
     def add_event_report(self, event: Union[MISPEvent, int, str, UUID], event_report: MISPEventReport, pythonify: bool = False) -> Union[Dict, MISPEventReport]:
         """Add an event report to an existing MISP event
 
