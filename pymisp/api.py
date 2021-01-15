@@ -486,7 +486,7 @@ class PyMISP:
         er.from_dict(**updated_event_report)
         return er
 
-    def delete_event_report(self, event_report: Union[MISPEventReport, int, str, UUID], hard: bool = False) -> Dict:
+    def delete_event_report(self, event_report: Union[MISPEventReport, int, str, UUID], hard: bool = False, pythonify: bool = False) -> Dict:
         """Delete an event report from a MISP instance
 
         :param event_report: event report to delete
@@ -498,7 +498,12 @@ class PyMISP:
             request_url += "/1"
         r = self._prepare_request('POST', request_url)
         response = self._check_json_response(r)
-        return response
+        if not (self.global_pythonify or pythonify) or 'errors' in response or hard:
+            # Hard will permanently delete, must return JSON
+            return response
+        er = MISPEventReport()
+        er.from_dict(**response)
+        return er
 
     # ## END Event Report ###
 
