@@ -23,6 +23,18 @@ class UpdateAttributeError(PyMISPError):
     pass
 
 
+class NewGalaxyError(PyMISPError):
+    pass
+
+
+class NewGalaxyClusterError(PyMISPError):
+    pass
+
+
+class NewGalaxyClusterRelationError(PyMISPError):
+    pass
+
+
 class SearchError(PyMISPError):
     pass
 
