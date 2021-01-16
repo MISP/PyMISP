@@ -1260,6 +1260,12 @@ class PyMISP:
         gc.from_dict(**cluster_j)
         return gc
 
+    def add_galaxy_cluster_relation(self, galaxy_cluster_relation: MISPGalaxyClusterRelation) -> Dict:
+        """Add a galaxy cluster relation"""
+        r = self._prepare_request('POST', 'galaxy_cluster_relations/add/', data=galaxy_cluster_relation)
+        cluster_rel_j = self._check_json_response(r)
+        return cluster_rel_j
+
     def update_galaxy_cluster_relation(self, galaxy_cluster_relation: MISPGalaxyClusterRelation) -> Dict:
         """Update a galaxy cluster relation."""
         cluster_relation_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster_relation)
