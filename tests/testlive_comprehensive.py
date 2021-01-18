@@ -1444,6 +1444,21 @@ class TestComprehensive(unittest.TestCase):
             obj_attrs = r.get_attributes_by_relation('ssdeep')
             self.assertEqual(len(obj_attrs), 1, obj_attrs)
             self.assertEqual(r.name, 'file', r)
+
+            # Test break_on_duplicate at object level
+            # with open('fo.json', 'w') as f:
+            #    f.write(fo.to_json(indent=2))
+            print(peo.to_json(indent=2))
+            fo_dup, peo_dup, _ = make_binary_objects('tests/viper-test-files/test_files/whoami.exe')
+            # with open('fo_dup.json', 'w') as f:
+            #    f.write(fo_dup.to_json(indent=2))
+            print(peo_dup.to_json(indent=2))
+            r = self.user_misp_connector.add_object(first, peo_dup, break_on_duplicate=True)
+            # r = self.user_misp_connector.add_object(first, fo_dup)
+            #time.sleep(60)
+            raise Exception(r)
+
+            # Test refs
             r = self.user_misp_connector.add_object_reference(fo.ObjectReference[0])
             self.assertEqual(r.object_uuid, fo.uuid, r.to_json())
             self.assertEqual(r.referenced_uuid, peo.uuid, r.to_json())
