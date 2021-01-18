@@ -509,15 +509,17 @@ class PyMISP:
         r = self._prepare_request('HEAD', f'objects/view/{object_id}')
         return self._check_head_response(r)
 
-    def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool = False) -> Union[Dict, MISPObject]:
+    def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool = False, break_on_duplicate: bool = False) -> Union[Dict, MISPObject]:
         """Add a MISP Object to an existing MISP event
 
         :param event: event to extend
         :param misp_object: object to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
+        :param break_on_duplicate: if True, check and reject if this object's attributes match an existing object's attributes; may require much time
         """
         event_id = get_uuid_or_id_from_abstract_misp(event)
-        r = self._prepare_request('POST', f'objects/add/{event_id}', data=misp_object)
+        params = {'breakOnDuplicate': True} if break_on_duplicate else {}
+        r = self._prepare_request('POST', f'objects/add/{event_id}', data=misp_object, kw_params=params)
         new_object = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_object:
             return new_object
