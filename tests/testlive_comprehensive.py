@@ -1444,6 +1444,13 @@ class TestComprehensive(unittest.TestCase):
             obj_attrs = r.get_attributes_by_relation('ssdeep')
             self.assertEqual(len(obj_attrs), 1, obj_attrs)
             self.assertEqual(r.name, 'file', r)
+
+            # Test break_on_duplicate at object level
+            fo_dup, peo_dup, _ = make_binary_objects('tests/viper-test-files/test_files/whoami.exe')
+            r = self.user_misp_connector.add_object(first, peo_dup, break_on_duplicate=True)
+            self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
+
+            # Test refs
             r = self.user_misp_connector.add_object_reference(fo.ObjectReference[0])
             self.assertEqual(r.object_uuid, fo.uuid, r.to_json())
             self.assertEqual(r.referenced_uuid, peo.uuid, r.to_json())
