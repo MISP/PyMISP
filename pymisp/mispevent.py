@@ -906,9 +906,18 @@ class MISPObject(AbstractMISP):
         if simple_value is not None:  # /!\ The value *can* be 0
             value = {'value': simple_value}
         if value.get('value') is None:
-            logger.warning("The value of the attribute you're trying to add is None, skipping it. Object relation: {}".format(object_relation))
+            logger.warning("The value of the attribute you're trying to add is None or empty string, skipping it. Object relation: {}".format(object_relation))
             return None
         else:
+            if isinstance(value['value'], bytes):
+                # That shouldn't happen, but we live in the real world, and it does.
+                # So we try to decode (otherwise, MISP barf), and raise a warning if needed.
+                try:
+                    value['value'] = value['value'].decode()
+                except Exception:
+                    logger.warning("The value of the attribute you're trying to add is a bytestream ({!r}), and we're unable to make it a string.".format(value['value']))
+                    return None
+
             # Make sure we're not adding an empty value.
             if isinstance(value['value'], str):
                 value['value'] = value['value'].strip()
