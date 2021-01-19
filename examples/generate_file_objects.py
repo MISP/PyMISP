@@ -43,6 +43,15 @@ def make_objects(path):
                 to_return['references'] += s.ObjectReference
 
     if peo:
+        if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
+            # special authenticode case for PE objects
+            for c in peo.certificates:
+                to_return['objects'].append(c)
+            for s in peo.signers:
+                to_return['objects'].append(s)
+            del peo.certificates
+            del peo.signers
+        del peo.sections
         to_return['objects'].append(peo)
         if peo.ObjectReference:
             to_return['references'] += peo.ObjectReference
