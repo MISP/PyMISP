@@ -78,6 +78,8 @@ mypy = "^0.790"
 flake8 = "^3.8.4"
 ipython = "^7.16.1"
 jupyterlab = "^2.2.9"
+# jedi 0.18.0 breaks ipython
+jedi = "<0.18.0"
 
 [build-system]
 requires = ["poetry_core>=1.0", "setuptools"]
