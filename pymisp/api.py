@@ -3176,7 +3176,8 @@ class PyMISP:
         except Exception:
             logger.debug(response.text)
             if expect_json:
-                raise PyMISPUnexpectedResponse(f'Unexpected response from server: {response.text}')
+                error_msg = f'Unexpected response (size: {len(response.text)}) from server: {response.text}'
+                raise PyMISPUnexpectedResponse(error_msg)
             if lenient_response_type and not response.headers['Content-Type'].startswith('application/json'):
                 return response.text
             if not response.content:
