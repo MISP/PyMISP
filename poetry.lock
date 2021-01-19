@@ -187,7 +187,7 @@ toml = ["toml"]
 
 [[package]]
 name = "coveralls"
-version = "2.2.0"
+version = "3.0.0"
 description = "Show coverage stats online via coveralls.io"
 category = "dev"
 optional = false
@@ -275,6 +275,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "ebcdic"
+version = "1.1.1"
+description = "Additional EBCDIC codecs"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "entrypoints"
 version = "0.3"
 description = "Discover and load entry points from installed packages."
@@ -284,7 +292,7 @@ python-versions = ">=2.7"
 
 [[package]]
 name = "extract-msg"
-version = "0.27.16"
+version = "0.28.1"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = false
@@ -292,6 +300,7 @@ python-versions = "*"
 
 [package.dependencies]
 compressed-rtf = ">=1.0.6"
+ebcdic = ">=1.1.1"
 imapclient = "2.1.0"
 olefile = ">=0.46"
 tzlocal = ">=2.1"
@@ -564,11 +573,11 @@ regex = ["regex"]
 
 [[package]]
 name = "lief"
-version = "0.10.1"
-description = ""
+version = "0.11.0"
+description = "Library to instrument executable formats"
 category = "main"
 optional = true
-python-versions = ">=2.7"
+python-versions = ">=3.6"
 
 [[package]]
 name = "markupsafe"
@@ -996,7 +1005,7 @@ py = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "recommonmark"
-version = "0.6.0"
+version = "0.7.1"
 description = "A docutils-compatibility bridge to CommonMark, enabling you to write CommonMark inside of Docutils & Sphinx projects."
 category = "main"
 optional = true
@@ -1376,7 +1385,7 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "9f1a8f3d7914d58a4a757bce980117f6000c9f1ebfd88fe43cf77e93152c3113"
+content-hash = "16bf33b66ee9dc57dde5257b88038f0ca99a79312f57f2bce29f758b9b0720c1"
 
 [metadata.files]
 alabaster = [
@@ -1544,8 +1553,8 @@ coverage = [
     {file = "coverage-5.3.1.tar.gz", hash = "sha256:38f16b1317b8dd82df67ed5daa5f5e7c959e46579840d77a67a4ceb9cef0a50b"},
 ]
 coveralls = [
-    {file = "coveralls-2.2.0-py2.py3-none-any.whl", hash = "sha256:2301a19500b06649d2ec4f2858f9c69638d7699a4c63027c5d53daba666147cc"},
-    {file = "coveralls-2.2.0.tar.gz", hash = "sha256:b990ba1f7bc4288e63340be0433698c1efe8217f78c689d254c2540af3d38617"},
+    {file = "coveralls-3.0.0-py2.py3-none-any.whl", hash = "sha256:f8384968c57dee4b7133ae701ecdad88e85e30597d496dcba0d7fbb470dca41f"},
+    {file = "coveralls-3.0.0.tar.gz", hash = "sha256:5399c0565ab822a70a477f7031f6c88a9dd196b3de2877b3facb43b51bd13434"},
 ]
 cryptography = [
     {file = "cryptography-3.3.1-cp27-cp27m-macosx_10_10_x86_64.whl", hash = "sha256:c366df0401d1ec4e548bebe8f91d55ebcc0ec3137900d214dd7aac8427ef3030"},
@@ -1586,13 +1595,16 @@ easygui = [
     {file = "easygui-0.98.1-py2.py3-none-any.whl", hash = "sha256:690658af9fca3f2f2a55f24421045f9b33ca33c877ed5fb61d4b942d8ec335f3"},
     {file = "easygui-0.98.1.tar.gz", hash = "sha256:dbc89afbb1aca83830ea4af568eb2491654e16b2706a14d040757fdf1fafbbfe"},
 ]
+ebcdic = [
+    {file = "ebcdic-1.1.1-py2.py3-none-any.whl", hash = "sha256:33b4cb729bc2d0bf46cc1847b0e5946897cb8d3f53520c5b9aa5fa98d7e735f1"},
+]
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
 ]
 extract-msg = [
-    {file = "extract_msg-0.27.16-py2.py3-none-any.whl", hash = "sha256:be86edca5faa7125f48cf210978dbfe65f9cc48fcc5a6fca83a749e0e9a9cedd"},
-    {file = "extract_msg-0.27.16.tar.gz", hash = "sha256:6cf209d5fd50fa34172cb7a418aee5bbe1c361705d5dea533542f1e5aacc7c1c"},
+    {file = "extract_msg-0.28.1-py2.py3-none-any.whl", hash = "sha256:7ce5761911b2caa9f07042efdecfcc9cf4afe524c3efbfd0aa5fa277faa1cc53"},
+    {file = "extract_msg-0.28.1.tar.gz", hash = "sha256:7300a50bfa91405a381826f8e22f39458c7322fea1cd660ef699c4157a58be4b"},
 ]
 flake8 = [
     {file = "flake8-3.8.4-py2.py3-none-any.whl", hash = "sha256:749dbbd6bfd0cf1318af27bf97a14e28e5ff548ef8e5b1566ccfb25a11e7c839"},
@@ -1667,20 +1679,25 @@ lark-parser = [
     {file = "lark_parser-0.11.1-py2.py3-none-any.whl", hash = "sha256:8b747e1f544dcc2789e3feaddd2a50c6a73bed69d62e9c69760c1e1f7d23495f"},
 ]
 lief = [
-    {file = "lief-0.10.1-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:83b51e01627b5982662f9550ac1230758aa56945ed86829e4291932d98417da3"},
-    {file = "lief-0.10.1-cp35-cp35m-win32.whl", hash = "sha256:8a91cee2568306fe1d2bf84341b459c85368317d01d7105fa49e4f4ede837076"},
-    {file = "lief-0.10.1-cp35-cp35m-win_amd64.whl", hash = "sha256:cce48d7c97cef85e01e6cfeff55f2068956b5c0257eb9c2d2c6d15e33dd1e4fc"},
-    {file = "lief-0.10.1-cp36-cp36m-macosx_10_12_x86_64.whl", hash = "sha256:f8b3f66956c56b582b3adc573bf2a938c25fb21c8894b373a113e24c494fc982"},
-    {file = "lief-0.10.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:3e6baaeb52bdc339b5f19688b58fd8d5778b92e50221f920cedfa2bec1f4d5c2"},
-    {file = "lief-0.10.1-cp36-cp36m-win32.whl", hash = "sha256:bddbf333af62310a10cb738a1df1dc2b140dd9c663b55ba3500c10c249d416d2"},
-    {file = "lief-0.10.1-cp36-cp36m-win_amd64.whl", hash = "sha256:913b36a67707dc2afa72f117bab9856ea3f434f332b04a002a0f9723c8779320"},
-    {file = "lief-0.10.1-cp37-cp37m-macosx_10_13_x86_64.whl", hash = "sha256:bc8488fb0661cb436fe4bb4fe947d0f9aa020e9acaed233ccf01ab04d888c68a"},
-    {file = "lief-0.10.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:895599194ea7495bf304e39317b04df20cccf799fc2751867cc1aa4997cfcdae"},
-    {file = "lief-0.10.1-cp37-cp37m-win32.whl", hash = "sha256:6547752b5db105cd41c9fa65d0d7452a4d7541b77ffee716b46246c6d81e172f"},
-    {file = "lief-0.10.1-cp37-cp37m-win_amd64.whl", hash = "sha256:45e5c592b57168c447698381d927eb2386ffdd52afe0c48245f848d4cc7ee05a"},
-    {file = "lief-0.10.1-cp38-cp38-macosx_10_13_x86_64.whl", hash = "sha256:9f604a361a3b1b3ed5fdafed0321c5956cb3b265b5efe2250d1bf8911a80c65b"},
-    {file = "lief-0.10.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:276cc63ec12a21bdf01b8d30962692c17499788234f0765247ca7a35872097ec"},
-    {file = "lief-0.10.1.tar.gz", hash = "sha256:a487fe7234c04bccd58223dbb79214421176e2629814c7a4a887764cceb5be7c"},
+    {file = "lief-0.11.0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:8774076dfbcf9b6906be4d9243de4a78fc09d317292251072d460ed1e0eeb96e"},
+    {file = "lief-0.11.0-cp36-cp36m-win32.whl", hash = "sha256:348ee294567826cad638b7e6cf2ede4ffe03524cd5b6038896f78e5b006d6295"},
+    {file = "lief-0.11.0-cp36-cp36m-win_amd64.whl", hash = "sha256:77ba7dd0d48933c0b26c980bda1ab4a7ad3c7031880181fab0b94caad3bc1a4d"},
+    {file = "lief-0.11.0-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:93d79a47db9977e6471b21d5efd4e7af4c29c76261d6583141fcf10f6ccd0eba"},
+    {file = "lief-0.11.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:d95cf1224c7b311b8d25dbd4de627d28717266e62b9721f1dc4c8427f929a60f"},
+    {file = "lief-0.11.0-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:0cd2665ff28937755c8acedc2e3fb9de5ba752353e19b51b89297b8be3f63ccb"},
+    {file = "lief-0.11.0-cp37-cp37m-win32.whl", hash = "sha256:b0a55424b3ffa08d16bf8ee6e5e9474b0a4b392ca4d94545c16e47e6366e41d4"},
+    {file = "lief-0.11.0-cp37-cp37m-win_amd64.whl", hash = "sha256:96d2a8d2310c7accaeb5c6679833c0cd8f0fb6d8c682a5df59d4d868c8881661"},
+    {file = "lief-0.11.0-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:e8c66834a0ee9ed1899db165c09ca04aba8dee574de1ccc866d82fbf0c059bb8"},
+    {file = "lief-0.11.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:2ee8f9787ea92109f19e5e4d22773042184ac524a3f11399ea5e13d974ac1f05"},
+    {file = "lief-0.11.0-cp38-cp38-manylinux2014_aarch64.whl", hash = "sha256:1fb570712fa17ee153aca263ab1f1ec763772ccb46992e415b3dc1c0248466bc"},
+    {file = "lief-0.11.0-cp38-cp38-win32.whl", hash = "sha256:f9b00c396c9f45c5f4cf37c034428ad525d6d7c7d38fc6c49ddc4b558201151b"},
+    {file = "lief-0.11.0-cp38-cp38-win_amd64.whl", hash = "sha256:1a110bd5db41b4fde1a61094658b0366352ed4c0a00b55bde821046a59c2f913"},
+    {file = "lief-0.11.0-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:afe4d15b519dd7d97732e85b7a2b11154c97a40ce517e1044b5cd5f80074ce36"},
+    {file = "lief-0.11.0-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:e6ff05e6ebcb9bea8833fcb558d4db3bc2a78031c4792fcac9f9612fa78258b3"},
+    {file = "lief-0.11.0-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:f31fde4e7174b4bc9b67ff22fd93fa15fc3faa1592ac669f3addc95d9e66168e"},
+    {file = "lief-0.11.0-cp39-cp39-win32.whl", hash = "sha256:9f2bd417090df21548af3a0216f3a02056291348c0826a5ff78e3f3046283978"},
+    {file = "lief-0.11.0-cp39-cp39-win_amd64.whl", hash = "sha256:9837166402248a4ef29018d498c4eccc11cbc92ee4083da046fa747d3863b43d"},
+    {file = "lief-0.11.0.zip", hash = "sha256:ccf977099153eaefa351e72e84dfa829334699521ef00434b50647d80de2cc56"},
 ]
 markupsafe = [
     {file = "MarkupSafe-1.1.1-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:09027a7803a62ca78792ad89403b1b7a73a01c8cb65909cd876f7fcebd79b161"},
@@ -1940,8 +1957,8 @@ pyzmq = [
     {file = "pyzmq-21.0.1.tar.gz", hash = "sha256:c3a630dd7716e8e127d43b22598e256a2d11a847b8cc3310350528960037fa06"},
 ]
 recommonmark = [
-    {file = "recommonmark-0.6.0-py2.py3-none-any.whl", hash = "sha256:2ec4207a574289355d5b6ae4ae4abb29043346ca12cdd5f07d374dc5987d2852"},
-    {file = "recommonmark-0.6.0.tar.gz", hash = "sha256:29cd4faeb6c5268c633634f2d69aef9431e0f4d347f90659fd0aab20e541efeb"},
+    {file = "recommonmark-0.7.1-py2.py3-none-any.whl", hash = "sha256:1b1db69af0231efce3fa21b94ff627ea33dee7079a01dd0a7f8482c3da148b3f"},
+    {file = "recommonmark-0.7.1.tar.gz", hash = "sha256:bdb4db649f2222dcd8d2d844f0006b958d627f732415d399791ee436a3686d67"},
 ]
 reportlab = [
     {file = "reportlab-3.5.59-cp27-cp27m-macosx_10_10_x86_64.whl", hash = "sha256:1da3d7a35f918cee905facfa94bd00ae6091cadc06dca1b0b31b69ae02d41d1d"},
