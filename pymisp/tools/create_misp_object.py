@@ -13,8 +13,7 @@ logger = logging.getLogger('pymisp')
 
 try:
     import lief  # type: ignore
-    from lief import Logger  # type: ignore
-    Logger.disable()
+    lief.logging.disable()
     HAS_LIEF = True
 
     from .peobject import make_pe_objects

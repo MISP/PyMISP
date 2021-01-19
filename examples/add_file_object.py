@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from pymisp.tools import make_binary_objects
 import traceback
 from keys import misp_url, misp_key, misp_verifycert
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--path", required=True, help="Path to process (expanded using glob).")
     args = parser.parse_args()
 
-    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     for f in glob.glob(args.path):
         try:
@@ -28,6 +28,15 @@ if __name__ == '__main__':
                 r = pymisp.add_object(args.event, s)
 
         if peo:
+            if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
+                # special authenticode case for PE objects
+                for c in peo.certificates:
+                    pymisp.add_object(args.event, c, pythonify=True)
+                for s in peo.signers:
+                    pymisp.add_object(args.event, s, pythonify=True)
+                del peo.certificates
+                del peo.signers
+            del peo.sections
             r = pymisp.add_object(args.event, peo, pythonify=True)
             for ref in peo.ObjectReference:
                 r = pymisp.add_object_reference(ref)
