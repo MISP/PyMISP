@@ -2,11 +2,79 @@ Changelog
 =========
 
 
+v2.4.137 (2021-01-20)
+---------------------
+
+New
+~~~
+- Allow to pass an object template to MISPObject.__init__ [Raphaël
+  Vinot]
+
+  MISPObject part of #6670
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Show size when the json is not loadable. [Raphaël Vinot]
+- Add authenticode support in generate_file_objects. [Raphaël Vinot]
+- Use lief 0.11.0, generate authenticode entries. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps, add 3.9 in GH. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps, objects templates. [Raphaël Vinot]
+- Add controller argument to get_csv script. [Raphaël Vinot]
+- [test] file object template are now 24. [Alexandre Dulaunoy]
+- [test] file object template is now at version 24. [Alexandre Dulaunoy]
+- [misp-objects] updated. [Alexandre Dulaunoy]
+- [type] favicon-mmh3 is the murmur3 hash of a favicon as used in
+  Shodan. [Alexandre Dulaunoy]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Clarify misp_objects_template_custom. [Raphaël Vinot]
+- Add docstring for misp_objects_template_custom. [Raphaël Vinot]
+- Trigger GH actions on PR. [Raphaël Vinot]
+- Improve documentation of MISPAttribute.malware_binary. [Raphaël Vinot]
+- Remove trailing space. [Raphaël Vinot]
+- On-demand decryption of malware-binary, speeds up pythonify. [Raphaël
+  Vinot]
+- Force a few packages versions. [Raphaël Vinot]
+
+Fix
+~~~
+- [dev mode only] force older jedi to avoid ipython exception. [Raphaël
+  Vinot]
+- Add python 3.9 in GH Actions. [Raphaël Vinot]
+- Do not fail if extract_msg is missing. [Raphaël Vinot]
+- Properly decode the body depending on the encoding of the email.
+  [Raphaël Vinot]
+
+  Fix #671
+- Properly match IO in load event. [Raphaël Vinot]
+- Typing on recent mypy. [Raphaël Vinot]
+- Typing edge case. [Raphaël Vinot]
+- Add attribute dict as proposal. [Raphaël Vinot]
+
+Other
+~~~~~
+- Noticed that test data mail_5.msg was malformatted. Replaced with
+  working test msg. [seamus tuohy]
+- Updated emailobject. [seamus tuohy]
+
+  Email object no longer requires extra php libraries for install.
+  Tests have been expanded to improve coverage.
+  RTF encapsulated HTML and Plain Text will now be de-encapsulated.
+  The raw MSG binary will now be included in the extracted email object.
+- Adding check if "from" is in the "received" header row. [nighttardis]
+- Update `vmray_automation` to stay compatible with the changes made to
+  `vmray_import` MISP modules. [Jens Thom]
+- Update mispevent.py. [Raphaël Vinot]
+
+
 v2.4.135.3 (2020-11-24)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Improve typing. [Raphaël Vinot]
 - Improve add_attribute with a list. [Raphaël Vinot]
