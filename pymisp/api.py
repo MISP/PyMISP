@@ -309,10 +309,12 @@ class PyMISP:
                   deleted: Union[bool, int, list] = False,
                   extended: Union[bool, int] = False,
                   pythonify: bool = False) -> Union[Dict, MISPEvent]:
-        """Get an event from a MISP instance
+        """Get an event from a MISP instance. Includes collections like
+        Attribute, EventReport, Feed, Galaxy, Object, Tag, etc. so the
+        response size may be large.
 
         :param event: event to get
-        :param deleted: whether to include deleted events
+        :param deleted: whether to include soft-deleted attributes
         :param extended: whether to get extended events
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
