@@ -1852,7 +1852,6 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(third)
 
     def test_search_logs(self):
-        # FIXME: https://github.com/MISP/MISP/issues/4872
         r = self.admin_misp_connector.update_user({'email': 'testusr-changed@user.local'}, self.test_usr)
         r = self.admin_misp_connector.search_logs(model='User', created=date.today(), pythonify=True)
         for entry in r[-1:]:
@@ -1860,7 +1859,16 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.search_logs(email='admin@admin.test', created=date.today(), pythonify=True)
         for entry in r[-1:]:
             self.assertEqual(entry.action, 'edit')
-        r = self.admin_misp_connector.update_user({'email': 'testusr@user.local'}, self.test_usr)
+
+        self.admin_misp_connector.update_user({'email': 'testusr@user.local'}, self.test_usr)
+        page = 1
+        while True:
+            r = self.admin_misp_connector.search_logs(model='User', limit=1, page=page, created=date.today(), pythonify=True)
+            if not r:
+                break
+            page += 1
+            last_change = r[0]
+        self.assertEqual(last_change['change'], 'email (testusr-changed@user.local) => (testusr@user.local)', last_change)
 
     def test_db_schema(self):
         diag = self.admin_misp_connector.db_schema_diagnostic()
