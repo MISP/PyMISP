@@ -2,6 +2,29 @@ Changelog
 =========
 
 
+v2.4.137.1 (2021-01-21)
+-----------------------
+
+New
+~~~
+- Fail if a duplicate object is added to an event. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Add test case for page/limit in logs search. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Improve docstring for get_event. [Raphaël Vinot]
+
+  fix #686
+- Bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Better warning if lief is outdated. [Raphaël Vinot]
+- Update minimal dependency for lief in setup.py. [Raphaël Vinot]
+
+
 v2.4.137 (2021-01-20)
 ---------------------
 
