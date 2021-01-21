@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 from io import BytesIO
 
 from . import FileObject
@@ -20,8 +19,13 @@ try:
     from .elfobject import make_elf_objects
     from .machoobject import make_macho_objects
 
+except AttributeError:
+    HAS_LIEF = False
+    logger.critical('You need lief >= 0.11.0. The quick and dirty fix is: pip3 install --force pymisp[fileobjects]')
+
 except ImportError:
     HAS_LIEF = False
+    logger.critical('You need lief >= 0.11.0. The quick and dirty fix is: pip3 install --force pymisp[fileobjects]')
 
 
 class FileTypeNotImplemented(MISPObjectException):
@@ -36,11 +40,7 @@ def make_binary_objects(filepath: Optional[str] = None, pseudofile: Optional[Byt
             if filepath:
                 lief_parsed = lief.parse(filepath=filepath)
             elif pseudofile and filename:
-                if sys.version_info < (3, 0):
-                    logger.critical('Pseudofile is not supported in python2. Just update.')
-                    lief_parsed = None
-                else:
-                    lief_parsed = lief.parse(raw=pseudofile.getvalue(), name=filename)
+                lief_parsed = lief.parse(raw=pseudofile.getvalue(), name=filename)
             else:
                 logger.critical('You need either a filepath, or a pseudofile and a filename.')
                 lief_parsed = None
