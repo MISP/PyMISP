@@ -1450,6 +1450,11 @@ class TestComprehensive(unittest.TestCase):
             r = self.user_misp_connector.add_object(first, peo_dup, break_on_duplicate=True)
             self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
 
+            # Test break on duplicate with breakOnDuplicate key in object
+            fo_dup.breakOnDuplicate = True
+            r = self.user_misp_connector.add_object(first, fo_dup)
+            self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
+
             # Test refs
             r = self.user_misp_connector.add_object_reference(fo.ObjectReference[0])
             self.assertEqual(r.object_uuid, fo.uuid, r.to_json())
