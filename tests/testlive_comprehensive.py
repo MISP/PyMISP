@@ -882,6 +882,13 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
             self.assertEqual(len(events[0].attributes), 4)
+
+            # Test PyMISP.add_attribute with enforceWarninglist enabled
+            _e = events[0]
+            _a = _e.add_attribute('ip-src', '1.1.1.1', enforceWarninglist=True)
+            _a = self.user_misp_connector.add_attribute(_e, _a)
+            self.assertTrue('trips over a warninglist and enforceWarninglist is enforced' in _a['errors'][1]['errors'], _a)
+
             response = self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%')  # disable ipv4 DNS.
             self.assertDictEqual(response, {'saved': True, 'success': '3 warninglist(s) toggled'})
 
