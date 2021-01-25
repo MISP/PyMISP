@@ -1208,6 +1208,25 @@ class PyMISP:
         g.from_dict(**galaxy_j, withCluster=withCluster)
         return g
 
+    def search_galaxy_clusters(self, galaxy: Union[MISPGalaxy, int, str, UUID], context: str = "all", searchall: str = None, pythonify: bool = False) -> Union[Dict, List[MISPGalaxyCluster]]:
+        galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
+        allowed_context_types = ["all", "default", "custom", "org", "deleted"]
+        if context not in allowed_context_types:
+            raise PyMISPError(f"The context must be one of {allowed_context_types.join(', ')}")
+        kw_params = {"context": context}
+        if searchall:
+            kw_params["searchall"] = searchall
+        r = self._prepare_request('GET', f"galaxy_clusters/index/{galaxy_id}", kw_params=kw_params)
+        clusters_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in clusters_j:
+            return clusters_j
+        response = []
+        for cluster in clusters_j:
+            c = MISPGalaxyCluster()
+            c.from_dict(**cluster)
+            response.append(c)
+        return response
+
     def update_galaxies(self) -> Dict:
         """Update all the galaxies."""
         response = self._prepare_request('POST', 'galaxies/update')
@@ -1216,6 +1235,16 @@ class PyMISP:
     def get_galaxy_cluster(self, galaxy_cluster: Union[MISPGalaxyCluster, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
         cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
         r = self._prepare_request('GET', f'galaxy_clusters/view/{cluster_id}')
+        cluster_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
+            return cluster_j
+        gc = MISPGalaxyCluster()
+        gc.from_dict(**cluster_j)
+        return gc
+
+    def add_galaxy_cluster(self, galaxy: MISPGalaxy, galaxy_cluster: MISPGalaxyCluster, pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
+        galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
+        r = self._prepare_request('POST', f'galaxy_clusters/add/{galaxy_id}', data=galaxy_cluster)
         cluster_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
             return cluster_j
