@@ -25,7 +25,6 @@ except AttributeError:
 
 except ImportError:
     HAS_LIEF = False
-    logger.critical('You need lief >= 0.11.0. The quick and dirty fix is: pip3 install --force pymisp[fileobjects]')
 
 
 class FileTypeNotImplemented(MISPObjectException):
