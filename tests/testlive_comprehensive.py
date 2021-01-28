@@ -2679,16 +2679,16 @@ class TestComprehensive(unittest.TestCase):
             # The event report should be requestable by the Event ID
             self.assertEqual(new_event_report.id, event_reports[0].id)
 
-            new_event_report = self.user_misp_connector.delete_event_report(new_event_report)
+            response = self.user_misp_connector.delete_event_report(new_event_report)
             # The event report should be soft-deletable
-            self.assertTrue(new_event_report.deleted)
+            self.assertTrue(response['success'])
+            self.assertEqual(response['name'], f'Event Report {new_event_report.uuid} soft deleted')
 
             response = self.user_misp_connector.delete_event_report(new_event_report, True)
             self.assertTrue(response['success'])
         finally:
             self.user_misp_connector.delete_event(event)
             self.user_misp_connector.delete_event_report(new_event_report)
-
 
     @unittest.skip("Internal use only")
     def missing_methods(self):
