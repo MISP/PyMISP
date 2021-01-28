@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import List, Optional, Union, IO, Dict, Any
 
 from .abstract import AbstractMISP, MISPTag
-from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError
+from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError, NewEventReportError
 
 logger = logging.getLogger('pymisp')
 
@@ -991,6 +991,68 @@ class MISPObject(AbstractMISP):
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
 
+class MISPEventReport(AbstractMISP):
+
+    _fields_for_feed: set = {'uuid', 'name', 'content', 'timestamp', 'deleted'}
+
+    def from_dict(self, **kwargs):
+        if 'EventReport' in kwargs:
+            kwargs = kwargs['EventReport']
+
+        self.distribution = kwargs.pop('distribution', None)
+        if self.distribution is not None:
+            self.distribution = int(self.distribution)
+            if self.distribution not in [0, 1, 2, 3, 4, 5]:
+                raise NewEventReportError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
+
+        if kwargs.get('sharing_group_id'):
+            self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
+
+        if self.distribution == 4:
+            # The distribution is set to sharing group, a sharing_group_id is required.
+            if not hasattr(self, 'sharing_group_id'):
+                raise NewEventReportError('If the distribution is set to sharing group, a sharing group ID is required.')
+            elif not self.sharing_group_id:
+                # Cannot be None or 0 either.
+                raise NewEventReportError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
+
+        self.name = kwargs.pop('name', None)
+        if self.name is None:
+            raise NewEventReportError('The name of the event report is required.')
+
+        self.content = kwargs.pop('content', None)
+        if self.content is None:
+            raise NewAttributeError('The content of the event report is required.')
+
+        if kwargs.get('id'):
+            self.id = int(kwargs.pop('id'))
+        if kwargs.get('event_id'):
+            self.event_id = int(kwargs.pop('event_id'))
+        if kwargs.get('timestamp'):
+            ts = kwargs.pop('timestamp')
+            if isinstance(ts, datetime):
+                self.timestamp = ts
+            else:
+                self.timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
+        if kwargs.get('deleted'):
+            self.deleted = kwargs.pop('deleted')
+
+        super().from_dict(**kwargs)
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'name'):
+            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
+        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+
+    def _set_default(self):
+        if not hasattr(self, 'timestamp'):
+            self.timestamp = datetime.timestamp(datetime.now())
+        if not hasattr(self, 'name'):
+            self.name = ''
+        if not hasattr(self, 'content'):
+            self.content = ''
+
+
 class MISPEvent(AbstractMISP):
 
     _fields_for_feed: set = {'uuid', 'info', 'threat_level_id', 'analysis', 'timestamp',
@@ -1014,6 +1076,7 @@ class MISPEvent(AbstractMISP):
         self.RelatedEvent: List[MISPEvent] = []
         self.ShadowAttribute: List[MISPShadowAttribute] = []
         self.SharingGroup: MISPSharingGroup
+        self.EventReport: List[MISPEventReport] = []
         self.Tag: List[MISPTag] = []
 
     def add_tag(self, tag: Optional[Union[str, MISPTag, dict]] = None, **kwargs) -> MISPTag:
@@ -1159,6 +1222,10 @@ class MISPEvent(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPAttribute.')
 
     @property
+    def event_reports(self) -> List[MISPEventReport]:
+        return self.EventReport
+
+    @property
     def shadow_attributes(self) -> List[MISPShadowAttribute]:
         return self.ShadowAttribute
 
@@ -1281,6 +1348,8 @@ class MISPEvent(AbstractMISP):
             self.set_date(kwargs.pop('date'))
         if kwargs.get('Attribute'):
             [self.add_attribute(**a) for a in kwargs.pop('Attribute')]
+        if kwargs.get('EventReport'):
+            [self.add_event_report(**e) for e in kwargs.pop('EventReport')]
 
         # All other keys
         if kwargs.get('id'):
@@ -1315,6 +1384,7 @@ class MISPEvent(AbstractMISP):
         if kwargs.get('SharingGroup'):
             self.SharingGroup = MISPSharingGroup()
             self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
+
         super(MISPEvent, self).from_dict(**kwargs)
 
     def to_dict(self) -> Dict:
@@ -1420,6 +1490,15 @@ class MISPEvent(AbstractMISP):
         if attr_list:
             return attr_list
         return attribute
+
+    def add_event_report(self, name: str, content: str, **kwargs) -> MISPEventReport:
+        """Add an event report. name and value are requred but you can pass all
+        other parameters supported by MISPEventReport"""
+        event_report = MISPEventReport()
+        event_report.from_dict(name=name, content=content, **kwargs)
+        self.event_reports.append(event_report)
+        self.edited = True
+        return event_report
 
     def get_object_by_id(self, object_id: Union[str, int]) -> MISPObject:
         """Get an object by ID

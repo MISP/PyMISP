@@ -27,7 +27,7 @@ logger = logging.getLogger('pymisp')
 
 
 try:
-    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlocklist
+    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlocklist, MISPEventReport
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
     from pymisp.exceptions import MISPServerError
 except ImportError:
@@ -2651,6 +2651,44 @@ class TestComprehensive(unittest.TestCase):
                 self.admin_misp_connector.delete_event_blocklist(ble)
             for blo in to_delete['bl_organisations']:
                 self.admin_misp_connector.delete_organisation_blocklist(blo)
+
+    def test_event_report(self):
+        event = self.create_simple_event()
+        new_event_report = MISPEventReport()
+        new_event_report.name = "Test Event Report"
+        new_event_report.content = "# Example report markdown"
+        new_event_report.distribution = 5  # Inherit
+        try:
+            event = self.user_misp_connector.add_event(event)
+            new_event_report = self.user_misp_connector.add_event_report(event.id, new_event_report)
+            # The event report should be linked by Event ID
+            self.assertEqual(event.id, new_event_report.event_id)
+
+            event = self.user_misp_connector.get_event(event)
+            # The Event Report should be present on the event
+            self.assertEqual(new_event_report.id, event.event_reports[0].id)
+
+            new_event_report.name = "Updated Event Report"
+            new_event_report.content = "Updated content"
+            new_event_report = self.user_misp_connector.update_event_report(new_event_report)
+            # The event report should be updatable
+            self.assertTrue(new_event_report.name == "Updated Event Report")
+            self.assertTrue(new_event_report.content == "Updated content")
+
+            event_reports = self.user_misp_connector.get_event_reports(event.id)
+            # The event report should be requestable by the Event ID
+            self.assertEqual(new_event_report.id, event_reports[0].id)
+
+            response = self.user_misp_connector.delete_event_report(new_event_report)
+            # The event report should be soft-deletable
+            self.assertTrue(response['success'])
+            self.assertEqual(response['name'], f'Event Report {new_event_report.uuid} soft deleted')
+
+            response = self.user_misp_connector.delete_event_report(new_event_report, True)
+            self.assertTrue(response['success'])
+        finally:
+            self.user_misp_connector.delete_event(event)
+            self.user_misp_connector.delete_event_report(new_event_report)
 
     @unittest.skip("Internal use only")
     def missing_methods(self):
