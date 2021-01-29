@@ -46,7 +46,7 @@ setup(
                       'RTFDE',
                       'extract_msg',
                       'oletools'],
-    extras_require={'fileobjects': ['python-magic', 'pydeep', 'lief>=0.10.1'],
+    extras_require={'fileobjects': ['python-magic', 'pydeep', 'lief>=0.11.0'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
                     'virustotal': ['validators'],

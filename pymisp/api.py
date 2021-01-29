@@ -23,8 +23,8 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, \
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
-    MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPGalaxyCluster, \
-    MISPGalaxyClusterRelation
+    MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
+    MISPGalaxyCluster, MISPGalaxyClusterRelation
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 SearchType = TypeVar('SearchType', str, int)
@@ -286,10 +286,12 @@ class PyMISP:
                   deleted: Union[bool, int, list] = False,
                   extended: Union[bool, int] = False,
                   pythonify: bool = False) -> Union[Dict, MISPEvent]:
-        """Get an event from a MISP instance
+        """Get an event from a MISP instance. Includes collections like
+        Attribute, EventReport, Feed, Galaxy, Object, Tag, etc. so the
+        response size may be large.
 
         :param event: event to get
-        :param deleted: whether to include deleted events
+        :param deleted: whether to include soft-deleted attributes
         :param extended: whether to get extended events
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -390,6 +392,92 @@ class PyMISP:
 
     # ## END Event ###
 
+    # ## BEGIN Event Report ###
+
+    def get_event_report(self, event_report: Union[MISPEventReport, int, str, UUID],
+                         pythonify: bool = False) -> Union[Dict, MISPEventReport]:
+        """Get an event report from a MISP instance
+
+        :param event_report: event report to get
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        event_report_id = get_uuid_or_id_from_abstract_misp(event_report)
+        r = self._prepare_request('GET', f'eventReports/view/{event_report_id}')
+        event_report_r = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in event_report_r:
+            return event_report_r
+        er = MISPEventReport()
+        er.from_dict(**event_report_r)
+        return er
+
+    def get_event_reports(self, event_id: Union[int, str],
+                          pythonify: bool = False) -> Union[Dict, List[MISPEventReport]]:
+        """Get event report from a MISP instance that are attached to an event ID
+
+        :param event_id: event id to get the event reports for
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output.
+        """
+        r = self._prepare_request('GET', f'eventReports/index/event_id:{event_id}')
+        event_reports = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in event_reports:
+            return event_reports
+        to_return = []
+        for event_report in event_reports:
+            er = MISPEventReport()
+            er.from_dict(**event_report)
+            to_return.append(er)
+        return to_return
+
+    def add_event_report(self, event: Union[MISPEvent, int, str, UUID], event_report: MISPEventReport, pythonify: bool = False) -> Union[Dict, MISPEventReport]:
+        """Add an event report to an existing MISP event
+
+        :param event: event to extend
+        :param event_report: event report to add.
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        event_id = get_uuid_or_id_from_abstract_misp(event)
+        r = self._prepare_request('POST', f'eventReports/add/{event_id}', data=event_report)
+        new_event_report = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in new_event_report:
+            return new_event_report
+        er = MISPEventReport()
+        er.from_dict(**new_event_report)
+        return er
+
+    def update_event_report(self, event_report: MISPEventReport, event_report_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPEventReport]:
+        """Update an event report on a MISP instance
+
+        :param event_report: event report to update
+        :param event_report_id: event report ID to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        if event_report_id is None:
+            erid = get_uuid_or_id_from_abstract_misp(event_report)
+        else:
+            erid = get_uuid_or_id_from_abstract_misp(event_report_id)
+        r = self._prepare_request('POST', f'eventReports/edit/{erid}', data=event_report)
+        updated_event_report = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_event_report:
+            return updated_event_report
+        er = MISPEventReport()
+        er.from_dict(**updated_event_report)
+        return er
+
+    def delete_event_report(self, event_report: Union[MISPEventReport, int, str, UUID], hard: bool = False) -> Dict:
+        """Delete an event report from a MISP instance
+
+        :param event_report: event report to delete
+        :param hard: flag for hard delete
+        """
+        event_report_id = get_uuid_or_id_from_abstract_misp(event_report)
+        request_url = f'eventReports/delete/{event_report_id}'
+        if hard:
+            request_url += "/1"
+        r = self._prepare_request('POST', request_url)
+        return self._check_json_response(r)
+
+    # ## END Event Report ###
+
     # ## BEGIN Object ###
 
     def get_object(self, misp_object: Union[MISPObject, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPObject]:
@@ -416,15 +504,17 @@ class PyMISP:
         r = self._prepare_request('HEAD', f'objects/view/{object_id}')
         return self._check_head_response(r)
 
-    def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool = False) -> Union[Dict, MISPObject]:
+    def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool = False, break_on_duplicate: bool = False) -> Union[Dict, MISPObject]:
         """Add a MISP Object to an existing MISP event
 
         :param event: event to extend
         :param misp_object: object to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
+        :param break_on_duplicate: if True, check and reject if this object's attributes match an existing object's attributes; may require much time
         """
         event_id = get_uuid_or_id_from_abstract_misp(event)
-        r = self._prepare_request('POST', f'objects/add/{event_id}', data=misp_object)
+        params = {'breakOnDuplicate': True} if break_on_duplicate else {}
+        r = self._prepare_request('POST', f'objects/add/{event_id}', data=misp_object, kw_params=params)
         new_object = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_object:
             return new_object
@@ -451,14 +541,18 @@ class PyMISP:
         o.from_dict(**updated_object)
         return o
 
-    def delete_object(self, misp_object: Union[MISPObject, int, str, UUID]) -> Dict:
+    def delete_object(self, misp_object: Union[MISPObject, int, str, UUID], hard: bool = False) -> Dict:
         """Delete an object from a MISP instance
 
         :param misp_object: object to delete
+        :param hard: flag for hard delete
         """
         object_id = get_uuid_or_id_from_abstract_misp(misp_object)
-        response = self._prepare_request('POST', f'objects/delete/{object_id}')
-        return self._check_json_response(response)
+        data = {}
+        if hard:
+            data['hard'] = 1
+        r = self._prepare_request('POST', f'objects/delete/{object_id}', data=data)
+        return self._check_json_response(r)
 
     def add_object_reference(self, misp_object_reference: MISPObjectReference, pythonify: bool = False) -> Union[Dict, MISPObjectReference]:
         """Add a reference to an object
@@ -3182,7 +3276,8 @@ class PyMISP:
         except Exception:
             logger.debug(response.text)
             if expect_json:
-                raise PyMISPUnexpectedResponse(f'Unexpected response from server: {response.text}')
+                error_msg = f'Unexpected response (size: {len(response.text)}) from server: {response.text}'
+                raise PyMISPUnexpectedResponse(error_msg)
             if lenient_response_type and not response.headers['Content-Type'].startswith('application/json'):
                 return response.text
             if not response.content:

@@ -19,6 +19,10 @@ class NewAttributeError(PyMISPError):
     pass
 
 
+class NewEventReportError(PyMISPError):
+    pass
+
+
 class UpdateAttributeError(PyMISPError):
     pass
 
