@@ -9,6 +9,7 @@ import sys
 from io import BytesIO, BufferedIOBase, TextIOBase
 from zipfile import ZipFile
 import uuid
+from uuid import UUID
 from collections import defaultdict
 import logging
 import hashlib
@@ -1294,7 +1295,7 @@ class MISPGalaxyCluster(AbstractMISP):
         self.cluster_elements.append(cluster_element)
         return cluster_element
 
-    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: uuid, referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: str = None, **kwargs) -> MISPGalaxyClusterRelation:
+    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: Union["MISPGalaxyCluster", str, UUID], referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: str = None, **kwargs) -> MISPGalaxyClusterRelation:
         """Add a cluster relation to a MISPGalaxyCluster.
 
         :param referenced_galaxy_cluster_uuid: UUID of the related cluster
@@ -1308,6 +1309,10 @@ class MISPGalaxyCluster(AbstractMISP):
         if not getattr(self, "uuid", None):
             raise PyMISPError("The cluster does not have a UUID, make sure it is a valid galaxy cluster")
         cluster_relation = MISPGalaxyClusterRelation()
+
+        if isinstance(referenced_galaxy_cluster_uuid, MISPGalaxyCluster):
+            referenced_galaxy_cluster_uuid = referenced_galaxy_cluster_uuid.uuid
+
         cluster_relation.from_dict(
             referenced_galaxy_cluster_uuid=referenced_galaxy_cluster_uuid,
             referenced_galaxy_cluster_type=referenced_galaxy_cluster_type,

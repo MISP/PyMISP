@@ -1359,7 +1359,7 @@ class PyMISP:
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
 
-        if galaxy_cluster.default:
+        if getattr(galaxy_cluster, "default", False):
             # We can't add default galaxies
             raise PyMISPError('You are not able add a default galaxy cluster')
         galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
@@ -1378,10 +1378,11 @@ class PyMISP:
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
 
-        if galaxy_cluster.default:
+        if getattr(galaxy_cluster, "default", False):
             # We can't edit default galaxies
             raise PyMISPError('You are not able to update a default galaxy cluster')
         cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
+        print(cluster_id)
         r = self._prepare_request('POST', f'galaxy_clusters/edit/{cluster_id}', data=galaxy_cluster)
         cluster_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
@@ -1395,7 +1396,7 @@ class PyMISP:
 
         :param galaxy_cluster: The galaxy cluster you wish to publish
         """
-        if isinstance(galaxy_cluster, MISPGalaxyCluster) and galaxy_cluster.default:
+        if isinstance(galaxy_cluster, MISPGalaxyCluster) and getattr(galaxy_cluster, "default", False):
             raise PyMISPError('You are not able to publish a default galaxy cluster')
         cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
         r = self._prepare_request('POST', f'galaxy_clusters/publish/{cluster_id}')
@@ -1433,7 +1434,7 @@ class PyMISP:
         :param hard: flag for hard delete
         """
 
-        if isinstance(galaxy_cluster, MISPGalaxyCluster) and galaxy_cluster.default:
+        if isinstance(galaxy_cluster, MISPGalaxyCluster) and getattr(galaxy_cluster, "default", False):
             raise PyMISPError('You are not able to delete a default galaxy cluster')
         data = {}
         if hard:
