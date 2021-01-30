@@ -27,10 +27,6 @@ class UpdateAttributeError(PyMISPError):
     pass
 
 
-class NewGalaxyError(PyMISPError):
-    pass
-
-
 class NewGalaxyClusterError(PyMISPError):
     pass
 

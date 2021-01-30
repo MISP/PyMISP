@@ -1054,6 +1054,16 @@ class MISPEventReport(AbstractMISP):
 
 
 class MISPGalaxyClusterElement(AbstractMISP):
+    """A MISP Galaxy cluster element, providing further info on a cluster
+
+    Creating a new galaxy cluster element can take the following parameters
+
+    :param key: The key/identifier of the element
+    :type key: str
+    :param value: The value of the element
+    :type value: str
+    """
+
     def __repr__(self) -> str:
         if hasattr(self, 'key') and hasattr(self, 'value'):
             return '<{self.__class__.__name__}(key={self.key}, value={self.value})'.format(self=self)
@@ -1065,26 +1075,30 @@ class MISPGalaxyClusterElement(AbstractMISP):
                               "Instead, create seperate elements for each value")
         super().__setattr__(key, value)
 
+    def from_dict(self, **kwargs):
+        if kwargs.get('id'):
+            self.id = int(kwargs.pop('id'))
+        if kwargs.get('galaxy_cluster_id'):
+            self.galaxy_cluster_id = int(kwargs.pop('galaxy_cluster_id'))
+
+        super().from_dict(**kwargs)
+
 
 class MISPGalaxyClusterRelation(AbstractMISP):
     """A MISP Galaxy cluster relation, linking one cluster to another
 
-    :param distribution: The distribution of the relation, one of 0, 1, 2, 3, default 0
-    :type distribution: int
+    Creating a new galaxy cluster can take the following parameters
+
     :param galaxy_cluster_uuid: The UUID of the galaxy the relation links to
     :type galaxy_cluster_uuid: uuid
     :param referenced_galaxy_cluster_type: The relation type, e.g. dropped-by
     :type referenced_galaxy_cluster_type: str
     :param referenced_galaxy_cluster_uuid: The UUID of the related galaxy
     :type referenced_galaxy_cluster_uuid: uuid
-    :param referenced_galaxy_cluster_id: The ID of the related galaxy
-    :type referenced_galaxy_cluster_id: int, optional
-    :param galaxy_cluster_id: The ID of the galaxy cluster
-    :type galaxy_cluster_id: id, optional
-    :param id: The ID of the cluster relation
-    :type id: int, optional
-    :param default: Whether the relation is a default
-    :type default: bool, optional
+    :param distribution: The distribution of the relation, one of 0, 1, 2, 3, 4, default 0
+    :type distribution: int
+    :param sharing_group_id: The sharing group of the relation, only when distribution is 4
+    :type sharing_group_id: int, optional
     """
 
     def __repr__(self) -> str:
@@ -1102,10 +1116,20 @@ class MISPGalaxyClusterRelation(AbstractMISP):
 
     def from_dict(self, **kwargs):
         # Default values for a valid event to send to a MISP instance
-        self.distribution = kwargs.pop('distribution', 0)
-        self.distribution = int(self.distribution)
+        self.distribution = int(kwargs.pop('distribution', 0))
         if self.distribution not in [0, 1, 2, 3, 4, 5]:
             raise NewGalaxyClusterRelationError(f'{self.distribution} is invalid, the distribution has to be in 0, 1, 2, 3, 4')
+
+        if kwargs.get('sharing_group_id'):
+            self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
+
+        if self.distribution == 4:
+            # The distribution is set to sharing group, a sharing_group_id is required.
+            if not hasattr(self, 'sharing_group_id'):
+                raise NewGalaxyClusterRelationError('If the distribution is set to sharing group, a sharing group ID is required.')
+            elif not self.sharing_group_id:
+                # Cannot be None or 0 either.
+                raise NewGalaxyClusterRelationError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
 
         if kwargs.get('id'):
             self.id = int(kwargs.pop('id'))
@@ -1144,52 +1168,22 @@ class MISPGalaxyCluster(AbstractMISP):
     """A MISP galaxy cluster, storing respective galaxy elements and relations.
     Used to view default galaxy clusters and add/edit/update/delete Galaxy 2.0 clusters
 
-    :param Org: The organisation as a MISPOrganisation
-    :type Org: MISPOrganisation
-    :param Orgc: The creator organisation as a MISPOrganisation
-    :type Orgc: MISPOrganisation
-    :param SharingGroup: The SharingGroup applied to the cluster, if any
-    :type SharingGroup: MISPSharingGroup, optional
-    :param default: Whether the galaxy cluster is a default or custom cluster, default clusters cannot be edited
-    :type default: bool
-    :param deleted: Whether the galaxy cluster is deleted or not
-    :type deleted: bool
+    Creating a new galaxy cluster can take the following parameters
+
+    :param value: The value of the galaxy cluster
+    :type value: str
     :param description: The description of the galaxy cluster
     :type description: str
-    :param distribution: The distribution type, one of 1, 2, 3, 4, 5
+    :param distribution: The distribution type, one of 0, 1, 2, 3, 4
     :type distribution: int
     :param sharing_group_id: The sharing group ID, if distribution is set to 4
     :type sharing_group_id: int, optional
-    :param extends_uuid: The UUID of the galaxy cluster it extends
-    :type extends_uuid: uuid, optional
-    :param galaxy_id: The ID of the galaxy
-    :type galaxy_id: int
-    :param id: The ID of the galaxy cluster
-    :type id: int
-    :param org_id: The org's ID
-    :type org_id: int
-    :param orgc_id: The creating org's ID
-    :type orgc_id: int
-    :param published: Whether the cluster is published or not
-    :type published: bool
-    :param source: The source of the galaxy cluster
-    :type source: str
-    :param tag_count: The count of events using this galaxy cluster
-    :type tag_count: int
-    :param tag_id: The tag ID
-    :type tag_id: int
-    :param tag_name: The galaxy cluster's tag
-    :type tag_name: str
-    :param type: The type of the galaxy cluster, must match the housing galaxies type
-    :type type: str
-    :param value: The value of the galaxy cluster
-    :type value: str
     :param authors: A list of authors of the galaxy cluster
-    :type authors: list, optional
+    :type authors: list[str], optional
     :param cluster_elements: List of MISPGalaxyClusterElement
-    :type cluster_elements: list, optional
-    :param cluster_relations: List of MISPGalaxyClusterRelation, changes must be made through PyMISP instance
-    :type cluster_relations: list, optional
+    :type cluster_elements: list[MISPGalaxyClusterElement], optional
+    :param cluster_relations: List of MISPGalaxyClusterRelation
+    :type cluster_relations: list[MISPGalaxyClusterRelation], optional
     """
 
     def __init__(self):
@@ -1200,6 +1194,8 @@ class MISPGalaxyCluster(AbstractMISP):
         self.Org: MISPOrganisation
         self.Orgc: MISPOrganisation
         self.SharingGroup: MISPSharingGroup
+        # Set any inititialized cluster to be False
+        self.default = False
 
     @property
     def cluster_elements(self) -> List[MISPGalaxyClusterElement]:
@@ -1217,18 +1213,45 @@ class MISPGalaxyCluster(AbstractMISP):
     def cluster_relations(self, cluster_relations: List[MISPGalaxyClusterRelation]):
         self.GalaxyClusterRelation = cluster_relations
 
+    @property
+    def meta(self) -> Dict:
+        """Function to return the galaxy cluster elements as a dictionary structure of lists
+        that comes from a MISPGalaxy within a MISPEvent. Lossy, you lose the element ID
+        """
+        response = defaultdict(list)
+        for element in self.cluster_elements:
+            response[element.key].append(element.value)
+        return dict(response)
+
     def from_dict(self, **kwargs):
-        # If the default field is set, we shouldn't have distribution or sharing group ID set
         if 'GalaxyCluster' in kwargs:
             kwargs = kwargs['GalaxyCluster']
 
-        if kwargs.get('default', False):
+        self.default = kwargs.pop('default', False)
+        # If the default field is set, we shouldn't have distribution or sharing group ID set
+        if self.default:
             blocked_fields = ["distribution" "sharing_group_id"]
             for field in blocked_fields:
                 if kwargs.get(field, None):
                     raise NewGalaxyClusterError(
-                        f"One of the following fields are set for a default galaxy cluster: {', '.join(blocked_fields)}"
+                        f"The field '{field}' cannot be set on a default galaxy cluster"
                     )
+
+        self.distribution = int(kwargs.pop('distribution', 0))
+        if self.distribution not in [0, 1, 2, 3, 4]:
+            raise NewGalaxyClusterError(f'{self.distribution} is invalid, the distribution has to be in 0, 1, 2, 3, 4')
+
+        if kwargs.get('sharing_group_id'):
+            self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
+
+        if self.distribution == 4:
+            # The distribution is set to sharing group, a sharing_group_id is required.
+            if not hasattr(self, 'sharing_group_id'):
+                raise NewGalaxyClusterError('If the distribution is set to sharing group, a sharing group ID is required.')
+            elif not self.sharing_group_id:
+                # Cannot be None or 0 either.
+                raise NewGalaxyClusterError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
+
         if 'uuid' in kwargs:
             self.uuid = kwargs.pop('uuid')
         if 'meta' in kwargs:
@@ -1257,30 +1280,38 @@ class MISPGalaxyCluster(AbstractMISP):
             self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
         super().from_dict(**kwargs)
 
-    def add_cluster_element(self, key: str, value: str, **kwargs):
+    def add_cluster_element(self, key: str, value: str, **kwargs) -> MISPGalaxyClusterElement:
         """Add a cluster relation to a MISPGalaxyCluster, key and value are required
 
         :param key: The key name of the element
+        :type key: str
         :param value: The value of the element
+        :type value: str
         """
+
         cluster_element = MISPGalaxyClusterElement()
         cluster_element.from_dict(key=key, value=value, **kwargs)
         self.cluster_elements.append(cluster_element)
         return cluster_element
 
-    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: uuid, referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: str = None, **kwargs):
-        """Add a cluster relation to a MISPGalaxyCluster
+    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: uuid, referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: str = None, **kwargs) -> MISPGalaxyClusterRelation:
+        """Add a cluster relation to a MISPGalaxyCluster.
 
         :param referenced_galaxy_cluster_uuid: UUID of the related cluster
+        :type referenced_galaxy_cluster_uuid: uuid
         :param referenced_galaxy_cluster_type: Relation type
+        :type referenced_galaxy_cluster_type: uuid
+        :param galaxy_cluster_uuid: UUID of this cluster, leave blank to use the stored UUID
+        :param galaxy_cluster_uuid: uuid, Optional
         """
+
         if not getattr(self, "uuid", None):
             raise PyMISPError("The cluster does not have a UUID, make sure it is a valid galaxy cluster")
         cluster_relation = MISPGalaxyClusterRelation()
         cluster_relation.from_dict(
-            galaxy_cluster_uuid=self.uuid,
             referenced_galaxy_cluster_uuid=referenced_galaxy_cluster_uuid,
             referenced_galaxy_cluster_type=referenced_galaxy_cluster_type,
+            galaxy_cluster_uuid=galaxy_cluster_uuid or self.uuid,
             **kwargs
         )
         self.cluster_relations.append(cluster_relation)
@@ -1293,27 +1324,7 @@ class MISPGalaxyCluster(AbstractMISP):
 
 
 class MISPGalaxy(AbstractMISP):
-    """Galaxy class, used to view a galaxy and respective clusters, supports the following fields
-
-    :param id: Galaxy ID
-    :type id: int
-    :param uuid: Galaxy UUID
-    :type uuuid: uuid, str
-    :param name: Galaxy name
-    :type name: str
-    :param type: Galaxy type
-    :type type: str
-    :param description: Galaxy description
-    :type description: str
-    :param version: Galaxy version number
-    :type version: int
-    :param icon: Galaxy icon
-    :type icon: str
-    :param namespace: Galaxy namespace
-    :type namespace: str
-    :param clusters: List of MISPGalaxyCluster
-    :type clusters: list
-    """
+    """Galaxy class, used to view a galaxy and respective clusters"""
 
     def __init__(self):
         super().__init__()
@@ -1338,8 +1349,8 @@ class MISPGalaxy(AbstractMISP):
         return self.GalaxyCluster
 
     def add_galaxy_cluster(self, **kwargs) -> MISPGalaxyCluster:
-        """Add a MISP galaxy and sub-clusters into an event.
-        Supports all other parameters supported by MISPGalaxy"""
+        """Add a MISP galaxy cluster into a MISPGalaxy.
+        Supports all other parameters supported by MISPGalaxyCluster"""
 
         galaxy_cluster = MISPGalaxyCluster()
         galaxy_cluster.from_dict(**kwargs)
