@@ -2,6 +2,131 @@ Changelog
 =========
 
 
+v2.4.137.2 (2021-02-01)
+-----------------------
+
+New
+~~~
+- Add in ability to create/update/delete MISP Event Reports. [Tom King]
+- Hard delete flag for objects. [Raphaël Vinot]
+- Fail if a duplicate object is added to an event. [Raphaël Vinot]
+- Support brotli compression. [Jakub Onderka]
+- Hard delete flag for objects. [Raphaël Vinot]
+- Fail if a duplicate object is added to an event. [Raphaël Vinot]
+- Add in ability to create/update/delete MISP Event Reports. [Tom King]
+- Add in ability to create/update/delete MISP Event Reports. [Tom King]
+- Hard delete flag for objects. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Add brotli support in the dependencies. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Make clear that to_json returns str. [Raphaël Vinot]
+- Disable correlation on malware-sample for FileObject. [Raphaël Vinot]
+- Bump objects templates. [Raphaël Vinot]
+- Add missing autodoc. [Raphaël Vinot]
+
+  fix #693
+- Add in delete function for a MISP Object. [Tom King]
+- Fix return of delete_event_report. [Raphaël Vinot]
+- Remove critical warning if lief is not installed. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/MISP/issues/6908
+- Bump deps. [Raphaël Vinot]
+- Allow response of delete to be pythonify, add in nosetest. [Tom King]
+- Add ability to get event reports from the Event ID. [Tom King]
+- Remove travis file, GH Actions is better. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Remove critical warning if lief is not installed. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/MISP/issues/6908
+- Add test case fir add_attribute and enforceWarninglist=True. [Raphaël
+  Vinot]
+- Add testcase with breakOnDuplicate in a MISPObject. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Add test case for page/limit in logs search. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Improve docstring for get_event. [Raphaël Vinot]
+
+  fix #686
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Show size when the json is not loadable. [Raphaël Vinot]
+- Add authenticode support in generate_file_objects. [Raphaël Vinot]
+- Use lief 0.11.0, generate authenticode entries. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps, add 3.9 in GH. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps, objects templates. [Raphaël Vinot]
+- Make clear that to_json returns str. [Raphaël Vinot]
+- Disable correlation on malware-sample for FileObject. [Raphaël Vinot]
+- Bump objects templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Add missing autodoc. [Raphaël Vinot]
+
+  fix #693
+- Add in delete function for a MISP Object. [Tom King]
+- Bump deps. [Raphaël Vinot]
+- Fix return of delete_event_report. [Raphaël Vinot]
+- Remove travis file, GH Actions is better. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Remove critical warning if lief is not installed. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/MISP/issues/6908
+- Add test case fir add_attribute and enforceWarninglist=True. [Raphaël
+  Vinot]
+- Add testcase with breakOnDuplicate in a MISPObject. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Add test case for page/limit in logs search. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Improve docstring for get_event. [Raphaël Vinot]
+
+  fix #686
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Show size when the json is not loadable. [Raphaël Vinot]
+- Add authenticode support in generate_file_objects. [Raphaël Vinot]
+- Use lief 0.11.0, generate authenticode entries. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps, add 3.9 in GH. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps, objects templates. [Raphaël Vinot]
+- Allow response of delete to be pythonify, add in nosetest. [Tom King]
+- Add ability to get event reports from the Event ID. [Tom King]
+- Remove travis file, GH Actions is better. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Remove critical warning if lief is not installed. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/MISP/issues/6908
+- Add test case fir add_attribute and enforceWarninglist=True. [Raphaël
+  Vinot]
+- Add testcase with breakOnDuplicate in a MISPObject. [Raphaël Vinot]
+
+Fix
+~~~
+- Flake error. [Raphaël Vinot]
+- Update testlive accordingly. [Raphaël Vinot]
+- Better warning if lief is outdated. [Raphaël Vinot]
+- Call the AbstractMISP.from_dict at the end of the function to ensure
+  the edited flag remains false. [Tom King]
+- Better warning if lief is outdated. [Raphaël Vinot]
+- Update minimal dependency for lief in setup.py. [Raphaël Vinot]
+- [dev mode only] force older jedi to avoid ipython exception. [Raphaël
+  Vinot]
+- Add python 3.9 in GH Actions. [Raphaël Vinot]
+- Update testlive accordingly. [Raphaël Vinot]
+- Better warning if lief is outdated. [Raphaël Vinot]
+- Update minimal dependency for lief in setup.py. [Raphaël Vinot]
+- [dev mode only] force older jedi to avoid ipython exception. [Raphaël
+  Vinot]
+- Add python 3.9 in GH Actions. [Raphaël Vinot]
+- Call the AbstractMISP.from_dict at the end of the function to ensure
+  the edited flag remains false. [Tom King]
+
+
 v2.4.137.1 (2021-01-21)
 -----------------------
 
@@ -11,6 +136,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Add test case for page/limit in logs search. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
