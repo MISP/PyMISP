@@ -103,7 +103,7 @@ def brotli_supported() -> bool:
 
     # pybrotli is an extra package required by urllib3 for brotli support
     try:
-        import brotli  # type: ignore
+        import brotli  # type: ignore # noqa
         return True
     except ImportError:
         return False
