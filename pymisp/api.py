@@ -15,7 +15,7 @@ from uuid import UUID
 import warnings
 import sys
 import copy
-import urllib3
+import urllib3  # type: ignore
 from io import BytesIO, StringIO
 
 from . import __version__, everything_broken
@@ -103,7 +103,7 @@ def brotli_supported() -> bool:
 
     # pybrotli is an extra package required by urllib3 for brotli support
     try:
-        import brotli
+        import brotli  # type: ignore
         return True
     except ImportError:
         return False
