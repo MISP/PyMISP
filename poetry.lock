@@ -89,7 +89,7 @@ lxml = ["lxml"]
 
 [[package]]
 name = "bleach"
-version = "3.2.3"
+version = "3.3.0"
 description = "An easy safelist-based HTML-sanitizing tool."
 category = "dev"
 optional = false
@@ -105,7 +105,7 @@ name = "brotlipy"
 version = "0.7.0"
 description = "Python binding to the Brotli library"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -1398,7 +1398,7 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "a20d7f6891639b03bb96cb0d4c50b5940fa9ce4ff21c149ff51b0e3d3957acae"
+content-hash = "4d8e6e07c185dd8bb0962c95bee85f870ea7a0fb1f769948323397389d0fe807"
 
 [metadata.files]
 alabaster = [
@@ -1449,8 +1449,8 @@ beautifulsoup4 = [
     {file = "beautifulsoup4-4.9.3.tar.gz", hash = "sha256:84729e322ad1d5b4d25f805bfa05b902dd96450f43842c4e99067d5e1369eb25"},
 ]
 bleach = [
-    {file = "bleach-3.2.3-py2.py3-none-any.whl", hash = "sha256:2d3b3f7e7d69148bb683b26a3f21eabcf62fa8fb7bc75d0e7a13bcecd9568d4d"},
-    {file = "bleach-3.2.3.tar.gz", hash = "sha256:c6ad42174219b64848e2e2cd434e44f56cd24a93a9b4f8bc52cfed55a1cd5aad"},
+    {file = "bleach-3.3.0-py2.py3-none-any.whl", hash = "sha256:6123ddc1052673e52bab52cdc955bcb57a015264a1c57d37bea2f6b817af0125"},
+    {file = "bleach-3.3.0.tar.gz", hash = "sha256:98b3170739e5e83dd9dc19633f074727ad848cbedb6026708c8ac2d3b697a433"},
 ]
 brotlipy = [
     {file = "brotlipy-0.7.0-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:af65d2699cb9f13b26ec3ba09e75e80d31ff422c03675fcb36ee4dabe588fdc2"},
