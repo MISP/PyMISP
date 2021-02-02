@@ -163,7 +163,7 @@ name = "colorclass"
 version = "2.2.0"
 description = "Colorful worry-free console applications for Linux, Mac OS X, and Windows."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -182,7 +182,7 @@ name = "compressed-rtf"
 version = "1.0.6"
 description = "Compressed Rich Text Format (RTF) compression and decompression package"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -217,7 +217,7 @@ name = "cryptography"
 version = "3.3.1"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*"
 
 [package.dependencies]
@@ -282,7 +282,7 @@ name = "easygui"
 version = "0.98.2"
 description = "EasyGUI is a module for very simple, very easy GUI programming in Python.  EasyGUI is different from other GUI generators in that EasyGUI is NOT event-driven.  Instead, all GUI interactions are invoked by simple function calls."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -290,7 +290,7 @@ name = "ebcdic"
 version = "1.1.1"
 description = "Additional EBCDIC codecs"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -306,7 +306,7 @@ name = "extract-msg"
 version = "0.28.1"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -351,7 +351,7 @@ name = "imapclient"
 version = "2.1.0"
 description = "Easy-to-use, Pythonic and complete IMAP client library"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -575,7 +575,7 @@ name = "lark-parser"
 version = "0.11.1"
 description = "a modern parsing library"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.extras]
@@ -619,7 +619,7 @@ name = "msoffcrypto-tool"
 version = "4.11.0"
 description = "A Python tool and library for decrypting MS Office files with passwords or other keys"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -768,7 +768,7 @@ name = "olefile"
 version = "0.46"
 description = "Python package to parse, read and write Microsoft OLE2 files (Structured Storage or Compound Document, Microsoft Office)"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
@@ -776,7 +776,7 @@ name = "oletools"
 version = "0.56"
 description = "Python tools to analyze security characteristics of MS Office and OLE files (also called Structured Storage, Compound File Binary Format or Compound Document File Format), for Malware Analysis and Incident Response #DFIR"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -822,7 +822,7 @@ name = "pcodedmp"
 version = "1.2.6"
 description = "A VBA p-code disassembler"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -982,7 +982,7 @@ name = "pytz"
 version = "2021.1"
 description = "World timezone definitions, modern and historical"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -1076,7 +1076,7 @@ name = "rtfde"
 version = "0.0.2"
 description = "A library for extracting HTML content from RTF encapsulated HTML as commonly found in the exchange MSG email format."
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -1305,7 +1305,7 @@ name = "tzlocal"
 version = "2.1"
 description = "tzinfo object for the local timezone"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -1363,7 +1363,7 @@ name = "win-unicode-console"
 version = "0.5"
 description = "Enable Unicode input and display when running Python from Windows console."
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -1387,6 +1387,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [extras]
+brotli = ["urllib3"]
 docs = ["sphinx-autodoc-typehints", "recommonmark"]
 email = ["extract_msg", "RTFDE", "oletools"]
 fileobjects = ["python-magic", "pydeep", "lief"]
@@ -1398,7 +1399,7 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "4d8e6e07c185dd8bb0962c95bee85f870ea7a0fb1f769948323397389d0fe807"
+content-hash = "9f7289c3410f9000dbf655580c0f32f8685b72e799f2d0030b029685b6e1db2a"
 
 [metadata.files]
 alabaster = [
