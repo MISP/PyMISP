@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+v2.4.137.3 (2021-02-02)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump objects. [Raphaël Vinot]
+- Fix and improve optional dependencies. [Raphaël Vinot]
+- Make brotli optional. [Raphaël Vinot]
+
+
 v2.4.137.2 (2021-02-01)
 -----------------------
 
@@ -19,6 +29,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Add brotli support in the dependencies. [Raphaël Vinot]
 - Make mypy happy. [Raphaël Vinot]
