@@ -946,12 +946,12 @@ class PyMISP:
 
     # ## BEGIN Tags ###
 
-    def tags(self, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
+    def tags(self, pythonify: bool = False, **kw_params) -> Union[Dict, List[MISPTag]]:
         """Get the list of existing tags.
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
-        r = self._prepare_request('GET', 'tags/index')
+        r = self._prepare_request('GET', 'tags/index', kw_params=kw_params)
         tags = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in tags:
             return tags['Tag']
