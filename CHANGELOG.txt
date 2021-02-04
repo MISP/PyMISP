@@ -2,11 +2,25 @@ Changelog
 =========
 
 
+v2.4.137.4 (2021-02-04)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Add kw_params to tags. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump template ID in test case. [Raphaël Vinot]
+
+
 v2.4.137.3 (2021-02-02)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Fix and improve optional dependencies. [Raphaël Vinot]
 - Make brotli optional. [Raphaël Vinot]
