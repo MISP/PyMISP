@@ -2,11 +2,21 @@ Changelog
 =========
 
 
+v2.4.138 (2021-02-08)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+
 v2.4.137.4 (2021-02-04)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Add kw_params to tags. [Raphaël Vinot]
