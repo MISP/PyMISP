@@ -1195,6 +1195,7 @@ class MISPGalaxyCluster(AbstractMISP):
         super().__init__()
         self.Galaxy: MISPGalaxy
         self.GalaxyElement: List[MISPGalaxyClusterElement] = []
+        self.meta = {}
         self.GalaxyClusterRelation: List[MISPGalaxyClusterRelation] = []
         self.Org: MISPOrganisation
         self.Orgc: MISPOrganisation
@@ -1218,8 +1219,18 @@ class MISPGalaxyCluster(AbstractMISP):
     def cluster_relations(self, cluster_relations: List[MISPGalaxyClusterRelation]):
         self.GalaxyClusterRelation = cluster_relations
 
+    def parse_meta_as_elements(self):
+        """Function to parse the meta field into GalaxyClusterElements"""
+        # Parse the cluster elements from the kwargs meta fields
+        for key, value in self.meta.items():
+            # The meta will merge fields together, i.e. Two 'countries' will be a list, so split these up
+            if not isinstance(value, list):
+                value = [value]
+            for v in value:
+                self.add_cluster_element(key=key, value=v)
+
     @property
-    def meta(self) -> Dict:
+    def elements_meta(self) -> Dict:
         """Function to return the galaxy cluster elements as a dictionary structure of lists
         that comes from a MISPGalaxy within a MISPEvent. Lossy, you lose the element ID
         """
@@ -1260,13 +1271,7 @@ class MISPGalaxyCluster(AbstractMISP):
         if 'uuid' in kwargs:
             self.uuid = kwargs.pop('uuid')
         if 'meta' in kwargs:
-            # Parse the cluster elements from the kwargs meta fields
-            for key, value in kwargs.pop('meta').items():
-                # The meta will merge fields together, i.e. Two 'countries' will be a list, so split these up
-                if not isinstance(value, list):
-                    value = [value]
-                for v in value:
-                    self.add_cluster_element(key=key, value=v)
+            self.meta = kwargs.pop('meta')
         if 'Galaxy' in kwargs:
             self.Galaxy = MISPGalaxy()
             self.Galaxy.from_dict(**kwargs.pop('Galaxy'))
