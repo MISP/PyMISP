@@ -751,6 +751,10 @@ class MISPObject(AbstractMISP):
             # Then we have no meta-category, template_uuid, description and template_version
             pass
 
+    def delete(self):
+        """Mark the attribute as deleted (soft delete)"""
+        self.deleted = True
+
     @property
     def disable_validation(self):
         self._strict = False

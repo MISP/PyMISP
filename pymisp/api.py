@@ -15,6 +15,7 @@ from uuid import UUID
 import warnings
 import sys
 import copy
+import urllib3  # type: ignore
 from io import BytesIO, StringIO
 
 from . import __version__, everything_broken
@@ -88,6 +89,27 @@ def register_user(misp_url: str, email: str,
     return r.json()
 
 
+def brotli_supported() -> bool:
+    """
+    Returns whether Brotli compression is supported
+    """
+
+    # urllib >= 1.25.1 includes brotli support
+    major, minor, patch = urllib3.__version__.split('.')  # noqa: F811
+    major, minor, patch = int(major), int(minor), int(patch)
+    urllib3_with_brotli = (major == 1 and ((minor == 25 and patch >= 1) or (minor >= 26))) or major >= 2
+
+    if not urllib3_with_brotli:
+        return False
+
+    # pybrotli is an extra package required by urllib3 for brotli support
+    try:
+        import brotli  # type: ignore # noqa
+        return True
+    except ImportError:
+        return False
+
+
 class PyMISP:
     """Python API for MISP
 
@@ -118,6 +140,8 @@ class PyMISP:
         self.tool: str = tool
         self.timeout: Optional[Union[float, Tuple[float, float]]] = timeout
         self.__session = requests.Session()  # use one session to keep connection between requests
+        if brotli_supported():
+            self.__session.headers['Accept-Encoding'] = ', '.join(('br', 'gzip', 'deflate'))
 
         self.global_pythonify = False
 
@@ -924,12 +948,12 @@ class PyMISP:
 
     # ## BEGIN Tags ###
 
-    def tags(self, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
+    def tags(self, pythonify: bool = False, **kw_params) -> Union[Dict, List[MISPTag]]:
         """Get the list of existing tags.
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
-        r = self._prepare_request('GET', 'tags/index')
+        r = self._prepare_request('GET', 'tags/index', kw_params=kw_params)
         tags = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in tags:
             return tags['Tag']
