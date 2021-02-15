@@ -94,7 +94,12 @@ def brotli_supported() -> bool:
     """
 
     # urllib >= 1.25.1 includes brotli support
-    major, minor, patch = urllib3.__version__.split('.')  # noqa: F811
+    version_splitted = urllib3.__version__.split('.')  # noqa: F811
+    if len(version_splitted) == 2:
+        major, minor = version_splitted
+        patch = 0
+    else:
+        major, minor, patch = version_splitted
     major, minor, patch = int(major), int(minor), int(patch)
     urllib3_with_brotli = (major == 1 and ((minor == 25 and patch >= 1) or (minor >= 26))) or major >= 2
 
