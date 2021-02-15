@@ -113,6 +113,9 @@ class PEObject(AbstractMISPObjectGenerator):
         if self.__pe.sections:
             pos = 0
             for section in self.__pe.sections:
+                if not section.name and not section.size:
+                    # Skip section if name is none AND size is 0.
+                    continue
                 s = PESectionObject(section, standalone=self._standalone, default_attributes_parameters=self._default_attributes_parameters)
                 self.add_reference(s.uuid, 'includes', 'Section {} of PE'.format(pos))
                 if ((self.__pe.entrypoint >= section.virtual_address)
