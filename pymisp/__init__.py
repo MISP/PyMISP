@@ -1,5 +1,7 @@
 __version__ = '2.4.138'
 import logging
+import sys
+import warnings
 
 FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
 formatter = logging.Formatter(FORMAT)
@@ -9,6 +11,14 @@ default_handler.setFormatter(formatter)
 logger = logging.getLogger(__name__)
 logger.addHandler(default_handler)
 logger.setLevel(logging.WARNING)
+
+
+def warning_2022():
+    if sys.version_info < (3, 8):
+        warnings.warn("""
+As our baseline system is the latest Ubuntu LTS, and Ubuntu LTS 20.04 has Python 3.8 available,
+we will officially deprecate python versions below 3.8 on January 1st 2022.
+**Please update your codebase.**""", DeprecationWarning, stacklevel=3)
 
 
 everything_broken = '''Unknown error: the response is not in JSON.
@@ -22,6 +32,7 @@ Response (if any):
 
 
 try:
+    warning_2022()
     from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse  # noqa
     from .abstract import AbstractMISP, MISPEncode, pymisp_json_default, MISPTag, Distribution, ThreatLevel, Analysis  # noqa
     from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport # noqa
