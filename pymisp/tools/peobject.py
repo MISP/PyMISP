@@ -153,7 +153,6 @@ class PECertificate(AbstractMISPObjectGenerator):
         self.add_attribute('version', value=self.__certificate.version)
         self.add_attribute('subject', value=self.__certificate.subject)
         self.add_attribute('signature_algorithm', value=self.__certificate.signature_algorithm)
-        self.add_attribute('serial-number', value=self.__certificate.serial_number)
         self.add_attribute('raw-base64', value=b64encode(self.__certificate.raw))
 
 
