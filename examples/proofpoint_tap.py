@@ -22,6 +22,9 @@ headers = {
 }
 
 responseSiem = requests.request("GET", urlSiem, headers=headers, params=queryString)
+if 'Credentials authentication failed' in str(responseSiem.text):
+    print("Credentials invalid, please edit keys.py and try again")
+    quit()
 
 jsonDataSiem = json.loads(responseSiem.text)
 
