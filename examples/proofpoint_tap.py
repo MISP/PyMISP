@@ -2,16 +2,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation
-from keys import misp_url, misp_key, misp_verifycert, proofpoint_sp, proofpoint_secret, misp_orgID, misp_orgUUID
-
-################# Edit these #################
-orgID = misp_orgID
-orgUUID = misp_orgUUID
-##############################################
-
-if orgUUID == '11111111-2222-3333-4444-555555555555':
-    print('Please edit the orgID and orgUUID variables in keys.py')
-    quit()
+from keys import misp_url, misp_key, misp_verifycert, proofpoint_sp, proofpoint_secret
 
 # initialize PyMISP and set url for Panorama
 misp = ExpandedPyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
