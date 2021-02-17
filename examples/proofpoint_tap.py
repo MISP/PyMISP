@@ -22,7 +22,7 @@ headers = {
 }
 
 responseSiem = requests.request("GET", urlSiem, headers=headers, params=queryString)
-if 'Credentials authentication failed' in str(responseSiem.text):
+if 'Credentials authentication failed' in responseSiem.text:
     print("Credentials invalid, please edit keys.py and try again")
     quit()
 
