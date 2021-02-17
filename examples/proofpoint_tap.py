@@ -3,6 +3,8 @@ from requests.auth import HTTPBasicAuth
 import json
 from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation
 from keys import misp_url, misp_key, misp_verifycert, proofpoint_sp, proofpoint_secret
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 if proofpoint_secret == '<proofpoint secret>':
     print('Set the proofpoint_secret in keys.py before running.  Exiting...')
