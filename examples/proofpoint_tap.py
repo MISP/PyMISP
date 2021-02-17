@@ -1,7 +1,17 @@
 import requests
+from requests.auth import HTTPBasicAuth
 import json
 from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation
-from keys import misp_url, misp_key, misp_verifycert, proofpoint_key
+from keys import misp_url, misp_key, misp_verifycert, proofpoint_sp, proofpoint_secret, misp_orgID, misp_orgUUID
+
+################# Edit these #################
+orgID = misp_orgID
+orgUUID = misp_orgUUID
+##############################################
+
+if orgUUID == '11111111-2222-3333-4444-555555555555':
+    print('Please edit the orgID and orgUUID variables in keys.py')
+    quit()
 
 # initialize PyMISP and set url for Panorama
 misp = ExpandedPyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
@@ -16,27 +26,19 @@ queryString = {
     "format": "json"
 }
 
-# auth to api needs to be set as a header, not as part of the query string
-headers = {
-    'Authorization': "Basic " + proofpoint_key
-}
 
-responseSiem = requests.request("GET", urlSiem, headers=headers, params=queryString)
+
+responseSiem = requests.request("GET", urlSiem,  params=queryString, auth=HTTPBasicAuth(proofpoint_sp, proofpoint_secret))
 if 'Credentials authentication failed' in responseSiem.text:
-    print("Credentials invalid, please edit keys.py and try again")
+    print('Credentials invalid, please edit keys.py and try again')
     quit()
 
 jsonDataSiem = json.loads(responseSiem.text)
 
 for alert in alertType:
     for messages in jsonDataSiem[alert]:
-        orgc = MISPOrganisation()
-        orgc.name = 'Proofpoint'
-        orgc.id = '#{ORGC.ID}'  # organisation id 
-        orgc.uuid = '#{ORGC.UUID}'  # organisation uuid
         # initialize and set MISPEvent()
         event = MISPEvent()
-        event.Orgc = orgc
         if alert == "messagesDelivered" or alert == "messagesBlocked":
             if alert == "messagesDelivered":
                 event.info = alert
@@ -115,7 +117,7 @@ for alert in alertType:
                 # get campaignID from each TAP alert and query campaign API
                 if threatInfo["campaignID"] is not None and threatInfo["campaignID"] != "":
                     urlCampaign = "https://tap-api-v2.proofpoint.com/v2/campaign/" + threatInfo["campaignID"]
-                    responseCampaign = requests.request("GET", urlCampaign, headers=headers)
+                    responseCampaign = requests.request("GET", urlCampaign, auth=HTTPBasicAuth(proofpoint_sp, proofpoint_secret))
 
                     jsonDataCampaign = json.loads(responseCampaign.text)
 
