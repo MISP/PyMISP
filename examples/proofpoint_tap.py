@@ -4,6 +4,10 @@ import json
 from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation
 from keys import misp_url, misp_key, misp_verifycert, proofpoint_sp, proofpoint_secret
 
+if proofpoint_secret == '<proofpoint secret>':
+    print('Set the proofpoint_secret in keys.py before running.  Exiting...')
+    quit()
+
 # initialize PyMISP and set url for Panorama
 misp = ExpandedPyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
 
