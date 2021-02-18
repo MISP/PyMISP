@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import json
-from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation
+from pymisp import ExpandedPyMISP, MISPEvent
 from keys import misp_url, misp_key, misp_verifycert, proofpoint_sp, proofpoint_secret
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
