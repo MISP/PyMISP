@@ -1255,6 +1255,14 @@ class TestComprehensive(unittest.TestCase):
                     response = self.admin_misp_connector.delete_tag(t)
                     self.assertEqual(response['message'], 'Tag deleted.')
 
+            # Test soft delete object
+            second.delete_object(ip_dom.uuid)
+            self.assertTrue(second.objects[-1].deleted)
+            second = self.user_misp_connector.update_event(second)
+            self.assertFalse(second.objects)
+            second = self.user_misp_connector.get_event(second, deleted=True)
+            self.assertTrue(second.objects[-1].deleted)
+
             # Test delete object
             r = self.user_misp_connector.delete_object(second.objects[0])
             self.assertEqual(r['message'], 'Object deleted', r)

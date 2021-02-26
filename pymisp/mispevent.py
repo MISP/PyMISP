@@ -751,7 +751,7 @@ class MISPObject(AbstractMISP):
             pass
 
     def delete(self):
-        """Mark the attribute as deleted (soft delete)"""
+        """Mark the object as deleted (soft delete)"""
         self.deleted = True
 
     @property
@@ -1552,6 +1552,19 @@ class MISPEvent(AbstractMISP):
         self.Object.append(misp_obj)
         self.edited = True
         return misp_obj
+
+    def delete_object(self, object_id: str):
+        """Delete an object
+
+        :param object_id: ID or UUID
+        """
+        for o in self.objects:
+            if ((hasattr(o, 'id') and o.id == object_id)
+                    or (hasattr(o, 'uuid') and o.uuid == object_id)):
+                o.delete()
+                break
+        else:
+            raise PyMISPError('No object with UUID/ID {} found.'.format(object_id))
 
     def run_expansions(self):
         for index, attribute in enumerate(self.attributes):
