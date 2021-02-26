@@ -2097,7 +2097,7 @@ class PyMISP:
         :param metadata: Only the metadata (event, tags, relations) is returned, attributes and proposals are omitted.
         :param uuid: Restrict the results by uuid.
         :param publish_timestamp: Restrict the results by the last publish timestamp (newer than).
-        :param timestamp: Restrict the results by the timestamp (last edit). Any event with a timestamp newer than the given timestamp will be returned. In case you are dealing with /attributes as scope, the attribute's timestamp will be used for the lookup.
+        :param timestamp: Restrict the results by the timestamp (last edit). Any event with a timestamp newer than the given timestamp will be returned. In case you are dealing with /attributes as scope, the attribute's timestamp will be used for the lookup. The input can be a timestamp or a short-hand time description (7d or 24h for example). You can also pass a list with two values to set a time range (for example ["14d", "7d"]).
         :param published: Set whether published or unpublished events should be returned. Do not set the parameter if you want both.
         :param enforce_warninglist: Remove any attributes from the result that would cause a hit on a warninglist entry.
         :param to_ids: By default all attributes are returned that match the other filter parameters, regardless of their to_ids setting. To restrict the returned data set to to_ids only attributes set this parameter to 1. 0 for the ones with to_ids set to False.
