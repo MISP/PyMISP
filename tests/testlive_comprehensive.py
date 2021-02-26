@@ -1152,6 +1152,19 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
+    def test_search_text(self):
+        first = self.create_simple_event()
+        first.add_attribute('ip-src', '8.8.8.8')
+        first.publish()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            self.admin_misp_connector.publish(first)
+            text = self.user_misp_connector.search(return_format='text', eventid=first.id)
+            self.assertEqual('8.8.8.8', text.strip())
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+
     def test_search_stix(self):
         first = self.create_simple_event()
         first.add_attribute('ip-src', '8.8.8.8')
