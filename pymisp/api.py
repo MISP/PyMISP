@@ -2394,7 +2394,7 @@ class PyMISP:
                 return self._csv_to_dict(normalized_response_text)  # type: ignore
             else:
                 return normalized_response_text
-        elif return_format == 'stix-xml':
+        elif return_format in ['stix-xml', 'text']:
             return self._check_response(response)
 
         normalized_response = self._check_json_response(response)
