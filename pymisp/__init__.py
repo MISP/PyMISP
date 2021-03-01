@@ -38,7 +38,6 @@ try:
     from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport # noqa
     from .tools import AbstractMISPObjectGenerator  # noqa
     from .tools import Neo4j  # noqa
-    from .tools import stix  # noqa
     from .tools import openioc  # noqa
     from .tools import ext_lookups  # noqa
     from .tools import update_objects  # noqa
