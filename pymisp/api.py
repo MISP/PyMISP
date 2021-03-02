@@ -24,7 +24,8 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, \
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
-    MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport
+    MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
+    MISPGalaxyCluster, MISPGalaxyClusterRelation
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 SearchType = TypeVar('SearchType', str, int)
@@ -499,9 +500,10 @@ class PyMISP:
         """
         event_report_id = get_uuid_or_id_from_abstract_misp(event_report)
         request_url = f'eventReports/delete/{event_report_id}'
+        data = {}
         if hard:
-            request_url += "/1"
-        r = self._prepare_request('POST', request_url)
+            data['hard'] = 1
+        r = self._prepare_request('POST', request_url, data=data)
         return self._check_json_response(r)
 
     # ## END Event Report ###
@@ -1314,10 +1316,11 @@ class PyMISP:
             to_return.append(g)
         return to_return
 
-    def get_galaxy(self, galaxy: Union[MISPGalaxy, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPGalaxy]:
+    def get_galaxy(self, galaxy: Union[MISPGalaxy, int, str, UUID], withCluster: bool = False, pythonify: bool = False) -> Union[Dict, MISPGalaxy]:
         """Get a galaxy by id
 
         :param galaxy: galaxy to get
+        :param withCluster: Include the clusters associated with the galaxy
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
         galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
@@ -1326,13 +1329,178 @@ class PyMISP:
         if not (self.global_pythonify or pythonify) or 'errors' in galaxy_j:
             return galaxy_j
         g = MISPGalaxy()
-        g.from_dict(**galaxy_j)
+        g.from_dict(**galaxy_j, withCluster=withCluster)
         return g
+
+    def search_galaxy_clusters(self, galaxy: Union[MISPGalaxy, int, str, UUID], context: str = "all", searchall: str = None, pythonify: bool = False) -> Union[List[Dict], List[MISPGalaxyCluster]]:
+        """Searches the galaxy clusters within a specific galaxy
+
+        :param galaxy: The MISPGalaxy you wish to search in
+        :param context: The context of how you want to search within the galaxy_
+        :param searchall: The search you want to make against the galaxy and context
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+
+        galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
+        allowed_context_types = ["all", "default", "custom", "org", "deleted"]
+        if context not in allowed_context_types:
+            raise PyMISPError(f"The context must be one of {allowed_context_types.join(', ')}")
+        kw_params = {"context": context}
+        if searchall:
+            kw_params["searchall"] = searchall
+        r = self._prepare_request('GET', f"galaxy_clusters/index/{galaxy_id}", kw_params=kw_params)
+        clusters_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in clusters_j:
+            return clusters_j
+        response = []
+        for cluster in clusters_j:
+            c = MISPGalaxyCluster()
+            c.from_dict(**cluster)
+            response.append(c)
+        return response
 
     def update_galaxies(self) -> Dict:
         """Update all the galaxies."""
         response = self._prepare_request('POST', 'galaxies/update')
         return self._check_json_response(response)
+
+    def get_galaxy_cluster(self, galaxy_cluster: Union[MISPGalaxyCluster, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
+        """Gets a specific galaxy cluster
+
+        :param galaxy_cluster: The MISPGalaxyCluster you want to get
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+
+        cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
+        r = self._prepare_request('GET', f'galaxy_clusters/view/{cluster_id}')
+        cluster_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
+            return cluster_j
+        gc = MISPGalaxyCluster()
+        gc.from_dict(**cluster_j)
+        return gc
+
+    def add_galaxy_cluster(self, galaxy: Union[MISPGalaxy, str, UUID], galaxy_cluster: MISPGalaxyCluster, pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
+        """Add a new galaxy cluster to a MISP Galaxy
+
+        :param galaxy: A MISPGalaxy (or UUID) where you wish to add the galaxy cluster
+        :param galaxy_cluster: A MISPGalaxyCluster you wish to add
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+
+        if getattr(galaxy_cluster, "default", False):
+            # We can't add default galaxies
+            raise PyMISPError('You are not able add a default galaxy cluster')
+        galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
+        r = self._prepare_request('POST', f'galaxy_clusters/add/{galaxy_id}', data=galaxy_cluster)
+        cluster_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
+            return cluster_j
+        gc = MISPGalaxyCluster()
+        gc.from_dict(**cluster_j)
+        return gc
+
+    def update_galaxy_cluster(self, galaxy_cluster: MISPGalaxyCluster, pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
+        """Update a custom galaxy cluster.
+
+        ;param galaxy_cluster: The MISPGalaxyCluster you wish to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+
+        if getattr(galaxy_cluster, "default", False):
+            # We can't edit default galaxies
+            raise PyMISPError('You are not able to update a default galaxy cluster')
+        cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
+        print(cluster_id)
+        r = self._prepare_request('POST', f'galaxy_clusters/edit/{cluster_id}', data=galaxy_cluster)
+        cluster_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
+            return cluster_j
+        gc = MISPGalaxyCluster()
+        gc.from_dict(**cluster_j)
+        return gc
+
+    def publish_galaxy_cluster(self, galaxy_cluster: Union[MISPGalaxyCluster, int, str, UUID]) -> Dict:
+        """Publishes a galaxy cluster
+
+        :param galaxy_cluster: The galaxy cluster you wish to publish
+        """
+        if isinstance(galaxy_cluster, MISPGalaxyCluster) and getattr(galaxy_cluster, "default", False):
+            raise PyMISPError('You are not able to publish a default galaxy cluster')
+        cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
+        r = self._prepare_request('POST', f'galaxy_clusters/publish/{cluster_id}')
+        response = self._check_json_response(r)
+        return response
+
+    def fork_galaxy_cluster(self, galaxy: Union[MISPGalaxy, int, str, UUID], galaxy_cluster: Union[MISPGalaxyClusterRelation, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
+        """Forks an existing galaxy cluster, creating a new one with matching attributes
+
+        :param galaxy: The galaxy (or galaxy ID) where the cluster you want to fork resides
+        :param galaxy_cluster: The galaxy cluster you wish to fork
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+
+        galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
+        cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
+        # Create a duplicate cluster from the cluster to fork
+        forked_galaxy_cluster = MISPGalaxyCluster()
+        forked_galaxy_cluster.from_dict(**galaxy_cluster)
+        # Set the UUID and version it extends from the existing galaxy cluster
+        forked_galaxy_cluster.extends_uuid = forked_galaxy_cluster.pop('uuid')
+        forked_galaxy_cluster.extends_version = forked_galaxy_cluster.pop('version')
+        r = self._prepare_request('POST', f'galaxy_clusters/add/{galaxy_id}/forkUUID:{cluster_id}', data=galaxy_cluster)
+        cluster_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
+            return cluster_j
+        gc = MISPGalaxyCluster()
+        gc.from_dict(**cluster_j)
+        return gc
+
+    def delete_galaxy_cluster(self, galaxy_cluster: Union[MISPGalaxyCluster, id, str, UUID], hard=False) -> Dict:
+        """Deletes a galaxy cluster from MISP
+
+        :param galaxy_cluster: The MISPGalaxyCluster you wish to delete from MISP
+        :param hard: flag for hard delete
+        """
+
+        if isinstance(galaxy_cluster, MISPGalaxyCluster) and getattr(galaxy_cluster, "default", False):
+            raise PyMISPError('You are not able to delete a default galaxy cluster')
+        data = {}
+        if hard:
+            data['hard'] = 1
+        cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
+        r = self._prepare_request('POST', f'galaxy_clusters/delete/{cluster_id}', data=data)
+        return self._check_json_response(r)
+
+    def add_galaxy_cluster_relation(self, galaxy_cluster_relation: MISPGalaxyClusterRelation) -> Dict:
+        """Add a galaxy cluster relation, cluster relation must include
+        cluster UUIDs in both directions
+
+        :param galaxy_cluster_relation: The MISPGalaxyClusterRelation to add
+        """
+        r = self._prepare_request('POST', 'galaxy_cluster_relations/add/', data=galaxy_cluster_relation)
+        cluster_rel_j = self._check_json_response(r)
+        return cluster_rel_j
+
+    def update_galaxy_cluster_relation(self, galaxy_cluster_relation: MISPGalaxyClusterRelation) -> Dict:
+        """Update a galaxy cluster relation
+
+        :param galaxy_cluster_relation: The MISPGalaxyClusterRelation to update
+        """
+        cluster_relation_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster_relation)
+        r = self._prepare_request('POST', f'galaxy_cluster_relations/edit/{cluster_relation_id}', data=galaxy_cluster_relation)
+        cluster_rel_j = self._check_json_response(r)
+        return cluster_rel_j
+
+    def delete_galaxy_cluster_relation(self, galaxy_cluster_relation: Union[MISPGalaxyClusterRelation, int, str, UUID]) -> Dict:
+        """Delete a galaxy cluster relation
+
+        :param galaxy_cluster_relation: The MISPGalaxyClusterRelation to delete
+        """
+        cluster_relation_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster_relation)
+        r = self._prepare_request('POST', f'galaxy_cluster_relations/delete/{cluster_relation_id}')
+        cluster_rel_j = self._check_json_response(r)
+        return cluster_rel_j
 
     # ## END Galaxy ###
 

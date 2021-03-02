@@ -192,7 +192,9 @@
             "Timo Steffens",
             "Various"
           ],
+          "default": false,
           "description": "The Sofacy Group (also known as APT28, Pawn Storm, Fancy Bear and Sednit) is a cyber espionage group believed to have ties to the Russian government. Likely operating since 2007, the group is known to target government, military, and security organizations. It has been characterized as an advanced persistent threat.",
+          "distribution": "0",
           "galaxy_id": "366",
           "id": "45563",
           "meta": {
@@ -248,7 +250,9 @@
             "Will Metcalf",
             "KahuSecurity"
           ],
+          "default": false,
           "description": "Sednit EK is the exploit kit used by APT28",
+          "distribution": "0",
           "galaxy_id": "370",
           "id": "38813",
           "meta": {
@@ -274,7 +278,9 @@
             "Will Metcalf",
             "KahuSecurity"
           ],
+          "default": false,
           "description": "DealersChoice is a Flash Player Exploit platform triggered by RTF",
+          "distribution": "0",
           "galaxy_id": "370",
           "id": "38805",
           "meta": {
@@ -315,7 +321,9 @@
             "Timo Steffens",
             "Christophe Vandeplas"
           ],
+          "default": false,
           "description": "backdoor",
+          "distribution": "0",
           "galaxy_id": "367",
           "id": "46592",
           "meta": {
@@ -347,7 +355,9 @@
             "Timo Steffens",
             "Christophe Vandeplas"
           ],
+          "default": false,
           "description": "",
+          "distribution": "0",
           "galaxy_id": "367",
           "id": "46670",
           "meta": {
@@ -370,7 +380,9 @@
             "Timo Steffens",
             "Christophe Vandeplas"
           ],
+          "default": false,
           "description": "backdoor used by apt28\n\nSedreco serves as a spying backdoor; its functionalities can be extended with dynamically loaded plugins. It is made up of two distinct components: a dropper and the persistent payload installed by this dropper. We have not seen this component since April 2016.",
+          "distribution": "0",
           "galaxy_id": "367",
           "id": "46591",
           "meta": {
@@ -405,7 +417,9 @@
             "Timo Steffens",
             "Christophe Vandeplas"
           ],
+          "default": false,
           "description": "This backdoor component is known to have a modular structure featuring various espionage functionalities, such as key-logging, screen grabbing and file exfiltration. This component is available for Osx, Windows, Linux and iOS operating systems.\n\nXagent is a modular backdoor with spying functionalities such as keystroke logging and file exfiltration. Xagent is the group’s flagship backdoor and heavily used in their operations. Early versions for Linux and Windows were seen years ago, then in 2015 an iOS version came out. One year later, an Android version was discovered and finally, in the beginning of 2017, an Xagent sample for OS X was described.",
+          "distribution": "0",
           "galaxy_id": "367",
           "id": "46669",
           "meta": {
@@ -444,7 +458,9 @@
           "authors": [
             "MITRE"
           ],
+          "default": false,
           "description": "JHUHUGIT is malware used by APT28. It is based on Carberp source code and serves as reconnaissance malware.[[Citation: Kaspersky Sofacy]][[Citation: F-Secure Sofacy 2015]][[Citation: ESET Sednit Part 1]][[Citation: FireEye APT28 January 2017]]\n\nAliases: JHUHUGIT, Seduploader, JKEYSKW, Sednit, GAMEFISH",
+          "distribution": "0",
           "galaxy_id": "365",
           "id": "41618",
           "meta": {
@@ -478,7 +494,9 @@
           "authors": [
             "MITRE"
           ],
+          "default": false,
           "description": "XTunnel a VPN-like network proxy tool that can relay traffic between a C2 server and a victim. It was first seen in May 2013 and reportedly used by APT28 during the compromise of the Democratic National Committee.[[Citation: Crowdstrike DNC June 2016]][[Citation: Invincea XTunnel]][[Citation: ESET Sednit Part 2]]\n\nAliases: XTunnel, X-Tunnel, XAPS",
+          "distribution": "0",
           "galaxy_id": "365",
           "id": "41543",
           "meta": {
@@ -509,7 +527,9 @@
           "authors": [
             "MITRE"
           ],
+          "default": false,
           "description": "ADVSTORESHELL is a spying backdoor that has been used by APT28 from at least 2012 to 2016. It is generally used for long-term espionage and is deployed on targets deemed interesting after a reconnaissance phase.[[Citation: Kaspersky Sofacy]][[Citation: ESET Sednit Part 2]]\n\nAliases: ADVSTORESHELL, NETUI, EVILTOSS, AZZY, Sedreco",
+          "distribution": "0",
           "galaxy_id": "365",
           "id": "41582",
           "meta": {
@@ -541,7 +561,9 @@
           "authors": [
             "MITRE"
           ],
+          "default": false,
           "description": "USBStealer is malware that has used by APT28 since at least 2005 to extract information from air-gapped networks. It does not have the capability to communicate over the Internet and has been used in conjunction with ADVSTORESHELL.[[Citation: ESET Sednit USBStealer 2014]][[Citation: Kaspersky Sofacy]]\n\nAliases: USBStealer, USB Stealer, Win32/USBStealer",
+          "distribution": "0",
           "galaxy_id": "365",
           "id": "41549",
           "meta": {
@@ -571,7 +593,9 @@
           "authors": [
             "MITRE"
           ],
+          "default": false,
           "description": "is a trojan that has been used by APT28  on OS X and appears to be a port of their standard CHOPSTICK or XAgent trojan.[[Citation: XAgentOSX]]",
+          "distribution": "0",
           "galaxy_id": "365",
           "id": "41551",
           "meta": {
@@ -595,7 +619,9 @@
           "authors": [
             "MITRE"
           ],
+          "default": false,
           "description": "CHOPSTICK is malware family of modular backdoors used by APT28. It has been used from at least November 2012 to August 2016 and is usually dropped on victims as second-stage malware, though it has been used as first-stage malware in several cases.[[Citation: FireEye APT28]][[Citation: ESET Sednit Part 2]][[Citation: FireEye APT28 January 2017]]\n\nAliases: CHOPSTICK, SPLM, Xagent, X-Agent, webhp",
+          "distribution": "0",
           "galaxy_id": "365",
           "id": "41559",
           "meta": {
@@ -628,7 +654,9 @@
           "authors": [
             "MITRE"
           ],
+          "default": false,
           "description": "Downdelph is a first-stage downloader written in Delphi that has been used by APT28 in rare instances between 2013 and 2015.[[Citation: ESET Sednit Part 3]]\n\nAliases: Downdelph, Delphacy",
+          "distribution": "0",
           "galaxy_id": "365",
           "id": "41504",
           "meta": {
