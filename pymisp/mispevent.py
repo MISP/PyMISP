@@ -1069,6 +1069,9 @@ class MISPGalaxyClusterElement(AbstractMISP):
     :type value: str
     """
 
+    key: str
+    value: str
+
     def __repr__(self) -> str:
         if hasattr(self, 'key') and hasattr(self, 'value'):
             return '<{self.__class__.__name__}(key={self.key}, value={self.value})'.format(self=self)
@@ -1117,7 +1120,7 @@ class MISPGalaxyClusterRelation(AbstractMISP):
         self.referenced_galaxy_cluster_uuid: uuid
         self.distribution: int = 0
         self.referenced_galaxy_cluster_type: str
-        self.Tag: MISPTag = []
+        self.Tag: List[MISPTag] = []
 
     def from_dict(self, **kwargs):
         # Default values for a valid event to send to a MISP instance
@@ -1212,7 +1215,7 @@ class MISPGalaxyCluster(AbstractMISP):
         self.GalaxyElement = cluster_elements
 
     @property
-    def cluster_relations(self) -> MISPGalaxyClusterRelation:
+    def cluster_relations(self) -> List[MISPGalaxyClusterRelation]:
         return self.GalaxyClusterRelation
 
     @cluster_relations.setter
@@ -1565,12 +1568,12 @@ class MISPEvent(AbstractMISP):
         return self.RelatedEvent
 
     @property
-    def objects(self) -> List[MISPObject]:
-        return self.Object
-
-    @property
     def galaxies(self) -> List[MISPGalaxy]:
         return self.Galaxy
+
+    @property
+    def objects(self) -> List[MISPObject]:
+        return self.Object
 
     @objects.setter
     def objects(self, objects: List[MISPObject]):

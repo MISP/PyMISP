@@ -1332,7 +1332,7 @@ class PyMISP:
         g.from_dict(**galaxy_j, withCluster=withCluster)
         return g
 
-    def search_galaxy_clusters(self, galaxy: Union[MISPGalaxy, int, str, UUID], context: str = "all", searchall: str = None, pythonify: bool = False) -> Union[List[Dict], List[MISPGalaxyCluster]]:
+    def search_galaxy_clusters(self, galaxy: Union[MISPGalaxy, int, str, UUID], context: str = "all", searchall: str = None, pythonify: bool = False) -> Union[Dict, List[MISPGalaxyCluster]]:
         """Searches the galaxy clusters within a specific galaxy
 
         :param galaxy: The MISPGalaxy you wish to search in
@@ -1342,9 +1342,9 @@ class PyMISP:
         """
 
         galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
-        allowed_context_types = ["all", "default", "custom", "org", "deleted"]
+        allowed_context_types: List[str] = ["all", "default", "custom", "org", "deleted"]
         if context not in allowed_context_types:
-            raise PyMISPError(f"The context must be one of {allowed_context_types.join(', ')}")
+            raise PyMISPError(f"The context must be one of {', '.join(allowed_context_types)}")
         kw_params = {"context": context}
         if searchall:
             kw_params["searchall"] = searchall
@@ -1432,7 +1432,7 @@ class PyMISP:
         response = self._check_json_response(r)
         return response
 
-    def fork_galaxy_cluster(self, galaxy: Union[MISPGalaxy, int, str, UUID], galaxy_cluster: Union[MISPGalaxyClusterRelation, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
+    def fork_galaxy_cluster(self, galaxy: Union[MISPGalaxy, int, str, UUID], galaxy_cluster: MISPGalaxyCluster, pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
         """Forks an existing galaxy cluster, creating a new one with matching attributes
 
         :param galaxy: The galaxy (or galaxy ID) where the cluster you want to fork resides
@@ -1456,7 +1456,7 @@ class PyMISP:
         gc.from_dict(**cluster_j)
         return gc
 
-    def delete_galaxy_cluster(self, galaxy_cluster: Union[MISPGalaxyCluster, id, str, UUID], hard=False) -> Dict:
+    def delete_galaxy_cluster(self, galaxy_cluster: Union[MISPGalaxyCluster, int, str, UUID], hard=False) -> Dict:
         """Deletes a galaxy cluster from MISP
 
         :param galaxy_cluster: The MISPGalaxyCluster you wish to delete from MISP
