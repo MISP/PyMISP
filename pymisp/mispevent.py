@@ -1203,6 +1203,7 @@ class MISPGalaxyCluster(AbstractMISP):
         self.Org: MISPOrganisation
         self.Orgc: MISPOrganisation
         self.SharingGroup: MISPSharingGroup
+        self.value: str
         # Set any inititialized cluster to be False
         self.default = False
 
@@ -1345,6 +1346,7 @@ class MISPGalaxy(AbstractMISP):
     def __init__(self):
         super().__init__()
         self.GalaxyCluster: List[MISPGalaxyCluster] = []
+        self.name: str
 
     def from_dict(self, **kwargs):
         """Galaxy could be in one of the following formats:
