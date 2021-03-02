@@ -1242,7 +1242,6 @@ class MISPGalaxyCluster(AbstractMISP):
     def from_dict(self, **kwargs):
         if 'GalaxyCluster' in kwargs:
             kwargs = kwargs['GalaxyCluster']
-
         self.default = kwargs.pop('default', False)
         # If the default field is set, we shouldn't have distribution or sharing group ID set
         if self.default:

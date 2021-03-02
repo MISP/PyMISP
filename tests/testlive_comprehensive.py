@@ -2739,7 +2739,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(element.value, "Test2")
 
             # The cluster should have the old meta as a prop
-            self.assertEqual(new_galaxy_cluster.meta, {'synonyms': ['Test2']})
+            self.assertEqual(new_galaxy_cluster.elements_meta, {'synonyms': ['Test2']})
 
             # The cluster element should be updatable
             element.value = "Test3"
@@ -2791,7 +2791,8 @@ class TestComprehensive(unittest.TestCase):
             resp = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster)
             self.assertTrue("errors" in resp)
         finally:
-            self.admin_misp_connector.delete_galaxy_cluster(new_galaxy_cluster)
+            self.admin_misp_connector.delete_galaxy_cluster_relation(relation)
+            self.admin_misp_connector.delete_galaxy_cluster(new_galaxy_cluster, hard=True)
             self.admin_misp_connector.toggle_global_pythonify()
 
     def test_event_galaxy(self):
