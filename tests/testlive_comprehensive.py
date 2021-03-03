@@ -1066,7 +1066,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(s[0].org_id, self.test_org.id)
             # Delete sighting
             r = self.user_misp_connector.delete_sighting(s[0])
-            self.assertEqual(r['message'], 'Sighting successfuly deleted.')
+            self.assertEqual(r['message'], 'Sighting successfully deleted.')
 
         finally:
             # Delete event
