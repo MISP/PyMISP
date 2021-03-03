@@ -303,7 +303,7 @@ python-versions = ">=2.7"
 
 [[package]]
 name = "extract-msg"
-version = "0.28.5"
+version = "0.28.7"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = true
@@ -1655,8 +1655,8 @@ entrypoints = [
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
 ]
 extract-msg = [
-    {file = "extract_msg-0.28.5-py2.py3-none-any.whl", hash = "sha256:4c7d7da5fa50cbeb406226acef572e9c308ffcae6aec35607abf6bfb63ad0448"},
-    {file = "extract_msg-0.28.5.tar.gz", hash = "sha256:044d1fbafd706e09aa9e0d8de351791c5517a171bc09e2391728508013793f28"},
+    {file = "extract_msg-0.28.7-py2.py3-none-any.whl", hash = "sha256:6ad2702bef86e6c1b8505e2993c7f3d37a1f3d140903138ee2df4a299dd2a29c"},
+    {file = "extract_msg-0.28.7.tar.gz", hash = "sha256:7ebdbd7863a3699080a69f71ec0cd30ed9bfee70bad9acc6a8e6abe9523c78c0"},
 ]
 flake8 = [
     {file = "flake8-3.8.4-py2.py3-none-any.whl", hash = "sha256:749dbbd6bfd0cf1318af27bf97a14e28e5ff548ef8e5b1566ccfb25a11e7c839"},
