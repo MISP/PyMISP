@@ -455,6 +455,7 @@
         "first-name",
         "middle-name",
         "last-name",
+        "full-name",
         "date-of-birth",
         "place-of-birth",
         "gender",
@@ -801,6 +802,10 @@
         "to_ids": 0
       },
       "frequent-flyer-number": {
+        "default_category": "Person",
+        "to_ids": 0
+      },
+      "full-name": {
         "default_category": "Person",
         "to_ids": 0
       },
@@ -1426,6 +1431,7 @@
       "first-name",
       "middle-name",
       "last-name",
+      "full-name",
       "date-of-birth",
       "place-of-birth",
       "gender",
