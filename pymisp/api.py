@@ -2905,7 +2905,7 @@ class PyMISP:
 
         if str(version) == '1':
             url = urljoin(self.root_url, '/events/upload_stix')
-            response = self._prepare_request('POST', url, data=to_post, output_type='xml')  # type: ignore
+            response = self._prepare_request('POST', url, data=to_post, output_type='xml', content_type='xml')  # type: ignore
         else:
             url = urljoin(self.root_url, '/events/upload_stix/2')
             response = self._prepare_request('POST', url, data=to_post)  # type: ignore
@@ -3389,7 +3389,7 @@ class PyMISP:
         return f'<{self.__class__.__name__}(url={self.root_url})'
 
     def _prepare_request(self, request_type: str, url: str, data: Union[str, Iterable, Mapping, AbstractMISP] = {}, params: Mapping = {},
-                         kw_params: Mapping = {}, output_type: str = 'json') -> requests.Response:
+                         kw_params: Mapping = {}, output_type: str = 'json', content_type: str = 'json') -> requests.Response:
         '''Prepare a request for python-requests'''
         url = urljoin(self.root_url, url)
         if data == {} or isinstance(data, str):
@@ -3419,7 +3419,7 @@ class PyMISP:
         prepped.headers.update(
             {'Authorization': self.key,
              'Accept': f'application/{output_type}',
-             'content-type': 'application/json',
+             'content-type': 'application/{content_type}',
              'User-Agent': user_agent})
         logger.debug(prepped.headers)
         settings = self.__session.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None,
