@@ -2453,7 +2453,7 @@ class TestComprehensive(unittest.TestCase):
         event.info = 'Test First Last seen'
         event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-04', last_seen='2020-01-04T12:30:34.323242+0800')
         obj = event.add_object(name='file', first_seen=1580147259.268763, last_seen=1580147300)
-        attr = obj.add_attribute('filename', 'blah.exe')
+        attr = obj.add_attribute('filename', 'blah.exe', comment="blah")
         attr.first_seen = '2022-01-30'
         attr.last_seen = '2022-02-23'
         try:
@@ -2463,6 +2463,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(first.attributes[0].last_seen, datetime(2020, 1, 4, 4, 30, 34, 323242, tzinfo=timezone.utc))
 
             # Object
+            self.assertEqual(first.objects[0].attributes[0].value, 'blah.exe')
+            self.assertEqual(first.objects[0].attributes[0].comment, 'blah')
             self.assertEqual(first.objects[0].first_seen, datetime(2020, 1, 27, 17, 47, 39, 268763, tzinfo=timezone.utc))
             self.assertEqual(first.objects[0].last_seen, datetime(2020, 1, 27, 17, 48, 20, tzinfo=timezone.utc))
 

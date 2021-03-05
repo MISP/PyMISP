@@ -112,6 +112,7 @@ class MISPOrganisation(AbstractMISP):
     def __init__(self):
         super().__init__()
         self.id: int
+        self.name: str
 
     def from_dict(self, **kwargs):
         if 'Organisation' in kwargs:
