@@ -38,6 +38,8 @@ class CSVLoader():
             else:
                 # Check if the CSV file has a header, and if it matches with the object template
                 tmp_object = MISPObject(self.template_name)
+                if not tmp_object._definition['attributes']:
+                    raise Exception(f'Unable to find the object template ({self.template_name}), impossible to create objects.')
                 allowed_fieldnames = list(tmp_object._definition['attributes'].keys())
                 for fieldname in self.fieldnames:
                     if fieldname not in allowed_fieldnames:
