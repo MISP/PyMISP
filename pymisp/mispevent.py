@@ -118,6 +118,11 @@ class MISPOrganisation(AbstractMISP):
             kwargs = kwargs['Organisation']
         super(MISPOrganisation, self).from_dict(**kwargs)
 
+    def __repr__(self) -> str:
+        if hasattr(self, 'name'):
+            return f'<{self.__class__.__name__}(type={self.name})'
+        return f'<{self.__class__.__name__}(NotInitialized)'
+
 
 class MISPSharingGroup(AbstractMISP):
 
@@ -909,7 +914,7 @@ class MISPObject(AbstractMISP):
         """Add an attribute. object_relation is required and the value key is a
         dictionary with all the keys supported by MISPAttribute"""
         if simple_value is not None:  # /!\ The value *can* be 0
-            value = {'value': simple_value}
+            value['value'] = simple_value
         if value.get('value') is None:
             logger.warning("The value of the attribute you're trying to add is None or empty string, skipping it. Object relation: {}".format(object_relation))
             return None
