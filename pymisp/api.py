@@ -1411,7 +1411,6 @@ class PyMISP:
             # We can't edit default galaxies
             raise PyMISPError('You are not able to update a default galaxy cluster')
         cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
-        print(cluster_id)
         r = self._prepare_request('POST', f'galaxy_clusters/edit/{cluster_id}', data=galaxy_cluster)
         cluster_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
@@ -3419,7 +3418,7 @@ class PyMISP:
         prepped.headers.update(
             {'Authorization': self.key,
              'Accept': f'application/{output_type}',
-             'content-type': 'application/{content_type}',
+             'content-type': f'application/{content_type}',
              'User-Agent': user_agent})
         logger.debug(prepped.headers)
         settings = self.__session.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None,
