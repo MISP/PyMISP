@@ -2054,6 +2054,9 @@ class MISPWarninglist(AbstractMISP):
 
 class MISPTaxonomy(AbstractMISP):
 
+    name: str
+    enabled: bool
+
     def from_dict(self, **kwargs):
         if 'Taxonomy' in kwargs:
             kwargs = kwargs['Taxonomy']
