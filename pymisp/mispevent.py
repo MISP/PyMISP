@@ -917,7 +917,7 @@ class MISPObject(AbstractMISP):
         if simple_value is not None:  # /!\ The value *can* be 0
             value['value'] = simple_value
         if value.get('value') is None:
-            logger.warning("The value of the attribute you're trying to add is None or empty string, skipping it. Object relation: {}".format(object_relation))
+            logger.warning("The value of the attribute you're trying to add is None, skipping it. Object relation: {}".format(object_relation))
             return None
         else:
             if isinstance(value['value'], bytes):
@@ -931,7 +931,7 @@ class MISPObject(AbstractMISP):
 
             # Make sure we're not adding an empty value.
             if isinstance(value['value'], str):
-                value['value'] = value['value'].strip()
+                value['value'] = value['value'].strip().strip('\x00')
                 if value['value'] == '':
                     logger.warning("The value of the attribute you're trying to add is an empty string, skipping it. Object relation: {}".format(object_relation))
                     return None
