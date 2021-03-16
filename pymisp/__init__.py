@@ -3,14 +3,7 @@ import logging
 import sys
 import warnings
 
-FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
-formatter = logging.Formatter(FORMAT)
-default_handler = logging.StreamHandler()
-default_handler.setFormatter(formatter)
-
 logger = logging.getLogger(__name__)
-logger.addHandler(default_handler)
-logger.setLevel(logging.WARNING)
 
 
 def warning_2022():
