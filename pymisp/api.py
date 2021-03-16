@@ -1736,7 +1736,7 @@ class PyMISP:
 
     def add_server(self, server: MISPServer, pythonify: bool = False) -> Union[Dict, MISPServer]:
         """Add a server to synchronise with.
-        Note: You probably want to use ExpandedPyMISP.get_sync_config and ExpandedPyMISP.import_server instead
+        Note: You probably want to use PyMISP.get_sync_config and PyMISP.import_server instead
 
         :param server: sync server config
         :param pythonify: Returns a PyMISP Object instead of the plain json output
