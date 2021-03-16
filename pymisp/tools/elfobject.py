@@ -65,6 +65,8 @@ class ELFObject(AbstractMISPObjectGenerator):
         if self.__elf.sections:
             pos = 0
             for section in self.__elf.sections:
+                if not section.name:
+                    continue
                 s = ELFSectionObject(section, standalone=self._standalone, default_attributes_parameters=self._default_attributes_parameters)
                 self.add_reference(s.uuid, 'includes', 'Section {} of ELF'.format(pos))
                 pos += 1
