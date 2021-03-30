@@ -37,7 +37,7 @@ ToIDSType = TypeVar('ToIDSType', str, int, bool)
 logger = logging.getLogger('pymisp')
 
 
-def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID]) -> Union[str, int]:
+def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID, dict]) -> Union[str, int]:
     """Extract the relevant ID accordingly to the given type passed as parameter"""
     if isinstance(obj, UUID):
         return str(obj)
