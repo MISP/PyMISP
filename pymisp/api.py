@@ -3207,12 +3207,7 @@ class PyMISP:
         :param tag: tag to add
         :param local: whether to tag locally
         """
-        if isinstance(misp_entity, AbstractMISP) and 'uuid' in misp_entity:
-            uuid = misp_entity.uuid
-        elif isinstance(misp_entity, dict) and 'uuid' in misp_entity:
-            uuid = misp_entity['uuid']
-        elif isinstance(misp_entity, str):
-            uuid = misp_entity
+        uuid = get_uuid_or_id_from_abstract_misp(misp_entity)
         if isinstance(tag, MISPTag):
             tag = tag.name
         to_post = {'uuid': uuid, 'tag': tag, 'local': local}
@@ -3225,12 +3220,7 @@ class PyMISP:
         :param misp_entity: misp_entity can be a UUID
         :param tag: tag to remove
         """
-        if isinstance(misp_entity, AbstractMISP) and 'uuid' in misp_entity:
-            uuid = misp_entity.uuid
-        elif isinstance(misp_entity, dict) and 'uuid' in misp_entity:
-            uuid = misp_entity['uuid']
-        elif isinstance(misp_entity, str):
-            uuid = misp_entity
+        uuid = get_uuid_or_id_from_abstract_misp(misp_entity)
         if isinstance(tag, MISPTag):
             if 'name' in tag:
                 tag_name = tag.name
