@@ -2,6 +2,43 @@ Changelog
 =========
 
 
+v2.4.141 (2021-04-01)
+---------------------
+
+Changes
+~~~~~~~
+- Bump deps. [Raphaël Vinot]
+- Get_uuid_or_id_from_abstract_misp accepts dict. [Raphaël Vinot]
+- Remove references to ExpandedPyMISP. [Raphaël Vinot]
+
+  Fix #721
+- Follow best practices and remove the logging handler. [Raphaël Vinot]
+- Strip NULL string from value. [Raphaël Vinot]
+
+  https://github.com/MISP/PyMISP/issues/678
+- Bump deps. [Raphaël Vinot]
+- Raise exception on missing template in CSVLoader. [Raphaël Vinot]
+- Bump templates. [Raphaël Vinot]
+- Re-bump objects. [Raphaël Vinot]
+- Bump object templates. [Raphaël Vinot]
+- Add test case, fix mypy. [Raphaël Vinot]
+- Take simple_value as value in MISPObject.add_attribute. [Raphaël
+  Vinot]
+
+Fix
+~~~
+- Use get_uuid_or_id_from_abstract_misp in tag methods. [Raphaël Vinot]
+
+  Fix #725
+- Skip nameless sections in ELF. [Raphaël Vinot]
+- Make reportlab tests optional if missing dep. [Raphaël Vinot]
+- Enable taxonomy failed if global pythonify is on. [Raphaël Vinot]
+- Properly pass content-type. [Raphaël Vinot]
+- Re-enable support for uploading STIX 1 documents. [Raphaël Vinot]
+
+  Fix #711
+
+
 v2.4.140 (2021-03-03)
 ---------------------
 
@@ -18,6 +55,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump object templates. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
