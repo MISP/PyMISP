@@ -2,12 +2,25 @@ Changelog
 =========
 
 
+v2.4.141.1 (2021-04-02)
+-----------------------
+
+Changes
+~~~~~~~
+- Re-bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+
+Other
+~~~~~
+- Fix bump version, deps, templates. [Raphaël Vinot]
+- Update README.md. [Raphaël Vinot]
+
+
 v2.4.141 (2021-04-01)
 ---------------------
 
 Changes
 ~~~~~~~
-- Bump version. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Get_uuid_or_id_from_abstract_misp accepts dict. [Raphaël Vinot]
