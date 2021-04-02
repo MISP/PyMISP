@@ -24,9 +24,20 @@ Only basic dependencies:
 pip3 install pymisp
 ```
 
-With optional dependencies:
+And there are a few optional dependencies:
+* fileobjects: to create PE/ELF/Mach-o objects. **Important**: it will install pydeep, which require the system package `libfuzzy-dev`
+* openioc: to import files in OpenIOC format (not really maintained).
+* virustotal: to query VirusTotal and generate the appropriate objects
+* docs: to generate te documentation
+* pdfexport: to generate PDF reports out of MISP events
+* url: to generate URL objects out of URLs with Pyfaup
+* email: to generate MISP Email objects
+* brotli: to use the brotli when interacting with a MISP instance
+
+Example: 
+
 ```
-pip3 install pymisp[fileobjects,openioc,virustotal]
+pip3 install pymisp[virustotal,email]
 ```
 
 ## Install the latest version from repo from development purposes
