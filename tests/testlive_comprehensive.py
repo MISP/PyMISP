@@ -1223,7 +1223,7 @@ class TestComprehensive(unittest.TestCase):
 
             # Test generic Tag methods
             r = self.admin_misp_connector.tag(second, 'generic_tag_test')
-            self.assertTrue('successfully' in r['message'].lower() and f'Event ({second.id})' in r['message'], r['message'])
+            self.assertTrue('successfully' in r['message'].lower() and f'({second.id})' in r['message'], r['message'])
             second = self.user_misp_connector.get_event(second.id, pythonify=True)
             self.assertTrue('generic_tag_test' == second.tags[0].name)
 
@@ -1237,7 +1237,7 @@ class TestComprehensive(unittest.TestCase):
             # r = self.admin_misp_connector.untag(second.objects[0].uuid, 'generic_tag_test')
             # self.assertTrue(r['message'].endswith(f'successfully removed from Object({second.objects[0].id}).'), r['message'])
             r = self.admin_misp_connector.tag(second.objects[0].attributes[0].uuid, 'generic_tag_test')
-            self.assertTrue('successfully' in r['message'].lower() and f'Attribute ({second.objects[0].attributes[0].id})' in r['message'], r['message'])
+            self.assertTrue('successfully' in r['message'].lower() and f'({second.objects[0].attributes[0].id})' in r['message'], r['message'])
             attr = self.user_misp_connector.get_attribute(second.objects[0].attributes[0].uuid, pythonify=True)
             self.assertTrue('generic_tag_test' == attr.tags[0].name)
             r = self.admin_misp_connector.untag(second.objects[0].attributes[0].uuid, 'generic_tag_test')
@@ -1422,11 +1422,11 @@ class TestComprehensive(unittest.TestCase):
             # self.assertEqual(r['errors'][1]['message'], 'Invalid Tag. This tag can only be set by a fixed organisation.')
             self.assertEqual(r['errors'][1]['message'], 'Invalid Target.')
             r = self.user_misp_connector.tag(first, tag_org_restricted)
-            self.assertTrue('successfully' in r['message'].lower() and f'Event ({first.id})' in r['message'], r['message'])
+            self.assertTrue('successfully' in r['message'].lower() and f'({first.id})' in r['message'], r['message'])
             r = self.pub_misp_connector.tag(first.attributes[0], tag_user_restricted)
             self.assertIn('Invalid Tag. This tag can only be set by a fixed user.', r['errors'][1]['errors'])
             r = self.user_misp_connector.tag(first.attributes[0], tag_user_restricted)
-            self.assertTrue('successfully' in r['message'].lower() and f'Attribute ({first.attributes[0].id})' in r['message'], r['message'])
+            self.assertTrue('successfully' in r['message'].lower() and f'({first.attributes[0].id})' in r['message'], r['message'])
             first = self.user_misp_connector.get_event(first, pythonify=True)
             self.assertTrue(len(first.attributes[0].tags) == 1)
             # test delete tag on attribute edit
@@ -2170,13 +2170,22 @@ class TestComprehensive(unittest.TestCase):
             if feed.name == 'blockrules of rules.emergingthreats.net':
                 e_thread_csv_feed = feed
                 break
+        e_thread_csv_feed.enabled = True
         updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed, pythonify=True)
+        self.assertTrue(updated_feed.enabled)
         self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
+
+        e_thread_csv_feed.enabled = False
         updated_feed = self.admin_misp_connector.disable_feed(e_thread_csv_feed, pythonify=True)
+        self.assertFalse(updated_feed.enabled)
         self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
 
         # Test partial update
         updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed.id, pythonify=True)
+        self.assertTrue(updated_feed.enabled)
+        self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
+        updated_feed = self.admin_misp_connector.disable_feed(e_thread_csv_feed.id, pythonify=True)
+        self.assertFalse(updated_feed.enabled)
         self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
 
     def test_servers(self):
