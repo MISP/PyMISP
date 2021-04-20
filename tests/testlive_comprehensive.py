@@ -2170,12 +2170,10 @@ class TestComprehensive(unittest.TestCase):
             if feed.name == 'blockrules of rules.emergingthreats.net':
                 e_thread_csv_feed = feed
                 break
-        e_thread_csv_feed.enabled = True
         updated_feed = self.admin_misp_connector.enable_feed(e_thread_csv_feed, pythonify=True)
         self.assertTrue(updated_feed.enabled)
         self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
 
-        e_thread_csv_feed.enabled = False
         updated_feed = self.admin_misp_connector.disable_feed(e_thread_csv_feed, pythonify=True)
         self.assertFalse(updated_feed.enabled)
         self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)

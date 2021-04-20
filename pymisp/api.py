@@ -1564,9 +1564,9 @@ class PyMISP:
             feed_id = get_uuid_or_id_from_abstract_misp(feed)  # In case we have a UUID
             f = MISPFeed()
             f.id = feed_id
-            f.enabled = True
         else:
             f = feed
+        f.enabled = True
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def disable_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
@@ -1579,9 +1579,9 @@ class PyMISP:
             feed_id = get_uuid_or_id_from_abstract_misp(feed)  # In case we have a UUID
             f = MISPFeed()
             f.id = feed_id
-            f.enabled = False
         else:
             f = feed
+        f.enabled = False
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def enable_feed_cache(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
@@ -1594,9 +1594,9 @@ class PyMISP:
             feed_id = get_uuid_or_id_from_abstract_misp(feed)  # In case we have a UUID
             f = MISPFeed()
             f.id = feed_id
-            f.caching_enabled = True
         else:
             f = feed
+        f.caching_enabled = True
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def disable_feed_cache(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
@@ -1609,9 +1609,9 @@ class PyMISP:
             feed_id = get_uuid_or_id_from_abstract_misp(feed)  # In case we have a UUID
             f = MISPFeed()
             f.id = feed_id
-            f.caching_enabled = False
         else:
             f = feed
+        f.caching_enabled = False
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def update_feed(self, feed: MISPFeed, feed_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPFeed]:
