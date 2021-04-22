@@ -27,7 +27,7 @@ logger = logging.getLogger('pymisp')
 
 
 try:
-    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlocklist, MISPEventReport, MISPGalaxyCluster
+    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlocklist, MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
     from pymisp.exceptions import MISPServerError
 except ImportError:
@@ -1632,6 +1632,21 @@ class TestComprehensive(unittest.TestCase):
         self.assertTrue(r['Noticelist']['enabled'], r)
         r = self.admin_misp_connector.disable_noticelist(testnl)
         self.assertFalse(r['Noticelist']['enabled'], r)
+
+    def test_correlation_exclusions(self):
+        newce = MISPCorrelationExclusion()
+        newce.value = "test-correlation-exclusion"
+        r = self.admin_misp_connector.add_correlation_exclusion(newce, pythonify=True)
+        self.assertEqual(r.value, newce.value)
+        correlation_exclusions = self.admin_misp_connector.correlation_exclusions(pythonify=True)
+        self.assertTrue(isinstance(correlation_exclusions, list))
+        testce = correlation_exclusions[0]
+        r = self.admin_misp_connector.get_correlation_exclusion(testce, pythonify=True)
+        self.assertEqual(r.value, testce.value)
+        r = self.admin_misp_connector.delete_correlation_exclusion(r)
+        self.assertTrue(r['success'])
+        r = self.admin_misp_connector.clean_correlation_exclusions()
+        self.assertTrue(r['success'])
 
     def test_galaxies(self):
         # Make sure we're up-to-date

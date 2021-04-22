@@ -2071,6 +2071,14 @@ class MISPNoticelist(AbstractMISP):
         super().from_dict(**kwargs)
 
 
+class MISPCorrelationExclusion(AbstractMISP):
+
+    def from_dict(self, **kwargs):
+        if 'CorrelationExclusion' in kwargs:
+            kwargs = kwargs['CorrelationExclusion']
+        super().from_dict(**kwargs)
+
+
 class MISPRole(AbstractMISP):
 
     def __init__(self, **kwargs):

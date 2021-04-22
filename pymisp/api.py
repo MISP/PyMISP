@@ -25,7 +25,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
-    MISPGalaxyCluster, MISPGalaxyClusterRelation
+    MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 SearchType = TypeVar('SearchType', str, int)
@@ -1300,6 +1300,69 @@ class PyMISP:
         return self._check_json_response(response)
 
     # ## END Noticelist ###
+
+    # ## BEGIN Correlation Exclusions ###
+
+    def correlation_exclusions(self, pythonify: bool = False) -> Union[Dict, List[MISPCorrelationExclusion]]:
+        """Get all the correlation exclusions
+
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        r = self._prepare_request('GET', 'correlation_exclusions')
+        correlation_exclusions = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in correlation_exclusions:
+            return correlation_exclusions
+        to_return = []
+        for correlation_exclusion in correlation_exclusions:
+            c = MISPCorrelationExclusion()
+            c.from_dict(**correlation_exclusion)
+            to_return.append(c)
+        return to_return
+
+    def get_correlation_exclusion(self, correlation_exclusion: Union[MISPCorrelationExclusion, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPCorrelationExclusion]:
+        """Get a correlation exclusion by ID
+
+        :param correlation_exclusion: Correlation exclusion to get
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        exclusion_id = get_uuid_or_id_from_abstract_misp(correlation_exclusion)
+        r = self._prepare_request('GET', f'correlation_exclusions/view/{exclusion_id}')
+        correlation_exclusion_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in correlation_exclusion_j:
+            return correlation_exclusion_j
+        c = MISPCorrelationExclusion()
+        c.from_dict(**correlation_exclusion_j)
+        return c
+
+    def add_correlation_exclusion(self, correlation_exclusion: MISPCorrelationExclusion, pythonify: bool = False) -> Union[Dict, MISPCorrelationExclusion]:
+        """Add a new correlation exclusion
+
+        :param correlation_exclusion: correlation exclusion to add
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        r = self._prepare_request('POST', 'correlation_exclusions/add', data=correlation_exclusion)
+        new_correlation_exclusion = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in new_correlation_exclusion:
+            return new_correlation_exclusion
+        c = MISPCorrelationExclusion()
+        c.from_dict(**new_correlation_exclusion)
+        return c
+
+    def delete_correlation_exclusion(self, correlation_exclusion: Union[MISPCorrelationExclusion, int, str, UUID]) -> Dict:
+        """Delete a correlation exclusion
+
+        :param correlation_exclusion: The MISPCorrelationExclusion you wish to delete from MISP
+        """
+        exclusion_id = get_uuid_or_id_from_abstract_misp(correlation_exclusion)
+        r = self._prepare_request('POST', f'correlation_exclusions/delete/{exclusion_id}')
+        return self._check_json_response(r)
+
+    def clean_correlation_exclusions(self):
+        """Initiate correlation exclusions cleanup"""
+        r = self._prepare_request('POST', 'correlation_exclusions/clean')
+        return self._check_json_response(r)
+
+    # ## END Correlation Exclusions ###
 
     # ## BEGIN Galaxy ###
 
