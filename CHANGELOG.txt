@@ -2,11 +2,38 @@ Changelog
 =========
 
 
+v2.4.142 (2021-04-26)
+---------------------
+
+New
+~~~
+- Support for correlation exclusion list. [Raphaël Vinot]
+
+  Fix #732
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Fix test suite. [Raphaël Vinot]
+- Bump objects templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Add comment for controller attribute in search. [Raphaël Vinot]
+
+Fix
+~~~
+- Enable/disable feeds. [Raphaël Vinot]
+- Mistake in mypy config. [Raphaël Vinot]
+- Exclude data from mypy. [Raphaël Vinot]
+
+
 v2.4.141.1 (2021-04-02)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Re-bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 
