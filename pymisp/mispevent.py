@@ -266,10 +266,12 @@ class MISPAttribute(AbstractMISP):
         if name in ['first_seen', 'last_seen']:
             _datetime = _make_datetime(value)
 
+            # NOTE: the two following should be exceptions, but there are existing events in this state,
+            # And we cannot dump them if it is there.
             if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > _datetime:
-                raise PyMISPError(f'last_seen ({value}) has to be after first_seen ({self.first_seen})')
+                logger.warning(f'last_seen ({value}) has to be after first_seen ({self.first_seen})')
             if name == 'first_seen' and hasattr(self, 'last_seen') and self.last_seen < _datetime:
-                raise PyMISPError(f'first_seen ({value}) has to be before last_seen ({self.last_seen})')
+                logger.warning(f'first_seen ({value}) has to be before last_seen ({self.last_seen})')
             super().__setattr__(name, _datetime)
         elif name == 'data':
             self._prepare_data(value)
@@ -725,9 +727,9 @@ class MISPObject(AbstractMISP):
             value = _make_datetime(value)
 
             if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > value:
-                raise PyMISPError('last_seen ({value}) has to be after first_seen ({self.first_seen})')
+                logger.warning(f'last_seen ({value}) has to be after first_seen ({self.first_seen})')
             if name == 'first_seen' and hasattr(self, 'last_seen') and self.last_seen < value:
-                raise PyMISPError('first_seen ({value}) has to be before last_seen ({self.last_seen})')
+                logger.warning(f'first_seen ({value}) has to be before last_seen ({self.last_seen})')
         super().__setattr__(name, value)
 
     def force_misp_objects_path_custom(self, misp_objects_path_custom: Union[Path, str], object_name: Optional[str] = None):
