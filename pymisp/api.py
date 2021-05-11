@@ -640,6 +640,13 @@ class PyMISP:
         t.from_dict(**object_template_r)
         return t
 
+    def get_raw_object_template(self, uuid_or_name: str) -> Dict:
+        """Get a row template. It needs to be present on disk on the MISP instance you're connected to.
+        The response of this method can be passed to MISPObject(<name>, misp_objects_template_custom=<response>)
+        """
+        r = self._prepare_request('GET', f'objectTemplates/getRaw/{uuid_or_name}')
+        return self._check_json_response(r)
+
     def update_object_templates(self) -> Dict:
         """Trigger an update of the object templates"""
         response = self._prepare_request('POST', 'objectTemplates/update')

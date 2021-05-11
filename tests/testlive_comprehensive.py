@@ -1371,6 +1371,13 @@ class TestComprehensive(unittest.TestCase):
         template = self.admin_misp_connector.get_object_template(object_template.uuid, pythonify=True)
         self.assertEqual(template.name, 'file')
 
+        raw_template = self.admin_misp_connector.get_raw_object_template('domain-ip')
+        raw_template['uuid'] = '4'
+        mo = MISPObject('domain-ip', misp_objects_template_custom=raw_template)
+        mo.add_attribute('ip', '8.8.8.8')
+        mo.add_attribute('domain', 'google.fr')
+        self.assertEqual(mo.template_uuid, '4')
+
     def test_tags(self):
         # Get list
         tags = self.admin_misp_connector.tags(pythonify=True)
