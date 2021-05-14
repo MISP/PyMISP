@@ -2,6 +2,26 @@ Changelog
 =========
 
 
+v2.4.143 (2021-05-14)
+---------------------
+
+New
+~~~
+- Method to get the raw object template. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version, deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump objects templates. [Raphaël Vinot]
+
+Fix
+~~~
+- First-seen and last-seen on attributes and objects were not checked
+  for sanity. [Raphaël Vinot]
+- Remove search_all example, use search instead. [Raphaël Vinot]
+
+
 v2.4.142 (2021-04-26)
 ---------------------
 
@@ -13,6 +33,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Fix test suite. [Raphaël Vinot]
