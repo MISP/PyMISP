@@ -38,8 +38,8 @@ attr_cnt_duplicate = 0
 attr_cnt_changed = 0
 yara_rules = []
 yara_rule_names = []
-if 'response' in result and 'Attribute' in result['response']:
-    for attribute in result['response']['Attribute']:
+if result.get('Attribute'):
+    for attribute in result.get('Attribute'):
         value = attribute['value']
         event_id = attribute['event_id']
         attribute_id = attribute['id']
