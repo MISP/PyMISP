@@ -2846,6 +2846,24 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(event)
             self.admin_misp_connector.toggle_global_pythonify()
 
+    def test_change_orgc(self):
+        self.admin_misp_connector.toggle_global_pythonify()
+        event = self.create_simple_event()
+        try:
+            event = self.admin_misp_connector.add_event(event)
+            self.assertEqual(event.Orgc.name, 'ORGNAME')
+            orgc = MISPOrganisation()
+            orgc.name = self.test_org.name
+            orgc.id = self.test_org.id
+            orgc.uuid = self.test_org.uuid
+            event.Orgc = orgc
+            event = self.admin_misp_connector.update_event(event)
+            time.sleep(30)
+            self.assertEqual(event.Orgc.name, 'Test Org')
+        finally:
+            self.admin_misp_connector.delete_event(event)
+            self.admin_misp_connector.toggle_global_pythonify()
+
     @unittest.skip("Internal use only")
     def missing_methods(self):
         skip = [
