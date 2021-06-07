@@ -2,6 +2,22 @@ Changelog
 =========
 
 
+v2.4.144 (2021-06-07)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump object templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Other
+~~~~~
+- Fix misp API response content parsing. [Silvian I]
+
+
 v2.4.143 (2021-05-14)
 ---------------------
 
@@ -11,6 +27,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version, deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump objects templates. [Raphaël Vinot]
