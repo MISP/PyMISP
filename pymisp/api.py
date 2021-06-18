@@ -79,7 +79,7 @@ def register_user(misp_url: str, email: str,
     if organisation:
         data['org_uuid'] = get_uuid_or_id_from_abstract_misp(data.pop('organisation'))
 
-    url = urljoin(data.pop('misp_url'), '/users/register')
+    url = urljoin(data.pop('misp_url'), 'users/register')
     user_agent = f'PyMISP {__version__} - no login -  Python {".".join(str(x) for x in sys.version_info[:2])}'
     headers = {
         'Accept': 'application/json',
@@ -2266,7 +2266,7 @@ class PyMISP:
         :param role: the default role to set
         """
         role_id = get_uuid_or_id_from_abstract_misp(role)
-        url = urljoin(self.root_url, f'/admin/roles/set_default/{role_id}')
+        url = urljoin(self.root_url, f'admin/roles/set_default/{role_id}')
         response = self._prepare_request('POST', url)
         return self._check_json_response(response)
 
@@ -2748,7 +2748,7 @@ class PyMISP:
 
     def search_feeds(self, value: Optional[SearchParameterTypes] = None, pythonify: Optional[bool] = False) -> Union[Dict, List[MISPFeed]]:
         '''Search in the feeds cached on the servers'''
-        response = self._prepare_request('POST', '/feeds/searchCaches', data={'value': value})
+        response = self._prepare_request('POST', 'feeds/searchCaches', data={'value': value})
         normalized_response = self._check_json_response(response)
         if not (self.global_pythonify or pythonify) or 'errors' in normalized_response:
             return normalized_response
@@ -2980,10 +2980,10 @@ class PyMISP:
             to_post = to_post.decode()
 
         if str(version) == '1':
-            url = urljoin(self.root_url, '/events/upload_stix')
+            url = urljoin(self.root_url, 'events/upload_stix')
             response = self._prepare_request('POST', url, data=to_post, output_type='xml', content_type='xml')  # type: ignore
         else:
-            url = urljoin(self.root_url, '/events/upload_stix/2')
+            url = urljoin(self.root_url, 'events/upload_stix/2')
             response = self._prepare_request('POST', url, data=to_post)  # type: ignore
         return response
 
@@ -3332,7 +3332,7 @@ class PyMISP:
 
     def get_all_functions(self, not_implemented: bool = False):
         '''Get all methods available via the API, including ones that are not implemented.'''
-        response = self._prepare_request('GET', '/servers/queryACL/printAllFunctionNames')
+        response = self._prepare_request('GET', 'servers/queryACL/printAllFunctionNames')
         functions = self._check_json_response(response)
         # Format as URLs
         paths = []
@@ -3457,6 +3457,9 @@ class PyMISP:
     def _prepare_request(self, request_type: str, url: str, data: Union[str, Iterable, Mapping, AbstractMISP] = {}, params: Mapping = {},
                          kw_params: Mapping = {}, output_type: str = 'json', content_type: str = 'json') -> requests.Response:
         '''Prepare a request for python-requests'''
+        if url[0] == '/':
+            # strip it: it will fail if MISP is in a sub directory
+            url = url[1:]
         url = urljoin(self.root_url, url)
         if data == {} or isinstance(data, str):
             d = data
