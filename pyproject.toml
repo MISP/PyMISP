@@ -88,11 +88,3 @@ types-Flask = "^1.1.1"
 [build-system]
 requires = ["poetry_core>=1.0", "setuptools"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.mypy]
-show_error_context = true
-pretty = true
-
-[[tool.mypy.overrides]]
-module = ["pymisp.data", "pymisp.data.*", "docs.source.*", "examples", "examples.*.*"]
-ignore_errors = true
