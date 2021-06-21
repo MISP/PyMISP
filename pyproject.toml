@@ -76,11 +76,23 @@ nose = "^1.3.7"
 coveralls = "^3.0.1"
 codecov = "^2.1.11"
 requests-mock = "^1.8.0"
-mypy = "^0.812"
+mypy = "^0.902"
 flake8 = "^3.9.0"
 ipython = "^7.16.1"
 jupyterlab = "^2.3.1"
+types-requests = "^2.25.0"
+types-python-dateutil = "^0.1.4"
+types-redis = "^3.5.4"
+types-Flask = "^1.1.1"
 
 [build-system]
 requires = ["poetry_core>=1.0", "setuptools"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+show_error_context = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = ["pymisp.data", "pymisp.data.*", "docs.source.*", "examples", "examples.*.*"]
+ignore_errors = true

@@ -7,6 +7,9 @@ examples/cudeso.py
 examples/feed-generator/output/*\.json
 examples/feed-generator/output/hashes\.csv
 examples/feed-generator/settings\.py
+examples/feed_generator/output/*\.json
+examples/feed_generator/output/hashes\.csv
+examples/feed_generator/settings\.py
 tests/reportlab_testoutputs/*\.pdf
 build/*
 dist/*
