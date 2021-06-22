@@ -1954,6 +1954,15 @@ class PyMISP:
         s.from_dict(**updated_sharing_group)
         return s
 
+    def sharing_group_exists(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> bool:
+        """Fast check if sharing group exists.
+
+        :param sharing_group: Sharing group to check
+        """
+        sharing_group_id = get_uuid_or_id_from_abstract_misp(sharing_group)
+        r = self._prepare_request('HEAD', f'sharing_groups/view/{sharing_group_id}')
+        return self._check_head_response(r)
+
     def delete_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> Dict:
         """Delete a sharing group
 
