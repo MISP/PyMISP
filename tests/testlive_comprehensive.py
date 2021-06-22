@@ -1576,6 +1576,8 @@ class TestComprehensive(unittest.TestCase):
         # Get list
         taxonomies = self.admin_misp_connector.taxonomies(pythonify=True)
         self.assertTrue(isinstance(taxonomies, list))
+
+        # Test fetching taxonomy by ID
         list_name_test = 'tlp'
         for tax in taxonomies:
             if tax.namespace == list_name_test:
@@ -1583,10 +1585,17 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.get_taxonomy(tax, pythonify=True)
         self.assertEqual(r.namespace, list_name_test)
         self.assertTrue('enabled' in r)
+
+        # Test fetching taxonomy by namespace
+        r = self.admin_misp_connector.get_taxonomy("tlp", pythonify=True)
+        self.assertEqual(r.namespace, "tlp")
+
         r = self.admin_misp_connector.enable_taxonomy(tax)
         self.assertEqual(r['message'], 'Taxonomy enabled')
+
         r = self.admin_misp_connector.enable_taxonomy_tags(tax)
         self.assertEqual(r['name'], 'The tag(s) has been saved.')
+
         r = self.admin_misp_connector.disable_taxonomy(tax)
         self.assertEqual(r['message'], 'Taxonomy disabled')
 
@@ -2077,9 +2086,15 @@ class TestComprehensive(unittest.TestCase):
         sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
         self.assertEqual(sharing_group.name, 'Testcases SG')
         self.assertEqual(sharing_group.releasability, 'Testing')
+
         # Change releasability
         r = self.admin_misp_connector.update_sharing_group({"releasability": "Testing updated"}, sharing_group)
         self.assertEqual(sharing_group.releasability, 'Testing updated')
+
+        # Test `sharing_group_exists` method
+        self.assertTrue(self.admin_misp_connector.sharing_group_exists(sharing_group))
+        self.assertTrue(self.admin_misp_connector.sharing_group_exists(sharing_group.id))
+        self.assertTrue(self.admin_misp_connector.sharing_group_exists(sharing_group.uuid))
 
         # add org
         r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group,
@@ -2128,6 +2143,10 @@ class TestComprehensive(unittest.TestCase):
             # Delete sharing group
             r = self.admin_misp_connector.delete_sharing_group(sharing_group.id)
             self.assertEqual(r['message'], 'SharingGroup deleted')
+
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.id))
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.uuid))
 
     def test_feeds(self):
         # Add

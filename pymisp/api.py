@@ -1092,7 +1092,7 @@ class PyMISP:
         return to_return
 
     def get_taxonomy(self, taxonomy: Union[MISPTaxonomy, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPTaxonomy]:
-        """Get a taxonomy by id from a MISP instance
+        """Get a taxonomy by id or namespace from a MISP instance
 
         :param taxonomy: taxonomy to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1921,6 +1921,7 @@ class PyMISP:
         s.from_dict(**sharing_group_j)
         return s
 
+
     def update_sharing_group(self, sharing_group: Union[MISPSharingGroup, dict], sharing_group_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
         """Update sharing group parameters
 
@@ -1939,6 +1940,16 @@ class PyMISP:
         s = MISPSharingGroup()
         s.from_dict(**updated_sharing_group)
         return s
+
+    def sharing_group_exists(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> bool:
+        """Fast check if sharing group exists.
+
+        :param sharing_group: Sharing group to check
+        """
+        sharing_group_id = get_uuid_or_id_from_abstract_misp(sharing_group)
+        r = self._prepare_request('HEAD', f'sharing_groups/view/{sharing_group_id}')
+        return self._check_head_response(r)
+
 
     def delete_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> Dict:
         """Delete a sharing group
@@ -2038,6 +2049,15 @@ class PyMISP:
         o = MISPOrganisation()
         o.from_dict(**organisation_j)
         return o
+
+    def organisation_exists(self, organisation: Union[MISPOrganisation, int, str, UUID]) -> bool:
+        """Fast check if organisation exists.
+
+        :param organisation: Organisation to check
+        """
+        organisation_id = get_uuid_or_id_from_abstract_misp(organisation)
+        r = self._prepare_request('HEAD', f'organisations/view/{organisation_id}')
+        return self._check_head_response(r)
 
     def add_organisation(self, organisation: MISPOrganisation, pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
         """Add an organisation
