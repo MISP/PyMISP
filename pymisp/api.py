@@ -1921,7 +1921,6 @@ class PyMISP:
         s.from_dict(**sharing_group_j)
         return s
 
-
     def update_sharing_group(self, sharing_group: Union[MISPSharingGroup, dict], sharing_group_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
         """Update sharing group parameters
 
@@ -1949,7 +1948,6 @@ class PyMISP:
         sharing_group_id = get_uuid_or_id_from_abstract_misp(sharing_group)
         r = self._prepare_request('HEAD', f'sharing_groups/view/{sharing_group_id}')
         return self._check_head_response(r)
-
 
     def delete_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> Dict:
         """Delete a sharing group
