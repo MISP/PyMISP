@@ -2029,6 +2029,15 @@ class PyMISP:
         o.from_dict(**organisation_j)
         return o
 
+    def organisation_exists(self, organisation: Union[MISPOrganisation, int, str, UUID]) -> bool:
+        """Fast check if organisation exists.
+
+        :param organisation: Organisation to check
+        """
+        organisation_id = get_uuid_or_id_from_abstract_misp(organisation)
+        r = self._prepare_request('HEAD', f'organisations/view/{organisation_id}')
+        return self._check_head_response(r)
+
     def add_organisation(self, organisation: MISPOrganisation, pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
         """Add an organisation
 
