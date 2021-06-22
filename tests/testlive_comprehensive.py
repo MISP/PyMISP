@@ -2077,6 +2077,10 @@ class TestComprehensive(unittest.TestCase):
         sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
         self.assertEqual(sharing_group.name, 'Testcases SG')
         self.assertEqual(sharing_group.releasability, 'Testing')
+        # Change releasability
+        r = self.admin_misp_connector.update_sharing_group({"releasability": "Testing updated"}, sharing_group)
+        self.assertEqual(sharing_group.releasability, 'Testing updated')
+
         # add org
         r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group,
                                                                self.test_org, extend=True)

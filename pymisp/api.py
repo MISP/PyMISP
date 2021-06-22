@@ -1935,6 +1935,25 @@ class PyMISP:
         s.from_dict(**sharing_group_j)
         return s
 
+    def update_sharing_group(self, sharing_group: Union[MISPSharingGroup, dict], sharing_group_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
+        """Update sharing group parameters
+
+        :param sharing_group: MISP Sharing Group
+        :param sharing_group_id Sharing group ID
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        if sharing_group_id is None:
+            sid = get_uuid_or_id_from_abstract_misp(sharing_group)
+        else:
+            sid = get_uuid_or_id_from_abstract_misp(sharing_group_id)
+        r = self._prepare_request('POST', f'sharing_groups/edit/{sid}', data=sharing_group)
+        updated_sharing_group = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_sharing_group:
+            return updated_sharing_group
+        s = MISPSharingGroup()
+        s.from_dict(**updated_sharing_group)
+        return s
+
     def delete_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> Dict:
         """Delete a sharing group
 
