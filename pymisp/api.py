@@ -1106,7 +1106,7 @@ class PyMISP:
         return to_return
 
     def get_taxonomy(self, taxonomy: Union[MISPTaxonomy, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPTaxonomy]:
-        """Get a taxonomy by id from a MISP instance
+        """Get a taxonomy by id or namespace from a MISP instance
 
         :param taxonomy: taxonomy to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
