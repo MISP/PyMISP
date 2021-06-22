@@ -1921,6 +1921,15 @@ class PyMISP:
         s.from_dict(**sharing_group_j)
         return s
 
+    def sharing_group_exists(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> bool:
+        """Fast check if sharing group exists.
+
+        :param sharing_group: Sharing group to check
+        """
+        sharing_group_id = get_uuid_or_id_from_abstract_misp(sharing_group)
+        r = self._prepare_request('HEAD', f'sharing_groups/view/{sharing_group_id}')
+        return self._check_head_response(r)
+
     def delete_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> Dict:
         """Delete a sharing group
 
@@ -2019,6 +2028,15 @@ class PyMISP:
         o = MISPOrganisation()
         o.from_dict(**organisation_j)
         return o
+
+    def organisation_exists(self, organisation: Union[MISPOrganisation, int, str, UUID]) -> bool:
+        """Fast check if organisation exists.
+
+        :param organisation: Organisation to check
+        """
+        organisation_id = get_uuid_or_id_from_abstract_misp(organisation)
+        r = self._prepare_request('HEAD', f'organisations/view/{organisation_id}')
+        return self._check_head_response(r)
 
     def add_organisation(self, organisation: MISPOrganisation, pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
         """Add an organisation

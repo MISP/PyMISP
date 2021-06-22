@@ -2077,6 +2077,10 @@ class TestComprehensive(unittest.TestCase):
         sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
         self.assertEqual(sharing_group.name, 'Testcases SG')
         self.assertEqual(sharing_group.releasability, 'Testing')
+        # Test `sharing_group_exists` method
+        self.assertTrue(self.admin_misp_connector.sharing_group_exists(sharing_group))
+        self.assertTrue(self.admin_misp_connector.sharing_group_exists(sharing_group.id))
+        self.assertTrue(self.admin_misp_connector.sharing_group_exists(sharing_group.uuid))
         # add org
         r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group,
                                                                self.test_org, extend=True)
@@ -2124,6 +2128,10 @@ class TestComprehensive(unittest.TestCase):
             # Delete sharing group
             r = self.admin_misp_connector.delete_sharing_group(sharing_group.id)
             self.assertEqual(r['message'], 'SharingGroup deleted')
+
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.id))
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.uuid))
 
     def test_feeds(self):
         # Add
