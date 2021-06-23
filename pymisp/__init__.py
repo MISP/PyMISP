@@ -36,6 +36,7 @@ try:
                             MISPCorrelationExclusion)
     from .tools import AbstractMISPObjectGenerator  # noqa
     from .tools import Neo4j  # noqa
+    from .tools import stix  # noqa
     from .tools import openioc  # noqa
     from .tools import ext_lookups  # noqa
     from .tools import update_objects  # noqa
