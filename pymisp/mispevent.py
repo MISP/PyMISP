@@ -1396,11 +1396,8 @@ class MISPEvent(AbstractMISP):
 
     def __init__(self, describe_types: Optional[Dict] = None, strict_validation: bool = False, **kwargs):
         super().__init__(**kwargs)
-        if strict_validation:
-            schema_file = 'schema.json'
-        else:
-            schema_file = 'schema-lax.json'
-        self.__json_schema = self._load_json(self.resources_path / schema_file)
+        self.__schema_file = 'schema.json' if strict_validation else 'schema-lax.json'
+
         if describe_types:
             # This variable is used in add_attribute in order to avoid duplicating the structure
             self.describe_types = describe_types
@@ -1618,7 +1615,8 @@ class MISPEvent(AbstractMISP):
             event.pop('Object', None)
         self.from_dict(**event)
         if validate:
-            jsonschema.validate(json.loads(self.to_json()), self.__json_schema)
+            json_schema = self._load_json(self.resources_path / self.__schema_file)
+            jsonschema.validate({"Event": self.jsonable()}, json_schema)
 
     def __setattr__(self, name, value):
         if name in ['date']:

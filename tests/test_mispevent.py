@@ -48,6 +48,14 @@ class TestMISPEvent(unittest.TestCase):
         del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
+    def test_loadfile_validate(self):
+        misp_event = MISPEvent()
+        misp_event.load_file('tests/mispevent_testfiles/event.json', validate=True)
+
+    def test_loadfile_validate_strict(self):
+        misp_event = MISPEvent(strict_validation=True)
+        misp_event.load_file('tests/mispevent_testfiles/event.json', validate=True)
+
     def test_event_tag(self):
         self.init_event()
         self.mispevent.add_tag('bar')
