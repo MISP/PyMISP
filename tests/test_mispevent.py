@@ -79,6 +79,15 @@ class TestMISPEvent(unittest.TestCase):
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
+    def test_to_dict_json_format(self):
+        misp_event = MISPEvent()
+        av_signature_object = MISPObject("av-signature")
+        av_signature_object.add_attribute("signature", "EICAR")
+        av_signature_object.add_attribute("software", "ClamAv")
+        misp_event.add_object(av_signature_object)
+
+        self.assertEqual(json.loads(misp_event.to_json()), misp_event.to_dict(json_format=True))
+
     def test_object_tag(self):
         self.mispevent.add_object(name='file', strict=True)
         a = self.mispevent.objects[0].add_attribute('filename', value='')
