@@ -2088,7 +2088,7 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(sharing_group.releasability, 'Testing')
 
         # Change releasability
-        r = self.admin_misp_connector.update_sharing_group({"releasability": "Testing updated"}, sharing_group)
+        r = self.admin_misp_connector.update_sharing_group({"releasability": "Testing updated"}, sharing_group, pythonify=True)
         self.assertEqual(r.releasability, 'Testing updated')
 
         # Test `sharing_group_exists` method
