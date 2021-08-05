@@ -27,6 +27,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump objects template. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Remove duplicates tests. [Raphaël Vinot]
 - [testlive_comprehensive] correct path to access sharing group
