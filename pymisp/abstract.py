@@ -179,7 +179,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         """Load a JSON string"""
         self.from_dict(**loads(json_string))
 
-    def to_dict(self) -> Dict:
+    def to_dict(self, json_format: bool = False) -> Dict:
         """Dump the class to a dictionary.
         This method automatically removes the timestamp recursively in every object
         that has been edited is order to let MISP update the event accordingly."""
@@ -192,6 +192,16 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
                 continue
             elif isinstance(val, str):
                 val = val.strip()
+            elif json_format:
+                if isinstance(val, AbstractMISP):
+                    val = val.to_json(True)
+                elif isinstance(val, (datetime, date)):
+                    val = val.isoformat()
+                elif isinstance(val, Enum):
+                    val = val.value
+                elif isinstance(val, UUID):
+                    val = str(val)
+
             if attribute == 'timestamp':
                 if not self.__force_timestamps and is_edited:
                     # In order to be accepted by MISP, the timestamp of an object
@@ -201,7 +211,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
                     continue
                 else:
                     val = self._datetime_to_timestamp(val)
-            if (attribute in ['first_seen', 'last_seen', 'datetime']
+            if (attribute in ('first_seen', 'last_seen', 'datetime')
                     and isinstance(val, datetime)
                     and not val.tzinfo):
                 # Need to make sure the timezone is set. Otherwise, it will be processed as UTC on the server

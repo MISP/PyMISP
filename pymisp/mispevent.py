@@ -528,8 +528,8 @@ class MISPAttribute(AbstractMISP):
 
         super().from_dict(**kwargs)
 
-    def to_dict(self) -> Dict:
-        to_return = super().to_dict()
+    def to_dict(self, json_format: bool = False) -> Dict:
+        to_return = super().to_dict(json_format)
         if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
         return to_return
@@ -967,10 +967,10 @@ class MISPObject(AbstractMISP):
             to_return.append(a)
         return to_return
 
-    def to_dict(self, strict: bool = False) -> Dict:
+    def to_dict(self, json_format: bool = False, strict: bool = False) -> Dict:
         if strict or self._strict and self._known_template:
             self._validate()
-        return super(MISPObject, self).to_dict()
+        return super(MISPObject, self).to_dict(json_format)
 
     def to_json(self, sort_keys: bool = False, indent: Optional[int] = None, strict: bool = False):
         if strict or self._strict and self._known_template:
@@ -1728,8 +1728,8 @@ class MISPEvent(AbstractMISP):
 
         super(MISPEvent, self).from_dict(**kwargs)
 
-    def to_dict(self) -> Dict:
-        to_return = super().to_dict()
+    def to_dict(self, json_format: bool = False) -> Dict:
+        to_return = super().to_dict(json_format)
 
         if to_return.get('date'):
             if isinstance(self.date, datetime):
