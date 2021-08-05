@@ -43,7 +43,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'https://localhost:8443'
-    key = 'd6OmdDFvU3Seau3UjwvHS1y3tFQbaRNhJhDX0tjh'
+    key = 'i8ckGjsyrfRSCPqE0qqr0XJbsLlfbOyYDzdSDawM'
     verifycert = False
 
 
