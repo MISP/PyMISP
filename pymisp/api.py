@@ -225,7 +225,7 @@ class PyMISP:
         # Sine MISP 2.4.146 is recommended PyMISP version included in getVersion call
         misp_version = self.misp_instance_version
         if "pymisp_recommended_version" in misp_version:
-            return {"version": misp_version["recommended_pymisp_version"]}  # Returns dict to keep BC
+            return {"version": misp_version["pymisp_recommended_version"]}  # Returns dict to keep BC
 
         response = self._prepare_request('GET', 'servers/getPyMISPVersion.json')
         return self._check_json_response(response)
