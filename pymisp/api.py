@@ -28,6 +28,15 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
+try:
+    # cached_property exists since Python 3.8
+    from functools import cached_property  # type: ignore
+except ImportError:
+    from functools import lru_cache
+
+    def cached_property(func):  # type: ignore
+        return property(lru_cache()(func))
+
 SearchType = TypeVar('SearchType', str, int)
 # str: string to search / list: values to search (OR) / dict: {'OR': [list], 'NOT': [list], 'AND': [list]}
 SearchParameterTypes = TypeVar('SearchParameterTypes', str, List[Union[str, int]], Dict[str, Union[str, int]])
@@ -213,12 +222,17 @@ class PyMISP:
     @property
     def recommended_pymisp_version(self) -> Dict:
         """Returns the recommended API version from the server"""
+        # Sine MISP 2.4.146 is recommended PyMISP version included in getVersion call
+        misp_version = self.misp_instance_version
+        if "pymisp_recommended_version" in misp_version:
+            return {"version": misp_version["pymisp_recommended_version"]}  # Returns dict to keep BC
+
         response = self._prepare_request('GET', 'servers/getPyMISPVersion.json')
         return self._check_json_response(response)
 
     @property
     def version(self) -> Dict:
-        """Returns the version of PyMISP you're curently using"""
+        """Returns the version of PyMISP you're currently using"""
         return {'version': __version__}
 
     @property
@@ -235,7 +249,7 @@ class PyMISP:
             return {'version': version[0]}
         return {'error': 'Impossible to retrieve the version of the main branch.'}
 
-    @property
+    @cached_property
     def misp_instance_version(self) -> Dict:
         """Returns the version of the instance."""
         response = self._prepare_request('GET', 'servers/getVersion')
