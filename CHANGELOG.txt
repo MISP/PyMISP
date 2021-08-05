@@ -2,11 +2,115 @@ Changelog
 =========
 
 
+v2.4.148 (2021-08-05)
+---------------------
+
+New
+~~~
+- Method `sharing_group_exists` [Jakub Onderka]
+- Method `update_sharing_group` [Jakub Onderka]
+- Save one REST call when initialize PyMISP class. [Jakub Onderka]
+- Method `organisation_exists` [Jakub Onderka]
+- Method `sharing_group_exists` [Jakub Onderka]
+- Method `update_sharing_group` [Jakub Onderka]
+- `to_dict` method supports `json_format` parameter. [Jakub Onderka]
+- Method `organisation_exists` [Jakub Onderka]
+- Method `sharing_group_exists` [Jakub Onderka]
+- Method `update_sharing_group` [Jakub Onderka]
+- Save one REST call when initialize PyMISP class. [Jakub Onderka]
+- Method `organisation_exists` [Jakub Onderka]
+- Method `sharing_group_exists` [Jakub Onderka]
+- Method `update_sharing_group` [Jakub Onderka]
+- Exclude decayed attributes in search. [Raphaël Vinot]
+
+  Fix #753
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Remove duplicates tests. [Raphaël Vinot]
+- [testlive_comprehensive] correct path to access sharing group
+  releasability after edit. [iglocska]
+- Properly validate update_sharing_group without pythonify. [Raphaël
+  Vinot]
+- Bump missing dep. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [testlive_comprehensive] correct path to access sharing group
+  releasability after edit. [iglocska]
+- [authkey test] removed from testlive_comprehensive. [iglocska]
+
+  - the default now enables advanced authkeys making the retriaval of keys impossible after the user creation
+- Do not load schema for event when not necessary. [Jakub Onderka]
+- Bump deps. [Raphaël Vinot]
+- `get_taxonomy` supports namespace. [Jakub Onderka]
+- Properly validate update_sharing_group without pythonify. [Raphaël
+  Vinot]
+- Bump missing dep. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [testlive_comprehensive] correct path to access sharing group
+  releasability after edit. [iglocska]
+- [authkey test] removed from testlive_comprehensive. [iglocska]
+
+  - the default now enables advanced authkeys making the retriaval of keys impossible after the user creation
+- Do not load schema for event when not necessary. [Jakub Onderka]
+- Bump deps. [Raphaël Vinot]
+- `get_taxonomy` supports namespace. [Jakub Onderka]
+- Properly validate update_sharing_group without pythonify. [Raphaël
+  Vinot]
+- Bump missing dep. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [testlive_comprehensive] correct path to access sharing group
+  releasability after edit. [iglocska]
+- [authkey test] removed from testlive_comprehensive. [iglocska]
+
+  - the default now enables advanced authkeys making the retriaval of keys impossible after the user creation
+- Do not load schema for event when not necessary. [Jakub Onderka]
+- Bump deps. [Raphaël Vinot]
+- `get_taxonomy` supports namespace. [Jakub Onderka]
+- Update mypy, change accordingly. [Raphaël Vinot]
+
+Fix
+~~~
+- Typo in key name. [Raphaël Vinot]
+- [test] test_sharing_groups. [Jakub Onderka]
+- [test] test_sharing_groups again. [Jakub Onderka]
+- [test] test_sharing_groups. [Jakub Onderka]
+- Typo in key name. [Raphaël Vinot]
+- [test] test_sharing_groups again. [Jakub Onderka]
+- [test] test_sharing_groups. [Jakub Onderka]
+- [test] test_sharing_groups again. [Jakub Onderka]
+- [test] test_sharing_groups. [Jakub Onderka]
+- Flake8 stuff. [Raphaël Vinot]
+- Revert rename, fix mypy. [Raphaël Vinot]
+- Properly handle the case MISP is in a sub redirect. [Raphaël Vinot]
+
+  Fix #757
+
+Other
+~~~~~
+- Revert "chg: Remove legacy stix converter." [iglocska]
+
+  This reverts commit 94ce4a367bbde9284a6f29e6e6152c91de386879.
+
+  - breaks misp-stix converter, reverting it for now, let's find a way to deprecate this without outright removing it
+- Revert "chg: Remove legacy stix converter." [iglocska]
+
+  This reverts commit 94ce4a367bbde9284a6f29e6e6152c91de386879.
+
+  - breaks misp-stix converter, reverting it for now, let's find a way to deprecate this without outright removing it
+- Revert "chg: Remove legacy stix converter." [iglocska]
+
+  This reverts commit 94ce4a367bbde9284a6f29e6e6152c91de386879.
+
+  - breaks misp-stix converter, reverting it for now, let's find a way to deprecate this without outright removing it
+
+
 v2.4.144 (2021-06-07)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump object templates. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
