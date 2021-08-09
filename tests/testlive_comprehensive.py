@@ -1307,6 +1307,17 @@ class TestComprehensive(unittest.TestCase):
             new_object.add_attribute('filename', 'foobar.exe')
             new_object = self.admin_misp_connector.update_object(new_object, pythonify=True)
             self.assertEqual(new_object.get_attributes_by_relation('filename')[1].value, 'foobar.exe', new_object)
+
+            # Get existing custom object, modify it, update on MISP
+            existing_object = self.admin_misp_connector.get_object(new_object.uuid, pythonify=True)
+            # existing_object.force_misp_objects_path_custom('tests/mispevent_testfiles', 'overwrite_file')
+            # The existing_object is a overwrite_file object, unless we uncomment the line above, type= is required below.
+            existing_object.add_attribute('pattern-in-file', value='foo', type='text')
+            updated_existing_object = self.admin_misp_connector.update_object(existing_object, pythonify=True)
+            print(updated_existing_object.to_json(indent=2))
+            print(updated_existing_object.get_attributes_by_relation('pattern-in-file'))
+            self.assertEqual(updated_existing_object.get_attributes_by_relation('pattern-in-file')[0].value, 'foo', updated_existing_object)
+
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
