@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import sys
-
 
 import unittest
 
@@ -50,6 +50,10 @@ except ImportError as e:
 urllib3.disable_warnings()
 
 fast_mode = False
+
+if not Path('tests/viper-test-files').exists():
+    print('The test files are missing, pulling it.')
+    os.system('git clone https://github.com/viper-framework/viper-test-files.git tests/viper-test-files')
 
 
 class TestComprehensive(unittest.TestCase):
