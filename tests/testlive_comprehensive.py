@@ -1318,8 +1318,6 @@ class TestComprehensive(unittest.TestCase):
             # The existing_object is a overwrite_file object, unless we uncomment the line above, type= is required below.
             existing_object.add_attribute('pattern-in-file', value='foo', type='text')
             updated_existing_object = self.admin_misp_connector.update_object(existing_object, pythonify=True)
-            print(updated_existing_object.to_json(indent=2))
-            print(updated_existing_object.get_attributes_by_relation('pattern-in-file'))
             self.assertEqual(updated_existing_object.get_attributes_by_relation('pattern-in-file')[0].value, 'foo', updated_existing_object)
 
         finally:
