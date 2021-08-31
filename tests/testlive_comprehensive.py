@@ -2709,7 +2709,7 @@ class TestComprehensive(unittest.TestCase):
             else:
                 raise Exception('Unable to find UUID in Events blocklist')
             first = self.user_misp_connector.add_event(first, pythonify=True)
-            self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+            self.assertEqual(first['errors'][1]['message'], 'Event blocked by event blocklist.', first)
             ble.comment = 'This is a test'
             ble.event_info = 'foo'
             ble.event_orgc = 'bar'
@@ -2729,7 +2729,7 @@ class TestComprehensive(unittest.TestCase):
             else:
                 raise Exception('Unable to find UUID in Orgs blocklist')
             first = self.user_misp_connector.add_event(first, pythonify=True)
-            self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+            self.assertEqual(first['errors'][1]['message'], 'Event blocked by organisation blocklist.', first)
 
             blo.comment = 'This is a test'
             blo.org_name = 'bar'
