@@ -1334,6 +1334,10 @@ class TestComprehensive(unittest.TestCase):
         misp_object.generate_attributes(attributeAsDict)
         first.add_object(misp_object)
         blah_object = MISPObject('BLAH_TEST')
+        blah_object.template_uuid = uuid4()
+        blah_object.template_id = 1
+        blah_object.description = 'foo'
+        setattr(blah_object, 'meta-category', 'bar')
         blah_object.add_reference(misp_object.uuid, "test relation")
         blah_object.add_attribute('transaction-number', value='foo', type="text", disable_correlation=True)
         first.add_object(blah_object)
@@ -1343,6 +1347,11 @@ class TestComprehensive(unittest.TestCase):
             self.assertFalse(first.objects[0].attributes[0].disable_correlation)
             self.assertTrue(first.objects[0].attributes[1].disable_correlation)
             self.assertTrue(first.objects[1].attributes[0].disable_correlation)
+
+            # test update on totally unknown template
+            first.objects[1].add_attribute('my relation', value='foobar', type='text', disable_correlation=True)
+            updated_custom = self.user_misp_connector.update_object(first.objects[1], pythonify=True)
+            self.assertEqual(updated_custom.attributes[1].value, 'foobar', updated_custom)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -2500,7 +2509,32 @@ class TestComprehensive(unittest.TestCase):
 
     def test_upload_stix(self):
         # FIXME https://github.com/MISP/MISP/issues/4892
-        pass
+        try:
+            # r1 = self.user_misp_connector.upload_stix('tests/stix1.xml', version='1')
+            # print('stix 1', r1.json())
+            # event_stix_one = MISPEvent()
+            # event_stix_one.load(r.)
+            # self.assertEqual(event_stix_one.attributes[0], '8.8.8.8')
+            r2 = self.user_misp_connector.upload_stix('tests/stix2.json', version='2')
+            print(json.dumps(r2.json(), indent=2))
+            event_stix_two = MISPEvent()
+            event_stix_two.load(r2.json())
+            print(event_stix_two.to_json(indent=2))
+            # FIXME: the response is buggy.
+            # self.assertEqual(event_stix_two.attributes[0], '8.8.8.8')
+            self.admin_misp_connector.delete_event(event_stix_two)
+            bl = self.admin_misp_connector.delete_event_blocklist(event_stix_two.uuid)
+            self.assertTrue(bl['success'])
+        finally:
+            # try:
+            #    self.admin_misp_connector.delete_event(event_stix_one)
+            # except Exception:
+            #    pass
+            try:
+                self.admin_misp_connector.delete_event(event_stix_two)
+                self.admin_misp_connector.delete_event_blocklist(event_stix_two.uuid)
+            except Exception:
+                pass
 
     def test_toggle_global_pythonify(self):
         first = self.create_simple_event()
