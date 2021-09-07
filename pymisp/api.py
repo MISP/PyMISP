@@ -1157,9 +1157,9 @@ class PyMISP:
         t = self.get_taxonomy(taxonomy_id)
         if isinstance(t, MISPTaxonomy) and not t.enabled:
             # Can happen if global pythonify is enabled.
-            raise PyMISPError(f"The taxonomy {t.name} is not enabled.")
+            raise PyMISPError(f"The taxonomy {t.namespace} is not enabled.")
         elif not t['Taxonomy']['enabled']:
-            raise PyMISPError(f"The taxonomy {t['Taxonomy']['name']} is not enabled.")
+            raise PyMISPError(f"The taxonomy {t['Taxonomy']['namespace']} is not enabled.")
         url = urljoin(self.root_url, 'taxonomies/addTag/{}'.format(taxonomy_id))
         response = self._prepare_request('POST', url)
         return self._check_json_response(response)

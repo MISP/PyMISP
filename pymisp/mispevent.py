@@ -2054,13 +2054,16 @@ class MISPWarninglist(AbstractMISP):
 
 class MISPTaxonomy(AbstractMISP):
 
-    name: str
     enabled: bool
+    namespace: str
 
     def from_dict(self, **kwargs):
         if 'Taxonomy' in kwargs:
             kwargs = kwargs['Taxonomy']
         super().from_dict(**kwargs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(namespace={self.namespace})>'
 
 
 class MISPNoticelist(AbstractMISP):

@@ -1318,8 +1318,6 @@ class TestComprehensive(unittest.TestCase):
             # The existing_object is a overwrite_file object, unless we uncomment the line above, type= is required below.
             existing_object.add_attribute('pattern-in-file', value='foo', type='text')
             updated_existing_object = self.admin_misp_connector.update_object(existing_object, pythonify=True)
-            print(updated_existing_object.to_json(indent=2))
-            print(updated_existing_object.get_attributes_by_relation('pattern-in-file'))
             self.assertEqual(updated_existing_object.get_attributes_by_relation('pattern-in-file')[0].value, 'foo', updated_existing_object)
 
         finally:
@@ -1332,6 +1330,10 @@ class TestComprehensive(unittest.TestCase):
                            {'MyCoolerAttribute': {'value': 'even worse', 'type': 'text', 'disable_correlation': True}}]
         misp_object = GenericObjectGenerator('my-cool-template')
         misp_object.generate_attributes(attributeAsDict)
+        misp_object.template_uuid = uuid4()
+        misp_object.template_id = 1
+        misp_object.description = 'bar'
+        setattr(misp_object, 'meta-category', 'foo')
         first.add_object(misp_object)
         blah_object = MISPObject('BLAH_TEST')
         blah_object.template_uuid = uuid4()
@@ -1343,7 +1345,7 @@ class TestComprehensive(unittest.TestCase):
         first.add_object(blah_object)
         try:
             first = self.user_misp_connector.add_event(first)
-            self.assertEqual(len(first.objects[0].attributes), 2)
+            self.assertEqual(len(first.objects[0].attributes), 2, first.objects[0].attributes)
             self.assertFalse(first.objects[0].attributes[0].disable_correlation)
             self.assertTrue(first.objects[0].attributes[1].disable_correlation)
             self.assertTrue(first.objects[1].attributes[0].disable_correlation)
