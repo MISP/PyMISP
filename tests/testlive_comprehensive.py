@@ -955,8 +955,9 @@ class TestComprehensive(unittest.TestCase):
             response = self.user_misp_connector.add_event(event, metadata=True)
             self.assertEqual(len(response.attributes), 0)  # response should contains zero attributes
 
-            event.info = "New name"
+            event.info = "New name ©"
             response = self.user_misp_connector.update_event(event, metadata=True)
+            self.assertEqual(response.info, event.info)
             self.assertEqual(len(response.attributes), 0)  # response should contains zero attributes
         finally:  # cleanup
             self.admin_misp_connector.delete_event(event)
@@ -2512,11 +2513,15 @@ class TestComprehensive(unittest.TestCase):
     def test_upload_stix(self):
         # FIXME https://github.com/MISP/MISP/issues/4892
         try:
-            # r1 = self.user_misp_connector.upload_stix('tests/stix1.xml', version='1')
-            # print('stix 1', r1.json())
-            # event_stix_one = MISPEvent()
-            # event_stix_one.load(r.)
+            r1 = self.user_misp_connector.upload_stix('tests/stix1.xml-utf8', version='1')
+            print(r1.text)
+            event_stix_one = MISPEvent()
+            event_stix_one.load(r1.json())
             # self.assertEqual(event_stix_one.attributes[0], '8.8.8.8')
+            self.admin_misp_connector.delete_event(event_stix_one)
+            bl = self.admin_misp_connector.delete_event_blocklist(event_stix_one.uuid)
+            self.assertTrue(bl['success'])
+
             r2 = self.user_misp_connector.upload_stix('tests/stix2.json', version='2')
             print(json.dumps(r2.json(), indent=2))
             event_stix_two = MISPEvent()
@@ -2528,10 +2533,11 @@ class TestComprehensive(unittest.TestCase):
             bl = self.admin_misp_connector.delete_event_blocklist(event_stix_two.uuid)
             self.assertTrue(bl['success'])
         finally:
-            # try:
-            #    self.admin_misp_connector.delete_event(event_stix_one)
-            # except Exception:
-            #    pass
+            try:
+                self.admin_misp_connector.delete_event(event_stix_one)
+                self.admin_misp_connector.delete_event_blocklist(event_stix_one.uuid)
+            except Exception:
+                pass
             try:
                 self.admin_misp_connector.delete_event(event_stix_two)
                 self.admin_misp_connector.delete_event_blocklist(event_stix_two.uuid)

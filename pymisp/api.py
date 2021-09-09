@@ -3027,9 +3027,6 @@ class PyMISP:
         else:
             raise MISPServerError("please fill path or data parameter")
 
-        if isinstance(to_post, bytes):
-            to_post = to_post.decode()
-
         if str(version) == '1':
             url = urljoin(self.root_url, 'events/upload_stix')
             response = self._prepare_request('POST', url, data=to_post, output_type='xml', content_type='xml')  # type: ignore
@@ -3505,21 +3502,20 @@ class PyMISP:
     def __repr__(self):
         return f'<{self.__class__.__name__}(url={self.root_url})'
 
-    def _prepare_request(self, request_type: str, url: str, data: Union[str, Iterable, Mapping, AbstractMISP] = {}, params: Mapping = {},
+    def _prepare_request(self, request_type: str, url: str, data: Union[Iterable, Mapping, AbstractMISP, bytes] = {}, params: Mapping = {},
                          kw_params: Mapping = {}, output_type: str = 'json', content_type: str = 'json') -> requests.Response:
         '''Prepare a request for python-requests'''
         if url[0] == '/':
             # strip it: it will fail if MISP is in a sub directory
             url = url[1:]
         url = urljoin(self.root_url, url)
-        if data == {} or isinstance(data, str):
+        if data == {} or isinstance(data, bytes):
             d = data
         elif data:
-            if not isinstance(data, str):  # Else, we already have a text blob to send
-                if isinstance(data, dict):  # Else, we can directly json encode.
-                    # Remove None values.
-                    data = {k: v for k, v in data.items() if v is not None}
-                d = json.dumps(data, default=pymisp_json_default)
+            if isinstance(data, dict):  # Else, we can directly json encode.
+                # Remove None values.
+                data = {k: v for k, v in data.items() if v is not None}
+            d = json.dumps(data, default=pymisp_json_default)
 
         logger.debug(f'{request_type} - {url}')
         if d is not None:
