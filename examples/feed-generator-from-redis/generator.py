@@ -147,8 +147,8 @@ class FeedGenerator:
 
         # create an empty manifest
         try:
-            with open(os.path.join(settings.outputdir, 'manifest.json'), 'w'):
-                pass
+            with open(os.path.join(settings.outputdir, 'manifest.json'), 'w') as f:
+                json.dump({}, f)
         except PermissionError as error:
             print(error)
             print("Please fix the above error and try again.")
