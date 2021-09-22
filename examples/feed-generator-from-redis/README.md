@@ -9,10 +9,16 @@
 
 ## Installation
 
-````
+```
+# redis-server
+sudo apt install redis-server
+
+# Check if redis is running
+redis-cli ping
+
 #  Feed generator
 git clone https://github.com/MISP/PyMISP
-cd examples/feed-generator-from-redis
+cd PyMISP/examples/feed-generator-from-redis
 cp settings.default.py settings.py
 vi settings.py  # adjust your settings
 
