@@ -282,6 +282,8 @@ class EMailObject(AbstractMISPObjectGenerator):
 
         if "To" in message:
             self.__add_emails("to", message["To"])
+        if "Delivered-To" in message:
+            self.__add_emails("to", message["Delivered-To"])
 
         if "From" in message:
             self.__add_emails("from", message["From"])
@@ -314,6 +316,12 @@ class EMailObject(AbstractMISPObjectGenerator):
 
         if "Thread-Index" in message:
             self.add_attribute("thread-index", message["Thread-Index"])
+
+        if "Received" in message:
+            try:
+                self.add_attribute("received-header-hostname", message['Received'].split(' ')[1])
+            except Exception:
+                pass
 
         self.__generate_received()
 
