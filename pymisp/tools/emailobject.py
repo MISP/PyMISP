@@ -319,7 +319,10 @@ class EMailObject(AbstractMISPObjectGenerator):
 
         if "Received" in message:
             try:
-                self.add_attribute("received-header-hostname", message['Received'].split(' ')[1])
+                # We only want the hostnames
+                received_content = message['Received'].split(' ')
+                if received_content[0] == 'from':
+                    self.add_attribute("received-header-hostname", received_content[1])
             except Exception:
                 pass
 
