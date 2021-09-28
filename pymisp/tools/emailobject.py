@@ -251,16 +251,6 @@ class EMailObject(AbstractMISPObjectGenerator):
             pass
         return to_return
 
-    def unicode_to_ascii(self, arg):
-        """
-        This function removes unicode characters and returns an ASCII string.
-        Spam messages commonly contain unicode encoded emojis which MISP cannot
-        handle. Those would either cause an error or show up as "?" in the UI.
-        """
-        string_encode = arg.encode("ascii", "ignore")
-        string_decode = string_encode.decode()
-        return string_decode
-
     def generate_attributes(self):
 
         # Attach original & Converted
@@ -296,8 +286,7 @@ class EMailObject(AbstractMISPObjectGenerator):
             self.__add_emails("to", message["Delivered-To"])
 
         if "From" in message:
-            from_ascii = self.unicode_to_ascii(message["From"])
-            self.__add_emails("from", from_ascii)
+            self.__add_emails("from", message["From"])
 
         if "Return-Path" in message:
             realname, address = email.utils.parseaddr(message["Return-Path"])
@@ -310,8 +299,7 @@ class EMailObject(AbstractMISPObjectGenerator):
             self.__add_emails("cc", message["Cc"])
 
         if "Subject" in message:
-            subject_ascii = self.unicode_to_ascii(message["Subject"])
-            self.add_attribute("subject", subject_ascii)
+            self.add_attribute("subject", message["Subject"])
 
         if "Message-ID" in message:
             self.add_attribute("message-id", message["Message-ID"])
