@@ -251,6 +251,16 @@ class EMailObject(AbstractMISPObjectGenerator):
             pass
         return to_return
 
+    def unicode_to_ascii(self, arg):
+        """
+        This function removes unicode characters and returns an ASCII string.
+        Spam messages commonly contain unicode encoded emojis which MISP cannot
+        handle. Those would either cause an error or show up as "?" in the UI.
+        """
+        string_encode = arg.encode("ascii", "ignore")
+        string_decode = string_encode.decode()
+        return string_decode
+
     def generate_attributes(self):
 
         # Attach original & Converted
@@ -286,7 +296,8 @@ class EMailObject(AbstractMISPObjectGenerator):
             self.__add_emails("to", message["Delivered-To"])
 
         if "From" in message:
-            self.__add_emails("from", message["From"])
+            from_ascii = self.unicode_to_ascii(message["From"])
+            self.__add_emails("from", from_ascii)
 
         if "Return-Path" in message:
             realname, address = email.utils.parseaddr(message["Return-Path"])
@@ -299,7 +310,8 @@ class EMailObject(AbstractMISPObjectGenerator):
             self.__add_emails("cc", message["Cc"])
 
         if "Subject" in message:
-            self.add_attribute("subject", message["Subject"])
+            subject_ascii = self.unicode_to_ascii(message["Subject"])
+            self.add_attribute("subject", subject_ascii)
 
         if "Message-ID" in message:
             self.add_attribute("message-id", message["Message-ID"])
@@ -316,15 +328,6 @@ class EMailObject(AbstractMISPObjectGenerator):
 
         if "Thread-Index" in message:
             self.add_attribute("thread-index", message["Thread-Index"])
-
-        if "Received" in message:
-            try:
-                # We only want the hostnames
-                received_content = message['Received'].split(' ')
-                if received_content[0] == 'from':
-                    self.add_attribute("received-header-hostname", received_content[1])
-            except Exception:
-                pass
 
         self.__generate_received()
 
@@ -354,7 +357,7 @@ class EMailObject(AbstractMISPObjectGenerator):
 
     def __generate_received(self):
         """
-        Extract IP addresses from received headers that are not private.
+        Extract IP addresses from received headers that are not private. Also extract hostnames or domains.
         """
         received_items = self.email.get_all("received")
         if received_items is None:
@@ -378,3 +381,11 @@ class EMailObject(AbstractMISPObjectGenerator):
                 continue  # skip header if IP not found or is private
 
             self.add_attribute("received-header-ip", value=str(ip), comment=fromstr)
+
+        # The hostnames and/or domains always come after the "Received: from"
+        # part so we can use regex to pick up those attributes.
+        received_from = re.findall(r'(?<=from\s)[\w\d\.\-]+\.\w{2,24}', str(received_items))
+        try:
+            [self.add_attribute("received-header-hostname", i) for i in received_from]
+        except Exception:
+            pass
