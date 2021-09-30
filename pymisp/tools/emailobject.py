@@ -45,7 +45,7 @@ class EMailObject(AbstractMISPObjectGenerator):
 
     def parse_email(self) -> EmailMessage:
         """Convert email into EmailMessage."""
-        content_in_bytes = self.__pseudofile.getvalue()
+        content_in_bytes = self.__pseudofile.getvalue().strip()
         eml = message_from_bytes(content_in_bytes,
                                  _class=EmailMessage,
                                  policy=policy.default)
