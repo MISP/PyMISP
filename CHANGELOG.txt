@@ -2,6 +2,74 @@ Changelog
 =========
 
 
+v2.4.148.1 (2021-09-30)
+-----------------------
+
+New
+~~~
+- Add few keys to email object creator. [Raphaël Vinot]
+
+  Fix #787
+- Test cases for edit objects and upload stix. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [doc] Minor fixes, note and typo. [Steve Clement]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Update tutorial for custom objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump live tests. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- [types] updated types/categories mapping. [Christophe Vandeplas]
+- Remove test files. [Raphaël Vinot]
+- Automatically pull the malwares repo when running
+  tests/testlive_comprehensive.py. [Raphaël Vinot]
+- Remove submodules with malware. [Raphaël Vinot]
+- Add test for updating a objects from a custom template. [Raphaël
+  Vinot]
+- Re-bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Message_from_bytes really dislikes newline at the beginning of a mail.
+  [Raphaël Vinot]
+- Skip IPs in Received header. [Raphaël Vinot]
+- Name is passed to super. [Raphaël Vinot]
+- Do not create empty manifest, json load dislikes it. [Raphaël Vinot]
+- Initial round of cleanup on redis feed generator. [Raphaël Vinot]
+- Upload of STIX document with non-ascii characters. [Raphaël Vinot]
+
+  Due to: https://github.com/psf/requests/issues/5560
+
+  TL;DR: a variable of type str passed to data in a POST request will be
+  silently re-encoded to ISO-8859-1, making MISP barf on the other side.
+- Remove outdated deps from setup.py. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/MISP/issues/7729
+
+Other
+~~~~~
+- Remove unicode to ascii parts. [Sami Tainio]
+- Fix #787 and add Unicode to ASCII function. [Sami Tainio]
+
+  Fix #787
+  - Uses regex to pick up the hostnames/domains from the "Received: from" headers.
+
+  Unicode to ASCII function
+  - Spam messages more often than not contain junk text as unicode characters in the headers. The "from" and "subject" headers being the most common ones. Before this change the script would error on such emails or sometimes replace the unicode characters with questionmarks "?".
+  - Function takes argument as an input and then encodes it in ascii while ignoring any malformed data. It then returns an ASCII string without the unicode characters.
+  - Currently implemented for "from" and "subject" handling.
+- Update README.md. [Raphaël Vinot]
+
+  Not using travis anymore.
+
+
 v2.4.148 (2021-08-05)
 ---------------------
 
