@@ -2,6 +2,63 @@ Changelog
 =========
 
 
+v2.4.148.1 (2021-09-30)
+-----------------------
+
+New
+~~~
+- Add few keys to email object creator. [Raphaël Vinot]
+
+  Fix #787
+- Test cases for edit objects and upload stix. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [doc] Minor fixes, note and typo. [Steve Clement]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Update tutorial for custom objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump live tests. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- [types] updated types/categories mapping. [Christophe Vandeplas]
+- Remove test files. [Raphaël Vinot]
+- Automatically pull the malwares repo when running
+  tests/testlive_comprehensive.py. [Raphaël Vinot]
+- Remove submodules with malware. [Raphaël Vinot]
+- Add test for updating a objects from a custom template. [Raphaël
+  Vinot]
+- Re-bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Message_from_bytes really dislikes newline at the beginning of a mail.
+  [Raphaël Vinot]
+- Skip IPs in Received header. [Raphaël Vinot]
+- Name is passed to super. [Raphaël Vinot]
+- Do not create empty manifest, json load dislikes it. [Raphaël Vinot]
+- Initial round of cleanup on redis feed generator. [Raphaël Vinot]
+- Upload of STIX document with non-ascii characters. [Raphaël Vinot]
+
+  Due to: https://github.com/psf/requests/issues/5560
+
+  TL;DR: a variable of type str passed to data in a POST request will be
+  silently re-encoded to ISO-8859-1, making MISP barf on the other side.
+- Remove outdated deps from setup.py. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/MISP/issues/7729
+
+Other
+~~~~~
+- Update README.md. [Raphaël Vinot]
+
+  Not using travis anymore.
+
+
 v2.4.148 (2021-08-05)
 ---------------------
 
