@@ -128,6 +128,7 @@ class MISPOrganisation(AbstractMISP):
 class MISPSharingGroup(AbstractMISP):
     def __init__(self):
         super().__init__()
+        self.name: str
         self.SharingGroupOrg: List[MISPOrganisation] = []
 
     @property
