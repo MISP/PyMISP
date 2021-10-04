@@ -1929,11 +1929,11 @@ class PyMISP:
         """
         sharing_group_id = get_uuid_or_id_from_abstract_misp(sharing_group)
         r = self._prepare_request('GET', f'sharing_groups/view/{sharing_group_id}')
-        sharing_group = self._check_json_response(r)
-        if not (self.global_pythonify or pythonify) or 'errors' in sharing_group:
-            return sharing_group
+        sharing_group_resp = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in sharing_group_resp:
+            return sharing_group_resp
         s = MISPSharingGroup()
-        s.from_dict(**sharing_group)
+        s.from_dict(**sharing_group_resp)
         return s
 
     def add_sharing_group(self, sharing_group: MISPSharingGroup, pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
