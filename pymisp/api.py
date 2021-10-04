@@ -2030,13 +2030,18 @@ class PyMISP:
 
     # ## BEGIN Organisation ###
 
-    def organisations(self, scope="local", pythonify: bool = False) -> Union[Dict, List[MISPOrganisation]]:
+    def organisations(self, scope="local", search: str = None, pythonify: bool = False) -> Union[Dict, List[MISPOrganisation]]:
         """Get all the organisations
 
         :param scope: scope of organizations to get
+        :param search: The search to make against the list of organisations
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
-        r = self._prepare_request('GET', f'organisations/index/scope:{scope}')
+        url_path = f'organisations/index/scope:{scope}'
+        if search:
+            url_path += f"/searchall:{search}"
+
+        r = self._prepare_request('GET', url_path)
         organisations = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in organisations:
             return organisations
@@ -2118,12 +2123,20 @@ class PyMISP:
 
     # ## BEGIN User ###
 
-    def users(self, pythonify: bool = False) -> Union[Dict, List[MISPUser]]:
-        """Get all the users
+    def users(self, search: str = None, organisation: int = None, pythonify: bool = False) -> Union[Dict, List[MISPUser]]:
+        """Get all the users, or a filtered set of users
 
+        :param search: The search to make against the list of users
+        :param organisation: The ID of an organisation to filter against
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
-        r = self._prepare_request('GET', 'admin/users/index')
+        urlpath = 'admin/users/index'
+        if search:
+            urlpath += f'/value:{search}'
+        if organisation:
+            organisation_id = get_uuid_or_id_from_abstract_misp(organisation)
+            urlpath += f"/searchorg:{organisation_id}"
+        r = self._prepare_request('GET', urlpath)
         users = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in users:
             return users
