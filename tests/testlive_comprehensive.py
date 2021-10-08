@@ -1176,7 +1176,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.user_misp_connector.add_event(first)
             stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
-            self.assertTrue(stix['related_packages'][0]['package']['incidents'][0]['related_indicators']['indicators'][0]['indicator']['observable']['object']['properties']['address_value']['value'], '8.8.8.8')
+            self.assertTrue(stix['related_packages']['related_packages'][0]['package']['incidents'][0]['related_indicators']['indicators'][0]['indicator']['observable']['object']['properties']['address_value']['value'], '8.8.8.8')
             stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
             self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
             stix_xml = self.user_misp_connector.search(return_format='stix-xml', eventid=first.id)
