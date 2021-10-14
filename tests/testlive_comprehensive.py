@@ -1771,6 +1771,33 @@ class TestComprehensive(unittest.TestCase):
         organisation = self.admin_misp_connector.update_organisation(organisation, pythonify=True)
         self.assertEqual(organisation.name, 'blah', organisation)
 
+    def test_org_search(self):
+        orgs = self.admin_misp_connector.organisations(pythonify=True)
+        org_name = 'ORGNAME'
+        # Search by the org name
+        orgs = self.admin_misp_connector.organisations(search=org_name, pythonify=True)
+        # There should be one org returned
+        self.assertTrue(len(orgs) == 1)
+
+        # This org should have the name ORGNAME
+        self.assertEqual(orgs[0].name, org_name)
+
+    def test_user_search(self):
+        users = self.admin_misp_connector.users(pythonify=True)
+        emailAddr = users[0].email
+
+        users = self.admin_misp_connector.users(search=emailAddr)
+        self.assertTrue(len(users) == 1)
+        self.assertEqual(users[0]['User']['email'], emailAddr)
+
+        users = self.admin_misp_connector.users(
+            search=emailAddr,
+            organisation=users[0]['Organisation']['id'],
+            pythonify=True
+        )
+        self.assertTrue(len(users) == 1)
+        self.assertEqual(users[0].email, emailAddr)
+
     def test_attribute(self):
         first = self.create_simple_event()
         second = self.create_simple_event()
