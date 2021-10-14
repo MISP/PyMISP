@@ -2208,6 +2208,30 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.id))
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.uuid))
 
+    def test_sharing_group(self):
+        # add
+        sg = MISPSharingGroup()
+        sg.name = 'Testcases SG'
+        sg.releasability = 'Testing'
+        sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
+        # Add the org to the sharing group
+        self.admin_misp_connector.add_org_to_sharing_group(
+            sharing_group,
+            self.test_org, extend=True
+        )
+        try:
+            # Get the sharing group once again
+            sharing_group = self.admin_misp_connector.get_sharing_group(sharing_group, pythonify=True)
+
+            self.assertTrue(isinstance(sharing_group, MISPSharingGroup))
+            self.assertEqual(sharing_group.name, 'Testcases SG')
+
+            # Check we have the org field present and the first org is our org
+            self.assertTrue(isinstance(getattr(sharing_group, "orgs"), list))
+            self.assertEqual(sharing_group.orgs[0].id, self.test_org.id)
+        finally:
+            self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+
     def test_feeds(self):
         # Add
         feed = MISPFeed()
