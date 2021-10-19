@@ -2569,7 +2569,6 @@ class TestComprehensive(unittest.TestCase):
         # FIXME https://github.com/MISP/MISP/issues/4892
         try:
             r1 = self.user_misp_connector.upload_stix('tests/stix1.xml-utf8', version='1')
-            print(r1.text)
             event_stix_one = MISPEvent()
             event_stix_one.load(r1.json())
             # self.assertEqual(event_stix_one.attributes[0], '8.8.8.8')
@@ -2578,10 +2577,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(bl['success'])
 
             r2 = self.user_misp_connector.upload_stix('tests/stix2.json', version='2')
-            print(json.dumps(r2.json(), indent=2))
             event_stix_two = MISPEvent()
             event_stix_two.load(r2.json())
-            print(event_stix_two.to_json(indent=2))
             # FIXME: the response is buggy.
             # self.assertEqual(event_stix_two.attributes[0], '8.8.8.8')
             self.admin_misp_connector.delete_event(event_stix_two)
