@@ -3144,7 +3144,7 @@ class PyMISP:
         query: Dict[str, Any] = {'setting': user_setting}
         if user:
             query['user_id'] = get_uuid_or_id_from_abstract_misp(user)
-        response = self._prepare_request('POST', 'userSettings/getSetting')
+        response = self._prepare_request('POST', 'userSettings/getSetting', data=query)
         user_setting_j = self._check_json_response(response)
         if not (self.global_pythonify or pythonify) or 'errors' in user_setting_j:
             return user_setting_j
