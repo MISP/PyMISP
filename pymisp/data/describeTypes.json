@@ -1391,7 +1391,6 @@
       "passport-country",
       "passport-expiration",
       "passport-number",
-      "filename-pattern",
       "pattern-in-file",
       "pattern-in-memory",
       "pattern-in-traffic",
