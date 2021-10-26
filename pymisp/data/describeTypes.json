@@ -243,6 +243,7 @@
         "pattern-in-traffic",
         "port",
         "snort",
+        "ssh-fingerprint",
         "stix2-pattern",
         "text",
         "uri",
@@ -717,6 +718,10 @@
         "default_category": "Payload delivery",
         "to_ids": 1
       },
+      "filename-pattern": {
+        "default_category": "Payload installation",
+        "to_ids": 1
+      },
       "filename|authentihash": {
         "default_category": "Payload delivery",
         "to_ids": 1
@@ -981,10 +986,6 @@
         "default_category": "Person",
         "to_ids": 0
       },
-      "pattern-filename": {
-        "default_category": "Payload installation",
-        "to_ids": 1
-      },
       "pattern-in-file": {
         "default_category": "Payload installation",
         "to_ids": 1
@@ -1128,6 +1129,10 @@
       "ssdeep": {
         "default_category": "Payload delivery",
         "to_ids": 1
+      },
+      "ssh-fingerprint": {
+        "default_category": "Network activity",
+        "to_ids": 0
       },
       "stix2-pattern": {
         "default_category": "Payload installation",
@@ -1319,6 +1324,7 @@
       "eppn",
       "favicon-mmh3",
       "filename",
+      "filename-pattern",
       "filename|authentihash",
       "filename|impfuzzy",
       "filename|imphash",
@@ -1385,7 +1391,6 @@
       "passport-country",
       "passport-expiration",
       "passport-number",
-      "pattern-filename",
       "pattern-in-file",
       "pattern-in-memory",
       "pattern-in-traffic",
@@ -1422,6 +1427,7 @@
       "snort",
       "special-service-request",
       "ssdeep",
+      "ssh-fingerprint",
       "stix2-pattern",
       "target-email",
       "target-external",
