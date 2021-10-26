@@ -986,10 +986,6 @@
         "default_category": "Person",
         "to_ids": 0
       },
-      "filename-pattern": {
-        "default_category": "Payload installation",
-        "to_ids": 1
-      },
       "pattern-in-file": {
         "default_category": "Payload installation",
         "to_ids": 1
