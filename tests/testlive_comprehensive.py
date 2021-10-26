@@ -1176,7 +1176,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.user_misp_connector.add_event(first)
             stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
-            self.assertTrue(stix['related_packages'][0]['package']['incidents'][0]['related_indicators']['indicators'][0]['indicator']['observable']['object']['properties']['address_value']['value'], '8.8.8.8')
+            self.assertTrue(stix['related_packages']['related_packages'][0]['package']['incidents'][0]['related_indicators']['indicators'][0]['indicator']['observable']['object']['properties']['address_value']['value'], '8.8.8.8')
             stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
             self.assertEqual(stix2['objects'][-1]['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
             stix_xml = self.user_misp_connector.search(return_format='stix-xml', eventid=first.id)
@@ -1771,6 +1771,33 @@ class TestComprehensive(unittest.TestCase):
         organisation = self.admin_misp_connector.update_organisation(organisation, pythonify=True)
         self.assertEqual(organisation.name, 'blah', organisation)
 
+    def test_org_search(self):
+        orgs = self.admin_misp_connector.organisations(pythonify=True)
+        org_name = 'ORGNAME'
+        # Search by the org name
+        orgs = self.admin_misp_connector.organisations(search=org_name, pythonify=True)
+        # There should be one org returned
+        self.assertTrue(len(orgs) == 1)
+
+        # This org should have the name ORGNAME
+        self.assertEqual(orgs[0].name, org_name)
+
+    def test_user_search(self):
+        users = self.admin_misp_connector.users(pythonify=True)
+        emailAddr = users[0].email
+
+        users = self.admin_misp_connector.users(search=emailAddr)
+        self.assertTrue(len(users) == 1)
+        self.assertEqual(users[0]['User']['email'], emailAddr)
+
+        users = self.admin_misp_connector.users(
+            search=emailAddr,
+            organisation=users[0]['Organisation']['id'],
+            pythonify=True
+        )
+        self.assertTrue(len(users) == 1)
+        self.assertEqual(users[0].email, emailAddr)
+
     def test_attribute(self):
         first = self.create_simple_event()
         second = self.create_simple_event()
@@ -1988,15 +2015,19 @@ class TestComprehensive(unittest.TestCase):
         remote_types = remote.pop('types')
         remote_categories = remote.pop('categories')
         remote_category_type_mappings = remote.pop('category_type_mappings')
+
         local = dict(self.admin_misp_connector.describe_types_local)
         local_types = local.pop('types')
         local_categories = local.pop('categories')
         local_category_type_mappings = local.pop('category_type_mappings')
+
         self.assertDictEqual(remote, local)
         self.assertEqual(sorted(remote_types), sorted(local_types))
         self.assertEqual(sorted(remote_categories), sorted(local_categories))
         for category, mapping in remote_category_type_mappings.items():
             self.assertEqual(sorted(local_category_type_mappings[category]), sorted(mapping))
+            for typ in mapping:
+                self.assertIn(typ, remote_types)
 
     def test_versions(self):
         self.assertEqual(self.user_misp_connector.version, self.user_misp_connector.pymisp_version_master)
@@ -2176,6 +2207,30 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.id))
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.uuid))
+
+    def test_sharing_group(self):
+        # add
+        sg = MISPSharingGroup()
+        sg.name = 'Testcases SG'
+        sg.releasability = 'Testing'
+        sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
+        # Add the org to the sharing group
+        self.admin_misp_connector.add_org_to_sharing_group(
+            sharing_group,
+            self.test_org, extend=True
+        )
+        try:
+            # Get the sharing group once again
+            sharing_group = self.admin_misp_connector.get_sharing_group(sharing_group, pythonify=True)
+
+            self.assertTrue(isinstance(sharing_group, MISPSharingGroup))
+            self.assertEqual(sharing_group.name, 'Testcases SG')
+
+            # Check we have the org field present and the first org is our org
+            self.assertTrue(isinstance(getattr(sharing_group, "orgs"), list))
+            self.assertEqual(sharing_group.orgs[0].id, self.test_org.id)
+        finally:
+            self.admin_misp_connector.delete_sharing_group(sharing_group.id)
 
     def test_feeds(self):
         # Add
@@ -2514,7 +2569,6 @@ class TestComprehensive(unittest.TestCase):
         # FIXME https://github.com/MISP/MISP/issues/4892
         try:
             r1 = self.user_misp_connector.upload_stix('tests/stix1.xml-utf8', version='1')
-            print(r1.text)
             event_stix_one = MISPEvent()
             event_stix_one.load(r1.json())
             # self.assertEqual(event_stix_one.attributes[0], '8.8.8.8')
@@ -2523,10 +2577,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(bl['success'])
 
             r2 = self.user_misp_connector.upload_stix('tests/stix2.json', version='2')
-            print(json.dumps(r2.json(), indent=2))
             event_stix_two = MISPEvent()
             event_stix_two.load(r2.json())
-            print(event_stix_two.to_json(indent=2))
             # FIXME: the response is buggy.
             # self.assertEqual(event_stix_two.attributes[0], '8.8.8.8')
             self.admin_misp_connector.delete_event(event_stix_two)
@@ -2751,7 +2803,7 @@ class TestComprehensive(unittest.TestCase):
             else:
                 raise Exception('Unable to find UUID in Events blocklist')
             first = self.user_misp_connector.add_event(first, pythonify=True)
-            self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+            self.assertEqual(first['errors'][1]['message'], 'Event blocked by event blocklist.', first)
             ble.comment = 'This is a test'
             ble.event_info = 'foo'
             ble.event_orgc = 'bar'
@@ -2771,7 +2823,7 @@ class TestComprehensive(unittest.TestCase):
             else:
                 raise Exception('Unable to find UUID in Orgs blocklist')
             first = self.user_misp_connector.add_event(first, pythonify=True)
-            self.assertEqual(first['errors'][1]['message'], 'Could not add Event', first)
+            self.assertEqual(first['errors'][1]['message'], 'Event blocked by organisation blocklist.', first)
 
             blo.comment = 'This is a test'
             blo.org_name = 'bar'

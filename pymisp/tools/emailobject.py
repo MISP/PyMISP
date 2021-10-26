@@ -45,7 +45,7 @@ class EMailObject(AbstractMISPObjectGenerator):
 
     def parse_email(self) -> EmailMessage:
         """Convert email into EmailMessage."""
-        content_in_bytes = self.__pseudofile.getvalue()
+        content_in_bytes = self.__pseudofile.getvalue().strip()
         eml = message_from_bytes(content_in_bytes,
                                  _class=EmailMessage,
                                  policy=policy.default)
@@ -317,12 +317,6 @@ class EMailObject(AbstractMISPObjectGenerator):
         if "Thread-Index" in message:
             self.add_attribute("thread-index", message["Thread-Index"])
 
-        if "Received" in message:
-            try:
-                self.add_attribute("received-header-hostname", message['Received'].split(' ')[1])
-            except Exception:
-                pass
-
         self.__generate_received()
 
     def __add_emails(self, typ: str, data: str, insert_display_names: bool = True):
@@ -351,7 +345,7 @@ class EMailObject(AbstractMISPObjectGenerator):
 
     def __generate_received(self):
         """
-        Extract IP addresses from received headers that are not private.
+        Extract IP addresses from received headers that are not private. Also extract hostnames or domains.
         """
         received_items = self.email.get_all("received")
         if received_items is None:
@@ -375,3 +369,11 @@ class EMailObject(AbstractMISPObjectGenerator):
                 continue  # skip header if IP not found or is private
 
             self.add_attribute("received-header-ip", value=str(ip), comment=fromstr)
+
+        # The hostnames and/or domains always come after the "Received: from"
+        # part so we can use regex to pick up those attributes.
+        received_from = re.findall(r'(?<=from\s)[\w\d\.\-]+\.\w{2,24}', str(received_items))
+        try:
+            [self.add_attribute("received-header-hostname", i) for i in received_from]
+        except Exception:
+            pass

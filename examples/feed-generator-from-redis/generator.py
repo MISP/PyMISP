@@ -158,7 +158,7 @@ class FeedGenerator:
         self.create_daily_event()
 
     def flush_event(self, new_event=None):
-        print('Writting event on disk' + ' ' * 50)
+        print('Writing event on disk' + ' ' * 50)
         if new_event is not None:
             event_uuid = new_event['uuid']
             event = new_event

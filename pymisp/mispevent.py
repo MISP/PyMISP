@@ -126,11 +126,40 @@ class MISPOrganisation(AbstractMISP):
 
 
 class MISPSharingGroup(AbstractMISP):
+    def __init__(self):
+        super().__init__()
+        self.name: str
+        self.SharingGroupOrg: List[MISPOrganisation] = []
+
+    @property
+    def orgs(self) -> List[MISPOrganisation]:
+        return self.SharingGroupOrg
+
+    @orgs.setter
+    def orgs(self, orgs: List[MISPOrganisation]):
+        """Set a list of prepared MISPSighting."""
+        if all(isinstance(x, MISPSighting) for x in orgs):
+            self.SharingGroupOrg = orgs
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPOrganisation.')
+
+    def add_org(self, org):
+        misp_org = MISPOrganisation()
+        misp_org.from_dict(**org)
+        self.SharingGroupOrg.append(misp_org)
+        return misp_org
 
     def from_dict(self, **kwargs):
+        if 'SharingGroupOrg' in kwargs:
+            [self.add_org(org) for org in kwargs.pop('SharingGroupOrg')]
         if 'SharingGroup' in kwargs:
             kwargs = kwargs['SharingGroup']
         super().from_dict(**kwargs)
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'name'):
+            return f'<{self.__class__.__name__}(name={self.name})'
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPShadowAttribute(AbstractMISP):
