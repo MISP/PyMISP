@@ -10,7 +10,7 @@ logger = logging.getLogger('pymisp')
 class ASNObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parameters: dict, strict: bool = True, **kwargs):
-        super(ASNObject, self).__init__('asn', strict=strict, **kwargs)
+        super().__init__('asn', **kwargs)
         self._parameters = parameters
         self.generate_attributes()
 
@@ -19,4 +19,3 @@ class ASNObject(AbstractMISPObjectGenerator):
         self._parameters['first-seen'] = first
         last = self._sanitize_timestamp(self._parameters.pop('last-seen', None))
         self._parameters['last-seen'] = last
-        return super(ASNObject, self).generate_attributes()

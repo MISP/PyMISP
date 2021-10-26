@@ -31,7 +31,7 @@ class MISPMsgConverstionError(MISPObjectException):
 class EMailObject(AbstractMISPObjectGenerator):
     def __init__(self, filepath: Union[Path, str] = None, pseudofile: BytesIO = None,
                  attach_original_email: bool = True, **kwargs):
-        super().__init__("email", **kwargs)
+        super().__init__('email', **kwargs)
 
         self.attach_original_email = attach_original_email
         self.encapsulated_body: Union[str, None] = None
