@@ -10,7 +10,7 @@ logger = logging.getLogger('pymisp')
 class GeolocationObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parameters: dict, strict: bool = True, **kwargs):
-        super().__init__('geolocation', **kwargs)
+        super().__init__('geolocation', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()
 
@@ -19,3 +19,4 @@ class GeolocationObject(AbstractMISPObjectGenerator):
         self._parameters['first-seen'] = first
         last = self._sanitize_timestamp(self._parameters.pop('last-seen', None))
         self._parameters['last-seen'] = last
+        super().generate_attributes()

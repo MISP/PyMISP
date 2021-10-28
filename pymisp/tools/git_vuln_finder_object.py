@@ -10,7 +10,7 @@ logger = logging.getLogger('pymisp')
 class GitVulnFinderObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parameters: dict, strict: bool = True, **kwargs):
-        super().__init__('git-vuln-finder', **kwargs)
+        super().__init__('git-vuln-finder', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()
 
@@ -25,3 +25,4 @@ class GitVulnFinderObject(AbstractMISPObjectGenerator):
             self._parameters['stats.deletions'] = stats.pop('deletions')
             self._parameters['stats.lines'] = stats.pop('lines')
             self._parameters['stats.files'] = stats.pop('files')
+        super().generate_attributes()

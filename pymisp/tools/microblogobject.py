@@ -12,7 +12,7 @@ logger = logging.getLogger('pymisp')
 class MicroblogObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parameters: dict, strict: bool = True, **kwargs):
-        super().__init__('microblog', **kwargs)
+        super().__init__('microblog', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()
 
