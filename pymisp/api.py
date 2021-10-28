@@ -2812,6 +2812,8 @@ class PyMISP:
         query.pop('pythonify')
         if log_id is not None:
             query['id'] = query.pop('log_id')
+        if created is not None and isinstance(created, (datetime)):
+            query['created'] = query.pop('created').timestamp()
 
         response = self._prepare_request('POST', 'admin/logs/index', data=query)
         normalized_response = self._check_json_response(response)

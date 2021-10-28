@@ -2614,7 +2614,7 @@ class TestComprehensive(unittest.TestCase):
     def test_first_last_seen(self):
         event = MISPEvent()
         event.info = 'Test First Last seen'
-        event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-04', last_seen='2020-01-04T12:30:34.323242+0800')
+        event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-03', last_seen='2020-01-04T12:30:34.323242+0800')
         obj = event.add_object(name='file', first_seen=1580147259.268763, last_seen=1580147300)
         attr = obj.add_attribute('filename', 'blah.exe', comment="blah")
         attr.first_seen = '2022-01-30'
@@ -2622,7 +2622,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.admin_misp_connector.add_event(event, pythonify=True)
             # Simple attribute
-            self.assertEqual(first.attributes[0].first_seen, datetime(2020, 1, 4, 0, 0).astimezone())
+            self.assertEqual(first.attributes[0].first_seen, datetime(2020, 1, 3, 0, 0).astimezone())
             self.assertEqual(first.attributes[0].last_seen, datetime(2020, 1, 4, 4, 30, 34, 323242, tzinfo=timezone.utc))
 
             # Object
