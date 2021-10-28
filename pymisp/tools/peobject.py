@@ -37,8 +37,7 @@ class PEObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parsed: Optional[lief.PE.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, **kwargs):
         """Creates an PE object, with lief"""
-        super().__init__('pe')
-        super(PEObject, self).__init__('pe', **kwargs)
+        super().__init__('pe', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if pseudofile:

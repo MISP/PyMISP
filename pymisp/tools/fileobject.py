@@ -31,9 +31,7 @@ except ImportError:
 class FileObject(AbstractMISPObjectGenerator):
 
     def __init__(self, filepath: Union[Path, str] = None, pseudofile: BytesIO = None, filename: str = None, **kwargs):
-        # PY3 way:
-        # super().__init__('file')
-        super(FileObject, self).__init__('file', **kwargs)
+        super().__init__('file', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if not HAS_MAGIC:

@@ -34,9 +34,7 @@ class MachOObject(AbstractMISPObjectGenerator):
 
     def __init__(self, parsed: Optional[lief.MachO.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, **kwargs):
         """Creates an MachO object, with lief"""
-        # Python3 way
-        # super().__init__('elf')
-        super(MachOObject, self).__init__('macho', **kwargs)
+        super().__init__('macho', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
         if pseudofile:
