@@ -295,6 +295,9 @@ class EMailObject(AbstractMISPObjectGenerator):
         if "Reply-To" in message:
             self.__add_emails("reply-to", message["reply-to"])
 
+        if "Bcc" in message:
+            self.__add_emails("bcc", message["Bcc"])
+
         if "Cc" in message:
             self.__add_emails("cc", message["Cc"])
 
