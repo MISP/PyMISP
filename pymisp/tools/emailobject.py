@@ -297,7 +297,7 @@ class EMailObject(AbstractMISPObjectGenerator):
 
         if "Bcc" in message:
             self.__add_emails("bcc", message["Bcc"])
-            
+
         if "Cc" in message:
             self.__add_emails("cc", message["Cc"])
 
