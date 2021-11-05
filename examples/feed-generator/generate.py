@@ -12,6 +12,11 @@ try:
 except ImportError:
     include_deleted = False
 
+try:
+    from settings import exclude_malware_samples
+except ImportError:
+    exclude_malware_samples = False
+
 valid_attribute_distributions = []
 
 
@@ -70,9 +75,13 @@ if __name__ == '__main__':
     for event in events:
         try:
             e = misp.get_event(event.uuid, deleted=include_deleted, pythonify=True)
+            if exclude_malware_samples:
+                for i, attribute in enumerate(e.attributes):
+                    if attribute.type == 'malware-sample':
+                        del e.attributes[i]
             e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True)
-        except Exception as e:
-            print(e, event.uuid)
+        except Exception as err:
+            print(err, event.uuid)
             continue
         if not e_feed:
             print(f'Invalid distribution {e.distribution}, skipping')

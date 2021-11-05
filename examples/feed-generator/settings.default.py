@@ -42,3 +42,9 @@ include_deleted = False
 # 5: Inherit Event
 valid_attribute_distribution_levels = ['0', '1', '2', '3', '4', '5']
 
+
+# By default, all attribute passing the filtering rules will be exported.
+# This setting can be used to filter out attributes being of the type `malaware-sample`. 
+# Warning: Keep in mind that if you propagate data (via synchronisation/feeds/...), recipients
+# will not be able to get the malware samples back.
+exclude_malware_samples = False
