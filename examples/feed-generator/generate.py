@@ -62,7 +62,7 @@ def saveManifest(manifest):
 if __name__ == '__main__':
     misp = init()
     try:
-        events = misp.search(metadata=True, limit=entries, **filters, pythonify=True)
+        events = misp.search_index(minimal=True, limit=entries, **filters, pythonify=False)
     except Exception as e:
         print(e)
         sys.exit("Invalid response received from MISP.")
