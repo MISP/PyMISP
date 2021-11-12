@@ -2484,9 +2484,9 @@ class PyMISP:
         if return_format not in return_formats:
             raise ValueError('return_format has to be in {}'.format(', '.join(return_formats)))
         if return_format == 'stix-xml':
-            query['returnFormat'] = 'stix'
+            query['return_format'] = 'stix'
         else:
-            query['returnFormat'] = return_format
+            query['return_format'] = return_format
 
         query['page'] = page
         query['limit'] = limit
