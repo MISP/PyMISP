@@ -5,7 +5,7 @@ import sys
 import json
 import os
 from pymisp import ExpandedPyMISP
-from settings import entries, url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
+from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
 
 try:
     from settings import include_deleted
@@ -13,9 +13,9 @@ except ImportError:
     include_deleted = False
 
 try:
-    from settings import exclude_malware_samples
+    from settings import exclude_attribute_types
 except ImportError:
-    exclude_malware_samples = False
+    exclude_attribute_types = []
 
 valid_attribute_distributions = []
 
@@ -62,7 +62,7 @@ def saveManifest(manifest):
 if __name__ == '__main__':
     misp = init()
     try:
-        events = misp.search_index(minimal=True, limit=entries, **filters, pythonify=False)
+        events = misp.search_index(minimal=True, **filters, pythonify=False)
     except Exception as e:
         print(e)
         sys.exit("Invalid response received from MISP.")
@@ -74,14 +74,14 @@ if __name__ == '__main__':
     total = len(events)
     for event in events:
         try:
-            e = misp.get_event(event.uuid, deleted=include_deleted, pythonify=True)
-            if exclude_malware_samples:
+            e = misp.get_event(event['uuid'], deleted=include_deleted, pythonify=True)
+            if exclude_attribute_types:
                 for i, attribute in enumerate(e.attributes):
-                    if attribute.type == 'malware-sample':
-                        del e.attributes[i]
+                    if attribute.type in exclude_attribute_types:
+                        e.attributes.pop(i)
             e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True)
         except Exception as err:
-            print(err, event.uuid)
+            print(err, event['uuid'])
             continue
         if not e_feed:
             print(f'Invalid distribution {e.distribution}, skipping')
