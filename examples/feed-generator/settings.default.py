@@ -12,9 +12,6 @@ ssl = False
 # sure that you use a directory dedicated to the feed
 outputdir = 'output'
 
-# Determine the number of entries to output
-entries = 200
-
 # The filters to be used for by the feed. You can use any filter that
 # you can use on the event index, such as organisation, tags, etc.
 # It uses the same joining and condition rules as the API parameters
@@ -42,3 +39,10 @@ include_deleted = False
 # 5: Inherit Event
 valid_attribute_distribution_levels = ['0', '1', '2', '3', '4', '5']
 
+# By default, all attribute passing the filtering rules will be exported.
+# This setting can be used to filter out any attributes being of the type contained in the list. 
+# Warning: Keep in mind that if you propagate data (via synchronisation/feeds/...), recipients
+# will not be able to get these attributes back unless their events get updated.
+# For example:
+# exclude_attribute_types = ['malware-sample']
+exclude_attribute_types = []
