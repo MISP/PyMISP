@@ -2,6 +2,72 @@ Changelog
 =========
 
 
+v2.4.151 (2021-11-19)
+---------------------
+
+New
+~~~
+- Add Blind Carbon Copy (bcc) headers. [Sami Tainio]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- [feed-generator] Make the feature to exlude attribute type more
+  generic. [Sami Mokaddem]
+- [feed-generator] Added exclude malware samples option. [Sami Mokaddem]
+- Bump deps, chardet is required by pyfaup. [Raphaël Vinot]
+- Removed a whitespace. [Sami Tainio]
+- Keep strict and generate attributes when needed. [Raphaël Vinot]
+- Slight changes regarding timezones. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Unified constructors. [Thomas Dupuy]
+- Slight changes regarding timezones. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [types] remove the duplicate. [Alexandre Dulaunoy]
+- [describeTypes] remove duplicate filename-pattern. [Alexandre
+  Dulaunoy]
+- [misp-objects] updated. [Alexandre Dulaunoy]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Bump many dependencies. [Raphaël Vinot]
+- Add in test case for get_sharing_group and validate orgs are present.
+  [Tom King]
+- Improve sharing groups, bring back organsations included and ability
+  to get specific SG. [Tom King]
+- Add in test case for searching against orgs and users. [Tom King]
+- Add ability to search against orgs and users by freetext search (both)
+  or organisation (users) [Tom King]
+- [test] Check if all category types exists. [Jakub Onderka]
+- Bump changelog. [Raphaël Vinot]
+- [py] Typo. [Steve Clement]
+- [describeTypes] updated to include ssh-fingerprint. [Alexandre
+  Dulaunoy]
+
+Fix
+~~~
+- [feed-generator] Revert back the event initial search to use the index
+  endpoint instead of RestSearch. [Sami Mokaddem]
+
+  Relying on RestSearch was offering more flexibility than index in terms of filtering options,
+  however, it might introduce a significant overhead potentially leading to timeout.
+- PyMISP.get_user_setting method. [Jakub Onderka]
+- [tests] Remove debug prints. [Jakub Onderka]
+- Fix final nosetest. [Tom King]
+- Fix nosetests. [Tom King]
+- [types] Update types to use `filename-pattern` type. [Jakub Onderka]
+- [test] Remove debug print. [Jakub Onderka]
+- [test] Correct error messages for blocked event. [Jakub Onderka]
+- Missing import in __init__ [Raphaël Vinot]
+
+  Fix #796
+- [tests] Fixed stix test. [chrisr3d]
+- [py] Typo. [Steve Clement]
+
+Other
+~~~~~
+- Update README.md. [Raphaël Vinot]
+
+
 v2.4.148.1 (2021-09-30)
 -----------------------
 
