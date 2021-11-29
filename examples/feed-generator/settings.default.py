@@ -46,3 +46,8 @@ valid_attribute_distribution_levels = ['0', '1', '2', '3', '4', '5']
 # For example:
 # exclude_attribute_types = ['malware-sample']
 exclude_attribute_types = []
+
+# Include the distribution and sharing group information (and names/UUIDs of organisations in those Sharing Groups)
+# Set this to False if you want to discard the distribution metadata. That way all data will inherit the distribution
+# the feed
+with_distribution = False
