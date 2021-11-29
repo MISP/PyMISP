@@ -6,6 +6,10 @@ import json
 import os
 from pymisp import ExpandedPyMISP
 from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
+try:
+    from settings import with_distribution
+except:
+    with_distribution = False
 
 try:
     from settings import include_deleted
@@ -79,7 +83,7 @@ if __name__ == '__main__':
                 for i, attribute in enumerate(e.attributes):
                     if attribute.type in exclude_attribute_types:
                         e.attributes.pop(i)
-            e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True)
+            e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True, with_distribution=with_distribution)
         except Exception as err:
             print(err, event['uuid'])
             continue
