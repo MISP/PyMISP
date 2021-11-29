@@ -8,7 +8,7 @@ from pymisp import ExpandedPyMISP
 from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
 try:
     from settings import with_distribution
-except:
+except ImportError:
     with_distribution = False
 
 try:
