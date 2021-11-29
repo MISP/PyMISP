@@ -174,6 +174,7 @@ class MISPSharingGroup(AbstractMISP):
             server['Server'].pop('id', None)
         return to_return
 
+
 class MISPShadowAttribute(AbstractMISP):
 
     def __init__(self):
@@ -344,7 +345,7 @@ class MISPAttribute(AbstractMISP):
         if not hasattr(self, 'timestamp'):
             self.timestamp = datetime.timestamp(datetime.now())
 
-    def _to_feed(self, with_distribution = False) -> Dict:
+    def _to_feed(self, with_distribution=False) -> Dict:
         if with_distribution:
             self._fields_for_feed.add('distribution')
         to_return = super()._to_feed()
@@ -763,7 +764,7 @@ class MISPObject(AbstractMISP):
         if not hasattr(self, 'timestamp'):
             self.timestamp = datetime.timestamp(datetime.now())
 
-    def _to_feed(self, with_distribution = False) -> Dict:
+    def _to_feed(self, with_distribution=False) -> Dict:
         if with_distribution:
             self._fields_for_feed.add('distribution')
         to_return = super(MISPObject, self)._to_feed()
@@ -1531,7 +1532,7 @@ class MISPEvent(AbstractMISP):
                 to_return += attribute.hash_values(algorithm)
         return to_return
 
-    def to_feed(self, valid_distributions: List[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False, with_distribution = False) -> Dict:
+    def to_feed(self, valid_distributions: List[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False, with_distribution=False) -> Dict:
         """ Generate a json output for MISP Feed.
 
         :param valid_distributions: only makes sense if the distribution key is set; i.e., the event is exported from a MISP instance.
