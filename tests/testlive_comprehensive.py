@@ -2227,8 +2227,8 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(sharing_group.name, 'Testcases SG')
 
             # Check we have the org field present and the first org is our org
-            self.assertTrue(isinstance(getattr(sharing_group, "orgs"), list))
-            self.assertEqual(sharing_group.orgs[0].id, self.test_org.id)
+            self.assertTrue(isinstance(getattr(sharing_group, "sgorgs"), list))
+            self.assertEqual(sharing_group.sgorgs[0].org_id, self.test_org.id)
         finally:
             self.admin_misp_connector.delete_sharing_group(sharing_group.id)
 

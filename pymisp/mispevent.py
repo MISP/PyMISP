@@ -186,8 +186,8 @@ class MISPSharingGroup(AbstractMISP):
 
     def __repr__(self) -> str:
         if hasattr(self, 'name'):
-            return f'<{self.__class__.__name__}(name={self.name})'
-        return f'<{self.__class__.__name__}(NotInitialized)'
+            return f'<{self.__class__.__name__}(name={self.name})>'
+        return f'<{self.__class__.__name__}(NotInitialized)>'
 
     def _to_feed(self) -> Dict:
         to_return = super()._to_feed()
