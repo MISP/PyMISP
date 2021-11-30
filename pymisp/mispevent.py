@@ -125,35 +125,61 @@ class MISPOrganisation(AbstractMISP):
         return f'<{self.__class__.__name__}(NotInitialized)'
 
 
+class MISPSharingGroupOrg(AbstractMISP):
+    _fields_for_feed: set = {'extend', 'Organisation'}
+
+    def __init__(self):
+        super().__init__()
+        self.extend: bool
+        self.Organisation: MISPOrganisation
+
+    def from_dict(self, **kwargs):
+        if 'SharingGroupOrg' in kwargs:
+            kwargs = kwargs['SharingGroupOrg']
+        if 'Organisation' in kwargs:
+            self.Organisation = MISPOrganisation()
+            self.Organisation.from_dict(**kwargs.pop('Organisation'))
+        super().from_dict(**kwargs)
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'Organisation') and hasattr(self, 'extend'):
+            return f'<{self.__class__.__name__}(Org={self.Organisation.name}, extend={self.extend})'
+        return f'<{self.__class__.__name__}(NotInitialized)'
+
+    def _to_feed(self) -> Dict:
+        to_return = super()._to_feed()
+        to_return['Organisation'] = self.Organisation._to_feed()
+        return to_return
+
+
 class MISPSharingGroup(AbstractMISP):
     _fields_for_feed: set = {'uuid', 'name', 'roaming', 'created', 'organisation_uuid', 'Organisation', 'SharingGroupOrg', 'SharingGroupServer'}
 
     def __init__(self):
         super().__init__()
         self.name: str
-        self.SharingGroupOrg: List[MISPOrganisation] = []
+        self.SharingGroupOrg: List[MISPSharingGroupOrg] = []
 
     @property
-    def orgs(self) -> List[MISPOrganisation]:
+    def sgorgs(self) -> List[MISPSharingGroupOrg]:
         return self.SharingGroupOrg
 
-    @orgs.setter
-    def orgs(self, orgs: List[MISPOrganisation]):
-        """Set a list of prepared MISPSighting."""
-        if all(isinstance(x, MISPSighting) for x in orgs):
-            self.SharingGroupOrg = orgs
+    @sgorgs.setter
+    def sgorgs(self, sgorgs: List[MISPSharingGroupOrg]):
+        if all(isinstance(x, MISPSharingGroupOrg) for x in sgorgs):
+            self.SharingGroupOrg = sgorgs
         else:
-            raise PyMISPError('All the attributes have to be of type MISPOrganisation.')
+            raise PyMISPError('All the attributes have to be of type MISPSharingGroupOrg.')
 
-    def add_org(self, org):
-        misp_org = MISPOrganisation()
-        misp_org.from_dict(**org)
-        self.SharingGroupOrg.append(misp_org)
-        return misp_org
+    def add_sgorg(self, sgorg):
+        misp_sgorg = MISPSharingGroupOrg()
+        misp_sgorg.from_dict(**sgorg)
+        self.SharingGroupOrg.append(misp_sgorg)
+        return misp_sgorg
 
     def from_dict(self, **kwargs):
         if 'SharingGroupOrg' in kwargs:
-            [self.add_org(org) for org in kwargs.pop('SharingGroupOrg')]
+            [self.add_sgorg(sgorg) for sgorg in kwargs.pop('SharingGroupOrg')]
         if 'SharingGroup' in kwargs:
             kwargs = kwargs['SharingGroup']
         super().from_dict(**kwargs)
@@ -165,7 +191,7 @@ class MISPSharingGroup(AbstractMISP):
 
     def _to_feed(self) -> Dict:
         to_return = super()._to_feed()
-        to_return['SharingGroupOrg'] = [org._to_feed() for org in self.SharingGroupOrg]
+        to_return['SharingGroupOrg'] = [sgorg._to_feed() for sgorg in self.SharingGroupOrg]
         to_return['Organisation'].pop('id', None)
         for server in to_return['SharingGroupServer']:
             server.pop('id', None)
