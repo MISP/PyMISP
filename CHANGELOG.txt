@@ -2,6 +2,32 @@ Changelog
 =========
 
 
+v2.4.152 (2021-12-22)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps, object templates. [Raphaël Vinot]
+- Bump objects templates. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Lief doesn't supports python 3.10. [Raphaël Vinot]
+- Debug poetry install, freezes on the GHA. [Raphaël Vinot]
+- Bump deps, use pytest. [Raphaël Vinot]
+- [feed-generator] support for distribution and sharing groups.
+  [Christophe Vandeplas]
+
+Fix
+~~~
+- Update live tests to support proper format of SGs. [Raphaël Vinot]
+- [sharinggroups] Fixes wrong model for SharingGroupOrg. [Christophe
+  Vandeplas]
+- [feed-generator] code style fixes. [Christophe Vandeplas]
+- [feed-generator] keeping function compatibility. [Christophe
+  Vandeplas]
+- [feed-generator] fix missing except type. [Christophe Vandeplas]
+
+
 v2.4.151 (2021-11-19)
 ---------------------
 
@@ -11,6 +37,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - [feed-generator] Make the feature to exlude attribute type more
