@@ -74,7 +74,7 @@ brotli = ['urllib3']
 
 [tool.poetry.dev-dependencies]
 requests-mock = "^1.9.3"
-mypy = "^0.921"
+mypy = "^0.931"
 flake8 = "^4.0.1"
 ipython = "^7.16.1"
 jupyterlab = "^3.2"
