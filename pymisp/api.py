@@ -102,15 +102,18 @@ def brotli_supported() -> bool:
     """
     Returns whether Brotli compression is supported
     """
+    major: int
+    minor: int
+    patch: int
 
     # urllib >= 1.25.1 includes brotli support
     version_splitted = urllib3.__version__.split('.')  # noqa: F811
     if len(version_splitted) == 2:
-        major, minor = version_splitted
+        major, minor = version_splitted  # type: ignore
         patch = 0
     else:
-        major, minor, patch = version_splitted
-    major, minor, patch = int(major), int(minor), int(patch)
+        major, minor, patch = version_splitted  # type: ignore
+    major, minor, patch = int(major), int(minor), int(patch)  # type: ignore
     urllib3_with_brotli = (major == 1 and ((minor == 25 and patch >= 1) or (minor >= 26))) or major >= 2
 
     if not urllib3_with_brotli:
