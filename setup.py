@@ -42,7 +42,7 @@ setup(
                       'python-dateutil',
                       'jsonschema',
                       'deprecated'],
-    extras_require={'fileobjects': ['python-magic', 'pydeep', 'lief>=0.11.0'],
+    extras_require={'fileobjects': ['python-magic', 'pydeep2', 'lief>=0.11.0'],
                     'neo': ['py2neo'],
                     'openioc': ['beautifulsoup4'],
                     'virustotal': ['validators'],
