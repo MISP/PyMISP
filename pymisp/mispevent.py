@@ -1558,11 +1558,12 @@ class MISPEvent(AbstractMISP):
                 to_return += attribute.hash_values(algorithm)
         return to_return
 
-    def to_feed(self, valid_distributions: List[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False, with_distribution=False) -> Dict:
+    def to_feed(self, valid_distributions: List[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False, with_distribution=False, with_local_tags: bool = True) -> Dict:
         """ Generate a json output for MISP Feed.
 
         :param valid_distributions: only makes sense if the distribution key is set; i.e., the event is exported from a MISP instance.
         :param with_distribution: exports distribution and Sharing Group info; otherwise all SharingGroup information is discarded (protecting privacy)
+        :param with_local_tags: tag export includes local exportable tags along with global exportable tags
         """
         required = ['info', 'Orgc']
         for r in required:
@@ -1583,7 +1584,7 @@ class MISPEvent(AbstractMISP):
             to_return['_manifest'] = self.manifest
 
         to_return['Orgc'] = self.Orgc._to_feed()
-        to_return['Tag'] = list(filter(None, [tag._to_feed() for tag in self.tags]))
+        to_return['Tag'] = list(filter(None, [tag._to_feed(with_local_tags) for tag in self.tags]))
         if self.attributes:
             to_return['Attribute'] = []
             for attribute in self.attributes:

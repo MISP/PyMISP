@@ -365,6 +365,7 @@ class MISPTag(AbstractMISP):
         super().__init__(**kwargs)
         self.name: str
         self.exportable: bool
+        self.local: bool
 
     def from_dict(self, **kwargs):
         if kwargs.get('Tag'):
@@ -375,8 +376,10 @@ class MISPTag(AbstractMISP):
         if not hasattr(self, 'colour'):
             self.colour = '#ffffff'
 
-    def _to_feed(self) -> Dict:
+    def _to_feed(self, with_local: bool = True) -> Dict:
         if hasattr(self, 'exportable') and not self.exportable:
+            return {}
+        if with_local is False and hasattr(self, 'local') and self.local:
             return {}
         return super()._to_feed()
 
