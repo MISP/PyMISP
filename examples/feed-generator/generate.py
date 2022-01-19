@@ -12,6 +12,11 @@ except ImportError:
     with_distribution = False
 
 try:
+    from settings import with_local_tags
+except ImportError:
+    with_local_tags = True
+
+try:
     from settings import include_deleted
 except ImportError:
     include_deleted = False
@@ -83,7 +88,7 @@ if __name__ == '__main__':
                 for i, attribute in enumerate(e.attributes):
                     if attribute.type in exclude_attribute_types:
                         e.attributes.pop(i)
-            e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True, with_distribution=with_distribution)
+            e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True, with_distribution=with_distribution, with_local_tags=with_local_tags)
         except Exception as err:
             print(err, event['uuid'])
             continue

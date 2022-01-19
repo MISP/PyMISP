@@ -51,3 +51,6 @@ exclude_attribute_types = []
 # Set this to False if you want to discard the distribution metadata. That way all data will inherit the distribution
 # the feed
 with_distribution = False
+
+# Include the exportable local tags along with the global tags.  The default is True.
+with_local_tags = True
