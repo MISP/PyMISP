@@ -490,7 +490,7 @@ test = ["pytest (!=5.3.4)", "pytest-cov", "flaky", "nose", "jedi (<=0.17.2)"]
 
 [[package]]
 name = "ipython"
-version = "7.16.2"
+version = "7.16.3"
 description = "IPython: Productive Interactive Computing"
 category = "dev"
 optional = false
@@ -1755,7 +1755,7 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6.2"
-content-hash = "e42f74d070b75137affc03424dad6f26c38038d07ccbcf49d2e7ce34b6003612"
+content-hash = "11dd7c4fb58fd069e9c449b22dd28fca0cb1163dd6833da413a60d78d973568d"
 
 [metadata.files]
 alabaster = [
@@ -2141,8 +2141,8 @@ ipykernel = [
     {file = "ipykernel-5.5.6.tar.gz", hash = "sha256:4ea44b90ae1f7c38987ad58ea0809562a17c2695a0499644326f334aecd369ec"},
 ]
 ipython = [
-    {file = "ipython-7.16.2-py3-none-any.whl", hash = "sha256:2f644313be4fdc5c8c2a17467f2949c29423c9e283a159d1fc9bf450a1a300af"},
-    {file = "ipython-7.16.2.tar.gz", hash = "sha256:613085f8acb0f35f759e32bea35fba62c651a4a2e409a0da11414618f5eec0c4"},
+    {file = "ipython-7.16.3-py3-none-any.whl", hash = "sha256:c0427ed8bc33ac481faf9d3acf7e84e0010cdaada945e0badd1e2e74cc075833"},
+    {file = "ipython-7.16.3.tar.gz", hash = "sha256:5ac47dc9af66fc2f5530c12069390877ae372ac905edca75a92a6e363b5d7caa"},
 ]
 ipython-genutils = [
     {file = "ipython_genutils-0.2.0-py2.py3-none-any.whl", hash = "sha256:72dd37233799e619666c9f639a9da83c34013a73e8bbc79a7a6348d93c61fab8"},
@@ -2193,6 +2193,10 @@ lark-parser = [
     {file = "lark_parser-0.12.0-py2.py3-none-any.whl", hash = "sha256:0eaf30cb5ba787fe404d73a7d6e61df97b21d5a63ac26c5008c78a494373c675"},
 ]
 lief = [
+    {file = "lief-0.11.5-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:be2b5420a8c48968c37621aa9ff0b34bc56115687f095da419ff97e4542cd27a"},
+    {file = "lief-0.11.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4f7f33e44ea73aebdfa4f511866a919a7a8cb5cbb6a3ca573549f8137232ec7b"},
+    {file = "lief-0.11.5-cp310-cp310-win32.whl", hash = "sha256:c30be8afd44f2b2441427f71b06a0cae190d535268304ba92f13b0eec9436221"},
+    {file = "lief-0.11.5-cp310-cp310-win_amd64.whl", hash = "sha256:aa41e6fbd8feb7e42a1d67b99604f4c32b31e5dd1e36c99a90af73f19dc377f8"},
     {file = "lief-0.11.5-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:1cca100e77382f4137a3b1283769efa0e68a965fa4f3e21e64e3f67b6e22fdc8"},
     {file = "lief-0.11.5-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:621ad19f77884a008d61e05b92aed8309a8460e93916f4722439beaa529ca37d"},
     {file = "lief-0.11.5-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c672dcd78dbbe2c0746721cdb1593b237a8b983d039e73713b055449e4a58207"},
