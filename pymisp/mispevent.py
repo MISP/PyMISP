@@ -1592,7 +1592,7 @@ class MISPEvent(AbstractMISP):
                     continue
                 to_return['Attribute'].append(attribute._to_feed(with_distribution=with_distribution))
                 if with_meta:
-                    to_return['_hashes'] += attribute.hash_values('md5')
+                    to_return['_hashes'] += attribute.hash_values('sha1')
 
         if self.objects:
             to_return['Object'] = []
@@ -1608,7 +1608,7 @@ class MISPEvent(AbstractMISP):
                         continue
                     obj_to_attach['Attribute'].append(attribute._to_feed(with_distribution=with_distribution))
                     if with_meta:
-                        to_return['_hashes'] += attribute.hash_values('md5')
+                        to_return['_hashes'] += attribute.hash_values('sha1')
                 to_return['Object'].append(obj_to_attach)
 
         if with_distribution:
