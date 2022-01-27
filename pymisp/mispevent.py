@@ -353,7 +353,7 @@ class MISPAttribute(AbstractMISP):
         if '|' in self.type or self.type == 'malware-sample':
             hashes = []
             for v in self.value.split('|'):
-                h = hashlib.new(algorithm)
+                h = hashlib.new(algorithm, usedforsecurity=False)
                 h.update(v.encode("utf-8"))
                 hashes.append(h.hexdigest())
             return hashes

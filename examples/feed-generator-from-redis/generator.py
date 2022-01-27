@@ -121,16 +121,16 @@ class FeedGenerator:
         if ('|' in attr_type or attr_type == 'malware-sample'):
             split = attr_value.split('|')
             self.attributeHashes.append([
-                hashlib.md5(str(split[0]).encode("utf-8")).hexdigest(),
+                hashlib.md5(str(split[0]).encode("utf-8"), usedforsecurity=False).hexdigest(),
                 self.current_event_uuid
             ])
             self.attributeHashes.append([
-                hashlib.md5(str(split[1]).encode("utf-8")).hexdigest(),
+                hashlib.md5(str(split[1]).encode("utf-8"), usedforsecurity=False).hexdigest(),
                 self.current_event_uuid
             ])
         else:
             self.attributeHashes.append([
-                hashlib.md5(str(attr_value).encode("utf-8")).hexdigest(),
+                hashlib.md5(str(attr_value).encode("utf-8"), usedforsecurity=False).hexdigest(),
                 self.current_event_uuid
             ])
 
