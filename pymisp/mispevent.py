@@ -354,9 +354,9 @@ class MISPAttribute(AbstractMISP):
             hashes = []
             for v in self.value.split('|'):
                 try:
-                    h = hashlib.new(algorithm)
-                except ValueError:
                     h = hashlib.new(algorithm, usedforsecurity=False)
+                except:
+                    h = hashlib.new(algorithm)
                 h.update(v.encode("utf-8"))
                 hashes.append(h.hexdigest())
             return hashes
