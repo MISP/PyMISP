@@ -28,7 +28,7 @@ jobs:
 
     - name: Install system dependencies
       run: |
-        sudo apt install libfuzzy-dev libemail-outlook-message-perl libemail-address-perl
+        sudo apt install libemail-outlook-message-perl libemail-address-perl
 
     - name: Install Python dependencies
       run: |
