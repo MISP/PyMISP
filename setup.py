@@ -18,7 +18,7 @@ setup(
     maintainer='Raphaël Vinot',
     url='https://github.com/MISP/PyMISP',
     project_urls={
-        'Documentation': 'http://pymisp.readthedocs.io',
+        'Documentation': 'https://pymisp.readthedocs.io',
         'Source': 'https://github.com/MISP/PyMISP',
         'Tracker': 'https://github.com/MISP/PyMISP/issues',
     },
