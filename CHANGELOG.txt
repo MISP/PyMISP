@@ -2,6 +2,19 @@ Changelog
 =========
 
 
+v2.4.155.1 (2022-03-03)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump required python version for doc. [Raphaël Vinot]
+- Remove python 3.6 from metadata. [Raphaël Vinot]
+
+Fix
+~~~
+- Incorrect call when requesting a new API key. [Raphaël Vinot]
+
+
 v2.4.155 (2022-03-03)
 ---------------------
 
@@ -12,6 +25,7 @@ New
 
 Changes
 ~~~~~~~
+- Re-bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
