@@ -12,9 +12,14 @@ New
 
 Changes
 ~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump new minimal python version to 3.7. [Raphaël Vinot]
+- Perl dependencies not longer required. [Jakub Onderka]
+- Simplify submodules checkout. [Jakub Onderka]
+- Use https for link to documentation. [Jakub Onderka]
 - Bump deps. [Raphaël Vinot]
 - [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
 - [FIPS] no clean way to support OpenSSL hashlib interface for FIPS.
@@ -35,6 +40,7 @@ Changes
 
 Fix
 ~~~
+- Libfuzzy-dev is not longer required. [Jakub Onderka]
 - [mispevent] cannot type. [Alexandre Dulaunoy]
 - Make mypy happy. [Raphaël Vinot]
 
