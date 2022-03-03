@@ -1753,6 +1753,9 @@ class TestComprehensive(unittest.TestCase):
         user.email = 'foo@bar.de'
         user = self.admin_misp_connector.update_user(user, pythonify=True)
         self.assertEqual(user.email, 'foo@bar.de')
+        # get API key
+        key = self.user_misp_connector.get_new_authkey()
+        self.assertTrue(isinstance(key, str))
 
     def test_organisation(self):
         # Get list

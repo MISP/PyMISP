@@ -2192,6 +2192,19 @@ class PyMISP:
                     usersettings.append(us)
             return u, role, usersettings
 
+    def get_new_authkey(self, user: Union[MISPUser, int, str, UUID] = 'me') -> str:
+        '''Get a new authorization key for a specific user, defaults to user doing the call.
+
+        :param user: The owner of the key
+        '''
+        data = {"user_id": get_uuid_or_id_from_abstract_misp(user)}
+        r = self._prepare_request('POST', '/auth_keys/add', data=data)
+        authkey = self._check_json_response(r)
+        if 'AuthKey' in authkey and 'authkey_raw' in authkey['AuthKey']:
+            return authkey['AuthKey']['authkey_raw']
+        else:
+            raise PyMISPUnexpectedResponse(f'Unable to get authkey: {authkey}')
+
     def add_user(self, user: MISPUser, pythonify: bool = False) -> Union[Dict, MISPUser]:
         """Add a new user
 
