@@ -2,11 +2,54 @@ Changelog
 =========
 
 
+v2.4.155 (2022-03-03)
+---------------------
+
+New
+~~~
+- Get_new_authkey for a user. [Raphaël Vinot]
+- [dep] Use pydeep2 instead of pydeep. [Jakub Onderka]
+
+Changes
+~~~~~~~
+- Bump misp-objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump new minimal python version to 3.7. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- [FIPS] no clean way to support OpenSSL hashlib interface for FIPS.
+  [Alexandre Dulaunoy]
+- [FIPS] falling back on older version of Python not having
+  usedforsecurity. [Alexandre Dulaunoy]
+- [FIPS] in some cases, the `usedforsecurity` is not used. So fail if
+  the FIPS compliance is required and then the `usedforsecurity` is
+  disabled. [Alexandre Dulaunoy]
+- [feeds] FIPS: when MD5 hashes are generated for fast-lookup it's not
+  for security. [Alexandre Dulaunoy]
+
+  hashlib provides an option to tell if the hash is used for security or
+  not. By default, it's set to True. For the feed cache generation, it's
+  not. Then usedforsecurity=False
+- Bump deps. [Raphaël Vinot]
+- Bump deps, objects. [Raphaël Vinot]
+
+Fix
+~~~
+- [mispevent] cannot type. [Alexandre Dulaunoy]
+- Make mypy happy. [Raphaël Vinot]
+
+Other
+~~~~~
+- Create add_filetype_object_from_csv.py. [Félix Herrenschmidt]
+- Add feed option for local tag exclusion #817. [deku]
+
+
 v2.4.152 (2021-12-22)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps, object templates. [Raphaël Vinot]
 - Bump objects templates. [Raphaël Vinot]
