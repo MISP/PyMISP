@@ -2197,8 +2197,8 @@ class PyMISP:
 
         :param user: The owner of the key
         '''
-        data = {"user_id": get_uuid_or_id_from_abstract_misp(user)}
-        r = self._prepare_request('POST', '/auth_keys/add', data=data)
+        user_id = get_uuid_or_id_from_abstract_misp(user)
+        r = self._prepare_request('POST', f'/auth_keys/add/{user_id}', data={})
         authkey = self._check_json_response(r)
         if 'AuthKey' in authkey and 'authkey_raw' in authkey['AuthKey']:
             return authkey['AuthKey']['authkey_raw']
