@@ -2033,7 +2033,7 @@ class TestComprehensive(unittest.TestCase):
                 self.assertIn(typ, remote_types)
 
     def test_versions(self):
-        self.assertEqual(self.user_misp_connector.version, self.user_misp_connector.pymisp_version_master)
+        self.assertIn(self.user_misp_connector.version, self.user_misp_connector.pymisp_version_master)
         self.assertEqual(self.user_misp_connector.misp_instance_version['version'],
                          self.user_misp_connector.misp_instance_version_master['version'])
 
