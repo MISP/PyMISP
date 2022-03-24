@@ -7,8 +7,17 @@ v2.4.157 (2022-03-24)
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps, objects. [Raphaël Vinot]
+- [tests] reverted. [Alexandre Dulaunoy]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- [tests] subversion are supported. [Alexandre Dulaunoy]
+
+Fix
+~~~
+- [tests] check if the version is a substring as PyMISP might contain
+  sub version. [Alexandre Dulaunoy]
 
 
 v2.4.155.1 (2022-03-03)
