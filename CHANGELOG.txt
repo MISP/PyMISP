@@ -2,11 +2,21 @@ Changelog
 =========
 
 
+v2.4.157 (2022-03-24)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps, objects. [Raphaël Vinot]
+
+
 v2.4.155.1 (2022-03-03)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump required python version for doc. [Raphaël Vinot]
 - Remove python 3.6 from metadata. [Raphaël Vinot]
 
