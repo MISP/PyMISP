@@ -34,7 +34,6 @@ jobs:
       run: |
         poetry run pytest --cov=pymisp tests/test_*.py
         poetry run mypy tests/testlive_comprehensive.py tests/test_mispevent.py tests/testlive_sync.py pymisp
-        poetry run flake8 --ignore=E501,W503,E226,E252 pymisp
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
