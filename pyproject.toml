@@ -46,20 +46,20 @@ requests = "^2.27.1"
 python-dateutil = "^2.8.2"
 jsonschema = "^4.5.1"
 deprecated = "^1.2.13"
-extract_msg = {version = "^0.30.8", optional = true}
+extract_msg = {version = "^0.30.12", optional = true}
 RTFDE = {version = "^0.0.2", optional = true}
 oletools = {version = "^0.60.1", optional = true}
-python-magic = {version = "^0.4.24", optional = true}
-pydeep2 = {version = "^0.5", optional = true}
+python-magic = {version = "^0.4.26", optional = true}
+pydeep2 = {version = "^0.5.1", optional = true}
 lief = {version = "^0.12.1", optional = true}
-beautifulsoup4 = {version = "^4.10.0", optional = true}
+beautifulsoup4 = {version = "^4.11.1", optional = true}
 validators = {version = "^0.19.0", optional = true}
 sphinx-autodoc-typehints = {version = "^1.18.1", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
-reportlab = {version = "^3.6.3", optional = true}
+reportlab = {version = "^3.6.9", optional = true}
 pyfaup = {version = "^1.2", optional = true}
-chardet = {version = "^4.0", optional = true}
-urllib3 = {extras = ["brotli"], version = "^1.26.7", optional = true}
+chardet = {version = "^4.0.0", optional = true}
+urllib3 = {extras = ["brotli"], version = "^1.26.9", optional = true}
 
 [tool.poetry.extras]
 fileobjects = ['python-magic', 'pydeep2', 'lief']
@@ -74,11 +74,11 @@ brotli = ['urllib3']
 [tool.poetry.dev-dependencies]
 requests-mock = "^1.9.3"
 mypy = "^0.950"
-ipython = "^7.33"
-jupyterlab = "^3.4.0"
-types-requests = "^2.27.25"
-types-python-dateutil = "^2.8.15"
-types-redis = "^4.2.2"
+ipython = "^7.33.0"
+jupyterlab = "^3.4.2"
+types-requests = "^2.27.27"
+types-python-dateutil = "^2.8.16"
+types-redis = "^4.2.5"
 types-Flask = "^1.1.6"
 pytest-cov = "^3.0.0"
 
