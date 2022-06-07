@@ -2413,6 +2413,7 @@ class PyMISP:
                include_decay_score: Optional[bool] = None, includeDecayScore: Optional[bool] = None,
                object_name: Optional[str] = None,
                exclude_decayed: Optional[bool] = None,
+               sharinggroup: Optional[Union[int, List[int]]] = None,
                pythonify: Optional[bool] = False,
                **kwargs) -> Union[Dict, str, List[Union[MISPEvent, MISPAttribute, MISPObject]]]:
         '''Search in the MISP instance
@@ -2453,6 +2454,7 @@ class PyMISP:
         :param include_correlations: [JSON Only - attribute] Include the correlations of the matching attributes.
         :param object_name: [objects controller only] Search for objects with that name
         :param exclude_decayed: [attributes controller only] Exclude the decayed attributes from the response
+        :param sharinggroup: Filter by sharing group ID(s)
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
 
         Deprecated:
@@ -2553,6 +2555,8 @@ class PyMISP:
         query['includeCorrelations'] = self._make_misp_bool(include_correlations)
         query['object_name'] = object_name
         query['excludeDecayed'] = self._make_misp_bool(exclude_decayed)
+        query['sharinggroup'] = sharinggroup
+
         url = urljoin(self.root_url, f'{controller}/restSearch')
         if return_format == 'stix-xml':
             response = self._prepare_request('POST', url, data=query, output_type='xml')
