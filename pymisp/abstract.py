@@ -231,7 +231,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         if hasattr(self, '_set_default') and callable(self._set_default):  # type: ignore
             self._set_default()  # type: ignore
         to_return = {}
-        for field in self._fields_for_feed:
+        for field in sorted(self._fields_for_feed):
             if getattr(self, field, None) is not None:
                 if field in ['timestamp', 'publish_timestamp']:
                     to_return[field] = self._datetime_to_timestamp(getattr(self, field))
