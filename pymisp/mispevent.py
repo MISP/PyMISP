@@ -793,6 +793,9 @@ class MISPObject(AbstractMISP):
     def _to_feed(self, with_distribution=False) -> Dict:
         if with_distribution:
             self._fields_for_feed.add('distribution')
+        if not hasattr(self, 'template_uuid'):
+            # workaround for old events where the template_uuid was not yet mandatory
+            self.template_uuid = '11111111-1111-1111-aaaa-111111111111'
         to_return = super(MISPObject, self)._to_feed()
         if self.references:
             to_return['ObjectReference'] = [reference._to_feed() for reference in self.references]
