@@ -36,7 +36,7 @@ class PSLFaup(object):
         :param url: The URL to normalize
         """
         self._clear()
-        if isinstance(url, bytes) and  b'//' not in url[:10]:
+        if isinstance(url, bytes) and b'//' not in url[:10]:
             url = b'//' + url
         elif '//' not in url[:10]:
             url = '//' + url
