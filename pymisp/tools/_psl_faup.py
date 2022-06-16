@@ -4,7 +4,7 @@
 import ipaddress
 import socket
 import idna
-from publicsuffixlist import PublicSuffixList
+from publicsuffixlist import PublicSuffixList  # type: ignore
 from urllib.parse import urlparse, urlunparse
 
 
