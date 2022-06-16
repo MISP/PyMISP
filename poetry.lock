@@ -1063,6 +1063,18 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "publicsuffixlist"
+version = "0.7.13"
+description = "publicsuffixlist implement"
+category = "main"
+optional = true
+python-versions = ">=2.6"
+
+[package.extras]
+readme = ["pandoc"]
+update = ["requests"]
+
+[[package]]
 name = "py"
 version = "1.11.0"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
@@ -1745,7 +1757,7 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "b18ee09283b422d1af1144249201c6b313c024ed6b8746dd1a734847c29815ea"
+content-hash = "f1626e907825ccc8f00cffa0c0603359cb7a5d3967912fe7f7ed35e520cf89d7"
 
 [metadata.files]
 alabaster = [
@@ -2462,6 +2474,10 @@ psutil = [
 ptyprocess = [
     {file = "ptyprocess-0.7.0-py2.py3-none-any.whl", hash = "sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35"},
     {file = "ptyprocess-0.7.0.tar.gz", hash = "sha256:5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220"},
+]
+publicsuffixlist = [
+    {file = "publicsuffixlist-0.7.13-py2.py3-none-any.whl", hash = "sha256:60abb0720c00b635149a7654445fb700822fcbf5187be8f51f7be174a291560e"},
+    {file = "publicsuffixlist-0.7.13.tar.gz", hash = "sha256:07409a5821a1f662b694c7390bdd50539528eb9d1e626811ca5e1447366b185f"},
 ]
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
