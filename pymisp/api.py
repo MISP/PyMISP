@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import TypeVar, Optional, Tuple, List, Dict, Union, Any, Mapping, Iterable
+from typing import TypeVar, Optional, Tuple, List, Dict, Union, Any, Mapping, Iterable, MutableMapping
 from datetime import date, datetime
 import csv
 from pathlib import Path
@@ -152,8 +152,8 @@ class PyMISP:
     :param timeout: Timeout, as described here: https://requests.readthedocs.io/en/master/user/advanced/#timeouts
     """
 
-    def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Mapping = {},
-                 cert: Tuple[str, tuple] = None, auth: AuthBase = None, tool: str = '', timeout: Optional[Union[float, Tuple[float, float]]] = None):
+    def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Optional[MutableMapping[str, str]] = None,
+                 cert: Optional[Union[str, Tuple[str, str]]] = None, auth: AuthBase = None, tool: str = '', timeout: Optional[Union[float, Tuple[float, float]]] = None):
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -162,8 +162,8 @@ class PyMISP:
         self.root_url: str = url
         self.key: str = key
         self.ssl: bool = ssl
-        self.proxies: Mapping[str, str] = proxies
-        self.cert: Optional[Tuple[str, tuple]] = cert
+        self.proxies: Optional[MutableMapping[str, str]] = proxies
+        self.cert: Optional[Union[str, Tuple[str, str]]] = cert
         self.auth: Optional[AuthBase] = auth
         self.tool: str = tool
         self.timeout: Optional[Union[float, Tuple[float, float]]] = timeout
