@@ -187,7 +187,7 @@ class PyMISP:
                 pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))
                 recommended_version_tup = tuple(int(x) for x in response['version'].split('.'))
                 if recommended_version_tup < pymisp_version_tup[:3]:
-                    logger.info(f"The version of PyMISP recommended by the MISP instance (response['version']) is older than the one you're using now ({__version__}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.")
+                    logger.info(f"The version of PyMISP recommended by the MISP instance ({response['version']}) is older than the one you're using now ({__version__}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.")
                 elif pymisp_version_tup[:3] < recommended_version_tup:
                     logger.warning(f"The version of PyMISP recommended by the MISP instance ({response['version']}) is newer than the one you're using now ({__version__}). Please upgrade PyMISP.")
 
