@@ -3525,7 +3525,8 @@ class PyMISP:
     def _check_response(self, response: requests.Response, lenient_response_type: bool = False, expect_json: bool = False) -> Union[Dict, str]:
         """Check if the response from the server is not an unexpected error"""
         if response.status_code >= 500:
-            logger.critical(everything_broken.format(response.request.headers, response.request.body, response.text))
+            headers_without_auth = {i:response.request.headers[i] for i in response.request.headers if i!='Authorization'} 
+            logger.critical(everything_broken.format(headers_without_auth, response.request.body, response.text))
             raise MISPServerError(f'Error code 500:\n{response.text}')
 
         if 400 <= response.status_code < 500:
