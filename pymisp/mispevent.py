@@ -1029,7 +1029,7 @@ class MISPObject(AbstractMISP):
                 attribute = MISPObjectAttribute(self._definition['attributes'][object_relation])
             else:
                 # Woopsie, this object_relation is unknown, no sane defaults for you.
-                logger.warning("The template ({}) doesn't have the object_relation ({}) you're trying to add.".format(self.name, object_relation))
+                logger.warning("The template ({}) doesn't have the object_relation ({}) you're trying to add. If you are creating a new event to push to MISP, please review your code so it matches the template.".format(self.name, object_relation))
                 attribute = MISPObjectAttribute({})
         else:
             attribute = MISPObjectAttribute({})
