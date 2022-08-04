@@ -1639,7 +1639,7 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-urllib3"
-version = "1.26.21"
+version = "1.26.22"
 description = "Typing stubs for urllib3"
 category = "dev"
 optional = false
@@ -1787,7 +1787,7 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "470f0f4666d7b19a17170e0afe70e0cc7b6a9f3d3289a15886a8272a89fb81b2"
+content-hash = "1af03e6ae8d5c7c438815e7731ec94c5280a0c4107e253ec762b6550f2f2a681"
 
 [metadata.files]
 alabaster = [
@@ -2873,8 +2873,8 @@ types-requests = [
     {file = "types_requests-2.28.7-py3-none-any.whl", hash = "sha256:38015d310d13cf7d4d712d2507178349e13fd5dab85259dab7d9a9884c2c9c2a"},
 ]
 types-urllib3 = [
-    {file = "types-urllib3-1.26.21.tar.gz", hash = "sha256:2f7fb7ae6a1884241e588c7becd5f005ce1e03f6eface8a3f65e378c2adf9516"},
-    {file = "types_urllib3-1.26.21-py3-none-any.whl", hash = "sha256:2f960d8681002a37385263c372882fd12c676e10b127553738a2b6064e4438d1"},
+    {file = "types-urllib3-1.26.22.tar.gz", hash = "sha256:b05af90e73889e688094008a97ca95788db8bf3736e2776fd43fb6b171485d94"},
+    {file = "types_urllib3-1.26.22-py3-none-any.whl", hash = "sha256:09a8783e1002472e8d1e1f3792d4c5cca1fffebb9b48ee1512aae6d16fe186bc"},
 ]
 types-werkzeug = [
     {file = "types-Werkzeug-1.0.9.tar.gz", hash = "sha256:5cc269604c400133d452a40cee6397655f878fc460e03fde291b9e3a5eaa518c"},
