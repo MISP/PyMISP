@@ -2,11 +2,85 @@ Changelog
 =========
 
 
+v2.4.160 (2022-08-05)
+---------------------
+
+New
+~~~
+- Enable TCP keepalive. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version, deps. [Raphaël Vinot]
+- Improve warning on invalid template, bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Add in test case. [Tom King]
+- Add ability to filter by sharing group for RestSearch for MISP >=
+  v2.4.158. [Tom King]
+
+Fix
+~~~
+- Delete sharing group after deleting the event. [Raphaël Vinot]
+- Give more time to MISP to publish the events before searching.
+  [Raphaël Vinot]
+- Improper json check on non-json responses. [Raphaël Vinot]
+
+  Fix #854
+- Mark all attributes in a soft deleted object as soft deleted too.
+  [Raphaël Vinot]
+
+  Bump misp-objects, deps.
+- Make flake8 happy. [Raphaël Vinot]
+- Properly convert MSG to EML. [Raphaël Vinot]
+- Update lock file. [Raphaël Vinot]
+- [feed] fixes bug when template_uuid does not exist. [Christophe
+  Vandeplas]
+
+Other
+~~~~~
+- Update api.py. [Derekt2]
+- Fix typo in logging message. [Philipp Hauswirth]
+- Fig: [feed] fixes bugs during export with old data. [Christophe
+  Vandeplas]
+- Update pyproject.toml. [Steven]
+
+  Add publicsuffixlist optional package for URL Object, which has a more current list than pyfaup
+- Fix multiple_space warning. [malvidin]
+- Option to include more URLObject attributes Add publicsuffixlist faup
+  for URLObject Windows support URLObject with PSLFaup prefers IP to
+  host/domain. [malvidin]
+- Ensure that keys are sorted in the returned `_to_feed()` dictionary.
+  [Yun Zheng Hu]
+
+  This allows for better deterministic feed output generation.
+
+
+v2.4.159 (2022-05-30)
+---------------------
+
+New
+~~~
+- [example:copyTagsFromAttributesToEvent] Added script to copy tags from
+  attributes to the event level. [Sami Mokaddem]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Massive bump deps for python 3.7. [Raphaël Vinot]
+
+
 v2.4.157 (2022-03-24)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump object templates. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps, objects. [Raphaël Vinot]
