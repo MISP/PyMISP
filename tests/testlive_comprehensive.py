@@ -43,7 +43,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'https://localhost:8443'
-    key = 'i8ckGjsyrfRSCPqE0qqr0XJbsLlfbOyYDzdSDawM'
+    key = 'sL9hrjIyY405RyGQHLx5DoCAM92BNmmGa8P4ck1E'
     verifycert = False
 
 
@@ -1096,6 +1096,7 @@ class TestComprehensive(unittest.TestCase):
             first.attributes[0].to_ids = True
             first = self.user_misp_connector.update_event(first)
             self.admin_misp_connector.publish(first, alert=False)
+            time.sleep(5)
             csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp())
             self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
@@ -1164,6 +1165,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.user_misp_connector.add_event(first)
             self.admin_misp_connector.publish(first)
+            time.sleep(5)
             text = self.user_misp_connector.search(return_format='text', eventid=first.id)
             self.assertEqual('8.8.8.8', text.strip())
         finally:
