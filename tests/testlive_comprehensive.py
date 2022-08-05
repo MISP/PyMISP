@@ -2236,6 +2236,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(sharing_group.sgorgs[0].org_id, self.test_org.id)
         finally:
             self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
 
     def test_sharing_group_search(self):
         # Add sharing group
@@ -2279,8 +2280,10 @@ class TestComprehensive(unittest.TestCase):
             # We should not be missing any of the attributes
             self.assertFalse(attribute_ids.difference(searched_attribute_ids))
         finally:
-            self.admin_misp_connector.delete_sharing_group(sharing_group.id)
             self.user_misp_connector.delete_event(event.id)
+            self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
 
     def test_feeds(self):
         # Add
