@@ -2,6 +2,20 @@ Changelog
 =========
 
 
+v2.4.160.1 (2022-08-09)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Make keepalive configuration linux only. [Raphaël Vinot]
+
+  Bump deps
+
+
 v2.4.160 (2022-08-05)
 ---------------------
 
