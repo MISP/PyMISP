@@ -11,6 +11,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump deps. [Raphaël Vinot]
 - Bump version, deps. [Raphaël Vinot]
 - Improve warning on invalid template, bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
