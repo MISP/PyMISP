@@ -1002,8 +1002,16 @@ class MISPObject(AbstractMISP):
         return all(relation in self._fast_attribute_access for relation in list_of_relations)
 
     def add_attribute(self, object_relation: str, simple_value: Optional[Union[str, int, float]] = None, **value) -> Optional[MISPAttribute]:
-        """Add an attribute. object_relation is required and the value key is a
-        dictionary with all the keys supported by MISPAttribute"""
+        """Add an attribute.
+        :param object_relation: The object relation of the attribute you're adding to the object
+        :param simple_value: The value
+        :param value: dictionary with all the keys supported by MISPAttribute
+
+        Note: as long as PyMISP knows about the object template, only the object_relation and the simple_value are required.
+              If PyMISP doesn't know the template, you also **must** pass a type.
+              All the other options that can be passed along when creating an attribute (comment, IDS flag, ...)
+              will be either taked out of the template, or out of the default setting for the type as defined on the MISP instance.
+        """
         if simple_value is not None:  # /!\ The value *can* be 0
             value['value'] = simple_value
         if value.get('value') is None:
