@@ -281,6 +281,14 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
         return len([k for k in self.__dict__.keys() if not (k[0] == '_' or k in self.__not_jsonable)])
 
     @property
+    def force_timestamp(self) -> bool:
+        return self.__force_timestamps
+
+    @force_timestamp.setter
+    def force_timestamp(self, force: bool):
+        self.__force_timestamps = force
+
+    @property
     def edited(self) -> bool:
         """Recursively check if an object has been edited and update the flag accordingly
         to the parent objects"""
