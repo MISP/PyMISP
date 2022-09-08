@@ -150,11 +150,16 @@ class PyMISP:
     :param cert: Client certificate, as described here: http://docs.python-requests.org/en/master/user/advanced/#client-side-certificates
     :param auth: The auth parameter is passed directly to requests, as described here: http://docs.python-requests.org/en/master/user/authentication/
     :param tool: The software using PyMISP (string), used to set a unique user-agent
+    :param http_headers: Arbitrary headers to pass to all the requests.
     :param timeout: Timeout, as described here: https://requests.readthedocs.io/en/master/user/advanced/#timeouts
     """
 
     def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Optional[MutableMapping[str, str]] = None,
-                 cert: Optional[Union[str, Tuple[str, str]]] = None, auth: AuthBase = None, tool: str = '', timeout: Optional[Union[float, Tuple[float, float]]] = None):
+                 cert: Optional[Union[str, Tuple[str, str]]] = None, auth: AuthBase = None, tool: str = '',
+                 timeout: Optional[Union[float, Tuple[float, float]]] = None,
+                 http_headers: Optional[Dict[str, str]]=None
+                 ):
+
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -171,6 +176,8 @@ class PyMISP:
         self.__session = requests.Session()  # use one session to keep connection between requests
         if brotli_supported():
             self.__session.headers['Accept-Encoding'] = ', '.join(('br', 'gzip', 'deflate'))
+        if http_headers:
+            self.__session.headers.update(http_headers)
 
         self.global_pythonify = False
 
