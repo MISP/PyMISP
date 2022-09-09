@@ -918,7 +918,7 @@ class TestComprehensive(unittest.TestCase):
 
             # Test PyMISP.add_attribute with enforceWarninglist enabled
             _e = events[0]
-            _a = _e.add_attribute('ip-src', '1.1.1.1', enforceWarninglist=True)
+            _a = _e.add_attribute('ip-src', '8.8.8.8', enforceWarninglist=True)
             _a = self.user_misp_connector.add_attribute(_e, _a)
             self.assertTrue('trips over a warninglist and enforceWarninglist is enforced' in _a['errors'][1]['errors'], _a)
 
