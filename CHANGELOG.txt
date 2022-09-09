@@ -2,11 +2,30 @@ Changelog
 =========
 
 
+v2.4.162 (2022-09-09)
+---------------------
+
+New
+~~~
+- Pass arbitrary headers to a PyMISP request. [Raphaël Vinot]
+- Allow to force the timestamps in to_dict/to_json, even if a change was
+  made. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Add in sort/desc for sorting results and limit/page for pagination.
+  [Tom King]
+- Improve documentation for add_attribute. [Raphaël Vinot]
+
+
 v2.4.160.1 (2022-08-09)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 
 Fix
