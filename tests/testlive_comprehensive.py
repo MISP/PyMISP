@@ -300,6 +300,35 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
+    def test_search_index(self):
+        try:
+            first, second, third = self.environment()
+            # Search as admin
+            events = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), pythonify=True)
+            self.assertEqual(len(events), 3)
+            for e in events:
+                self.assertIn(e.id, [first.id, second.id, third.id])
+
+            # Test limit and pagination
+            event_one = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), limit=1, page=1, pythonify=True)[0]
+            event_two = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), limit=1, page=2, pythonify=True)[0]
+            self.assertTrue(event_one.id != event_two.id)
+            two_events = self.admin_misp_connector.search_index(limit=2)
+            self.assertTrue(len(two_events), 2)
+
+            # Test ordering by the Info field. Can't use timestamp as each will likely have the same
+            event = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), sort="info", desc=True, limit=1, pythonify=True)[0]
+            # First|Second|*Third* event
+            self.assertEqual(event.id, third.id)
+            # *First*|Second|Third event
+            event = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), sort="info", desc=False, limit=1, pythonify=True)[0]
+            self.assertEqual(event.id, first.id)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+            self.admin_misp_connector.delete_event(second)
+            self.admin_misp_connector.delete_event(third)
+
     def test_search_objects(self):
         '''Search for objects'''
         try:
