@@ -1191,6 +1191,17 @@ class PyMISP:
         response = self._prepare_request('POST', 'taxonomies/update')
         return self._check_json_response(response)
 
+    def set_taxonomy_required(self, taxonomy: Union[MISPTaxonomy, int, str], required: bool = False) -> Dict:
+        taxonomy_id = get_uuid_or_id_from_abstract_misp(taxonomy)
+        url = urljoin(self.root_url, 'taxonomies/toggleRequired/{}'.format(taxonomy_id))
+        payload = {
+            "Taxonomy": {
+                "required": required
+            }
+        }
+        response = self._prepare_request('POST', url, data=payload)
+        return self._check_json_response(response)
+
     # ## END Taxonomies ###
 
     # ## BEGIN Warninglists ###
