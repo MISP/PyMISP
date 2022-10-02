@@ -1657,6 +1657,16 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.disable_taxonomy(tax)
         self.assertEqual(r['message'], 'Taxonomy disabled')
 
+        # Test toggling the required status
+        r = self.admin_misp_connector.set_taxonomy_required(tax, not tax.required)
+        self.assertEqual(r['message'], 'Taxonomy toggleRequireded')
+
+        updatedTax = self.admin_misp_connector.get_taxonomy(tax, pythonify=True)
+        self.assertFalse(tax.required == updatedTax.required)
+
+        # Return back to default required status
+        r = self.admin_misp_connector.set_taxonomy_required(tax, not tax.required)
+
     def test_warninglists(self):
         # Make sure we're up-to-date
         r = self.admin_misp_connector.update_warninglists()
