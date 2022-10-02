@@ -2,6 +2,21 @@ Changelog
 =========
 
 
+v2.4.162.1 (2022-10-02)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump deps and version. [Raphaël Vinot]
+
+  Fix LIEF vuln.
+- Bump deps, objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Change DNS warning list test. [Raphaël Vinot]
+
+
 v2.4.162 (2022-09-09)
 ---------------------
 
@@ -13,11 +28,16 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Add in sort/desc for sorting results and limit/page for pagination.
   [Tom King]
 - Improve documentation for add_attribute. [Raphaël Vinot]
+
+Fix
+~~~
+- Missing place to update version. [Raphaël Vinot]
 
 
 v2.4.160.1 (2022-08-09)
