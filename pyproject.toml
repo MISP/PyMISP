@@ -72,14 +72,14 @@ url = ['pyfaup', 'chardet']
 email = ['extract_msg', "RTFDE", "oletools"]
 brotli = ['urllib3']
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"
-mypy = "^0.981"
+mypy = "^0.982"
 ipython = "^7.34.0"
-jupyterlab = "^3.4.7"
-types-requests = "^2.28.11"
+jupyterlab = "^3.4.8"
+types-requests = "^2.28.11.1"
 types-python-dateutil = "^2.8.19"
-types-redis = "^4.3.21"
+types-redis = "^4.3.21.1"
 types-Flask = "^1.1.6"
 pytest-cov = "^4.0.0"
 
