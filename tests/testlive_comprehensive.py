@@ -1678,7 +1678,7 @@ class TestComprehensive(unittest.TestCase):
         # Get list
         warninglists = self.admin_misp_connector.warninglists(pythonify=True)
         self.assertTrue(isinstance(warninglists, list))
-        list_name_test = 'List of known hashes with common false-positives (based on Florian Roth input list)'
+        list_name_test = 'Valid covid-19 related domains'
         for wl in warninglists:
             if wl.name == list_name_test:
                 break
