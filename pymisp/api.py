@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import TypeVar, Optional, Tuple, List, Dict, Union, Any, Mapping, Iterable
+from typing import TypeVar, Optional, Tuple, List, Dict, Union, Any, Mapping, Iterable, MutableMapping
 from datetime import date, datetime
 import csv
 from pathlib import Path
@@ -27,6 +27,18 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
     MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
+
+
+if sys.platform == 'linux':
+    # Enable TCP keepalive by default on every requests
+    import socket
+    from urllib3.connection import HTTPConnection
+    HTTPConnection.default_socket_options = HTTPConnection.default_socket_options + [
+        (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),  # enable keepalive
+        (socket.SOL_TCP, socket.TCP_KEEPIDLE, 30),  # Start pinging after 30s of idle time
+        (socket.SOL_TCP, socket.TCP_KEEPINTVL, 10),  # ping every 10s
+        (socket.SOL_TCP, socket.TCP_KEEPCNT, 6)  # kill the connection if 6 ping fail  (60s total)
+    ]
 
 try:
     # cached_property exists since Python 3.8
@@ -138,11 +150,16 @@ class PyMISP:
     :param cert: Client certificate, as described here: http://docs.python-requests.org/en/master/user/advanced/#client-side-certificates
     :param auth: The auth parameter is passed directly to requests, as described here: http://docs.python-requests.org/en/master/user/authentication/
     :param tool: The software using PyMISP (string), used to set a unique user-agent
+    :param http_headers: Arbitrary headers to pass to all the requests.
     :param timeout: Timeout, as described here: https://requests.readthedocs.io/en/master/user/advanced/#timeouts
     """
 
-    def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Mapping = {},
-                 cert: Tuple[str, tuple] = None, auth: AuthBase = None, tool: str = '', timeout: Optional[Union[float, Tuple[float, float]]] = None):
+    def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Optional[MutableMapping[str, str]] = None,
+                 cert: Optional[Union[str, Tuple[str, str]]] = None, auth: AuthBase = None, tool: str = '',
+                 timeout: Optional[Union[float, Tuple[float, float]]] = None,
+                 http_headers: Optional[Dict[str, str]]=None
+                 ):
+
         if not url:
             raise NoURL('Please provide the URL of your MISP instance.')
         if not key:
@@ -151,14 +168,16 @@ class PyMISP:
         self.root_url: str = url
         self.key: str = key
         self.ssl: bool = ssl
-        self.proxies: Mapping[str, str] = proxies
-        self.cert: Optional[Tuple[str, tuple]] = cert
+        self.proxies: Optional[MutableMapping[str, str]] = proxies
+        self.cert: Optional[Union[str, Tuple[str, str]]] = cert
         self.auth: Optional[AuthBase] = auth
         self.tool: str = tool
         self.timeout: Optional[Union[float, Tuple[float, float]]] = timeout
         self.__session = requests.Session()  # use one session to keep connection between requests
         if brotli_supported():
             self.__session.headers['Accept-Encoding'] = ', '.join(('br', 'gzip', 'deflate'))
+        if http_headers:
+            self.__session.headers.update(http_headers)
 
         self.global_pythonify = False
 
@@ -176,7 +195,7 @@ class PyMISP:
                 pymisp_version_tup = tuple(int(x) for x in __version__.split('.'))
                 recommended_version_tup = tuple(int(x) for x in response['version'].split('.'))
                 if recommended_version_tup < pymisp_version_tup[:3]:
-                    logger.info(f"The version of PyMISP recommended by the MISP instance (response['version']) is older than the one you're using now ({__version__}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.")
+                    logger.info(f"The version of PyMISP recommended by the MISP instance ({response['version']}) is older than the one you're using now ({__version__}). If you have a problem, please upgrade the MISP instance or use an older PyMISP version.")
                 elif pymisp_version_tup[:3] < recommended_version_tup:
                     logger.warning(f"The version of PyMISP recommended by the MISP instance ({response['version']}) is newer than the one you're using now ({__version__}). Please upgrade PyMISP.")
 
@@ -1170,6 +1189,17 @@ class PyMISP:
     def update_taxonomies(self) -> Dict:
         """Update all the taxonomies."""
         response = self._prepare_request('POST', 'taxonomies/update')
+        return self._check_json_response(response)
+
+    def set_taxonomy_required(self, taxonomy: Union[MISPTaxonomy, int, str], required: bool = False) -> Dict:
+        taxonomy_id = get_uuid_or_id_from_abstract_misp(taxonomy)
+        url = urljoin(self.root_url, 'taxonomies/toggleRequired/{}'.format(taxonomy_id))
+        payload = {
+            "Taxonomy": {
+                "required": required
+            }
+        }
+        response = self._prepare_request('POST', url, data=payload)
         return self._check_json_response(response)
 
     # ## END Taxonomies ###
@@ -2569,7 +2599,7 @@ class PyMISP:
                 return self._csv_to_dict(normalized_response_text)  # type: ignore
             else:
                 return normalized_response_text
-        elif return_format in ['stix-xml', 'text']:
+        elif return_format not in ['json', 'yara-json']:
             return self._check_response(response)
 
         normalized_response = self._check_json_response(response)
@@ -2647,6 +2677,10 @@ class PyMISP:
                                                        ]] = None,
                      sharinggroup: Optional[List[SearchType]] = None,
                      minimal: Optional[bool] = None,
+                     sort: Optional[str] = None,
+                     desc: Optional[bool] = None,
+                     limit: Optional[int] = None,
+                     page: Optional[int] = None,
                      pythonify: Optional[bool] = None) -> Union[Dict, List[MISPEvent]]:
         """Search event metadata shown on the event index page. Using ! in front of a value
         means NOT, except for parameters date_from, date_to and timestamp which cannot be negated.
@@ -2678,6 +2712,10 @@ class PyMISP:
         :param publish_timestamp: Filter on event's publish timestamp.
         :param sharinggroup: Restrict by a sharing group | list
         :param minimal: Return only event ID, UUID, timestamp, sighting_timestamp and published.
+        :param sort: The field to sort the events by, such as 'id', 'date', 'attribute_count'.
+        :param desc: Whether to sort events ascending (default) or descending.
+        :param limit: Limit the number of events returned
+        :param page: If a limit is set, sets the page to be returned. page 3, limit 100 will return records 201->300).
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output.
             Warning: it might use a lot of RAM
         """
@@ -2696,7 +2734,8 @@ class PyMISP:
                 query['timestamp'] = (self._make_timestamp(timestamp[0]), self._make_timestamp(timestamp[1]))
             else:
                 query['timestamp'] = self._make_timestamp(timestamp)
-
+        if query.get("sort"):
+            query["direction"] = "desc" if desc else "asc"
         url = urljoin(self.root_url, 'events/index')
         response = self._prepare_request('POST', url, data=query)
         normalized_response = self._check_json_response(response)
@@ -3514,7 +3553,8 @@ class PyMISP:
     def _check_response(self, response: requests.Response, lenient_response_type: bool = False, expect_json: bool = False) -> Union[Dict, str]:
         """Check if the response from the server is not an unexpected error"""
         if response.status_code >= 500:
-            logger.critical(everything_broken.format(response.request.headers, response.request.body, response.text))
+            headers_without_auth = {i: response.request.headers[i] for i in response.request.headers if i != 'Authorization'}
+            logger.critical(everything_broken.format(headers_without_auth, response.request.body, response.text))
             raise MISPServerError(f'Error code 500:\n{response.text}')
 
         if 400 <= response.status_code < 500:
@@ -3575,7 +3615,6 @@ class PyMISP:
             # CakePHP params in URL
             to_append_url = '/'.join([f'{k}:{v}' for k, v in kw_params.items()])
             url = f'{url}/{to_append_url}'
-
         req = requests.Request(request_type, url, data=d, params=params)
         user_agent = f'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
         if self.tool:

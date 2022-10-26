@@ -43,7 +43,7 @@ try:
 except ImportError as e:
     print(e)
     url = 'https://localhost:8443'
-    key = 'i8ckGjsyrfRSCPqE0qqr0XJbsLlfbOyYDzdSDawM'
+    key = 'sL9hrjIyY405RyGQHLx5DoCAM92BNmmGa8P4ck1E'
     verifycert = False
 
 
@@ -294,6 +294,35 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(events), 2)
             for e in events:
                 self.assertIn(e.id, [second.id, third.id])
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+            self.admin_misp_connector.delete_event(second)
+            self.admin_misp_connector.delete_event(third)
+
+    def test_search_index(self):
+        try:
+            first, second, third = self.environment()
+            # Search as admin
+            events = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), pythonify=True)
+            self.assertEqual(len(events), 3)
+            for e in events:
+                self.assertIn(e.id, [first.id, second.id, third.id])
+
+            # Test limit and pagination
+            event_one = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), limit=1, page=1, pythonify=True)[0]
+            event_two = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), limit=1, page=2, pythonify=True)[0]
+            self.assertTrue(event_one.id != event_two.id)
+            two_events = self.admin_misp_connector.search_index(limit=2)
+            self.assertTrue(len(two_events), 2)
+
+            # Test ordering by the Info field. Can't use timestamp as each will likely have the same
+            event = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), sort="info", desc=True, limit=1, pythonify=True)[0]
+            # First|Second|*Third* event
+            self.assertEqual(event.id, third.id)
+            # *First*|Second|Third event
+            event = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), sort="info", desc=False, limit=1, pythonify=True)[0]
+            self.assertEqual(event.id, first.id)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -889,7 +918,7 @@ class TestComprehensive(unittest.TestCase):
 
             # Test PyMISP.add_attribute with enforceWarninglist enabled
             _e = events[0]
-            _a = _e.add_attribute('ip-src', '1.1.1.1', enforceWarninglist=True)
+            _a = _e.add_attribute('ip-src', '8.8.8.8', enforceWarninglist=True)
             _a = self.user_misp_connector.add_attribute(_e, _a)
             self.assertTrue('trips over a warninglist and enforceWarninglist is enforced' in _a['errors'][1]['errors'], _a)
 
@@ -1096,6 +1125,7 @@ class TestComprehensive(unittest.TestCase):
             first.attributes[0].to_ids = True
             first = self.user_misp_connector.update_event(first)
             self.admin_misp_connector.publish(first, alert=False)
+            time.sleep(5)
             csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp())
             self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
@@ -1164,6 +1194,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.user_misp_connector.add_event(first)
             self.admin_misp_connector.publish(first)
+            time.sleep(5)
             text = self.user_misp_connector.search(return_format='text', eventid=first.id)
             self.assertEqual('8.8.8.8', text.strip())
         finally:
@@ -1625,6 +1656,16 @@ class TestComprehensive(unittest.TestCase):
 
         r = self.admin_misp_connector.disable_taxonomy(tax)
         self.assertEqual(r['message'], 'Taxonomy disabled')
+
+        # Test toggling the required status
+        r = self.admin_misp_connector.set_taxonomy_required(tax, not tax.required)
+        self.assertEqual(r['message'], 'Taxonomy toggleRequireded')
+
+        updatedTax = self.admin_misp_connector.get_taxonomy(tax, pythonify=True)
+        self.assertFalse(tax.required == updatedTax.required)
+
+        # Return back to default required status
+        r = self.admin_misp_connector.set_taxonomy_required(tax, not tax.required)
 
     def test_warninglists(self):
         # Make sure we're up-to-date
@@ -2234,6 +2275,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(sharing_group.sgorgs[0].org_id, self.test_org.id)
         finally:
             self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
 
     def test_sharing_group_search(self):
         # Add sharing group
@@ -2277,8 +2319,10 @@ class TestComprehensive(unittest.TestCase):
             # We should not be missing any of the attributes
             self.assertFalse(attribute_ids.difference(searched_attribute_ids))
         finally:
-            self.admin_misp_connector.delete_sharing_group(sharing_group.id)
             self.user_misp_connector.delete_event(event.id)
+            self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+
+        self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
 
     def test_feeds(self):
         # Add

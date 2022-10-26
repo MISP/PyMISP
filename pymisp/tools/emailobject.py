@@ -6,14 +6,13 @@ import logging
 import ipaddress
 import email.utils
 from email import policy, message_from_bytes
-from email.utils import parsedate_to_datetime
 from email.message import EmailMessage
 from io import BytesIO
 from pathlib import Path
-from typing import Union, List, Tuple, Dict, cast
+from typing import Union, List, Tuple, Dict, cast, Any
 
-from extract_msg import openMsg  # type: ignore
-from extract_msg.message import Message as MsgObj  # type: ignore
+from extract_msg import openMsg
+from extract_msg.message import Message as MsgObj
 from RTFDE.exceptions import MalformedEncapsulatedRtf, NotEncapsulatedRtf  # type: ignore
 from RTFDE.deencapsulate import DeEncapsulator  # type: ignore
 from oletools.common.codepages import codepage2codec  # type: ignore
@@ -101,10 +100,9 @@ class EMailObject(AbstractMISPObjectGenerator):
         eml = self._build_eml(message, body, attachments)
         return eml
 
-    def _extract_msg_objects(self, msg_obj: MsgObj):
+    def _extract_msg_objects(self, msg_obj: MsgObj) -> Tuple[EmailMessage, Dict, List[Any]]:
         """Extracts email objects needed to construct an eml from a msg."""
-        original_eml_header = msg_obj._getStringStream('__substg1.0_007D')
-        message = email.message_from_string(original_eml_header, policy=policy.default)
+        message: EmailMessage = email.message_from_string(msg_obj.header.as_string(), policy=policy.default)  # type: ignore
         body = {}
         if msg_obj.body is not None:
             body['text'] = {"obj": msg_obj.body,
@@ -276,9 +274,8 @@ class EMailObject(AbstractMISPObjectGenerator):
         if headers:
             self.add_attribute("header", "\n".join(headers))
 
-        if "Date" in message:
-            self.add_attribute("send-date",
-                               parsedate_to_datetime(message.get('date')))
+        if "Date" in message and message.get('date').datetime is not None:
+            self.add_attribute("send-date", message.get('date').datetime)
 
         if "To" in message:
             self.__add_emails("to", message["To"])
