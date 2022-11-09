@@ -28,7 +28,7 @@ class MISPMsgConverstionError(MISPObjectException):
 
 
 class EMailObject(AbstractMISPObjectGenerator):
-    def __init__(self, filepath: Union[Path, str], pseudofile: BytesIO,
+    def __init__(self, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None,
                  attach_original_email: bool = True, **kwargs):
         super().__init__('email', **kwargs)
 
@@ -111,7 +111,7 @@ class EMailObject(AbstractMISPObjectGenerator):
                             "cte": "base64"}
         if msg_obj.htmlBody is not None:
             try:
-                _html_encoding_raw = msg_obj.mainProperties['3FDE0003'].value
+                _html_encoding_raw = msg_obj.props['3FDE0003'].value
                 _html_encoding = codepage2codec(_html_encoding_raw)
             except KeyError:
                 _html_encoding = msg_obj.stringEncoding
