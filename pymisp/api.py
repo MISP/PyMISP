@@ -90,7 +90,7 @@ def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID, d
 
 
 def register_user(misp_url: str, email: str,
-                  organisation: Union[MISPOrganisation, int, str, UUID] = None,
+                  organisation: Optional[Union[MISPOrganisation, int, str, UUID]] = None,
                   org_id: Optional[str] = None, org_name: Optional[str] = None,
                   message: Optional[str] = None, custom_perms: Optional[str] = None,
                   perm_sync: bool = False, perm_publish: bool = False, perm_admin: bool = False,
@@ -155,7 +155,7 @@ class PyMISP:
     """
 
     def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Optional[MutableMapping[str, str]] = None,
-                 cert: Optional[Union[str, Tuple[str, str]]] = None, auth: AuthBase = None, tool: str = '',
+                 cert: Optional[Union[str, Tuple[str, str]]] = None, auth: Optional[AuthBase] = None, tool: str = '',
                  timeout: Optional[Union[float, Tuple[float, float]]] = None,
                  http_headers: Optional[Dict[str, str]]=None
                  ):
@@ -1475,7 +1475,7 @@ class PyMISP:
         g.from_dict(**galaxy_j, withCluster=withCluster)
         return g
 
-    def search_galaxy_clusters(self, galaxy: Union[MISPGalaxy, int, str, UUID], context: str = "all", searchall: str = None, pythonify: bool = False) -> Union[Dict, List[MISPGalaxyCluster]]:
+    def search_galaxy_clusters(self, galaxy: Union[MISPGalaxy, int, str, UUID], context: str = "all", searchall: Optional[str] = None, pythonify: bool = False) -> Union[Dict, List[MISPGalaxyCluster]]:
         """Searches the galaxy clusters within a specific galaxy: https://www.misp-project.org/openapi/#tag/Galaxy-Clusters/operation/getGalaxyClusters and https://www.misp-project.org/openapi/#tag/Galaxy-Clusters/operation/getGalaxyClusterById
 
         :param galaxy: The MISPGalaxy you wish to search in
@@ -2101,7 +2101,7 @@ class PyMISP:
 
     # ## BEGIN Organisation ###
 
-    def organisations(self, scope="local", search: str = None, pythonify: bool = False) -> Union[Dict, List[MISPOrganisation]]:
+    def organisations(self, scope="local", search: Optional[str] = None, pythonify: bool = False) -> Union[Dict, List[MISPOrganisation]]:
         """Get all the organisations: https://www.misp-project.org/openapi/#tag/Organisations/operation/getOrganisations
 
         :param scope: scope of organizations to get
@@ -2194,7 +2194,7 @@ class PyMISP:
 
     # ## BEGIN User ###
 
-    def users(self, search: str = None, organisation: int = None, pythonify: bool = False) -> Union[Dict, List[MISPUser]]:
+    def users(self, search: Optional[str] = None, organisation: Optional[int] = None, pythonify: bool = False) -> Union[Dict, List[MISPUser]]:
         """Get all the users, or a filtered set of users: https://www.misp-project.org/openapi/#tag/Users/operation/getUsers
 
         :param search: The search to make against the list of users

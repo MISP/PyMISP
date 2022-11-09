@@ -102,7 +102,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
     __misp_objects_path = misp_objects_path
     __describe_types = describe_types
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict):
         """Abstract class for all the MISP objects.
         NOTE: Every method in every classes inheriting this one are doing
               changes in memory and  do not modify data on a remote MISP instance.
@@ -120,7 +120,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             # Ignore the edited objects and keep the timestamps.
             self.__force_timestamps: bool = True
         else:
-            self.__force_timestamps: bool = False
+            self.__force_timestamps = False
 
     @property
     def describe_types(self) -> Dict:
@@ -369,7 +369,7 @@ class MISPTag(AbstractMISP):
 
     _fields_for_feed: set = {'name', 'colour'}
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict):
         super().__init__(**kwargs)
         self.name: str
         self.exportable: bool

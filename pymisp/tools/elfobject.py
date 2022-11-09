@@ -6,7 +6,7 @@ from ..exceptions import InvalidMISPObject
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import logging
-from typing import Union
+from typing import Union, Optional
 from pathlib import Path
 from . import FileObject
 
@@ -32,7 +32,7 @@ def make_elf_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone
 
 class ELFObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: lief.ELF.Binary = None, filepath: Union[Path, str] = None, pseudofile: Union[BytesIO, bytes] = None, **kwargs):
+    def __init__(self, parsed: Optional[lief.ELF.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[Union[BytesIO, bytes]] = None, **kwargs):
         """Creates an ELF object, with lief"""
         super().__init__('elf', **kwargs)
         if not HAS_PYDEEP:
