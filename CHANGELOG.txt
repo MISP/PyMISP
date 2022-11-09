@@ -2,6 +2,20 @@ Changelog
 =========
 
 
+v2.4.165 (2022-11-09)
+---------------------
+
+Changes
+~~~~~~~
+- Bump mypy. [Raphaël Vinot]
+- Add links to doc. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Issue with EMailObject. [Raphaël Vinot]
+
+
 v2.4.162.2 (2022-11-02)
 -----------------------
 
@@ -11,6 +25,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump lief (CVEs), version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
