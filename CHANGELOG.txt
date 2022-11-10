@@ -2,11 +2,33 @@ Changelog
 =========
 
 
+v2.4.165.1 (2022-11-10)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly bump version. [Raphaël Vinot]
+
+Other
+~~~~~
+- Update __init__.py. [Marcelo Chaves]
+
+  Regardless of running the latest PyMISP version, the message below is presented:
+  ```
+  The version of PyMISP recommended by the MISP instance (2.4.165) is newer than the one you're using now (2.4.162.1). Please upgrade PyMISP.
+  ```
+
+
 v2.4.165 (2022-11-09)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump mypy. [Raphaël Vinot]
 - Add links to doc. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
