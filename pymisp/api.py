@@ -90,7 +90,7 @@ def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID, d
 
 
 def register_user(misp_url: str, email: str,
-                  organisation: Union[MISPOrganisation, int, str, UUID] = None,
+                  organisation: Optional[Union[MISPOrganisation, int, str, UUID]] = None,
                   org_id: Optional[str] = None, org_name: Optional[str] = None,
                   message: Optional[str] = None, custom_perms: Optional[str] = None,
                   perm_sync: bool = False, perm_publish: bool = False, perm_admin: bool = False,
@@ -155,7 +155,7 @@ class PyMISP:
     """
 
     def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Optional[MutableMapping[str, str]] = None,
-                 cert: Optional[Union[str, Tuple[str, str]]] = None, auth: AuthBase = None, tool: str = '',
+                 cert: Optional[Union[str, Tuple[str, str]]] = None, auth: Optional[AuthBase] = None, tool: str = '',
                  timeout: Optional[Union[float, Tuple[float, float]]] = None,
                  http_headers: Optional[Dict[str, str]]=None
                  ):
@@ -332,7 +332,7 @@ class PyMISP:
     # ## BEGIN Event ##
 
     def events(self, pythonify: bool = False) -> Union[Dict, List[MISPEvent]]:
-        """Get all the events from the MISP instance
+        """Get all the events from the MISP instance: https://www.misp-project.org/openapi/#tag/Events/operation/getEvents
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -353,7 +353,7 @@ class PyMISP:
                   pythonify: bool = False) -> Union[Dict, MISPEvent]:
         """Get an event from a MISP instance. Includes collections like
         Attribute, EventReport, Feed, Galaxy, Object, Tag, etc. so the
-        response size may be large.
+        response size may be large : https://www.misp-project.org/openapi/#tag/Events/operation/getEventById
 
         :param event: event to get
         :param deleted: whether to include soft-deleted attributes
@@ -387,7 +387,7 @@ class PyMISP:
         return self._check_head_response(r)
 
     def add_event(self, event: MISPEvent, pythonify: bool = False, metadata: bool = False) -> Union[Dict, MISPEvent]:
-        """Add a new event on a MISP instance
+        """Add a new event on a MISP instance: https://www.misp-project.org/openapi/#tag/Events/operation/addEvent
 
         :param event: event to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -403,7 +403,7 @@ class PyMISP:
 
     def update_event(self, event: MISPEvent, event_id: Optional[int] = None, pythonify: bool = False,
                      metadata: bool = False) -> Union[Dict, MISPEvent]:
-        """Update an event on a MISP instance'''
+        """Update an event on a MISP instance: https://www.misp-project.org/openapi/#tag/Events/operation/editEvent
 
         :param event: event to update
         :param event_id: ID of event to update
@@ -423,7 +423,7 @@ class PyMISP:
         return e
 
     def delete_event(self, event: Union[MISPEvent, int, str, UUID]) -> Dict:
-        """Delete an event from a MISP instance'''
+        """Delete an event from a MISP instance: https://www.misp-project.org/openapi/#tag/Events/operation/deleteEvent
 
         :param event: event to delete
         """
@@ -432,7 +432,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def publish(self, event: Union[MISPEvent, int, str, UUID], alert: bool = False) -> Dict:
-        """Publish the event with one single HTTP POST
+        """Publish the event with one single HTTP POST: https://www.misp-project.org/openapi/#tag/Events/operation/publishEvent
 
         :param event: event to publish
         :param alert: whether to send an email.  The default is to not send a mail as it is assumed this method is called on update.
@@ -442,6 +442,15 @@ class PyMISP:
             response = self._prepare_request('POST', f'events/alert/{event_id}')
         else:
             response = self._prepare_request('POST', f'events/publish/{event_id}')
+        return self._check_json_response(response)
+
+    def unpublish(self, event: Union[MISPEvent, int, str, UUID]) -> Dict:
+        """Unpublish the event with one single HTTP POST: https://www.misp-project.org/openapi/#tag/Events/operation/unpublishEvent
+
+        :param event: event to unpublish
+        """
+        event_id = get_uuid_or_id_from_abstract_misp(event)
+        response = self._prepare_request('POST', f'events/publish/{event_id}')
         return self._check_json_response(response)
 
     def contact_event_reporter(self, event: Union[MISPEvent, int, str, UUID], message: str) -> Dict:
@@ -547,7 +556,7 @@ class PyMISP:
     # ## BEGIN Object ###
 
     def get_object(self, misp_object: Union[MISPObject, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPObject]:
-        """Get an object from the remote MISP instance
+        """Get an object from the remote MISP instance: https://www.misp-project.org/openapi/#tag/Objects/operation/getObjectById
 
         :param misp_object: object to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -571,7 +580,7 @@ class PyMISP:
         return self._check_head_response(r)
 
     def add_object(self, event: Union[MISPEvent, int, str, UUID], misp_object: MISPObject, pythonify: bool = False, break_on_duplicate: bool = False) -> Union[Dict, MISPObject]:
-        """Add a MISP Object to an existing MISP event
+        """Add a MISP Object to an existing MISP event: https://www.misp-project.org/openapi/#tag/Objects/operation/addObject
 
         :param event: event to extend
         :param misp_object: object to add
@@ -608,7 +617,7 @@ class PyMISP:
         return o
 
     def delete_object(self, misp_object: Union[MISPObject, int, str, UUID], hard: bool = False) -> Dict:
-        """Delete an object from a MISP instance
+        """Delete an object from a MISP instance: https://www.misp-project.org/openapi/#tag/Objects/operation/deleteObject
 
         :param misp_object: object to delete
         :param hard: flag for hard delete
@@ -693,7 +702,7 @@ class PyMISP:
     # ## BEGIN Attribute ###
 
     def attributes(self, pythonify: bool = False) -> Union[Dict, List[MISPAttribute]]:
-        """Get all the attributes from the MISP instance
+        """Get all the attributes from the MISP instance: https://www.misp-project.org/openapi/#tag/Attributes/operation/getAttributes
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -709,7 +718,7 @@ class PyMISP:
         return to_return
 
     def get_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPAttribute]:
-        """Get an attribute from a MISP instance
+        """Get an attribute from a MISP instance: https://www.misp-project.org/openapi/#tag/Attributes/operation/getAttributeById
 
         :param attribute: attribute to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -733,7 +742,7 @@ class PyMISP:
         return self._check_head_response(r)
 
     def add_attribute(self, event: Union[MISPEvent, int, str, UUID], attribute: Union[MISPAttribute, Iterable], pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
-        """Add an attribute to an existing MISP event
+        """Add an attribute to an existing MISP event: https://www.misp-project.org/openapi/#tag/Attributes/operation/addAttribute
 
         :param event: event to extend
         :param attribute: attribute or (MISP version 2.4.113+) list of attributes to add.
@@ -778,7 +787,7 @@ class PyMISP:
         return a
 
     def update_attribute(self, attribute: MISPAttribute, attribute_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPAttribute, MISPShadowAttribute]:
-        """Update an attribute on a MISP instance
+        """Update an attribute on a MISP instance: https://www.misp-project.org/openapi/#tag/Attributes/operation/editAttribute
 
         :param attribute: attribute to update
         :param attribute_id: attribute ID to update
@@ -803,7 +812,7 @@ class PyMISP:
         return a
 
     def delete_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], hard: bool = False) -> Dict:
-        """Delete an attribute from a MISP instance
+        """Delete an attribute from a MISP instance: https://www.misp-project.org/openapi/#tag/Attributes/operation/deleteAttribute
 
         :param attribute: attribute to delete
         :param hard: flag for hard delete
@@ -821,6 +830,20 @@ class PyMISP:
             # Re-try with a proposal
             return self.delete_attribute_proposal(attribute_id)
         return response
+
+    def restore_attribute(self, attribute: Union[MISPAttribute, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPAttribute]:
+        """Restore a soft deleted attribute from a MISP instance: https://www.misp-project.org/openapi/#tag/Attributes/operation/restoreAttribute
+
+        :param attribute: attribute to restore
+        """
+        attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
+        r = self._prepare_request('POST', f'attributes/restore/{attribute_id}')
+        response = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in response:
+            return response
+        a = MISPAttribute()
+        a.from_dict(**response)
+        return a
 
     # ## END Attribute ###
 
@@ -930,7 +953,7 @@ class PyMISP:
     def sightings(self, misp_entity: Optional[AbstractMISP] = None,
                   org: Optional[Union[MISPOrganisation, int, str, UUID]] = None,
                   pythonify: bool = False) -> Union[Dict, List[MISPSighting]]:
-        """Get the list of sightings related to a MISPEvent or a MISPAttribute (depending on type of misp_entity)
+        """Get the list of sightings related to a MISPEvent or a MISPAttribute (depending on type of misp_entity): https://www.misp-project.org/openapi/#tag/Sightings/operation/getSightingsByEventId
 
         :param misp_entity: MISP entity
         :param org: MISP organization
@@ -964,7 +987,7 @@ class PyMISP:
     def add_sighting(self, sighting: MISPSighting,
                      attribute: Optional[Union[MISPAttribute, int, str, UUID]] = None,
                      pythonify: bool = False) -> Union[Dict, MISPSighting]:
-        """Add a new sighting (globally, or to a specific attribute)
+        """Add a new sighting (globally, or to a specific attribute): https://www.misp-project.org/openapi/#tag/Sightings/operation/addSighting and https://www.misp-project.org/openapi/#tag/Sightings/operation/getSightingsByEventId
 
         :param sighting: sighting to add
         :param attribute: specific attribute to modify with the sighting
@@ -984,7 +1007,7 @@ class PyMISP:
         return s
 
     def delete_sighting(self, sighting: Union[MISPSighting, int, str, UUID]) -> Dict:
-        """Delete a sighting from a MISP instance
+        """Delete a sighting from a MISP instance: https://www.misp-project.org/openapi/#tag/Sightings/operation/deleteSighting
 
         :param sighting: sighting to delete
         """
@@ -997,7 +1020,7 @@ class PyMISP:
     # ## BEGIN Tags ###
 
     def tags(self, pythonify: bool = False, **kw_params) -> Union[Dict, List[MISPTag]]:
-        """Get the list of existing tags.
+        """Get the list of existing tags: https://www.misp-project.org/openapi/#tag/Tags/operation/getTags
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -1013,7 +1036,7 @@ class PyMISP:
         return to_return
 
     def get_tag(self, tag: Union[MISPTag, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPTag]:
-        """Get a tag by id.
+        """Get a tag by id: https://www.misp-project.org/openapi/#tag/Tags/operation/getTagById
 
         :param tag: tag to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1028,7 +1051,7 @@ class PyMISP:
         return t
 
     def add_tag(self, tag: MISPTag, pythonify: bool = False) -> Union[Dict, MISPTag]:
-        """Add a new tag on a MISP instance.
+        """Add a new tag on a MISP instance: https://www.misp-project.org/openapi/#tag/Tags/operation/addTag
         The user calling this method needs the Tag Editor permission.
         It doesn't add a tag to an event, simply creates it on the MISP instance.
 
@@ -1062,7 +1085,7 @@ class PyMISP:
         return self.update_tag(tag, pythonify=pythonify)
 
     def update_tag(self, tag: MISPTag, tag_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPTag]:
-        """Edit only the provided parameters of a tag
+        """Edit only the provided parameters of a tag: https://www.misp-project.org/openapi/#tag/Tags/operation/editTag
 
         :param tag: tag to update
         :aram tag_id: tag ID to update
@@ -1081,7 +1104,7 @@ class PyMISP:
         return t
 
     def delete_tag(self, tag: Union[MISPTag, int, str, UUID]) -> Dict:
-        """Delete a tag from a MISP instance
+        """Delete a tag from a MISP instance: https://www.misp-project.org/openapi/#tag/Tags/operation/deleteTag
 
         :param tag: tag to delete
         """
@@ -1090,7 +1113,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def search_tags(self, tagname: str, strict_tagname: bool = False, pythonify: bool = False) -> Union[Dict, List[MISPTag]]:
-        """Search for tags by name.
+        """Search for tags by name: https://www.misp-project.org/openapi/#tag/Tags/operation/searchTag
 
         :param tag_name: Name to search, use % for substrings matches.
         :param strict_tagname: only return tags matching exactly the tag name (so skipping synonyms and cluster's value)
@@ -1112,7 +1135,7 @@ class PyMISP:
     # ## BEGIN Taxonomies ###
 
     def taxonomies(self, pythonify: bool = False) -> Union[Dict, List[MISPTaxonomy]]:
-        """Get all the taxonomies
+        """Get all the taxonomies: https://www.misp-project.org/openapi/#tag/Taxonomies/operation/getTaxonomies
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -1128,7 +1151,7 @@ class PyMISP:
         return to_return
 
     def get_taxonomy(self, taxonomy: Union[MISPTaxonomy, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPTaxonomy]:
-        """Get a taxonomy by id or namespace from a MISP instance
+        """Get a taxonomy by id or namespace from a MISP instance: https://www.misp-project.org/openapi/#tag/Taxonomies/operation/getTaxonomyById
 
         :param taxonomy: taxonomy to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1143,7 +1166,7 @@ class PyMISP:
         return t
 
     def enable_taxonomy(self, taxonomy: Union[MISPTaxonomy, int, str, UUID]) -> Dict:
-        """Enable a taxonomy
+        """Enable a taxonomy: https://www.misp-project.org/openapi/#tag/Taxonomies/operation/enableTaxonomy
 
         :param taxonomy: taxonomy to enable
         """
@@ -1152,7 +1175,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def disable_taxonomy(self, taxonomy: Union[MISPTaxonomy, int, str, UUID]) -> Dict:
-        """Disable a taxonomy.
+        """Disable a taxonomy: https://www.misp-project.org/openapi/#tag/Taxonomies/operation/disableTaxonomy
 
         :param taxonomy: taxonomy to disable
         """
@@ -1187,7 +1210,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def update_taxonomies(self) -> Dict:
-        """Update all the taxonomies."""
+        """Update all the taxonomies: https://www.misp-project.org/openapi/#tag/Taxonomies/operation/updateTaxonomies"""
         response = self._prepare_request('POST', 'taxonomies/update')
         return self._check_json_response(response)
 
@@ -1207,7 +1230,7 @@ class PyMISP:
     # ## BEGIN Warninglists ###
 
     def warninglists(self, pythonify: bool = False) -> Union[Dict, List[MISPWarninglist]]:
-        """Get all the warninglists.
+        """Get all the warninglists: https://www.misp-project.org/openapi/#tag/Warninglists/operation/getWarninglists
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -1223,7 +1246,7 @@ class PyMISP:
         return to_return
 
     def get_warninglist(self, warninglist: Union[MISPWarninglist, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPWarninglist]:
-        """Get a warninglist by id
+        """Get a warninglist by id: https://www.misp-project.org/openapi/#tag/Warninglists/operation/getWarninglistById
 
         :param warninglist: warninglist to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1238,7 +1261,7 @@ class PyMISP:
         return w
 
     def toggle_warninglist(self, warninglist_id: Optional[Union[str, int, List[int]]] = None, warninglist_name: Optional[Union[str, List[str]]] = None, force_enable: bool = False) -> Dict:
-        '''Toggle (enable/disable) the status of a warninglist by id
+        '''Toggle (enable/disable) the status of a warninglist by id: https://www.misp-project.org/openapi/#tag/Warninglists/operation/toggleEnableWarninglist
 
         :param warninglist_id: ID of the WarningList
         :param warninglist_name: name of the WarningList
@@ -1287,7 +1310,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def update_warninglists(self) -> Dict:
-        """Update all the warninglists."""
+        """Update all the warninglists: https://www.misp-project.org/openapi/#tag/Warninglists/operation/updateWarninglists"""
         response = self._prepare_request('POST', 'warninglists/update')
         return self._check_json_response(response)
 
@@ -1296,7 +1319,7 @@ class PyMISP:
     # ## BEGIN Noticelist ###
 
     def noticelists(self, pythonify: bool = False) -> Union[Dict, List[MISPNoticelist]]:
-        """Get all the noticelists
+        """Get all the noticelists: https://www.misp-project.org/openapi/#tag/Noticelists/operation/getNoticelists
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -1312,7 +1335,7 @@ class PyMISP:
         return to_return
 
     def get_noticelist(self, noticelist: Union[MISPNoticelist, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPNoticelist]:
-        """Get a noticelist by id
+        """Get a noticelist by id: https://www.misp-project.org/openapi/#tag/Noticelists/operation/getNoticelistById
 
         :param notistlist: Noticelist to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1327,7 +1350,7 @@ class PyMISP:
         return n
 
     def enable_noticelist(self, noticelist: Union[MISPNoticelist, int, str, UUID]) -> Dict:
-        """Enable a noticelist by id
+        """Enable a noticelist by id: https://www.misp-project.org/openapi/#tag/Noticelists/operation/toggleEnableNoticelist
 
         :param noticelist: Noticelist to enable
         """
@@ -1349,7 +1372,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def update_noticelists(self) -> Dict:
-        """Update all the noticelists."""
+        """Update all the noticelists: https://www.misp-project.org/openapi/#tag/Noticelists/operation/updateNoticelists"""
         response = self._prepare_request('POST', 'noticelists/update')
         return self._check_json_response(response)
 
@@ -1421,7 +1444,7 @@ class PyMISP:
     # ## BEGIN Galaxy ###
 
     def galaxies(self, pythonify: bool = False) -> Union[Dict, List[MISPGalaxy]]:
-        """Get all the galaxies
+        """Get all the galaxies: https://www.misp-project.org/openapi/#tag/Galaxies/operation/getGalaxies
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -1437,7 +1460,7 @@ class PyMISP:
         return to_return
 
     def get_galaxy(self, galaxy: Union[MISPGalaxy, int, str, UUID], withCluster: bool = False, pythonify: bool = False) -> Union[Dict, MISPGalaxy]:
-        """Get a galaxy by id
+        """Get a galaxy by id: https://www.misp-project.org/openapi/#tag/Galaxies/operation/getGalaxyById
 
         :param galaxy: galaxy to get
         :param withCluster: Include the clusters associated with the galaxy
@@ -1452,8 +1475,8 @@ class PyMISP:
         g.from_dict(**galaxy_j, withCluster=withCluster)
         return g
 
-    def search_galaxy_clusters(self, galaxy: Union[MISPGalaxy, int, str, UUID], context: str = "all", searchall: str = None, pythonify: bool = False) -> Union[Dict, List[MISPGalaxyCluster]]:
-        """Searches the galaxy clusters within a specific galaxy
+    def search_galaxy_clusters(self, galaxy: Union[MISPGalaxy, int, str, UUID], context: str = "all", searchall: Optional[str] = None, pythonify: bool = False) -> Union[Dict, List[MISPGalaxyCluster]]:
+        """Searches the galaxy clusters within a specific galaxy: https://www.misp-project.org/openapi/#tag/Galaxy-Clusters/operation/getGalaxyClusters and https://www.misp-project.org/openapi/#tag/Galaxy-Clusters/operation/getGalaxyClusterById
 
         :param galaxy: The MISPGalaxy you wish to search in
         :param context: The context of how you want to search within the galaxy_
@@ -1480,7 +1503,7 @@ class PyMISP:
         return response
 
     def update_galaxies(self) -> Dict:
-        """Update all the galaxies."""
+        """Update all the galaxies: https://www.misp-project.org/openapi/#tag/Galaxies/operation/updateGalaxies"""
         response = self._prepare_request('POST', 'galaxies/update')
         return self._check_json_response(response)
 
@@ -1501,7 +1524,7 @@ class PyMISP:
         return gc
 
     def add_galaxy_cluster(self, galaxy: Union[MISPGalaxy, str, UUID], galaxy_cluster: MISPGalaxyCluster, pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
-        """Add a new galaxy cluster to a MISP Galaxy
+        """Add a new galaxy cluster to a MISP Galaxy: https://www.misp-project.org/openapi/#tag/Galaxy-Clusters/operation/addGalaxyCluster
 
         :param galaxy: A MISPGalaxy (or UUID) where you wish to add the galaxy cluster
         :param galaxy_cluster: A MISPGalaxyCluster you wish to add
@@ -1521,7 +1544,7 @@ class PyMISP:
         return gc
 
     def update_galaxy_cluster(self, galaxy_cluster: MISPGalaxyCluster, pythonify: bool = False) -> Union[Dict, MISPGalaxyCluster]:
-        """Update a custom galaxy cluster.
+        """Update a custom galaxy cluster: https://www.misp-project.org/openapi/#tag/Galaxy-Clusters/operation/editGalaxyCluster
 
         ;param galaxy_cluster: The MISPGalaxyCluster you wish to update
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1540,7 +1563,7 @@ class PyMISP:
         return gc
 
     def publish_galaxy_cluster(self, galaxy_cluster: Union[MISPGalaxyCluster, int, str, UUID]) -> Dict:
-        """Publishes a galaxy cluster
+        """Publishes a galaxy cluster: https://www.misp-project.org/openapi/#tag/Galaxy-Clusters/operation/publishGalaxyCluster
 
         :param galaxy_cluster: The galaxy cluster you wish to publish
         """
@@ -1576,7 +1599,7 @@ class PyMISP:
         return gc
 
     def delete_galaxy_cluster(self, galaxy_cluster: Union[MISPGalaxyCluster, int, str, UUID], hard=False) -> Dict:
-        """Deletes a galaxy cluster from MISP
+        """Deletes a galaxy cluster from MISP: https://www.misp-project.org/openapi/#tag/Galaxy-Clusters/operation/deleteGalaxyCluster
 
         :param galaxy_cluster: The MISPGalaxyCluster you wish to delete from MISP
         :param hard: flag for hard delete
@@ -1626,7 +1649,7 @@ class PyMISP:
     # ## BEGIN Feed ###
 
     def feeds(self, pythonify: bool = False) -> Union[Dict, List[MISPFeed]]:
-        """Get the list of existing feeds
+        """Get the list of existing feeds: https://www.misp-project.org/openapi/#tag/Feeds/operation/getFeeds
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -1642,7 +1665,7 @@ class PyMISP:
         return to_return
 
     def get_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
-        """Get a feed by id
+        """Get a feed by id: https://www.misp-project.org/openapi/#tag/Feeds/operation/getFeedById
 
         :param feed: feed to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1657,7 +1680,7 @@ class PyMISP:
         return f
 
     def add_feed(self, feed: MISPFeed, pythonify: bool = False) -> Union[Dict, MISPFeed]:
-        """Add a new feed on a MISP instance
+        """Add a new feed on a MISP instance: https://www.misp-project.org/openapi/#tag/Feeds/operation/addFeed
 
         :param feed: feed to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1672,7 +1695,7 @@ class PyMISP:
         return f
 
     def enable_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
-        """Enable a feed; fetching it will create event(s)
+        """Enable a feed; fetching it will create event(s): https://www.misp-project.org/openapi/#tag/Feeds/operation/enableFeed
 
         :param feed: feed to enable
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1687,7 +1710,7 @@ class PyMISP:
         return self.update_feed(feed=f, pythonify=pythonify)
 
     def disable_feed(self, feed: Union[MISPFeed, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPFeed]:
-        """Disable a feed
+        """Disable a feed: https://www.misp-project.org/openapi/#tag/Feeds/operation/disableFeed
 
         :param feed: feed to disable
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1761,7 +1784,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def fetch_feed(self, feed: Union[MISPFeed, int, str, UUID]) -> Dict:
-        """Fetch one single feed by id
+        """Fetch one single feed by id: https://www.misp-project.org/openapi/#tag/Feeds/operation/fetchFromFeed
 
         :param feed: feed to fetch
         """
@@ -1770,12 +1793,12 @@ class PyMISP:
         return self._check_json_response(response)
 
     def cache_all_feeds(self) -> Dict:
-        """ Cache all the feeds"""
+        """ Cache all the feeds: https://www.misp-project.org/openapi/#tag/Feeds/operation/cacheFeeds"""
         response = self._prepare_request('GET', 'feeds/cacheFeeds/all')
         return self._check_json_response(response)
 
     def cache_feed(self, feed: Union[MISPFeed, int, str, UUID]) -> Dict:
-        """Cache a specific feed by id
+        """Cache a specific feed by id: https://www.misp-project.org/openapi/#tag/Feeds/operation/cacheFeeds
 
         :param feed: feed to cache
         """
@@ -1808,7 +1831,7 @@ class PyMISP:
     # ## BEGIN Server ###
 
     def servers(self, pythonify: bool = False) -> Union[Dict, List[MISPServer]]:
-        """Get the existing servers the MISP instance can synchronise with
+        """Get the existing servers the MISP instance can synchronise with: https://www.misp-project.org/openapi/#tag/Servers/operation/getServers
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -1852,7 +1875,7 @@ class PyMISP:
         return s
 
     def add_server(self, server: MISPServer, pythonify: bool = False) -> Union[Dict, MISPServer]:
-        """Add a server to synchronise with.
+        """Add a server to synchronise with: https://www.misp-project.org/openapi/#tag/Servers/operation/getServers
         Note: You probably want to use PyMISP.get_sync_config and PyMISP.import_server instead
 
         :param server: sync server config
@@ -1867,7 +1890,7 @@ class PyMISP:
         return s
 
     def update_server(self, server: MISPServer, server_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPServer]:
-        """Update a server to synchronise with
+        """Update a server to synchronise with: https://www.misp-project.org/openapi/#tag/Servers/operation/getServers
 
         :param server: sync server config
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1885,7 +1908,7 @@ class PyMISP:
         return s
 
     def delete_server(self, server: Union[MISPServer, int, str, UUID]) -> Dict:
-        """Delete a sync server
+        """Delete a sync server: https://www.misp-project.org/openapi/#tag/Servers/operation/getServers
 
         :param server: sync server config
         """
@@ -1894,7 +1917,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def server_pull(self, server: Union[MISPServer, int, str, UUID], event: Optional[Union[MISPEvent, int, str, UUID]] = None) -> Dict:
-        """Initialize a pull from a sync server, optionally limited to one event
+        """Initialize a pull from a sync server, optionally limited to one event: https://www.misp-project.org/openapi/#tag/Servers/operation/pullServer
 
         :param server: sync server config
         :param event: event
@@ -1910,7 +1933,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def server_push(self, server: Union[MISPServer, int, str, UUID], event: Optional[Union[MISPEvent, int, str, UUID]] = None) -> Dict:
-        """Initialize a push to a sync server, optionally limited to one event
+        """Initialize a push to a sync server, optionally limited to one event: https://www.misp-project.org/openapi/#tag/Servers/operation/pushServer
 
         :param server: sync server config
         :param event: event
@@ -1939,7 +1962,7 @@ class PyMISP:
     # ## BEGIN Sharing group ###
 
     def sharing_groups(self, pythonify: bool = False) -> Union[Dict, List[MISPSharingGroup]]:
-        """Get the existing sharing groups
+        """Get the existing sharing groups: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/getSharingGroup
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -1955,7 +1978,7 @@ class PyMISP:
         return to_return
 
     def get_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
-        """Get a sharing group
+        """Get a sharing group: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/getSharingGroupById
 
         :param sharing_group: sharing group to find
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1970,7 +1993,7 @@ class PyMISP:
         return s
 
     def add_sharing_group(self, sharing_group: MISPSharingGroup, pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
-        """Add a new sharing group
+        """Add a new sharing group: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/addSharingGroup
 
         :param sharing_group: sharing group to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -1984,7 +2007,7 @@ class PyMISP:
         return s
 
     def update_sharing_group(self, sharing_group: Union[MISPSharingGroup, dict], sharing_group_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPSharingGroup]:
-        """Update sharing group parameters
+        """Update sharing group parameters: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/editSharingGroup
 
         :param sharing_group: MISP Sharing Group
         :param sharing_group_id Sharing group ID
@@ -2012,7 +2035,7 @@ class PyMISP:
         return self._check_head_response(r)
 
     def delete_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID]) -> Dict:
-        """Delete a sharing group
+        """Delete a sharing group: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/deleteSharingGroup
 
         :param sharing_group: sharing group to delete
         """
@@ -2022,7 +2045,7 @@ class PyMISP:
 
     def add_org_to_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID],
                                  organisation: Union[MISPOrganisation, int, str, UUID], extend: bool = False) -> Dict:
-        '''Add an organisation to a sharing group.
+        '''Add an organisation to a sharing group: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/addOrganisationToSharingGroup
 
         :param sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
         :param organisation: Organisation's local instance ID, or Organisation's global UUID, or Organisation's name as known to the curent instance
@@ -2036,7 +2059,7 @@ class PyMISP:
 
     def remove_org_from_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID],
                                       organisation: Union[MISPOrganisation, int, str, UUID]) -> Dict:
-        '''Remove an organisation from a sharing group.
+        '''Remove an organisation from a sharing group: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/removeOrganisationFromSharingGroup
 
         :param sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
         :param organisation: Organisation's local instance ID, or Organisation's global UUID, or Organisation's name as known to the curent instance
@@ -2049,7 +2072,7 @@ class PyMISP:
 
     def add_server_to_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID],
                                     server: Union[MISPServer, int, str, UUID], all_orgs: bool = False) -> Dict:
-        '''Add a server to a sharing group.
+        '''Add a server to a sharing group: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/addServerToSharingGroup
 
         :param sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
         :param server: Server's local instance ID, or URL of the Server, or Server's name as known to the curent instance
@@ -2063,7 +2086,7 @@ class PyMISP:
 
     def remove_server_from_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID],
                                          server: Union[MISPServer, int, str, UUID]) -> Dict:
-        '''Remove a server from a sharing group.
+        '''Remove a server from a sharing group: https://www.misp-project.org/openapi/#tag/Sharing-Groups/operation/removeServerFromSharingGroup
 
         :param sharing_group: Sharing group's local instance ID, or Sharing group's global UUID
         :param server: Server's local instance ID, or URL of the Server, or Server's name as known to the curent instance
@@ -2078,8 +2101,8 @@ class PyMISP:
 
     # ## BEGIN Organisation ###
 
-    def organisations(self, scope="local", search: str = None, pythonify: bool = False) -> Union[Dict, List[MISPOrganisation]]:
-        """Get all the organisations
+    def organisations(self, scope="local", search: Optional[str] = None, pythonify: bool = False) -> Union[Dict, List[MISPOrganisation]]:
+        """Get all the organisations: https://www.misp-project.org/openapi/#tag/Organisations/operation/getOrganisations
 
         :param scope: scope of organizations to get
         :param search: The search to make against the list of organisations
@@ -2101,7 +2124,7 @@ class PyMISP:
         return to_return
 
     def get_organisation(self, organisation: Union[MISPOrganisation, int, str, UUID], pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
-        """Get an organisation by id
+        """Get an organisation by id: https://www.misp-project.org/openapi/#tag/Organisations/operation/getOrganisationById
 
         :param organisation: organization to get
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -2125,7 +2148,7 @@ class PyMISP:
         return self._check_head_response(r)
 
     def add_organisation(self, organisation: MISPOrganisation, pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
-        """Add an organisation
+        """Add an organisation: https://www.misp-project.org/openapi/#tag/Organisations/operation/addOrganisation
 
         :param organisation: organization to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -2139,7 +2162,7 @@ class PyMISP:
         return o
 
     def update_organisation(self, organisation: MISPOrganisation, organisation_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPOrganisation]:
-        """Update an organisation
+        """Update an organisation: https://www.misp-project.org/openapi/#tag/Organisations/operation/editOrganisation
 
         :param organisation: organization to update
         :param organisation_id: id to update
@@ -2158,7 +2181,7 @@ class PyMISP:
         return o
 
     def delete_organisation(self, organisation: Union[MISPOrganisation, int, str, UUID]) -> Dict:
-        """Delete an organisation by id
+        """Delete an organisation by id: https://www.misp-project.org/openapi/#tag/Organisations/operation/deleteOrganisation
 
         :param organisation: organization to delete
         """
@@ -2171,8 +2194,8 @@ class PyMISP:
 
     # ## BEGIN User ###
 
-    def users(self, search: str = None, organisation: int = None, pythonify: bool = False) -> Union[Dict, List[MISPUser]]:
-        """Get all the users, or a filtered set of users
+    def users(self, search: Optional[str] = None, organisation: Optional[int] = None, pythonify: bool = False) -> Union[Dict, List[MISPUser]]:
+        """Get all the users, or a filtered set of users: https://www.misp-project.org/openapi/#tag/Users/operation/getUsers
 
         :param search: The search to make against the list of users
         :param organisation: The ID of an organisation to filter against
@@ -2196,7 +2219,7 @@ class PyMISP:
         return to_return
 
     def get_user(self, user: Union[MISPUser, int, str, UUID] = 'me', pythonify: bool = False, expanded: bool = False) -> Union[Dict, MISPUser, Tuple[MISPUser, MISPRole, List[MISPUserSetting]]]:
-        """Get a user by id
+        """Get a user by id: https://www.misp-project.org/openapi/#tag/Users/operation/getUsers
 
         :param user: user to get; `me` means the owner of the API key doing the query
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -2223,7 +2246,7 @@ class PyMISP:
             return u, role, usersettings
 
     def get_new_authkey(self, user: Union[MISPUser, int, str, UUID] = 'me') -> str:
-        '''Get a new authorization key for a specific user, defaults to user doing the call.
+        '''Get a new authorization key for a specific user, defaults to user doing the call: https://www.misp-project.org/openapi/#tag/AuthKeys/operation/addAuthKey
 
         :param user: The owner of the key
         '''
@@ -2236,7 +2259,7 @@ class PyMISP:
             raise PyMISPUnexpectedResponse(f'Unable to get authkey: {authkey}')
 
     def add_user(self, user: MISPUser, pythonify: bool = False) -> Union[Dict, MISPUser]:
-        """Add a new user
+        """Add a new user: https://www.misp-project.org/openapi/#tag/Users/operation/addUser
 
         :param user: user to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
@@ -2250,7 +2273,7 @@ class PyMISP:
         return u
 
     def update_user(self, user: MISPUser, user_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPUser]:
-        """Update a user on a MISP instance
+        """Update a user on a MISP instance: https://www.misp-project.org/openapi/#tag/Users/operation/editUser
 
         :param user: user to update
         :param user_id: id to update
@@ -2272,7 +2295,7 @@ class PyMISP:
         return e
 
     def delete_user(self, user: Union[MISPUser, int, str, UUID]) -> Dict:
-        """Delete a user by id
+        """Delete a user by id: https://www.misp-project.org/openapi/#tag/Users/operation/deleteUser
 
         :param user: user to delete
         """
@@ -2282,7 +2305,7 @@ class PyMISP:
         return self._check_json_response(response)
 
     def change_user_password(self, new_password: str) -> Dict:
-        """Change the password of the curent user
+        """Change the password of the curent user:
 
         :param new_password: password to set
         """
@@ -2449,6 +2472,12 @@ class PyMISP:
         '''Search in the MISP instance
 
         :param controller: Controller to search on, it can be `events`, `objects`, `attributes`. The response will either be a list of events, objects, or attributes.
+                           Reference documentation for each controller:
+
+                               * events: https://www.misp-project.org/openapi/#tag/Events/operation/restSearchEvents
+                               * attributes: https://www.misp-project.org/openapi/#tag/Attributes/operation/restSearchAttributes
+                               * objects: N/A
+
         :param return_format: Set the return format of the search (Currently supported: json, xml, openioc, suricata, snort - more formats are being moved to restSearch with the goal being that all searches happen through this API). Can be passed as the first parameter after restSearch or via the JSON payload.
         :param limit: Limit the number of results returned, depending on the scope (for example 10 attributes or 10 full events).
         :param page: If a limit is set, sets the page to be returned. page 3, limit 100 will return records 201->300).
@@ -3179,7 +3208,7 @@ class PyMISP:
     # ## BEGIN User Settings ###
 
     def user_settings(self, pythonify: bool = False) -> Union[Dict, List[MISPUserSetting]]:
-        """Get all the user settings
+        """Get all the user settings: https://www.misp-project.org/openapi/#tag/UserSettings/operation/getUserSettings
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
@@ -3196,7 +3225,7 @@ class PyMISP:
 
     def get_user_setting(self, user_setting: str, user: Optional[Union[MISPUser, int, str, UUID]] = None,
                          pythonify: bool = False) -> Union[Dict, MISPUserSetting]:
-        """Get a user setting
+        """Get a user setting: https://www.misp-project.org/openapi/#tag/UserSettings/operation/getUserSettingById
 
         :param user_setting: name of user setting
         :param user: user
@@ -3215,7 +3244,7 @@ class PyMISP:
 
     def set_user_setting(self, user_setting: str, value: Union[str, dict], user: Optional[Union[MISPUser, int, str, UUID]] = None,
                          pythonify: bool = False) -> Union[Dict, MISPUserSetting]:
-        """Set a user setting
+        """Set a user setting: https://www.misp-project.org/openapi/#tag/UserSettings/operation/setUserSetting
 
         :param user_setting: name of user setting
         :param value: value to set
@@ -3237,7 +3266,7 @@ class PyMISP:
         return u
 
     def delete_user_setting(self, user_setting: str, user: Optional[Union[MISPUser, int, str, UUID]] = None) -> Dict:
-        """Delete a user setting
+        """Delete a user setting: https://www.misp-project.org/openapi/#tag/UserSettings/operation/deleteUserSettingById
 
         :param user_setting: name of user setting
         :param user: user
