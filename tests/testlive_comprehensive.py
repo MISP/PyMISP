@@ -1262,8 +1262,14 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue('successfully' in r['message'].lower() and f'({second.id})' in r['message'], r['message'])
             second = self.user_misp_connector.get_event(second.id, pythonify=True)
             self.assertTrue('generic_tag_test' == second.tags[0].name)
+            # # Test local tag, shouldn't update the timestamp
+            old_ts = second.timestamp
+            r = self.admin_misp_connector.tag(second, 'generic_tag_test_local', local=True)
+            second = self.user_misp_connector.get_event(second.id, pythonify=True)
+            self.assertEqual(old_ts, second.timestamp)
 
             r = self.admin_misp_connector.untag(second, 'generic_tag_test')
+            r = self.admin_misp_connector.untag(second, 'generic_tag_test_local')
             self.assertTrue(r['message'].endswith(f'successfully removed from Event({second.id}).'), r['message'])
             second = self.user_misp_connector.get_event(second.id, pythonify=True)
             self.assertFalse(second.tags)
