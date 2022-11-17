@@ -3449,8 +3449,10 @@ class PyMISP:
         """
         uuid = get_uuid_or_id_from_abstract_misp(misp_entity)
         if isinstance(tag, MISPTag):
-            tag = tag.name
-        to_post = {'uuid': uuid, 'tag': tag, 'local': local}
+            tag_name = tag.name if 'name' in tag else ""
+        else:
+            tag_name = tag
+        to_post = {'uuid': uuid, 'tag': tag_name, 'local': local}
         response = self._prepare_request('POST', 'tags/attachTagToObject', data=to_post)
         return self._check_json_response(response)
 
@@ -3462,8 +3464,7 @@ class PyMISP:
         """
         uuid = get_uuid_or_id_from_abstract_misp(misp_entity)
         if isinstance(tag, MISPTag):
-            if 'name' in tag:
-                tag_name = tag.name
+            tag_name = tag.name if 'name' in tag else ""
         else:
             tag_name = tag
         to_post = {'uuid': uuid, 'tag': tag_name}
