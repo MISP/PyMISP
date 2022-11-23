@@ -347,7 +347,7 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "extract-msg"
-version = "0.36.5"
+version = "0.37.0"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = true
@@ -558,7 +558,7 @@ dev = ["hypothesis"]
 
 [[package]]
 name = "jsonschema"
-version = "4.17.0"
+version = "4.17.1"
 description = "An implementation of JSON Schema validation for Python"
 category = "main"
 optional = false
@@ -1819,7 +1819,7 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "043229fa9ec62077e411e0869c4c4d649dd31c968f011ab66116bd6b7b1ae3f8"
+content-hash = "e62d60557a3f451de75aaeab766131041f058adfa008ede2fa6d0d55fc028a3a"
 
 [metadata.files]
 alabaster = [
@@ -2220,8 +2220,8 @@ exceptiongroup = [
     {file = "exceptiongroup-1.0.4.tar.gz", hash = "sha256:bd14967b79cd9bdb54d97323216f8fdf533e278df937aa2a90089e7d6e06e5ec"},
 ]
 extract-msg = [
-    {file = "extract_msg-0.36.5-py2.py3-none-any.whl", hash = "sha256:9ce358ab515bfc7b558d175ee6cd8ea61d9a35f934b9d5d927119d20e6b180f9"},
-    {file = "extract_msg-0.36.5.tar.gz", hash = "sha256:3d4044aeab3b5d35d91d3791fbe6ebaf5a414bd3d4437c46e6920d7b9340b482"},
+    {file = "extract_msg-0.37.0-py2.py3-none-any.whl", hash = "sha256:c7bd5187bafcbd04b37919e58b872cd647af2b18c1e922add6e2386a763e05ba"},
+    {file = "extract_msg-0.37.0.tar.gz", hash = "sha256:b0ad4ab44e4e180c858ea2c327f714a20160c41ba432053477c07b1c481f0cd8"},
 ]
 fastjsonschema = [
     {file = "fastjsonschema-2.16.2-py3-none-any.whl", hash = "sha256:21f918e8d9a1a4ba9c22e09574ba72267a6762d47822db9add95f6454e51cc1c"},
@@ -2276,8 +2276,8 @@ json5 = [
     {file = "json5-0.9.10.tar.gz", hash = "sha256:ad9f048c5b5a4c3802524474ce40a622fae789860a86f10cc4f7e5f9cf9b46ab"},
 ]
 jsonschema = [
-    {file = "jsonschema-4.17.0-py3-none-any.whl", hash = "sha256:f660066c3966db7d6daeaea8a75e0b68237a48e51cf49882087757bb59916248"},
-    {file = "jsonschema-4.17.0.tar.gz", hash = "sha256:5bfcf2bca16a087ade17e02b282d34af7ccd749ef76241e7f9bd7c0cb8a9424d"},
+    {file = "jsonschema-4.17.1-py3-none-any.whl", hash = "sha256:410ef23dcdbca4eaedc08b850079179883c2ed09378bd1f760d4af4aacfa28d7"},
+    {file = "jsonschema-4.17.1.tar.gz", hash = "sha256:05b2d22c83640cde0b7e0aa329ca7754fbd98ea66ad8ae24aa61328dfe057fa3"},
 ]
 jupyter-client = [
     {file = "jupyter_client-7.4.7-py3-none-any.whl", hash = "sha256:df56ae23b8e1da1b66f89dee1368e948b24a7f780fa822c5735187589fc4c157"},
