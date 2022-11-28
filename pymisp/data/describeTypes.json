@@ -276,6 +276,7 @@
         "anonymised",
         "attachment",
         "authentihash",
+        "azure-application-id",
         "cdhash",
         "chrome-extension-id",
         "comment",
@@ -543,6 +544,10 @@
         "to_ids": 0
       },
       "authentihash": {
+        "default_category": "Payload delivery",
+        "to_ids": 1
+      },
+      "azure-application-id": {
         "default_category": "Payload delivery",
         "to_ids": 1
       },
