@@ -1286,6 +1286,7 @@
       "anonymised",
       "attachment",
       "authentihash",
+      "azure-application-id",
       "bank-account-nr",
       "bic",
       "bin",
