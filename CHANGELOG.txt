@@ -13,6 +13,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - [types] added azure-application-id. [iglocska]
 - Bump deps. [Raphaël Vinot]
@@ -21,6 +22,7 @@ Changes
 
 Fix
 ~~~
+- [describetypes] updated with the latest output from MISP. [iglocska]
 - [types] added missing type value. [iglocska]
 
 
