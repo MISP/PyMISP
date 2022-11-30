@@ -25,7 +25,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
-    MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion
+    MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 
@@ -2419,6 +2419,49 @@ class PyMISP:
         return self._check_json_response(response)
 
     # ## END Role ###
+
+    # ## BEGIN Decaying Models ###
+
+    def update_decaying_models(self) -> Dict:
+        """Update all the Decaying models"""
+        response = self._prepare_request('POST', 'decayingModel/update')
+        return self._check_json_response(response)
+
+    def decaying_models(self, pythonify: bool = False) -> Union[Dict, List[MISPDecayingModel]]:
+        """Get all the decaying models
+
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output
+        """
+        r = self._prepare_request('GET', 'decayingModel/index')
+        models = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in models:
+            return models
+        to_return = []
+        for model in models:
+            n = MISPDecayingModel()
+            n.from_dict(**model)
+            to_return.append(n)
+        return to_return
+
+    def enable_decaying_model(self, decaying_model: Union[MISPDecayingModel, int, str]) -> Dict:
+        """Enable a decaying Model"""
+        if isinstance(decaying_model, MISPDecayingModel):
+            decaying_model_id = decaying_model.id
+        else:
+            decaying_model_id = int(decaying_model)
+        response = self._prepare_request('POST', f'decayingModel/enable/{decaying_model_id}')
+        return self._check_json_response(response)
+
+    def disable_decaying_model(self, decaying_model: Union[MISPDecayingModel, int, str]) -> Dict:
+        """Disable a decaying Model"""
+        if isinstance(decaying_model, MISPDecayingModel):
+            decaying_model_id = decaying_model.id
+        else:
+            decaying_model_id = int(decaying_model)
+        response = self._prepare_request('POST', f'decayingModel/disable/{decaying_model_id}')
+        return self._check_json_response(response)
+
+    # ## END Decaying Models ###
 
     # ## BEGIN Search methods ###
 

@@ -1,4 +1,4 @@
-__version__ = '2.4.165.1'
+__version__ = '2.4.166'
 import logging
 import sys
 import warnings
@@ -33,7 +33,7 @@ try:
                             MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed,
                             MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist,
                             MISPEventReport, MISPGalaxyCluster, MISPGalaxyClusterElement, MISPGalaxyClusterRelation,
-                            MISPCorrelationExclusion, MISPGalaxy)
+                            MISPCorrelationExclusion, MISPGalaxy, MISPDecayingModel)
     from .tools import AbstractMISPObjectGenerator  # noqa
     from .tools import Neo4j  # noqa
     from .tools import stix  # noqa

@@ -2349,3 +2349,19 @@ class MISPOrganisationBlocklist(AbstractMISP):
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(org_uuid={self.org_uuid}'
+
+
+class MISPDecayingModel(AbstractMISP):
+
+    def __init__(self, **kwargs: Dict) -> None:
+        super().__init__(**kwargs)
+        self.uuid: str
+        self.id: int
+
+    def from_dict(self, **kwargs):
+        if 'DecayingModel' in kwargs:
+            kwargs = kwargs['DecayingModel']
+        super().from_dict(**kwargs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(uuid={self.uuid})>'
