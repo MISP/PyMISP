@@ -65,6 +65,10 @@ class UnknownMISPObjectTemplate(MISPObjectException):
     pass
 
 
+class InvalidMISPGalaxy(PyMISPError):
+    pass
+
+
 class PyMISPInvalidFormat(PyMISPError):
     pass
 

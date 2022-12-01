@@ -8,8 +8,8 @@ import glob
 import hashlib
 from datetime import date, datetime
 
-from pymisp import (MISPEvent, MISPSighting, MISPTag, MISPOrganisation,
-                    MISPObject)
+from pymisp import (MISPAttribute, MISPEvent, MISPGalaxy, MISPObject, MISPOrganisation,
+                    MISPSighting, MISPTag)
 from pymisp.exceptions import InvalidMISPObject
 from pymisp.tools import GitVulnFinderObject
 
@@ -68,6 +68,15 @@ class TestMISPEvent(unittest.TestCase):
         del self.mispevent.uuid
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
 
+    def test_event_galaxy(self):
+        self.init_event()
+        with open('tests/mispevent_testfiles/galaxy.json', 'r') as f:
+            galaxy = json.load(f)
+        misp_galaxy = MISPGalaxy()
+        misp_galaxy.from_dict(**galaxy)
+        self.mispevent.add_galaxy(misp_galaxy)
+        self.assertEqual(self.mispevent.galaxies[0].to_json(sort_keys=True, indent=2), json.dumps(galaxy, sort_keys=True, indent=2))
+
     def test_attribute(self):
         self.init_event()
         a = self.mispevent.add_attribute('filename', 'bar.exe')
@@ -86,6 +95,21 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/attribute_del.json', 'r') as f:
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    def test_attribute_galaxy(self):
+        self.init_event()
+        with open('tests/mispevent_testfiles/galaxy.json', 'r') as f:
+            galaxy = json.load(f)
+        misp_galaxy = MISPGalaxy()
+        misp_galaxy.from_dict(**galaxy)
+        attribute = MISPAttribute()
+        attribute.from_dict(**{'type': 'github-username', 'value': 'adulau'})
+        attribute.add_galaxy(misp_galaxy)
+        self.mispevent.add_attribute(**attribute)
+        self.assertEqual(
+            self.mispevent.attributes[0].galaxies[0].to_json(sort_keys=True, indent=2),
+            json.dumps(galaxy, sort_keys=True, indent=2)
+        )
 
     def test_to_dict_json_format(self):
         misp_event = MISPEvent()
@@ -129,6 +153,22 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/event_obj_tag.json', 'r') as f:
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+
+    def test_object_galaxy(self):
+        self.init_event()
+        misp_object = MISPObject('github-user')
+        misp_object.add_attribute('username', 'adulau')
+        misp_object.add_attribute('repository', 'cve-search')
+        self.mispevent.add_object(misp_object)
+        with open('tests/mispevent_testfiles/galaxy.json', 'r') as f:
+            galaxy = json.load(f)
+        misp_galaxy = MISPGalaxy()
+        misp_galaxy.from_dict(**galaxy)
+        self.mispevent.objects[0].attributes[0].add_galaxy(misp_galaxy)
+        self.assertEqual(
+            self.mispevent.objects[0].attributes[0].galaxies[0].to_json(sort_keys=True, indent=2),
+            json.dumps(galaxy, sort_keys=True, indent=2)
+        )
 
     def test_malware(self):
         with open('tests/mispevent_testfiles/simple.json', 'rb') as f:
