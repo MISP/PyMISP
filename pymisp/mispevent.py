@@ -17,7 +17,9 @@ from pathlib import Path
 from typing import List, Optional, Union, IO, Dict, Any
 
 from .abstract import AbstractMISP, MISPTag
-from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError, NewEventReportError, NewGalaxyClusterError, NewGalaxyClusterRelationError
+from .exceptions import (UnknownMISPObjectTemplate, InvalidMISPGalaxy, InvalidMISPObject,
+                         PyMISPError, NewEventError, NewAttributeError, NewEventReportError,
+                         NewGalaxyClusterError, NewGalaxyClusterRelationError)
 
 logger = logging.getLogger('pymisp')
 
@@ -277,6 +279,7 @@ class MISPAttribute(AbstractMISP):
         self.SharingGroup: MISPSharingGroup
         self.Sighting: List[MISPSighting] = []
         self.Tag: List[MISPTag] = []
+        self.Galaxy: List[MISPGalaxy] = []
 
         # For search
         self.Event: MISPEvent
@@ -297,6 +300,27 @@ class MISPAttribute(AbstractMISP):
     def tags(self, tags: List[MISPTag]):
         """Set a list of prepared MISPTag."""
         super()._set_tags(tags)
+
+    def add_galaxy(self, galaxy: Union['MISPGalaxy', dict, None] = None, **kwargs) -> 'MISPGalaxy':
+        """Add a galaxy to the Attribute, either by passing a MISPGalaxy or a dictionary"""
+        if isinstance(galaxy, MISPGalaxy):
+            self.galaxies.append(galaxy)
+            return galaxy
+        if isinstance(galaxy, dict):
+            misp_galaxy = MISPGalaxy()
+            misp_galaxy.from_dict(**galaxy)
+        elif kwargs:
+            misp_galaxy = MISPGalaxy()
+            misp_galaxy.from_dict(**kwargs)
+        else:
+            raise InvalidMISPGalaxy("A Galaxy to add to an existing Attribute needs to be either a MISPGalaxy or a plain python dictionary")
+        self.galaxies.append(misp_galaxy)
+        return misp_galaxy
+
+    @property
+    def galaxies(self) -> List['MISPGalaxy']:
+        """Returns a list of galaxies associated to this Attribute"""
+        return self.Galaxy
 
     def _prepare_data(self, data: Optional[Union[Path, str, bytes, BytesIO]]):
         if not data:
@@ -588,6 +612,8 @@ class MISPAttribute(AbstractMISP):
 
         if kwargs.get('Tag'):
             [self.add_tag(tag) for tag in kwargs.pop('Tag')]
+        if kwargs.get('Galaxy'):
+            [self.add_galaxy(galaxy) for galaxy in kwargs.pop('Galaxy')]
         if kwargs.get('Sighting'):
             [self.add_sighting(sighting) for sighting in kwargs.pop('Sighting')]
         if kwargs.get('ShadowAttribute'):
@@ -1945,13 +1971,23 @@ class MISPEvent(AbstractMISP):
         self.edited = True
         return event_report
 
-    def add_galaxy(self, **kwargs) -> MISPGalaxy:
-        """Add a MISP galaxy and sub-clusters into an event.
+    def add_galaxy(self, galaxy: Union[MISPGalaxy, dict, None] = None, **kwargs) -> MISPGalaxy:
+        """Add a galaxy and sub-clusters into an event, either by passing
+        a MISPGalaxy or a dictionary.
         Supports all other parameters supported by MISPGalaxy"""
-        galaxy = MISPGalaxy()
-        galaxy.from_dict(**kwargs)
-        self.galaxies.append(galaxy)
-        return galaxy
+        if isinstance(galaxy, MISPGalaxy):
+            self.galaxies.append(galaxy)
+            return galaxy
+        if isinstance(galaxy, dict):
+            misp_galaxy = MISPGalaxy()
+            misp_galaxy.from_dict(**galaxy)
+        elif kwargs:
+            misp_galaxy = MISPGalaxy()
+            misp_galaxy.from_dict(**kwargs)
+        else:
+            raise InvalidMISPGalaxy("A Galaxy to add to an existing Event needs to be either a MISPGalaxy or a plain python dictionary")
+        self.galaxies.append(misp_galaxy)
+        return misp_galaxy
 
     def get_object_by_id(self, object_id: Union[str, int]) -> MISPObject:
         """Get an object by ID
