@@ -44,7 +44,7 @@ include = [
 python = "^3.7"
 requests = "^2.28.1"
 python-dateutil = "^2.8.2"
-jsonschema = "^4.17.1"
+jsonschema = "^4.17.3"
 deprecated = "^1.2.13"
 extract_msg = {version = "^0.37.1", optional = true}
 RTFDE = {version = "^0.0.2", optional = true}
@@ -59,7 +59,7 @@ recommonmark = {version = "^0.7.1", optional = true}
 reportlab = {version = "^3.6.12", optional = true}
 pyfaup = {version = "^1.2", optional = true}
 publicsuffixlist = {version = "^0.9.1", optional = true}
-chardet = {version = "^5.0.0", optional = true}
+chardet = {version = "^5.1.0", optional = true}
 urllib3 = {extras = ["brotli"], version = "^1.26.13", optional = true}
 
 [tool.poetry.extras]
