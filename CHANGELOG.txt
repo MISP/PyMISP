@@ -7,6 +7,8 @@ v2.4.167 (2022-12-22)
 
 Changes
 ~~~~~~~
+- Bump objects. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump dependencies, move to poetry 1.3. [Raphaël Vinot]
