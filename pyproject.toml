@@ -18,9 +18,10 @@ classifiers=[
     'Intended Audience :: Science/Research',
     'Intended Audience :: Telecommunications Industry',
     'Intended Audience :: Information Technology',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
     'Topic :: Security',
     'Topic :: Internet'
 ]
@@ -41,7 +42,7 @@ include = [
 "Source" = "https://github.com/MISP/PyMISP"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 requests = "^2.28.1"
 python-dateutil = "^2.8.2"
 jsonschema = "^4.17.3"
@@ -54,7 +55,7 @@ pydeep2 = {version = "^0.5.1", optional = true}
 lief = {version = "^0.12.3", optional = true}
 beautifulsoup4 = {version = "^4.11.1", optional = true}
 validators = {version = "^0.20.0", optional = true}
-sphinx-autodoc-typehints = {version = "^1.19.5", optional = true}
+sphinx-autodoc-typehints = {version = "^1.20.1", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
 reportlab = {version = "^3.6.12", optional = true}
 pyfaup = {version = "^1.2", optional = true}
@@ -75,11 +76,11 @@ brotli = ['urllib3']
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"
 mypy = "^0.991"
-ipython = "^7.34.0"
+ipython = "^8.8.0"
 jupyterlab = "^3.5.2"
-types-requests = "^2.28.11.6"
+types-requests = "^2.28.11.7"
 types-python-dateutil = "^2.8.19.5"
-types-redis = "^4.3.21.6"
+types-redis = "^4.4.0.0"
 types-Flask = "^1.1.6"
 pytest-cov = "^4.0.0"
 
