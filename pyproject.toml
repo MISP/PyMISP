@@ -61,7 +61,7 @@ reportlab = {version = "^3.6.12", optional = true}
 pyfaup = {version = "^1.2", optional = true}
 publicsuffixlist = {version = "^0.9.1", optional = true}
 chardet = {version = "^5.1.0", optional = true}
-urllib3 = {extras = ["brotli"], version = "^1.26.13", optional = true}
+urllib3 = {extras = ["brotli"], version = "^1.26.14", optional = true}
 
 [tool.poetry.extras]
 fileobjects = ['python-magic', 'pydeep2', 'lief']
