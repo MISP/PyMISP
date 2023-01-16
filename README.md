@@ -1,10 +1,10 @@
-**IMPORTANT NOTE**: This library will require **at least** Python 3.10 starting the 1st of January 2023. If you have legacy versions of python, please use the latest PyMISP version that will be released in December 2022, and consider updating your system(s). Anything released within the last 2 years will do, starting with Ubuntu 22.04.
+**IMPORTANT NOTE**: This library will require **at least** Python 3.10 starting the 1st of January 2024. If you have legacy versions of python, please use the latest PyMISP version that will be released in December 2022, and consider updating your system(s). Anything released within the last 2 years will do, starting with Ubuntu 22.04.
 
 # PyMISP - Python Library to access MISP
 
 [![Documentation Status](https://readthedocs.org/projects/pymisp/badge/?version=latest)](http://pymisp.readthedocs.io/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/MISP/PyMISP/badge.svg?branch=main)](https://coveralls.io/github/MISP/PyMISP?branch=main)
-[![Python 3.6](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360/)
+[![Python 3.8](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![PyPi version](https://img.shields.io/pypi/v/pymisp.svg)](https://pypi.python.org/pypi/pymisp/)
 [![Number of PyPI downloads](https://img.shields.io/pypi/dm/pymisp.svg)](https://pypi.python.org/pypi/pymisp/)
 
