@@ -2,6 +2,32 @@ Changelog
 =========
 
 
+v2.4.167.1 (2023-01-16)
+-----------------------
+
+New
+~~~
+- Add relationship_type in Tag entries for feeds. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump requests. [Raphaël Vinot]
+- Bump pyzmq. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump python version used by read the docs. [Raphaël Vinot]
+- Bump warning to inform user that python 3.10 wil be required in 12
+  months. [Raphaël Vinot]
+- Bump minimal PyMISP version to 3.8. [Raphaël Vinot]
+- Re-bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Update whl files. [Raphaël Vinot]
+- Nvm, readthedocs requires python 3.8 at most. [Raphaël Vinot]
+
+
 v2.4.167 (2022-12-22)
 ---------------------
 
