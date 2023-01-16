@@ -55,12 +55,11 @@ pydeep2 = {version = "^0.5.1", optional = true}
 lief = {version = "^0.12.3", optional = true}
 beautifulsoup4 = {version = "^4.11.1", optional = true}
 validators = {version = "^0.20.0", optional = true}
-sphinx-autodoc-typehints = {version = "^1.20.1", optional = true}
+sphinx-autodoc-typehints = {version = "^1.21.0", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
 reportlab = {version = "^3.6.12", optional = true}
 pyfaup = {version = "^1.2", optional = true}
 publicsuffixlist = {version = "^0.9.1", optional = true}
-chardet = {version = "^5.1.0", optional = true}
 urllib3 = {extras = ["brotli"], version = "^1.26.14", optional = true}
 
 [tool.poetry.extras]
@@ -69,7 +68,7 @@ openioc = ['beautifulsoup4']
 virustotal = ['validators']
 docs = ['sphinx-autodoc-typehints', 'recommonmark']
 pdfexport = ['reportlab']
-url = ['pyfaup', 'chardet']
+url = ['pyfaup']
 email = ['extract_msg', "RTFDE", "oletools"]
 brotli = ['urllib3']
 
