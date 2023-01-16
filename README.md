@@ -1,4 +1,4 @@
-**IMPORTANT NOTE**: This library will require **at least** Python 3.10 starting the 1st of January 2024. If you have legacy versions of python, please use the latest PyMISP version that will be released in December 2022, and consider updating your system(s). Anything released within the last 2 years will do, starting with Ubuntu 22.04.
+**IMPORTANT NOTE**: This library will require **at least** Python 3.10 starting the 1st of January 2024. If you have legacy versions of python, please use the latest PyMISP version that will be released in December 2023, and consider updating your system(s). Anything released within the last 2 years will do, starting with Ubuntu 22.04.
 
 # PyMISP - Python Library to access MISP
 
