@@ -2,6 +2,19 @@ Changelog
 =========
 
 
+v2.4.167.2 (2023-01-17)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+
+Fix
+~~~
+- Set relationship_type default in MISPTag to empty string. [Raphaël
+  Vinot]
+
+
 v2.4.167.1 (2023-01-16)
 -----------------------
 
@@ -11,6 +24,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump requests. [Raphaël Vinot]
