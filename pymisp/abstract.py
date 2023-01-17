@@ -383,7 +383,7 @@ class MISPTag(AbstractMISP):
 
     def _set_default(self):
         if not hasattr(self, 'relationship_type'):
-            self.relationship_type = None
+            self.relationship_type = ''
         if not hasattr(self, 'colour'):
             self.colour = '#ffffff'
 
