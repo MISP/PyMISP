@@ -55,7 +55,7 @@ pydeep2 = {version = "^0.5.1", optional = true}
 lief = {version = "^0.12.3", optional = true}
 beautifulsoup4 = {version = "^4.11.1", optional = true}
 validators = {version = "^0.20.0", optional = true}
-sphinx-autodoc-typehints = {version = "^1.21.4", optional = true}
+sphinx-autodoc-typehints = {version = "^1.21.5", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
 reportlab = {version = "^3.6.12", optional = true}
 pyfaup = {version = "^1.2", optional = true}
@@ -79,7 +79,7 @@ ipython = "^8.8.0"
 jupyterlab = "^3.5.2"
 types-requests = "^2.28.11.8"
 types-python-dateutil = "^2.8.19.6"
-types-redis = "^4.4.0.2"
+types-redis = "^4.4.0.3"
 types-Flask = "^1.1.6"
 pytest-cov = "^4.0.0"
 
