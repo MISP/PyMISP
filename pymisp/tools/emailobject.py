@@ -11,8 +11,8 @@ from io import BytesIO
 from pathlib import Path
 from typing import Union, List, Tuple, Dict, cast, Any, Optional
 
-from extract_msg import openMsg
-from extract_msg.message import Message as MsgObj
+from extract_msg import openMsg  # type: ignore
+from extract_msg.message import Message as MsgObj  # type: ignore
 from RTFDE.exceptions import MalformedEncapsulatedRtf, NotEncapsulatedRtf  # type: ignore
 from RTFDE.deencapsulate import DeEncapsulator  # type: ignore
 from oletools.common.codepages import codepage2codec  # type: ignore

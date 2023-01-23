@@ -1,4 +1,4 @@
-__version__ = '2.4.166'
+__version__ = '2.4.168'
 import logging
 import sys
 import warnings
@@ -6,11 +6,11 @@ import warnings
 logger = logging.getLogger(__name__)
 
 
-def warning_2022():
-    if sys.version_info < (3, 8):
+def warning_2024():
+    if sys.version_info < (3, 10):
         warnings.warn("""
-As our baseline system is the latest Ubuntu LTS, and Ubuntu LTS 20.04 has Python 3.8 available,
-we will officially deprecate python versions below 3.8 on January 1st 2022.
+As our baseline system is the latest Ubuntu LTS, and Ubuntu LTS 22.04 has Python 3.10 available,
+we will officially deprecate python versions below 3.10 on January 1st 2024.
 **Please update your codebase.**""", DeprecationWarning, stacklevel=3)
 
 
@@ -25,7 +25,7 @@ Response (if any):
 
 
 try:
-    warning_2022()
+    warning_2024()
     from .exceptions import (PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, # noqa
                              InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse)
     from .abstract import AbstractMISP, MISPEncode, pymisp_json_default, MISPTag, Distribution, ThreatLevel, Analysis # noqa
