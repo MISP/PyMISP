@@ -2889,14 +2889,14 @@ test = ["cython", "html5lib", "pytest (>=4.6)"]
 
 [[package]]
 name = "sphinx-autodoc-typehints"
-version = "1.21.5"
+version = "1.21.7"
 description = "Type hints (PEP 484) support for the Sphinx autodoc extension"
 category = "main"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "sphinx_autodoc_typehints-1.21.5-py3-none-any.whl", hash = "sha256:6e92f9697a64a09782266eb7e17afd6b54833cd698ba65f4d7916d87b33ade7e"},
-    {file = "sphinx_autodoc_typehints-1.21.5.tar.gz", hash = "sha256:72ea273cf49c00c4b87432e1ad23d002a785bdf0ed49c034fdd6b4c0888f0c52"},
+    {file = "sphinx_autodoc_typehints-1.21.7-py3-none-any.whl", hash = "sha256:e62ae99f7e0546f5083262f744365256ad9f975dab47c6a1fe11fd4d316fb4dd"},
+    {file = "sphinx_autodoc_typehints-1.21.7.tar.gz", hash = "sha256:92bee8da845edfe33df3bba4b5a67f1ff5723f597ee2c9c3f831c29ce918819d"},
 ]
 
 [package.dependencies]
@@ -3514,4 +3514,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "be2858276098bb2905d9eaf2d2d4d78a0e022d21a2faa97a1b3869f7e30f1a26"
+content-hash = "0f3a3dd8b570aff53d715e179961ff55c2f7d9c6bc796074ca963d5c84229766"
