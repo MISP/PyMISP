@@ -102,7 +102,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
     __misp_objects_path = misp_objects_path
     __describe_types = describe_types
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict):
         """Abstract class for all the MISP objects.
         NOTE: Every method in every classes inheriting this one are doing
               changes in memory and  do not modify data on a remote MISP instance.
@@ -120,7 +120,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
             # Ignore the edited objects and keep the timestamps.
             self.__force_timestamps: bool = True
         else:
-            self.__force_timestamps: bool = False
+            self.__force_timestamps = False
 
     @property
     def describe_types(self) -> Dict:
@@ -367,13 +367,14 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
 
 class MISPTag(AbstractMISP):
 
-    _fields_for_feed: set = {'name', 'colour'}
+    _fields_for_feed: set = {'name', 'colour', 'relationship_type'}
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict):
         super().__init__(**kwargs)
         self.name: str
         self.exportable: bool
         self.local: bool
+        self.relationship_type: Optional[str]
 
     def from_dict(self, **kwargs):
         if kwargs.get('Tag'):
@@ -381,6 +382,8 @@ class MISPTag(AbstractMISP):
         super().from_dict(**kwargs)
 
     def _set_default(self):
+        if not hasattr(self, 'relationship_type'):
+            self.relationship_type = ''
         if not hasattr(self, 'colour'):
             self.colour = '#ffffff'
 

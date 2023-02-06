@@ -17,7 +17,9 @@ from pathlib import Path
 from typing import List, Optional, Union, IO, Dict, Any
 
 from .abstract import AbstractMISP, MISPTag
-from .exceptions import UnknownMISPObjectTemplate, InvalidMISPObject, PyMISPError, NewEventError, NewAttributeError, NewEventReportError, NewGalaxyClusterError, NewGalaxyClusterRelationError
+from .exceptions import (UnknownMISPObjectTemplate, InvalidMISPGalaxy, InvalidMISPObject,
+                         PyMISPError, NewEventError, NewAttributeError, NewEventReportError,
+                         NewGalaxyClusterError, NewGalaxyClusterRelationError)
 
 logger = logging.getLogger('pymisp')
 
@@ -109,7 +111,7 @@ class MISPOrganisation(AbstractMISP):
 
     _fields_for_feed: set = {'name', 'uuid'}
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.id: int
         self.name: str
@@ -128,7 +130,7 @@ class MISPOrganisation(AbstractMISP):
 class MISPSharingGroupOrg(AbstractMISP):
     _fields_for_feed: set = {'extend', 'Organisation'}
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.extend: bool
         self.Organisation: MISPOrganisation
@@ -155,7 +157,7 @@ class MISPSharingGroupOrg(AbstractMISP):
 class MISPSharingGroup(AbstractMISP):
     _fields_for_feed: set = {'uuid', 'name', 'roaming', 'created', 'organisation_uuid', 'Organisation', 'SharingGroupOrg', 'SharingGroupServer'}
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.name: str
         self.SharingGroupOrg: List[MISPSharingGroupOrg] = []
@@ -203,7 +205,7 @@ class MISPSharingGroup(AbstractMISP):
 
 class MISPShadowAttribute(AbstractMISP):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.type: str
         self.value: str
@@ -221,7 +223,7 @@ class MISPShadowAttribute(AbstractMISP):
 
 class MISPSighting(AbstractMISP):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.id: int
         self.value: str
@@ -277,6 +279,7 @@ class MISPAttribute(AbstractMISP):
         self.SharingGroup: MISPSharingGroup
         self.Sighting: List[MISPSighting] = []
         self.Tag: List[MISPTag] = []
+        self.Galaxy: List[MISPGalaxy] = []
 
         # For search
         self.Event: MISPEvent
@@ -297,6 +300,27 @@ class MISPAttribute(AbstractMISP):
     def tags(self, tags: List[MISPTag]):
         """Set a list of prepared MISPTag."""
         super()._set_tags(tags)
+
+    def add_galaxy(self, galaxy: Union['MISPGalaxy', dict, None] = None, **kwargs) -> 'MISPGalaxy':
+        """Add a galaxy to the Attribute, either by passing a MISPGalaxy or a dictionary"""
+        if isinstance(galaxy, MISPGalaxy):
+            self.galaxies.append(galaxy)
+            return galaxy
+        if isinstance(galaxy, dict):
+            misp_galaxy = MISPGalaxy()
+            misp_galaxy.from_dict(**galaxy)
+        elif kwargs:
+            misp_galaxy = MISPGalaxy()
+            misp_galaxy.from_dict(**kwargs)
+        else:
+            raise InvalidMISPGalaxy("A Galaxy to add to an existing Attribute needs to be either a MISPGalaxy or a plain python dictionary")
+        self.galaxies.append(misp_galaxy)
+        return misp_galaxy
+
+    @property
+    def galaxies(self) -> List['MISPGalaxy']:
+        """Returns a list of galaxies associated to this Attribute"""
+        return self.Galaxy
 
     def _prepare_data(self, data: Optional[Union[Path, str, bytes, BytesIO]]):
         if not data:
@@ -588,6 +612,8 @@ class MISPAttribute(AbstractMISP):
 
         if kwargs.get('Tag'):
             [self.add_tag(tag) for tag in kwargs.pop('Tag')]
+        if kwargs.get('Galaxy'):
+            [self.add_galaxy(galaxy) for galaxy in kwargs.pop('Galaxy')]
         if kwargs.get('Sighting'):
             [self.add_sighting(sighting) for sighting in kwargs.pop('Sighting')]
         if kwargs.get('ShadowAttribute'):
@@ -678,7 +704,7 @@ class MISPObjectReference(AbstractMISP):
     _fields_for_feed: set = {'uuid', 'timestamp', 'relationship_type', 'comment',
                              'object_uuid', 'referenced_uuid'}
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.uuid = str(uuid.uuid4())
         self.object_uuid: str
@@ -1202,15 +1228,10 @@ class MISPGalaxyClusterRelation(AbstractMISP):
     Creating a new galaxy cluster can take the following parameters
 
     :param galaxy_cluster_uuid: The UUID of the galaxy the relation links to
-    :type galaxy_cluster_uuid: uuid
     :param referenced_galaxy_cluster_type: The relation type, e.g. dropped-by
-    :type referenced_galaxy_cluster_type: str
     :param referenced_galaxy_cluster_uuid: The UUID of the related galaxy
-    :type referenced_galaxy_cluster_uuid: uuid
     :param distribution: The distribution of the relation, one of 0, 1, 2, 3, 4, default 0
-    :type distribution: int
     :param sharing_group_id: The sharing group of the relation, only when distribution is 4
-    :type sharing_group_id: int, optional
     """
 
     def __repr__(self) -> str:
@@ -1218,10 +1239,10 @@ class MISPGalaxyClusterRelation(AbstractMISP):
             return '<{self.__class__.__name__}(referenced_galaxy_cluster_type={self.referenced_galaxy_cluster_type})'.format(self=self)
         return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.galaxy_cluster_uuid: uuid
-        self.referenced_galaxy_cluster_uuid: uuid
+        self.galaxy_cluster_uuid: str
+        self.referenced_galaxy_cluster_uuid: str
         self.distribution: int = 0
         self.referenced_galaxy_cluster_type: str
         self.Tag: List[MISPTag] = []
@@ -1298,11 +1319,11 @@ class MISPGalaxyCluster(AbstractMISP):
     :type cluster_relations: list[MISPGalaxyClusterRelation], optional
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.Galaxy: MISPGalaxy
         self.GalaxyElement: List[MISPGalaxyClusterElement] = []
-        self.meta = {}
+        self.meta: Dict = {}
         self.GalaxyClusterRelation: List[MISPGalaxyClusterRelation] = []
         self.Org: MISPOrganisation
         self.Orgc: MISPOrganisation
@@ -1411,7 +1432,7 @@ class MISPGalaxyCluster(AbstractMISP):
         self.cluster_elements.append(cluster_element)
         return cluster_element
 
-    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: Union["MISPGalaxyCluster", str, UUID], referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: str = None, **kwargs) -> MISPGalaxyClusterRelation:
+    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: Union["MISPGalaxyCluster", str, UUID], referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: Optional[str] = None, **kwargs: Dict) -> MISPGalaxyClusterRelation:
         """Add a cluster relation to a MISPGalaxyCluster.
 
         :param referenced_galaxy_cluster_uuid: UUID of the related cluster
@@ -1447,7 +1468,7 @@ class MISPGalaxyCluster(AbstractMISP):
 class MISPGalaxy(AbstractMISP):
     """Galaxy class, used to view a galaxy and respective clusters"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.GalaxyCluster: List[MISPGalaxyCluster] = []
         self.name: str
@@ -1950,13 +1971,23 @@ class MISPEvent(AbstractMISP):
         self.edited = True
         return event_report
 
-    def add_galaxy(self, **kwargs) -> MISPGalaxy:
-        """Add a MISP galaxy and sub-clusters into an event.
+    def add_galaxy(self, galaxy: Union[MISPGalaxy, dict, None] = None, **kwargs) -> MISPGalaxy:
+        """Add a galaxy and sub-clusters into an event, either by passing
+        a MISPGalaxy or a dictionary.
         Supports all other parameters supported by MISPGalaxy"""
-        galaxy = MISPGalaxy()
-        galaxy.from_dict(**kwargs)
-        self.galaxies.append(galaxy)
-        return galaxy
+        if isinstance(galaxy, MISPGalaxy):
+            self.galaxies.append(galaxy)
+            return galaxy
+        if isinstance(galaxy, dict):
+            misp_galaxy = MISPGalaxy()
+            misp_galaxy.from_dict(**galaxy)
+        elif kwargs:
+            misp_galaxy = MISPGalaxy()
+            misp_galaxy.from_dict(**kwargs)
+        else:
+            raise InvalidMISPGalaxy("A Galaxy to add to an existing Event needs to be either a MISPGalaxy or a plain python dictionary")
+        self.galaxies.append(misp_galaxy)
+        return misp_galaxy
 
     def get_object_by_id(self, object_id: Union[str, int]) -> MISPObject:
         """Get an object by ID
@@ -2122,7 +2153,7 @@ class MISPObjectTemplate(AbstractMISP):
 
 class MISPUser(AbstractMISP):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict) -> None:
         super().__init__(**kwargs)
         self.email: str
 
@@ -2193,7 +2224,7 @@ class MISPCorrelationExclusion(AbstractMISP):
 
 class MISPRole(AbstractMISP):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict) -> None:
         super().__init__(**kwargs)
         self.perm_admin: int
         self.perm_site_admin: int
@@ -2214,7 +2245,7 @@ class MISPServer(AbstractMISP):
 
 class MISPLog(AbstractMISP):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict) -> None:
         super().__init__(**kwargs)
         self.model: str
         self.action: str
@@ -2231,7 +2262,7 @@ class MISPLog(AbstractMISP):
 
 class MISPEventDelegation(AbstractMISP):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict) -> None:
         super().__init__(**kwargs)
         self.org_id: int
         self.requester_org_id: int
@@ -2313,7 +2344,7 @@ class MISPUserSetting(AbstractMISP):
 
 class MISPInbox(AbstractMISP):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict) -> None:
         super().__init__(**kwargs)
         self.data: Dict
 
@@ -2328,7 +2359,7 @@ class MISPInbox(AbstractMISP):
 
 class MISPEventBlocklist(AbstractMISP):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict) -> None:
         super().__init__(**kwargs)
         self.event_uuid: str
 
@@ -2343,7 +2374,7 @@ class MISPEventBlocklist(AbstractMISP):
 
 class MISPOrganisationBlocklist(AbstractMISP):
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Dict) -> None:
         super().__init__(**kwargs)
         self.org_uuid: str
 
@@ -2354,3 +2385,19 @@ class MISPOrganisationBlocklist(AbstractMISP):
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(org_uuid={self.org_uuid}'
+
+
+class MISPDecayingModel(AbstractMISP):
+
+    def __init__(self, **kwargs: Dict) -> None:
+        super().__init__(**kwargs)
+        self.uuid: str
+        self.id: int
+
+    def from_dict(self, **kwargs):
+        if 'DecayingModel' in kwargs:
+            kwargs = kwargs['DecayingModel']
+        super().from_dict(**kwargs)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(uuid={self.uuid})>'

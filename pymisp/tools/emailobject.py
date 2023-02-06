@@ -9,10 +9,10 @@ from email import policy, message_from_bytes
 from email.message import EmailMessage
 from io import BytesIO
 from pathlib import Path
-from typing import Union, List, Tuple, Dict, cast, Any
+from typing import Union, List, Tuple, Dict, cast, Any, Optional
 
-from extract_msg import openMsg
-from extract_msg.message import Message as MsgObj
+from extract_msg import openMsg  # type: ignore
+from extract_msg.message import Message as MsgObj  # type: ignore
 from RTFDE.exceptions import MalformedEncapsulatedRtf, NotEncapsulatedRtf  # type: ignore
 from RTFDE.deencapsulate import DeEncapsulator  # type: ignore
 from oletools.common.codepages import codepage2codec  # type: ignore
@@ -28,7 +28,7 @@ class MISPMsgConverstionError(MISPObjectException):
 
 
 class EMailObject(AbstractMISPObjectGenerator):
-    def __init__(self, filepath: Union[Path, str] = None, pseudofile: BytesIO = None,
+    def __init__(self, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None,
                  attach_original_email: bool = True, **kwargs):
         super().__init__('email', **kwargs)
 
@@ -80,8 +80,8 @@ class EMailObject(AbstractMISPObjectGenerator):
         raise PyMISPNotImplementedYet("EmailObject does not know how to decode data passed to it. Object may not be an email. If this is an email please submit it as an issue to PyMISP so we can add support.")
 
     @staticmethod
-    def create_pseudofile(filepath: Union[Path, str] = None,
-                          pseudofile: BytesIO = None) -> BytesIO:
+    def create_pseudofile(filepath: Optional[Union[Path, str]] = None,
+                          pseudofile: Optional[BytesIO] = None) -> BytesIO:
         """Creates a pseudofile using directly passed data or data loaded from file path.
         """
         if filepath:
@@ -111,7 +111,7 @@ class EMailObject(AbstractMISPObjectGenerator):
                             "cte": "base64"}
         if msg_obj.htmlBody is not None:
             try:
-                _html_encoding_raw = msg_obj.mainProperties['3FDE0003'].value
+                _html_encoding_raw = msg_obj.props['3FDE0003'].value
                 _html_encoding = codepage2codec(_html_encoding_raw)
             except KeyError:
                 _html_encoding = msg_obj.stringEncoding

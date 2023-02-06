@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pymisp"
-version = "2.4.162.1"
+version = "2.4.168"
 description = "Python API for MISP."
 authors = ["Raphaël Vinot <raphael.vinot@circl.lu>"]
 license = "BSD-2-Clause"
@@ -18,9 +18,10 @@ classifiers=[
     'Intended Audience :: Science/Research',
     'Intended Audience :: Telecommunications Industry',
     'Intended Audience :: Information Technology',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
     'Topic :: Security',
     'Topic :: Internet'
 ]
@@ -41,26 +42,25 @@ include = [
 "Source" = "https://github.com/MISP/PyMISP"
 
 [tool.poetry.dependencies]
-python = "^3.7"
-requests = "^2.28.1"
+python = "^3.8"
+requests = "^2.28.2"
 python-dateutil = "^2.8.2"
-jsonschema = "^4.16.0"
+jsonschema = "^4.17.3"
 deprecated = "^1.2.13"
-extract_msg = {version = "^0.36.4", optional = true}
+extract_msg = {version = "^0.39.0", optional = true}
 RTFDE = {version = "^0.0.2", optional = true}
 oletools = {version = "^0.60.1", optional = true}
 python-magic = {version = "^0.4.27", optional = true}
 pydeep2 = {version = "^0.5.1", optional = true}
-lief = {version = "^0.12.2", optional = true}
+lief = {version = "^0.12.3", optional = true}
 beautifulsoup4 = {version = "^4.11.1", optional = true}
 validators = {version = "^0.20.0", optional = true}
-sphinx-autodoc-typehints = {version = "^1.19.4", optional = true}
+sphinx-autodoc-typehints = {version = "^1.21.8", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
-reportlab = {version = "^3.6.11", optional = true}
+reportlab = {version = "^3.6.12", optional = true}
 pyfaup = {version = "^1.2", optional = true}
-publicsuffixlist = {version = "^0.9.0", optional = true}
-chardet = {version = "^5.0.0", optional = true}
-urllib3 = {extras = ["brotli"], version = "^1.26.12", optional = true}
+publicsuffixlist = {version = "^0.9.2", optional = true}
+urllib3 = {extras = ["brotli"], version = "^1.26.14", optional = true}
 
 [tool.poetry.extras]
 fileobjects = ['python-magic', 'pydeep2', 'lief']
@@ -68,18 +68,18 @@ openioc = ['beautifulsoup4']
 virustotal = ['validators']
 docs = ['sphinx-autodoc-typehints', 'recommonmark']
 pdfexport = ['reportlab']
-url = ['pyfaup', 'chardet']
+url = ['pyfaup']
 email = ['extract_msg', "RTFDE", "oletools"]
 brotli = ['urllib3']
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"
-mypy = "^0.982"
-ipython = "^7.34.0"
-jupyterlab = "^3.4.8"
-types-requests = "^2.28.11.1"
-types-python-dateutil = "^2.8.19"
-types-redis = "^4.3.21.1"
+mypy = "^0.991"
+ipython = "^8.9.0"
+jupyterlab = "^3.5.3"
+types-requests = "^2.28.11.8"
+types-python-dateutil = "^2.8.19.6"
+types-redis = "^4.4.0.4"
 types-Flask = "^1.1.6"
 pytest-cov = "^4.0.0"
 

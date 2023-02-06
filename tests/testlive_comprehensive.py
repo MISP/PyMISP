@@ -679,6 +679,31 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
+    def test_search_decay(self):
+        # Creating event 1
+        first = self.create_simple_event()
+        first.add_attribute('ip-dst', '8.8.8.8')
+        first.publish()
+        try:
+            r = self.admin_misp_connector.update_decaying_models()
+            self.assertTrue(r['success'], r)
+            simple_decaying_model = None
+            models = self.admin_misp_connector.decaying_models(pythonify=True)
+            for model in models:
+                if model.name == 'NIDS Simple Decaying Model':
+                    simple_decaying_model = model
+            self.assertTrue(simple_decaying_model, models)
+            self.admin_misp_connector.enable_decaying_model(simple_decaying_model)
+            # TODO: check the response, it is curently an empty list
+            first = self.pub_misp_connector.add_event(first, pythonify=True)
+            result = self.pub_misp_connector.search('attributes', to_ids=1, includeDecayScore=True, pythonify=True)
+            self.assertTrue(result[0].decay_score, result[0].to_json(indent=2))
+            self.admin_misp_connector.disable_decaying_model(simple_decaying_model)
+            # TODO: check the response, it is curently a list of all the models
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+
     def test_default_distribution(self):
         '''The default distributions on the VM are This community only for the events and Inherit from event for attr/obj)'''
         first = self.create_simple_event()
@@ -1262,8 +1287,14 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue('successfully' in r['message'].lower() and f'({second.id})' in r['message'], r['message'])
             second = self.user_misp_connector.get_event(second.id, pythonify=True)
             self.assertTrue('generic_tag_test' == second.tags[0].name)
+            # # Test local tag, shouldn't update the timestamp
+            old_ts = second.timestamp
+            r = self.admin_misp_connector.tag(second, 'generic_tag_test_local', local=True)
+            second = self.user_misp_connector.get_event(second.id, pythonify=True)
+            self.assertEqual(old_ts, second.timestamp)
 
             r = self.admin_misp_connector.untag(second, 'generic_tag_test')
+            r = self.admin_misp_connector.untag(second, 'generic_tag_test_local')
             self.assertTrue(r['message'].endswith(f'successfully removed from Event({second.id}).'), r['message'])
             second = self.user_misp_connector.get_event(second.id, pythonify=True)
             self.assertFalse(second.tags)
