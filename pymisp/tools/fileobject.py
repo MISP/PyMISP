@@ -33,9 +33,9 @@ class FileObject(AbstractMISPObjectGenerator):
     def __init__(self, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, filename: Optional[str] = None, **kwargs) -> None:
         super().__init__('file', **kwargs)
         if not HAS_PYDEEP:
-            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if not HAS_MAGIC:
-            logger.warning("Please install python-magic: pip install python-magic.")
+            logger.warning("python-magic is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if filename:
             # Useful in case the file is copied with a pre-defined name by a script but we want to keep the original name
             self.__filename = filename
