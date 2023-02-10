@@ -3097,7 +3097,7 @@ class PyMISP:
             data = {'event_id': event_id, 'org_id': organisation_id, 'distribution': distribution, 'message': message}
             r = self._prepare_request('POST', f'eventDelegations/delegateEvent/{event_id}', data=data)
         elif event_delegation:
-            r = self._prepare_request('POST', f'eventDelegations/delegateEvent/{event_id}', data=event_delegation)
+            r = self._prepare_request('POST', f'eventDelegations/delegateEvent/{event_delegation.event_id}', data=event_delegation)
         else:
             raise PyMISPError('Either event and organisation OR event_delegation are required.')
         delegation_j = self._check_json_response(r)
