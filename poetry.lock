@@ -923,14 +923,14 @@ tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
 name = "extract-msg"
-version = "0.39.0"
+version = "0.39.1"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 category = "main"
 optional = true
 python-versions = ">=3.6"
 files = [
-    {file = "extract_msg-0.39.0-py2.py3-none-any.whl", hash = "sha256:41a5886ce7bafe262c79025a46b74bf035613b8589d3063b5b132a17f6889d72"},
-    {file = "extract_msg-0.39.0.tar.gz", hash = "sha256:5937584117d0051322673cc39e48059437a9ab5c3f49e484ed4284f3a95492ec"},
+    {file = "extract_msg-0.39.1-py2.py3-none-any.whl", hash = "sha256:ad35b9260cdcdfdd61b0661d02eec495f0eaaf3ffa5d4cec4eca89da351dc8a7"},
+    {file = "extract_msg-0.39.1.tar.gz", hash = "sha256:bb83d79f13ed2d94380dc7705a4d6a8ba98de6694ccc242fa51afd74f2394d4e"},
 ]
 
 [package.dependencies]
@@ -1071,14 +1071,14 @@ files = [
 
 [[package]]
 name = "ipykernel"
-version = "6.21.1"
+version = "6.21.2"
 description = "IPython Kernel for Jupyter"
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "ipykernel-6.21.1-py3-none-any.whl", hash = "sha256:1a04bb359212e23e46adc0116ec82ea128c1e5bd532fde4fbe679787ff36f0cf"},
-    {file = "ipykernel-6.21.1.tar.gz", hash = "sha256:a0f8eece39cab1ee352c9b59ec67bbe44d8299f8238e4c16ff7f4cf0052d3378"},
+    {file = "ipykernel-6.21.2-py3-none-any.whl", hash = "sha256:430d00549b6aaf49bd0f5393150691edb1815afa62d457ee6b1a66b25cb17874"},
+    {file = "ipykernel-6.21.2.tar.gz", hash = "sha256:6e9213484e4ce1fb14267ee435e18f23cc3a0634e635b9fb4ed4677b84e0fdf8"},
 ]
 
 [package.dependencies]
@@ -1092,7 +1092,7 @@ matplotlib-inline = ">=0.1"
 nest-asyncio = "*"
 packaging = "*"
 psutil = "*"
-pyzmq = ">=17"
+pyzmq = ">=20"
 tornado = ">=6.1"
 traitlets = ">=5.4.0"
 
@@ -1333,14 +1333,14 @@ test = ["click", "coverage", "pre-commit", "pytest (>=6.1.0)", "pytest-asyncio (
 
 [[package]]
 name = "jupyter-server"
-version = "2.2.1"
+version = "2.3.0"
 description = "The backend—i.e. core services, APIs, and REST endpoints—to Jupyter web applications."
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jupyter_server-2.2.1-py3-none-any.whl", hash = "sha256:854fb7d49f6b7f545d4f8354172b004dcda887ba0699def7112daf785ba3c9ce"},
-    {file = "jupyter_server-2.2.1.tar.gz", hash = "sha256:5afb8a0cdfee37d02d69bdf470ae9cbb1dee5d4788f9bc6cc8e54bd8c83fb096"},
+    {file = "jupyter_server-2.3.0-py3-none-any.whl", hash = "sha256:b15078954120886d580e19d1746e2b62a3dc7bd082cb4716115c25fcd7061b00"},
+    {file = "jupyter_server-2.3.0.tar.gz", hash = "sha256:29d6657bfb160b0e39b9030d67f33f918a188f2eba28065314a933b327fef872"},
 ]
 
 [package.dependencies]
@@ -2442,14 +2442,14 @@ six = ">=1.5"
 
 [[package]]
 name = "python-json-logger"
-version = "2.0.4"
+version = "2.0.6"
 description = "A python library adding a json log formatter"
 category = "dev"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.6"
 files = [
-    {file = "python-json-logger-2.0.4.tar.gz", hash = "sha256:764d762175f99fcc4630bd4853b09632acb60a6224acb27ce08cd70f0b1b81bd"},
-    {file = "python_json_logger-2.0.4-py3-none-any.whl", hash = "sha256:3b03487b14eb9e4f77e4fc2a023358b5394b82fd89cecf5586259baed57d8c6f"},
+    {file = "python-json-logger-2.0.6.tar.gz", hash = "sha256:ed33182c2b438a366775c25c1219ebbd5bd7f71694c644d6b3b3861e19565ae3"},
+    {file = "python_json_logger-2.0.6-py3-none-any.whl", hash = "sha256:3af8e5b907b4a5b53cae249205ee3a3d3472bd7ad9ddfaec136eec2f2faf4995"},
 ]
 
 [[package]]
@@ -2906,14 +2906,14 @@ files = [
 
 [[package]]
 name = "soupsieve"
-version = "2.3.2.post1"
+version = "2.4"
 description = "A modern CSS selector implementation for Beautiful Soup."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "soupsieve-2.3.2.post1-py3-none-any.whl", hash = "sha256:3b2503d3c7084a42b1ebd08116e5f81aadfaea95863628c80a3b774a11b7c759"},
-    {file = "soupsieve-2.3.2.post1.tar.gz", hash = "sha256:fc53893b3da2c33de295667a0e19f078c14bf86544af307354de5fcf12a3f30d"},
+    {file = "soupsieve-2.4-py3-none-any.whl", hash = "sha256:49e5368c2cda80ee7e84da9dbe3e110b70a4575f196efb74e51b94549d921955"},
+    {file = "soupsieve-2.4.tar.gz", hash = "sha256:e28dba9ca6c7c00173e34e4ba57448f0688bb681b7c5e8bf4971daafc093d69a"},
 ]
 
 [[package]]
@@ -3234,14 +3234,14 @@ files = [
 
 [[package]]
 name = "types-pyopenssl"
-version = "23.0.0.2"
+version = "23.0.0.3"
 description = "Typing stubs for pyOpenSSL"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-pyOpenSSL-23.0.0.2.tar.gz", hash = "sha256:2e95f9a667d5eeb0af699196f857f7d23d5b4d642437bd37355bc13a87e9f4ae"},
-    {file = "types_pyOpenSSL-23.0.0.2-py3-none-any.whl", hash = "sha256:ea7e5d06f9190a1cb013ad4b13d48896e5cd1e785c04491f38b206d1bc4b8dc1"},
+    {file = "types-pyOpenSSL-23.0.0.3.tar.gz", hash = "sha256:6ca54d593f8b946f9570f9ed7457c41da3b518feff5e344851941a6209bea62b"},
+    {file = "types_pyOpenSSL-23.0.0.3-py3-none-any.whl", hash = "sha256:847ab17a16475a882dc29898648a6a35ad0d3e11a5bba5aa8ab2f3435a8647cb"},
 ]
 
 [package.dependencies]
@@ -3249,26 +3249,26 @@ cryptography = ">=35.0.0"
 
 [[package]]
 name = "types-python-dateutil"
-version = "2.8.19.6"
+version = "2.8.19.7"
 description = "Typing stubs for python-dateutil"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-python-dateutil-2.8.19.6.tar.gz", hash = "sha256:4a6f4cc19ce4ba1a08670871e297bf3802f55d4f129e6aa2443f540b6cf803d2"},
-    {file = "types_python_dateutil-2.8.19.6-py3-none-any.whl", hash = "sha256:cfb7d31021c6bce6f3362c69af6e3abb48fe3e08854f02487e844ff910deec2a"},
+    {file = "types-python-dateutil-2.8.19.7.tar.gz", hash = "sha256:7af5a5d1b80ab1dfa0ba4d879facb382e836a62c2d408c2a509be4680fd8b1c8"},
+    {file = "types_python_dateutil-2.8.19.7-py3-none-any.whl", hash = "sha256:669751e1e6d4f3dbbff471231740e7ecdae2135b604383e477fe31fd56223967"},
 ]
 
 [[package]]
 name = "types-redis"
-version = "4.4.0.6"
+version = "4.5.1.1"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-redis-4.4.0.6.tar.gz", hash = "sha256:57f8b3706afe47ef36496d70a97a3783560e6cb19e157be12985dbb31de1d853"},
-    {file = "types_redis-4.4.0.6-py3-none-any.whl", hash = "sha256:8b40d6bf3a54352d4cb2aa7d01294c572a39d40a9d289b96bdf490b51d3a42d2"},
+    {file = "types-redis-4.5.1.1.tar.gz", hash = "sha256:c072e4824855f46d0a968509c3e0fa4789fc13b62d472064527bad3d1815aeed"},
+    {file = "types_redis-4.5.1.1-py3-none-any.whl", hash = "sha256:081dfeec730df6e3f32ccbdafe3198873b7c02516c22d79cc2a40efdd69a3963"},
 ]
 
 [package.dependencies]
@@ -3277,14 +3277,14 @@ types-pyOpenSSL = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.28.11.12"
+version = "2.28.11.13"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-requests-2.28.11.12.tar.gz", hash = "sha256:fd530aab3fc4f05ee36406af168f0836e6f00f1ee51a0b96b7311f82cb675230"},
-    {file = "types_requests-2.28.11.12-py3-none-any.whl", hash = "sha256:dbc2933635860e553ffc59f5e264264981358baffe6342b925e3eb8261f866ee"},
+    {file = "types-requests-2.28.11.13.tar.gz", hash = "sha256:3fd332842e8759ea5f7eb7789df8aa772ba155216ccf10ef4aa3b0e5b42e1b46"},
+    {file = "types_requests-2.28.11.13-py3-none-any.whl", hash = "sha256:94896f6f8e9f3db11e422c6e3e4abbc5d7ccace853eac74b23bdd65eeee3cdee"},
 ]
 
 [package.dependencies]
@@ -3292,14 +3292,14 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-urllib3"
-version = "1.26.25.5"
+version = "1.26.25.6"
 description = "Typing stubs for urllib3"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-urllib3-1.26.25.5.tar.gz", hash = "sha256:5630e578246d170d91ebe3901788cd28d53c4e044dc2e2488e3b0d55fb6895d8"},
-    {file = "types_urllib3-1.26.25.5-py3-none-any.whl", hash = "sha256:e8f25c8bb85cde658c72ee931e56e7abd28803c26032441eea9ff4a4df2b0c31"},
+    {file = "types-urllib3-1.26.25.6.tar.gz", hash = "sha256:35586727cbd7751acccf2c0f34a88baffc092f435ab62458f10776466590f2d5"},
+    {file = "types_urllib3-1.26.25.6-py3-none-any.whl", hash = "sha256:a6c23c41bd03e542eaee5423a018f833077b51c4bf9ceb5aa544e12b812d5604"},
 ]
 
 [[package]]
@@ -3316,14 +3316,14 @@ files = [
 
 [[package]]
 name = "typing-extensions"
-version = "4.4.0"
+version = "4.5.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typing_extensions-4.4.0-py3-none-any.whl", hash = "sha256:16fa4864408f655d35ec496218b85f79b3437c829e93320c7c9215ccfd92489e"},
-    {file = "typing_extensions-4.4.0.tar.gz", hash = "sha256:1511434bb92bf8dd198c12b1cc812e800d4181cfcb867674e0f8279cc93087aa"},
+    {file = "typing_extensions-4.5.0-py3-none-any.whl", hash = "sha256:fb33085c39dd998ac16d1431ebc293a8b3eedd00fd4a32de0ff79002c19511b4"},
+    {file = "typing_extensions-4.5.0.tar.gz", hash = "sha256:5cb5f4a79139d699607b3ef622a1dedafa84e115ab0024e0d9c044a9479ca7cb"},
 ]
 
 [[package]]
@@ -3644,4 +3644,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "8ef480dbf9545be1937ef88f5bdd7f30d024aa21f662aa0bd9149ab625dd34be"
+content-hash = "374ca863eb5613d1acb0eca148f89c12aab92fa0f92b844a0128ca5f2e94ba19"
