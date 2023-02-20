@@ -36,7 +36,7 @@ class ELFObject(AbstractMISPObjectGenerator):
         """Creates an ELF object, with lief"""
         super().__init__('elf', **kwargs)
         if not HAS_PYDEEP:
-            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
                 self.__elf = lief.ELF.parse(raw=pseudofile.getvalue())
