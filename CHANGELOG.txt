@@ -2,11 +2,43 @@ Changelog
 =========
 
 
+v2.4.168.1 (2023-02-28)
+-----------------------
+
+New
+~~~
+- [doc] added the Jupyter notebook used in a.7-rest-api-extensive-
+  restsearch. [Alexandre Dulaunoy]
+
+Changes
+~~~~~~~
+- Bump templates, again. [Raphaël Vinot]
+- Bump templates. [Raphaël Vinot]
+- Bump deps, templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly handle missing parameter in CSV importer. [Raphaël Vinot]
+
+  Fix #931
+- Undefined variable in event delegation. [Raphaël Vinot]
+- Remove reference to old pydeep. [Raphaël Vinot]
+
+  Fix #914
+
+
 v2.4.168 (2023-01-23)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
