@@ -214,7 +214,8 @@ class EMailObject(AbstractMISPObjectGenerator):
                                        filename=attch.longFilename)
                 cur_attach = message.get_payload()[-1]
                 self._update_content_disp_properties(attch, cur_attach)
-        message.set_boundary(_orig_boundry)  # Set back original boundary
+        if _orig_boundry is not None:
+            message.set_boundary(_orig_boundry)  # Set back original boundary
         return message
 
     @staticmethod
@@ -235,7 +236,7 @@ class EMailObject(AbstractMISPObjectGenerator):
                 pass
 
     @property
-    def attachments(self) -> List[Tuple[str, BytesIO]]:
+    def attachments(self) -> List[Tuple[Optional[str], BytesIO]]:
         to_return = []
         try:
             for attachment in self.email.iter_attachments():
