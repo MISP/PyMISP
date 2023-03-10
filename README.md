@@ -52,7 +52,7 @@ poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport
 ### Running the tests
 
 ```bash
-poetry run nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
+poetry run pytest --cov=pymisp tests/test_*.py
 ```
 
 If you have a MISP instance to test against, you can also run the live ones:
@@ -60,7 +60,7 @@ If you have a MISP instance to test against, you can also run the live ones:
 **Note**: You need to update the key in `tests/testlive_comprehensive.py` to the automation key of your admin account.
 
 ```bash
-poetry run nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py
+poetry run pytest --cov=pymisp tests/testlive_comprehensive.py
 ```
 
 ## Samples and how to use PyMISP
@@ -124,7 +124,7 @@ logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', for
 ```bash
 # From poetry
 
-nosetests-3.4 -s --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py:TestComprehensive.[test_name]
+pytest --cov=pymisp tests/test_*.py tests/testlive_comprehensive.py:TestComprehensive.[test_name]
 
 ```
 

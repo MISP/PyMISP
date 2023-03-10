@@ -367,7 +367,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
 
 class MISPTag(AbstractMISP):
 
-    _fields_for_feed: set = {'name', 'colour', 'relationship_type'}
+    _fields_for_feed: set = {'name', 'colour', 'relationship_type', 'local'}
 
     def __init__(self, **kwargs: Dict):
         super().__init__(**kwargs)
@@ -386,6 +386,8 @@ class MISPTag(AbstractMISP):
             self.relationship_type = ''
         if not hasattr(self, 'colour'):
             self.colour = '#ffffff'
+        if not hasattr(self, 'local'):
+            self.local = False
 
     def _to_feed(self, with_local: bool = True) -> Dict:
         if hasattr(self, 'exportable') and not self.exportable:
