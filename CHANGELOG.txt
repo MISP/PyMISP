@@ -2,11 +2,23 @@ Changelog
 =========
 
 
+v2.4.169.1 (2023-03-14)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Add greynoise-ip object. [Raphaël Vinot]
+
+  Fix #951
+
+
 v2.4.169 (2023-03-10)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump templates. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
