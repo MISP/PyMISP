@@ -1491,7 +1491,7 @@ class PyMISP:
         kw_params = {"context": context}
         if searchall:
             kw_params["searchall"] = searchall
-        r = self._prepare_request('GET', f"galaxy_clusters/index/{galaxy_id}", kw_params=kw_params)
+        r = self._prepare_request('POST', f"galaxy_clusters/index/{galaxy_id}", kw_params=kw_params)
         clusters_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in clusters_j:
             return clusters_j
