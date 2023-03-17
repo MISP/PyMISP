@@ -2,11 +2,35 @@ Changelog
 =========
 
 
+v2.4.169.2 (2023-03-17)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Include event reports by default in feed. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Use proper parameter to trigger the request in search_galaxy_clusters.
+  [Raphaël Vinot]
+- Use POST in search galaxy cluster. [Raphaël Vinot]
+
+Other
+~~~~~
+- Rename include_event_reports kwarg to with_event_reports, in-line with
+  other kwarg naming. [UFOSmuggler]
+- Add kwarg to allow the inclusion of event reports into to_feed(),
+  honour with_distribution and valid_distributions kwargs. [UFOSmuggler]
+
+
 v2.4.169.1 (2023-03-14)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Add greynoise-ip object. [Raphaël Vinot]
 
