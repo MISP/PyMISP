@@ -1091,7 +1091,7 @@ class Event_Metadata():
                     Paragraph("Related Event #" + str(i + OFFSET), self.sample_style_sheet['Heading4']))
                 flowable_table.append(Indenter(left=-INDENT_SIZE_HEADING))
 
-                flowable_table += self.create_reduced_flowable_table_from_event(evt)
+                flowable_table += self.create_reduced_flowable_table_from_event(evt['Event'])
                 i += 1
         else:
             return flowable_table.append(self.value_formatter.get_unoverflowable_paragraph(DEFAULT_VALUE))
