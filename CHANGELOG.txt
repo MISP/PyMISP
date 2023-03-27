@@ -2,11 +2,25 @@ Changelog
 =========
 
 
+v2.4.169.3 (2023-03-27)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Invalid check if taxo is enabled. [Raphaël Vinot]
+
+
 v2.4.169.2 (2023-03-17)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Include event reports by default in feed. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
