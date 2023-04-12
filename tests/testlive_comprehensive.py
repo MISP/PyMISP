@@ -1901,6 +1901,15 @@ class TestComprehensive(unittest.TestCase):
             similar_error = self.user_misp_connector.add_attribute(first, new_similar)
             self.assertEqual(similar_error['errors'][1]['errors']['value'][0], 'A similar attribute already exists for this event.')
 
+            # Test add attribute break_on_duplicate=False
+            time.sleep(5)
+            new_similar = MISPAttribute()
+            new_similar.value = '1.2.3.4'
+            new_similar.type = 'ip-dst'
+            new_similar = self.user_misp_connector.add_attribute(first, new_similar, break_on_duplicate=False)
+            self.assertTrue(isinstance(new_similar, MISPAttribute), new_similar)
+            self.assertGreater(new_similar.timestamp, new_attribute.timestamp)
+
             # Test add multiple attributes at once
             attr0 = MISPAttribute()
             attr0.value = '0.0.0.0'
