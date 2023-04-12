@@ -2,11 +2,27 @@ Changelog
 =========
 
 
+v2.4.170 (2023-04-12)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Other
+~~~~~
+- Add: support breakOnDuplicate option for attributes:add() [Luciano
+  Righetti]
+- Update reportlab_generator.py. [CarlosLoureiro]
+
+
 v2.4.169.3 (2023-03-27)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 
