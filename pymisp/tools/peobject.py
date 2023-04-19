@@ -13,7 +13,7 @@ from base64 import b64encode
 
 from . import FileObject
 
-import lief  # type: ignore
+import lief
 
 try:
     import pydeep  # type: ignore
@@ -24,7 +24,7 @@ except ImportError:
 logger = logging.getLogger('pymisp')
 
 
-def make_pe_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
+def make_pe_objects(lief_parsed: lief.PE.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
     pe_object = PEObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(pe_object.uuid, 'includes', 'PE indicators')
     pe_sections = []
@@ -42,7 +42,7 @@ class PEObject(AbstractMISPObjectGenerator):
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                self.__pe = lief.PE.parse(raw=pseudofile.getvalue())
+                self.__pe = lief.PE.parse(io=pseudofile)
             elif isinstance(pseudofile, bytes):
                 self.__pe = lief.PE.parse(raw=pseudofile)
             else:

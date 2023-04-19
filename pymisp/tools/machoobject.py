@@ -10,7 +10,7 @@ from typing import Optional, Union
 from pathlib import Path
 from . import FileObject
 
-import lief  # type: ignore
+import lief
 
 try:
     import pydeep  # type: ignore
@@ -21,7 +21,7 @@ except ImportError:
 logger = logging.getLogger('pymisp')
 
 
-def make_macho_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
+def make_macho_objects(lief_parsed: lief.MachO.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
     macho_object = MachOObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(macho_object.uuid, 'includes', 'MachO indicators')
     macho_sections = []
@@ -39,7 +39,7 @@ class MachOObject(AbstractMISPObjectGenerator):
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                self.__macho = lief.MachO.parse(raw=pseudofile.getvalue())
+                self.__macho = lief.MachO.parse(io=pseudofile)
             elif isinstance(pseudofile, bytes):
                 self.__macho = lief.MachO.parse(raw=pseudofile)
             else:

@@ -10,7 +10,7 @@ from typing import Union, Optional
 from pathlib import Path
 from . import FileObject
 
-import lief  # type: ignore
+import lief
 
 try:
     import pydeep  # type: ignore
@@ -21,7 +21,7 @@ except ImportError:
 logger = logging.getLogger('pymisp')
 
 
-def make_elf_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
+def make_elf_objects(lief_parsed: lief.ELF.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
     elf_object = ELFObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(elf_object.uuid, 'includes', 'ELF indicators')
     elf_sections = []
@@ -32,14 +32,14 @@ def make_elf_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone
 
 class ELFObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: Optional[lief.ELF.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[Union[BytesIO, bytes]] = None, **kwargs):
+    def __init__(self, parsed: Optional[lief.ELF.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, **kwargs):
         """Creates an ELF object, with lief"""
         super().__init__('elf', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                self.__elf = lief.ELF.parse(raw=pseudofile.getvalue())
+                self.__elf = lief.ELF.parse(io=pseudofile)
             elif isinstance(pseudofile, bytes):
                 self.__elf = lief.ELF.parse(raw=pseudofile)
             else:
