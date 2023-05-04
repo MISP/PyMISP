@@ -2,11 +2,36 @@ Changelog
 =========
 
 
+v2.4.170.2 (2023-05-04)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+
+v2.4.170.1 (2023-04-19)
+-----------------------
+
+Changes
+~~~~~~~
+- Disable fail fast in GHA. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Update lief code to v0.13. [Raphaël Vinot]
+
+
 v2.4.170 (2023-04-12)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 
