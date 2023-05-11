@@ -643,13 +643,17 @@ class PyMISP:
         ref.from_dict(**object_reference)
         return ref
 
-    def delete_object_reference(self, object_reference: Union[MISPObjectReference, int, str, UUID]) -> Dict:
-        """Delete a reference to an object
-
-        :param object_reference: object reference
-        """
+    def delete_object_reference(
+        self,
+        object_reference: Union[MISPObjectReference, int, str, UUID],
+        hard: bool = False,
+    ) -> Dict:
+        """Delete a reference to an object."""
         object_reference_id = get_uuid_or_id_from_abstract_misp(object_reference)
-        response = self._prepare_request('POST', f'objectReferences/delete/{object_reference_id}')
+        query_url = f"objectReferences/delete/{object_reference_id}"
+        if hard:
+            query_url += "/true"
+        response = self._prepare_request("POST", query_url)
         return self._check_json_response(response)
 
     # Object templates
@@ -1446,7 +1450,11 @@ class PyMISP:
 
     # ## BEGIN Galaxy ###
 
-    def galaxies(self, pythonify: bool = False) -> Union[Dict, List[MISPGalaxy]]:
+    def galaxies(
+        self,
+        withCluster: bool = False,
+        pythonify: bool = False,
+    ) -> Union[Dict, List[MISPGalaxy]]:
         """Get all the galaxies: https://www.misp-project.org/openapi/#tag/Galaxies/operation/getGalaxies
 
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
@@ -1458,7 +1466,25 @@ class PyMISP:
         to_return = []
         for galaxy in galaxies:
             g = MISPGalaxy()
-            g.from_dict(**galaxy)
+            g.from_dict(**galaxy, withCluster=withCluster)
+            to_return.append(g)
+        return to_return
+
+    def search_galaxy(
+        self,
+        value: str,
+        withCluster: bool = False,
+        pythonify: bool = False,
+    ) -> Union[Dict, List[MISPGalaxy]]:
+        """Text search to find a matching galaxy name, namespace, description, or uuid."""
+        r = self._prepare_request("POST", "galaxies", data={"value": value})
+        galaxies = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or "errors" in galaxies:
+            return galaxies
+        to_return = []
+        for galaxy in galaxies:
+            g = MISPGalaxy()
+            g.from_dict(**galaxy, withCluster=withCluster)
             to_return.append(g)
         return to_return
 
@@ -2475,6 +2501,7 @@ class PyMISP:
                category: Optional[SearchParameterTypes] = None,
                org: Optional[SearchParameterTypes] = None,
                tags: Optional[SearchParameterTypes] = None,
+               event_tags: Optional[SearchParameterTypes] = None,
                quick_filter: Optional[str] = None, quickFilter: Optional[str] = None,
                date_from: Optional[Union[datetime, date, int, str, float, None]] = None,
                date_to: Optional[Union[datetime, date, int, str, float, None]] = None,
@@ -2532,6 +2559,7 @@ class PyMISP:
         :param category: The attribute category, any valid MISP attribute category is accepted.
         :param org: Search by the creator organisation by supplying the organisation identifier.
         :param tags: Tags to search or to exclude. You can pass a list, or the output of `build_complex_query`
+        :param event_tags: Tags to search or to exclude at the event level. You can pass a list, or the output of `build_complex_query`
         :param quick_filter: The string passed to this field will ignore all of the other arguments. MISP will return an xml / json (depending on the header sent) of all events that have a sub-string match on value in the event info, event orgc, or any of the attribute value1 / value2 fields, or in the attribute comment.
         :param date_from: Events with the date set to a date after the one specified. This filter will use the date of the event.
         :param date_to: Events with the date set to a date before the one specified. This filter will use the date of the event.
@@ -2619,6 +2647,7 @@ class PyMISP:
         query['category'] = category
         query['org'] = org
         query['tags'] = tags
+        query['event_tags'] = event_tags
         query['quickFilter'] = quick_filter
         query['from'] = self._make_timestamp(date_from)
         query['to'] = self._make_timestamp(date_to)
