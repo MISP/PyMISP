@@ -2574,7 +2574,8 @@ class PyMISP:
 
         '''
 
-        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix-xml', 'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings']
+        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix-xml',
+                          'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings', 'context', 'context-markdown']
 
         if controller not in ['events', 'attributes', 'objects']:
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
