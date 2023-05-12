@@ -37,21 +37,23 @@ def make_binary_objects(filepath: Optional[str] = None, pseudofile: Optional[Byt
     if HAS_LIEF and (filepath or (pseudofile and filename)):
         if filepath:
             lief_parsed = lief.parse(filepath=filepath)
+            print(lief_parsed)
         elif pseudofile and filename:
             lief_parsed = lief.parse(raw=pseudofile.getvalue(), name=filename)
-            if isinstance(lief_parsed, lief.lief_errors):
-                logger.warning('Got an error parsing the file: {lief_parsed}')
-            elif isinstance(lief_parsed, lief.PE.Binary):
-                return make_pe_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
-            elif isinstance(lief_parsed, lief.ELF.Binary):
-                return make_elf_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
-            elif isinstance(lief_parsed, lief.MachO.Binary):
-                return make_macho_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
-            else:
-                logger.critical(f'Unexpected type from lief: {type(lief_parsed)}')
         else:
             logger.critical('You need either a filepath, or a pseudofile and a filename.')
             lief_parsed = None
+
+        if isinstance(lief_parsed, lief.lief_errors):
+            logger.warning('Got an error parsing the file: {lief_parsed}')
+        elif isinstance(lief_parsed, lief.PE.Binary):
+            return make_pe_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
+        elif isinstance(lief_parsed, lief.ELF.Binary):
+            return make_elf_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
+        elif isinstance(lief_parsed, lief.MachO.Binary):
+            return make_macho_objects(lief_parsed, misp_file, standalone, default_attributes_parameters)
+        else:
+            logger.critical(f'Unexpected type from lief: {type(lief_parsed)}')
     if not HAS_LIEF:
         logger.warning('Please install lief, documentation here: https://github.com/lief-project/LIEF')
     return misp_file, None, []
