@@ -2,13 +2,19 @@ Changelog
 =========
 
 
-v2.4.171 (2023-05-11)
+v2.4.171 (2023-05-12)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Remove old setup files, bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly use lief on a file. [Raphaël Vinot]
 
 Other
 ~~~~~
