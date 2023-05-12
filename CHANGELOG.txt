@@ -7,6 +7,7 @@ v2.4.171 (2023-05-12)
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
@@ -14,6 +15,7 @@ Changes
 
 Fix
 ~~~
+- Extra print breaking the CI on MISP side. [Raphaël Vinot]
 - Properly use lief on a file. [Raphaël Vinot]
 
 Other
