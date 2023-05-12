@@ -37,7 +37,6 @@ def make_binary_objects(filepath: Optional[str] = None, pseudofile: Optional[Byt
     if HAS_LIEF and (filepath or (pseudofile and filename)):
         if filepath:
             lief_parsed = lief.parse(filepath=filepath)
-            print(lief_parsed)
         elif pseudofile and filename:
             lief_parsed = lief.parse(raw=pseudofile.getvalue(), name=filename)
         else:
