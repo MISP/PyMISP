@@ -1596,6 +1596,47 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
+    def test_add_event_with_attachment_object_controller__hard(self):
+        first = self.create_simple_event()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            fo, peo, seos = make_binary_objects('tests/viper-test-files/test_files/whoami.exe')
+            for s in seos:
+                r = self.user_misp_connector.add_object(first, s)
+                self.assertEqual(r.name, 'pe-section', r)
+
+            r = self.user_misp_connector.add_object(first, peo, pythonify=True)
+            self.assertEqual(r.name, 'pe', r)
+            for ref in peo.ObjectReference:
+                r = self.user_misp_connector.add_object_reference(ref)
+                self.assertEqual(r.object_uuid, peo.uuid, r.to_json())
+
+            r = self.user_misp_connector.add_object(first, fo)
+            obj_attrs = r.get_attributes_by_relation('ssdeep')
+            self.assertEqual(len(obj_attrs), 1, obj_attrs)
+            self.assertEqual(r.name, 'file', r)
+
+            # Test break_on_duplicate at object level
+            fo_dup, peo_dup, _ = make_binary_objects('tests/viper-test-files/test_files/whoami.exe')
+            r = self.user_misp_connector.add_object(first, peo_dup, break_on_duplicate=True)
+            self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
+
+            # Test break on duplicate with breakOnDuplicate key in object
+            fo_dup.breakOnDuplicate = True
+            r = self.user_misp_connector.add_object(first, fo_dup)
+            self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
+
+            # Test refs
+            r = self.user_misp_connector.add_object_reference(fo.ObjectReference[0])
+            self.assertEqual(r.object_uuid, fo.uuid, r.to_json())
+            self.assertEqual(r.referenced_uuid, peo.uuid, r.to_json())
+            r = self.user_misp_connector.delete_object_reference(r, hard=True)
+            self.assertEqual(r['message'], 'ObjectReference deleted')
+            # TODO: verify that the reference is not soft-deleted instead
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+
     def test_lief_and_sign(self):
         first = self.create_simple_event()
         try:
@@ -3007,6 +3048,13 @@ class TestComprehensive(unittest.TestCase):
         finally:
             self.user_misp_connector.delete_event(event)
             self.user_misp_connector.delete_event_report(new_event_report)
+
+    def test_search_galaxy(self):
+        self.admin_misp_connector.toggle_global_pythonify()
+        galaxy = self.admin_misp_connector.galaxies()[0]
+        ret = self.admin_misp_connector.search_galaxy(value=galaxy.name)
+        self.assertEqual(len(ret), 1)
+        self.admin_misp_connector.toggle_global_pythonify()
 
     def test_galaxy_cluster(self):
         self.admin_misp_connector.toggle_global_pythonify()
