@@ -16,7 +16,7 @@ outputdir = 'output'
 # you can use on the event index, such as organisation, tags, etc.
 # It uses the same joining and condition rules as the API parameters
 # For example:
-# filters = {'tag':'tlp:white|feed-export|!privint','org':'CIRCL', 'published':1}
+# filters = {'tags':['tlp:white','feed-export','!privint'],'org':'CIRCL', 'published':1}
 # the above would generate a feed for all published events created by CIRCL,
 # tagged tlp:white and/or feed-export but exclude anything tagged privint
 filters = {'published':'true'}
