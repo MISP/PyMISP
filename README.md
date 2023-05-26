@@ -46,7 +46,7 @@ pip3 install pymisp[virustotal,email]
 ```
 git clone https://github.com/MISP/PyMISP.git && cd PyMISP
 git submodule update --init
-poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport
+poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport -E email
 ```
 
 ### Running the tests

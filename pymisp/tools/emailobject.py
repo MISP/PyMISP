@@ -11,8 +11,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Union, List, Tuple, Dict, cast, Any, Optional
 
-from extract_msg import openMsg  # type: ignore
-from extract_msg.message import Message as MsgObj  # type: ignore
+from extract_msg import openMsg, MessageBase
 from RTFDE.exceptions import MalformedEncapsulatedRtf, NotEncapsulatedRtf  # type: ignore
 from RTFDE.deencapsulate import DeEncapsulator  # type: ignore
 from oletools.common.codepages import codepage2codec  # type: ignore
@@ -94,13 +93,14 @@ class EMailObject(AbstractMISPObjectGenerator):
 
     def _msg_to_eml(self, msg_bytes: bytes) -> EmailMessage:
         """Converts a msg into an eml."""
-        msg_obj = openMsg(msg_bytes)
+        # NOTE: openMsg returns a MessageBase, not a MSGFile
+        msg_obj: MessageBase = openMsg(msg_bytes)  # type: ignore
         # msg obj stores the original raw header here
         message, body, attachments = self._extract_msg_objects(msg_obj)
         eml = self._build_eml(message, body, attachments)
         return eml
 
-    def _extract_msg_objects(self, msg_obj: MsgObj) -> Tuple[EmailMessage, Dict, List[Any]]:
+    def _extract_msg_objects(self, msg_obj: MessageBase) -> Tuple[EmailMessage, Dict, List[Any]]:
         """Extracts email objects needed to construct an eml from a msg."""
         message: EmailMessage = email.message_from_string(msg_obj.header.as_string(), policy=policy.default)  # type: ignore
         body = {}
