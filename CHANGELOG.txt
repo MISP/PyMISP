@@ -2,11 +2,45 @@ Changelog
 =========
 
 
+v2.4.172 (2023-06-08)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] Bumped latest version with updated templates.
+  [Christian Studer]
+- Bump deps. [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps-dev): bump jupyterlab from 3.6.3 to 4.0.0.
+  [dependabot[bot]]
+
+  Bumps [jupyterlab](https://github.com/jupyterlab/jupyterlab) from 3.6.3 to 4.0.0.
+  - [Release notes](https://github.com/jupyterlab/jupyterlab/releases)
+  - [Changelog](https://github.com/jupyterlab/jupyterlab/blob/master/CHANGELOG.md)
+  - [Commits](https://github.com/jupyterlab/jupyterlab/compare/@jupyterlab/vdom@3.6.3...@jupyterlab/lsp@4.0.0)
+
+  ---
+  updated-dependencies:
+  - dependency-name: jupyterlab
+    dependency-type: direct:development
+    update-type: version-update:semver-major
+  ...
+- Update settings.default.py - tags not tag. [Alexandre Dulaunoy]
+
+  tags is now an array
+
+
 v2.4.171 (2023-05-16)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, object templates. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
