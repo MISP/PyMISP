@@ -7,12 +7,17 @@ v2.4.172 (2023-06-08)
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - [misp-objects] Bumped latest version with updated templates.
   [Christian Studer]
 - Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly bump version. [Raphaël Vinot]
 
 Other
 ~~~~~
