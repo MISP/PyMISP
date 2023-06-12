@@ -875,25 +875,25 @@ tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
 name = "extract-msg"
-version = "0.41.2"
+version = "0.41.5"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "extract_msg-0.41.2-py2.py3-none-any.whl", hash = "sha256:a4ef65695ae8d795c85d68d274e199749fcdceb9395fccc3a47071ef8cb02e1b"},
-    {file = "extract_msg-0.41.2.tar.gz", hash = "sha256:ef3b23e22373ed3b1f5ca6b23c1f80d7fe4af42cc015152ebd7e0734ccaa08ee"},
+    {file = "extract_msg-0.41.5-py2.py3-none-any.whl", hash = "sha256:ad70dcdab3701b0fae554168c9642ad4ebef7f2ec283313c55e895a6518911e5"},
+    {file = "extract_msg-0.41.5.tar.gz", hash = "sha256:99d4fdc0c0912c836370bf9fbb6e77558bb978499c1b5fdd31634684e323885c"},
 ]
 
 [package.dependencies]
 beautifulsoup4 = ">=4.11.1,<4.13"
 chardet = ">=4.0.0,<6"
-compressed-rtf = "1.0.6"
-ebcdic = "1.1.1"
+compressed-rtf = ">=1.0.6,<2"
+ebcdic = ">=1.1.1,<2"
 imapclient = ">=2.3.0,<3"
 olefile = "0.46"
 red-black-tree-mod = "1.20"
 RTFDE = "0.0.2"
-tzlocal = "4.2"
+tzlocal = ">=4.2,<6"
 
 [package.extras]
 all = ["extract-msg[mime]"]
@@ -2498,6 +2498,7 @@ optional = true
 python-versions = ">=3.7,<4"
 files = [
     {file = "reportlab-4.0.4-py3-none-any.whl", hash = "sha256:3dcda79ce04baf70721e2ec54854722644262cac2feec3d5c4c5e77015504cb0"},
+    {file = "reportlab-4.0.4.tar.gz", hash = "sha256:7f70b3b56aff5f11cb4136c51a0f5a56fe6e4c8fbbac7b903076db99a8ef31c1"},
 ]
 
 [package.dependencies]
