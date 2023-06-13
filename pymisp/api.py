@@ -450,7 +450,7 @@ class PyMISP:
         :param event: event to unpublish
         """
         event_id = get_uuid_or_id_from_abstract_misp(event)
-        response = self._prepare_request('POST', f'events/publish/{event_id}')
+        response = self._prepare_request('POST', f'events/unpublish/{event_id}')
         return self._check_json_response(response)
 
     def contact_event_reporter(self, event: Union[MISPEvent, int, str, UUID], message: str) -> Dict:
