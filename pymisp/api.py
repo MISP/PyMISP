@@ -3704,6 +3704,9 @@ class PyMISP:
         if url[0] == '/':
             # strip it: it will fail if MISP is in a sub directory
             url = url[1:]
+        # Cake PHP being an idiot, it doesn't accepts %20 (space) in the URL path,
+        # so we need to make it a + instead and hope for the best
+        url = url.replace(' ', '+')
         url = urljoin(self.root_url, url)
         if data == {} or isinstance(data, bytes):
             d = data
@@ -3721,6 +3724,7 @@ class PyMISP:
             # CakePHP params in URL
             to_append_url = '/'.join([f'{k}:{v}' for k, v in kw_params.items()])
             url = f'{url}/{to_append_url}'
+
         req = requests.Request(request_type, url, data=d, params=params)
         user_agent = f'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
         if self.tool:
