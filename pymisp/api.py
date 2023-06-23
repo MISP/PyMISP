@@ -414,7 +414,7 @@ class PyMISP:
             eid = get_uuid_or_id_from_abstract_misp(event)
         else:
             eid = get_uuid_or_id_from_abstract_misp(event_id)
-        r = self._prepare_request('POST', f'events/edit/{eid}' + ('/metadata:1' if metadata else ''), data=event)
+        r = self._prepare_request('PUT', f'events/edit/{eid}' + ('/metadata:1' if metadata else ''), data=event)
         updated_event = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_event:
             return updated_event
@@ -428,7 +428,7 @@ class PyMISP:
         :param event: event to delete
         """
         event_id = get_uuid_or_id_from_abstract_misp(event)
-        response = self._prepare_request('POST', f'events/delete/{event_id}')
+        response = self._prepare_request('DELETE', f'events/delete/{event_id}')
         return self._check_json_response(response)
 
     def publish(self, event: Union[MISPEvent, int, str, UUID], alert: bool = False) -> Dict:
@@ -626,7 +626,7 @@ class PyMISP:
         data = {}
         if hard:
             data['hard'] = 1
-        r = self._prepare_request('POST', f'objects/delete/{object_id}', data=data)
+        r = self._prepare_request('DELETE', f'objects/delete/{object_id}', data=data)
         return self._check_json_response(r)
 
     def add_object_reference(self, misp_object_reference: MISPObjectReference, pythonify: bool = False) -> Union[Dict, MISPObjectReference]:
@@ -803,7 +803,7 @@ class PyMISP:
             aid = get_uuid_or_id_from_abstract_misp(attribute)
         else:
             aid = get_uuid_or_id_from_abstract_misp(attribute_id)
-        r = self._prepare_request('POST', f'attributes/edit/{aid}', data=attribute)
+        r = self._prepare_request('PUT', f'attributes/edit/{aid}', data=attribute)
         updated_attribute = self._check_json_response(r)
         if 'errors' in updated_attribute:
             if (updated_attribute['errors'][0] == 403
@@ -827,7 +827,7 @@ class PyMISP:
         data = {}
         if hard:
             data['hard'] = 1
-        r = self._prepare_request('POST', f'attributes/delete/{attribute_id}', data=data)
+        r = self._prepare_request('DELETE', f'attributes/delete/{attribute_id}', data=data)
         response = self._check_json_response(r)
         if ('errors' in response and response['errors'][0] == 403
                 and response['errors'][1]['message'] == 'You do not have permission to do that.'):
@@ -917,7 +917,7 @@ class PyMISP:
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
         initial_attribute_id = get_uuid_or_id_from_abstract_misp(initial_attribute)
-        r = self._prepare_request('POST', f'shadowAttributes/edit/{initial_attribute_id}', data=attribute)
+        r = self._prepare_request('PUT', f'shadowAttributes/edit/{initial_attribute_id}', data=attribute)
         update_attribute_proposal = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in update_attribute_proposal:
             return update_attribute_proposal
@@ -1583,7 +1583,7 @@ class PyMISP:
             # We can't edit default galaxies
             raise PyMISPError('You are not able to update a default galaxy cluster')
         cluster_id = get_uuid_or_id_from_abstract_misp(galaxy_cluster)
-        r = self._prepare_request('POST', f'galaxy_clusters/edit/{cluster_id}', data=galaxy_cluster)
+        r = self._prepare_request('PUT', f'galaxy_clusters/edit/{cluster_id}', data=galaxy_cluster)
         cluster_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
             return cluster_j
@@ -1795,7 +1795,7 @@ class PyMISP:
         else:
             fid = get_uuid_or_id_from_abstract_misp(feed_id)
         # FIXME: https://github.com/MISP/MISP/issues/4834
-        r = self._prepare_request('POST', f'feeds/edit/{fid}', data={'Feed': feed})
+        r = self._prepare_request('PUT', f'feeds/edit/{fid}', data={'Feed': feed})
         updated_feed = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_feed:
             return updated_feed
@@ -1928,7 +1928,7 @@ class PyMISP:
             sid = get_uuid_or_id_from_abstract_misp(server)
         else:
             sid = get_uuid_or_id_from_abstract_misp(server_id)
-        r = self._prepare_request('POST', f'servers/edit/{sid}', data=server)
+        r = self._prepare_request('PUT', f'servers/edit/{sid}', data=server)
         updated_server = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_server:
             return updated_server
@@ -2069,7 +2069,7 @@ class PyMISP:
         :param sharing_group: sharing group to delete
         """
         sharing_group_id = get_uuid_or_id_from_abstract_misp(sharing_group)
-        response = self._prepare_request('POST', f'sharingGroups/delete/{sharing_group_id}')
+        response = self._prepare_request('DELETE', f'sharingGroups/delete/{sharing_group_id}')
         return self._check_json_response(response)
 
     def add_org_to_sharing_group(self, sharing_group: Union[MISPSharingGroup, int, str, UUID],
@@ -2201,7 +2201,7 @@ class PyMISP:
             oid = get_uuid_or_id_from_abstract_misp(organisation)
         else:
             oid = get_uuid_or_id_from_abstract_misp(organisation_id)
-        r = self._prepare_request('POST', f'admin/organisations/edit/{oid}', data=organisation)
+        r = self._prepare_request('PUT', f'admin/organisations/edit/{oid}', data=organisation)
         updated_organisation = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_organisation:
             return updated_organisation
@@ -2216,7 +2216,7 @@ class PyMISP:
         """
         # NOTE: MISP in inconsistent and currently require "delete" in the path and doesn't support HTTP DELETE
         organisation_id = get_uuid_or_id_from_abstract_misp(organisation)
-        response = self._prepare_request('POST', f'admin/organisations/delete/{organisation_id}')
+        response = self._prepare_request('DELETE', f'admin/organisations/delete/{organisation_id}')
         return self._check_json_response(response)
 
     # ## END Organisation ###
@@ -2315,7 +2315,7 @@ class PyMISP:
         url = f'users/edit/{uid}'
         if self._current_role.perm_admin or self._current_role.perm_site_admin:
             url = f'admin/{url}'
-        r = self._prepare_request('POST', url, data=user)
+        r = self._prepare_request('PUT', url, data=user)
         updated_user = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_user:
             return updated_user
@@ -2330,7 +2330,7 @@ class PyMISP:
         """
         # NOTE: MISP in inconsistent and currently require "delete" in the path and doesn't support HTTP DELETE
         user_id = get_uuid_or_id_from_abstract_misp(user)
-        response = self._prepare_request('POST', f'admin/users/delete/{user_id}')
+        response = self._prepare_request('DELETE', f'admin/users/delete/{user_id}')
         return self._check_json_response(response)
 
     def change_user_password(self, new_password: str) -> Dict:
@@ -3350,7 +3350,7 @@ class PyMISP:
         query: Dict[str, Any] = {'setting': user_setting}
         if user:
             query['user_id'] = get_uuid_or_id_from_abstract_misp(user)
-        response = self._prepare_request('POST', 'userSettings/delete', data=query)
+        response = self._prepare_request('DELETE', 'userSettings/delete', data=query)
         return self._check_json_response(response)
 
     # ## END User Settings ###
