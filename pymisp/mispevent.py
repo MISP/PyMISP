@@ -1721,6 +1721,13 @@ class MISPEvent(AbstractMISP):
     def galaxies(self) -> List[MISPGalaxy]:
         return self.Galaxy
 
+    @galaxies.setter
+    def galaxies(self, galaxies: List[MISPGalaxy]):
+        if all(isinstance(x, MISPGalaxy) for x in galaxies):
+            self.Galaxy = galaxies
+        else:
+            raise PyMISPError('All the attributes have to be of type MISPGalaxy.')
+
     @property
     def objects(self) -> List[MISPObject]:
         return self.Object
