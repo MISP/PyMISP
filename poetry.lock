@@ -2054,13 +2054,13 @@ files = [
 
 [[package]]
 name = "publicsuffixlist"
-version = "0.10.0.20230608"
+version = "0.10.0.20230702"
 description = "publicsuffixlist implement"
 optional = true
 python-versions = ">=2.6"
 files = [
-    {file = "publicsuffixlist-0.10.0.20230608-py2.py3-none-any.whl", hash = "sha256:4b641e8367a45443165cf56fdab405faa67ca7a21bbe3e0449e1f2ed4f744836"},
-    {file = "publicsuffixlist-0.10.0.20230608.tar.gz", hash = "sha256:84cb4e189317d151aab86c50517fca48800b4f46ce459681132a194832cb0657"},
+    {file = "publicsuffixlist-0.10.0.20230702-py2.py3-none-any.whl", hash = "sha256:f5e3860ce6c92bcb8ede95f33f2b1f55f2de101a29d6c6ca50ac4f397374935b"},
+    {file = "publicsuffixlist-0.10.0.20230702.tar.gz", hash = "sha256:3a6a5e9dd1f9ea706888d5614167fa1567e25284d5d32ce51323cea3e8390d28"},
 ]
 
 [package.extras]
@@ -2498,6 +2498,7 @@ optional = true
 python-versions = ">=3.7,<4"
 files = [
     {file = "reportlab-4.0.4-py3-none-any.whl", hash = "sha256:3dcda79ce04baf70721e2ec54854722644262cac2feec3d5c4c5e77015504cb0"},
+    {file = "reportlab-4.0.4.tar.gz", hash = "sha256:7f70b3b56aff5f11cb4136c51a0f5a56fe6e4c8fbbac7b903076db99a8ef31c1"},
 ]
 
 [package.dependencies]
