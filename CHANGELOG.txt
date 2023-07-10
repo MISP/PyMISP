@@ -2,6 +2,32 @@ Changelog
 =========
 
 
+v2.4.173 (2023-07-10)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Maybe fixing a CakePHP issue. [Raphaël Vinot]
+
+  Maybe fixing #1014
+- Use proper endpoint to unpublish event. [Raphaël Vinot]
+
+  Fix #1012
+
+Other
+~~~~~
+- Feat: introduce setter for galaxies. [Sura De Silva]
+
+
 v2.4.172 (2023-06-08)
 ---------------------
 
@@ -17,6 +43,7 @@ Changes
 
 Fix
 ~~~
+- Proper changelog bump. [Raphaël Vinot]
 - Properly bump version. [Raphaël Vinot]
 
 Other
