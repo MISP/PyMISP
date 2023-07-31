@@ -2,11 +2,29 @@ Changelog
 =========
 
 
+v2.4.174 (2023-07-31)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version, templates. [Raphaël Vinot]
+- Bump deps, fix code accordingly. [Raphaël Vinot]
+
+Fix
+~~~
+- Push code changes related to deps upgrade... [Raphaël Vinot]
+
+Other
+~~~~~
+- Git: Bump deps. [Raphaël Vinot]
+
+
 v2.4.173 (2023-07-10)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
