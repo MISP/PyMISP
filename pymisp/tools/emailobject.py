@@ -11,7 +11,9 @@ from io import BytesIO
 from pathlib import Path
 from typing import Union, List, Tuple, Dict, cast, Any, Optional
 
-from extract_msg import openMsg, MessageBase
+from extract_msg import openMsg
+from extract_msg.msg_classes import MessageBase
+from extract_msg.properties import FixedLengthProp
 from RTFDE.exceptions import MalformedEncapsulatedRtf, NotEncapsulatedRtf  # type: ignore
 from RTFDE.deencapsulate import DeEncapsulator  # type: ignore
 from oletools.common.codepages import codepage2codec  # type: ignore
@@ -111,8 +113,11 @@ class EMailObject(AbstractMISPObjectGenerator):
                             "cte": "base64"}
         if msg_obj.htmlBody is not None:
             try:
-                _html_encoding_raw = msg_obj.props['3FDE0003'].value
-                _html_encoding = codepage2codec(_html_encoding_raw)
+                if isinstance(msg_obj.props['3FDE0003'], FixedLengthProp):
+                    _html_encoding_raw = msg_obj.props['3FDE0003'].value
+                    _html_encoding = codepage2codec(_html_encoding_raw)
+                else:
+                    _html_encoding = msg_obj.stringEncoding
             except KeyError:
                 _html_encoding = msg_obj.stringEncoding
             body['html'] = {'obj': msg_obj.htmlBody.decode(),
