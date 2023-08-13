@@ -860,13 +860,13 @@ tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
 name = "extract-msg"
-version = "0.44.0"
+version = "0.45.0"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "extract_msg-0.44.0-py2.py3-none-any.whl", hash = "sha256:06db4f31f900c99984fa910341961e137aa2fcb06d470583fbac4a48cd80edca"},
-    {file = "extract_msg-0.44.0.tar.gz", hash = "sha256:6f51ca87ffdbc2c8d28589d7221bfb8710e6af164037a3ee574bef35f4470397"},
+    {file = "extract_msg-0.45.0-py2.py3-none-any.whl", hash = "sha256:af645ffe1534bce93b20390576dac2aee027c17a714365172d31b3894f810ca7"},
+    {file = "extract_msg-0.45.0.tar.gz", hash = "sha256:6814865cf2ba806bd69af53af688a13e000a95d4991cce6a0416b3bdeb739496"},
 ]
 
 [package.dependencies]
@@ -1368,13 +1368,13 @@ test = ["coverage", "jupyter-server (>=2.0.0)", "pytest (>=7.0)", "pytest-cov", 
 
 [[package]]
 name = "jupyterlab"
-version = "4.0.4"
+version = "4.0.5"
 description = "JupyterLab computational environment"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jupyterlab-4.0.4-py3-none-any.whl", hash = "sha256:23eef35d22be8f2ad9b873ec41ceb2e8c3b0dc8ae740c0f973e2de09e587530f"},
-    {file = "jupyterlab-4.0.4.tar.gz", hash = "sha256:049449a56d93202ed204e0e86f96f5a3447a08cfc09fb012fd239e178651cb34"},
+    {file = "jupyterlab-4.0.5-py3-none-any.whl", hash = "sha256:13b3a326e7b95d72746fe20dbe80ee1e71165d6905e01ceaf1320eb809cb1b47"},
+    {file = "jupyterlab-4.0.5.tar.gz", hash = "sha256:de49deb75f9b9aec478ed04754cbefe9c5d22fd796a5783cdc65e212983d3611"},
 ]
 
 [package.dependencies]
@@ -3367,4 +3367,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "2cf61b394da4b1a38ba439d7d1b9b2c99b09280b1ae2cd2d7df69bade76620d5"
+content-hash = "bf60060f2934f472abf5549a70d5a819fc4eb60065bcf0dc645782ac83dd6ed7"
