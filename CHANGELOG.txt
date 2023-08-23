@@ -2,11 +2,31 @@ Changelog
 =========
 
 
+v2.4.175 (2023-08-23)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps, readthedocs config. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Update Sharing group info from full object. [Raphaël Vinot]
+
+  Fix #1049
+- Changes in msg-extract strip a character. [Raphaël Vinot]
+
+
 v2.4.174 (2023-07-31)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version, templates. [Raphaël Vinot]
 - Bump deps, fix code accordingly. [Raphaël Vinot]
 
