@@ -2046,6 +2046,7 @@ class PyMISP:
             sid = get_uuid_or_id_from_abstract_misp(sharing_group)
         else:
             sid = get_uuid_or_id_from_abstract_misp(sharing_group_id)
+        sharing_group.pop('modified', None)  # Quick fix for https://github.com/MISP/PyMISP/issues/1049 - remove when fixed in MISP.
         r = self._prepare_request('POST', f'sharing_groups/edit/{sid}', data=sharing_group)
         updated_sharing_group = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_sharing_group:
