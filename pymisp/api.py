@@ -3699,8 +3699,9 @@ class PyMISP:
     def __repr__(self):
         return f'<{self.__class__.__name__}(url={self.root_url})'
 
-    def _prepare_request(self, request_type: str, url: str, data: Union[Iterable, Mapping, AbstractMISP, bytes] = {}, params: Mapping = {},
-                         kw_params: Mapping = {}, output_type: str = 'json', content_type: str = 'json') -> requests.Response:
+    def _prepare_request(self, request_type: str, url: str, data: Optional[Union[Iterable, Mapping, AbstractMISP, bytes]] = None,
+                         params: Mapping = {}, kw_params: Mapping = {},
+                         output_type: str = 'json', content_type: str = 'json') -> requests.Response:
         '''Prepare a request for python-requests'''
         if url[0] == '/':
             # strip it: it will fail if MISP is in a sub directory
@@ -3709,13 +3710,15 @@ class PyMISP:
         # so we need to make it a + instead and hope for the best
         url = url.replace(' ', '+')
         url = urljoin(self.root_url, url)
-        if data == {} or isinstance(data, bytes):
-            d = data
-        elif data:
-            if isinstance(data, dict):  # Else, we can directly json encode.
-                # Remove None values.
-                data = {k: v for k, v in data.items() if v is not None}
-            d = json.dumps(data, default=pymisp_json_default)
+        d: Optional[Union[bytes, str]] = None
+        if data is not None:
+            if isinstance(data, bytes):
+                d = data
+            else:
+                if isinstance(data, dict):
+                    # Remove None values.
+                    data = {k: v for k, v in data.items() if v is not None}
+                d = json.dumps(data, default=pymisp_json_default)
 
         logger.debug(f'{request_type} - {url}')
         if d is not None:
