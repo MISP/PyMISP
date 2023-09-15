@@ -2,11 +2,64 @@ Changelog
 =========
 
 
+v2.4.176 (2023-09-15)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version, deps. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps, objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Avoid exception when data is an empty iterator. [Raphaël Vinot]
+
+  Fix #1053
+
+Other
+~~~~~
+- Revert "build(deps): bump codecov/codecov-action from 3 to 4" [Raphaël
+  Vinot]
+
+  This reverts commit b7bb6b74317b70613ed42ea234eaafb00da6e5c6.
+- Build(deps): bump codecov/codecov-action from 3 to 4.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 3 to 4.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v3...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Build(deps): bump actions/checkout from 3 to 4. [dependabot[bot]]
+
+  Bumps [actions/checkout](https://github.com/actions/checkout) from 3 to 4.
+  - [Release notes](https://github.com/actions/checkout/releases)
+  - [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/actions/checkout/compare/v3...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/checkout
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
 v2.4.175 (2023-08-23)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump objects, missed that. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps, readthedocs config. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
