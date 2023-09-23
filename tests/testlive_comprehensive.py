@@ -49,7 +49,7 @@ except ImportError as e:
 
 urllib3.disable_warnings()
 
-fast_mode = False
+fast_mode = True
 
 test_file_path = Path('tests/viper-test-files')
 
