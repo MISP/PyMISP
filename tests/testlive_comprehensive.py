@@ -49,15 +49,15 @@ except ImportError as e:
 
 urllib3.disable_warnings()
 
-fast_mode = True
+fast_mode = False
 
 test_file_path = Path('tests/viper-test-files')
 
 print(test_file_path, 'exists: ', test_file_path.exists())
 
-#if not test_file_path.exists():
-#    print('The test files are missing, pulling it.')
-#    os.system('git clone https://github.com/viper-framework/viper-test-files.git tests/viper-test-files')
+if not test_file_path.exists():
+    print('The test files are missing, pulling it.')
+    os.system('git clone https://github.com/viper-framework/viper-test-files.git tests/viper-test-files')
 
 
 class TestComprehensive(unittest.TestCase):
