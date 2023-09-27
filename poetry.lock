@@ -1253,13 +1253,13 @@ test = ["coverage", "ipykernel (>=6.14)", "mypy", "paramiko", "pre-commit", "pyt
 
 [[package]]
 name = "jupyter-core"
-version = "5.3.1"
+version = "5.3.2"
 description = "Jupyter core package. A base package on which Jupyter projects rely."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jupyter_core-5.3.1-py3-none-any.whl", hash = "sha256:ae9036db959a71ec1cac33081eeb040a79e681f08ab68b0883e9a676c7a90dce"},
-    {file = "jupyter_core-5.3.1.tar.gz", hash = "sha256:5ba5c7938a7f97a6b0481463f7ff0dbac7c15ba48cf46fa4035ca6e838aa1aba"},
+    {file = "jupyter_core-5.3.2-py3-none-any.whl", hash = "sha256:a4af53c3fa3f6330cebb0d9f658e148725d15652811d1c32dc0f63bb96f2e6d6"},
+    {file = "jupyter_core-5.3.2.tar.gz", hash = "sha256:0c28db6cbe2c37b5b398e1a1a5b22f84fd64cd10afc1f6c05b02fb09481ba45f"},
 ]
 
 [package.dependencies]
@@ -2044,13 +2044,13 @@ files = [
 
 [[package]]
 name = "publicsuffixlist"
-version = "0.10.0.20230920"
+version = "0.10.0.20230927"
 description = "publicsuffixlist implement"
 optional = true
 python-versions = ">=2.6"
 files = [
-    {file = "publicsuffixlist-0.10.0.20230920-py2.py3-none-any.whl", hash = "sha256:3ef6fabdbde3bbdb2d0a340496552ddb78343b49e1504bd405f19409d21e2639"},
-    {file = "publicsuffixlist-0.10.0.20230920.tar.gz", hash = "sha256:e12a7cbb224027e4a0d30bfa4e336430e08a94bfdcff64e858fd5bc86d8166d1"},
+    {file = "publicsuffixlist-0.10.0.20230927-py2.py3-none-any.whl", hash = "sha256:a69728f6fea169815607e029b30ad28cedc242d7eb049a867ea7aea47aaac01e"},
+    {file = "publicsuffixlist-0.10.0.20230927.tar.gz", hash = "sha256:1a60e79b6a84a5fdd12f4f2d9a2c985548a3f628daf2ac7c7f9af47b6492b403"},
 ]
 
 [package.extras]
@@ -3085,13 +3085,13 @@ files = [
 
 [[package]]
 name = "traitlets"
-version = "5.10.0"
+version = "5.10.1"
 description = "Traitlets Python configuration system"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "traitlets-5.10.0-py3-none-any.whl", hash = "sha256:417745a96681fbb358e723d5346a547521f36e9bd0d50ba7ab368fff5d67aa54"},
-    {file = "traitlets-5.10.0.tar.gz", hash = "sha256:f584ea209240466e66e91f3c81aa7d004ba4cf794990b0c775938a1544217cd1"},
+    {file = "traitlets-5.10.1-py3-none-any.whl", hash = "sha256:07ab9c5bf8a0499fd7b088ba51be899c90ffc936ffc797d7b6907fc516bcd116"},
+    {file = "traitlets-5.10.1.tar.gz", hash = "sha256:db9c4aa58139c3ba850101913915c042bdba86f7c8a0dda1c6f7f92c5da8e542"},
 ]
 
 [package.extras]
@@ -3177,13 +3177,13 @@ files = [
 
 [[package]]
 name = "types-redis"
-version = "4.6.0.6"
+version = "4.6.0.7"
 description = "Typing stubs for redis"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-redis-4.6.0.6.tar.gz", hash = "sha256:7865a843802937ab2ddca33579c4e255bfe73f87af85824ead7a6729ba92fc52"},
-    {file = "types_redis-4.6.0.6-py3-none-any.whl", hash = "sha256:e0e9dcc530623db3a41ec058ccefdcd5c7582557f02ab5f7aa9a27fe10a78d7e"},
+    {file = "types-redis-4.6.0.7.tar.gz", hash = "sha256:28c4153ddb5c9d4f10def44a2454673c361d2d5fc3cd867cf3bb1520f3f59a38"},
+    {file = "types_redis-4.6.0.7-py3-none-any.whl", hash = "sha256:05b1bf92879b25df20433fa1af07784a0d7928c616dc2ebf9087618db77ccbd0"},
 ]
 
 [package.dependencies]
@@ -3192,13 +3192,13 @@ types-pyOpenSSL = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.3"
+version = "2.31.0.6"
 description = "Typing stubs for requests"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "types-requests-2.31.0.3.tar.gz", hash = "sha256:d5d7a08965fca12bedf716eaf5430c6e3d0da9f3164a1dba2a7f3885f9ebe3c0"},
-    {file = "types_requests-2.31.0.3-py3-none-any.whl", hash = "sha256:938f51653c757716aeca5d72c405c5e2befad8b0d330e3b385ce7f148e1b10dc"},
+    {file = "types-requests-2.31.0.6.tar.gz", hash = "sha256:cd74ce3b53c461f1228a9b783929ac73a666658f223e28ed29753771477b3bd0"},
+    {file = "types_requests-2.31.0.6-py3-none-any.whl", hash = "sha256:a2db9cb228a81da8348b49ad6db3f5519452dd20a9c1e1a868c83c5fe88fd1a9"},
 ]
 
 [package.dependencies]
@@ -3498,4 +3498,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "a129194255be3604becb053eddd796769b7427c7ddf06d5e385aa881e83394d6"
+content-hash = "caacd0d64381f5fa31ddf1f280ae9c7678bf213d1130c414529eacdfd708bf22"

@@ -58,7 +58,7 @@ sphinx-autodoc-typehints = {version = "^1.24.0", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
 reportlab = {version = "^4.0.5", optional = true}
 pyfaup = {version = "^1.2", optional = true}
-publicsuffixlist = {version = "^0.10.0.20230920", optional = true}
+publicsuffixlist = {version = "^0.10.0.20230927", optional = true}
 urllib3 = {extras = ["brotli"], version = "*", optional = true}
 Sphinx = [
     {version = "<7.2", python = "<3.9", optional = true},
@@ -83,9 +83,9 @@ ipython = [
     {version = "^8.13.0", python = ">=3.9"}
 ]
 jupyterlab = "^4.0.6"
-types-requests = "^2.31.0.3"
+types-requests = "^2.31.0.6"
 types-python-dateutil = "^2.8.19.14"
-types-redis = "^4.6.0.6"
+types-redis = "^4.6.0.7"
 types-Flask = "^1.1.6"
 pytest-cov = "^4.1.0"
 
