@@ -2,11 +2,47 @@ Changelog
 =========
 
 
+v2.4.178 (2023-10-24)
+---------------------
+
+New
+~~~
+- Run tests on python 3.12 too. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump version, make __version__ dynamic. [Raphaël Vinot]
+- Bump deps, allow older jsonschema for compatibility. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Disable search logs tests for now. [Raphaël Vinot]
+- Disable fastmode, reenable fetching files. [Raphaël Vinot]
+- Try to speedup tests by not importing galaxies, taxos, ... [Raphaël
+  Vinot]
+- Do not clone repo from test. [Raphaël Vinot]
+
+Fix
+~~~
+- Make other fieldnames in CSV also valid... [Raphaël Vinot]
+- Make fieldnames actually valid. [Raphaël Vinot]
+- Remove CI for python 3.12, waiting for pydeep wheels. [Raphaël Vinot]
+- Allow object-relation names with uppercase characters defined in the
+  templates. [Raphaël Vinot]
+- Check if path exists in tests. [Raphaël Vinot]
+
+Other
+~~~~~
+- Ch: Bump deps. [Raphaël Vinot]
+
+
 v2.4.176 (2023-09-15)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version, deps. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump deps, objects. [Raphaël Vinot]
