@@ -1,9 +1,12 @@
-__version__ = '2.4.176'
 import logging
 import sys
 import warnings
 
+import importlib.metadata
+
 logger = logging.getLogger(__name__)
+
+__version__ = importlib.metadata.version("pymisp")
 
 
 def warning_2024():

@@ -265,9 +265,9 @@ class PyMISP:
     @property
     def pymisp_version_main(self) -> Dict:
         """Get the most recent version of PyMISP from github"""
-        r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/main/pymisp/__init__.py')
+        r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/main/pyproject.toml')
         if r.status_code == 200:
-            version = re.findall("__version__ = '(.*)'", r.text)
+            version = re.findall('version = "(.*)"', r.text)
             return {'version': version[0]}
         return {'error': 'Impossible to retrieve the version of the main branch.'}
 
