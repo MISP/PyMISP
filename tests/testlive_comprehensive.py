@@ -1842,7 +1842,7 @@ class TestComprehensive(unittest.TestCase):
             event.add_object(**o)
 
         csv2 = CSVLoader(template_name='file', csv_path=Path('tests/csv_testfiles/invalid_fieldnames.csv'),
-                         fieldnames=['SHA1', 'fileName', 'size-in-bytes'], has_fieldnames=True)
+                         fieldnames=['sha1', 'filename', 'size-in-bytes'], has_fieldnames=True)
         try:
             first = self.user_misp_connector.add_event(event)
             for o in csv2.load():
