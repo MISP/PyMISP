@@ -33,7 +33,7 @@ if sys.platform == 'linux':
     # Enable TCP keepalive by default on every requests
     import socket
     from urllib3.connection import HTTPConnection
-    HTTPConnection.default_socket_options = HTTPConnection.default_socket_options + [
+    HTTPConnection.default_socket_options = HTTPConnection.default_socket_options + [  # type: ignore
         (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),  # enable keepalive
         (socket.SOL_TCP, socket.TCP_KEEPIDLE, 30),  # Start pinging after 30s of idle time
         (socket.SOL_TCP, socket.TCP_KEEPINTVL, 10),  # ping every 10s
@@ -265,9 +265,9 @@ class PyMISP:
     @property
     def pymisp_version_main(self) -> Dict:
         """Get the most recent version of PyMISP from github"""
-        r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/main/pymisp/__init__.py')
+        r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/main/pyproject.toml')
         if r.status_code == 200:
-            version = re.findall("__version__ = '(.*)'", r.text)
+            version = re.findall('version = "(.*)"', r.text)
             return {'version': version[0]}
         return {'error': 'Impossible to retrieve the version of the main branch.'}
 
@@ -2046,6 +2046,7 @@ class PyMISP:
             sid = get_uuid_or_id_from_abstract_misp(sharing_group)
         else:
             sid = get_uuid_or_id_from_abstract_misp(sharing_group_id)
+        sharing_group.pop('modified', None)  # Quick fix for https://github.com/MISP/PyMISP/issues/1049 - remove when fixed in MISP.
         r = self._prepare_request('POST', f'sharing_groups/edit/{sid}', data=sharing_group)
         updated_sharing_group = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_sharing_group:
@@ -3698,8 +3699,9 @@ class PyMISP:
     def __repr__(self):
         return f'<{self.__class__.__name__}(url={self.root_url})'
 
-    def _prepare_request(self, request_type: str, url: str, data: Union[Iterable, Mapping, AbstractMISP, bytes] = {}, params: Mapping = {},
-                         kw_params: Mapping = {}, output_type: str = 'json', content_type: str = 'json') -> requests.Response:
+    def _prepare_request(self, request_type: str, url: str, data: Optional[Union[Iterable, Mapping, AbstractMISP, bytes]] = None,
+                         params: Mapping = {}, kw_params: Mapping = {},
+                         output_type: str = 'json', content_type: str = 'json') -> requests.Response:
         '''Prepare a request for python-requests'''
         if url[0] == '/':
             # strip it: it will fail if MISP is in a sub directory
@@ -3708,13 +3710,15 @@ class PyMISP:
         # so we need to make it a + instead and hope for the best
         url = url.replace(' ', '+')
         url = urljoin(self.root_url, url)
-        if data == {} or isinstance(data, bytes):
-            d = data
-        elif data:
-            if isinstance(data, dict):  # Else, we can directly json encode.
-                # Remove None values.
-                data = {k: v for k, v in data.items() if v is not None}
-            d = json.dumps(data, default=pymisp_json_default)
+        d: Optional[Union[bytes, str]] = None
+        if data is not None:
+            if isinstance(data, bytes):
+                d = data
+            else:
+                if isinstance(data, dict):
+                    # Remove None values.
+                    data = {k: v for k, v in data.items() if v is not None}
+                d = json.dumps(data, default=pymisp_json_default)
 
         logger.debug(f'{request_type} - {url}')
         if d is not None:
