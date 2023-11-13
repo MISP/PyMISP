@@ -2259,7 +2259,7 @@ class PyMISP:
         r = self._prepare_request('GET', f'users/view/{user_id}')
         user_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in user_j:
-            return user_j
+            raise PyMISPUnexpectedResponse(f'Error on user access: {user_j}')
         u = MISPUser()
         u.from_dict(**user_j)
         if not expanded:
