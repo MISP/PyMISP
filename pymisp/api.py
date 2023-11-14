@@ -207,7 +207,18 @@ class PyMISP:
             self._current_user: MISPUser
             self._current_role: MISPRole
             self._current_user_settings: List[MISPUserSetting]
-            self._current_user, self._current_role, self._current_user_settings = self.get_user(pythonify=True, expanded=True)
+            user_infos = self.get_user(pythonify=True, expanded=True)
+            if isinstance(user_infos, dict):
+                # There was an error during the get_user call
+                if e := user_infos.get('errors'):
+                    raise PyMISPError(f'Unable to get the user settings: {e}')
+                raise PyMISPError(f'Unexpected error when initializing the connection: {user_infos}')
+            elif len(user_infos) == 3:
+                self._current_user, self._current_role, self._current_user_settings = user_infos
+            else:
+                raise PyMISPError(f'Unexpected error when initializing the connection: {user_infos}')
+        except PyMISPError as e:
+            raise e
         except Exception as e:
             raise PyMISPError(f'Unable to connect to MISP ({self.root_url}). Please make sure the API key and the URL are correct (http/https is required): {e}')
 
@@ -2253,7 +2264,7 @@ class PyMISP:
 
         :param user: user to get; `me` means the owner of the API key doing the query
         :param pythonify: Returns a PyMISP Object instead of the plain json output
-        :param expanded: Also returns a MISPRole and a MISPUserSetting
+        :param expanded: Also returns a MISPRole and a MISPUserSetting. Only taken in account if pythonify is True.
         """
         user_id = get_uuid_or_id_from_abstract_misp(user)
         r = self._prepare_request('GET', f'users/view/{user_id}')
