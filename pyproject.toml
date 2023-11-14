@@ -53,11 +53,11 @@ pydeep2 = {version = "^0.5.1", optional = true}
 lief = {version = "^0.13.2", optional = true}
 beautifulsoup4 = {version = "^4.12.2", optional = true}
 validators = {version = "^0.22.0", optional = true}
-sphinx-autodoc-typehints = {version = "^1.24.1", optional = true}
+sphinx-autodoc-typehints = {version = "^1.25.2", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
-reportlab = {version = "^4.0.6", optional = true}
+reportlab = {version = "^4.0.7", optional = true}
 pyfaup = {version = "^1.2", optional = true}
-publicsuffixlist = {version = "^0.10.0.20231104", optional = true}
+publicsuffixlist = {version = "^0.10.0.20231109", optional = true}
 urllib3 = {extras = ["brotli"], version = "*", optional = true}
 Sphinx = [
     {version = "<7.2", python = "<3.9", optional = true},
@@ -76,7 +76,7 @@ brotli = ['urllib3']
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.11.0"
-mypy = "^1.6.1"
+mypy = "^1.7.0"
 ipython = [
     {version = "<8.13.0", python = "<3.9"},
     {version = "^8.13.0", python = ">=3.9"}
@@ -84,7 +84,7 @@ ipython = [
 jupyterlab = "^4.0.8"
 types-requests = "^2.31.0.10"
 types-python-dateutil = "^2.8.19.14"
-types-redis = "^4.6.0.9"
+types-redis = "^4.6.0.10"
 types-Flask = "^1.1.6"
 pytest-cov = "^4.1.0"
 
