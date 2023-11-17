@@ -64,15 +64,12 @@ class TestEmailObject(unittest.TestCase):
                          self._get_values(eml_email_object, "to")[0])
         self.assertEqual(self._get_values(email_object, "from")[0],
                          self._get_values(eml_email_object, "from")[0])
-        dirty_display_name = self._get_values(email_object, "from-display-name")[0]
-        dirty_display_name = dirty_display_name[:-2] + dirty_display_name[-1]
-        self.assertEqual(dirty_display_name,
+        self.assertEqual(self._get_values(email_object, "from-display-name")[0],
                          self._get_values(eml_email_object, "from-display-name")[0])
         self.assertEqual(len(self._get_values(email_object, "email-body")), 2)
 
         self.assertEqual(self._get_values(email_object, "received-header-ip"),
                          self._get_values(eml_email_object, "received-header-ip"))
-
 
     def test_bom_encoded(self):
         """Test utf-8-sig encoded email"""
