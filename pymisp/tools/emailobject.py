@@ -173,7 +173,7 @@ class EMailObject(AbstractMISPObjectGenerator):
             _html = body.get('html', {}).get('obj')
             for attch in attachments:
                 if _html.find("cid:{0}".format(attch.cid)) != -1:
-                    _content_type = attch._getStringStream('__substg1.0_370E')
+                    _content_type = attch.getStringStream('__substg1.0_370E')
                     maintype, subtype = _content_type.split("/", 1)
                     related_content[attch.cid] = (attch,
                                                   {'obj': attch.data,
@@ -210,7 +210,7 @@ class EMailObject(AbstractMISPObjectGenerator):
                     message.add_alternative(**mime_dict)
         for attch in attachments:  # Add attachments at the end.
             if attch.cid not in related_content.keys():
-                _content_type = attch._getStringStream('__substg1.0_370E')
+                _content_type = attch.getStringStream('__substg1.0_370E')
                 maintype, subtype = _content_type.split("/", 1)
                 message.add_attachment(attch.data,
                                        maintype=maintype,
