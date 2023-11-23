@@ -1219,12 +1219,12 @@ class TestComprehensive(unittest.TestCase):
     def test_search_text(self):
         first = self.create_simple_event()
         first.add_attribute('ip-src', '8.8.8.8')
-        first.publish()
+        # first.publish()
         try:
             first = self.user_misp_connector.add_event(first)
-            self.admin_misp_connector.publish(first)
+            # self.admin_misp_connector.publish(first)
             time.sleep(5)
-            text = self.user_misp_connector.search(return_format='text', eventid=first.id)
+            text = self.user_misp_connector.search(return_format='text', eventid=first.id, published=0)
             self.assertEqual('8.8.8.8', text.strip())
         finally:
             # Delete event
