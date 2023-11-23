@@ -2,6 +2,25 @@ Changelog
 =========
 
 
+v2.4.179 (2023-11-23)
+---------------------
+
+Changes
+~~~~~~~
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] Bumped latest version. [Christian Studer]
+
+Fix
+~~~
+- Eml and msg are in sync again. [Raphaël Vinot]
+- Update calls to getStringStream to the public method. [Raphaël Vinot]
+- Avoid confusing error when an auth key is limited to an IP. [Raphaël
+  Vinot]
+
+  Fix #1099
+
+
 v2.4.178 (2023-10-24)
 ---------------------
 
@@ -11,6 +30,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version, make __version__ dynamic. [Raphaël Vinot]
 - Bump deps, allow older jsonschema for compatibility. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
