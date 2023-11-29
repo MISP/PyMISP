@@ -638,7 +638,7 @@ class MISPAttribute(AbstractMISP):
     def _prepare_new_malware_sample(self):
         if '|' in self.value:
             # Get the filename, ignore the md5, because humans.
-            self.malware_filename, md5 = self.value.split('|')
+            self.malware_filename, md5 = self.value.rsplit('|', 1)
         else:
             # Assuming the user only passed the filename
             self.malware_filename = self.value
@@ -1664,7 +1664,6 @@ class MISPEvent(AbstractMISP):
                     event_report.pop('SharingGroup', None)
                     event_report.pop('sharing_group_id', None)
                 to_return['EventReport'].append(event_report.to_dict())
-
 
         return {'Event': to_return}
 
