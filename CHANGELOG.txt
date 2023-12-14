@@ -2,11 +2,45 @@ Changelog
 =========
 
 
+v2.4.182 (2023-12-14)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Avoid exception when the malware file name contains a "|" [Raphaël
+  Vinot]
+
+Other
+~~~~~
+- Build(deps): bump actions/setup-python from 4 to 5. [dependabot[bot]]
+
+  Bumps [actions/setup-python](https://github.com/actions/setup-python) from 4 to 5.
+  - [Release notes](https://github.com/actions/setup-python/releases)
+  - [Commits](https://github.com/actions/setup-python/compare/v4...v5)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/setup-python
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
 v2.4.179 (2023-11-23)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump version, changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - [misp-objects] Bumped latest version. [Christian Studer]
