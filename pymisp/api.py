@@ -169,7 +169,7 @@ class PyMISP:
 
         self.root_url: str = url
         self.key: str = key
-        self.ssl: bool = ssl
+        self.ssl: Union[bool, str] = ssl
         self.proxies: Optional[MutableMapping[str, str]] = proxies
         self.cert: Optional[Union[str, Tuple[str, str]]] = cert
         self.auth: Optional[AuthBase] = auth
