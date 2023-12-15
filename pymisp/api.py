@@ -151,13 +151,15 @@ class PyMISP:
     :param auth: The auth parameter is passed directly to requests, as described here: http://docs.python-requests.org/en/master/user/authentication/
     :param tool: The software using PyMISP (string), used to set a unique user-agent
     :param http_headers: Arbitrary headers to pass to all the requests.
+    :param https_adapter: Arbitrary HTTPS adapter for the requests session.
     :param timeout: Timeout, as described here: https://requests.readthedocs.io/en/master/user/advanced/#timeouts
     """
 
-    def __init__(self, url: str, key: str, ssl: bool = True, debug: bool = False, proxies: Optional[MutableMapping[str, str]] = None,
+    def __init__(self, url: str, key: str, ssl: Union[bool, str] = True, debug: bool = False, proxies: Optional[MutableMapping[str, str]] = None,
                  cert: Optional[Union[str, Tuple[str, str]]] = None, auth: Optional[AuthBase] = None, tool: str = '',
                  timeout: Optional[Union[float, Tuple[float, float]]] = None,
-                 http_headers: Optional[Dict[str, str]]=None
+                 http_headers: Optional[Dict[str, str]] = None,
+                 https_adapter: Optional[requests.adapters.BaseAdapter] = None
                  ):
 
         if not url:
@@ -174,6 +176,8 @@ class PyMISP:
         self.tool: str = tool
         self.timeout: Optional[Union[float, Tuple[float, float]]] = timeout
         self.__session = requests.Session()  # use one session to keep connection between requests
+        if https_adapter is not None:
+            self.__session.mount('https://', https_adapter)
         if brotli_supported():
             self.__session.headers['Accept-Encoding'] = ', '.join(('br', 'gzip', 'deflate'))
         if http_headers:
