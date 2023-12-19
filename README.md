@@ -159,6 +159,35 @@ Your new MISPObject generator must generate attributes and add them as class pro
 
 When the object is sent to MISP, all the class properties will be exported to the JSON export.
 
+## Installing PyMISP on a machine with no internet access
+
+This is done using poetry and you need to have this repository cloned on your machine.
+The commands below have to be run from inside the cloned directory.
+
+
+1. From a machine with access to the internet, get the dependencies:
+
+```bash
+mkdir offline
+poetry export --all-extras  > offline/requirements.txt
+poetry run pip download -r offline/requirements.txt -d offline/packages/
+```
+
+2. Prepare the PyMISP Package
+
+```bash
+poetry build
+mv dist/*.whl offline/packages/
+```
+
+2. Copy the content of `offline/packages/` to the machine with no internet access.
+
+3. Install the packages:
+
+```bash
+python -m pip install --no-index --no-deps packages/*.whl
+```
+
 # License
 
 PyMISP is distributed under an [open source license](./LICENSE). A simplified 2-BSD license.
