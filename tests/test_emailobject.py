@@ -1,17 +1,27 @@
-from email.message import EmailMessage
-import unittest
-from io import BytesIO
-from typing import List
-from pymisp.tools import EMailObject
-from pathlib import Path
-from os import urandom
 import json
+import unittest
+
+from email.message import EmailMessage
+from io import BytesIO
+from os import urandom
+from pathlib import Path
+from typing import List
+from zipfile import ZipFile
+
+from pymisp.tools import EMailObject
 from pymisp.exceptions import PyMISPNotImplementedYet, InvalidMISPObject
 
 
 class TestEmailObject(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        with ZipFile(Path("tests/email_testfiles/mail_1.eml.zip"), 'r') as myzip:
+            with myzip.open('mail_1.eml', pwd=b'AVs are dumb') as myfile:
+                cls.eml_1 = BytesIO(myfile.read())
+
     def test_mail_1(self):
-        email_object = EMailObject(Path("tests/email_testfiles/mail_1.eml"))
+        email_object = EMailObject(pseudofile=self.eml_1)
         self.assertEqual(self._get_values(email_object, "subject")[0], "письмо уведом-е")
         self.assertEqual(self._get_values(email_object, "to")[0], "kinney@noth.com")
         self.assertEqual(self._get_values(email_object, "from")[0], "suvorov.s@nalg.ru")
@@ -50,7 +60,7 @@ class TestEmailObject(unittest.TestCase):
 
     def test_msg(self):
         # Test result of eml converted to msg is the same
-        eml_email_object = EMailObject(Path("tests/email_testfiles/mail_1.eml"))
+        eml_email_object = EMailObject(pseudofile=self.eml_1)
         email_object = EMailObject(Path("tests/email_testfiles/mail_1.msg"))
 
         self.assertIsInstance(email_object.email, EmailMessage)
@@ -74,7 +84,7 @@ class TestEmailObject(unittest.TestCase):
     def test_bom_encoded(self):
         """Test utf-8-sig encoded email"""
         bom_email_object = EMailObject(Path("tests/email_testfiles/mail_1_bom.eml"))
-        eml_email_object = EMailObject(Path("tests/email_testfiles/mail_1.eml"))
+        eml_email_object = EMailObject(pseudofile=self.eml_1)
 
         self.assertIsInstance(bom_email_object.email, EmailMessage)
         for file_name, file_content in bom_email_object.attachments:
