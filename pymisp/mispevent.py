@@ -15,6 +15,7 @@ import logging
 import hashlib
 from pathlib import Path
 from typing import List, Optional, Union, IO, Dict, Any
+import warnings
 
 from .abstract import AbstractMISP, MISPTag
 from .exceptions import (UnknownMISPObjectTemplate, InvalidMISPGalaxy, InvalidMISPObject,
@@ -28,11 +29,6 @@ try:
     from dateutil.parser import parse
 except ImportError:
     logger.exception("Cannot import dateutil")
-
-try:
-    import jsonschema  # type: ignore
-except ImportError:
-    logger.exception("Cannot import jsonschema")
 
 try:
     # pyme renamed to gpg the 2016-10-28
@@ -1764,8 +1760,7 @@ class MISPEvent(AbstractMISP):
             event.pop('Object', None)
         self.from_dict(**event)
         if validate:
-            json_schema = self._load_json(self.resources_path / self.__schema_file)
-            jsonschema.validate({"Event": self.jsonable()}, json_schema)
+            warnings.warn('''The validate parameter is deprecated because PyMISP is more flexible at loading event than the schema''')
 
     def __setattr__(self, name, value):
         if name in ['date']:
