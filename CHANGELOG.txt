@@ -2,6 +2,28 @@ Changelog
 =========
 
 
+v2.4.183 (2024-01-04)
+---------------------
+
+New
+~~~
+- Documentation to install PyMISP on offline machine. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump objects. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Remove jsonschema from dependencies. [Raphaël Vinot]
+- Encrypt malicious js. [Raphaël Vinot]
+
+Other
+~~~~~
+- Fix api ssl verify typing. [Steven]
+- Add HTTPS Adapter. [Steven]
+
+  Add the ability to provide a custom HTTPS adapter to the PyMISP class. With M2Crypto and m2requests, this can enable mutual TLS with hardware tokens.
+
+
 v2.4.182 (2023-12-14)
 ---------------------
 
