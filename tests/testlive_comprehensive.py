@@ -1580,14 +1580,34 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(obj_attrs), 1, obj_attrs)
             self.assertEqual(r.name, 'file', r)
 
-            # Test break_on_duplicate at object level
+            # Test break_on_duplicate at object level for add_object
             fo_dup, peo_dup, _ = make_binary_objects('tests/viper-test-files/test_files/whoami.exe')
             r = self.user_misp_connector.add_object(first, peo_dup, break_on_duplicate=True)
             self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
 
-            # Test break on duplicate with breakOnDuplicate key in object
+            # Test break on duplicate with breakOnDuplicate key in object for add_object
             fo_dup.breakOnDuplicate = True
             r = self.user_misp_connector.add_object(first, fo_dup)
+            self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
+
+            # Test break_on_duplicate at object level for update_object
+            obj1 = MISPObject('domain-ip')
+            obj1.add_attribute('ip', value="8.8.8.8")
+            obj1.add_attribute('domain', value="google.lu")
+            obj2 = MISPObject('domain-ip')
+            obj2.add_attribute('ip', value="8.8.8.8")
+            obj2.add_attribute('domain', value="google.fr")
+            o1 = self.user_misp_connector.add_object(first, obj1, pythonify=True)
+            self.assertEqual(o1.attributes[1].value, 'google.lu')
+            o2 = self.user_misp_connector.add_object(first, obj2, pythonify=True)
+            self.assertEqual(o2.attributes[1].value, 'google.fr')
+            obj2.attributes[1].value = 'google.lu'
+            r = self.user_misp_connector.update_object(obj2, o2.uuid, break_on_duplicate=True)
+            self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
+
+            # Test break on duplicate with breakOnDuplicate key in object for update_object
+            obj2.breakOnDuplicate = True
+            r = self.user_misp_connector.update_object(obj2, o2.uuid)
             self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
 
             # Test refs

@@ -612,7 +612,7 @@ class PyMISP:
         o.from_dict(**new_object)
         return o
 
-    def update_object(self, misp_object: MISPObject, object_id: Optional[int] = None, pythonify: bool = False) -> Union[Dict, MISPObject]:
+    def update_object(self, misp_object: MISPObject, object_id: Optional[int] = None, pythonify: bool = False, break_on_duplicate: bool = False) -> Union[Dict, MISPObject]:
         """Update an object on a MISP instance
 
         :param misp_object: object to update
@@ -623,7 +623,8 @@ class PyMISP:
             oid = get_uuid_or_id_from_abstract_misp(misp_object)
         else:
             oid = get_uuid_or_id_from_abstract_misp(object_id)
-        r = self._prepare_request('POST', f'objects/edit/{oid}', data=misp_object)
+        params = {'breakOnDuplicate': True} if break_on_duplicate else {}
+        r = self._prepare_request('POST', f'objects/edit/{oid}', data=misp_object, kw_params=params)
         updated_object = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_object:
             return updated_object
