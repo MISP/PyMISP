@@ -1,41 +1,33 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
+import logging
 from datetime import date, datetime
-
 from deprecated import deprecated  # type: ignore
 from json import JSONEncoder
 from uuid import UUID
 from abc import ABCMeta
-
-try:
-    from rapidjson import load  # type: ignore
-    from rapidjson import loads  # type: ignore
-    from rapidjson import dumps  # type: ignore
-    HAS_RAPIDJSON = True
-except ImportError:
-    from json import load
-    from json import loads
-    from json import dumps
-    HAS_RAPIDJSON = False
-
-import logging
 from enum import Enum
 from typing import Union, Optional, Any, Dict, List, Set, Mapping
-
-from .exceptions import PyMISPInvalidFormat, PyMISPError
-
-
 from collections.abc import MutableMapping
 from functools import lru_cache
 from pathlib import Path
 
+try:
+    import orjson  # type: ignore
+    from orjson import loads, dumps  # type: ignore
+    HAS_ORJSON = True
+except ImportError:
+    from json import loads, dumps
+    HAS_ORJSON = False
+
+from .exceptions import PyMISPInvalidFormat, PyMISPError
+
 logger = logging.getLogger('pymisp')
+
 
 resources_path = Path(__file__).parent / 'data'
 misp_objects_path = resources_path / 'misp-objects' / 'objects'
-with (resources_path / 'describeTypes.json').open('r') as f:
-    describe_types = load(f)['result']
+with (resources_path / 'describeTypes.json').open('rb') as f:
+    describe_types = loads(f.read())['result']
 
 
 class MISPFileCache(object):
@@ -43,11 +35,11 @@ class MISPFileCache(object):
 
     @staticmethod
     @lru_cache(maxsize=150)
-    def _load_json(path: Path) -> Union[dict, None]:
+    def _load_json(path: Path) -> Optional[dict]:
         if not path.exists():
             return None
-        with path.open('r', encoding='utf-8') as f:
-            data = load(f)
+        with path.open('rb') as f:
+            data = loads(f.read())
         return data
 
 
@@ -249,6 +241,15 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):
 
     def to_json(self, sort_keys: bool = False, indent: Optional[int] = None) -> str:
         """Dump recursively any class of type MISPAbstract to a json string"""
+        if HAS_ORJSON:
+            option = 0
+            if sort_keys:
+                option |= orjson.OPT_SORT_KEYS
+            if indent:
+                option |= orjson.OPT_INDENT_2
+
+            return dumps(self, default=pymisp_json_default, option=option).decode("utf-8")
+
         return dumps(self, default=pymisp_json_default, sort_keys=sort_keys, indent=indent)
 
     def __getitem__(self, key):
@@ -406,23 +407,13 @@ class MISPTag(AbstractMISP):
         return '<{self.__class__.__name__}(NotInitialized)>'.format(self=self)
 
 
-if HAS_RAPIDJSON:
-    def pymisp_json_default(obj: Union[AbstractMISP, datetime, date, Enum, UUID]) -> Union[Dict, str]:
-        if isinstance(obj, AbstractMISP):
-            return obj.jsonable()
-        elif isinstance(obj, (datetime, date)):
-            return obj.isoformat()
-        elif isinstance(obj, Enum):
-            return obj.value
-        elif isinstance(obj, UUID):
-            return str(obj)
-else:
-    def pymisp_json_default(obj: Union[AbstractMISP, datetime, date, Enum, UUID]) -> Union[Dict, str]:
-        if isinstance(obj, AbstractMISP):
-            return obj.jsonable()
-        elif isinstance(obj, (datetime, date)):
-            return obj.isoformat()
-        elif isinstance(obj, Enum):
-            return obj.value
-        elif isinstance(obj, UUID):
-            return str(obj)
+# UUID, datetime, date and Enum is serialized by ORJSON by default
+def pymisp_json_default(obj: Union[AbstractMISP, datetime, date, Enum, UUID]) -> Union[Dict, str]:
+    if isinstance(obj, AbstractMISP):
+        return obj.jsonable()
+    elif isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    elif isinstance(obj, Enum):
+        return obj.value
+    elif isinstance(obj, UUID):
+        return str(obj)

@@ -1,13 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from typing import TypeVar, Optional, Tuple, List, Dict, Union, Any, Mapping, Iterable, MutableMapping
 from datetime import date, datetime
 import csv
 from pathlib import Path
 import logging
 from urllib.parse import urljoin
-import json
 import requests
 from requests.auth import AuthBase
 import re
@@ -17,6 +13,14 @@ import sys
 import copy
 import urllib3  # type: ignore
 from io import BytesIO, StringIO
+
+try:
+    # orjson is optional dependency that speedups parsing and encoding JSON
+    from orjson import loads, dumps  # type: ignore
+    HAS_ORJSON = True
+except ImportError:
+    from json import loads, dumps
+    HAS_ORJSON = False
 
 from . import __version__, everything_broken
 from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPError, NoURL, NoKey
@@ -297,7 +301,7 @@ class PyMISP:
         """Get the most recent version from github"""
         r = requests.get('https://raw.githubusercontent.com/MISP/MISP/2.4/VERSION.json')
         if r.status_code == 200:
-            master_version = json.loads(r.text)
+            master_version = loads(r.content)
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
         return {'error': 'Impossible to retrieve the version of the master branch.'}
 
@@ -3345,7 +3349,7 @@ class PyMISP:
         """
         query: Dict[str, Any] = {'setting': user_setting}
         if isinstance(value, dict):
-            value = json.dumps(value)
+            value = dumps(value).decode("utf-8") if HAS_ORJSON else dumps(value)
         query['value'] = value
         if user:
             query['user_id'] = get_uuid_or_id_from_abstract_misp(user)
@@ -3682,7 +3686,7 @@ class PyMISP:
         if 400 <= response.status_code < 500:
             # The server returns a json message with the error details
             try:
-                error_message = response.json()
+                error_message = loads(response.content)
             except Exception:
                 raise MISPServerError(f'Error code {response.status_code}:\n{response.text}')
 
@@ -3692,7 +3696,7 @@ class PyMISP:
         # At this point, we had no error.
 
         try:
-            response_json = response.json()
+            response_json = loads(response.content)
             logger.debug(response_json)
             if isinstance(response_json, dict) and response_json.get('response') is not None:
                 # Cleanup.
@@ -3721,7 +3725,7 @@ class PyMISP:
         if url[0] == '/':
             # strip it: it will fail if MISP is in a sub directory
             url = url[1:]
-        # Cake PHP being an idiot, it doesn't accepts %20 (space) in the URL path,
+        # Cake PHP being an idiot, it doesn't accept %20 (space) in the URL path,
         # so we need to make it a + instead and hope for the best
         url = url.replace(' ', '+')
         url = urljoin(self.root_url, url)
@@ -3733,7 +3737,7 @@ class PyMISP:
                 if isinstance(data, dict):
                     # Remove None values.
                     data = {k: v for k, v in data.items() if v is not None}
-                d = json.dumps(data, default=pymisp_json_default)
+                d = dumps(data, default=pymisp_json_default)
 
         logger.debug(f'{request_type} - {url}')
         if d is not None:

@@ -125,7 +125,6 @@ logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', for
 # From poetry
 
 pytest --cov=pymisp tests/test_*.py tests/testlive_comprehensive.py:TestComprehensive.[test_name]
-
 ```
 
 ## Documentation
@@ -180,9 +179,9 @@ poetry build
 mv dist/*.whl offline/packages/
 ```
 
-2. Copy the content of `offline/packages/` to the machine with no internet access.
+3. Copy the content of `offline/packages/` to the machine with no internet access.
 
-3. Install the packages:
+4. Install the packages:
 
 ```bash
 python -m pip install --no-index --no-deps packages/*.whl

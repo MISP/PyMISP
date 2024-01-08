@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-
 from datetime import timezone, datetime, date
 import copy
-import json
 import os
 import base64
 import sys
@@ -16,6 +13,12 @@ import hashlib
 from pathlib import Path
 from typing import List, Optional, Union, IO, Dict, Any
 import warnings
+
+try:
+    # orjson is optional dependency that speedups parsing and encoding JSON
+    import orjson as json  # type: ignore
+except ImportError:
+    import json
 
 from .abstract import AbstractMISP, MISPTag
 from .exceptions import (UnknownMISPObjectTemplate, InvalidMISPGalaxy, InvalidMISPObject,
@@ -1090,7 +1093,7 @@ class MISPObject(AbstractMISP):
             self._validate()
         return super(MISPObject, self).to_dict(json_format)
 
-    def to_json(self, sort_keys: bool = False, indent: Optional[int] = None, strict: bool = False):
+    def to_json(self, sort_keys: bool = False, indent: Optional[int] = None, strict: bool = False) -> str:
         if strict or self._strict and self._known_template:
             self._validate()
         return super(MISPObject, self).to_json(sort_keys=sort_keys, indent=indent)
@@ -1760,7 +1763,7 @@ class MISPEvent(AbstractMISP):
             event.pop('Object', None)
         self.from_dict(**event)
         if validate:
-            warnings.warn('''The validate parameter is deprecated because PyMISP is more flexible at loading event than the schema''')
+            warnings.warn('The validate parameter is deprecated because PyMISP is more flexible at loading event than the schema')
 
     def __setattr__(self, name, value):
         if name in ['date']:
