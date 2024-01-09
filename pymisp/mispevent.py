@@ -1883,9 +1883,9 @@ class MISPEvent(AbstractMISP):
                 self.date = self.date.date()
             to_return['date'] = self.date.isoformat()
         if to_return.get('publish_timestamp'):
-            to_return['publish_timestamp'] = self._datetime_to_timestamp(self.publish_timestamp)
+            to_return['publish_timestamp'] = str(self._datetime_to_timestamp(self.publish_timestamp))
         if to_return.get('sighting_timestamp'):
-            to_return['sighting_timestamp'] = self._datetime_to_timestamp(self.sighting_timestamp)
+            to_return['sighting_timestamp'] = str(self._datetime_to_timestamp(self.sighting_timestamp))
 
         return to_return
 
