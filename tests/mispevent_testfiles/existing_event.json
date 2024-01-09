@@ -4590,7 +4590,7 @@
   "org_id": "2",
   "orgc_id": "2",
   "proposal_email_lock": false,
-  "publish_timestamp": 0,
+  "publish_timestamp": "0",
   "published": false,
   "sharing_group_id": "0",
   "threat_level_id": "3",

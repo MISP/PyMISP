@@ -138,7 +138,7 @@
   "org_id": "1",
   "orgc_id": "1",
   "proposal_email_lock": true,
-  "publish_timestamp": 0,
+  "publish_timestamp": "0",
   "published": false,
   "sharing_group_id": "0",
   "threat_level_id": "1",
