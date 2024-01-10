@@ -3536,12 +3536,14 @@ class PyMISP:
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: Union[AbstractMISP, str, dict], tag: Union[MISPTag, str], local: bool = False) -> Dict:
+    def tag(self, misp_entity: Union[AbstractMISP, str, dict], tag: Union[MISPTag, str],
+            local: bool = False, relationship_type: Optional[str] = None) -> Dict:
         """Tag an event or an attribute.
 
         :param misp_entity: a MISPEvent, a MISP Attribute, or a UUID
         :param tag: tag to add
         :param local: whether to tag locally
+        :param relationship_type: Type of relationship between the tag and the attribute or event
         """
         uuid = get_uuid_or_id_from_abstract_misp(misp_entity)
         if isinstance(tag, MISPTag):
@@ -3549,6 +3551,8 @@ class PyMISP:
         else:
             tag_name = tag
         to_post = {'uuid': uuid, 'tag': tag_name, 'local': local}
+        if relationship_type:
+            to_post['relationship_type'] = relationship_type
         response = self._prepare_request('POST', 'tags/attachTagToObject', data=to_post)
         return self._check_json_response(response)
 
