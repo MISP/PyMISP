@@ -69,7 +69,7 @@ def get_uuid_or_id_from_abstract_misp(obj: Union[AbstractMISP, int, str, UUID, d
     if isinstance(obj, (int, str)):
         return obj
 
-    if isinstance(obj, dict) and len(obj.keys()) == 1:
+    if isinstance(obj, dict) and len(obj) == 1:
         # We have an object in that format: {'Event': {'id': 2, ...}}
         # We need to get the content of that dictionary
         obj = obj[list(obj.keys())[0]]
@@ -186,6 +186,7 @@ class PyMISP:
             self.__session.headers['Accept-Encoding'] = ', '.join(('br', 'gzip', 'deflate'))
         if http_headers:
             self.__session.headers.update(http_headers)
+        self._user_agent = f'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
 
         self.global_pythonify = False
 
@@ -2622,10 +2623,10 @@ class PyMISP:
 
         '''
 
-        return_formats = ['openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix-xml',
-                          'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings', 'context', 'context-markdown']
+        return_formats = ('openioc', 'json', 'xml', 'suricata', 'snort', 'text', 'rpz', 'csv', 'cache', 'stix-xml',
+                          'stix', 'stix2', 'yara', 'yara-json', 'attack', 'attack-sightings', 'context', 'context-markdown')
 
-        if controller not in ['events', 'attributes', 'objects']:
+        if controller not in ('events', 'attributes', 'objects'):
             raise ValueError('controller has to be in {}'.format(', '.join(['events', 'attributes', 'objects'])))
 
         # Deprecated stuff / synonyms
@@ -2996,7 +2997,7 @@ class PyMISP:
         query.pop('pythonify')
         if log_id is not None:
             query['id'] = query.pop('log_id')
-        if created is not None and isinstance(created, (datetime)):
+        if created is not None and isinstance(created, datetime):
             query['created'] = query.pop('created').timestamp()
 
         response = self._prepare_request('POST', 'admin/logs/index', data=query)
@@ -3349,7 +3350,7 @@ class PyMISP:
         """
         query: Dict[str, Any] = {'setting': user_setting}
         if isinstance(value, dict):
-            value = dumps(value).decode("utf-8") if HAS_ORJSON else dumps(value)
+            value = str(dumps(value)) if HAS_ORJSON else dumps(value)
         query['value'] = value
         if user:
             query['user_id'] = get_uuid_or_id_from_abstract_misp(user)
@@ -3739,7 +3740,7 @@ class PyMISP:
                     data = {k: v for k, v in data.items() if v is not None}
                 d = dumps(data, default=pymisp_json_default)
 
-        logger.debug(f'{request_type} - {url}')
+        logger.debug('%s - %s', request_type, url)
         if d is not None:
             logger.debug(d)
 
@@ -3749,9 +3750,7 @@ class PyMISP:
             url = f'{url}/{to_append_url}'
 
         req = requests.Request(request_type, url, data=d, params=params)
-        user_agent = f'PyMISP {__version__} - Python {".".join(str(x) for x in sys.version_info[:2])}'
-        if self.tool:
-            user_agent = f'{user_agent} - {self.tool}'
+        user_agent = f'{self._user_agent} - {self.tool}' if self.tool else self._user_agent
         req.auth = self.auth
         prepped = self.__session.prepare_request(req)
         prepped.headers.update(
