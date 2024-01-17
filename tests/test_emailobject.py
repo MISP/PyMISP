@@ -1,4 +1,6 @@
-import json
+from __future__ import annotations
+
+# import json
 import unittest
 
 from email.message import EmailMessage
@@ -146,7 +148,6 @@ class TestEmailObject(unittest.TestCase):
         if not isinstance(found_error, PyMISPNotImplementedYet):
             self.fail("Expected PyMISPNotImplementedYet when EmailObject receives completely unknown binary input data in a pseudofile. But, did not get that exception.")
 
-
     @staticmethod
-    def _get_values(obj: EMailObject, relation: str) -> List[str]:
+    def _get_values(obj: EMailObject, relation: str) -> list[str]:
         return [attr.value for attr in obj.attributes if attr['object_relation'] == relation]
