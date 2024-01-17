@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TypeVar, Any, Mapping, Iterable, MutableMapping, Union
+from typing import TypeVar, Any, Mapping, Iterable, MutableMapping, Union, List, Dict
 from datetime import date, datetime
 import csv
 from pathlib import Path
@@ -57,7 +57,7 @@ except ImportError:
 
 SearchType = TypeVar('SearchType', str, int)
 # str: string to search / list: values to search (OR) / dict: {'OR': [list], 'NOT': [list], 'AND': [list]}
-SearchParameterTypes = TypeVar('SearchParameterTypes', str, list[Union[str, int]], dict[str, Union[str, int]])
+SearchParameterTypes = TypeVar('SearchParameterTypes', str, List[Union[str, int]], Dict[str, Union[str, int]])
 
 ToIDSType = TypeVar('ToIDSType', str, int, bool)
 
