@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 # NOTE: Reference on how this module is used: https://vvx7.io/posts/2020/05/misp-slack-bot/
 

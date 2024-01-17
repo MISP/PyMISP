@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -13,7 +12,7 @@ import json
 from pathlib import Path
 import hashlib
 
-import urllib3  # type: ignore
+import urllib3
 import time
 from uuid import uuid4
 
@@ -31,11 +30,7 @@ try:
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
     from pymisp.exceptions import MISPServerError
 except ImportError:
-    if sys.version_info < (3, 6):
-        print('This test suite requires Python 3.6+, breaking.')
-        sys.exit(0)
-    else:
-        raise
+    raise
 
 try:
     from keys import url, key  # type: ignore

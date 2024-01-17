@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import glob
 import os
@@ -17,7 +17,7 @@ class Neo4j():
         if not has_py2neo:
             raise Exception('py2neo is required, please install: pip install py2neo')
         authenticate(host, username, password)
-        self.graph = Graph("http://{}/db/data/".format(host))
+        self.graph = Graph(f"http://{host}/db/data/")
 
     def load_events_directory(self, directory):
         self.events = []

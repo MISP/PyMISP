@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 import ipaddress
 import socket
@@ -12,7 +13,7 @@ class UrlNotDecoded(Exception):
     pass
 
 
-class PSLFaup(object):
+class PSLFaup:
     """
     Fake Faup Python Library using PSL for Windows support
     """
@@ -64,7 +65,7 @@ class PSLFaup(object):
         if not self.decoded:
             raise UrlNotDecoded("You must call faup.decode() first")
 
-        netloc = self.get_host() + ('' if self.get_port() is None else ':{}'.format(self.get_port()))
+        netloc = self.get_host() + ('' if self.get_port() is None else f':{self.get_port()}')
         return _ensure_bytes(
             urlunparse(
                 (self.get_scheme(), netloc, self.get_resource_path(),

@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from __future__ import annotations
+
 import requests
 import json
 
@@ -66,7 +68,7 @@ class VehicleObject(AbstractMISPObjectGenerator):
         self.add_attribute('image-url', type='text', value=ImageUrl)
 
     def _query(self):
-        payload = "RegistrationNumber={}&username={}".format(self._registration, self._username)
+        payload = f"RegistrationNumber={self._registration}&username={self._username}"
         headers = {
             'Content-Type': "application/x-www-form-urlencoded",
             'cache-control': "no-cache",

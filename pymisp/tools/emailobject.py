@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 import re
 import logging
@@ -29,14 +30,14 @@ class MISPMsgConverstionError(MISPObjectException):
 
 
 class EMailObject(AbstractMISPObjectGenerator):
-    def __init__(self, filepath: Optional[Union[Path, str]]=None, pseudofile: Optional[BytesIO]=None,
+    def __init__(self, filepath: Path | str | None=None, pseudofile: BytesIO | None=None,
                  attach_original_email: bool = True, **kwargs):
         super().__init__('email', **kwargs)
 
         self.attach_original_email = attach_original_email
-        self.encapsulated_body: Union[str, None] = None
-        self.eml_from_msg: Union[bool, None] = None
-        self.raw_emails: Dict[str, Union[BytesIO, None]] = {'msg': None,
+        self.encapsulated_body: str | None = None
+        self.eml_from_msg: bool | None = None
+        self.raw_emails: dict[str, BytesIO | None] = {'msg': None,
                                                             'eml': None}
 
         self.__pseudofile = self.create_pseudofile(filepath, pseudofile)
@@ -66,7 +67,7 @@ class EMailObject(AbstractMISPObjectGenerator):
                     return message
         except ValueError as _e:  # Exception
             logger.debug("Email not in .msg format or is a corrupted .msg. Attempting to decode email from other formats.")
-            logger.debug("Error: {} ".format(_e))
+            logger.debug(f"Error: {_e} ")
         try:
             if content_in_bytes[:3] == b'\xef\xbb\xbf':  # utf-8-sig byte-order mark (BOM)
                 eml_bytes = content_in_bytes.decode("utf_8_sig").encode("utf-8")
@@ -81,8 +82,8 @@ class EMailObject(AbstractMISPObjectGenerator):
         raise PyMISPNotImplementedYet("EmailObject does not know how to decode data passed to it. Object may not be an email. If this is an email please submit it as an issue to PyMISP so we can add support.")
 
     @staticmethod
-    def create_pseudofile(filepath: Optional[Union[Path, str]] = None,
-                          pseudofile: Optional[BytesIO] = None) -> BytesIO:
+    def create_pseudofile(filepath: Path | str | None = None,
+                          pseudofile: BytesIO | None = None) -> BytesIO:
         """Creates a pseudofile using directly passed data or data loaded from file path.
         """
         if filepath:
@@ -102,7 +103,7 @@ class EMailObject(AbstractMISPObjectGenerator):
         eml = self._build_eml(message, body, attachments)
         return eml
 
-    def _extract_msg_objects(self, msg_obj: MessageBase) -> Tuple[EmailMessage, Dict, List[Any]]:
+    def _extract_msg_objects(self, msg_obj: MessageBase) -> tuple[EmailMessage, dict, list[Any]]:
         """Extracts email objects needed to construct an eml from a msg."""
         message: EmailMessage = email.message_from_string(msg_obj.header.as_string(), policy=policy.default)  # type: ignore
         body = {}
@@ -153,14 +154,14 @@ class EMailObject(AbstractMISPObjectGenerator):
     def _build_eml(self, message: EmailMessage, body: dict, attachments: list) -> EmailMessage:
         """Constructs an eml file from objects extracted from a msg."""
         # Order the body objects by increasing complexity and toss any missing objects
-        body_objects: List[dict] = [body.get('text', {}),
+        body_objects: list[dict] = [body.get('text', {}),
                                     body.get('html', {}),
                                     body.get('rtf', {})]
         body_objects = [i for i in body_objects if i != {}]
         # If this a non-multipart email then we only need to attach the payload
         if message.get_content_maintype() != 'multipart':
             for _body in body_objects:
-                if "text/{0}".format(_body['subtype']) == message.get_content_type():
+                if "text/{}".format(_body['subtype']) == message.get_content_type():
                     message.set_content(**_body)
                     return message
             raise MISPMsgConverstionError("Unable to find appropriate eml payload in message body.")
@@ -172,7 +173,7 @@ class EMailObject(AbstractMISPObjectGenerator):
         if isinstance(body.get('html', None), dict):
             _html = body.get('html', {}).get('obj')
             for attch in attachments:
-                if _html.find("cid:{0}".format(attch.cid)) != -1:
+                if _html.find(f"cid:{attch.cid}") != -1:
                     _content_type = attch.getStringStream('__substg1.0_370E')
                     maintype, subtype = _content_type.split("/", 1)
                     related_content[attch.cid] = (attch,
@@ -241,7 +242,7 @@ class EMailObject(AbstractMISPObjectGenerator):
                 pass
 
     @property
-    def attachments(self) -> List[Tuple[Optional[str], BytesIO]]:
+    def attachments(self) -> list[tuple[str | None, BytesIO]]:
         to_return = []
         try:
             for attachment in self.email.iter_attachments():
@@ -269,14 +270,14 @@ class EMailObject(AbstractMISPObjectGenerator):
         message = self.email
 
         for _pref, body in message._find_body(message, preferencelist=['plain', 'html']):
-            comment = "{0} body".format(body.get_content_type())
+            comment = f"{body.get_content_type()} body"
             if self.encapsulated_body == body.get_content_type():
                 comment += " De-Encapsulated from RTF in original msg."
             self.add_attribute("email-body",
                                body.get_content(),
                                comment=comment)
 
-        headers = ["{}: {}".format(k, v) for k, v in message.items()]
+        headers = [f"{k}: {v}" for k, v in message.items()]
         if headers:
             self.add_attribute("header", "\n".join(headers))
 
@@ -331,20 +332,20 @@ class EMailObject(AbstractMISPObjectGenerator):
 
         for realname, address in email.utils.getaddresses([data]):
             if address and realname:
-                addresses.append({"value": address, "comment": "{} <{}>".format(realname, address)})
+                addresses.append({"value": address, "comment": f"{realname} <{address}>"})
             elif address:
                 addresses.append({"value": address})
             else:  # parsing failed, skip
                 continue
 
             if realname:
-                display_names.append({"value": realname, "comment": "{} <{}>".format(realname, address)})
+                display_names.append({"value": realname, "comment": f"{realname} <{address}>"})
 
         if addresses:
             self.add_attributes(typ, *addresses)
         if insert_display_names and display_names:
             try:
-                self.add_attributes("{}-display-name".format(typ), *display_names)
+                self.add_attributes(f"{typ}-display-name", *display_names)
             except NewAttributeError:
                 # email object doesn't support display name for all email addrs
                 pass

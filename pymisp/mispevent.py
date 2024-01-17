@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timezone, datetime, date
 import copy
 import os
@@ -11,7 +13,7 @@ from collections import defaultdict
 import logging
 import hashlib
 from pathlib import Path
-from typing import List, Optional, Union, IO, Dict, Any
+from typing import IO, Any
 import warnings
 
 try:
@@ -53,25 +55,11 @@ def _make_datetime(value) -> datetime:
         # Timestamp
         value = datetime.fromtimestamp(value)
     elif isinstance(value, str):
-        if sys.version_info >= (3, 7):
-            try:
-                # faster
-                value = datetime.fromisoformat(value)
-            except Exception:
-                value = parse(value)
-        else:
-            try:
-                # faster
-                if '+' in value or value.find('-', 10) > -1:  # date contains `-` char
-                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f%z")
-                elif '.' in value:
-                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-                elif 'T' in value:
-                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
-                else:
-                    value = datetime.strptime(value, "%Y-%m-%d")
-            except Exception:
-                value = parse(value)
+        try:
+            # faster
+            value = datetime.fromisoformat(value)
+        except Exception:
+            value = parse(value)
     elif isinstance(value, datetime):
         pass
     elif isinstance(value, date):  # NOTE: date has to be *after* datetime, or it will be overwritten
@@ -85,7 +73,7 @@ def _make_datetime(value) -> datetime:
     return value
 
 
-def make_bool(value: Optional[Union[bool, int, str, dict, list]]) -> bool:
+def make_bool(value: bool | int | str | dict | list | None) -> bool:
     """Converts the supplied value to a boolean.
 
     :param value: Value to interpret as a boolean.  An empty string, dict
@@ -103,7 +91,7 @@ def make_bool(value: Optional[Union[bool, int, str, dict, list]]) -> bool:
             return False
         return True
     else:
-        raise PyMISPError('Unable to convert {} to a boolean.'.format(value))
+        raise PyMISPError(f'Unable to convert {value} to a boolean.')
 
 
 class MISPOrganisation(AbstractMISP):
@@ -118,7 +106,7 @@ class MISPOrganisation(AbstractMISP):
     def from_dict(self, **kwargs):
         if 'Organisation' in kwargs:
             kwargs = kwargs['Organisation']
-        super(MISPOrganisation, self).from_dict(**kwargs)
+        super().from_dict(**kwargs)
 
     def __repr__(self) -> str:
         if hasattr(self, 'name'):
@@ -147,7 +135,7 @@ class MISPSharingGroupOrg(AbstractMISP):
             return f'<{self.__class__.__name__}(Org={self.Organisation.name}, extend={self.extend})'
         return f'<{self.__class__.__name__}(NotInitialized)'
 
-    def _to_feed(self) -> Dict:
+    def _to_feed(self) -> dict:
         to_return = super()._to_feed()
         to_return['Organisation'] = self.Organisation._to_feed()
         return to_return
@@ -159,14 +147,14 @@ class MISPSharingGroup(AbstractMISP):
     def __init__(self) -> None:
         super().__init__()
         self.name: str
-        self.SharingGroupOrg: List[MISPSharingGroupOrg] = []
+        self.SharingGroupOrg: list[MISPSharingGroupOrg] = []
 
     @property
-    def sgorgs(self) -> List[MISPSharingGroupOrg]:
+    def sgorgs(self) -> list[MISPSharingGroupOrg]:
         return self.SharingGroupOrg
 
     @sgorgs.setter
-    def sgorgs(self, sgorgs: List[MISPSharingGroupOrg]):
+    def sgorgs(self, sgorgs: list[MISPSharingGroupOrg]):
         if all(isinstance(x, MISPSharingGroupOrg) for x in sgorgs):
             self.SharingGroupOrg = sgorgs
         else:
@@ -190,7 +178,7 @@ class MISPSharingGroup(AbstractMISP):
             return f'<{self.__class__.__name__}(name={self.name})>'
         return f'<{self.__class__.__name__}(NotInitialized)>'
 
-    def _to_feed(self) -> Dict:
+    def _to_feed(self) -> dict:
         to_return = super()._to_feed()
         to_return['SharingGroupOrg'] = [sgorg._to_feed() for sgorg in self.SharingGroupOrg]
         to_return['Organisation'].pop('id', None)
@@ -240,7 +228,7 @@ class MISPSighting(AbstractMISP):
         """
         if 'Sighting' in kwargs:
             kwargs = kwargs['Sighting']
-        super(MISPSighting, self).from_dict(**kwargs)
+        super().from_dict(**kwargs)
 
     def __repr__(self) -> str:
         if hasattr(self, 'value'):
@@ -249,7 +237,7 @@ class MISPSighting(AbstractMISP):
             return '<{self.__class__.__name__}(id={self.id})'.format(self=self)
         if hasattr(self, 'uuid'):
             return '<{self.__class__.__name__}(uuid={self.uuid})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPAttribute(AbstractMISP):
@@ -257,7 +245,7 @@ class MISPAttribute(AbstractMISP):
                              'deleted', 'timestamp', 'to_ids', 'disable_correlation',
                              'first_seen', 'last_seen'}
 
-    def __init__(self, describe_types: Optional[Dict] = None, strict: bool = False):
+    def __init__(self, describe_types: dict | None = None, strict: bool = False):
         """Represents an Attribute
 
         :param describe_types: Use it if you want to overwrite the default describeTypes.json file (you don't)
@@ -265,42 +253,42 @@ class MISPAttribute(AbstractMISP):
         """
         super().__init__()
         if describe_types:
-            self.describe_types: Dict[str, Any] = describe_types
-        self.__categories: List[str] = self.describe_types['categories']
-        self.__category_type_mapping: Dict[str, List[str]] = self.describe_types['category_type_mappings']
-        self.__sane_default: Dict[str, Dict[str, Union[str, int]]] = self.describe_types['sane_defaults']
+            self.describe_types: dict[str, Any] = describe_types
+        self.__categories: list[str] = self.describe_types['categories']
+        self.__category_type_mapping: dict[str, list[str]] = self.describe_types['category_type_mappings']
+        self.__sane_default: dict[str, dict[str, str | int]] = self.describe_types['sane_defaults']
         self.__strict: bool = strict
-        self.data: Optional[BytesIO] = None
+        self.data: BytesIO | None = None
         self.first_seen: datetime
         self.last_seen: datetime
         self.uuid: str = str(uuid.uuid4())
-        self.ShadowAttribute: List[MISPShadowAttribute] = []
+        self.ShadowAttribute: list[MISPShadowAttribute] = []
         self.SharingGroup: MISPSharingGroup
-        self.Sighting: List[MISPSighting] = []
-        self.Tag: List[MISPTag] = []
-        self.Galaxy: List[MISPGalaxy] = []
+        self.Sighting: list[MISPSighting] = []
+        self.Tag: list[MISPTag] = []
+        self.Galaxy: list[MISPGalaxy] = []
 
         # For search
         self.Event: MISPEvent
-        self.RelatedAttribute: List[MISPAttribute]
+        self.RelatedAttribute: list[MISPAttribute]
 
         # For malware sample
-        self._malware_binary: Optional[BytesIO]
+        self._malware_binary: BytesIO | None
 
-    def add_tag(self, tag: Optional[Union[str, MISPTag, Dict]] = None, **kwargs) -> MISPTag:
+    def add_tag(self, tag: str | MISPTag | dict | None = None, **kwargs) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
-    def tags(self) -> List[MISPTag]:
+    def tags(self) -> list[MISPTag]:
         """Returns a list of tags associated to this Attribute"""
         return self.Tag
 
     @tags.setter
-    def tags(self, tags: List[MISPTag]):
+    def tags(self, tags: list[MISPTag]):
         """Set a list of prepared MISPTag."""
         super()._set_tags(tags)
 
-    def add_galaxy(self, galaxy: Union['MISPGalaxy', dict, None] = None, **kwargs) -> 'MISPGalaxy':
+    def add_galaxy(self, galaxy: MISPGalaxy | dict | None = None, **kwargs) -> MISPGalaxy:
         """Add a galaxy to the Attribute, either by passing a MISPGalaxy or a dictionary"""
         if isinstance(galaxy, MISPGalaxy):
             self.galaxies.append(galaxy)
@@ -317,11 +305,11 @@ class MISPAttribute(AbstractMISP):
         return misp_galaxy
 
     @property
-    def galaxies(self) -> List['MISPGalaxy']:
+    def galaxies(self) -> list[MISPGalaxy]:
         """Returns a list of galaxies associated to this Attribute"""
         return self.Galaxy
 
-    def _prepare_data(self, data: Optional[Union[Path, str, bytes, BytesIO]]):
+    def _prepare_data(self, data: Path | str | bytes | BytesIO | None):
         if not data:
             super().__setattr__('data', None)
             return
@@ -369,10 +357,10 @@ class MISPAttribute(AbstractMISP):
         else:
             super().__setattr__(name, value)
 
-    def hash_values(self, algorithm: str = 'sha512') -> List[str]:
+    def hash_values(self, algorithm: str = 'sha512') -> list[str]:
         """Compute the hash of every value for fast lookups"""
         if algorithm not in hashlib.algorithms_available:
-            raise PyMISPError('The algorithm {} is not available for hashing.'.format(algorithm))
+            raise PyMISPError(f'The algorithm {algorithm} is not available for hashing.')
         if '|' in self.type or self.type == 'malware-sample':
             hashes = []
             for v in self.value.split('|'):
@@ -394,7 +382,7 @@ class MISPAttribute(AbstractMISP):
         if not hasattr(self, 'timestamp'):
             self.timestamp = datetime.timestamp(datetime.now())
 
-    def _to_feed(self, with_distribution=False) -> Dict:
+    def _to_feed(self, with_distribution=False) -> dict:
         if with_distribution:
             self._fields_for_feed.add('distribution')
         to_return = super()._to_feed()
@@ -410,12 +398,12 @@ class MISPAttribute(AbstractMISP):
         return to_return
 
     @property
-    def known_types(self) -> List[str]:
+    def known_types(self) -> list[str]:
         """Returns a list of all the known MISP attributes types"""
         return self.describe_types['types']
 
     @property
-    def malware_binary(self) -> Optional[BytesIO]:
+    def malware_binary(self) -> BytesIO | None:
         """Returns a BytesIO of the malware, if the attribute has one.
         Decrypts, unpacks and caches the binary on the first invocation,
         which may require some time for large attachments (~1s/MB).
@@ -437,11 +425,11 @@ class MISPAttribute(AbstractMISP):
         return None
 
     @property
-    def shadow_attributes(self) -> List[MISPShadowAttribute]:
+    def shadow_attributes(self) -> list[MISPShadowAttribute]:
         return self.ShadowAttribute
 
     @shadow_attributes.setter
-    def shadow_attributes(self, shadow_attributes: List[MISPShadowAttribute]):
+    def shadow_attributes(self, shadow_attributes: list[MISPShadowAttribute]):
         """Set a list of prepared MISPShadowAttribute."""
         if all(isinstance(x, MISPShadowAttribute) for x in shadow_attributes):
             self.ShadowAttribute = shadow_attributes
@@ -449,11 +437,11 @@ class MISPAttribute(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPShadowAttribute.')
 
     @property
-    def sightings(self) -> List[MISPSighting]:
+    def sightings(self) -> list[MISPSighting]:
         return self.Sighting
 
     @sightings.setter
-    def sightings(self, sightings: List[MISPSighting]):
+    def sightings(self, sightings: list[MISPSighting]):
         """Set a list of prepared MISPSighting."""
         if all(isinstance(x, MISPSighting) for x in sightings):
             self.Sighting = sightings
@@ -468,7 +456,7 @@ class MISPAttribute(AbstractMISP):
         """Alias for add_shadow_attribute"""
         return self.add_shadow_attribute(shadow_attribute, **kwargs)
 
-    def add_shadow_attribute(self, shadow_attribute: Optional[Union[MISPShadowAttribute, Dict]] = None, **kwargs) -> MISPShadowAttribute:
+    def add_shadow_attribute(self, shadow_attribute: MISPShadowAttribute | dict | None = None, **kwargs) -> MISPShadowAttribute:
         """Add a shadow attribute to the attribute (by name or a MISPShadowAttribute object)"""
         if isinstance(shadow_attribute, MISPShadowAttribute):
             misp_shadow_attribute = shadow_attribute
@@ -479,12 +467,12 @@ class MISPAttribute(AbstractMISP):
             misp_shadow_attribute = MISPShadowAttribute()
             misp_shadow_attribute.from_dict(**kwargs)
         else:
-            raise PyMISPError("The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(shadow_attribute))
+            raise PyMISPError(f"The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {shadow_attribute}")
         self.shadow_attributes.append(misp_shadow_attribute)
         self.edited = True
         return misp_shadow_attribute
 
-    def add_sighting(self, sighting: Optional[Union[MISPSighting, dict]] = None, **kwargs) -> MISPSighting:
+    def add_sighting(self, sighting: MISPSighting | dict | None = None, **kwargs) -> MISPSighting:
         """Add a sighting to the attribute (by name or a MISPSighting object)"""
         if isinstance(sighting, MISPSighting):
             misp_sighting = sighting
@@ -495,7 +483,7 @@ class MISPAttribute(AbstractMISP):
             misp_sighting = MISPSighting()
             misp_sighting.from_dict(**kwargs)
         else:
-            raise PyMISPError("The sighting is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(sighting))
+            raise PyMISPError(f"The sighting is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {sighting}")
         self.sightings.append(misp_sighting)
         self.edited = True
         return misp_sighting
@@ -553,13 +541,13 @@ class MISPAttribute(AbstractMISP):
             self.to_ids = make_bool(self.to_ids)
 
         if not isinstance(self.to_ids, bool):
-            raise NewAttributeError('{} is invalid, to_ids has to be True or False'.format(self.to_ids))
+            raise NewAttributeError(f'{self.to_ids} is invalid, to_ids has to be True or False')
 
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
             self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4, 5]:
-                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
+                raise NewAttributeError(f'{self.distribution} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5')
 
         # other possible values
         if kwargs.get('data'):
@@ -578,10 +566,7 @@ class MISPAttribute(AbstractMISP):
             fs = kwargs.pop('first_seen')
             try:
                 # Faster
-                if sys.version_info >= (3, 7):
-                    self.first_seen = datetime.fromisoformat(fs)
-                else:
-                    self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
+                self.first_seen = datetime.fromisoformat(fs)
             except Exception:
                 # Use __setattr__
                 self.first_seen = fs
@@ -590,10 +575,7 @@ class MISPAttribute(AbstractMISP):
             ls = kwargs.pop('last_seen')
             try:
                 # Faster
-                if sys.version_info >= (3, 7):
-                    self.last_seen = datetime.fromisoformat(ls)
-                else:
-                    self.last_seen = datetime.strptime(ls, "%Y-%m-%dT%H:%M:%S.%f%z")
+                self.last_seen = datetime.fromisoformat(ls)
             except Exception:
                 # Use __setattr__
                 self.last_seen = ls
@@ -607,7 +589,7 @@ class MISPAttribute(AbstractMISP):
                 raise NewAttributeError('If the distribution is set to sharing group, a sharing group ID is required.')
             elif not self.sharing_group_id:
                 # Cannot be None or 0 either.
-                raise NewAttributeError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
+                raise NewAttributeError(f'If the distribution is set to sharing group, a sharing group ID is required (cannot be {self.sharing_group_id}).')
 
         if kwargs.get('Tag'):
             [self.add_tag(tag) for tag in kwargs.pop('Tag')]
@@ -628,7 +610,7 @@ class MISPAttribute(AbstractMISP):
 
         super().from_dict(**kwargs)
 
-    def to_dict(self, json_format: bool = False) -> Dict:
+    def to_dict(self, json_format: bool = False) -> dict:
         to_return = super().to_dict(json_format)
         if self.data:
             to_return['data'] = base64.b64encode(self.data.getvalue()).decode()
@@ -663,7 +645,7 @@ class MISPAttribute(AbstractMISP):
     def __repr__(self):
         if hasattr(self, 'value'):
             return '<{self.__class__.__name__}(type={self.type}, value={self.value})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
     def verify(self, gpg_uid):  # pragma: no cover
         # Not used
@@ -719,12 +701,12 @@ class MISPObjectReference(AbstractMISP):
     def from_dict(self, **kwargs):
         if 'ObjectReference' in kwargs:
             kwargs = kwargs['ObjectReference']
-        super(MISPObjectReference, self).from_dict(**kwargs)
+        super().from_dict(**kwargs)
 
     def __repr__(self) -> str:
         if hasattr(self, 'referenced_uuid') and hasattr(self, 'object_uuid'):
             return '<{self.__class__.__name__}(object_uuid={self.object_uuid}, referenced_uuid={self.referenced_uuid}, relationship_type={self.relationship_type})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPObject(AbstractMISP):
@@ -733,7 +715,7 @@ class MISPObject(AbstractMISP):
                              'template_version', 'uuid', 'timestamp', 'comment',
                              'first_seen', 'last_seen', 'deleted'}
 
-    def __init__(self, name: str, strict: bool = False, standalone: bool = True, default_attributes_parameters: Dict = {}, **kwargs):
+    def __init__(self, name: str, strict: bool = False, standalone: bool = True, default_attributes_parameters: dict = {}, **kwargs):
         ''' Master class representing a generic MISP object
 
         :param name: Name of the object
@@ -749,7 +731,7 @@ class MISPObject(AbstractMISP):
         self.name: str = name
         self._known_template: bool = False
         self.id: int
-        self._definition: Optional[Dict]
+        self._definition: dict | None
 
         misp_objects_template_custom = kwargs.pop('misp_objects_template_custom', None)
         misp_objects_path_custom = kwargs.pop('misp_objects_path_custom', None)
@@ -763,9 +745,9 @@ class MISPObject(AbstractMISP):
         self.first_seen: datetime
         self.last_seen: datetime
         self.__fast_attribute_access: dict = defaultdict(list)  # Hashtable object_relation: [attributes]
-        self.ObjectReference: List[MISPObjectReference] = []
+        self.ObjectReference: list[MISPObjectReference] = []
         self._standalone: bool = False
-        self.Attribute: List[MISPObjectAttribute] = []
+        self.Attribute: list[MISPObjectAttribute] = []
         self.SharingGroup: MISPSharingGroup
         self._default_attributes_parameters: dict
         if isinstance(default_attributes_parameters, MISPAttribute):
@@ -794,7 +776,7 @@ class MISPObject(AbstractMISP):
             self.sharing_group_id = 0
         self.standalone = standalone
 
-    def _load_template_path(self, template_path: Union[Path, str]) -> bool:
+    def _load_template_path(self, template_path: Path | str) -> bool:
         template = self._load_json(template_path)
         if not template:
             self._definition = None
@@ -802,7 +784,7 @@ class MISPObject(AbstractMISP):
         self._load_template(template)
         return True
 
-    def _load_template(self, template: Dict) -> None:
+    def _load_template(self, template: dict) -> None:
         self._definition = template
         setattr(self, 'meta-category', self._definition['meta-category'])
         self.template_uuid = self._definition['uuid']
@@ -815,7 +797,7 @@ class MISPObject(AbstractMISP):
         if not hasattr(self, 'timestamp'):
             self.timestamp = datetime.timestamp(datetime.now())
 
-    def _to_feed(self, with_distribution=False) -> Dict:
+    def _to_feed(self, with_distribution=False) -> dict:
         if with_distribution:
             self._fields_for_feed.add('distribution')
         if not hasattr(self, 'template_uuid'):  # workaround for old events where the template_uuid was not yet mandatory
@@ -824,7 +806,7 @@ class MISPObject(AbstractMISP):
             self.description = '<unknown>'
         if not hasattr(self, 'meta-category'):  # workaround for old events where meta-category is not always set
             setattr(self, 'meta-category', 'misc')
-        to_return = super(MISPObject, self)._to_feed()
+        to_return = super()._to_feed()
         if self.references:
             to_return['ObjectReference'] = [reference._to_feed() for reference in self.references]
         if with_distribution:
@@ -844,12 +826,12 @@ class MISPObject(AbstractMISP):
                 logger.warning(f'first_seen ({value}) has to be before last_seen ({self.last_seen})')
         super().__setattr__(name, value)
 
-    def force_misp_objects_path_custom(self, misp_objects_path_custom: Union[Path, str], object_name: Optional[str] = None):
+    def force_misp_objects_path_custom(self, misp_objects_path_custom: Path | str, object_name: str | None = None):
         if object_name:
             self.name = object_name
         self._set_template(misp_objects_path_custom)
 
-    def _set_template(self, misp_objects_path_custom: Optional[Union[Path, str]] = None, misp_objects_template_custom: Optional[Dict] = None):
+    def _set_template(self, misp_objects_path_custom: Path | str | None = None, misp_objects_template_custom: dict | None = None):
         if misp_objects_template_custom:
             # A complete template was given to the constructor
             self._load_template(misp_objects_template_custom)
@@ -866,7 +848,7 @@ class MISPObject(AbstractMISP):
             self._known_template = self._load_template_path(self.misp_objects_path / self.name / 'definition.json')
 
         if not self._known_template and self._strict:
-            raise UnknownMISPObjectTemplate('{} is unknown in the MISP object directory.'.format(self.name))
+            raise UnknownMISPObjectTemplate(f'{self.name} is unknown in the MISP object directory.')
         else:
             # Then we have no meta-category, template_uuid, description and template_version
             pass
@@ -881,11 +863,11 @@ class MISPObject(AbstractMISP):
         self._strict = False
 
     @property
-    def attributes(self) -> List['MISPObjectAttribute']:
+    def attributes(self) -> list[MISPObjectAttribute]:
         return self.Attribute
 
     @attributes.setter
-    def attributes(self, attributes: List['MISPObjectAttribute']):
+    def attributes(self, attributes: list[MISPObjectAttribute]):
         if all(isinstance(x, MISPObjectAttribute) for x in attributes):
             self.Attribute = attributes
             self.__fast_attribute_access = defaultdict(list)
@@ -893,11 +875,11 @@ class MISPObject(AbstractMISP):
             raise PyMISPError('All the attributes have to be of type MISPObjectAttribute.')
 
     @property
-    def references(self) -> List[MISPObjectReference]:
+    def references(self) -> list[MISPObjectReference]:
         return self.ObjectReference
 
     @references.setter
-    def references(self, references: List[MISPObjectReference]):
+    def references(self, references: list[MISPObjectReference]):
         if all(isinstance(x, MISPObjectReference) for x in references):
             self.ObjectReference = references
         else:
@@ -941,7 +923,7 @@ class MISPObject(AbstractMISP):
             self.distribution = kwargs.pop('distribution')
             self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4, 5]:
-                raise NewAttributeError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
+                raise NewAttributeError(f'{self.distribution} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5')
 
         if kwargs.get('timestamp'):
             ts = kwargs.pop('timestamp')
@@ -954,10 +936,7 @@ class MISPObject(AbstractMISP):
             fs = kwargs.pop('first_seen')
             try:
                 # Faster
-                if sys.version_info >= (3, 7):
-                    self.first_seen = datetime.fromisoformat(fs)
-                else:
-                    self.first_seen = datetime.strptime(fs, "%Y-%m-%dT%H:%M:%S.%f%z")
+                self.first_seen = datetime.fromisoformat(fs)
             except Exception:
                 # Use __setattr__
                 self.first_seen = fs
@@ -966,10 +945,7 @@ class MISPObject(AbstractMISP):
             ls = kwargs.pop('last_seen')
             try:
                 # Faster
-                if sys.version_info >= (3, 7):
-                    self.last_seen = datetime.fromisoformat(ls)
-                else:
-                    self.last_seen = datetime.strptime(ls, "%Y-%m-%dT%H:%M:%S.%f%z")
+                self.last_seen = datetime.fromisoformat(ls)
             except Exception:
                 # Use __setattr__
                 self.last_seen = ls
@@ -989,7 +965,7 @@ class MISPObject(AbstractMISP):
 
         super().from_dict(**kwargs)
 
-    def add_reference(self, referenced_uuid: Union[AbstractMISP, str], relationship_type: str, comment: Optional[str] = None, **kwargs) -> MISPObjectReference:
+    def add_reference(self, referenced_uuid: AbstractMISP | str, relationship_type: str, comment: str | None = None, **kwargs) -> MISPObjectReference:
         """Add a link (uuid) to another object"""
         if isinstance(referenced_uuid, AbstractMISP):
             # Allow to pass an object or an attribute instead of its UUID
@@ -1011,22 +987,22 @@ class MISPObject(AbstractMISP):
         self.edited = True
         return reference
 
-    def get_attributes_by_relation(self, object_relation: str) -> List[MISPAttribute]:
+    def get_attributes_by_relation(self, object_relation: str) -> list[MISPAttribute]:
         '''Returns the list of attributes with the given object relation in the object'''
         return self._fast_attribute_access.get(object_relation, [])
 
     @property
-    def _fast_attribute_access(self) -> Dict:
+    def _fast_attribute_access(self) -> dict:
         if not self.__fast_attribute_access:
             for a in self.attributes:
                 self.__fast_attribute_access[a.object_relation].append(a)
         return self.__fast_attribute_access
 
-    def has_attributes_by_relation(self, list_of_relations: List[str]) -> bool:
+    def has_attributes_by_relation(self, list_of_relations: list[str]) -> bool:
         '''True if all the relations in the list are defined in the object'''
         return all(relation in self._fast_attribute_access for relation in list_of_relations)
 
-    def add_attribute(self, object_relation: str, simple_value: Optional[Union[str, int, float]] = None, **value) -> Optional[MISPAttribute]:
+    def add_attribute(self, object_relation: str, simple_value: str | int | float | None = None, **value) -> MISPAttribute | None:
         """Add an attribute.
         :param object_relation: The object relation of the attribute you're adding to the object
         :param simple_value: The value
@@ -1040,7 +1016,7 @@ class MISPObject(AbstractMISP):
         if simple_value is not None:  # /!\ The value *can* be 0
             value['value'] = simple_value
         if value.get('value') is None:
-            logger.warning("The value of the attribute you're trying to add is None, skipping it. Object relation: {}".format(object_relation))
+            logger.warning(f"The value of the attribute you're trying to add is None, skipping it. Object relation: {object_relation}")
             return None
         else:
             if isinstance(value['value'], bytes):
@@ -1056,14 +1032,14 @@ class MISPObject(AbstractMISP):
             if isinstance(value['value'], str):
                 value['value'] = value['value'].strip().strip('\x00')
                 if value['value'] == '':
-                    logger.warning("The value of the attribute you're trying to add is an empty string, skipping it. Object relation: {}".format(object_relation))
+                    logger.warning(f"The value of the attribute you're trying to add is an empty string, skipping it. Object relation: {object_relation}")
                     return None
         if self._known_template and self._definition:
             if object_relation in self._definition['attributes']:
                 attribute = MISPObjectAttribute(self._definition['attributes'][object_relation])
             else:
                 # Woopsie, this object_relation is unknown, no sane defaults for you.
-                logger.warning("The template ({}) doesn't have the object_relation ({}) you're trying to add. If you are creating a new event to push to MISP, please review your code so it matches the template.".format(self.name, object_relation))
+                logger.warning(f"The template ({self.name}) doesn't have the object_relation ({object_relation}) you're trying to add. If you are creating a new event to push to MISP, please review your code so it matches the template.")
                 attribute = MISPObjectAttribute({})
         else:
             attribute = MISPObjectAttribute({})
@@ -1074,7 +1050,7 @@ class MISPObject(AbstractMISP):
         self.edited = True
         return attribute
 
-    def add_attributes(self, object_relation: str, *attributes) -> List[Optional[MISPAttribute]]:
+    def add_attributes(self, object_relation: str, *attributes) -> list[MISPAttribute | None]:
         '''Add multiple attributes with the same object_relation.
         Helper for object_relation when multiple is True in the template.
         It is the same as calling multiple times add_attribute with the same object_relation.
@@ -1088,15 +1064,15 @@ class MISPObject(AbstractMISP):
             to_return.append(a)
         return to_return
 
-    def to_dict(self, json_format: bool = False, strict: bool = False) -> Dict:
+    def to_dict(self, json_format: bool = False, strict: bool = False) -> dict:
         if strict or self._strict and self._known_template:
             self._validate()
-        return super(MISPObject, self).to_dict(json_format)
+        return super().to_dict(json_format)
 
-    def to_json(self, sort_keys: bool = False, indent: Optional[int] = None, strict: bool = False) -> str:
+    def to_json(self, sort_keys: bool = False, indent: int | None = None, strict: bool = False) -> str:
         if strict or self._strict and self._known_template:
             self._validate()
-        return super(MISPObject, self).to_json(sort_keys=sort_keys, indent=indent)
+        return super().to_json(sort_keys=sort_keys, indent=indent)
 
     def _validate(self) -> bool:
         if not self._definition:
@@ -1105,7 +1081,7 @@ class MISPObject(AbstractMISP):
         if self._definition.get('required'):
             required_missing = set(self._definition['required']) - set(self._fast_attribute_access.keys())
             if required_missing:
-                raise InvalidMISPObject('{} are required.'.format(required_missing))
+                raise InvalidMISPObject(f'{required_missing} are required.')
         if self._definition.get('requiredOneOf'):
             if not set(self._definition['requiredOneOf']) & set(self._fast_attribute_access.keys()):
                 # We ecpect at least one of the object_relation in requiredOneOf, and it isn't the case
@@ -1116,13 +1092,13 @@ class MISPObject(AbstractMISP):
                 continue
             if not self._definition['attributes'][rel].get('multiple'):
                 # object_relation's here more than once, but it isn't allowed in the template.
-                raise InvalidMISPObject('Multiple occurrences of {} is not allowed'.format(rel))
+                raise InvalidMISPObject(f'Multiple occurrences of {rel} is not allowed')
         return True
 
     def __repr__(self) -> str:
         if hasattr(self, 'name'):
             return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPEventReport(AbstractMISP):
@@ -1137,7 +1113,7 @@ class MISPEventReport(AbstractMISP):
         if self.distribution is not None:
             self.distribution = int(self.distribution)
             if self.distribution not in [0, 1, 2, 3, 4, 5]:
-                raise NewEventReportError('{} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5'.format(self.distribution))
+                raise NewEventReportError(f'{self.distribution} is invalid, the distribution has to be in 0, 1, 2, 3, 4, 5')
 
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
@@ -1148,7 +1124,7 @@ class MISPEventReport(AbstractMISP):
                 raise NewEventReportError('If the distribution is set to sharing group, a sharing group ID is required.')
             elif not self.sharing_group_id:
                 # Cannot be None or 0 either.
-                raise NewEventReportError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
+                raise NewEventReportError(f'If the distribution is set to sharing group, a sharing group ID is required (cannot be {self.sharing_group_id}).')
 
         self.name = kwargs.pop('name', None)
         if self.name is None:
@@ -1176,7 +1152,7 @@ class MISPEventReport(AbstractMISP):
     def __repr__(self) -> str:
         if hasattr(self, 'name'):
             return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
     def _set_default(self):
         if not hasattr(self, 'timestamp'):
@@ -1204,7 +1180,7 @@ class MISPGalaxyClusterElement(AbstractMISP):
     def __repr__(self) -> str:
         if hasattr(self, 'key') and hasattr(self, 'value'):
             return '<{self.__class__.__name__}(key={self.key}, value={self.value})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
     def __setattr__(self, key, value):
         if key == "value" and isinstance(value, list):
@@ -1236,7 +1212,7 @@ class MISPGalaxyClusterRelation(AbstractMISP):
     def __repr__(self) -> str:
         if hasattr(self, "referenced_galaxy_cluster_type"):
             return '<{self.__class__.__name__}(referenced_galaxy_cluster_type={self.referenced_galaxy_cluster_type})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
     def __init__(self) -> None:
         super().__init__()
@@ -1244,7 +1220,7 @@ class MISPGalaxyClusterRelation(AbstractMISP):
         self.referenced_galaxy_cluster_uuid: str
         self.distribution: int = 0
         self.referenced_galaxy_cluster_type: str
-        self.Tag: List[MISPTag] = []
+        self.Tag: list[MISPTag] = []
 
     def from_dict(self, **kwargs):
         # Default values for a valid event to send to a MISP instance
@@ -1261,7 +1237,7 @@ class MISPGalaxyClusterRelation(AbstractMISP):
                 raise NewGalaxyClusterRelationError('If the distribution is set to sharing group, a sharing group ID is required.')
             elif not self.sharing_group_id:
                 # Cannot be None or 0 either.
-                raise NewGalaxyClusterRelationError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
+                raise NewGalaxyClusterRelationError(f'If the distribution is set to sharing group, a sharing group ID is required (cannot be {self.sharing_group_id}).')
 
         if kwargs.get('id'):
             self.id = int(kwargs.pop('id'))
@@ -1282,16 +1258,16 @@ class MISPGalaxyClusterRelation(AbstractMISP):
             self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
         super().from_dict(**kwargs)
 
-    def add_tag(self, tag: Optional[Union[str, MISPTag, Dict]] = None, **kwargs) -> MISPTag:
+    def add_tag(self, tag: str | MISPTag | dict | None = None, **kwargs) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
-    def tags(self) -> List[MISPTag]:
+    def tags(self) -> list[MISPTag]:
         """Returns a list of tags associated to this Attribute"""
         return self.Tag
 
     @tags.setter
-    def tags(self, tags: List[MISPTag]):
+    def tags(self, tags: list[MISPTag]):
         """Set a list of prepared MISPTag."""
         super()._set_tags(tags)
 
@@ -1321,9 +1297,9 @@ class MISPGalaxyCluster(AbstractMISP):
     def __init__(self) -> None:
         super().__init__()
         self.Galaxy: MISPGalaxy
-        self.GalaxyElement: List[MISPGalaxyClusterElement] = []
-        self.meta: Dict = {}
-        self.GalaxyClusterRelation: List[MISPGalaxyClusterRelation] = []
+        self.GalaxyElement: list[MISPGalaxyClusterElement] = []
+        self.meta: dict = {}
+        self.GalaxyClusterRelation: list[MISPGalaxyClusterRelation] = []
         self.Org: MISPOrganisation
         self.Orgc: MISPOrganisation
         self.SharingGroup: MISPSharingGroup
@@ -1332,19 +1308,19 @@ class MISPGalaxyCluster(AbstractMISP):
         self.default = False
 
     @property
-    def cluster_elements(self) -> List[MISPGalaxyClusterElement]:
+    def cluster_elements(self) -> list[MISPGalaxyClusterElement]:
         return self.GalaxyElement
 
     @cluster_elements.setter
-    def cluster_elements(self, cluster_elements: List[MISPGalaxyClusterElement]):
+    def cluster_elements(self, cluster_elements: list[MISPGalaxyClusterElement]):
         self.GalaxyElement = cluster_elements
 
     @property
-    def cluster_relations(self) -> List[MISPGalaxyClusterRelation]:
+    def cluster_relations(self) -> list[MISPGalaxyClusterRelation]:
         return self.GalaxyClusterRelation
 
     @cluster_relations.setter
-    def cluster_relations(self, cluster_relations: List[MISPGalaxyClusterRelation]):
+    def cluster_relations(self, cluster_relations: list[MISPGalaxyClusterRelation]):
         self.GalaxyClusterRelation = cluster_relations
 
     def parse_meta_as_elements(self):
@@ -1358,7 +1334,7 @@ class MISPGalaxyCluster(AbstractMISP):
                 self.add_cluster_element(key=key, value=v)
 
     @property
-    def elements_meta(self) -> Dict:
+    def elements_meta(self) -> dict:
         """Function to return the galaxy cluster elements as a dictionary structure of lists
         that comes from a MISPGalaxy within a MISPEvent. Lossy, you lose the element ID
         """
@@ -1393,7 +1369,7 @@ class MISPGalaxyCluster(AbstractMISP):
                 raise NewGalaxyClusterError('If the distribution is set to sharing group, a sharing group ID is required.')
             elif not self.sharing_group_id:
                 # Cannot be None or 0 either.
-                raise NewGalaxyClusterError('If the distribution is set to sharing group, a sharing group ID is required (cannot be {}).'.format(self.sharing_group_id))
+                raise NewGalaxyClusterError(f'If the distribution is set to sharing group, a sharing group ID is required (cannot be {self.sharing_group_id}).')
 
         if 'uuid' in kwargs:
             self.uuid = kwargs.pop('uuid')
@@ -1431,7 +1407,7 @@ class MISPGalaxyCluster(AbstractMISP):
         self.cluster_elements.append(cluster_element)
         return cluster_element
 
-    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: Union["MISPGalaxyCluster", str, UUID], referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: Optional[str] = None, **kwargs: Dict) -> MISPGalaxyClusterRelation:
+    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: MISPGalaxyCluster | str | UUID, referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: str | None = None, **kwargs: dict) -> MISPGalaxyClusterRelation:
         """Add a cluster relation to a MISPGalaxyCluster.
 
         :param referenced_galaxy_cluster_uuid: UUID of the related cluster
@@ -1461,7 +1437,7 @@ class MISPGalaxyCluster(AbstractMISP):
     def __repr__(self) -> str:
         if hasattr(self, 'value'):
             return '<{self.__class__.__name__}(value={self.value})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPGalaxy(AbstractMISP):
@@ -1469,7 +1445,7 @@ class MISPGalaxy(AbstractMISP):
 
     def __init__(self) -> None:
         super().__init__()
-        self.GalaxyCluster: List[MISPGalaxyCluster] = []
+        self.GalaxyCluster: list[MISPGalaxyCluster] = []
         self.name: str
 
     def from_dict(self, **kwargs):
@@ -1487,7 +1463,7 @@ class MISPGalaxy(AbstractMISP):
         super().from_dict(**kwargs)
 
     @property
-    def clusters(self) -> List[MISPGalaxyCluster]:
+    def clusters(self) -> list[MISPGalaxyCluster]:
         return self.GalaxyCluster
 
     def add_galaxy_cluster(self, **kwargs) -> MISPGalaxyCluster:
@@ -1502,7 +1478,7 @@ class MISPGalaxy(AbstractMISP):
     def __repr__(self) -> str:
         if hasattr(self, 'name'):
             return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPEvent(AbstractMISP):
@@ -1510,7 +1486,7 @@ class MISPEvent(AbstractMISP):
     _fields_for_feed: set = {'uuid', 'info', 'threat_level_id', 'analysis', 'timestamp',
                              'publish_timestamp', 'published', 'date', 'extends_uuid'}
 
-    def __init__(self, describe_types: Optional[Dict] = None, strict_validation: bool = False, **kwargs):
+    def __init__(self, describe_types: dict | None = None, strict_validation: bool = False, **kwargs):
         super().__init__(**kwargs)
         self.__schema_file = 'schema.json' if strict_validation else 'schema-lax.json'
 
@@ -1520,25 +1496,25 @@ class MISPEvent(AbstractMISP):
 
         self.uuid: str = str(uuid.uuid4())
         self.date: date
-        self.Attribute: List[MISPAttribute] = []
-        self.Object: List[MISPObject] = []
-        self.RelatedEvent: List[MISPEvent] = []
-        self.ShadowAttribute: List[MISPShadowAttribute] = []
+        self.Attribute: list[MISPAttribute] = []
+        self.Object: list[MISPObject] = []
+        self.RelatedEvent: list[MISPEvent] = []
+        self.ShadowAttribute: list[MISPShadowAttribute] = []
         self.SharingGroup: MISPSharingGroup
-        self.EventReport: List[MISPEventReport] = []
-        self.Tag: List[MISPTag] = []
-        self.Galaxy: List[MISPGalaxy] = []
+        self.EventReport: list[MISPEventReport] = []
+        self.Tag: list[MISPTag] = []
+        self.Galaxy: list[MISPGalaxy] = []
 
-    def add_tag(self, tag: Optional[Union[str, MISPTag, dict]] = None, **kwargs) -> MISPTag:
+    def add_tag(self, tag: str | MISPTag | dict | None = None, **kwargs) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
-    def tags(self) -> List[MISPTag]:
+    def tags(self) -> list[MISPTag]:
         """Returns a list of tags associated to this Event"""
         return self.Tag
 
     @tags.setter
-    def tags(self, tags: List[MISPTag]):
+    def tags(self, tags: list[MISPTag]):
         """Set a list of prepared MISPTag."""
         super()._set_tags(tags)
 
@@ -1564,7 +1540,7 @@ class MISPEvent(AbstractMISP):
             self.threat_level_id = 4
 
     @property
-    def manifest(self) -> Dict:
+    def manifest(self) -> dict:
         required = ['info', 'Orgc']
         for r in required:
             if not hasattr(self, r):
@@ -1584,8 +1560,8 @@ class MISPEvent(AbstractMISP):
             }
         }
 
-    def attributes_hashes(self, algorithm: str = 'sha512') -> List[str]:
-        to_return: List[str] = []
+    def attributes_hashes(self, algorithm: str = 'sha512') -> list[str]:
+        to_return: list[str] = []
         for attribute in self.attributes:
             to_return += attribute.hash_values(algorithm)
         for obj in self.objects:
@@ -1593,7 +1569,7 @@ class MISPEvent(AbstractMISP):
                 to_return += attribute.hash_values(algorithm)
         return to_return
 
-    def to_feed(self, valid_distributions: List[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False, with_distribution=False, with_local_tags: bool = True, with_event_reports: bool = True) -> Dict:
+    def to_feed(self, valid_distributions: list[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False, with_distribution=False, with_local_tags: bool = True, with_event_reports: bool = True) -> dict:
         """ Generate a json output for MISP Feed.
 
         :param valid_distributions: only makes sense if the distribution key is set; i.e., the event is exported from a MISP instance.
@@ -1667,7 +1643,7 @@ class MISPEvent(AbstractMISP):
         return {'Event': to_return}
 
     @property
-    def known_types(self) -> List[str]:
+    def known_types(self) -> list[str]:
         return self.describe_types['types']
 
     @property
@@ -1686,68 +1662,68 @@ class MISPEvent(AbstractMISP):
             raise PyMISPError('Orgc must be of type MISPOrganisation.')
 
     @property
-    def attributes(self) -> List[MISPAttribute]:
+    def attributes(self) -> list[MISPAttribute]:
         return self.Attribute
 
     @attributes.setter
-    def attributes(self, attributes: List[MISPAttribute]):
+    def attributes(self, attributes: list[MISPAttribute]):
         if all(isinstance(x, MISPAttribute) for x in attributes):
             self.Attribute = attributes
         else:
             raise PyMISPError('All the attributes have to be of type MISPAttribute.')
 
     @property
-    def event_reports(self) -> List[MISPEventReport]:
+    def event_reports(self) -> list[MISPEventReport]:
         return self.EventReport
 
     @property
-    def shadow_attributes(self) -> List[MISPShadowAttribute]:
+    def shadow_attributes(self) -> list[MISPShadowAttribute]:
         return self.ShadowAttribute
 
     @shadow_attributes.setter
-    def shadow_attributes(self, shadow_attributes: List[MISPShadowAttribute]):
+    def shadow_attributes(self, shadow_attributes: list[MISPShadowAttribute]):
         if all(isinstance(x, MISPShadowAttribute) for x in shadow_attributes):
             self.ShadowAttribute = shadow_attributes
         else:
             raise PyMISPError('All the attributes have to be of type MISPShadowAttribute.')
 
     @property
-    def related_events(self) -> List['MISPEvent']:
+    def related_events(self) -> list[MISPEvent]:
         return self.RelatedEvent
 
     @property
-    def galaxies(self) -> List[MISPGalaxy]:
+    def galaxies(self) -> list[MISPGalaxy]:
         return self.Galaxy
 
     @galaxies.setter
-    def galaxies(self, galaxies: List[MISPGalaxy]):
+    def galaxies(self, galaxies: list[MISPGalaxy]):
         if all(isinstance(x, MISPGalaxy) for x in galaxies):
             self.Galaxy = galaxies
         else:
             raise PyMISPError('All the attributes have to be of type MISPGalaxy.')
 
     @property
-    def objects(self) -> List[MISPObject]:
+    def objects(self) -> list[MISPObject]:
         return self.Object
 
     @objects.setter
-    def objects(self, objects: List[MISPObject]):
+    def objects(self, objects: list[MISPObject]):
         if all(isinstance(x, MISPObject) for x in objects):
             self.Object = objects
         else:
             raise PyMISPError('All the attributes have to be of type MISPObject.')
 
-    def load_file(self, event_path: Union[Path, str], validate: bool = False, metadata_only: bool = False):
+    def load_file(self, event_path: Path | str, validate: bool = False, metadata_only: bool = False):
         """Load a JSON dump from a file on the disk"""
         if not os.path.exists(event_path):
             raise PyMISPError('Invalid path, unable to load the event.')
         with open(event_path, 'rb') as f:
             self.load(f, validate, metadata_only)
 
-    def load(self, json_event: Union[IO, str, bytes, dict], validate: bool = False, metadata_only: bool = False):
+    def load(self, json_event: IO | str | bytes | dict, validate: bool = False, metadata_only: bool = False):
         """Load a JSON dump from a pseudo file or a JSON string"""
         if isinstance(json_event, (BufferedIOBase, TextIOBase)):
-            json_event = json_event.read()  # type: ignore
+            json_event = json_event.read()
 
         if isinstance(json_event, (str, bytes)):
             json_event = json.loads(json_event)
@@ -1770,13 +1746,10 @@ class MISPEvent(AbstractMISP):
             if isinstance(value, date):
                 pass
             elif isinstance(value, str):
-                if sys.version_info >= (3, 7):
-                    try:
-                        # faster
-                        value = date.fromisoformat(value)
-                    except Exception:
-                        value = parse(value).date()
-                else:
+                try:
+                    # faster
+                    value = date.fromisoformat(value)
+                except Exception:
                     value = parse(value).date()
             elif isinstance(value, (int, float)):
                 value = date.fromtimestamp(value)
@@ -1786,7 +1759,7 @@ class MISPEvent(AbstractMISP):
                 raise NewEventError(f'Invalid format for the date: {type(value)} - {value}')
         super().__setattr__(name, value)
 
-    def set_date(self, d: Optional[Union[str, int, float, datetime, date]] = None, ignore_invalid: bool = False):
+    def set_date(self, d: str | int | float | datetime | date | None = None, ignore_invalid: bool = False):
         """Set a date for the event
 
         :param d: String, datetime, or date object
@@ -1873,9 +1846,9 @@ class MISPEvent(AbstractMISP):
             self.SharingGroup = MISPSharingGroup()
             self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
 
-        super(MISPEvent, self).from_dict(**kwargs)
+        super().from_dict(**kwargs)
 
-    def to_dict(self, json_format: bool = False) -> Dict:
+    def to_dict(self, json_format: bool = False) -> dict:
         to_return = super().to_dict(json_format)
 
         if to_return.get('date'):
@@ -1904,17 +1877,17 @@ class MISPEvent(AbstractMISP):
             misp_shadow_attribute = MISPShadowAttribute()
             misp_shadow_attribute.from_dict(**kwargs)
         else:
-            raise PyMISPError("The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {}".format(shadow_attribute))
+            raise PyMISPError(f"The shadow_attribute is in an invalid format (can be either string, MISPShadowAttribute, or an expanded dict): {shadow_attribute}")
         self.shadow_attributes.append(misp_shadow_attribute)
         self.edited = True
         return misp_shadow_attribute
 
-    def get_attribute_tag(self, attribute_identifier: str) -> List[MISPTag]:
+    def get_attribute_tag(self, attribute_identifier: str) -> list[MISPTag]:
         """Return the tags associated to an attribute or an object attribute.
 
         :param attribute_identifier: can be an ID, UUID, or the value.
         """
-        tags: List[MISPTag] = []
+        tags: list[MISPTag] = []
         for a in self.attributes + [attribute for o in self.objects for attribute in o.attributes]:
             if ((hasattr(a, 'id') and a.id == attribute_identifier)
                     or (hasattr(a, 'uuid') and a.uuid == attribute_identifier)
@@ -1923,7 +1896,7 @@ class MISPEvent(AbstractMISP):
                 tags += a.tags
         return tags
 
-    def add_attribute_tag(self, tag: Union[MISPTag, str], attribute_identifier: str) -> List[MISPAttribute]:
+    def add_attribute_tag(self, tag: MISPTag | str, attribute_identifier: str) -> list[MISPAttribute]:
         """Add a tag to an existing attribute. Raise an Exception if the attribute doesn't exist.
 
         :param tag: Tag name as a string, MISPTag instance, or dictionary
@@ -1939,11 +1912,11 @@ class MISPEvent(AbstractMISP):
                 attributes.append(a)
 
         if not attributes:
-            raise PyMISPError('No attribute with identifier {} found.'.format(attribute_identifier))
+            raise PyMISPError(f'No attribute with identifier {attribute_identifier} found.')
         self.edited = True
         return attributes
 
-    def publish(self):
+    def publish(self) -> None:
         """Mark the attribute as published"""
         self.published = True
 
@@ -1962,12 +1935,12 @@ class MISPEvent(AbstractMISP):
                 a.delete()
                 break
         else:
-            raise PyMISPError('No attribute with UUID/ID {} found.'.format(attribute_id))
+            raise PyMISPError(f'No attribute with UUID/ID {attribute_id} found.')
 
-    def add_attribute(self, type: str, value: Union[str, int, float], **kwargs) -> Union[MISPAttribute, List[MISPAttribute]]:
+    def add_attribute(self, type: str, value: str | int | float, **kwargs) -> MISPAttribute | list[MISPAttribute]:
         """Add an attribute. type and value are required but you can pass all
         other parameters supported by MISPAttribute"""
-        attr_list: List[MISPAttribute] = []
+        attr_list: list[MISPAttribute] = []
         if isinstance(value, list):
             attr_list = [self.add_attribute(type=type, value=a, **kwargs) for a in value]
         else:
@@ -1988,7 +1961,7 @@ class MISPEvent(AbstractMISP):
         self.edited = True
         return event_report
 
-    def add_galaxy(self, galaxy: Union[MISPGalaxy, dict, None] = None, **kwargs) -> MISPGalaxy:
+    def add_galaxy(self, galaxy: MISPGalaxy | dict | None = None, **kwargs) -> MISPGalaxy:
         """Add a galaxy and sub-clusters into an event, either by passing
         a MISPGalaxy or a dictionary.
         Supports all other parameters supported by MISPGalaxy"""
@@ -2006,14 +1979,14 @@ class MISPEvent(AbstractMISP):
         self.galaxies.append(misp_galaxy)
         return misp_galaxy
 
-    def get_object_by_id(self, object_id: Union[str, int]) -> MISPObject:
+    def get_object_by_id(self, object_id: str | int) -> MISPObject:
         """Get an object by ID
 
         :param object_id: the ID is the one set by the server when creating the new object"""
         for obj in self.objects:
             if hasattr(obj, 'id') and int(obj.id) == int(object_id):
                 return obj
-        raise InvalidMISPObject('Object with {} does not exist in this event'.format(object_id))
+        raise InvalidMISPObject(f'Object with {object_id} does not exist in this event')
 
     def get_object_by_uuid(self, object_uuid: str) -> MISPObject:
         """Get an object by UUID
@@ -2022,9 +1995,9 @@ class MISPEvent(AbstractMISP):
         for obj in self.objects:
             if hasattr(obj, 'uuid') and obj.uuid == object_uuid:
                 return obj
-        raise InvalidMISPObject('Object with {} does not exist in this event'.format(object_uuid))
+        raise InvalidMISPObject(f'Object with {object_uuid} does not exist in this event')
 
-    def get_objects_by_name(self, object_name: str) -> List[MISPObject]:
+    def get_objects_by_name(self, object_name: str) -> list[MISPObject]:
         """Get objects by name
 
         :param object_name: name is set by the server when creating the new object"""
@@ -2034,7 +2007,7 @@ class MISPEvent(AbstractMISP):
                 objects.append(obj)
         return objects
 
-    def add_object(self, obj: Union[MISPObject, dict, None] = None, **kwargs) -> MISPObject:
+    def add_object(self, obj: MISPObject | dict | None = None, **kwargs) -> MISPObject:
         """Add an object to the Event, either by passing a MISPObject, or a dictionary"""
         if isinstance(obj, MISPObject):
             misp_obj = obj
@@ -2061,12 +2034,12 @@ class MISPEvent(AbstractMISP):
         :param object_id: ID or UUID
         """
         for o in self.objects:
-            if ((hasattr(o, 'id') and o.id == object_id)
+            if ((hasattr(o, 'id') and int(o.id) == int(object_id))
                     or (hasattr(o, 'uuid') and o.uuid == object_id)):
                 o.delete()
                 break
         else:
-            raise PyMISPError('No object with UUID/ID {} found.'.format(object_id))
+            raise PyMISPError(f'No object with UUID/ID {object_id} found.')
 
     def run_expansions(self):
         for index, attribute in enumerate(self.attributes):
@@ -2078,7 +2051,7 @@ class MISPEvent(AbstractMISP):
                 try:
                     from .tools import make_binary_objects
                 except ImportError as e:
-                    logger.info('Unable to load make_binary_objects: {}'.format(e))
+                    logger.info(f'Unable to load make_binary_objects: {e}')
                     continue
                 file_object, bin_type_object, bin_section_objects = make_binary_objects(pseudofile=attribute.malware_binary, filename=attribute.malware_filename)
                 self.add_object(file_object)
@@ -2089,12 +2062,12 @@ class MISPEvent(AbstractMISP):
                         self.add_object(bin_section_object)
                 self.attributes.pop(index)
             else:
-                logger.warning('No expansions for this data type ({}). Open an issue if needed.'.format(attribute.type))
+                logger.warning(f'No expansions for this data type ({attribute.type}). Open an issue if needed.')
 
     def __repr__(self) -> str:
         if hasattr(self, 'info'):
             return '<{self.__class__.__name__}(info={self.info})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
     def _serialize(self):  # pragma: no cover
         return '{date}{threat_level_id}{info}{uuid}{analysis}{timestamp}'.format(
@@ -2165,12 +2138,12 @@ class MISPObjectTemplate(AbstractMISP):
         super().from_dict(**kwargs)
 
     def __repr__(self) -> str:
-        return '<{self.__class__.__name__}(self.name)'.format(self=self)
+        return f'<{self.__class__.__name__}(self.name)'
 
 
 class MISPUser(AbstractMISP):
 
-    def __init__(self, **kwargs: Dict) -> None:
+    def __init__(self, **kwargs: dict) -> None:
         super().__init__(**kwargs)
         self.email: str
 
@@ -2178,13 +2151,13 @@ class MISPUser(AbstractMISP):
         if 'User' in kwargs:
             kwargs = kwargs['User']
         super().from_dict(**kwargs)
-        if hasattr(self, 'password') and set(self.password) == set(['*']):
+        if hasattr(self, 'password') and set(self.password) == {'*'}:
             self.password = None
 
     def __repr__(self) -> str:
         if hasattr(self, 'email'):
             return '<{self.__class__.__name__}(email={self.email})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPFeed(AbstractMISP):
@@ -2197,7 +2170,7 @@ class MISPFeed(AbstractMISP):
             try:
                 self.settings = json.loads(self.settings)
             except json.decoder.JSONDecodeError as e:
-                logger.error("Failed to parse feed settings: {}".format(self.settings))
+                logger.error(f"Failed to parse feed settings: {self.settings}")
                 raise e
 
 
@@ -2241,7 +2214,7 @@ class MISPCorrelationExclusion(AbstractMISP):
 
 class MISPRole(AbstractMISP):
 
-    def __init__(self, **kwargs: Dict) -> None:
+    def __init__(self, **kwargs: dict) -> None:
         super().__init__(**kwargs)
         self.perm_admin: int
         self.perm_site_admin: int
@@ -2262,7 +2235,7 @@ class MISPServer(AbstractMISP):
 
 class MISPLog(AbstractMISP):
 
-    def __init__(self, **kwargs: Dict) -> None:
+    def __init__(self, **kwargs: dict) -> None:
         super().__init__(**kwargs)
         self.model: str
         self.action: str
@@ -2279,7 +2252,7 @@ class MISPLog(AbstractMISP):
 
 class MISPEventDelegation(AbstractMISP):
 
-    def __init__(self, **kwargs: Dict) -> None:
+    def __init__(self, **kwargs: dict) -> None:
         super().__init__(**kwargs)
         self.org_id: int
         self.requester_org_id: int
@@ -2304,7 +2277,7 @@ class MISPObjectAttribute(MISPAttribute):
         super().__init__()
         self._definition = definition
 
-    def from_dict(self, object_relation: str, value: Union[str, int, float], **kwargs):  # type: ignore
+    def from_dict(self, object_relation: str, value: str | int | float, **kwargs):  # type: ignore
         # NOTE: Signature of "from_dict" incompatible with supertype "MISPAttribute"
         self.object_relation = object_relation
         self.value = value
@@ -2334,7 +2307,7 @@ class MISPObjectAttribute(MISPAttribute):
     def __repr__(self):
         if hasattr(self, 'value'):
             return '<{self.__class__.__name__}(object_relation={self.object_relation}, value={self.value})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)'
 
 
 class MISPCommunity(AbstractMISP):
@@ -2361,9 +2334,9 @@ class MISPUserSetting(AbstractMISP):
 
 class MISPInbox(AbstractMISP):
 
-    def __init__(self, **kwargs: Dict) -> None:
+    def __init__(self, **kwargs: dict) -> None:
         super().__init__(**kwargs)
-        self.data: Dict
+        self.data: dict
 
     def from_dict(self, **kwargs):
         if 'Inbox' in kwargs:
@@ -2376,7 +2349,7 @@ class MISPInbox(AbstractMISP):
 
 class MISPEventBlocklist(AbstractMISP):
 
-    def __init__(self, **kwargs: Dict) -> None:
+    def __init__(self, **kwargs: dict) -> None:
         super().__init__(**kwargs)
         self.event_uuid: str
 
@@ -2391,7 +2364,7 @@ class MISPEventBlocklist(AbstractMISP):
 
 class MISPOrganisationBlocklist(AbstractMISP):
 
-    def __init__(self, **kwargs: Dict) -> None:
+    def __init__(self, **kwargs: dict) -> None:
         super().__init__(**kwargs)
         self.org_uuid: str
 
@@ -2406,7 +2379,7 @@ class MISPOrganisationBlocklist(AbstractMISP):
 
 class MISPDecayingModel(AbstractMISP):
 
-    def __init__(self, **kwargs: Dict) -> None:
+    def __init__(self, **kwargs: dict) -> None:
         super().__init__(**kwargs)
         self.uuid: str
         self.id: int

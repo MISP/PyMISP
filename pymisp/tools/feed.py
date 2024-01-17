@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from pathlib import Path
 from pymisp import MISPEvent
@@ -9,7 +10,7 @@ from typing import List
 
 def feed_meta_generator(path: Path):
     manifests = {}
-    hashes: List[str] = []
+    hashes: list[str] = []
 
     for f_name in path.glob('*.json'):
         if str(f_name.name) == 'manifest.json':

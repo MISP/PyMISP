@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .vtreportobject import VTReportObject  # noqa
 from .neo4j import Neo4j  # noqa
 from .fileobject import FileObject  # noqa

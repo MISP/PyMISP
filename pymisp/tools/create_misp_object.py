@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from io import BytesIO
 
@@ -31,7 +32,7 @@ class FileTypeNotImplemented(MISPObjectException):
     pass
 
 
-def make_binary_objects(filepath: Optional[str] = None, pseudofile: Optional[BytesIO] = None, filename: Optional[str] = None, standalone: bool = True, default_attributes_parameters: dict = {}):
+def make_binary_objects(filepath: str | None = None, pseudofile: BytesIO | None = None, filename: str | None = None, standalone: bool = True, default_attributes_parameters: dict = {}):
     misp_file = FileObject(filepath=filepath, pseudofile=pseudofile, filename=filename,
                            standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     if HAS_LIEF and (filepath or (pseudofile and filename)):

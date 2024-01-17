@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
@@ -13,11 +14,11 @@ logger = logging.getLogger('pymisp')
 
 class SSHAuthorizedKeysObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, authorized_keys_path: Optional[Union[Path, str]] = None, authorized_keys_pseudofile: Optional[StringIO] = None, **kwargs):
+    def __init__(self, authorized_keys_path: Path | str | None = None, authorized_keys_pseudofile: StringIO | None = None, **kwargs):
         # PY3 way:
         super().__init__('ssh-authorized-keys', **kwargs)
         if authorized_keys_path:
-            with open(authorized_keys_path, 'r') as f:
+            with open(authorized_keys_path) as f:
                 self.__pseudofile = StringIO(f.read())
         elif authorized_keys_pseudofile and isinstance(authorized_keys_pseudofile, StringIO):
             self.__pseudofile = authorized_keys_pseudofile

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 import re
 from typing import Optional
@@ -24,7 +25,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
     :indicator: IOC to search VirusTotal for
     '''
-    def __init__(self, apikey: str, indicator: str, vt_proxies: Optional[dict] = None, **kwargs):
+    def __init__(self, apikey: str, indicator: str, vt_proxies: dict | None = None, **kwargs):
         super().__init__('virustotal-report', **kwargs)
         indicator = indicator.strip()
         self._resource_type = self.__validate_resource(indicator)
@@ -33,7 +34,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
             self._report = self.__query_virustotal(apikey, indicator)
             self.generate_attributes()
         else:
-            error_msg = "A valid indicator is required. (One of type url, md5, sha1, sha256). Received '{}' instead".format(indicator)
+            error_msg = f"A valid indicator is required. (One of type url, md5, sha1, sha256). Received '{indicator}' instead"
             raise InvalidMISPObject(error_msg)
 
     def get_report(self):
@@ -70,7 +71,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
         :resource: Indicator to search in VirusTotal
         '''
-        url = "https://www.virustotal.com/vtapi/v2/{}/report".format(self._resource_type)
+        url = f"https://www.virustotal.com/vtapi/v2/{self._resource_type}/report"
         params = {"apikey": apikey, "resource": resource}
         # for now assume we're using a public API key - we'll figure out private keys later
         if self._proxies:

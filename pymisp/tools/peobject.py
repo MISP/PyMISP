@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
@@ -35,7 +36,7 @@ def make_pe_objects(lief_parsed: lief.PE.Binary, misp_file: FileObject, standalo
 
 class PEObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: Optional[lief.PE.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, **kwargs):
+    def __init__(self, parsed: lief.PE.Binary | None = None, filepath: Path | str | None = None, pseudofile: BytesIO | None = None, **kwargs):
         """Creates an PE object, with lief"""
         super().__init__('pe', **kwargs)
         if not HAS_PYDEEP:
@@ -46,7 +47,7 @@ class PEObject(AbstractMISPObjectGenerator):
             elif isinstance(pseudofile, bytes):
                 self.__pe = lief.PE.parse(raw=pseudofile)
             else:
-                raise InvalidMISPObject('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
+                raise InvalidMISPObject(f'Pseudo file can be BytesIO or bytes got {type(pseudofile)}')
         elif filepath:
             self.__pe = lief.PE.parse(filepath)
         elif parsed:
@@ -54,7 +55,7 @@ class PEObject(AbstractMISPObjectGenerator):
             if isinstance(parsed, lief.PE.Binary):
                 self.__pe = parsed
             else:
-                raise InvalidMISPObject('Not a lief.PE.Binary: {}'.format(type(parsed)))
+                raise InvalidMISPObject(f'Not a lief.PE.Binary: {type(parsed)}')
         self.generate_attributes()
 
     def _is_exe(self):
@@ -67,7 +68,7 @@ class PEObject(AbstractMISPObjectGenerator):
 
     def _is_driver(self):
         # List from pefile
-        system_DLLs = set(('ntoskrnl.exe', 'hal.dll', 'ndis.sys', 'bootvid.dll', 'kdcom.dll'))
+        system_DLLs = {'ntoskrnl.exe', 'hal.dll', 'ndis.sys', 'bootvid.dll', 'kdcom.dll'}
         if system_DLLs.intersection([imp.lower() for imp in self.__pe.libraries]):
             return True
         return False
@@ -116,10 +117,10 @@ class PEObject(AbstractMISPObjectGenerator):
                     # Skip section if name is none AND size is 0.
                     continue
                 s = PESectionObject(section, standalone=self._standalone, default_attributes_parameters=self._default_attributes_parameters)
-                self.add_reference(s.uuid, 'includes', 'Section {} of PE'.format(pos))
+                self.add_reference(s.uuid, 'includes', f'Section {pos} of PE')
                 if ((self.__pe.entrypoint >= section.virtual_address)
                         and (self.__pe.entrypoint < (section.virtual_address + section.virtual_size))):
-                    self.add_attribute('entrypoint-section-at-position', value='{}|{}'.format(section.name, pos))
+                    self.add_attribute('entrypoint-section-at-position', value=f'{section.name}|{pos}')
                 pos += 1
                 self.sections.append(s)
         self.add_attribute('number-sections', value=len(self.sections))

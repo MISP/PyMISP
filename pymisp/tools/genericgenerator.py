@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from .abstractgenerator import AbstractMISPObjectGenerator
 from typing import List
@@ -8,7 +9,7 @@ from typing import List
 class GenericObjectGenerator(AbstractMISPObjectGenerator):
 
     # FIXME: this method is different from the master one, and that's probably not a good idea.
-    def generate_attributes(self, attributes: List[dict]):  # type: ignore
+    def generate_attributes(self, attributes: list[dict]):  # type: ignore
         """Generates MISPObjectAttributes from a list of dictionaries.
         Each entry if the list must be in one of the two following formats:
         * {<object_relation>: <value>}

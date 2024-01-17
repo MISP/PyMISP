@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import sys
 import warnings
@@ -59,4 +61,4 @@ try:
         pass
     logger.debug('pymisp loaded properly')
 except ImportError as e:
-    logger.warning('Unable to load pymisp properly: {}'.format(e))
+    logger.warning(f'Unable to load pymisp properly: {e}')

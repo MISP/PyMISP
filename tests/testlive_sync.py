@@ -1,23 +1,18 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import time
 import sys
 import unittest
 import subprocess
 
-import urllib3  # type: ignore
+import urllib3
 import logging
 logging.disable(logging.CRITICAL)
 
 try:
     from pymisp import ExpandedPyMISP, MISPOrganisation, MISPUser, MISPEvent, MISPObject, MISPSharingGroup, Distribution
 except ImportError:
-    if sys.version_info < (3, 6):
-        print('This test suite requires Python 3.6+, breaking.')
-        sys.exit(0)
-    else:
-        raise
+    raise
 
 key = 'eYQdGTEWZJ8C2lm9EpnMqxQGwGiPNyoR75JvLdlE'
 verifycert = False

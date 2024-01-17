@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
@@ -22,7 +23,7 @@ except ImportError:
     HAS_PYDEEP = False
 
 try:
-    import magic  # type: ignore
+    import magic
     HAS_MAGIC = True
 except ImportError:
     HAS_MAGIC = False
@@ -30,7 +31,7 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, filename: Optional[str] = None, **kwargs) -> None:
+    def __init__(self, filepath: Path | str | None = None, pseudofile: BytesIO | None = None, filename: str | None = None, **kwargs) -> None:
         super().__init__('file', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")

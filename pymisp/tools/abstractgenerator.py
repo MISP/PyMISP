@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from .. import MISPObject
 from ..exceptions import InvalidMISPObject
@@ -10,7 +11,7 @@ from typing import Union, Optional
 
 class AbstractMISPObjectGenerator(MISPObject):
 
-    def _detect_epoch(self, timestamp: Union[str, int, float]) -> bool:
+    def _detect_epoch(self, timestamp: str | int | float) -> bool:
         try:
             tmp = float(timestamp)
             if tmp < 30000000:
@@ -21,7 +22,7 @@ class AbstractMISPObjectGenerator(MISPObject):
         except ValueError:
             return False
 
-    def _sanitize_timestamp(self, timestamp: Optional[Union[datetime, date, dict, str, int, float]] = None) -> datetime:
+    def _sanitize_timestamp(self, timestamp: datetime | date | dict | str | int | float | None = None) -> datetime:
         if not timestamp:
             return datetime.now()
 

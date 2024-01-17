@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
 try:
     from misp_stix_converter.converters.buildMISPAttribute import buildEvent  # type: ignore

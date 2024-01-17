@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from pathlib import Path
 from typing import List, Optional
@@ -10,7 +11,7 @@ from pymisp import MISPObject
 
 class CSVLoader():
 
-    def __init__(self, template_name: str, csv_path: Path, fieldnames: Optional[List[str]] = None, has_fieldnames=False,
+    def __init__(self, template_name: str, csv_path: Path, fieldnames: list[str] | None = None, has_fieldnames=False,
                  delimiter: str = ',', quotechar: str = '"'):
         self.template_name = template_name
         self.delimiter = delimiter
