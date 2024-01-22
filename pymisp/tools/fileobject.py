@@ -11,7 +11,6 @@ import math
 from collections import Counter
 import logging
 from pathlib import Path
-from typing import Union, Optional
 
 logger = logging.getLogger('pymisp')
 
@@ -31,7 +30,7 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath: Path | str | None = None, pseudofile: BytesIO | None = None, filename: str | None = None, **kwargs) -> None:
+    def __init__(self, filepath: Path | str | None = None, pseudofile: BytesIO | bytes | None = None, filename: str | None = None, **kwargs) -> None:
         super().__init__('file', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")

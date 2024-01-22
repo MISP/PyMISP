@@ -8,7 +8,6 @@ from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 from datetime import datetime
 import logging
-from typing import Optional, Union
 from pathlib import Path
 from base64 import b64encode
 
@@ -36,15 +35,17 @@ def make_pe_objects(lief_parsed: lief.PE.Binary, misp_file: FileObject, standalo
 
 class PEObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: lief.PE.Binary | None = None, filepath: Path | str | None = None, pseudofile: BytesIO | None = None, **kwargs):
+    def __init__(self, parsed: lief.PE.Binary | None = None, filepath: Path | str | None = None, pseudofile: BytesIO | list[int] | None = None, **kwargs):
         """Creates an PE object, with lief"""
         super().__init__('pe', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                self.__pe = lief.PE.parse(io=pseudofile)
+                self.__pe = lief.PE.parse(obj=pseudofile)
             elif isinstance(pseudofile, bytes):
+                self.__pe = lief.PE.parse(raw=list(pseudofile))
+            elif isinstance(pseudofile, list):
                 self.__pe = lief.PE.parse(raw=pseudofile)
             else:
                 raise InvalidMISPObject(f'Pseudo file can be BytesIO or bytes got {type(pseudofile)}')

@@ -7,7 +7,6 @@ from .abstractgenerator import AbstractMISPObjectGenerator
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import logging
-from typing import Optional, Union
 from pathlib import Path
 from . import FileObject
 
@@ -33,15 +32,17 @@ def make_macho_objects(lief_parsed: lief.MachO.Binary, misp_file: FileObject, st
 
 class MachOObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: lief.MachO.Binary | None = None, filepath: Path | str | None = None, pseudofile: BytesIO | None = None, **kwargs):
+    def __init__(self, parsed: lief.MachO.Binary | None = None, filepath: Path | str | None = None, pseudofile: BytesIO | list[int] | None = None, **kwargs):
         """Creates an MachO object, with lief"""
         super().__init__('macho', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                self.__macho = lief.MachO.parse(io=pseudofile)
+                self.__macho = lief.MachO.parse(obj=pseudofile)
             elif isinstance(pseudofile, bytes):
+                self.__macho = lief.MachO.parse(raw=list(pseudofile))
+            elif isinstance(pseudofile, list):
                 self.__macho = lief.MachO.parse(raw=pseudofile)
             else:
                 raise InvalidMISPObject(f'Pseudo file can be BytesIO or bytes got {type(pseudofile)}')
@@ -49,7 +50,7 @@ class MachOObject(AbstractMISPObjectGenerator):
             self.__macho = lief.MachO.parse(filepath)
         elif parsed:
             # Got an already parsed blob
-            if isinstance(parsed, lief.MachO.Binary):
+            if isinstance(parsed, lief.MachO.FatBinary):
                 self.__macho = parsed
             else:
                 raise InvalidMISPObject(f'Not a lief.MachO.Binary: {type(parsed)}')

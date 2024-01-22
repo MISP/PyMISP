@@ -7,7 +7,6 @@ from ..exceptions import InvalidMISPObject
 from io import BytesIO
 from hashlib import md5, sha1, sha256, sha512
 import logging
-from typing import Union, Optional
 from pathlib import Path
 from . import FileObject
 
@@ -33,15 +32,17 @@ def make_elf_objects(lief_parsed: lief.ELF.Binary, misp_file: FileObject, standa
 
 class ELFObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: lief.ELF.Binary | None = None, filepath: Path | str | None = None, pseudofile: BytesIO | None = None, **kwargs):
+    def __init__(self, parsed: lief.ELF.Binary | None = None, filepath: Path | str | None = None, pseudofile: BytesIO | bytes | list[int] | None = None, **kwargs):
         """Creates an ELF object, with lief"""
         super().__init__('elf', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                self.__elf = lief.ELF.parse(io=pseudofile)
+                self.__elf = lief.ELF.parse(obj=pseudofile)
             elif isinstance(pseudofile, bytes):
+                self.__elf = lief.ELF.parse(raw=list(pseudofile))
+            elif isinstance(pseudofile, list):
                 self.__elf = lief.ELF.parse(raw=pseudofile)
             else:
                 raise InvalidMISPObject(f'Pseudo file can be BytesIO or bytes got {type(pseudofile)}')
