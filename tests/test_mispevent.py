@@ -92,7 +92,7 @@ class TestMISPEvent(unittest.TestCase):
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
         # Fake setting an attribute ID for testing
         self.mispevent.attributes[0].id = 42
-        self.mispevent.delete_attribute(42)
+        self.mispevent.delete_attribute('42')
         with open('tests/mispevent_testfiles/attribute_del.json') as f:
             ref_json = json.load(f)
         self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))

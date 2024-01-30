@@ -92,7 +92,7 @@ class MISPEncode(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
-class AbstractMISP(MutableMapping[str, Any], MISPFileCache, metaclass=ABCMeta):
+class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: ignore[type-arg]
     __resources_path = resources_path
     __misp_objects_path = misp_objects_path
     __describe_types = describe_types
