@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 __version__ = importlib.metadata.version("pymisp")
 
 
-def warning_2024():
+def warning_2024() -> None:
     if sys.version_info < (3, 10):
         warnings.warn("""
 As our baseline system is the latest Ubuntu LTS, and Ubuntu LTS 22.04 has Python 3.10 available,
@@ -62,3 +62,17 @@ try:
     logger.debug('pymisp loaded properly')
 except ImportError as e:
     logger.warning(f'Unable to load pymisp properly: {e}')
+
+__all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
+           'MISPEvent', 'MISPAttribute', 'MISPObjectReference', 'MISPObjectAttribute',
+           'MISPObject', 'MISPUser', 'MISPOrganisation', 'MISPSighting', 'MISPLog',
+           'MISPShadowAttribute', 'MISPWarninglist', 'MISPTaxonomy', 'MISPNoticelist',
+           'MISPObjectTemplate', 'MISPSharingGroup', 'MISPRole', 'MISPServer', 'MISPFeed',
+           'MISPEventDelegation', 'MISPUserSetting', 'MISPInbox', 'MISPEventBlocklist',
+           'MISPOrganisationBlocklist', 'MISPEventReport', 'MISPCorrelationExclusion',
+           'MISPDecayingModel', 'MISPGalaxy', 'MISPGalaxyCluster', 'MISPGalaxyClusterElement',
+           'MISPGalaxyClusterRelation', 'PyMISPError', 'NewEventError', 'NewAttributeError',
+           'NoURL', 'NoKey', 'InvalidMISPObject', 'UnknownMISPObjectTemplate', 'PyMISPInvalidFormat',
+           'EmailObject', 'FileObject', 'IPObject', 'DomainObject', 'URIObject', 'ASNObject',
+           'Distribution', 'ThreatLevel', 'Analysis'
+           ]

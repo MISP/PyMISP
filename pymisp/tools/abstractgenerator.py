@@ -6,7 +6,6 @@ from .. import MISPObject
 from ..exceptions import InvalidMISPObject
 from datetime import datetime, date
 from dateutil.parser import parse
-from typing import Union, Optional
 
 
 class AbstractMISPObjectGenerator(MISPObject):

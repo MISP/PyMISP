@@ -43,3 +43,13 @@ try:
 except ImportError:
     # Requires lief, optional [fileobjects]
     pass
+
+__all__ = ['VTReportObject', 'Neo4j', 'FileObject', 'make_binary_objects',
+           'AbstractMISPObjectGenerator', 'GenericObjectGenerator',
+           'load_openioc', 'load_openioc_file', 'SBSignatureObject',
+           'Fail2BanObject', 'DomainIPObject', 'ASNObject', 'GeolocationObject',
+           'GitVulnFinderObject', 'VehicleObject', 'CSVLoader',
+           'SSHAuthorizedKeysObject', 'feed_meta_generator', 'update_objects',
+           'EMailObject', 'URLObject', 'PEObject', 'PESectionObject', 'ELFObject',
+           'ELFSectionObject', 'MachOObject', 'MachOSectionObject'
+           ]
