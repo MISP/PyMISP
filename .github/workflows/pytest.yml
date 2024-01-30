@@ -34,13 +34,12 @@ jobs:
     - name: Test with nosetests
       run: |
         poetry run pytest --cov=pymisp tests/test_*.py
-        poetry run mypy tests/testlive_comprehensive.py tests/test_mispevent.py tests/testlive_sync.py pymisp
+        poetry run mypy .
 
     - name: Test with nosetests with orjson
       run: |
         pip3 install orjson
         poetry run pytest --cov=pymisp tests/test_*.py
-        poetry run mypy tests/testlive_comprehensive.py tests/test_mispevent.py tests/testlive_sync.py pymisp
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
