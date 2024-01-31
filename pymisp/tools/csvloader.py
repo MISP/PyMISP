@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Optional
 
 import csv
 from pymisp import MISPObject
@@ -11,8 +10,9 @@ from pymisp import MISPObject
 
 class CSVLoader():
 
-    def __init__(self, template_name: str, csv_path: Path, fieldnames: list[str] | None = None, has_fieldnames=False,
-                 delimiter: str = ',', quotechar: str = '"'):
+    def __init__(self, template_name: str, csv_path: Path,
+                 fieldnames: list[str] | None = None, has_fieldnames: bool=False,
+                 delimiter: str = ',', quotechar: str = '"') -> None:
         self.template_name = template_name
         self.delimiter = delimiter
         self.quotechar = quotechar
@@ -26,7 +26,7 @@ class CSVLoader():
         else:
             self.has_fieldnames = has_fieldnames
 
-    def load(self):
+    def load(self) -> list[MISPObject]:
 
         objects = []
 
@@ -44,7 +44,7 @@ class CSVLoader():
             # Check if the CSV file has a header, and if it matches with the object template
             tmp_object = MISPObject(self.template_name)
 
-            if not tmp_object._definition['attributes']:
+            if not tmp_object._definition or not tmp_object._definition['attributes']:
                 raise Exception(f'Unable to find the object template ({self.template_name}), impossible to create objects.')
             allowed_fieldnames = list(tmp_object._definition['attributes'].keys())
             for fieldname in self.fieldnames:

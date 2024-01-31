@@ -5,9 +5,8 @@ from __future__ import annotations
 import logging
 
 from io import BytesIO
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from . import FileObject, PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
 from ..exceptions import MISPObjectException
 logger = logging.getLogger('pymisp')
 
@@ -27,6 +26,9 @@ except AttributeError:
 
 except ImportError:
     HAS_LIEF = False
+
+if TYPE_CHECKING:
+    from . import FileObject, PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
 
 
 class FileTypeNotImplemented(MISPObjectException):
