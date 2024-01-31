@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from io import BytesIO
-
-from . import FileObject
-from ..exceptions import MISPObjectException
 import logging
 
+from io import BytesIO
+from typing import Any
+
+from . import FileObject, PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
+from ..exceptions import MISPObjectException
 logger = logging.getLogger('pymisp')
 
 try:
@@ -32,7 +33,11 @@ class FileTypeNotImplemented(MISPObjectException):
     pass
 
 
-def make_binary_objects(filepath: str | None = None, pseudofile: BytesIO | bytes | None = None, filename: str | None = None, standalone: bool = True, default_attributes_parameters: dict = {}):
+def make_binary_objects(filepath: str | None = None,
+                        pseudofile: BytesIO | bytes | None = None,
+                        filename: str | None = None,
+                        standalone: bool = True,
+                        default_attributes_parameters: dict[str, Any] = {}) -> tuple[FileObject, PEObject | ELFObject | MachOObject | None, list[PESectionObject] | list[ELFSectionObject] | list[MachOSectionObject]]:
     misp_file = FileObject(filepath=filepath, pseudofile=pseudofile, filename=filename,
                            standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     if HAS_LIEF and (filepath or pseudofile):
