@@ -718,10 +718,10 @@ class PyMISP:
         r = self._prepare_request('GET', f'objectTemplates/getRaw/{uuid_or_name}')
         return self._check_json_response(r)
 
-    def update_object_templates(self) -> dict[str, Any]:
+    def update_object_templates(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Trigger an update of the object templates"""
         response = self._prepare_request('POST', 'objectTemplates/update')
-        return self._check_json_response(response)
+        return self._check_json_response_list(response)
 
     # ## END Object ###
 
@@ -1202,7 +1202,7 @@ class PyMISP:
         response = self._prepare_request('POST', f'taxonomies/enable/{taxonomy_id}')
         return self._check_json_response(response)
 
-    def disable_taxonomy(self, taxonomy: MISPTaxonomy | int | str | UUID) -> dict[str, Any]:
+    def disable_taxonomy(self, taxonomy: MISPTaxonomy | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
         """Disable a taxonomy: https://www.misp-project.org/openapi/#tag/Taxonomies/operation/disableTaxonomy
 
         :param taxonomy: taxonomy to disable
@@ -1238,10 +1238,10 @@ class PyMISP:
         response = self._prepare_request('POST', url)
         return self._check_json_response(response)
 
-    def update_taxonomies(self) -> dict[str, Any]:
+    def update_taxonomies(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Update all the taxonomies: https://www.misp-project.org/openapi/#tag/Taxonomies/operation/updateTaxonomies"""
         response = self._prepare_request('POST', 'taxonomies/update')
-        return self._check_json_response(response)
+        return self._check_json_response_list(response)
 
     def set_taxonomy_required(self, taxonomy: MISPTaxonomy | int | str, required: bool = False) -> dict[str, Any]:
         taxonomy_id = get_uuid_or_id_from_abstract_misp(taxonomy)
@@ -1330,18 +1330,18 @@ class PyMISP:
         warninglist_id = get_uuid_or_id_from_abstract_misp(warninglist)
         return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=False)
 
-    def values_in_warninglist(self, value: Iterable[str]) -> dict[str, Any]:
+    def values_in_warninglist(self, value: Iterable[str]) -> dict[str, Any] | list[dict[str, Any]]:
         """Check if IOC values are in warninglist
 
         :param value: iterator with values to check
         """
         response = self._prepare_request('POST', 'warninglists/checkValue', data=value)
-        return self._check_json_response(response)
+        return self._check_json_response_list(response)
 
-    def update_warninglists(self) -> dict[str, Any]:
+    def update_warninglists(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Update all the warninglists: https://www.misp-project.org/openapi/#tag/Warninglists/operation/updateWarninglists"""
         response = self._prepare_request('POST', 'warninglists/update')
-        return self._check_json_response(response)
+        return self._check_json_response_list(response)
 
     # ## END Warninglists ###
 
@@ -1400,10 +1400,10 @@ class PyMISP:
         response = self._prepare_request('POST', f'noticelists/enableNoticelist/{noticelist_id}')
         return self._check_json_response(response)
 
-    def update_noticelists(self) -> dict[str, Any]:
+    def update_noticelists(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Update all the noticelists: https://www.misp-project.org/openapi/#tag/Noticelists/operation/updateNoticelists"""
         response = self._prepare_request('POST', 'noticelists/update')
-        return self._check_json_response(response)
+        return self._check_json_response_list(response)
 
     # ## END Noticelist ###
 
@@ -1553,10 +1553,10 @@ class PyMISP:
             response.append(c)
         return response
 
-    def update_galaxies(self) -> dict[str, Any]:
+    def update_galaxies(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Update all the galaxies: https://www.misp-project.org/openapi/#tag/Galaxies/operation/updateGalaxies"""
         response = self._prepare_request('POST', 'galaxies/update')
-        return self._check_json_response(response)
+        return self._check_json_response_list(response)
 
     def get_galaxy_cluster(self, galaxy_cluster: MISPGalaxyCluster | int | str | UUID, pythonify: bool = False) -> dict[str, Any] | MISPGalaxyCluster:
         """Gets a specific galaxy cluster
@@ -2475,10 +2475,10 @@ class PyMISP:
 
     # ## BEGIN Decaying Models ###
 
-    def update_decaying_models(self) -> dict[str, Any]:
+    def update_decaying_models(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Update all the Decaying models"""
         response = self._prepare_request('POST', 'decayingModel/update')
-        return self._check_json_response(response)
+        return self._check_json_response_list(response)
 
     def decaying_models(self, pythonify: bool = False) -> dict[str, Any] | list[MISPDecayingModel] | list[dict[str, Any]]:
         """Get all the decaying models
