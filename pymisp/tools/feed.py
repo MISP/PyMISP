@@ -5,10 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from pymisp import MISPEvent
 import json
-from typing import List
 
 
-def feed_meta_generator(path: Path):
+def feed_meta_generator(path: Path) -> None:
     manifests = {}
     hashes: list[str] = []
 

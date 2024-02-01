@@ -13,7 +13,7 @@ from ..abstract import resources_path
 static_repo = "https://github.com/MISP/misp-objects/archive/main.zip"
 
 
-def update_objects():
+def update_objects() -> None:
     r = requests.get(static_repo)
 
     zipped_repo = BytesIO(r.content)

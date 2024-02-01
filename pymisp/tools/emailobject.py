@@ -31,7 +31,7 @@ class MISPMsgConverstionError(MISPObjectException):
 
 
 class EMailObject(AbstractMISPObjectGenerator):
-    def __init__(self, filepath: Path | str | None=None, pseudofile: BytesIO | None=None,  # type: ignore[no-untyped-def]
+    def __init__(self, filepath: Path | str | None=None, pseudofile: BytesIO | bytes | None=None,  # type: ignore[no-untyped-def]
                  attach_original_email: bool = True, **kwargs) -> None:
         super().__init__('email', **kwargs)
 
@@ -79,11 +79,11 @@ class EMailObject(AbstractMISPObjectGenerator):
                     return eml
         except UnicodeDecodeError:
             pass
-        raise PyMISPNotImplementedYet("EmailObject does not know how to decode data passed to it. Object may not be an email. If this is an email please submit it as an issue to PyMISP so we can add support.")
+        raise InvalidMISPObject("EmailObject does not know how to decode data passed to it. Object may not be an email. If this is an email please submit it as an issue to PyMISP so we can add support.")
 
     @staticmethod
     def create_pseudofile(filepath: Path | str | None = None,
-                          pseudofile: BytesIO | None = None) -> BytesIO:
+                          pseudofile: BytesIO | bytes | None = None) -> BytesIO:
         """Creates a pseudofile using directly passed data or data loaded from file path.
         """
         if filepath:
@@ -91,6 +91,8 @@ class EMailObject(AbstractMISPObjectGenerator):
                 return BytesIO(f.read())
         elif pseudofile and isinstance(pseudofile, BytesIO):
             return pseudofile
+        elif pseudofile and isinstance(pseudofile, bytes):
+            return BytesIO(pseudofile)
         else:
             raise InvalidMISPObject('File buffer (BytesIO) or a path is required.')
 

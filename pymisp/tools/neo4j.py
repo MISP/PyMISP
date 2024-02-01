@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import glob
 import os
+
 from .. import MISPEvent
 
 try:
@@ -13,23 +14,23 @@ except ImportError:
 
 class Neo4j():
 
-    def __init__(self, host='localhost:7474', username='neo4j', password='neo4j'):
+    def __init__(self, host: str='localhost:7474', username: str='neo4j', password: str='neo4j') -> None:
         if not has_py2neo:
             raise Exception('py2neo is required, please install: pip install py2neo')
         authenticate(host, username, password)
         self.graph = Graph(f"http://{host}/db/data/")
 
-    def load_events_directory(self, directory):
-        self.events = []
+    def load_events_directory(self, directory: str) -> None:
+        self.events: list[MISPEvent] = []
         for path in glob.glob(os.path.join(directory, '*.json')):
             e = MISPEvent()
             e.load(path)
             self.import_event(e)
 
-    def del_all(self):
+    def del_all(self) -> None:
         self.graph.delete_all()
 
-    def import_event(self, event):
+    def import_event(self, event: MISPEvent) -> None:
         tx = self.graph.begin()
         event_node = Node('Event', uuid=event.uuid, name=event.info)
         # event_node['distribution'] = event.distribution

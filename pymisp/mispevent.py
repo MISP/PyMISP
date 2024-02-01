@@ -13,7 +13,7 @@ from collections import defaultdict
 import logging
 import hashlib
 from pathlib import Path
-from typing import IO, Any
+from typing import IO, Any, Sequence
 import warnings
 
 try:
@@ -1010,15 +1010,17 @@ class MISPObject(AbstractMISP):
         self.edited = True
         return attribute
 
-    def add_attributes(self, object_relation: str, *attributes: list[dict[str, Any] | MISPAttribute]) -> list[MISPAttribute | None]:
+    def add_attributes(self, object_relation: str, *attributes: Sequence[str | dict[str, Any] | MISPAttribute]) -> list[MISPAttribute | None]:
         '''Add multiple attributes with the same object_relation.
         Helper for object_relation when multiple is True in the template.
         It is the same as calling multiple times add_attribute with the same object_relation.
         '''
         to_return = []
         for attribute in attributes:
-            if isinstance(attribute, dict):
-                a = self.add_attribute(object_relation, **attribute)
+            if isinstance(attribute, MISPAttribute):
+                a = self.add_attribute(object_relation, **attribute.to_dict())
+            elif isinstance(attribute, dict):
+                a = self.add_attribute(object_relation, **attribute)  # type: ignore[misc]
             else:
                 a = self.add_attribute(object_relation, value=attribute)
             to_return.append(a)
@@ -1256,6 +1258,10 @@ class MISPGalaxyCluster(AbstractMISP):
     :type cluster_relations: list[MISPGalaxyClusterRelation], optional
     """
 
+    id: int | str | None
+    tag_name: str
+    galaxy_id: str | None
+
     def __init__(self) -> None:
         super().__init__()
         self.Galaxy: MISPGalaxy
@@ -1404,6 +1410,8 @@ class MISPGalaxyCluster(AbstractMISP):
 
 class MISPGalaxy(AbstractMISP):
     """Galaxy class, used to view a galaxy and respective clusters"""
+
+    id: str | None
 
     def __init__(self) -> None:
         super().__init__()
@@ -2047,6 +2055,8 @@ class MISPObjectTemplate(AbstractMISP):
 
 
 class MISPUser(AbstractMISP):
+
+    authkey: str
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         super().__init__(**kwargs)

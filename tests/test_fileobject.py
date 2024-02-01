@@ -9,7 +9,7 @@ import pathlib
 
 
 class TestFileObject(unittest.TestCase):
-    def test_mimeType(self):
+    def test_mimeType(self) -> None:
         file_object = FileObject(filepath=pathlib.Path(__file__))
         attributes = json.loads(file_object.to_json())['Attribute']
         mime = next(attr for attr in attributes if attr['object_relation'] == 'mimetype')

@@ -1012,7 +1012,7 @@ class PyMISP:
             to_return.append(s)
         return to_return
 
-    def add_sighting(self, sighting: MISPSighting,
+    def add_sighting(self, sighting: MISPSighting | dict[str, Any],
                      attribute: MISPAttribute | int | str | UUID | None = None,
                      pythonify: bool = False) -> dict[str, Any] | MISPSighting:
         """Add a new sighting (globally, or to a specific attribute): https://www.misp-project.org/openapi/#tag/Sightings/operation/addSighting and https://www.misp-project.org/openapi/#tag/Sightings/operation/getSightingsByEventId

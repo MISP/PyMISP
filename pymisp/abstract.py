@@ -8,7 +8,7 @@ from deprecated import deprecated  # type: ignore
 from json import JSONEncoder
 from uuid import UUID
 from abc import ABCMeta
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Any, Mapping
 from collections.abc import MutableMapping
 from functools import lru_cache
@@ -46,7 +46,7 @@ class MISPFileCache:
         return data
 
 
-class Distribution(Enum):
+class Distribution(IntEnum):
     your_organisation_only = 0
     this_community_only = 1
     connected_communities = 2
@@ -55,14 +55,14 @@ class Distribution(Enum):
     inherit = 5
 
 
-class ThreatLevel(Enum):
+class ThreatLevel(IntEnum):
     high = 1
     medium = 2
     low = 3
     undefined = 4
 
 
-class Analysis(Enum):
+class Analysis(IntEnum):
     initial = 0
     ongoing = 1
     completed = 2

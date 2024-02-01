@@ -30,7 +30,9 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath: Path | str | None = None, pseudofile: BytesIO | bytes | None = None, filename: str | None = None, **kwargs) -> None:
+    def __init__(self, filepath: Path | str | None = None,  # type: ignore[no-untyped-def]
+                 pseudofile: BytesIO | bytes | None = None,
+                 filename: str | None = None, **kwargs) -> None:
         super().__init__('file', **kwargs)
         if not HAS_PYDEEP:
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
@@ -55,10 +57,10 @@ class FileObject(AbstractMISPObjectGenerator):
         self.__data = self.__pseudofile.getvalue()
         self.generate_attributes()
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         self.add_attribute('filename', value=self.__filename)
-        size = self.add_attribute('size-in-bytes', value=len(self.__data))
-        if int(size.value) > 0:
+        self.add_attribute('size-in-bytes', value=len(self.__data))
+        if len(self.__data) > 0:
             self.add_attribute('entropy', value=self.__entropy_H(self.__data))
             self.add_attribute('md5', value=md5(self.__data).hexdigest())
             self.add_attribute('sha1', value=sha1(self.__data).hexdigest())
