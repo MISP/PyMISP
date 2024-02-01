@@ -12,7 +12,7 @@ import unittest
 from datetime import datetime, timedelta, date, timezone
 from io import BytesIO
 from pathlib import Path
-from typing import TypeVar, Type, Any
+from typing import TypeVar, Any
 from uuid import uuid4
 
 import urllib3

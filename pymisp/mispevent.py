@@ -2007,7 +2007,7 @@ class MISPEvent(AbstractMISP):
         :param object_id: ID or UUID
         """
         for o in self.objects:
-            if ((hasattr(o, 'id') and int(o.id) == int(object_id))
+            if ((hasattr(o, 'id') and object_id.isdigit() and int(o.id) == int(object_id))
                     or (hasattr(o, 'uuid') and o.uuid == object_id)):
                 o.delete()
                 break
