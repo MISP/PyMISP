@@ -19,6 +19,7 @@ try:
     from .peobject import make_pe_objects
     from .elfobject import make_elf_objects
     from .machoobject import make_macho_objects
+    from . import FileObject
 
 except AttributeError:
     HAS_LIEF = False
@@ -28,7 +29,7 @@ except ImportError:
     HAS_LIEF = False
 
 if TYPE_CHECKING:
-    from . import FileObject, PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
+    from . import PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
 
 
 class FileTypeNotImplemented(MISPObjectException):
