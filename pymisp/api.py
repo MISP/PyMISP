@@ -3515,14 +3515,14 @@ class PyMISP:
         o.from_dict(**updated_organisation_blocklist)
         return o
 
-    def delete_event_blocklist(self, event_blocklist: MISPEventBlocklist | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
+    def delete_event_blocklist(self, event_blocklist: MISPEventBlocklist | str | UUID) -> dict[str, Any]:
         """Delete a blocklisted event by id
 
         :param event_blocklist: event block list to delete
         """
         event_blocklist_id = get_uuid_or_id_from_abstract_misp(event_blocklist)
         response = self._prepare_request('POST', f'eventBlocklists/delete/{event_blocklist_id}')
-        return self._check_json_response_list(response)
+        return self._check_json_response(response)
 
     def delete_organisation_blocklist(self, organisation_blocklist: MISPOrganisationBlocklist | str | UUID) -> dict[str, Any]:
         """Delete a blocklisted organisation by id
