@@ -135,8 +135,8 @@ class TestComprehensive(unittest.TestCase):
         mispevent = MISPEvent(force_timestamps=force_timestamps)
         mispevent.info = 'This is a super simple test'
         mispevent.distribution = Distribution.your_organisation_only
-        mispevent.threat_level_id = int(ThreatLevel.low)
-        mispevent.analysis = int(Analysis.completed)
+        mispevent.threat_level_id = ThreatLevel.low
+        mispevent.analysis = Analysis.completed
         mispevent.add_attribute('text', str(uuid4()))
         return mispevent
 
