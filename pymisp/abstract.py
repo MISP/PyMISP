@@ -46,7 +46,7 @@ class MISPFileCache:
         return data
 
 
-class Distribution(IntEnum):
+class Distribution(Enum):
     your_organisation_only = 0
     this_community_only = 1
     connected_communities = 2
