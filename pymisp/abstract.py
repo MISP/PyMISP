@@ -55,14 +55,14 @@ class Distribution(Enum):
     inherit = 5
 
 
-class ThreatLevel(IntEnum):
+class ThreatLevel(Enum):
     high = 1
     medium = 2
     low = 3
     undefined = 4
 
 
-class Analysis(IntEnum):
+class Analysis(Enum):
     initial = 0
     ongoing = 1
     completed = 2

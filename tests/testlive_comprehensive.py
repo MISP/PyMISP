@@ -1705,7 +1705,7 @@ class TestComprehensive(unittest.TestCase):
         first_send = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first_send)
-            self.assertTrue(isinstance(first, MISPEvent), '\n'.join([first_send, first]))
+            self.assertTrue(isinstance(first, MISPEvent), first)
             file_obj, bin_obj, sections = make_binary_objects('tests/viper-test-files/test_files/whoami.exe', standalone=False)
             first.add_object(file_obj)
             first.add_object(bin_obj)
