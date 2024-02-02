@@ -1333,13 +1333,16 @@ class PyMISP:
         warninglist_id = get_uuid_or_id_from_abstract_misp(warninglist)
         return self.toggle_warninglist(warninglist_id=warninglist_id, force_enable=False)
 
-    def values_in_warninglist(self, value: Iterable[str]) -> dict[str, Any]:
+    def values_in_warninglist(self, value: Iterable[str]) -> dict[str, Any] | list[dict[str, Any]]:
         """Check if IOC values are in warninglist
 
         :param value: iterator with values to check
         """
         response = self._prepare_request('POST', 'warninglists/checkValue', data=value)
-        return self._check_json_response(response)
+        try:
+            return self._check_json_response_list(response)
+        except PyMISPError:
+            return self._check_json_response(response)
 
     def update_warninglists(self) -> dict[str, Any]:
         """Update all the warninglists: https://www.misp-project.org/openapi/#tag/Warninglists/operation/updateWarninglists"""
