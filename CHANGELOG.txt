@@ -2,11 +2,42 @@ Changelog
 =========
 
 
+v2.4.184.2 (2024-02-06)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
+
+Fix
+~~~
+- Do not throw a warning every time one import pymisp... [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps): bump codecov/codecov-action from 3 to 4.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 3 to 4.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v3...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
 v2.4.184.1 (2024-02-06)
 -----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
 
 
