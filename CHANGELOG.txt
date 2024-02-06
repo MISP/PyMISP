@@ -2,6 +2,14 @@ Changelog
 =========
 
 
+v2.4.184.1 (2024-02-06)
+-----------------------
+
+Changes
+~~~~~~~
+- Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
+
+
 v2.4.184 (2024-02-02)
 ---------------------
 
@@ -17,6 +25,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version, objects. [Raphaël Vinot]
 - Remove IntEnum. [Raphaël Vinot]
 - Add even more debug for gha. [Raphaël Vinot]
