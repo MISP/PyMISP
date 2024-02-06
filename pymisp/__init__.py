@@ -47,7 +47,6 @@ try:
     from .tools import update_objects  # noqa
 
     from .api import PyMISP, register_user  # noqa
-    from .api import PyMISP as ExpandedPyMISP  # noqa
     from .tools import load_warninglists  # noqa
     # Let's not bother with old python
     try:
@@ -62,6 +61,11 @@ try:
 except ImportError as e:
     logger.warning(f'Unable to load pymisp properly: {e}')
 
+
+class ExpandedPyMISP(PyMISP):
+    warnings.warn('This class is deprecated, use PyMISP instead', FutureWarning)
+
+
 __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPEvent', 'MISPAttribute', 'MISPObjectReference', 'MISPObjectAttribute',
            'MISPObject', 'MISPUser', 'MISPOrganisation', 'MISPSighting', 'MISPLog',
@@ -73,5 +77,5 @@ __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPGalaxyClusterRelation', 'PyMISPError', 'NewEventError', 'NewAttributeError',
            'NoURL', 'NoKey', 'InvalidMISPObject', 'UnknownMISPObjectTemplate', 'PyMISPInvalidFormat',
            'EmailObject', 'FileObject', 'IPObject', 'DomainObject', 'URIObject', 'ASNObject',
-           'Distribution', 'ThreatLevel', 'Analysis'
+           'Distribution', 'ThreatLevel', 'Analysis', 'ExpandedPyMISP'
            ]
