@@ -63,7 +63,10 @@ except ImportError as e:
 
 
 class ExpandedPyMISP(PyMISP):
-    warnings.warn('This class is deprecated, use PyMISP instead', FutureWarning)
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn('This class is deprecated, use PyMISP instead', FutureWarning)
+        super().__init__(*args, **kwargs)
 
 
 __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
