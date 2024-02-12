@@ -2,11 +2,42 @@ Changelog
 =========
 
 
+v2.4.184.3 (2024-02-12)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly get body from message, without headers. [Raphaël Vinot]
+- Remove from __all__ entries that shouldn't be there. [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps-dev): bump jupyter-lsp from 2.2.1 to 2.2.2.
+  [dependabot[bot]]
+
+  Bumps [jupyter-lsp](https://github.com/jupyter-lsp/jupyterlab-lsp) from 2.2.1 to 2.2.2.
+  - [Release notes](https://github.com/jupyter-lsp/jupyterlab-lsp/releases)
+  - [Changelog](https://github.com/jupyter-lsp/jupyterlab-lsp/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/jupyter-lsp/jupyterlab-lsp/commits)
+
+  ---
+  updated-dependencies:
+  - dependency-name: jupyter-lsp
+    dependency-type: indirect
+  ...
+
+
 v2.4.184.2 (2024-02-06)
 -----------------------
 
 Changes
 ~~~~~~~
+- Add changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
 
