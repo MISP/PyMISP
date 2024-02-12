@@ -20,7 +20,7 @@ from RTFDE.exceptions import MalformedEncapsulatedRtf, NotEncapsulatedRtf  # typ
 from RTFDE.deencapsulate import DeEncapsulator  # type: ignore
 from oletools.common.codepages import codepage2codec  # type: ignore
 
-from ..exceptions import InvalidMISPObject, PyMISPNotImplementedYet, MISPObjectException, NewAttributeError
+from ..exceptions import InvalidMISPObject, MISPObjectException, NewAttributeError
 from .abstractgenerator import AbstractMISPObjectGenerator
 
 logger = logging.getLogger('pymisp')
@@ -269,13 +269,14 @@ class EMailObject(AbstractMISPObjectGenerator):
                                    data=self.raw_emails.get('msg'))
 
         message = self.email
+        body: EmailMessage
 
         if body := message.get_body(preferencelist=['plain']):
             comment = f"{body.get_content_type()} body"
             if self.encapsulated_body == body.get_content_type():
                 comment += " De-Encapsulated from RTF in original msg."
             self.add_attribute("email-body",
-                               body.as_string(),
+                               body.get_content(),
                                comment=comment)
 
         if body := message.get_body(preferencelist=['html']):
@@ -283,7 +284,7 @@ class EMailObject(AbstractMISPObjectGenerator):
             if self.encapsulated_body == body.get_content_type():
                 comment += " De-Encapsulated from RTF in original msg."
             self.add_attribute("email-body",
-                               body.as_string(),
+                               body.get_content(),
                                comment=comment)
 
         headers = [f"{k}: {v}" for k, v in message.items()]
