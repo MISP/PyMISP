@@ -40,15 +40,14 @@ try:
                             MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist,
                             MISPEventReport, MISPCorrelationExclusion, MISPDecayingModel, MISPGalaxy, MISPGalaxyCluster,
                             MISPGalaxyClusterElement, MISPGalaxyClusterRelation)
+    from .api import PyMISP, register_user  # noqa
+    # NOTE: the direct imports to .tools are kept for backward compatibility but should be removed in the future
     from .tools import AbstractMISPObjectGenerator  # noqa
-    from .tools import Neo4j  # noqa
     from .tools import openioc  # noqa
     from .tools import ext_lookups  # noqa
     from .tools import update_objects  # noqa
-
-    from .api import PyMISP, register_user  # noqa
     from .tools import load_warninglists  # noqa
-    # Let's not bother with old python
+
     try:
         from .tools import reportlab_generator  # noqa
     except ImportError:
@@ -79,6 +78,5 @@ __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPDecayingModel', 'MISPGalaxy', 'MISPGalaxyCluster', 'MISPGalaxyClusterElement',
            'MISPGalaxyClusterRelation', 'PyMISPError', 'NewEventError', 'NewAttributeError',
            'NoURL', 'NoKey', 'InvalidMISPObject', 'UnknownMISPObjectTemplate', 'PyMISPInvalidFormat',
-           'EmailObject', 'FileObject', 'IPObject', 'DomainObject', 'URIObject', 'ASNObject',
            'Distribution', 'ThreatLevel', 'Analysis', 'ExpandedPyMISP'
            ]
