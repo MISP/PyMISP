@@ -1292,12 +1292,12 @@ class PyMISP:
         w.from_dict(**wl)
         return w
 
-    def toggle_warninglist(self, warninglist_id: str | int | list[int] | None = None, warninglist_name: str | list[str] | None = None, force_enable: bool = False) -> dict[str, Any] | list[dict[str, Any]]:
+    def toggle_warninglist(self, warninglist_id: str | int | list[int] | None = None, warninglist_name: str | list[str] | None = None, force_enable: bool | None = None) -> dict[str, Any] | list[dict[str, Any]]:
         '''Toggle (enable/disable) the status of a warninglist by id: https://www.misp-project.org/openapi/#tag/Warninglists/operation/toggleEnableWarninglist
 
         :param warninglist_id: ID of the WarningList
         :param warninglist_name: name of the WarningList
-        :param force_enable: Force the warning list in the enabled state (does nothing if already enabled)
+        :param force_enable: Force the warning list in the enabled state (does nothing if already enabled) - None means toggle.
         '''
         if warninglist_id is None and warninglist_name is None:
             raise PyMISPError('Either warninglist_id or warninglist_name is required.')
@@ -1312,7 +1312,7 @@ class PyMISP:
                 query['name'] = warninglist_name
             else:
                 query['name'] = [warninglist_name]
-        if force_enable:
+        if force_enable is not None:
             query['enabled'] = force_enable
         response = self._prepare_request('POST', 'warninglists/toggleEnable', data=query)
         return self._check_json_response(response)
