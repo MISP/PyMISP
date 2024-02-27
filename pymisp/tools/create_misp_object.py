@@ -8,6 +8,7 @@ from io import BytesIO
 from typing import Any, TYPE_CHECKING
 
 from ..exceptions import MISPObjectException
+from . import FileObject
 logger = logging.getLogger('pymisp')
 
 try:
@@ -19,8 +20,6 @@ try:
     from .peobject import make_pe_objects
     from .elfobject import make_elf_objects
     from .machoobject import make_macho_objects
-    from . import FileObject
-
 except AttributeError:
     HAS_LIEF = False
     logger.critical('You need lief >= 0.11.0. The quick and dirty fix is: pip3 install --force pymisp[fileobjects]')
