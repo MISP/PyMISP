@@ -2,11 +2,35 @@ Changelog
 =========
 
 
+v2.4.186 (2024-02-27)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Correct FileObject import. [Johannes Bader]
+
+  The FileObject import has been moved outside the try-except-block
+  related to lief, as the import is needed regardless whether lief
+  is available or not.
+- Disable WL when calling the disable method, not toggle. [Raphaël
+  Vinot]
+
+  Fix #1159
+
+
 v2.4.185 (2024-02-16)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 
 
