@@ -7,6 +7,7 @@ v2.4.186 (2024-02-27)
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
@@ -23,6 +24,22 @@ Fix
   Vinot]
 
   Fix #1159
+
+Other
+~~~~~
+- Build(deps): bump urllib3 from 2.2.0 to 2.2.1. [dependabot[bot]]
+
+  Bumps [urllib3](https://github.com/urllib3/urllib3) from 2.2.0 to 2.2.1.
+  - [Release notes](https://github.com/urllib3/urllib3/releases)
+  - [Changelog](https://github.com/urllib3/urllib3/blob/main/CHANGES.rst)
+  - [Commits](https://github.com/urllib3/urllib3/compare/2.2.0...2.2.1)
+
+  ---
+  updated-dependencies:
+  - dependency-name: urllib3
+    dependency-type: direct:production
+    update-type: version-update:semver-patch
+  ...
 
 
 v2.4.185 (2024-02-16)
