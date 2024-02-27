@@ -125,7 +125,6 @@ logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', for
 # From poetry
 
 pytest --cov=pymisp tests/test_*.py tests/testlive_comprehensive.py:TestComprehensive.[test_name]
-
 ```
 
 ## Documentation
@@ -158,6 +157,35 @@ Creating a new MISP object generator should be done using a pre-defined template
 Your new MISPObject generator must generate attributes and add them as class properties using `add_attribute`.
 
 When the object is sent to MISP, all the class properties will be exported to the JSON export.
+
+## Installing PyMISP on a machine with no internet access
+
+This is done using poetry and you need to have this repository cloned on your machine.
+The commands below have to be run from inside the cloned directory.
+
+
+1. From a machine with access to the internet, get the dependencies:
+
+```bash
+mkdir offline
+poetry export --all-extras  > offline/requirements.txt
+poetry run pip download -r offline/requirements.txt -d offline/packages/
+```
+
+2. Prepare the PyMISP Package
+
+```bash
+poetry build
+mv dist/*.whl offline/packages/
+```
+
+3. Copy the content of `offline/packages/` to the machine with no internet access.
+
+4. Install the packages:
+
+```bash
+python -m pip install --no-index --no-deps packages/*.whl
+```
 
 # License
 

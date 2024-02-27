@@ -1,23 +1,25 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+import logging
 
 from io import BytesIO
+from typing import Any, TYPE_CHECKING
 
-from . import FileObject
 from ..exceptions import MISPObjectException
-import logging
-from typing import Optional
-
 logger = logging.getLogger('pymisp')
 
 try:
     import lief
+    import lief.logging
     lief.logging.disable()
     HAS_LIEF = True
 
     from .peobject import make_pe_objects
     from .elfobject import make_elf_objects
     from .machoobject import make_macho_objects
+    from . import FileObject
 
 except AttributeError:
     HAS_LIEF = False
@@ -26,19 +28,29 @@ except AttributeError:
 except ImportError:
     HAS_LIEF = False
 
+if TYPE_CHECKING:
+    from . import PEObject, ELFObject, MachOObject, PESectionObject, ELFSectionObject, MachOSectionObject
+
 
 class FileTypeNotImplemented(MISPObjectException):
     pass
 
 
-def make_binary_objects(filepath: Optional[str] = None, pseudofile: Optional[BytesIO] = None, filename: Optional[str] = None, standalone: bool = True, default_attributes_parameters: dict = {}):
+def make_binary_objects(filepath: str | None = None,
+                        pseudofile: BytesIO | bytes | None = None,
+                        filename: str | None = None,
+                        standalone: bool = True,
+                        default_attributes_parameters: dict[str, Any] = {}) -> tuple[FileObject, PEObject | ELFObject | MachOObject | None, list[PESectionObject] | list[ELFSectionObject] | list[MachOSectionObject]]:
     misp_file = FileObject(filepath=filepath, pseudofile=pseudofile, filename=filename,
                            standalone=standalone, default_attributes_parameters=default_attributes_parameters)
-    if HAS_LIEF and (filepath or (pseudofile and filename)):
+    if HAS_LIEF and (filepath or pseudofile):
         if filepath:
             lief_parsed = lief.parse(filepath=filepath)
-        elif pseudofile and filename:
-            lief_parsed = lief.parse(raw=pseudofile.getvalue(), name=filename)
+        elif pseudofile:
+            if isinstance(pseudofile, bytes):
+                lief_parsed = lief.parse(raw=pseudofile)
+            else:  # BytesIO
+                lief_parsed = lief.parse(obj=pseudofile)
         else:
             logger.critical('You need either a filepath, or a pseudofile and a filename.')
             lief_parsed = None

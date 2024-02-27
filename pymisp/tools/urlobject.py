@@ -1,9 +1,12 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+import logging
+
+from urllib.parse import unquote_plus
 
 from .abstractgenerator import AbstractMISPObjectGenerator
-import logging
-from urllib.parse import unquote_plus
 
 try:
     from pyfaup.faup import Faup  # type: ignore
@@ -17,13 +20,13 @@ faup = Faup()
 
 class URLObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, url: str, generate_all=False, **kwargs):
+    def __init__(self, url: str, generate_all=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__('url', **kwargs)
         self._generate_all = True if generate_all is True else False
         faup.decode(unquote_plus(url))
         self.generate_attributes()
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         self.add_attribute('url', value=faup.url.decode())
         if faup.get_host():
             self.add_attribute('host', value=faup.get_host())

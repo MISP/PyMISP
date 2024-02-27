@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 
+from __future__ import annotations
+
 import requests
 import json
+
+from typing import Any
 
 from .abstractgenerator import AbstractMISPObjectGenerator
 
@@ -11,14 +15,16 @@ from .abstractgenerator import AbstractMISPObjectGenerator
 class VehicleObject(AbstractMISPObjectGenerator):
     '''Vehicle object generator out of regcheck.org.uk'''
 
-    country_urls = {
+    country_urls: dict[str, str] = {
         'fr': "http://www.regcheck.org.uk/api/reg.asmx/CheckFrance",
         'es': "http://www.regcheck.org.uk/api/reg.asmx/CheckSpain",
         'uk': "http://www.regcheck.org.uk/api/reg.asmx/Check"
     }
 
-    def __init__(self, country: str, registration: str, username: str, **kwargs):
+    def __init__(self, country: str, registration: str, username: str, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__('vehicle', **kwargs)
+        if country not in self.country_urls:
+            raise ValueError(f"Country {country} not supportet, must be one of {self.country_urls.keys()}")
         self._country = country
         self._registration = registration
         self._username = username
@@ -26,10 +32,10 @@ class VehicleObject(AbstractMISPObjectGenerator):
         self.generate_attributes()
 
     @property
-    def report(self):
+    def report(self) -> dict[str, Any]:
         return self._report
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         carDescription = self._report["Description"]
         carMake = self._report["CarMake"]["CurrentTextValue"]
         carModel = self._report["CarModel"]["CurrentTextValue"]
@@ -65,14 +71,14 @@ class VehicleObject(AbstractMISPObjectGenerator):
         self.add_attribute('date-first-registration', type='text', value=firstRegistration)
         self.add_attribute('image-url', type='text', value=ImageUrl)
 
-    def _query(self):
-        payload = "RegistrationNumber={}&username={}".format(self._registration, self._username)
+    def _query(self) -> dict[str, Any]:
+        payload = f"RegistrationNumber={self._registration}&username={self._username}"
         headers = {
             'Content-Type': "application/x-www-form-urlencoded",
             'cache-control': "no-cache",
         }
 
-        response = requests.request("POST", self.country_urls.get(self._country), data=payload, headers=headers)
+        response = requests.request("POST", self.country_urls[self._country], data=payload, headers=headers)
         # FIXME: Clean that up.
         for item in response.text.split("</vehicleJson>"):
             if "<vehicleJson>" in item:

@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
 
 class PyMISPError(Exception):
-    def __init__(self, message):
-        super(PyMISPError, self).__init__(message)
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
         self.message = message
 
 

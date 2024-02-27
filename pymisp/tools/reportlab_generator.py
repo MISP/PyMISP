@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 # Standard imports
 import base64
@@ -49,7 +50,7 @@ def create_flowable_tag(misp_tag):
     return [Flowable_Tag(text=misp_tag.name, color=misp_tag.colour, custom_style=col1_style)]
 
 
-class Flowable_Tag(Flowable):
+class Flowable_Tag(Flowable):  # type: ignore[misc]
     """
     Custom flowable to handle tags. Draw one Tag with the webview formatting
     Modified from : http://two.pairlist.net/pipermail/reportlab-users/2005-February/003695.html
@@ -108,7 +109,7 @@ class Flowable_Tag(Flowable):
         LEFT_INTERNAL_PADDING = 2
         ELONGATION = LEFT_INTERNAL_PADDING * 2
 
-        p = Paragraph("<font color='{}'>{}</font>".format(self.choose_good_text_color(), self.text), style=self.custom_style)
+        p = Paragraph(f"<font color='{self.choose_good_text_color()}'>{self.text}</font>", style=self.custom_style)
         string_width = stringWidth(self.text, self.custom_style.fontName, self.custom_style.fontSize)
 
         self.width = string_width + ELONGATION
@@ -615,7 +616,7 @@ class Value_Formatter():
                 curr_uuid = str(is_safe_value(uuid))
                 curr_baseurl = self.config[moduleconfig[0]]
                 curr_url = uuid_to_url(curr_baseurl, curr_uuid)
-                html_url = "<a href={}>{}</a>".format(curr_url, safe_string(text))
+                html_url = f"<a href={curr_url}>{safe_string(text)}</a>"
 
                 if color:
                     # They want fancy colors
@@ -744,7 +745,7 @@ class Value_Formatter():
                 answer = YES_ANSWER
                 if is_safe_value(published_timestamp):
                     # Published and have published date
-                    answer += '({})'.format(published_timestamp.strftime(EXPORT_DATE_FORMAT))
+                    answer += f'({published_timestamp.strftime(EXPORT_DATE_FORMAT)})'
                 else:
                     # Published without published date
                     answer += "(no date)"
