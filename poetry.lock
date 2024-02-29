@@ -909,13 +909,13 @@ tests = ["asttokens (>=2.1.0)", "coverage", "coverage-enable-subprocess", "ipyth
 
 [[package]]
 name = "extract-msg"
-version = "0.47.0"
+version = "0.48.0"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "extract_msg-0.47.0-py2.py3-none-any.whl", hash = "sha256:ab177546d6ebbea7818e9acb352f6f8cce3821e39319405e6a873808238564a5"},
-    {file = "extract_msg-0.47.0.tar.gz", hash = "sha256:d3ed5fdc8cdff3567421d7e4183511905eb3c83d2605e6c9335c653efa6cfb41"},
+    {file = "extract_msg-0.48.0-py2.py3-none-any.whl", hash = "sha256:8502c3f54f73e0d9a49d431353ed59efe615448b17f3e0921fcc967e7c996de8"},
+    {file = "extract_msg-0.48.0.tar.gz", hash = "sha256:72369613484786e99ee57f6d47178abffb810c9a2e8b143ef5a3ed47bcffa444"},
 ]
 
 [package.dependencies]
@@ -3329,13 +3329,13 @@ files = [
 
 [[package]]
 name = "types-pyopenssl"
-version = "24.0.0.20240130"
+version = "24.0.0.20240228"
 description = "Typing stubs for pyOpenSSL"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-pyOpenSSL-24.0.0.20240130.tar.gz", hash = "sha256:c812e5c1c35249f75ef5935708b2a997d62abf9745be222e5f94b9595472ab25"},
-    {file = "types_pyOpenSSL-24.0.0.20240130-py3-none-any.whl", hash = "sha256:24a255458b5b8a7fca8139cf56f2a8ad5a4f1a5f711b73a5bb9cb50dc688fab5"},
+    {file = "types-pyOpenSSL-24.0.0.20240228.tar.gz", hash = "sha256:cd990717d8aa3743ef0e73e0f462e64b54d90c304249232d48fece4f0f7c3c6a"},
+    {file = "types_pyOpenSSL-24.0.0.20240228-py3-none-any.whl", hash = "sha256:a472cf877a873549175e81972f153f44e975302a3cf17381eb5f3d41ccfb75a4"},
 ]
 
 [package.dependencies]
@@ -3659,4 +3659,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "87ffab7b554e19ae1d029620c6861210b226f577aff26bdc436bc7c70230fd0e"
+content-hash = "aec9ca0e4fb40d267ecc9a2cbb5db1bcef5ff939dd67e4314a69cb44ddc1a471"
