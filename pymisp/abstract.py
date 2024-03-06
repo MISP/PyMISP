@@ -410,7 +410,11 @@ class MISPTag(AbstractMISP):
             return '<{self.__class__.__name__}(name={self.name})>'.format(self=self)
         return f'<{self.__class__.__name__}(NotInitialized)>'
 
-
+    def to_dict(self, json_format: bool = False) -> dict[str, Any]:
+        to_return = super().to_dict(json_format)
+        if to_return.get('local'):
+            to_return['local'] = int(to_return.get('local'))
+        return to_return
 # UUID, datetime, date and Enum is serialized by ORJSON by default
 def pymisp_json_default(obj: AbstractMISP | datetime | date | Enum | UUID) -> dict[str, Any] | str:
     if isinstance(obj, AbstractMISP):
