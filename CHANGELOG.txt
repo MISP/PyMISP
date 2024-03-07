@@ -2,11 +2,22 @@ Changelog
 =========
 
 
+v2.4.187 (2024-03-07)
+---------------------
+
+Changes
+~~~~~~~
+- Bump templates, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump extract-msg. [Raphaël Vinot]
+
+
 v2.4.186 (2024-02-27)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
