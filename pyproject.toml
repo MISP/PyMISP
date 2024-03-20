@@ -52,7 +52,7 @@ python-magic = {version = "^0.4.27", optional = true}
 pydeep2 = {version = "^0.5.1", optional = true}
 lief = {version = "^0.14.1", optional = true}
 beautifulsoup4 = {version = "^4.12.3", optional = true}
-validators = {version = "^0.22.0", optional = true}
+validators = {version = "^0.23.0", optional = true}
 sphinx-autodoc-typehints = {version = "^2.0.0", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
 reportlab = {version = "^4.1.0", optional = true}
@@ -76,16 +76,16 @@ brotli = ['urllib3']
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.11.0"
-mypy = "^1.8.0"
+mypy = "^1.9.0"
 ipython = [
     {version = "<8.13.0", python = "<3.9"},
     {version = "^8.18.0", python = ">=3.9"},
     {version = "^8.19.0", python = ">=3.10"}
 ]
-jupyterlab = "^4.1.4"
-types-requests = "^2.31.0.20240218"
-types-python-dateutil = "^2.8.19.20240106"
-types-redis = "^4.6.0.20240218"
+jupyterlab = "^4.1.5"
+types-requests = "^2.31.0.20240311"
+types-python-dateutil = "^2.9.0.20240316"
+types-redis = "^4.6.0.20240311"
 types-Flask = "^1.1.6"
 pytest-cov = "^4.1.0"
 
