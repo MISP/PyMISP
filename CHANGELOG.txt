@@ -2,11 +2,25 @@ Changelog
 =========
 
 
+v2.4.188 (2024-03-20)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version, templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Avoid issue when payload ist a list. [Raphaël Vinot]
+
+
 v2.4.187 (2024-03-07)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump templates, version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump extract-msg. [Raphaël Vinot]
