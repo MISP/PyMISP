@@ -196,11 +196,19 @@ class EMailObject(AbstractMISPObjectGenerator):
             for mime_items in related_content.values():
                 if isinstance(mime_items[1], dict):
                     message.add_related(**mime_items[1])
-                cur_attach = message.get_payload()[-1]
+                if p := message.get_payload():
+                    if isinstance(p, list):
+                        cur_attach = p[-1]
+                    else:
+                        cur_attach = p
                 self._update_content_disp_properties(mime_items[0], cur_attach)
             if body.get('text', None):
                 # Now add the HTML as an alternative within the related obj
-                related = message.get_payload()[0]
+                if p := message.get_payload():
+                    if isinstance(p, list):
+                        related = p[0]
+                    else:
+                        related = p
                 related.add_alternative(**body.get('html'))
         else:
             for mime_dict in body_objects:
@@ -219,7 +227,11 @@ class EMailObject(AbstractMISPObjectGenerator):
                                        subtype=subtype,
                                        cid=attch.cid,
                                        filename=attch.longFilename)
-                cur_attach = message.get_payload()[-1]
+                if p := message.get_payload():
+                    if isinstance(p, list):
+                        cur_attach = p[-1]
+                    else:
+                        cur_attach = p
                 self._update_content_disp_properties(attch, cur_attach)
         if _orig_boundry is not None:
             message.set_boundary(_orig_boundry)  # Set back original boundary
