@@ -2,16 +2,28 @@ Changelog
 =========
 
 
-v2.4.188 (2024-03-20)
+v2.4.188 (2024-03-22)
 ---------------------
+
+New
+~~~
+- Support X-MISP-AUTH Header. [Raphaël Vinot]
+
+  Also, improve HTTP headers init
+
+  Fix #1179
 
 Changes
 ~~~~~~~
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version, templates. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 
 Fix
 ~~~
+- Python 3.8 support & typing. [Raphaël Vinot]
+- Typing for Python < 3.10. [Raphaël Vinot]
 - Avoid issue when payload ist a list. [Raphaël Vinot]
 
 
