@@ -15,6 +15,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version, templates. [Raphaël Vinot]
@@ -22,6 +23,7 @@ Changes
 
 Fix
 ~~~
+- Strip API key before setting it. [Raphaël Vinot]
 - Python 3.8 support & typing. [Raphaël Vinot]
 - Typing for Python < 3.10. [Raphaël Vinot]
 - Avoid issue when payload ist a list. [Raphaël Vinot]
