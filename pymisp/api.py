@@ -177,7 +177,7 @@ class PyMISP:
             raise NoKey('Please provide your authorization key.')
 
         self.root_url: str = url
-        self.key: str = key
+        self.key: str = key.strip()
         self.ssl: bool | str = ssl
         self.proxies: MutableMapping[str, str] | None = proxies
         self.cert: str | tuple[str, str] | None = cert
