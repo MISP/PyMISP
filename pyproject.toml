@@ -87,7 +87,7 @@ types-requests = "^2.31.0.20240311"
 types-python-dateutil = "^2.9.0.20240316"
 types-redis = "^4.6.0.20240311"
 types-Flask = "^1.1.6"
-pytest-cov = "^4.1.0"
+pytest-cov = ">=4.1,<6.0"
 
 [build-system]
 requires = ["poetry_core>=1.1", "setuptools"]
