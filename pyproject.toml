@@ -52,7 +52,7 @@ python-magic = {version = "^0.4.27", optional = true}
 pydeep2 = {version = "^0.5.1", optional = true}
 lief = {version = "^0.14.1", optional = true}
 beautifulsoup4 = {version = "^4.12.3", optional = true}
-validators = {version = "^0.23.0", optional = true}
+validators = {version = ">=0.23,<0.25", optional = true}
 sphinx-autodoc-typehints = {version = "^2.0.0", optional = true}
 recommonmark = {version = "^0.7.1", optional = true}
 reportlab = {version = "^4.1.0", optional = true}
