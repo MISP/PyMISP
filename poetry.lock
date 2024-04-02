@@ -3464,13 +3464,13 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "validators"
-version = "0.24.0"
+version = "0.26.0"
 description = "Python Data Validation for Humans™"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "validators-0.24.0-py3-none-any.whl", hash = "sha256:4a99eb368747e60900bae947418eb21e230ff4ff5e7b7944b9308c456d86da32"},
-    {file = "validators-0.24.0.tar.gz", hash = "sha256:cd23defb36de42d14e7559cf0757f761bb46b10d9de2998e6ef805f769d859e3"},
+    {file = "validators-0.26.0-py3-none-any.whl", hash = "sha256:61234f9303c54b30bacdb566c57b176aee510ad7f168301f67c28158af46208c"},
+    {file = "validators-0.26.0.tar.gz", hash = "sha256:004e15ed83145454e8db90d66dcee063f1084b81e447310b52c5f91022823150"},
 ]
 
 [[package]]
@@ -3643,4 +3643,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "12d1c9cfa33627059168bed8fb9c6ac7e5eaf2c8ba0e6cadb79446f15d8c3ab4"
+content-hash = "a55c3bd4840a99f19cd062782b88eed53000e999560c12db1ea05421be5bccfc"
