@@ -252,7 +252,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
                 option |= orjson.OPT_INDENT_2
             # orjson dumps method returns bytes instead of bytes, to keep compatibility with json
             # we have to convert output to str
-            return str(dumps(self, default=pymisp_json_default, option=option))
+            return dumps(self, default=pymisp_json_default, option=option).decode()
 
         return dumps(self, default=pymisp_json_default, sort_keys=sort_keys, indent=indent)
 
