@@ -2,6 +2,23 @@ Changelog
 =========
 
 
+v2.4.190 (2024-04-18)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version, deps. [Raphaël Vinot]
+- Bump deps, require python 3.9+ for doc. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [data] describeTypes file updated. [Alexandre Dulaunoy]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- [internal] Correct way to convert bytes to string if orjson exists.
+  [Jakub Onderka]
+
+
 v2.4.188 (2024-03-22)
 ---------------------
 
@@ -15,6 +32,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
