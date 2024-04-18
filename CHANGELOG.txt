@@ -7,6 +7,8 @@ v2.4.190 (2024-04-18)
 
 Changes
 ~~~~~~~
+- Bump object templates. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version, deps. [Raphaël Vinot]
 - Bump deps, require python 3.9+ for doc. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
