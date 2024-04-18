@@ -838,11 +838,14 @@ dev = ["PyTest", "PyTest-Cov", "bump2version (<1)", "sphinx (<2)", "tox"]
 
 [[package]]
 name = "docutils"
-version = "0.20.1"
+version = "0.21.1"
 description = "Docutils -- Python Documentation Utilities"
 optional = true
-python-versions = "*"
-files = []
+python-versions = ">=3.9"
+files = [
+    {file = "docutils-0.21.1-py3-none-any.whl", hash = "sha256:14c8d34a55b46c88f9f714adb29cefbdd69fb82f3fef825e59c5faab935390d8"},
+    {file = "docutils-0.21.1.tar.gz", hash = "sha256:65249d8a5345bc95e0f40f280ba63c98eb24de35c6c8f5b662e3e8948adea83f"},
+]
 
 [[package]]
 name = "easygui"
@@ -3534,7 +3537,7 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 
 [extras]
 brotli = ["urllib3"]
-docs = ["Sphinx", "recommonmark", "sphinx-autodoc-typehints"]
+docs = ["Sphinx", "docutils", "recommonmark", "sphinx-autodoc-typehints"]
 email = ["RTFDE", "extract_msg", "oletools"]
 fileobjects = ["lief", "pydeep2", "python-magic"]
 openioc = ["beautifulsoup4"]
@@ -3545,4 +3548,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "7c26dd3629fc8bf389c9c2299c9c14a11c41001a43855a619581878e99928ac0"
+content-hash = "7c5ace0dd762f11b8ae8fbcf8a213ecef00db5540709ac82d724c41cb63c4054"
