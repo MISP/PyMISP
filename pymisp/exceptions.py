@@ -23,6 +23,21 @@ class NewEventReportError(PyMISPError):
     pass
 
 
+class NewAnalystDataError(PyMISPError):
+    pass
+
+
+class NewNoteError(PyMISPError):
+    pass
+
+
+class NewOpinionError(PyMISPError):
+    pass
+
+class NewRelationshipError(PyMISPError):
+    pass
+
+
 class UpdateAttributeError(PyMISPError):
     pass
 
