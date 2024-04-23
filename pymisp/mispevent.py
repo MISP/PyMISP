@@ -27,12 +27,20 @@ from .exceptions import (NewNoteError, NewOpinionError, NewRelationshipError, Un
                          PyMISPError, NewEventError, NewAttributeError, NewEventReportError,
                          NewGalaxyClusterError, NewGalaxyClusterRelationError, NewAnalystDataError)
 
+
 logger = logging.getLogger('pymisp')
+
+try:
+    from dateutil.parser import parse
+except ImportError:
+    logger.exception("Cannot import dateutil")
 
 
 class AnalystDataBehaviorMixin:
 
-    def __init__(self, **kwargs) -> None:
+    classObjectType: str
+
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__()
         self.uuid = str(uuid.uuid4())
         self.Note: list[MISPNote] = []
@@ -78,11 +86,6 @@ class AnalystDataBehaviorMixin:
         self.relationships.append(the_relationship)
         self.edited = True
         return the_relationship
-
-try:
-    from dateutil.parser import parse
-except ImportError:
-    logger.exception("Cannot import dateutil")
 
 
 def _make_datetime(value: int | float | str | datetime | date) -> datetime:
@@ -1119,7 +1122,7 @@ class MISPEventReport(AbstractMISP, AnalystDataBehaviorMixin):
 
     timestamp: float | int | datetime
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__(**kwargs)
     #     self.uuid = str(uuid.uuid4())
     #     self.Note: list[MISPNote] = []
@@ -2446,7 +2449,7 @@ class MISPAnalystData(AbstractMISP):
             raise TypeError(f"only children of '{cls.__name__}' may be instantiated")
         return object.__new__(cls)
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__(**kwargs)
         self.uuid = str(uuid.uuid4())
         self.object_uuid: str
@@ -2524,12 +2527,12 @@ class MISPNote(MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'note', 'language'})
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.note: str
         self.language: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.note = kwargs.pop('note', None)
         if self.note is None:
             raise NewNoteError('The text note of the note is required.')
@@ -2546,12 +2549,12 @@ class MISPOpinion(MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'opinion', 'comment'})
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.opinion: int
         self.comment: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.opinion = kwargs.pop('opinion', None)
         if self.opinion is not None:
             self.opinion = int(self.opinion)
@@ -2576,13 +2579,13 @@ class MISPRelationship(MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'related_object_uuid', 'related_object_type', 'relationship_type'})
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.related_object_uuid: str
         self.related_object_type: str
         self.relationship_type: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.related_object_uuid = kwargs.pop('related_object_uuid', None)
         if self.related_object_uuid is None:
             raise NewRelationshipError('The target UUID for this relationship is required.')
@@ -2591,7 +2594,7 @@ class MISPRelationship(MISPAnalystData):
         if self.related_object_type is None:
             raise NewRelationshipError('The target object type for this relationship is required.')
         if self.related_object_type not in self.valid_object_type:
-            raise NewAnalystDataError('The target object type is not a valid type. Actual: {self.related_object_type}.'.format(self=self))
+            raise NewAnalystDataError(f'The target object type is not a valid type. Actual: {self.related_object_type}.')
 
         return super().from_dict(**kwargs)
 
