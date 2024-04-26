@@ -1554,7 +1554,7 @@ class PyMISP:
         """
 
         galaxy_id = get_uuid_or_id_from_abstract_misp(galaxy)
-        allowed_context_types: list[str] = ["all", "default", "custom", "org", "deleted"]
+        allowed_context_types: list[str] = ["all", "default", "custom", "org", "orgc", "deleted"]
         if context not in allowed_context_types:
             raise PyMISPError(f"The context must be one of {', '.join(allowed_context_types)}")
         kw_params = {"context": context}
