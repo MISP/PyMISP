@@ -30,11 +30,14 @@ from .exceptions import (NewNoteError, NewOpinionError, NewRelationshipError, Un
 logger = logging.getLogger('pymisp')
 
 
-class AnalystDataBehaviorMixin:
+class AnalystDataBehaviorMixin(AbstractMISP):
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.uuid = str(uuid.uuid4())
+    # NOTE: edited here must be the property of Abstract MISP
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.uuid: str  # Created in the child class
+        self.classObjectType: str  # Must be defined in the child class
         self.Note: list[MISPNote] = []
         self.Opinion: list[MISPOpinion] = []
         self.Relationship: list[MISPRelationship] = []
@@ -275,7 +278,7 @@ class MISPSighting(AbstractMISP):
         return f'<{self.__class__.__name__}(NotInitialized)'
 
 
-class MISPAttribute(AnalystDataBehaviorMixin, AbstractMISP):
+class MISPAttribute(AnalystDataBehaviorMixin):
     _fields_for_feed: set[str] = {'uuid', 'value', 'category', 'type', 'comment', 'data',
                                   'deleted', 'timestamp', 'to_ids', 'disable_correlation',
                                   'first_seen', 'last_seen'}
@@ -717,7 +720,7 @@ class MISPObjectReference(AbstractMISP):
         return f'<{self.__class__.__name__}(NotInitialized)'
 
 
-class MISPObject(AnalystDataBehaviorMixin, AbstractMISP):
+class MISPObject(AnalystDataBehaviorMixin):
 
     _fields_for_feed: set[str] = {'name', 'meta-category', 'description', 'template_uuid',
                                   'template_version', 'uuid', 'timestamp', 'comment',
@@ -1116,15 +1119,12 @@ class MISPObject(AnalystDataBehaviorMixin, AbstractMISP):
         return f'<{self.__class__.__name__}(NotInitialized)'
 
 
-class MISPEventReport(AnalystDataBehaviorMixin, AbstractMISP):
+class MISPEventReport(AnalystDataBehaviorMixin):
 
     _fields_for_feed: set[str] = {'uuid', 'name', 'content', 'timestamp', 'deleted'}
     classObjectType = 'EventReport'
 
     timestamp: float | int | datetime
-
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if 'EventReport' in kwargs:
@@ -1508,7 +1508,7 @@ class MISPGalaxy(AbstractMISP):
         return f'<{self.__class__.__name__}(NotInitialized)'
 
 
-class MISPEvent(AnalystDataBehaviorMixin, AbstractMISP):
+class MISPEvent(AnalystDataBehaviorMixin):
 
     _fields_for_feed: set[str] = {'uuid', 'info', 'threat_level_id', 'analysis', 'timestamp',
                                   'publish_timestamp', 'published', 'date', 'extends_uuid'}
@@ -2408,7 +2408,7 @@ class MISPAnalystData(AbstractMISP):
             raise TypeError(f"only children of '{cls.__name__}' may be instantiated")
         return object.__new__(cls)
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
         super().__init__(**kwargs)
         self.uuid = str(uuid.uuid4())
         self.object_uuid: str
@@ -2488,12 +2488,12 @@ class MISPNote(AnalystDataBehaviorMixin, MISPAnalystData):
 
     classObjectType = 'Note'
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
         self.note: str
         self.language: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.note = kwargs.pop('note', None)
         if self.note is None:
             raise NewNoteError('The text note of the note is required.')
@@ -2512,12 +2512,12 @@ class MISPOpinion(AnalystDataBehaviorMixin, MISPAnalystData):
 
     classObjectType = 'Opinion'
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
         self.opinion: int
         self.comment: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.opinion = kwargs.pop('opinion', None)
         if self.opinion is not None:
             self.opinion = int(self.opinion)
@@ -2544,13 +2544,13 @@ class MISPRelationship(AnalystDataBehaviorMixin, MISPAnalystData):
 
     classObjectType = 'Relationship'
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
         self.related_object_uuid: str
         self.related_object_type: str
         self.relationship_type: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
 
         self.related_object_type = kwargs.pop('related_object_type', None)
         if self.related_object_type is None:
@@ -2565,7 +2565,7 @@ class MISPRelationship(AnalystDataBehaviorMixin, MISPAnalystData):
                 self.related_object_type = self.related_object_type.classObjectType
 
         if self.related_object_type not in self.valid_object_type:
-            raise NewAnalystDataError('The target object type is not a valid type. Actual: {self.related_object_type}.'.format(self=self))
+            raise NewAnalystDataError(f'The target object type is not a valid type. Actual: {self.related_object_type}.')
 
         return super().from_dict(**kwargs)
 
