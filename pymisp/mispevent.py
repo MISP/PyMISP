@@ -1126,6 +1126,11 @@ class MISPEventReport(AnalystDataBehaviorMixin):
 
     timestamp: float | int | datetime
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.uuid: str = str(uuid.uuid4())
+
+
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if 'EventReport' in kwargs:
             kwargs = kwargs['EventReport']
