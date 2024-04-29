@@ -34,8 +34,8 @@ class AnalystDataBehaviorMixin(AbstractMISP):
 
     # NOTE: edited here must be the property of Abstract MISP
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(**kwargs)
         self.uuid: str  # Created in the child class
         self.classObjectType: str  # Must be defined in the child class
         self.Note: list[MISPNote] = []
