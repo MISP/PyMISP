@@ -2382,7 +2382,7 @@ class MISPDecayingModel(AbstractMISP):
 class MISPAnalystData(AbstractMISP):
 
     _fields_for_feed: set[str] = {'uuid', 'object_uuid', 'object_type', 'authors',
-                                  'created', 'distribution', 'sharing_group_id', }
+                                  'created', 'distribution', 'sharing_group_id', 'note_type_name'}
 
     valid_object_type = {'Attribute', 'Event', 'EventReport', 'GalaxyCluster', 'Galaxy',
                          'Object', 'Note', 'Opinion', 'Relationship', 'Organisation',
@@ -2417,6 +2417,7 @@ class MISPAnalystData(AbstractMISP):
         self.created: float | int | datetime
         self.modified: float | int | datetime
         self.SharingGroup: MISPSharingGroup
+        self.note_type_name = self.classObjectType
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if 'Note' in kwargs:
