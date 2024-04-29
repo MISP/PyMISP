@@ -39,7 +39,7 @@ try:
                             MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed,
                             MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist,
                             MISPEventReport, MISPCorrelationExclusion, MISPDecayingModel, MISPGalaxy, MISPGalaxyCluster,
-                            MISPGalaxyClusterElement, MISPGalaxyClusterRelation)
+                            MISPGalaxyClusterElement, MISPGalaxyClusterRelation, MISPNote, MISPOpinion, MISPRelationship)
     from .api import PyMISP, register_user  # noqa
     # NOTE: the direct imports to .tools are kept for backward compatibility but should be removed in the future
     from .tools import AbstractMISPObjectGenerator  # noqa
@@ -76,7 +76,8 @@ __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPEventDelegation', 'MISPUserSetting', 'MISPInbox', 'MISPEventBlocklist',
            'MISPOrganisationBlocklist', 'MISPEventReport', 'MISPCorrelationExclusion',
            'MISPDecayingModel', 'MISPGalaxy', 'MISPGalaxyCluster', 'MISPGalaxyClusterElement',
-           'MISPGalaxyClusterRelation', 'PyMISPError', 'NewEventError', 'NewAttributeError',
+           'MISPGalaxyClusterRelation', 'MISPNote', 'MISPOpinion', 'MISPRelationship',
+           'PyMISPError', 'NewEventError', 'NewAttributeError',
            'NoURL', 'NoKey', 'InvalidMISPObject', 'UnknownMISPObjectTemplate', 'PyMISPInvalidFormat',
            'Distribution', 'ThreatLevel', 'Analysis', 'ExpandedPyMISP'
            ]
