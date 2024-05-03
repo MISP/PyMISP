@@ -2425,9 +2425,6 @@ class MISPAnalystData(AbstractMISP):
         self.note_type_name = self.classObjectType
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        if 'Note' in kwargs:
-            kwargs = kwargs['Note']
-
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
             self.distribution = int(self.distribution)
@@ -2447,10 +2444,10 @@ class MISPAnalystData(AbstractMISP):
 
         self.object_uuid = kwargs.pop('object_uuid', None)
         if self.object_uuid is None:
-            raise NewAnalystDataError('The UUID for which this note is attached is required.')
+            raise NewAnalystDataError('The UUID for which this element is attached is required.')
         self.object_type = kwargs.pop('object_type', None)
         if self.object_type is None:
-            raise NewAnalystDataError('The element type for which this note is attached is required.')
+            raise NewAnalystDataError('The element type for which this element is attached is required.')
         if self.object_type not in self.valid_object_type:
             raise NewAnalystDataError('The element type is not a valid type. Actual: {self.object_type}.')
 
@@ -2461,13 +2458,13 @@ class MISPAnalystData(AbstractMISP):
             if isinstance(ts, datetime):
                 self.created = ts
             else:
-                self.created = datetime.fromtimestamp(int(ts), timezone.utc)
+                self.created = datetime.fromisoformat(ts + '+00:00')  # Force UTC TZ
         if kwargs.get('modified'):
             ts = kwargs.pop('modified')
             if isinstance(ts, datetime):
                 self.modified = ts
             else:
-                self.modified = datetime.fromtimestamp(int(ts), timezone.utc)
+                self.modified = datetime.fromisoformat(ts + '+00:00')  # Force UTC TZ
 
         if kwargs.get('Org'):
             self.Org = MISPOrganisation()
@@ -2500,6 +2497,8 @@ class MISPNote(AnalystDataBehaviorMixin, MISPAnalystData):
         super().__init__(**kwargs)
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if 'Note' in kwargs:
+            kwargs = kwargs['Note']
         self.note = kwargs.pop('note', None)
         if self.note is None:
             raise NewNoteError('The text note of the note is required.')
@@ -2524,6 +2523,8 @@ class MISPOpinion(AnalystDataBehaviorMixin, MISPAnalystData):
         super().__init__(**kwargs)
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if 'Opinion' in kwargs:
+            kwargs = kwargs['Opinion']
         self.opinion = kwargs.pop('opinion', None)
         if self.opinion is not None:
             self.opinion = int(self.opinion)
@@ -2557,7 +2558,8 @@ class MISPRelationship(AnalystDataBehaviorMixin, MISPAnalystData):
         super().__init__(**kwargs)
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-
+        if 'Relationship' in kwargs:
+            kwargs = kwargs['Relationship']
         self.related_object_type = kwargs.pop('related_object_type', None)
         if self.related_object_type is None:
             raise NewRelationshipError('The target object type for this relationship is required.')

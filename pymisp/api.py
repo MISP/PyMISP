@@ -31,7 +31,8 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
-    MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel
+    MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel, \
+    MISPNote, MISPOpinion, MISPRelationship
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 
@@ -586,6 +587,186 @@ class PyMISP:
         return self._check_json_response(r)
 
     # ## END Event Report ###
+
+    # ## BEGIN Analyst Data ###
+    def get_analyst_data(self, analyst_data: MISPNote | MISPOpinion | MISPRelationship | int | str | UUID,
+                         pythonify: bool = False) -> dict[str, Any] | MISPNote | MISPOpinion | MISPRelationship:
+        """Get an analyst data from a MISP instance
+
+        :param analyst_data: analyst data to get
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        type = analyst_data.classObjectType
+        analyst_data_id = get_uuid_or_id_from_abstract_misp(analyst_data)
+        r = self._prepare_request('GET', f'analyst_data/view/{type}/{analyst_data_id}')
+        analyst_data_r = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in analyst_data_r:
+            return analyst_data_r
+        er = {'Note': MISPNote, 'Opinion': MISPOpinion, 'Relationship': MISPRelationship}.get(type, MISPNote)()
+        er.from_dict(**analyst_data_r)
+        return er
+
+    def add_analyst_data(self, analyst_data: MISPNote | MISPOpinion | MISPRelationship,
+                         pythonify: bool = False) -> dict[str, Any] | MISPNote | MISPOpinion | MISPRelationship:
+        """Add an analyst data to an existing MISP element
+
+        :param analyst_data: analyst_data to add
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        type = analyst_data.classObjectType
+        object_uuid = analyst_data.object_uuid
+        object_type = analyst_data.object_type
+        r = self._prepare_request('POST', f'analyst_data/add/{type}/{object_uuid}/{object_type}', data=analyst_data)
+        new_analyst_data = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in new_analyst_data:
+            return new_analyst_data
+        er = {'Note': MISPNote, 'Opinion': MISPOpinion, 'Relationship': MISPRelationship}.get(type, MISPNote)()
+        er.from_dict(**new_analyst_data)
+        return er
+
+    def update_analyst_data(self, analyst_data: MISPNote | MISPOpinion | MISPRelationship, analyst_data_id: int | None = None,
+                            pythonify: bool = False) -> dict[str, Any] | MISPNote | MISPOpinion | MISPRelationship:
+        """Update an analyst data on a MISP instance
+
+        :param analyst_data: analyst data to update
+        :param analyst_data_id: analyst data ID to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        type = analyst_data.classObjectType
+        if analyst_data_id is None:
+            adid = get_uuid_or_id_from_abstract_misp(analyst_data)
+        else:
+            adid = get_uuid_or_id_from_abstract_misp(analyst_data_id)
+        r = self._prepare_request('POST', f'analyst_data/edit/{type}/{adid}', data=analyst_data)
+        updated_analyst_data = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_analyst_data:
+            return updated_analyst_data
+        er = {'Note': MISPNote, 'Opinion': MISPOpinion, 'Relationship': MISPRelationship}.get(type, MISPNote)()
+        er.from_dict(**updated_analyst_data)
+        return er
+
+    def delete_analyst_data(self, analyst_data: MISPNote | MISPOpinion | MISPRelationship | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete an analyst data from a MISP instance
+
+        :param analyst_data: analyst data to delete
+        """
+        type = analyst_data.classObjectType
+        analyst_data_id = get_uuid_or_id_from_abstract_misp(analyst_data)
+        request_url = f'analyst_data/delete/{type}/{analyst_data_id}'
+        data = {}
+        r = self._prepare_request('POST', request_url, data=data)
+        return self._check_json_response(r)
+
+    # ## END Analyst Data ###
+
+    # ## BEGIN Analyst Note ###
+
+    def get_note(self, note: MISPNote, pythonify: bool = False) -> dict[str, Any] | MISPNote:
+        """Get a note from a MISP instance
+
+        :param note: note to get
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        return self.get_analyst_data(note, pythonify)
+
+    def add_note(self, note: MISPNote, pythonify: bool = False) -> dict[str, Any] | MISPNote:
+        """Add a note to an existing MISP element
+
+        :param note: note to add
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        return self.add_analyst_data(note, pythonify)
+
+    def update_note(self, note: MISPNote, note_id: int | None = None, pythonify: bool = False) -> dict[str, Any] | MISPNote:
+        """Update a note on a MISP instance
+
+        :param note: note to update
+        :param note_id: note ID to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        return self.update_analyst_data(note, note_id, pythonify)
+
+    def delete_note(self, note: MISPNote | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete a note from a MISP instance
+
+        :param note: note delete
+        """
+        return self.delete_analyst_data(note)
+
+    # ## END Analyst Note ###
+
+    # ## BEGIN Analyst Opinion ###
+
+    def get_opinion(self, opinion: MISPOpinion, pythonify: bool = False) -> dict[str, Any] | MISPOpinion:
+        """Get an opinion from a MISP instance
+
+        :param opinion: opinion to get
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        return self.get_analyst_data(opinion, pythonify)
+
+    def add_opinion(self, opinion: MISPOpinion, pythonify: bool = False) -> dict[str, Any] | MISPOpinion:
+        """Add an opinion to an existing MISP element
+
+        :param opinion: opinion to add
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        return self.add_analyst_data(opinion, pythonify)
+
+    def update_opinion(self, opinion: MISPOpinion, opinion_id: int | None = None, pythonify: bool = False) -> dict[str, Any] | MISPOpinion:
+        """Update an opinion on a MISP instance
+
+        :param opinion: opinion to update
+        :param opinion_id: opinion ID to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        return self.update_analyst_data(opinion, opinion_id, pythonify)
+
+    def delete_opinion(self, opinion: MISPOpinion | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete an opinion from a MISP instance
+
+        :param opinion: opinion to delete
+        """
+        return self.delete_analyst_data(opinion)
+
+    # ## END Analyst Opinion ###
+
+    # ## BEGIN Analyst Relationship ###
+
+    def get_relationship(self, relationship: MISPRelationship, pythonify: bool = False) -> dict[str, Any] | MISPRelationship:
+        """Get a relationship from a MISP instance
+
+        :param relationship: relationship to get
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        return self.get_analyst_data(relationship, pythonify)
+
+    def add_relationship(self, relationship: MISPRelationship, pythonify: bool = False) -> dict[str, Any] | MISPRelationship:
+        """Add a relationship to an existing MISP element
+
+        :param relationship: relationship to add
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        return self.add_analyst_data(relationship, pythonify)
+
+    def update_relationship(self, relationship: MISPRelationship, relationship_id: int | None = None, pythonify: bool = False) -> dict[str, Any] | MISPRelationship:
+        """Update a relationship on a MISP instance
+
+        :param relationship: relationship to update
+        :param relationship_id: relationship ID to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        return self.update_analyst_data(relationship, relationship_id, pythonify)
+
+    def delete_relationship(self, relationship: MISPRelationship | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete a relationship from a MISP instance
+
+        :param relationship: relationship to delete
+        """
+        return self.delete_analyst_data(relationship)
+
+    # ## END Analyst Relationship ###
+
 
     # ## BEGIN Object ###
 
