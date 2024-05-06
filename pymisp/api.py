@@ -32,7 +32,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
     MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel, \
-    MISPNote, MISPOpinion, MISPRelationship
+    MISPNote, MISPOpinion, MISPRelationship, AnalystDataBehaviorMixin
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 
@@ -585,24 +585,26 @@ class PyMISP:
             data['hard'] = 1
         r = self._prepare_request('POST', request_url, data=data)
         return self._check_json_response(r)
-
     # ## END Event Report ###
 
-    # ## BEGIN Analyst Data ###
-    def get_analyst_data(self, analyst_data: MISPNote | MISPOpinion | MISPRelationship | int | str | UUID,
+    # ## BEGIN Analyst Data ###a
+    def get_analyst_data(self, analyst_data: AnalystDataBehaviorMixin | int | str | UUID,
                          pythonify: bool = False) -> dict[str, Any] | MISPNote | MISPOpinion | MISPRelationship:
         """Get an analyst data from a MISP instance
 
         :param analyst_data: analyst data to get
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
-        type = analyst_data.classObjectType
+        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+            analyst_data_type = analyst_data.analyst_data_object_type
+        else:
+            analyst_data_type = 'all'
         analyst_data_id = get_uuid_or_id_from_abstract_misp(analyst_data)
-        r = self._prepare_request('GET', f'analyst_data/view/{type}/{analyst_data_id}')
+        r = self._prepare_request('GET', f'analyst_data/view/{analyst_data_type}/{analyst_data_id}')
         analyst_data_r = self._check_json_response(r)
-        if not (self.global_pythonify or pythonify) or 'errors' in analyst_data_r:
+        if not (self.global_pythonify or pythonify) or 'errors' in analyst_data_r or analyst_data_type == 'all':
             return analyst_data_r
-        er = {'Note': MISPNote, 'Opinion': MISPOpinion, 'Relationship': MISPRelationship}.get(type, MISPNote)()
+        er = type(analyst_data)()
         er.from_dict(**analyst_data_r)
         return er
 
@@ -613,14 +615,13 @@ class PyMISP:
         :param analyst_data: analyst_data to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
-        type = analyst_data.classObjectType
         object_uuid = analyst_data.object_uuid
         object_type = analyst_data.object_type
-        r = self._prepare_request('POST', f'analyst_data/add/{type}/{object_uuid}/{object_type}', data=analyst_data)
+        r = self._prepare_request('POST', f'analyst_data/add/{analyst_data.analyst_data_object_type}/{object_uuid}/{object_type}', data=analyst_data)
         new_analyst_data = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_analyst_data:
             return new_analyst_data
-        er = {'Note': MISPNote, 'Opinion': MISPOpinion, 'Relationship': MISPRelationship}.get(type, MISPNote)()
+        er = type(analyst_data)()
         er.from_dict(**new_analyst_data)
         return er
 
@@ -632,14 +633,17 @@ class PyMISP:
         :param analyst_data_id: analyst data ID to update
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
-        type = analyst_data.classObjectType
+        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+            analyst_data_type = analyst_data.analyst_data_object_type
+        else:
+            analyst_data_type = 'all'
         if analyst_data_id is None:
             analyst_data_id = get_uuid_or_id_from_abstract_misp(analyst_data)
-        r = self._prepare_request('POST', f'analyst_data/edit/{type}/{analyst_data_id}', data=analyst_data)
+        r = self._prepare_request('POST', f'analyst_data/edit/{analyst_data_type}/{analyst_data_id}', data=analyst_data)
         updated_analyst_data = self._check_json_response(r)
-        if not (self.global_pythonify or pythonify) or 'errors' in updated_analyst_data:
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_analyst_data or analyst_data_type == 'all':
             return updated_analyst_data
-        er = {'Note': MISPNote, 'Opinion': MISPOpinion, 'Relationship': MISPRelationship}.get(type, MISPNote)()
+        er = type(analyst_data)()
         er.from_dict(**updated_analyst_data)
         return er
 
@@ -648,9 +652,12 @@ class PyMISP:
 
         :param analyst_data: analyst data to delete
         """
-        type = analyst_data.classObjectType
+        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+            analyst_data_type = analyst_data.analyst_data_object_type
+        else:
+            analyst_data_type = 'all'
         analyst_data_id = get_uuid_or_id_from_abstract_misp(analyst_data)
-        request_url = f'analyst_data/delete/{type}/{analyst_data_id}'
+        request_url = f'analyst_data/delete/{analyst_data_type}/{analyst_data_id}'
         r = self._prepare_request('POST', request_url)
         return self._check_json_response(r)
 

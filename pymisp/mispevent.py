@@ -37,10 +37,14 @@ class AnalystDataBehaviorMixin(AbstractMISP):
     def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__(**kwargs)
         self.uuid: str  # Created in the child class
-        self.classObjectType: str  # Must be defined in the child class
+        self._analyst_data_object_type: str  # Must be defined in the child class
         self.Note: list[MISPNote] = []
         self.Opinion: list[MISPOpinion] = []
         self.Relationship: list[MISPRelationship] = []
+
+    @property
+    def analyst_data_object_type(self) -> str:
+        return self._analyst_data_object_type
 
     @property
     def notes(self) -> list[MISPNote]:
@@ -57,7 +61,7 @@ class AnalystDataBehaviorMixin(AbstractMISP):
     def add_note(self, note: str, language: str | None = None, **kwargs) -> MISPNote:  # type: ignore[no-untyped-def]
         the_note = MISPNote()
         the_note.from_dict(note=note, language=language,
-                           object_uuid=self.uuid, object_type=self.classObjectType,
+                           object_uuid=self.uuid, object_type=self.analyst_data_object_type,
                            **kwargs)
         self.notes.append(the_note)
         self.edited = True
@@ -66,7 +70,7 @@ class AnalystDataBehaviorMixin(AbstractMISP):
     def add_opinion(self, opinion: int, comment: str | None = None, **kwargs) -> MISPNote:  # type: ignore[no-untyped-def]
         the_opinion = MISPOpinion()
         the_opinion.from_dict(opinion=opinion, comment=comment,
-                              object_uuid=self.uuid, object_type=self.classObjectType,
+                              object_uuid=self.uuid, object_type=self.analyst_data_object_type,
                               **kwargs)
         self.opinions.append(the_opinion)
         self.edited = True
@@ -76,7 +80,7 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         the_relationship = MISPRelationship()
         the_relationship.from_dict(related_object_type=related_object_type, related_object_uuid=related_object_uuid,
                                    relationship_type=relationship_type,
-                                   object_uuid=self.uuid, object_type=self.classObjectType,
+                                   object_uuid=self.uuid, object_type=self.analyst_data_object_type,
                                    **kwargs)
         self.relationships.append(the_relationship)
         self.edited = True
@@ -303,7 +307,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
                                   'deleted', 'timestamp', 'to_ids', 'disable_correlation',
                                   'first_seen', 'last_seen'}
 
-    classObjectType = 'Attribute'
+    _analyst_data_object_type = 'Attribute'
 
     def __init__(self, describe_types: dict[str, Any] | None = None, strict: bool = False):
         """Represents an Attribute
@@ -746,7 +750,7 @@ class MISPObject(AnalystDataBehaviorMixin):
                                   'template_version', 'uuid', 'timestamp', 'comment',
                                   'first_seen', 'last_seen', 'deleted'}
 
-    classObjectType = 'Object'
+    _analyst_data_object_type = 'Object'
 
     def __init__(self, name: str, strict: bool = False, standalone: bool = True,  # type: ignore[no-untyped-def]
                  default_attributes_parameters: dict[str, Any] = {}, **kwargs) -> None:
@@ -1142,7 +1146,7 @@ class MISPObject(AnalystDataBehaviorMixin):
 class MISPEventReport(AnalystDataBehaviorMixin):
 
     _fields_for_feed: set[str] = {'uuid', 'name', 'content', 'timestamp', 'deleted'}
-    classObjectType = 'EventReport'
+    _analyst_data_object_type = 'EventReport'
 
     timestamp: float | int | datetime
 
@@ -1537,7 +1541,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
     _fields_for_feed: set[str] = {'uuid', 'info', 'threat_level_id', 'analysis', 'timestamp',
                                   'publish_timestamp', 'published', 'date', 'extends_uuid'}
 
-    classObjectType = 'Event'
+    _analyst_data_object_type = 'Event'
 
     def __init__(self, describe_types: dict[str, Any] | None = None, strict_validation: bool = False, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__(**kwargs)
@@ -2507,7 +2511,7 @@ class MISPNote(AnalystDataBehaviorMixin, MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'note', 'language'})
 
-    classObjectType = 'Note'
+    _analyst_data_object_type = 'Note'
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         self.note: str
@@ -2532,7 +2536,7 @@ class MISPOpinion(AnalystDataBehaviorMixin, MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'opinion', 'comment'})
 
-    classObjectType = 'Opinion'
+    _analyst_data_object_type = 'Opinion'
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         self.opinion: int
@@ -2566,7 +2570,7 @@ class MISPRelationship(AnalystDataBehaviorMixin, MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'related_object_uuid', 'related_object_type', 'relationship_type'})
 
-    classObjectType = 'Relationship'
+    _analyst_data_object_type = 'Relationship'
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         self.related_object_uuid: str
@@ -2587,7 +2591,7 @@ class MISPRelationship(AnalystDataBehaviorMixin, MISPAnalystData):
                 raise NewRelationshipError('The target UUID for this relationship is required.')
             else:
                 self.related_object_uuid = self.related_object_type.uuid
-                self.related_object_type = self.related_object_type.classObjectType
+                self.related_object_type = self.related_object_type._analyst_data_object_type
 
         if self.related_object_type not in self.valid_object_type:
             raise NewAnalystDataError(f'The target object type is not a valid type. Actual: {self.related_object_type}.')
