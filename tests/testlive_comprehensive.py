@@ -3240,7 +3240,6 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(new_note.object_uuid == event.uuid)
 
             event = self.user_misp_connector.get_event(event)
-            print(event.to_json(indent=2))
             # The Note should be present on the event
             self.assertTrue(event.notes[0].object_uuid == event.uuid)
 

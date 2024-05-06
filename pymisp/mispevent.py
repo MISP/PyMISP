@@ -83,22 +83,23 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         return the_relationship
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        if 'Note' in kwargs and kwargs.get('Note'):
-            for note in kwargs.pop('Note'):
-                note.pop('object_uuid', None)
-                note.pop('object_type', None)
-                self.add_note(**note)
-        if 'Opinion' in kwargs and kwargs.get('Opinion'):
-            for opinion in kwargs.pop('Opinion'):
-                opinion.pop('object_uuid', None)
-                opinion.pop('object_type', None)
-                self.add_opinion(**opinion)
-        if 'Relationship' in kwargs and kwargs.get('Relationship'):
-            for relationship in kwargs.pop('Relationship'):
-                relationship.pop('object_uuid', None)
-                relationship.pop('object_type', None)
-                self.add_relationship(**relationship)
+        # These members need a fully initialized class to be loaded properly
+        notes = kwargs.pop('Note', [])
+        opinions = kwargs.pop('Opinion', [])
+        relationships = kwargs.pop('Relationship', [])
         super().from_dict(**kwargs)
+        for note in notes:
+            note.pop('object_uuid', None)
+            note.pop('object_type', None)
+            self.add_note(**note)
+        for opinion in opinions:
+            opinion.pop('object_uuid', None)
+            opinion.pop('object_type', None)
+            self.add_opinion(**opinion)
+        for relationship in relationships:
+            relationship.pop('object_uuid', None)
+            relationship.pop('object_type', None)
+            self.add_relationship(**relationship)
 
 
 try:
