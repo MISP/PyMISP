@@ -653,8 +653,7 @@ class PyMISP:
         type = analyst_data.classObjectType
         analyst_data_id = get_uuid_or_id_from_abstract_misp(analyst_data)
         request_url = f'analyst_data/delete/{type}/{analyst_data_id}'
-        data = {}
-        r = self._prepare_request('POST', request_url, data=data)
+        r = self._prepare_request('POST', request_url)
         return self._check_json_response(r)
 
     # ## END Analyst Data ###
@@ -766,7 +765,6 @@ class PyMISP:
         return self.delete_analyst_data(relationship)
 
     # ## END Analyst Relationship ###
-
 
     # ## BEGIN Object ###
 

@@ -82,6 +82,16 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         self.edited = True
         return the_relationship
 
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if 'Note' in kwargs and kwargs.get('Note'):
+            self.add_note(**kwargs.pop('Note'))
+        if 'Opinion' in kwargs and kwargs.get('Opinion'):
+            self.add_opinion(**kwargs.pop('Opinion'))
+        if 'Relationship' in kwargs and kwargs.get('Relationship'):
+            self.add_relationship(**kwargs.pop('Relationship'))
+        super().from_dict(**kwargs)
+
+
 try:
     from dateutil.parser import parse
 except ImportError:
@@ -1129,7 +1139,6 @@ class MISPEventReport(AnalystDataBehaviorMixin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.uuid: str = str(uuid.uuid4())
-
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if 'EventReport' in kwargs:
@@ -2422,7 +2431,6 @@ class MISPAnalystData(AbstractMISP):
         self.created: float | int | datetime
         self.modified: float | int | datetime
         self.SharingGroup: MISPSharingGroup
-        self.note_type_name = self.classObjectType
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         self.distribution = kwargs.pop('distribution', None)

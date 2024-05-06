@@ -8,7 +8,7 @@ from deprecated import deprecated  # type: ignore
 from json import JSONEncoder
 from uuid import UUID
 from abc import ABCMeta
-from enum import Enum, IntEnum
+from enum import Enum
 from typing import Any, Mapping
 from collections.abc import MutableMapping
 from functools import lru_cache
@@ -147,19 +147,6 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
         treatment are processed.
         Note: This method is used when you initialize an object with existing data so by default,
         the class is flaged as not edited."""
-        # Recursively loads more analyst data
-        from pymisp.mispevent import AnalystDataBehaviorMixin, MISPNote, MISPOpinion, MISPRelationship
-        if isinstance(self, AnalystDataBehaviorMixin):
-            for analystType in ['Note', 'Opinion', 'Relationship']:
-                if kwargs.get(analystType):
-                    analystDataList = kwargs.pop(analystType)
-                    for analystDataDict in analystDataList:
-                        analystData = {'Note': MISPNote, 'Opinion': MISPOpinion, 'Relationship': MISPRelationship}.get(analystType, MISPNote)()
-                        analystDataDict['object_uuid'] = self.uuid if 'object_uuid' not in analystDataDict else analystDataDict['object_uuid']
-                        analystDataDict['object_type'] = self.classObjectType
-                        analystData.from_dict(**analystDataDict)
-                        {'Note': self.notes, 'Opinion': self.opinions, 'Relationship': self.relationships}.get(analystType, 'Note').append(analystData)
-
         for prop, value in kwargs.items():
             if value is None:
                 continue
