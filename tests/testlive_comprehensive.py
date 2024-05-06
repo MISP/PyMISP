@@ -26,7 +26,7 @@ try:
                         MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting,
                         MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster,
                         MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist,
-                        MISPNote, MISPOpinion, MISPRelationship)
+                        MISPNote)
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
 except ImportError:
     raise
@@ -3200,6 +3200,7 @@ class TestComprehensive(unittest.TestCase):
 
     def test_analyst_data_CRUD(self) -> None:
         event = self.create_simple_event()
+        self.admin_misp_connector.toggle_global_pythonify()
         try:
             fake_uuid = str(uuid4())
             new_note1 = MISPNote()
@@ -3220,13 +3221,13 @@ class TestComprehensive(unittest.TestCase):
             new_note1 = self.user_misp_connector.update_note(new_note1)
             # Fetch newly added node
             new_note1 = self.user_misp_connector.get_note(new_note1)
-             # The Opinion shoud be able to be created via the Note
-            self.assertTrue(new_note1.Opinion[0].opinion == new_opinion.opinion)
+            # The Opinion shoud be able to be created via the Note
+            self.assertTrue(new_note1.opinions[0].opinion == new_opinion.opinion)
 
             response = self.user_misp_connector.delete_note(new_note1)
             # The Note should be deletable
             self.assertTrue(response['success'])
-            self.assertEqual(response['message'], f'Note deleted.')
+            self.assertEqual(response['message'], 'Note deleted.')
             # The Opinion should not be deleted
             opinion_resp = self.user_misp_connector.get_opinion(new_opinion)
             self.assertTrue(opinion_resp.opinion == new_opinion.opinion)
@@ -3239,16 +3240,17 @@ class TestComprehensive(unittest.TestCase):
             self.assertTrue(new_note.object_uuid == event.uuid)
 
             event = self.user_misp_connector.get_event(event)
+            print(event.to_json(indent=2))
             # The Note should be present on the event
-            self.assertTrue(event.Note[0].object_uuid == event.uuid)
+            self.assertTrue(event.notes[0].object_uuid == event.uuid)
 
         finally:
             self.admin_misp_connector.delete_event(event)
             try:
                 self.admin_misp_connector.delete_opinion(new_opinion)
                 self.admin_misp_connector.delete_note(new_note)
-                self.admin_misp_connector.delete_note(new_note1) # Should already be deleted
-            except:
+                self.admin_misp_connector.delete_note(new_note1)  # Should already be deleted
+            except Exception:
                 pass
 
     def test_analyst_data_ACL(self) -> None:
@@ -3260,6 +3262,7 @@ class TestComprehensive(unittest.TestCase):
         sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
         # Chec that sharing group was created
         self.assertEqual(sharing_group.name, 'Testcases SG')
+        self.admin_misp_connector.toggle_global_pythonify()
 
         try:
             new_note: MISPNote = event.add_note(note='Test Note', language='en')
@@ -3272,11 +3275,11 @@ class TestComprehensive(unittest.TestCase):
 
             event = self.admin_misp_connector.get_event(event)
             # The note should be visible for the creator
-            self.assertEqual(len(event.Note), 1)
+            self.assertEqual(len(event.notes), 1)
             self.assertTrue(new_note.note == "Test Note")
 
             resp = self.user_misp_connector.get_note(new_note)
-             # The note should not be visible to another org
+            # The note should not be visible to another org
             self.assertTrue(len(resp), 0)
 
             event = self.user_misp_connector.get_event(event)
@@ -3295,7 +3298,7 @@ class TestComprehensive(unittest.TestCase):
 
             # Add org to the sharing group
             r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group,
-                                                                self.test_org, extend=True)
+                                                                   self.test_org, extend=True)
             self.assertEqual(r['name'], 'Organisation added to the sharing group.')
 
             event = self.user_misp_connector.get_event(event)
@@ -3303,7 +3306,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(event.Note), 1)
 
             new_note.note = "Updated Note"
-            resp = self.user_misp_connector.update_note(new_note) 
+            resp = self.user_misp_connector.update_note(new_note)
             # The Note should not be updatable by another organisation
             self.assertTrue(resp['errors'])
 
@@ -3329,7 +3332,7 @@ class TestComprehensive(unittest.TestCase):
                 self.admin_misp_connector.delete_sharing_group(sharing_group.id)
                 self.admin_misp_connector.delete_organisation(fake_org)
                 self.admin_misp_connector.delete_note(new_note)
-            except:
+            except Exception:
                 pass
 
     @unittest.skip("Internal use only")

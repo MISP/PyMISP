@@ -634,10 +634,8 @@ class PyMISP:
         """
         type = analyst_data.classObjectType
         if analyst_data_id is None:
-            adid = get_uuid_or_id_from_abstract_misp(analyst_data)
-        else:
-            adid = get_uuid_or_id_from_abstract_misp(analyst_data_id)
-        r = self._prepare_request('POST', f'analyst_data/edit/{type}/{adid}', data=analyst_data)
+            analyst_data_id = get_uuid_or_id_from_abstract_misp(analyst_data)
+        r = self._prepare_request('POST', f'analyst_data/edit/{type}/{analyst_data_id}', data=analyst_data)
         updated_analyst_data = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in updated_analyst_data:
             return updated_analyst_data

@@ -84,11 +84,20 @@ class AnalystDataBehaviorMixin(AbstractMISP):
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if 'Note' in kwargs and kwargs.get('Note'):
-            self.add_note(**kwargs.pop('Note'))
+            for note in kwargs.pop('Note'):
+                note.pop('object_uuid', None)
+                note.pop('object_type', None)
+                self.add_note(**note)
         if 'Opinion' in kwargs and kwargs.get('Opinion'):
-            self.add_opinion(**kwargs.pop('Opinion'))
+            for opinion in kwargs.pop('Opinion'):
+                opinion.pop('object_uuid', None)
+                opinion.pop('object_type', None)
+                self.add_opinion(**opinion)
         if 'Relationship' in kwargs and kwargs.get('Relationship'):
-            self.add_relationship(**kwargs.pop('Relationship'))
+            for relationship in kwargs.pop('Relationship'):
+                relationship.pop('object_uuid', None)
+                relationship.pop('object_type', None)
+                self.add_relationship(**relationship)
         super().from_dict(**kwargs)
 
 
@@ -2510,7 +2519,6 @@ class MISPNote(AnalystDataBehaviorMixin, MISPAnalystData):
         self.note = kwargs.pop('note', None)
         if self.note is None:
             raise NewNoteError('The text note of the note is required.')
-
         super().from_dict(**kwargs)
 
     def __repr__(self) -> str:
