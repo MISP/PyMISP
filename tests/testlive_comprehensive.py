@@ -3197,6 +3197,43 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(event)
             self.admin_misp_connector.toggle_global_pythonify()
 
+    def test_attach_galaxy_cluster(self) -> None:
+        event = self.create_simple_event() 
+        event = self.admin_misp_connector.add_event(event, pythonify=True)
+        try:
+            galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)
+            galaxy: MISPGalaxy = galaxies[0]
+            if gid := galaxy.id:
+                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True, pythonify=True)
+            else:
+                raise Exception("No galaxy found")
+            galaxy_cluster: MISPGalaxyCluster = galaxy.clusters[0]
+            self.admin_misp_connector.attach_galaxy_cluster(event, galaxy_cluster)
+            event = self.admin_misp_connector.get_event(event.id, pythonify=True)
+
+            self.assertEqual(len(event.galaxies), 1)
+            event_galaxy = event.galaxies[0]
+            # The galaxy ID should equal the galaxy from which the cluster came from
+            self.assertEqual(event_galaxy.id, galaxy.id)
+            # The galaxy cluster should equal the cluster added
+            self.assertEqual(event_galaxy.clusters[0].id, galaxy_cluster.id)
+
+            galaxy_cluster: MISPGalaxyCluster = galaxy.clusters[1]
+
+            # Test on attribute
+            attribute = event.Attribute[0]
+            event = self.admin_misp_connector.get_event(event.id, pythonify=True)
+            attribute = event.Attribute[0]
+            self.assertEqual(len(attribute.galaxies), 1)
+            attribute_galaxy = attribute.galaxies[0]
+            # The galaxy ID should equal the galaxy from which the cluster came from
+            self.assertEqual(attribute_galaxy.id, galaxy.id)
+            # The galaxy cluster should equal the cluster added
+            self.assertEqual(attribute_galaxy.clusters[0].id, galaxy_cluster.id)
+        finally:
+            self.admin_misp_connector.delete_event(event)
+            self.admin_misp_connector.toggle_global_pythonify()
+
     @unittest.skip("Internal use only")
     def missing_methods(self) -> None:
         skip = [
