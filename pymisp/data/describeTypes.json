@@ -545,6 +545,10 @@
                 "default_category": "Other",
                 "to_ids": 0
             },
+            "integer": {
+                "default_category": "Other",
+                "to_ids": 0
+            },
             "datetime": {
                 "default_category": "Other",
                 "to_ids": 0
@@ -891,6 +895,7 @@
             "dns-soa-email",
             "size-in-bytes",
             "counter",
+            "integer",
             "datetime",
             "port",
             "ip-dst|port",
@@ -1460,6 +1465,7 @@
                 "other",
                 "size-in-bytes",
                 "counter",
+                "integer",
                 "datetime",
                 "cpe",
                 "port",

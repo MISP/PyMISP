@@ -7,7 +7,7 @@ from typing import Any
 
 import requests
 try:
-    import validators  # type: ignore
+    import validators
     has_validators = True
 except ImportError:
     has_validators = False
