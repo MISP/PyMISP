@@ -587,6 +587,39 @@ class PyMISP:
 
     # ## END Event Report ###
 
+    # ## BEGIN Galaxy Cluster ###
+    def attach_galaxy_cluster(self, misp_entity: MISPEvent | MISPAttribute, galaxy_cluster: MISPGalaxyCluster | int | str, local: bool = False, pythonify: bool = False) -> dict[str, Any] | list[dict[str, Any]]:
+        """Attach a galaxy cluster to an event or an attribute
+
+        :param misp_entity: a MISP Event or a MISP Attribute
+        :param galaxy_cluster: Galaxy cluster to attach
+        :param local: whether the object should be attached locally or not to the target
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        if isinstance(misp_entity, MISPEvent):
+            attach_target_type = 'event'
+        elif isinstance(misp_entity, MISPAttribute):
+            attach_target_type = 'attribute'
+        else:
+            raise PyMISPError('The misp_entity must be MISPEvent or MISPAttribute')
+
+        attach_target_id = misp_entity.id
+        local = 1 if local else 0
+
+        if isinstance(galaxy_cluster, MISPGalaxyCluster):
+            cluster_id = galaxy_cluster.id
+        elif isinstance(galaxy_cluster, (int, str)):
+            cluster_id = galaxy_cluster
+        else:
+            raise PyMISPError('The galaxy_cluster must be MISPGalaxyCluster or the id associated with the cluster (int or str)')  
+
+        to_post = { 'Galaxy': { 'target_id': cluster_id } }
+        url = f'galaxies/attachCluster/{attach_target_id}/{attach_target_type}/local:{local}'
+
+        r = self._prepare_request('POST', url, data=to_post)
+        return self._check_json_response(r)
+    # ## END Galaxy Cluster ###
+
     # ## BEGIN Object ###
 
     def get_object(self, misp_object: MISPObject | int | str | UUID, pythonify: bool = False) -> dict[str, Any] | MISPObject:
