@@ -25,7 +25,8 @@ try:
                         MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag,
                         MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting,
                         MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster,
-                        MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist)
+                        MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist,
+                        MISPNote)
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
 except ImportError:
     raise
@@ -3198,7 +3199,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.toggle_global_pythonify()
 
     def test_attach_galaxy_cluster(self) -> None:
-        event = self.create_simple_event() 
+        event = self.create_simple_event()
         event = self.admin_misp_connector.add_event(event, pythonify=True)
         try:
             galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)
@@ -3233,6 +3234,142 @@ class TestComprehensive(unittest.TestCase):
         finally:
             self.admin_misp_connector.delete_event(event)
             self.admin_misp_connector.toggle_global_pythonify()
+
+    def test_analyst_data_CRUD(self) -> None:
+        event = self.create_simple_event()
+        self.admin_misp_connector.toggle_global_pythonify()
+        try:
+            fake_uuid = str(uuid4())
+            new_note1 = MISPNote()
+            new_note1.object_type = 'Event'
+            new_note1.object_uuid = fake_uuid
+            new_note1.note = 'Fake note'
+            new_note1 = self.user_misp_connector.add_note(new_note1)
+            # The Note should be linked even for non-existing data
+            self.assertTrue(new_note1.object_uuid == fake_uuid)
+
+            new_note1.note = "Updated Note"
+            new_note1 = self.user_misp_connector.update_note(new_note1)
+            # The Note should be updatable
+            self.assertTrue(new_note1.note == "Updated Note")
+
+            # The Note should be able to get an Opinion
+            new_opinion = new_note1.add_opinion(42, 'Test Opinion')
+            new_note1 = self.user_misp_connector.update_note(new_note1)
+            # Fetch newly added node
+            new_note1 = self.user_misp_connector.get_note(new_note1)
+            # The Opinion shoud be able to be created via the Note
+            self.assertTrue(new_note1.opinions[0].opinion == new_opinion.opinion)
+
+            response = self.user_misp_connector.delete_note(new_note1)
+            # The Note should be deletable
+            self.assertTrue(response['success'])
+            self.assertEqual(response['message'], 'Note deleted.')
+            # The Opinion should not be deleted
+            opinion_resp = self.user_misp_connector.get_opinion(new_opinion)
+            self.assertTrue(opinion_resp.opinion == new_opinion.opinion)
+
+            new_note: MISPNote = event.add_note(note='Test Note', language='en')
+            new_note.distribution = 1  # Community
+            event = self.user_misp_connector.add_event(event)
+            # The note should be linked by Event UUID
+            self.assertEqual(new_note.object_type, 'Event')
+            self.assertTrue(new_note.object_uuid == event.uuid)
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note should be present on the event
+            self.assertTrue(event.notes[0].object_uuid == event.uuid)
+
+        finally:
+            self.admin_misp_connector.delete_event(event)
+            try:
+                self.admin_misp_connector.delete_opinion(new_opinion)
+                self.admin_misp_connector.delete_note(new_note)
+                self.admin_misp_connector.delete_note(new_note1)  # Should already be deleted
+            except Exception:
+                pass
+
+    def test_analyst_data_ACL(self) -> None:
+        event = self.create_simple_event()
+        event.distribution = 2
+        sg = MISPSharingGroup()
+        sg.name = 'Testcases SG'
+        sg.releasability = 'Testing'
+        sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
+        # Chec that sharing group was created
+        self.assertEqual(sharing_group.name, 'Testcases SG')
+        self.admin_misp_connector.toggle_global_pythonify()
+
+        try:
+            new_note: MISPNote = event.add_note(note='Test Note', language='en')
+            new_note.distribution = 0  # Org only
+            event = self.admin_misp_connector.add_event(event)
+
+            # The note should be linked by Event UUID
+            self.assertEqual(new_note.object_type, 'Event')
+            self.assertEqual(event.uuid, new_note.object_uuid)
+
+            event = self.admin_misp_connector.get_event(event)
+            # The note should be visible for the creator
+            self.assertEqual(len(event.notes), 1)
+            self.assertTrue(new_note.note == "Test Note")
+
+            resp = self.user_misp_connector.get_note(new_note)
+            # The note should not be visible to another org
+            self.assertTrue(len(resp), 0)
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should not be visible for another org than the creator
+            self.assertEqual(len(event.Note), 0)
+
+            new_note = self.admin_misp_connector.get_note(new_note)
+            new_note.distribution = 4
+            new_note.sharing_group_id = sharing_group.id
+            new_note = self.admin_misp_connector.update_note(new_note)
+            self.assertEqual(int(new_note.sharing_group_id), int(sharing_group.id))
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should not be visible for another org not part of the sharing group
+            self.assertEqual(len(event.Note), 0)
+
+            # Add org to the sharing group
+            r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group,
+                                                                   self.test_org, extend=True)
+            self.assertEqual(r['name'], 'Organisation added to the sharing group.')
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should now be visible
+            self.assertEqual(len(event.Note), 1)
+
+            new_note.note = "Updated Note"
+            resp = self.user_misp_connector.update_note(new_note)
+            # The Note should not be updatable by another organisation
+            self.assertTrue(resp['errors'])
+
+            resp = self.user_misp_connector.delete_note(new_note)
+            # The Note should not be deletable by another organisation
+            self.assertTrue(resp['errors'])
+
+            organisation = MISPOrganisation()
+            organisation.name = 'Fake Org'
+            fake_org = self.admin_misp_connector.add_organisation(organisation, pythonify=True)
+            new_note_2 = new_note.add_note('Test Note 2')
+            new_note_2.orgc_uuid = fake_org.uuid
+            new_note_2 = self.user_misp_connector.add_note(new_note_2)
+            # Regular user should not be able to create a note on behalf of another organisation
+            self.assertFalse(new_note_2.orgc_uuid == fake_org.uuid)
+            # Note should have the orgc set to the use's organisation for non-privileged users
+            self.assertTrue(new_note_2.orgc_uuid == self.test_org.uuid)
+
+        finally:
+            self.admin_misp_connector.delete_event(event)
+            try:
+                pass
+                self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+                self.admin_misp_connector.delete_organisation(fake_org)
+                self.admin_misp_connector.delete_note(new_note)
+            except Exception:
+                pass
 
     @unittest.skip("Internal use only")
     def missing_methods(self) -> None:

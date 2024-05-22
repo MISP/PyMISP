@@ -8,7 +8,7 @@ from deprecated import deprecated  # type: ignore
 from json import JSONEncoder
 from uuid import UUID
 from abc import ABCMeta
-from enum import Enum, IntEnum
+from enum import Enum
 from typing import Any, Mapping
 from collections.abc import MutableMapping
 from functools import lru_cache
