@@ -34,6 +34,7 @@ class NewNoteError(PyMISPError):
 class NewOpinionError(PyMISPError):
     pass
 
+
 class NewRelationshipError(PyMISPError):
     pass
 
