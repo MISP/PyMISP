@@ -2,6 +2,49 @@ Changelog
 =========
 
 
+v2.4.193 (2024-06-06)
+---------------------
+
+New
+~~~
+- [analyst-data] Added initial support of analyst data concept and
+  functions - WiP. [Sami Mokaddem]
+
+Changes
+~~~~~~~
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- A bit more refactoring. [Raphaël Vinot]
+- Use from_dict in the mixin to initialize the objects. [Raphaël Vinot]
+- [analyst-data] Added improvements, API endpoints and tests. [Sami
+  Mokaddem]
+- [analyst-data] Make sure to include note_type_name. [Sami Mokaddem]
+- Make mypy happy, change inheritance. [Raphaël Vinot]
+- Allow orgc context for search_galaxy_clusters. [Jeroen Pinoy]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [analyst-data] Continued implementation of analyst-data support. [Sami
+  Mokaddem]
+- Allow orgc context for search_galaxy_clusters. [Jeroen Pinoy]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Get the tests to pass. [Raphaël Vinot]
+- Properly load AnalystData from dict. [Raphaël Vinot]
+- More changes to get the tests to pass. [Raphaël Vinot]
+- [event-report] Make sure to generate an UUID. [Sami Mokaddem]
+- Pass kwargs to abstract. [Raphaël Vinot]
+
+Other
+~~~~~
+- Chg; Bump version. [Raphaël Vinot]
+- Add test case. [Vincenzo]
+- Add attach galaxy cluster method. [Vincenzo]
+
+
 v2.4.190 (2024-04-18)
 ---------------------
 
