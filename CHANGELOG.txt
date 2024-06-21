@@ -2,6 +2,20 @@ Changelog
 =========
 
 
+v2.4.194 (2024-06-21)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Make a response in the tests a MISPUser obj. [Raphaël Vinot]
+- Tests failing du to missing error. [Raphaël Vinot]
+
+
 v2.4.193 (2024-06-06)
 ---------------------
 
@@ -40,6 +54,7 @@ Fix
 
 Other
 ~~~~~
+- Chg; Bump changelog. [Raphaël Vinot]
 - Chg; Bump version. [Raphaël Vinot]
 - Add test case. [Vincenzo]
 - Add attach galaxy cluster method. [Vincenzo]
