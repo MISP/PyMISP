@@ -2716,7 +2716,8 @@ class TestComprehensive(unittest.TestCase):
             # # Enable autoalert on admin
             self.admin_misp_connector._current_user.autoalert = True
             self.admin_misp_connector._current_user.termsaccepted = True
-            self.user_misp_connector.update_user(self.admin_misp_connector._current_user)
+            admin_usr = self.admin_misp_connector.update_user(self.admin_misp_connector._current_user)
+            self.assertTrue(admin_usr.autoalert)
 
             first = self.admin_misp_connector.add_event(first, pythonify=True)
             second = self.admin_misp_connector.add_event(second, pythonify=True)
