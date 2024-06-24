@@ -67,18 +67,26 @@ class NoKey(PyMISPError):
     pass
 
 
-class MISPObjectException(PyMISPError):
-    pass
+class MISPAttributeException(PyMISPError):
+    """A base class for attribute specific exceptions"""
 
+class MISPObjectException(PyMISPError):
+    """A base class for object specific exceptions"""
+
+
+class InvalidMISPAttribute(MISPAttributeException):
+    """Exception raised when an attribute doesn't respect the constraints in the definition"""
+
+class InvalidMISPObjectAttribute(MISPAttributeException):
+    """Exception raised when an object attribute doesn't respect the constraints in the definition"""
 
 class InvalidMISPObject(MISPObjectException):
-    """Exception raised when an object doesn't respect the contrains in the definition"""
-    pass
+    """Exception raised when an object doesn't respect the constraints in the definition"""
 
 
 class UnknownMISPObjectTemplate(MISPObjectException):
     """Exception raised when the template is unknown"""
-    pass
+
 
 
 class InvalidMISPGalaxy(PyMISPError):
