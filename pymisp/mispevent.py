@@ -23,8 +23,8 @@ except ImportError:
     import json
 
 from .abstract import AbstractMISP, MISPTag
-from .exceptions import (NewNoteError, NewOpinionError, NewRelationshipError, UnknownMISPObjectTemplate, InvalidMISPGalaxy, InvalidMISPObject,
-                         PyMISPError, NewEventError, NewAttributeError, NewEventReportError,
+from .exceptions import (NewNoteError, NewOpinionError, NewRelationshipError, UnknownMISPObjectTemplate, InvalidMISPGalaxy, InvalidMISPAttribute,
+                         InvalidMISPObject, InvalidMISPObjectAttribute, PyMISPError, NewEventError, NewAttributeError, NewEventReportError,
                          NewGalaxyClusterError, NewGalaxyClusterRelationError, NewAnalystDataError)
 
 logger = logging.getLogger('pymisp')
@@ -1026,6 +1026,26 @@ class MISPObject(AnalystDataBehaviorMixin):
         self.ObjectReference.append(reference)
         self.edited = True
         return reference
+
+    def get_attribute_by_id(self, attribute_id: str | int) -> MISPObjectAttribute:
+        """Get an object attribute by ID
+
+        :param attribute_id: The ID of the seeking object attribute"""
+        for attribute in self.attributes:
+            if hasattr(attribute, 'id') and attribute.id == attribute_id:
+                return attribute
+
+        raise InvalidMISPObjectAttribute(f'Object attribute with {attribute_id} does not exist in this event')
+
+    def get_attribute_by_uuid(self, attribute_uuid: str) -> MISPObjectAttribute:
+        """Get an object attribute by UUID
+
+        :param attribute_uuid: The UUID of the seeking object attribute"""
+        for attribute in self.attributes:
+            if hasattr(attribute, 'uuid') and attribute.uuid == attribute_uuid:
+                return attribute
+
+        raise InvalidMISPObjectAttribute(f'Object attribute with {attribute_uuid} does not exist in this event')
 
     def get_attributes_by_relation(self, object_relation: str) -> list[MISPAttribute]:
         '''Returns the list of attributes with the given object relation in the object'''
@@ -2038,6 +2058,25 @@ class MISPEvent(AnalystDataBehaviorMixin):
             raise InvalidMISPGalaxy("A Galaxy to add to an existing Event needs to be either a MISPGalaxy or a plain python dictionary")
         self.galaxies.append(misp_galaxy)
         return misp_galaxy
+
+    def get_attribute_by_id(self, attribute_id: str | int) -> MISPAttribute:
+        """Get an attribute by ID
+
+        :param attribute_id: The ID of the seeking attribute"""
+        for attribute in self.attributes:
+            if hasattr(attribute, 'id') and int(attribute.id) == int(attribute_id):
+                return attribute
+        raise InvalidMISPAttribute(f'Attribute with {attribute_id} does not exist in this event')
+
+    def get_attribute_by_uuid(self, attribute_uuid: str) -> MISPAttribute:
+        """Get an attribute by UUID
+
+        :param attribute_uuid: The UUID of the seeking attribute"""
+        for attribute in self.attributes:
+            if hasattr(attribute, 'uuid') and attribute.uuid == attribute_uuid:
+                return attribute
+
+        raise InvalidMISPAttribute(f'Attribute with {attribute_uuid} does not exist in this event')
 
     def get_object_by_id(self, object_id: str | int) -> MISPObject:
         """Get an object by ID
