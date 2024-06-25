@@ -25,7 +25,8 @@ try:
                         MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag,
                         MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting,
                         MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster,
-                        MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist)
+                        MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist,
+                        MISPNote)
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
 except ImportError:
     raise
@@ -78,7 +79,6 @@ class TestComprehensive(unittest.TestCase):
         cls.admin_misp_connector.set_server_setting('debug', 1, force=True)
         if not fast_mode:
             r = cls.admin_misp_connector.update_misp()
-            print(r)
         # Creates an org
         organisation = MISPOrganisation()
         organisation.name = 'Test Org'
@@ -2716,7 +2716,8 @@ class TestComprehensive(unittest.TestCase):
             # # Enable autoalert on admin
             self.admin_misp_connector._current_user.autoalert = True
             self.admin_misp_connector._current_user.termsaccepted = True
-            self.user_misp_connector.update_user(self.admin_misp_connector._current_user)
+            admin_usr = self.admin_misp_connector.update_user(self.admin_misp_connector._current_user, pythonify=True)
+            self.assertTrue(admin_usr.autoalert)
 
             first = self.admin_misp_connector.add_event(first, pythonify=True)
             second = self.admin_misp_connector.add_event(second, pythonify=True)
@@ -3075,16 +3076,13 @@ class TestComprehensive(unittest.TestCase):
             self.user_misp_connector.delete_event_report(new_event_report)
 
     def test_search_galaxy(self) -> None:
-        self.admin_misp_connector.toggle_global_pythonify()
-        galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies()  # type: ignore[assignment]
+        galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)  # type: ignore[assignment]
         galaxy: MISPGalaxy = galaxies[0]
-        ret = self.admin_misp_connector.search_galaxy(value=galaxy.name)
+        ret = self.admin_misp_connector.search_galaxy(value=galaxy.name, pythonify=True)
         self.assertEqual(len(ret), 1)
-        self.admin_misp_connector.toggle_global_pythonify()
 
     def test_galaxy_cluster(self) -> None:
-        self.admin_misp_connector.toggle_global_pythonify()
-        galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies()  # type: ignore[assignment]
+        galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)  # type: ignore[assignment]
         galaxy: MISPGalaxy = galaxies[0]
         new_galaxy_cluster: MISPGalaxyCluster = MISPGalaxyCluster()
         new_galaxy_cluster.value = "Test Cluster"
@@ -3093,13 +3091,13 @@ class TestComprehensive(unittest.TestCase):
         new_galaxy_cluster.description = "Example test cluster"
         try:
             if gid := galaxy.id:
-                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True)  # type: ignore[assignment]
+                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True, pythonify=True)  # type: ignore[assignment]
             else:
                 raise Exception("No galaxy found")
             existing_galaxy_cluster = galaxy.clusters[0]
 
             if gid := galaxy.id:
-                new_galaxy_cluster = self.admin_misp_connector.add_galaxy_cluster(gid, new_galaxy_cluster)  # type: ignore[assignment]
+                new_galaxy_cluster = self.admin_misp_connector.add_galaxy_cluster(gid, new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             else:
                 raise Exception("No galaxy found")
             # The new galaxy cluster should be under the selected galaxy
@@ -3108,7 +3106,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(new_galaxy_cluster.value, "Test Cluster")
 
             new_galaxy_cluster.add_cluster_element("synonyms", "Test2")
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
 
             # The cluster should have one element that is a synonym
             self.assertEqual(len(new_galaxy_cluster.cluster_elements), 1)
@@ -3121,22 +3119,22 @@ class TestComprehensive(unittest.TestCase):
 
             # The cluster element should be updatable
             element.value = "Test3"
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             element = new_galaxy_cluster.cluster_elements[0]
             self.assertEqual(element.value, "Test3")
 
             new_galaxy_cluster.add_cluster_element("synonyms", "ToDelete")
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             # The cluster should have two elements
             self.assertEqual(len(new_galaxy_cluster.cluster_elements), 2)
 
             new_galaxy_cluster.cluster_elements = [e for e in new_galaxy_cluster.cluster_elements if e.value != "ToDelete"]
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             # The cluster elements should be deletable
             self.assertEqual(len(new_galaxy_cluster.cluster_elements), 1)
 
             new_galaxy_cluster.add_cluster_relation(existing_galaxy_cluster, "is-tested-by")
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             # The cluster should have a relationship
             self.assertEqual(len(new_galaxy_cluster.cluster_relations), 1)
             relation = new_galaxy_cluster.cluster_relations[0]
@@ -3144,7 +3142,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(relation.referenced_galaxy_cluster_uuid, existing_galaxy_cluster.uuid)
 
             relation.add_tag("tlp:amber")
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             relation = new_galaxy_cluster.cluster_relations[0]
             # The relationship should have a tag of tlp:amber
             self.assertEqual(len(relation.tags), 1)
@@ -3154,13 +3152,13 @@ class TestComprehensive(unittest.TestCase):
             resp = self.admin_misp_connector.delete_galaxy_cluster_relation(relation)
             self.assertTrue(resp['success'])
             # The cluster relation should no longer be present
-            new_galaxy_cluster = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
+            new_galaxy_cluster = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             self.assertEqual(len(new_galaxy_cluster.cluster_relations), 0)
 
             resp = self.admin_misp_connector.delete_galaxy_cluster(new_galaxy_cluster)
             # Galaxy clusters should be soft deletable
             self.assertTrue(resp['success'])
-            new_galaxy_cluster = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
+            new_galaxy_cluster = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             self.assertTrue(isinstance(new_galaxy_cluster, MISPGalaxyCluster))
 
             resp = self.admin_misp_connector.delete_galaxy_cluster(new_galaxy_cluster, hard=True)
@@ -3169,23 +3167,20 @@ class TestComprehensive(unittest.TestCase):
             resp = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
             self.assertTrue("errors" in resp)
         finally:
-            self.admin_misp_connector.delete_galaxy_cluster_relation(relation)
-            self.admin_misp_connector.delete_galaxy_cluster(new_galaxy_cluster, hard=True)
-            self.admin_misp_connector.toggle_global_pythonify()
+            pass
 
     def test_event_galaxy(self) -> None:
-        self.admin_misp_connector.toggle_global_pythonify()
         event = self.create_simple_event()
         try:
-            galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies()  # type: ignore[assignment]
+            galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)  # type: ignore[assignment]
             galaxy: MISPGalaxy = galaxies[0]
             if gid := galaxy.id:
-                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True)  # type: ignore[assignment]
+                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True, pythonify=True)  # type: ignore[assignment]
             else:
                 raise Exception("No galaxy found")
             galaxy_cluster: MISPGalaxyCluster = galaxy.clusters[0]
             event.add_tag(galaxy_cluster.tag_name)
-            event = self.admin_misp_connector.add_event(event)
+            event = self.admin_misp_connector.add_event(event, pythonify=True)
             # The event should have a galaxy attached
             self.assertEqual(len(event.galaxies), 1)
             event_galaxy = event.galaxies[0]
@@ -3195,7 +3190,179 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(event_galaxy.clusters[0].id, galaxy_cluster.id)
         finally:
             self.admin_misp_connector.delete_event(event)
-            self.admin_misp_connector.toggle_global_pythonify()
+
+    def test_attach_galaxy_cluster(self) -> None:
+        event = self.create_simple_event()
+        event = self.admin_misp_connector.add_event(event, pythonify=True)
+        try:
+            galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)
+            galaxy: MISPGalaxy = galaxies[0]
+            if gid := galaxy.id:
+                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True, pythonify=True)
+            else:
+                raise Exception("No galaxy found")
+            galaxy_cluster: MISPGalaxyCluster = galaxy.clusters[0]
+            response = self.admin_misp_connector.attach_galaxy_cluster(event, galaxy_cluster)
+            self.assertTrue(response['saved'])
+            event = self.admin_misp_connector.get_event(event.id, pythonify=True)
+
+            self.assertEqual(len(event.galaxies), 1)
+            event_galaxy = event.galaxies[0]
+            # The galaxy ID should equal the galaxy from which the cluster came from
+            self.assertEqual(event_galaxy.id, galaxy.id)
+            # The galaxy cluster should equal the cluster added
+            self.assertEqual(event_galaxy.clusters[0].id, galaxy_cluster.id)
+
+            galaxy_cluster: MISPGalaxyCluster = galaxy.clusters[1]
+
+            # Test on attribute
+            attribute = event.attributes[0]
+            response = self.admin_misp_connector.attach_galaxy_cluster(attribute, galaxy_cluster)
+            self.assertTrue(response['saved'])
+            event = self.admin_misp_connector.get_event(event.id, pythonify=True)
+            attribute = event.attributes[0]
+            self.assertEqual(len(attribute.galaxies), 1)
+            attribute_galaxy = attribute.galaxies[0]
+            # The galaxy ID should equal the galaxy from which the cluster came from
+            self.assertEqual(attribute_galaxy.id, galaxy.id)
+            # The galaxy cluster should equal the cluster added
+            self.assertEqual(attribute_galaxy.clusters[0].id, galaxy_cluster.id)
+        finally:
+            self.admin_misp_connector.delete_event(event)
+
+    def test_analyst_data_CRUD(self) -> None:
+        event = self.create_simple_event()
+        try:
+            fake_uuid = str(uuid4())
+            new_note1 = MISPNote()
+            new_note1.object_type = 'Event'
+            new_note1.object_uuid = fake_uuid
+            new_note1.note = 'Fake note'
+            new_note1 = self.user_misp_connector.add_note(new_note1)
+            # The Note should be linked even for non-existing data
+            self.assertTrue(new_note1.object_uuid == fake_uuid)
+
+            new_note1.note = "Updated Note"
+            new_note1 = self.user_misp_connector.update_note(new_note1)
+            # The Note should be updatable
+            self.assertTrue(new_note1.note == "Updated Note")
+
+            # The Note should be able to get an Opinion
+            new_opinion = new_note1.add_opinion(42, 'Test Opinion')
+            new_note1 = self.user_misp_connector.update_note(new_note1)
+            # Fetch newly added node
+            new_note1 = self.user_misp_connector.get_note(new_note1)
+            # The Opinion shoud be able to be created via the Note
+            self.assertTrue(new_note1.opinions[0].opinion == new_opinion.opinion)
+
+            response = self.user_misp_connector.delete_note(new_note1)
+            # The Note should be deletable
+            self.assertTrue(response['success'])
+            self.assertEqual(response['message'], 'Note deleted.')
+            # The Opinion should not be deleted
+            opinion_resp = self.user_misp_connector.get_opinion(new_opinion)
+            self.assertTrue(opinion_resp.opinion == new_opinion.opinion)
+
+            new_note: MISPNote = event.add_note(note='Test Note', language='en')
+            new_note.distribution = 1  # Community
+            event = self.user_misp_connector.add_event(event)
+            # The note should be linked by Event UUID
+            self.assertEqual(new_note.object_type, 'Event')
+            self.assertTrue(new_note.object_uuid == event.uuid)
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note should be present on the event
+            self.assertTrue(event.notes[0].object_uuid == event.uuid)
+
+        finally:
+            self.admin_misp_connector.delete_event(event)
+            try:
+                self.admin_misp_connector.delete_opinion(new_opinion)
+                self.admin_misp_connector.delete_note(new_note)
+                self.admin_misp_connector.delete_note(new_note1)  # Should already be deleted
+            except Exception:
+                pass
+
+    def test_analyst_data_ACL(self) -> None:
+        event = self.create_simple_event()
+        event.distribution = 2
+        sg = MISPSharingGroup()
+        sg.name = 'Testcases SG'
+        sg.releasability = 'Testing'
+        sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
+        # Chec that sharing group was created
+        self.assertEqual(sharing_group.name, 'Testcases SG')
+
+        try:
+            new_note: MISPNote = event.add_note(note='Test Note', language='en')
+            new_note.distribution = 0  # Org only
+            event = self.admin_misp_connector.add_event(event, pythonify=True)
+
+            # The note should be linked by Event UUID
+            self.assertEqual(new_note.object_type, 'Event')
+            self.assertEqual(event.uuid, new_note.object_uuid)
+
+            event = self.admin_misp_connector.get_event(event, pythonify=True)
+            # The note should be visible for the creator
+            self.assertEqual(len(event.notes), 1)
+            self.assertTrue(new_note.note == "Test Note")
+
+            resp = self.user_misp_connector.get_note(new_note)
+            # The note should not be visible to another org
+            self.assertTrue(len(resp), 0)
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should not be visible for another org than the creator
+            self.assertEqual(len(event.Note), 0)
+
+            new_note = self.admin_misp_connector.get_note(new_note, pythonify=True)
+            new_note.distribution = 4
+            new_note.sharing_group_id = sharing_group.id
+            new_note = self.admin_misp_connector.update_note(new_note, pythonify=True)
+            self.assertEqual(int(new_note.sharing_group_id), int(sharing_group.id))
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should not be visible for another org not part of the sharing group
+            self.assertEqual(len(event.Note), 0)
+
+            # Add org to the sharing group
+            r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group,
+                                                                   self.test_org, extend=True)
+            self.assertEqual(r['name'], 'Organisation added to the sharing group.')
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should now be visible
+            self.assertEqual(len(event.Note), 1)
+
+            new_note.note = "Updated Note"
+            resp = self.user_misp_connector.update_note(new_note)
+            # The Note should not be updatable by another organisation
+            self.assertTrue(resp['errors'])
+
+            resp = self.user_misp_connector.delete_note(new_note)
+            # The Note should not be deletable by another organisation
+            self.assertTrue(resp['errors'])
+
+            organisation = MISPOrganisation()
+            organisation.name = 'Fake Org'
+            fake_org = self.admin_misp_connector.add_organisation(organisation, pythonify=True)
+            new_note_2 = new_note.add_note('Test Note 2')
+            new_note_2.orgc_uuid = fake_org.uuid
+            new_note_2 = self.user_misp_connector.add_note(new_note_2)
+            # Regular user should not be able to create a note on behalf of another organisation
+            self.assertFalse(new_note_2.orgc_uuid == fake_org.uuid)
+            # Note should have the orgc set to the use's organisation for non-privileged users
+            self.assertTrue(new_note_2.orgc_uuid == self.test_org.uuid)
+
+        finally:
+            self.admin_misp_connector.delete_event(event)
+            try:
+                pass
+                self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+                self.admin_misp_connector.delete_organisation(fake_org)
+                self.admin_misp_connector.delete_note(new_note)
+            except Exception:
+                pass
 
     @unittest.skip("Internal use only")
     def missing_methods(self) -> None:
