@@ -863,6 +863,11 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events, [])
             events = self.user_misp_connector.search(timestamp=timeframe, published=False)
             self.assertEqual(len(events), 2)
+            # check publish & search
+            self.pub_misp_connector.publish(second)
+            events = self.user_misp_connector.search(timestamp=timeframe, published=False)
+            self.assertEqual(len(events), 1)
+
             events = self.user_misp_connector.search(eventid=first.id)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
