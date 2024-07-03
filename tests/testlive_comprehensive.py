@@ -866,14 +866,14 @@ class TestComprehensive(unittest.TestCase):
             # check publish & search
             
             bg_processing_state = self.admin_misp_connector.get_server_setting('MISP.background_jobs')['value']
-            self.admin_misp_connector.set_server_setting('MISP.background_processing', False, force=True)
+            self.admin_misp_connector.set_server_setting('MISP.background_jobs', False, force=True)
             publish_result = self.admin_misp_connector.publish(second)
             self.assertEqual(publish_result["success"], True)
             second = self.admin_misp_connector.get_event(second, pythonify=True)
             # check if the publishing succeeded
-            self.assertEqual(second.published, True)
             time.sleep(1)
-            self.admin_misp_connector.set_server_setting('MISP.background_processing', bg_processing_state, force=True)
+            self.assertEqual(second.published, True)
+            self.admin_misp_connector.set_server_setting('MISP.background_jobs', bg_processing_state, force=True)
             events = self.user_misp_connector.search(timestamp=timeframe, published=False)
             self.assertEqual(len(events), 1)
 
