@@ -868,6 +868,9 @@ class TestComprehensive(unittest.TestCase):
             bg_processing_state = self.admin_misp_connector.get_server_setting('MISP.background_jobs')['value']
             self.admin_misp_connector.set_server_setting('MISP.background_processing', False, force=True)
             self.admin_misp_connector.publish(second)
+            second = self.admin_misp_connector.get_event(second, pythonify=True)
+            # check if the publishing succeeded
+            self.assertEqual(second.published, True)
             time.sleep(1)
             self.admin_misp_connector.set_server_setting('MISP.background_processing', bg_processing_state, force=True)
             events = self.user_misp_connector.search(timestamp=timeframe, published=False)
