@@ -898,13 +898,13 @@ tests = ["asttokens (>=2.1.0)", "coverage", "coverage-enable-subprocess", "ipyth
 
 [[package]]
 name = "extract-msg"
-version = "0.48.5"
+version = "0.48.7"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "extract_msg-0.48.5-py3-none-any.whl", hash = "sha256:36f89ee19521e1bc0f3f0f9628423f0285fde1180b62cc9e61f20d5b22e780f1"},
-    {file = "extract_msg-0.48.5.tar.gz", hash = "sha256:16f097a6455d9d038d67d7a063bf391b33d7d1eb9684a2d04b56b13fdf3053ac"},
+    {file = "extract_msg-0.48.7-py3-none-any.whl", hash = "sha256:0477489aa2ac417387803f19fa53ddc44136846a648b0898a114212272a1a111"},
+    {file = "extract_msg-0.48.7.tar.gz", hash = "sha256:3ddf015c0e0a6ea36026fedfb7f8e434ca37150a31069363b2d0752196d15b6e"},
 ]
 
 [package.dependencies]
