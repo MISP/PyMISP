@@ -36,8 +36,8 @@ try:
     verifycert = False
 except ImportError as e:
     print(e)
-    url = 'https://localhost:8443'
-    key = 'sL9hrjIyY405RyGQHLx5DoCAM92BNmmGa8P4ck1E'
+    url = 'https://10.197.206.83'
+    key = 'OdzzuBSnH83tEjvZbf7SFejC1kC3gS11Cnj2wxLk'
     verifycert = False
 
 logging.disable(logging.CRITICAL)
@@ -863,6 +863,19 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events, [])
             events = self.user_misp_connector.search(timestamp=timeframe, published=False)
             self.assertEqual(len(events), 2)
+            # check publish & search
+            bg_processing_state = self.admin_misp_connector.get_server_setting('MISP.background_jobs')['value']
+            self.admin_misp_connector.set_server_setting('MISP.background_jobs', False, force=True)
+            publish_result = self.admin_misp_connector.publish(second)
+            self.assertEqual(publish_result["success"], True)
+            second = self.admin_misp_connector.get_event(second, pythonify=True)
+            # check if the publishing succeeded
+            time.sleep(1)
+            self.assertEqual(second.published, True)
+            self.admin_misp_connector.set_server_setting('MISP.background_jobs', bg_processing_state, force=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, published=False)
+            self.assertEqual(len(events), 1)
+
             events = self.user_misp_connector.search(eventid=first.id)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
