@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 import time
-import sys
 import unittest
 import subprocess
 
-import urllib3  # type: ignore
+import urllib3
 import logging
 logging.disable(logging.CRITICAL)
 
 try:
-    from pymisp import ExpandedPyMISP, MISPOrganisation, MISPUser, MISPEvent, MISPObject, MISPSharingGroup, Distribution
+    from pymisp import PyMISP, MISPOrganisation, MISPUser, MISPEvent, MISPObject, MISPSharingGroup, Distribution
 except ImportError:
-    if sys.version_info < (3, 6):
-        print('This test suite requires Python 3.6+, breaking.')
-        sys.exit(0)
-    else:
-        raise
+    raise
 
 key = 'eYQdGTEWZJ8C2lm9EpnMqxQGwGiPNyoR75JvLdlE'
 verifycert = False
@@ -73,7 +69,7 @@ fast_mode = True
 class MISPInstance():
 
     def __init__(self, params):
-        self.initial_user_connector = ExpandedPyMISP(params['url'], params['key'], ssl=False, debug=False)
+        self.initial_user_connector = PyMISP(params['url'], params['key'], ssl=False, debug=False)
         # Git pull
         self.initial_user_connector.update_misp()
         # Set the default role (id 3 on the VM is normal user)
@@ -101,7 +97,7 @@ class MISPInstance():
         user.org_id = self.test_org.id
         user.role_id = 1  # Site admin
         self.test_site_admin = self.initial_user_connector.add_user(user)
-        self.site_admin_connector = ExpandedPyMISP(params['url'], self.test_site_admin.authkey, ssl=False, debug=False)
+        self.site_admin_connector = PyMISP(params['url'], self.test_site_admin.authkey, ssl=False, debug=False)
         self.site_admin_connector.toggle_global_pythonify()
         # Create org admin
         user = MISPUser()
@@ -109,14 +105,14 @@ class MISPInstance():
         user.org_id = self.test_org.id
         user.role_id = 2  # Org admin
         self.test_org_admin = self.site_admin_connector.add_user(user)
-        self.org_admin_connector = ExpandedPyMISP(params['url'], self.test_org_admin.authkey, ssl=False, debug=False)
+        self.org_admin_connector = PyMISP(params['url'], self.test_org_admin.authkey, ssl=False, debug=False)
         self.org_admin_connector.toggle_global_pythonify()
         # Create user
         user = MISPUser()
         user.email = params['email_user']
         user.org_id = self.test_org.id
         self.test_usr = self.org_admin_connector.add_user(user)
-        self.user_connector = ExpandedPyMISP(params['url'], self.test_usr.authkey, ssl=False, debug=False)
+        self.user_connector = PyMISP(params['url'], self.test_usr.authkey, ssl=False, debug=False)
         self.user_connector.toggle_global_pythonify()
 
         # Setup external_baseurl
@@ -141,7 +137,7 @@ class MISPInstance():
         user.org_id = sync_org.id
         user.role_id = 5  # Org admin
         sync_user = self.site_admin_connector.add_user(user)
-        sync_user_connector = ExpandedPyMISP(self.site_admin_connector.root_url, sync_user.authkey, ssl=False, debug=False)
+        sync_user_connector = PyMISP(self.site_admin_connector.root_url, sync_user.authkey, ssl=False, debug=False)
         sync_server_config = sync_user_connector.get_sync_config(pythonify=True)
         self.sync.append((sync_org, sync_user, sync_server_config))
 

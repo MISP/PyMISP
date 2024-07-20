@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 import re
-from typing import Optional
+from typing import Any
 
 import requests
 try:
-    import validators  # type: ignore
+    import validators
     has_validators = True
 except ImportError:
     has_validators = False
@@ -24,7 +25,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
     :indicator: IOC to search VirusTotal for
     '''
-    def __init__(self, apikey: str, indicator: str, vt_proxies: Optional[dict] = None, **kwargs):
+    def __init__(self, apikey: str, indicator: str, vt_proxies: dict[str, str] | None = None, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__('virustotal-report', **kwargs)
         indicator = indicator.strip()
         self._resource_type = self.__validate_resource(indicator)
@@ -33,20 +34,20 @@ class VTReportObject(AbstractMISPObjectGenerator):
             self._report = self.__query_virustotal(apikey, indicator)
             self.generate_attributes()
         else:
-            error_msg = "A valid indicator is required. (One of type url, md5, sha1, sha256). Received '{}' instead".format(indicator)
+            error_msg = f"A valid indicator is required. (One of type url, md5, sha1, sha256). Received '{indicator}' instead"
             raise InvalidMISPObject(error_msg)
 
-    def get_report(self):
+    def get_report(self) -> dict[str, Any]:
         return self._report
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         ''' Parse the VirusTotal report for relevant attributes '''
         self.add_attribute("last-submission", value=self._report["scan_date"])
         self.add_attribute("permalink", value=self._report["permalink"])
         ratio = "{}/{}".format(self._report["positives"], self._report["total"])
         self.add_attribute("detection-ratio", value=ratio)
 
-    def __validate_resource(self, ioc: str):
+    def __validate_resource(self, ioc: str) -> str | bool:
         '''
         Validate the data type of an indicator.
         Domains and IP addresses aren't supported because
@@ -62,7 +63,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
             return "file"
         return False
 
-    def __query_virustotal(self, apikey: str, resource: str):
+    def __query_virustotal(self, apikey: str, resource: str) -> dict[str, Any]:
         '''
         Query VirusTotal for information about an indicator
 
@@ -70,7 +71,7 @@ class VTReportObject(AbstractMISPObjectGenerator):
 
         :resource: Indicator to search in VirusTotal
         '''
-        url = "https://www.virustotal.com/vtapi/v2/{}/report".format(self._resource_type)
+        url = f"https://www.virustotal.com/vtapi/v2/{self._resource_type}/report"
         params = {"apikey": apikey, "resource": resource}
         # for now assume we're using a public API key - we'll figure out private keys later
         if self._proxies:

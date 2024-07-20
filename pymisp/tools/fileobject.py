@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 from ..exceptions import InvalidMISPObject
 from .abstractgenerator import AbstractMISPObjectGenerator
@@ -10,7 +11,6 @@ import math
 from collections import Counter
 import logging
 from pathlib import Path
-from typing import Union, Optional
 
 logger = logging.getLogger('pymisp')
 
@@ -22,7 +22,7 @@ except ImportError:
     HAS_PYDEEP = False
 
 try:
-    import magic  # type: ignore
+    import magic
     HAS_MAGIC = True
 except ImportError:
     HAS_MAGIC = False
@@ -30,12 +30,14 @@ except ImportError:
 
 class FileObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, filename: Optional[str] = None, **kwargs) -> None:
+    def __init__(self, filepath: Path | str | None = None,  # type: ignore[no-untyped-def]
+                 pseudofile: BytesIO | bytes | None = None,
+                 filename: str | None = None, **kwargs) -> None:
         super().__init__('file', **kwargs)
         if not HAS_PYDEEP:
-            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if not HAS_MAGIC:
-            logger.warning("Please install python-magic: pip install python-magic.")
+            logger.warning("python-magic is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if filename:
             # Useful in case the file is copied with a pre-defined name by a script but we want to keep the original name
             self.__filename = filename
@@ -55,10 +57,10 @@ class FileObject(AbstractMISPObjectGenerator):
         self.__data = self.__pseudofile.getvalue()
         self.generate_attributes()
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         self.add_attribute('filename', value=self.__filename)
-        size = self.add_attribute('size-in-bytes', value=len(self.__data))
-        if int(size.value) > 0:
+        self.add_attribute('size-in-bytes', value=len(self.__data))
+        if len(self.__data) > 0:
             self.add_attribute('entropy', value=self.__entropy_H(self.__data))
             self.add_attribute('md5', value=md5(self.__data).hexdigest())
             self.add_attribute('sha1', value=sha1(self.__data).hexdigest())

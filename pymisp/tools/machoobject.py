@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+import logging
+
+from hashlib import md5, sha1, sha256, sha512
+from io import BytesIO
+from pathlib import Path
+from typing import Any
 
 from ..exceptions import InvalidMISPObject
-from .abstractgenerator import AbstractMISPObjectGenerator
-from io import BytesIO
-from hashlib import md5, sha1, sha256, sha512
-import logging
-from typing import Optional, Union
-from pathlib import Path
-from . import FileObject
 
-import lief  # type: ignore
+from . import FileObject
+from .abstractgenerator import AbstractMISPObjectGenerator
+
+import lief
 
 try:
     import pydeep  # type: ignore
@@ -21,7 +25,10 @@ except ImportError:
 logger = logging.getLogger('pymisp')
 
 
-def make_macho_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalone: bool = True, default_attributes_parameters: dict = {}):
+def make_macho_objects(lief_parsed: lief.MachO.Binary,
+                       misp_file: FileObject,
+                       standalone: bool = True,
+                       default_attributes_parameters: dict[str, Any] = {}) -> tuple[FileObject, MachOObject, list[MachOSectionObject]]:
     macho_object = MachOObject(parsed=lief_parsed, standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     misp_file.add_reference(macho_object.uuid, 'includes', 'MachO indicators')
     macho_sections = []
@@ -32,31 +39,43 @@ def make_macho_objects(lief_parsed: lief.Binary, misp_file: FileObject, standalo
 
 class MachOObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parsed: Optional[lief.MachO.Binary] = None, filepath: Optional[Union[Path, str]] = None, pseudofile: Optional[BytesIO] = None, **kwargs):
+    __macho: lief.MachO.Binary
+
+    def __init__(self, parsed: lief.MachO.Binary | lief.MachO.FatBinary | None = None,  # type: ignore[no-untyped-def]
+                 filepath: Path | str | None = None,
+                 pseudofile: BytesIO | list[int] | None = None,
+                 **kwargs) -> None:
         """Creates an MachO object, with lief"""
         super().__init__('macho', **kwargs)
         if not HAS_PYDEEP:
-            logger.warning("Please install pydeep: pip install git+https://github.com/kbandla/pydeep.git")
+            logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                self.__macho = lief.MachO.parse(raw=pseudofile.getvalue())
+                m = lief.MachO.parse(obj=pseudofile)
             elif isinstance(pseudofile, bytes):
-                self.__macho = lief.MachO.parse(raw=pseudofile)
+                m = lief.MachO.parse(raw=list(pseudofile))
+            elif isinstance(pseudofile, list):
+                m = lief.MachO.parse(raw=pseudofile)
             else:
-                raise InvalidMISPObject('Pseudo file can be BytesIO or bytes got {}'.format(type(pseudofile)))
+                raise InvalidMISPObject(f'Pseudo file can be BytesIO or bytes got {type(pseudofile)}')
+            if not m:
+                raise InvalidMISPObject('Unable to parse pseudofile')
+            self.__macho = m.at(0)
         elif filepath:
-            self.__macho = lief.MachO.parse(filepath)
+            if m := lief.MachO.parse(filepath):
+                self.__macho = m.at(0)
         elif parsed:
             # Got an already parsed blob
-            if isinstance(parsed, lief.MachO.Binary):
+            if isinstance(parsed, lief.MachO.FatBinary):
+                self.__macho = parsed.at(0)
+            elif isinstance(parsed, lief.MachO.Binary):
                 self.__macho = parsed
             else:
-                raise InvalidMISPObject('Not a lief.MachO.Binary: {}'.format(type(parsed)))
+                raise InvalidMISPObject(f'Not a lief.MachO.Binary: {type(parsed)}')
         self.generate_attributes()
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         self.add_attribute('type', value=str(self.__macho.header.file_type).split('.')[1])
-        self.add_attribute('name', value=self.__macho.name)
         # General information
         if self.__macho.has_entrypoint:
             self.add_attribute('entrypoint-address', value=self.__macho.entrypoint)
@@ -66,7 +85,7 @@ class MachOObject(AbstractMISPObjectGenerator):
             pos = 0
             for section in self.__macho.sections:
                 s = MachOSectionObject(section, standalone=self._standalone, default_attributes_parameters=self._default_attributes_parameters)
-                self.add_reference(s.uuid, 'includes', 'Section {} of MachO'.format(pos))
+                self.add_reference(s.uuid, 'includes', f'Section {pos} of MachO')
                 pos += 1
                 self.sections.append(s)
         self.add_attribute('number-sections', value=len(self.sections))
@@ -74,19 +93,19 @@ class MachOObject(AbstractMISPObjectGenerator):
 
 class MachOSectionObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, section: lief.MachO.Section, **kwargs):
+    def __init__(self, section: lief.MachO.Section, **kwargs) -> None:  # type: ignore[no-untyped-def]
         """Creates an MachO Section object. Object generated by MachOObject."""
         # Python3 way
         # super().__init__('pe-section')
-        super(MachOSectionObject, self).__init__('macho-section', **kwargs)
+        super().__init__('macho-section', **kwargs)
         self.__section = section
         self.__data = bytes(self.__section.content)
         self.generate_attributes()
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         self.add_attribute('name', value=self.__section.name)
-        size = self.add_attribute('size-in-bytes', value=self.__section.size)
-        if int(size.value) > 0:
+        self.add_attribute('size-in-bytes', value=self.__section.size)
+        if int(self.__section.size) > 0:
             self.add_attribute('entropy', value=self.__section.entropy)
             self.add_attribute('md5', value=md5(self.__data).hexdigest())
             self.add_attribute('sha1', value=sha1(self.__data).hexdigest())

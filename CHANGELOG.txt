@@ -2,6 +2,866 @@ Changelog
 =========
 
 
+v2.4.194 (2024-06-21)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Make a response in the tests a MISPUser obj. [Raphaël Vinot]
+- Tests failing du to missing error. [Raphaël Vinot]
+
+
+v2.4.193 (2024-06-06)
+---------------------
+
+New
+~~~
+- [analyst-data] Added initial support of analyst data concept and
+  functions - WiP. [Sami Mokaddem]
+
+Changes
+~~~~~~~
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- A bit more refactoring. [Raphaël Vinot]
+- Use from_dict in the mixin to initialize the objects. [Raphaël Vinot]
+- [analyst-data] Added improvements, API endpoints and tests. [Sami
+  Mokaddem]
+- [analyst-data] Make sure to include note_type_name. [Sami Mokaddem]
+- Make mypy happy, change inheritance. [Raphaël Vinot]
+- Allow orgc context for search_galaxy_clusters. [Jeroen Pinoy]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [analyst-data] Continued implementation of analyst-data support. [Sami
+  Mokaddem]
+- Allow orgc context for search_galaxy_clusters. [Jeroen Pinoy]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Get the tests to pass. [Raphaël Vinot]
+- Properly load AnalystData from dict. [Raphaël Vinot]
+- More changes to get the tests to pass. [Raphaël Vinot]
+- [event-report] Make sure to generate an UUID. [Sami Mokaddem]
+- Pass kwargs to abstract. [Raphaël Vinot]
+
+Other
+~~~~~
+- Chg; Bump changelog. [Raphaël Vinot]
+- Chg; Bump version. [Raphaël Vinot]
+- Add test case. [Vincenzo]
+- Add attach galaxy cluster method. [Vincenzo]
+
+
+v2.4.190 (2024-04-18)
+---------------------
+
+Changes
+~~~~~~~
+- Bump object templates. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version, deps. [Raphaël Vinot]
+- Bump deps, require python 3.9+ for doc. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [data] describeTypes file updated. [Alexandre Dulaunoy]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- [internal] Correct way to convert bytes to string if orjson exists.
+  [Jakub Onderka]
+
+
+v2.4.188 (2024-03-22)
+---------------------
+
+New
+~~~
+- Support X-MISP-AUTH Header. [Raphaël Vinot]
+
+  Also, improve HTTP headers init
+
+  Fix #1179
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version, templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Strip API key before setting it. [Raphaël Vinot]
+- Python 3.8 support & typing. [Raphaël Vinot]
+- Typing for Python < 3.10. [Raphaël Vinot]
+- Avoid issue when payload ist a list. [Raphaël Vinot]
+
+
+v2.4.187 (2024-03-07)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump templates, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump extract-msg. [Raphaël Vinot]
+
+
+v2.4.186 (2024-02-27)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Correct FileObject import. [Johannes Bader]
+
+  The FileObject import has been moved outside the try-except-block
+  related to lief, as the import is needed regardless whether lief
+  is available or not.
+- Disable WL when calling the disable method, not toggle. [Raphaël
+  Vinot]
+
+  Fix #1159
+
+Other
+~~~~~
+- Build(deps): bump urllib3 from 2.2.0 to 2.2.1. [dependabot[bot]]
+
+  Bumps [urllib3](https://github.com/urllib3/urllib3) from 2.2.0 to 2.2.1.
+  - [Release notes](https://github.com/urllib3/urllib3/releases)
+  - [Changelog](https://github.com/urllib3/urllib3/blob/main/CHANGES.rst)
+  - [Commits](https://github.com/urllib3/urllib3/compare/2.2.0...2.2.1)
+
+  ---
+  updated-dependencies:
+  - dependency-name: urllib3
+    dependency-type: direct:production
+    update-type: version-update:semver-patch
+  ...
+
+
+v2.4.185 (2024-02-16)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+
+
+v2.4.184.3 (2024-02-12)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly get body from message, without headers. [Raphaël Vinot]
+- Remove from __all__ entries that shouldn't be there. [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps-dev): bump jupyter-lsp from 2.2.1 to 2.2.2.
+  [dependabot[bot]]
+
+  Bumps [jupyter-lsp](https://github.com/jupyter-lsp/jupyterlab-lsp) from 2.2.1 to 2.2.2.
+  - [Release notes](https://github.com/jupyter-lsp/jupyterlab-lsp/releases)
+  - [Changelog](https://github.com/jupyter-lsp/jupyterlab-lsp/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/jupyter-lsp/jupyterlab-lsp/commits)
+
+  ---
+  updated-dependencies:
+  - dependency-name: jupyter-lsp
+    dependency-type: indirect
+  ...
+
+
+v2.4.184.2 (2024-02-06)
+-----------------------
+
+Changes
+~~~~~~~
+- Add changelog. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
+
+Fix
+~~~
+- Do not throw a warning every time one import pymisp... [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps): bump codecov/codecov-action from 3 to 4.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 3 to 4.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v3...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
+v2.4.184.1 (2024-02-06)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
+
+
+v2.4.184 (2024-02-02)
+---------------------
+
+New
+~~~
+- Enable support for python 3.12. [Raphaël Vinot]
+- Relationship_type in tag. [Raphaël Vinot]
+
+  Fix https://github.com/MISP/MISP/issues/9483
+- [internal] Add support for orjson. [Jakub Onderka]
+
+  orjson is much faster library for decoding and encoding JSON formats
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version, objects. [Raphaël Vinot]
+- Remove IntEnum. [Raphaël Vinot]
+- Add even more debug for gha. [Raphaël Vinot]
+- Add some debug for gha. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Add more strict typing, not done yet. [Raphaël Vinot]
+- Add a bunch more typing. [Raphaël Vinot]
+- Use typing info of lief. [Raphaël Vinot]
+- First batch of changes for strict typing. [Raphaël Vinot]
+- Update typing to please lief. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [internal] Simplify code. [Jakub Onderka]
+- [internal] User faster method to convert bytes to str. [Jakub Onderka]
+- New annotations in tests. [Raphaël Vinot]
+- Initial changes to use new annotations. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps, try to install with python 3.12. [Raphaël Vinot]
+- Make the publish_timestamp a string, as per specs. [Raphaël Vinot]
+- [internal] Update poetry.lock. [Jakub Onderka]
+
+Fix
+~~~
+- Revert typing changes. [Raphaël Vinot]
+- More responses athat are lists. [Raphaël Vinot]
+- Another call that cn be a list or a dict. [Raphaël Vinot]
+- Do not cast enum. [Raphaël Vinot]
+- More fixes to support responses from MISP. [Raphaël Vinot]
+- Handle list responses properly. [Raphaël Vinot]
+- Import FileObject as needed. [Raphaël Vinot]
+- Also skip docs from mypy. [Raphaël Vinot]
+- Run mypy on what I want. [Raphaël Vinot]
+- Compatibility with python 3.8. [Raphaël Vinot]
+- Python < 3.10 support on typing, for good. [Raphaël Vinot]
+- Python < 3.10 support on typing. [Raphaël Vinot]
+- Rollback tests on python 3.12 as lief is not supported yet. [Raphaël
+  Vinot]
+- Add missing wheel. [Raphaël Vinot]
+- Make publish_timestamp a string in tests. [Raphaël Vinot]
+- [internal] README typos. [Jakub Onderka]
+
+Other
+~~~~~
+- Revert "fix: More responses athat are lists" [Raphaël Vinot]
+
+  This reverts commit 709a10c64c0513b515f25c3ecfb9eb577b55084b.
+- Build(deps): bump jinja2 from 3.1.2 to 3.1.3. [dependabot[bot]]
+
+  Bumps [jinja2](https://github.com/pallets/jinja) from 3.1.2 to 3.1.3.
+  - [Release notes](https://github.com/pallets/jinja/releases)
+  - [Changelog](https://github.com/pallets/jinja/blob/main/CHANGES.rst)
+  - [Commits](https://github.com/pallets/jinja/compare/3.1.2...3.1.3)
+
+  ---
+  updated-dependencies:
+  - dependency-name: jinja2
+    dependency-type: indirect
+  ...
+
+
+v2.4.183 (2024-01-04)
+---------------------
+
+New
+~~~
+- Documentation to install PyMISP on offline machine. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Remove jsonschema from dependencies. [Raphaël Vinot]
+- Encrypt malicious js. [Raphaël Vinot]
+
+Other
+~~~~~
+- Fix api ssl verify typing. [Steven]
+- Add HTTPS Adapter. [Steven]
+
+  Add the ability to provide a custom HTTPS adapter to the PyMISP class. With M2Crypto and m2requests, this can enable mutual TLS with hardware tokens.
+
+
+v2.4.182 (2023-12-14)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Avoid exception when the malware file name contains a "|" [Raphaël
+  Vinot]
+
+Other
+~~~~~
+- Build(deps): bump github/codeql-action from 2 to 3. [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 2 to 3.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v2...v3)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Build(deps): bump actions/setup-python from 4 to 5. [dependabot[bot]]
+
+  Bumps [actions/setup-python](https://github.com/actions/setup-python) from 4 to 5.
+  - [Release notes](https://github.com/actions/setup-python/releases)
+  - [Commits](https://github.com/actions/setup-python/compare/v4...v5)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/setup-python
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
+v2.4.179 (2023-11-23)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version, changelog. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] Bumped latest version. [Christian Studer]
+
+Fix
+~~~
+- Eml and msg are in sync again. [Raphaël Vinot]
+- Update calls to getStringStream to the public method. [Raphaël Vinot]
+- Avoid confusing error when an auth key is limited to an IP. [Raphaël
+  Vinot]
+
+  Fix #1099
+
+
+v2.4.178 (2023-10-24)
+---------------------
+
+New
+~~~
+- Run tests on python 3.12 too. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version, make __version__ dynamic. [Raphaël Vinot]
+- Bump deps, allow older jsonschema for compatibility. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Disable search logs tests for now. [Raphaël Vinot]
+- Disable fastmode, reenable fetching files. [Raphaël Vinot]
+- Try to speedup tests by not importing galaxies, taxos, ... [Raphaël
+  Vinot]
+- Do not clone repo from test. [Raphaël Vinot]
+
+Fix
+~~~
+- Make other fieldnames in CSV also valid... [Raphaël Vinot]
+- Make fieldnames actually valid. [Raphaël Vinot]
+- Remove CI for python 3.12, waiting for pydeep wheels. [Raphaël Vinot]
+- Allow object-relation names with uppercase characters defined in the
+  templates. [Raphaël Vinot]
+- Check if path exists in tests. [Raphaël Vinot]
+
+Other
+~~~~~
+- Ch: Bump deps. [Raphaël Vinot]
+
+
+v2.4.176 (2023-09-15)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version, deps. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps, objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Avoid exception when data is an empty iterator. [Raphaël Vinot]
+
+  Fix #1053
+
+Other
+~~~~~
+- Revert "build(deps): bump codecov/codecov-action from 3 to 4" [Raphaël
+  Vinot]
+
+  This reverts commit b7bb6b74317b70613ed42ea234eaafb00da6e5c6.
+- Build(deps): bump codecov/codecov-action from 3 to 4.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 3 to 4.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v3...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Build(deps): bump actions/checkout from 3 to 4. [dependabot[bot]]
+
+  Bumps [actions/checkout](https://github.com/actions/checkout) from 3 to 4.
+  - [Release notes](https://github.com/actions/checkout/releases)
+  - [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/actions/checkout/compare/v3...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/checkout
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
+v2.4.175 (2023-08-23)
+---------------------
+
+Changes
+~~~~~~~
+- Bump objects, missed that. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps, readthedocs config. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Update Sharing group info from full object. [Raphaël Vinot]
+
+  Fix #1049
+- Changes in msg-extract strip a character. [Raphaël Vinot]
+
+
+v2.4.174 (2023-07-31)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version, templates. [Raphaël Vinot]
+- Bump deps, fix code accordingly. [Raphaël Vinot]
+
+Fix
+~~~
+- Push code changes related to deps upgrade... [Raphaël Vinot]
+
+Other
+~~~~~
+- Git: Bump deps. [Raphaël Vinot]
+
+
+v2.4.173 (2023-07-10)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Maybe fixing a CakePHP issue. [Raphaël Vinot]
+
+  Maybe fixing #1014
+- Use proper endpoint to unpublish event. [Raphaël Vinot]
+
+  Fix #1012
+
+Other
+~~~~~
+- Feat: introduce setter for galaxies. [Sura De Silva]
+
+
+v2.4.172 (2023-06-08)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] Bumped latest version with updated templates.
+  [Christian Studer]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Proper changelog bump. [Raphaël Vinot]
+- Properly bump version. [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps-dev): bump jupyterlab from 3.6.3 to 4.0.0.
+  [dependabot[bot]]
+
+  Bumps [jupyterlab](https://github.com/jupyterlab/jupyterlab) from 3.6.3 to 4.0.0.
+  - [Release notes](https://github.com/jupyterlab/jupyterlab/releases)
+  - [Changelog](https://github.com/jupyterlab/jupyterlab/blob/master/CHANGELOG.md)
+  - [Commits](https://github.com/jupyterlab/jupyterlab/compare/@jupyterlab/vdom@3.6.3...@jupyterlab/lsp@4.0.0)
+
+  ---
+  updated-dependencies:
+  - dependency-name: jupyterlab
+    dependency-type: direct:development
+    update-type: version-update:semver-major
+  ...
+- Update settings.default.py - tags not tag. [Alexandre Dulaunoy]
+
+  tags is now an array
+
+
+v2.4.171 (2023-05-16)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, object templates. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Remove old setup files, bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Extra print breaking the CI on MISP side. [Raphaël Vinot]
+- Properly use lief on a file. [Raphaël Vinot]
+
+Other
+~~~~~
+- Allow search by 'event_tags' and improve the handling of galaxy
+  clusters. [Stefano Ortolani]
+
+  Changes:
+  - Add 'event_tags' parameter when searching for events
+  - Add new method to search for galaxies by value
+  - Add new parameter to fetch cluster information when retrieving clusters
+  - Add new parameter to hard-delete object references
+- Using underscore name 'description_file' in setup.cfg. [Erhan]
+
+  Usage of dash-separated 'description-file' will not be supported in future versions. Please use the underscore name 'description_file' instead. By 2023-Sep-26, you need to update your project and remove deprecated calls or your builds will no longer be supported.
+
+  See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
+
+
+v2.4.170.2 (2023-05-04)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+
+v2.4.170.1 (2023-04-19)
+-----------------------
+
+Changes
+~~~~~~~
+- Disable fail fast in GHA. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Update lief code to v0.13. [Raphaël Vinot]
+
+
+v2.4.170 (2023-04-12)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Other
+~~~~~
+- Add: support breakOnDuplicate option for attributes:add() [Luciano
+  Righetti]
+- Update reportlab_generator.py. [CarlosLoureiro]
+
+
+v2.4.169.3 (2023-03-27)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Invalid check if taxo is enabled. [Raphaël Vinot]
+
+
+v2.4.169.2 (2023-03-17)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Include event reports by default in feed. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Use proper parameter to trigger the request in search_galaxy_clusters.
+  [Raphaël Vinot]
+- Use POST in search galaxy cluster. [Raphaël Vinot]
+
+Other
+~~~~~
+- Rename include_event_reports kwarg to with_event_reports, in-line with
+  other kwarg naming. [UFOSmuggler]
+- Add kwarg to allow the inclusion of event reports into to_feed(),
+  honour with_distribution and valid_distributions kwargs. [UFOSmuggler]
+
+
+v2.4.169.1 (2023-03-14)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Add greynoise-ip object. [Raphaël Vinot]
+
+  Fix #951
+
+
+v2.4.169 (2023-03-10)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Add local key in MISPTag. [Raphaël Vinot]
+
+  Related #947
+- Use pytest for the tests. [Raphaël Vinot]
+
+
+v2.4.168.1 (2023-02-28)
+-----------------------
+
+New
+~~~
+- [doc] added the Jupyter notebook used in a.7-rest-api-extensive-
+  restsearch. [Alexandre Dulaunoy]
+
+Changes
+~~~~~~~
+- Bump changelog, version. [Raphaël Vinot]
+- Bump templates, again. [Raphaël Vinot]
+- Bump templates. [Raphaël Vinot]
+- Bump deps, templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly handle missing parameter in CSV importer. [Raphaël Vinot]
+
+  Fix #931
+- Undefined variable in event delegation. [Raphaël Vinot]
+- Remove reference to old pydeep. [Raphaël Vinot]
+
+  Fix #914
+
+
+v2.4.168 (2023-01-23)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+
+v2.4.167.2 (2023-01-17)
+-----------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+
+Fix
+~~~
+- Set relationship_type default in MISPTag to empty string. [Raphaël
+  Vinot]
+- Another typo in readme. [Raphaël Vinot]
+- Typo in readme. [Raphaël Vinot]
+
+
+v2.4.167.1 (2023-01-16)
+-----------------------
+
+New
+~~~
+- Add relationship_type in Tag entries for feeds. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump requests. [Raphaël Vinot]
+- Bump pyzmq. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump python version used by read the docs. [Raphaël Vinot]
+- Bump warning to inform user that python 3.10 wil be required in 12
+  months. [Raphaël Vinot]
+- Bump minimal PyMISP version to 3.8. [Raphaël Vinot]
+- Re-bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Update whl files. [Raphaël Vinot]
+- Nvm, readthedocs requires python 3.8 at most. [Raphaël Vinot]
+
+
+v2.4.167 (2022-12-22)
+---------------------
+
+Changes
+~~~~~~~
+- Bump objects. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump dependencies, move to poetry 1.3. [Raphaël Vinot]
+- Bump certifi. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Re-order classes. [Raphaël Vinot]
+
+Other
+~~~~~
+- Creation fo "add_attributes_from_csv.py" [Julien Mongenet]
+
+  The file aims to ingest a formated CSV file containing attributes for MISP ingestion.
+- Graceful handling of tagging when name attribute is missing. [Sura De
+  Silva]
+- Add: Galaxy test sample. [Christian Studer]
+- Add: Added very straight forward tests to make sure the galaxy
+  clusters are properly defined. [Christian Studer]
+- Add: Added the `Galaxy` field to MISPAttribute using the MISPGalaxy
+  class. [Christian Studer]
+
+  - Including an `add_galaxy` method similar to the
+    one used for events
+  - `attribute.galaxies` gives the list of attached
+    galaxy clusters
+
+
 v2.4.166 (2022-11-28)
 ---------------------
 
@@ -13,6 +873,7 @@ New
 
 Changes
 ~~~~~~~
+- Re-bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - [types] added azure-application-id. [iglocska]
@@ -4622,5 +5483,3 @@ v1.1.2 (2015-08-05)
 - Json export is not supported everywhere. [Raphaël Vinot]
 - Some testing. [Raphaël Vinot]
 - Initial commit. [Raphaël Vinot]
-
-

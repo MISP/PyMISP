@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 try:
     from pymispgalaxies import Clusters  # type: ignore
@@ -14,7 +15,7 @@ except ImportError:
     has_pymispgalaxies = False
 
 
-def revert_tag_from_galaxies(tag):
+def revert_tag_from_galaxies(tag: str) -> list[str]:
     clusters = Clusters()
     try:
         return clusters.revert_machinetag(tag)
@@ -22,7 +23,7 @@ def revert_tag_from_galaxies(tag):
         return []
 
 
-def revert_tag_from_taxonomies(tag):
+def revert_tag_from_taxonomies(tag: str) -> list[str]:
     taxonomies = Taxonomies()
     try:
         return taxonomies.revert_machinetag(tag)
@@ -30,7 +31,7 @@ def revert_tag_from_taxonomies(tag):
         return []
 
 
-def search_taxonomies(query):
+def search_taxonomies(query: str) -> list[str]:
     taxonomies = Taxonomies()
     found = taxonomies.search(query)
     if not found:
@@ -38,6 +39,6 @@ def search_taxonomies(query):
     return found
 
 
-def search_galaxies(query):
+def search_galaxies(query: str) -> list[str]:
     clusters = Clusters()
     return clusters.search(query)

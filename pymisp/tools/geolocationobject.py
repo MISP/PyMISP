@@ -1,20 +1,24 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+import logging
+
+from typing import Any
 
 from .abstractgenerator import AbstractMISPObjectGenerator
-import logging
 
 logger = logging.getLogger('pymisp')
 
 
 class GeolocationObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parameters: dict, strict: bool = True, **kwargs):
+    def __init__(self, parameters: dict[str, Any], strict: bool = True, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__('geolocation', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         first = self._sanitize_timestamp(self._parameters.pop('first-seen', None))
         self._parameters['first-seen'] = first
         last = self._sanitize_timestamp(self._parameters.pop('last-seen', None))

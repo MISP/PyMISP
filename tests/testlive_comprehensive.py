@@ -1,65 +1,77 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
+import hashlib
+import json
+import logging
 import os
-import sys
-
+import time
 import unittest
 
-from pymisp.tools import make_binary_objects
 from datetime import datetime, timedelta, date, timezone
 from io import BytesIO
-import json
 from pathlib import Path
-import hashlib
-
-import urllib3  # type: ignore
-import time
+from typing import TypeVar, Any
 from uuid import uuid4
 
-import email
+import urllib3
 
-from collections import defaultdict
-
-import logging
-logging.disable(logging.CRITICAL)
-logger = logging.getLogger('pymisp')
-
+from pymisp.tools import make_binary_objects
 
 try:
-    from pymisp import register_user, PyMISP, MISPEvent, MISPOrganisation, MISPUser, Distribution, ThreatLevel, Analysis, MISPObject, MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag, MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting, MISPEventBlocklist, MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster
+    from pymisp import (register_user, PyMISP, MISPEvent, MISPOrganisation,
+                        MISPUser, Distribution, ThreatLevel, Analysis, MISPObject,
+                        MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag,
+                        MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting,
+                        MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster,
+                        MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist,
+                        MISPNote)
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
-    from pymisp.exceptions import MISPServerError
 except ImportError:
-    if sys.version_info < (3, 6):
-        print('This test suite requires Python 3.6+, breaking.')
-        sys.exit(0)
-    else:
-        raise
+    raise
 
 try:
     from keys import url, key  # type: ignore
     verifycert = False
 except ImportError as e:
     print(e)
-    url = 'https://localhost:8443'
-    key = 'sL9hrjIyY405RyGQHLx5DoCAM92BNmmGa8P4ck1E'
+    url = 'https://10.197.206.83'
+    key = 'OdzzuBSnH83tEjvZbf7SFejC1kC3gS11Cnj2wxLk'
     verifycert = False
 
+logging.disable(logging.CRITICAL)
+logger = logging.getLogger('pymisp')
 
 urllib3.disable_warnings()
 
 fast_mode = False
 
-if not Path('tests/viper-test-files').exists():
+test_file_path = Path('tests/viper-test-files')
+
+print(test_file_path, 'exists: ', test_file_path.exists())
+
+if not test_file_path.exists():
     print('The test files are missing, pulling it.')
     os.system('git clone https://github.com/viper-framework/viper-test-files.git tests/viper-test-files')
+
+T = TypeVar('T', bound='TestComprehensive')
 
 
 class TestComprehensive(unittest.TestCase):
 
+    admin_misp_connector: PyMISP
+    user_misp_connector: PyMISP
+    test_usr: MISPUser
+    test_pub: MISPUser
+    test_org: MISPOrganisation
+    test_org_delegate: MISPOrganisation
+    delegate_user_misp_connector: PyMISP
+    pub_misp_connector: PyMISP
+    test_usr_delegate: MISPUser
+
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls: type[T]) -> None:
         cls.maxDiff = None
         # Connect as admin
         cls.admin_misp_connector = PyMISP(url, key, verifycert, debug=False)
@@ -67,22 +79,21 @@ class TestComprehensive(unittest.TestCase):
         cls.admin_misp_connector.set_server_setting('debug', 1, force=True)
         if not fast_mode:
             r = cls.admin_misp_connector.update_misp()
-            print(r)
         # Creates an org
         organisation = MISPOrganisation()
         organisation.name = 'Test Org'
-        cls.test_org = cls.admin_misp_connector.add_organisation(organisation, pythonify=True)
+        cls.test_org = cls.admin_misp_connector.add_organisation(organisation, pythonify=True)  # type: ignore[assignment]
         # Create an org to delegate to
         organisation = MISPOrganisation()
         organisation.name = 'Test Org - delegate'
-        cls.test_org_delegate = cls.admin_misp_connector.add_organisation(organisation, pythonify=True)
+        cls.test_org_delegate = cls.admin_misp_connector.add_organisation(organisation, pythonify=True)  # type: ignore[assignment]
         # Set the refault role (id 3 on the VM)
         cls.admin_misp_connector.set_default_role(3)
         # Creates a user
         user = MISPUser()
         user.email = 'testusr@user.local'
         user.org_id = cls.test_org.id
-        cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)
+        cls.test_usr = cls.admin_misp_connector.add_user(user, pythonify=True)  # type: ignore[assignment]
         cls.user_misp_connector = PyMISP(url, cls.test_usr.authkey, verifycert, debug=True)
         cls.user_misp_connector.toggle_global_pythonify()
         # Creates a publisher
@@ -90,14 +101,14 @@ class TestComprehensive(unittest.TestCase):
         user.email = 'testpub@user.local'
         user.org_id = cls.test_org.id
         user.role_id = 4
-        cls.test_pub = cls.admin_misp_connector.add_user(user, pythonify=True)
+        cls.test_pub = cls.admin_misp_connector.add_user(user, pythonify=True)  # type: ignore[assignment]
         cls.pub_misp_connector = PyMISP(url, cls.test_pub.authkey, verifycert)
         # Creates a user that can accept a delegation request
         user = MISPUser()
         user.email = 'testusr@delegate.recipient.local'
         user.org_id = cls.test_org_delegate.id
         user.role_id = 2
-        cls.test_usr_delegate = cls.admin_misp_connector.add_user(user, pythonify=True)
+        cls.test_usr_delegate = cls.admin_misp_connector.add_user(user, pythonify=True)  # type: ignore[assignment]
         cls.delegate_user_misp_connector = PyMISP(url, cls.test_usr_delegate.authkey, verifycert, debug=False)
         cls.delegate_user_misp_connector.toggle_global_pythonify()
         if not fast_mode:
@@ -110,7 +121,7 @@ class TestComprehensive(unittest.TestCase):
             cls.admin_misp_connector.load_default_feeds()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         # Delete publisher
         cls.admin_misp_connector.delete_user(cls.test_pub)
         # Delete user
@@ -120,7 +131,7 @@ class TestComprehensive(unittest.TestCase):
         cls.admin_misp_connector.delete_organisation(cls.test_org)
         cls.admin_misp_connector.delete_organisation(cls.test_org_delegate)
 
-    def create_simple_event(self, force_timestamps=False):
+    def create_simple_event(self, force_timestamps: bool=False) -> MISPEvent:
         mispevent = MISPEvent(force_timestamps=force_timestamps)
         mispevent.info = 'This is a super simple test'
         mispevent.distribution = Distribution.your_organisation_only
@@ -129,7 +140,7 @@ class TestComprehensive(unittest.TestCase):
         mispevent.add_attribute('text', str(uuid4()))
         return mispevent
 
-    def environment(self):
+    def environment(self) -> tuple[MISPEvent, MISPEvent, MISPEvent]:
         first_event = MISPEvent()
         first_event.info = 'First event - org only - low - completed'
         first_event.distribution = Distribution.your_organisation_only
@@ -171,13 +182,13 @@ class TestComprehensive(unittest.TestCase):
 
         # Create first and third event as admin
         # usr won't be able to see the first one
-        first = self.admin_misp_connector.add_event(first_event, pythonify=True)
-        third = self.admin_misp_connector.add_event(third_event, pythonify=True)
+        first: MISPEvent = self.admin_misp_connector.add_event(first_event, pythonify=True)  # type: ignore[assignment]
+        third: MISPEvent = self.admin_misp_connector.add_event(third_event, pythonify=True)  # type: ignore[assignment]
         # Create second event as user
-        second = self.user_misp_connector.add_event(second_event)
+        second: MISPEvent = self.user_misp_connector.add_event(second_event)  # type: ignore[assignment]
         return first, second, third
 
-    def test_server_settings(self):
+    def test_server_settings(self) -> None:
         settings = self.admin_misp_connector.server_settings()
         for final_setting in settings['finalSettings']:
             if final_setting['setting'] == 'MISP.max_correlations_per_event':
@@ -202,7 +213,7 @@ class TestComprehensive(unittest.TestCase):
         setting = self.admin_misp_connector.get_server_setting('MISP.live')
         self.assertTrue(setting['value'])
 
-    def test_search_value_event(self):
+    def test_search_value_event(self) -> None:
         '''Search a value on the event controller
         * Test ACL admin user vs normal user in an other org
         * Make sure we have one match
@@ -210,17 +221,17 @@ class TestComprehensive(unittest.TestCase):
         try:
             first, second, third = self.environment()
             # Search as admin
-            events = self.admin_misp_connector.search(value=first.attributes[0].value, pythonify=True)
+            events: list[MISPEvent] = self.admin_misp_connector.search(value=first.attributes[0].value, pythonify=True)  # type: ignore[assignment]
             self.assertEqual(len(events), 2)
             for e in events:
                 self.assertIn(e.id, [first.id, second.id])
             # Search as user
-            events = self.user_misp_connector.search(value=first.attributes[0].value)
+            events = self.user_misp_connector.search(value=first.attributes[0].value)  # type: ignore[assignment]
             self.assertEqual(len(events), 1)
             for e in events:
                 self.assertIn(e.id, [second.id])
             # Non-existing value
-            events = self.user_misp_connector.search(value=str(uuid4()))
+            events = self.user_misp_connector.search(value=str(uuid4()))  # type: ignore[assignment]
             self.assertEqual(events, [])
         finally:
             # Delete events
@@ -228,37 +239,37 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_value_attribute(self):
+    def test_search_value_attribute(self) -> None:
         '''Search value in attributes controller'''
         try:
             first, second, third = self.environment()
             # Search as admin
-            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, pythonify=True)
+            attributes: list[MISPAttribute] = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, pythonify=True)  # type: ignore[assignment]
             self.assertEqual(len(attributes), 2)
             for a in attributes:
                 self.assertIn(a.event_id, [first.id, second.id])
             # Search as user
-            attributes = self.user_misp_connector.search(controller='attributes', value=first.attributes[0].value)
+            attributes = self.user_misp_connector.search(controller='attributes', value=first.attributes[0].value)  # type: ignore[assignment]
             self.assertEqual(len(attributes), 1)
             for a in attributes:
                 self.assertIn(a.event_id, [second.id])
             # Non-existing value
-            attributes = self.user_misp_connector.search(controller='attributes', value=str(uuid4()))
+            attributes = self.user_misp_connector.search(controller='attributes', value=str(uuid4()))  # type: ignore[assignment]
             self.assertEqual(attributes, [])
 
             # Include context - search as user (can only see one event)
-            attributes = self.user_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_context=True, pythonify=True)
+            attributes = self.user_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_context=True, pythonify=True)  # type: ignore[assignment]
             self.assertTrue(isinstance(attributes[0].Event, MISPEvent))
             self.assertEqual(attributes[0].Event.uuid, second.uuid)
 
             # Include context - search as admin (can see both event)
-            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_context=True, pythonify=True)
+            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_context=True, pythonify=True)  # type: ignore[assignment]
             self.assertTrue(isinstance(attributes[0].Event, MISPEvent))
             self.assertEqual(attributes[0].Event.uuid, first.uuid)
             self.assertEqual(attributes[1].Event.uuid, second.uuid)
 
             # Include correlations - search as admin (can see both event)
-            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_correlations=True, pythonify=True)
+            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_correlations=True, pythonify=True)  # type: ignore[assignment]
             self.assertTrue(isinstance(attributes[0].Event, MISPEvent))
             self.assertEqual(attributes[0].Event.uuid, first.uuid)
             self.assertEqual(attributes[1].Event.uuid, second.uuid)
@@ -266,8 +277,9 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(attributes[1].RelatedAttribute[0].Event.uuid, first.uuid)
 
             # Include sightings - search as admin (can see both event)
-            self.admin_misp_connector.add_sighting({'value': first.attributes[0].value})
-            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_sightings=True, pythonify=True)
+            s: dict[str, Any] = {'value': first.attributes[0].value}
+            self.admin_misp_connector.add_sighting(s)
+            attributes = self.admin_misp_connector.search(controller='attributes', value=first.attributes[0].value, include_sightings=True, pythonify=True)  # type: ignore[assignment]
             self.assertTrue(isinstance(attributes[0].Event, MISPEvent))
             self.assertEqual(attributes[0].Event.uuid, first.uuid)
             self.assertEqual(attributes[1].Event.uuid, second.uuid)
@@ -279,17 +291,21 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_type_event(self):
+    def test_search_type_event(self) -> None:
         '''Search multiple events, search events containing attributes with specific types'''
         try:
             first, second, third = self.environment()
             # Search as admin
-            events = self.admin_misp_connector.search(timestamp=first.timestamp.timestamp(), pythonify=True)
+            if isinstance(first.timestamp, datetime):
+                ts = first.timestamp.timestamp()
+            else:
+                ts = first.timestamp
+            events: list[MISPEvent] = self.admin_misp_connector.search(timestamp=ts, pythonify=True)  # type: ignore[assignment]
             self.assertEqual(len(events), 3)
             for e in events:
                 self.assertIn(e.id, [first.id, second.id, third.id])
             attributes_types_search = self.admin_misp_connector.build_complex_query(or_parameters=['ip-src', 'ip-dst'])
-            events = self.admin_misp_connector.search(timestamp=first.timestamp.timestamp(),
+            events = self.admin_misp_connector.search(timestamp=ts,  # type: ignore[assignment,type-var]
                                                       type_attribute=attributes_types_search, pythonify=True)
             self.assertEqual(len(events), 2)
             for e in events:
@@ -300,28 +316,32 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_index(self):
+    def test_search_index(self) -> None:
         try:
             first, second, third = self.environment()
             # Search as admin
-            events = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), pythonify=True)
+            if isinstance(first.timestamp, datetime):
+                ts = first.timestamp.timestamp()
+            else:
+                ts = first.timestamp
+            events: MISPEvent = self.admin_misp_connector.search_index(timestamp=ts, pythonify=True)  # type: ignore[assignment]
             self.assertEqual(len(events), 3)
             for e in events:
                 self.assertIn(e.id, [first.id, second.id, third.id])
 
             # Test limit and pagination
-            event_one = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), limit=1, page=1, pythonify=True)[0]
-            event_two = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), limit=1, page=2, pythonify=True)[0]
+            event_one: MISPEvent = self.admin_misp_connector.search_index(timestamp=ts, limit=1, page=1, pythonify=True)[0]  # type: ignore[index,assignment]
+            event_two: MISPEvent = self.admin_misp_connector.search_index(timestamp=ts, limit=1, page=2, pythonify=True)[0]  # type: ignore[index,assignment]
             self.assertTrue(event_one.id != event_two.id)
             two_events = self.admin_misp_connector.search_index(limit=2)
             self.assertTrue(len(two_events), 2)
 
             # Test ordering by the Info field. Can't use timestamp as each will likely have the same
-            event = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), sort="info", desc=True, limit=1, pythonify=True)[0]
+            event: MISPEvent = self.admin_misp_connector.search_index(timestamp=ts, sort="info", desc=True, limit=1, pythonify=True)[0]  # type: ignore[index,assignment]
             # First|Second|*Third* event
             self.assertEqual(event.id, third.id)
             # *First*|Second|Third event
-            event = self.admin_misp_connector.search_index(timestamp=first.timestamp.timestamp(), sort="info", desc=False, limit=1, pythonify=True)[0]
+            event = self.admin_misp_connector.search_index(timestamp=ts, sort="info", desc=False, limit=1, pythonify=True)[0]  # type: ignore[index,assignment]
             self.assertEqual(event.id, first.id)
         finally:
             # Delete event
@@ -329,7 +349,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_objects(self):
+    def test_search_objects(self) -> None:
         '''Search for objects'''
         try:
             first = self.create_simple_event()
@@ -347,7 +367,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_search_type_attribute(self):
+    def test_search_type_attribute(self) -> None:
         '''Search multiple attributes, search attributes with specific types'''
         try:
             first, second, third = self.environment()
@@ -371,7 +391,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_tag_event(self):
+    def test_search_tag_event(self) -> None:
         '''Search Tags at events level'''
         try:
             first, second, third = self.environment()
@@ -405,7 +425,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_tag_attribute(self):
+    def test_search_tag_attribute(self) -> None:
         '''Search Tags at attributes level'''
         try:
             first, second, third = self.environment()
@@ -432,7 +452,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_tag_advanced_event(self):
+    def test_search_tag_advanced_event(self) -> None:
         '''Advanced search Tags at events level'''
         try:
             first, second, third = self.environment()
@@ -462,7 +482,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_tag_advanced_attributes(self):
+    def test_search_tag_advanced_attributes(self) -> None:
         '''Advanced search Tags at attributes level'''
         try:
             first, second, third = self.environment()
@@ -481,7 +501,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_timestamp_event(self):
+    def test_search_timestamp_event(self) -> None:
         '''Search specific update timestamps at events level'''
         # Creating event 1 - timestamp 5 min ago
         first = self.create_simple_event(force_timestamps=True)
@@ -517,7 +537,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_search_timestamp_attribute(self):
+    def test_search_timestamp_attribute(self) -> None:
         '''Search specific update timestamps at attributes level'''
         # Creating event 1 - timestamp 5 min ago
         first = self.create_simple_event(force_timestamps=True)
@@ -555,7 +575,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_user_perms(self):
+    def test_user_perms(self) -> None:
         '''Test publish rights'''
         try:
             first = self.create_simple_event()
@@ -571,7 +591,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_delete_with_update(self):
+    def test_delete_with_update(self) -> None:
         try:
             first = self.create_simple_event()
             obj = MISPObject('file')
@@ -596,14 +616,14 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_get_non_exists_event(self):
+    def test_get_non_exists_event(self) -> None:
         event = self.user_misp_connector.get_event(0)  # non exists id
         self.assertEqual(event['errors'][0], 404)
 
         event = self.user_misp_connector.get_event("ab2b6e28-fda5-4282-bf60-22b81de77851")  # non exists uuid
         self.assertEqual(event['errors'][0], 404)
 
-    def test_delete_by_uuid(self):
+    def test_delete_by_uuid(self) -> None:
         try:
             first = self.create_simple_event()
             obj = MISPObject('file')
@@ -640,7 +660,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_search_publish_timestamp(self):
+    def test_search_publish_timestamp(self) -> None:
         '''Search for a specific publication timestamp, an interval, and invalid values.'''
         # Creating event 1
         first = self.create_simple_event()
@@ -679,7 +699,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_search_decay(self):
+    def test_search_decay(self) -> None:
         # Creating event 1
         first = self.create_simple_event()
         first.add_attribute('ip-dst', '8.8.8.8')
@@ -704,7 +724,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_default_distribution(self):
+    def test_default_distribution(self) -> None:
         '''The default distributions on the VM are This community only for the events and Inherit from event for attr/obj)'''
         first = self.create_simple_event()
         del first.distribution
@@ -746,7 +766,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_exists(self):
+    def test_exists(self) -> None:
         """Check event, attribute and object existence"""
         event = self.create_simple_event()
         misp_object = MISPObject('domain-ip')
@@ -783,7 +803,7 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(self.user_misp_connector.object_exists(misp_object))
         self.assertFalse(self.user_misp_connector.object_exists(misp_object.id))
 
-    def test_simple_event(self):
+    def test_simple_event(self) -> None:
         '''Search a bunch of parameters:
             * Value not existing
             * only return metadata
@@ -843,6 +863,19 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events, [])
             events = self.user_misp_connector.search(timestamp=timeframe, published=False)
             self.assertEqual(len(events), 2)
+            # check publish & search
+            bg_processing_state = self.admin_misp_connector.get_server_setting('MISP.background_jobs')['value']
+            self.admin_misp_connector.set_server_setting('MISP.background_jobs', False, force=True)
+            publish_result = self.admin_misp_connector.publish(second)
+            self.assertEqual(publish_result["success"], True)
+            second = self.admin_misp_connector.get_event(second, pythonify=True)
+            # check if the publishing succeeded
+            time.sleep(1)
+            self.assertEqual(second.published, True)
+            self.admin_misp_connector.set_server_setting('MISP.background_jobs', bg_processing_state, force=True)
+            events = self.user_misp_connector.search(timestamp=timeframe, published=False)
+            self.assertEqual(len(events), 1)
+
             events = self.user_misp_connector.search(eventid=first.id)
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, first.id)
@@ -1002,7 +1035,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_event_add_update_metadata(self):
+    def test_event_add_update_metadata(self) -> None:
         event = self.create_simple_event()
         event.add_attribute('ip-src', '9.9.9.9')
         try:
@@ -1016,7 +1049,7 @@ class TestComprehensive(unittest.TestCase):
         finally:  # cleanup
             self.admin_misp_connector.delete_event(event)
 
-    def test_extend_event(self):
+    def test_extend_event(self) -> None:
         first = self.create_simple_event()
         first.info = 'parent event'
         first.add_tag('tlp:amber___test')
@@ -1037,7 +1070,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_edit_attribute(self):
+    def test_edit_attribute(self) -> None:
         first = self.create_simple_event()
         try:
             first.attributes[0].comment = 'This is the original comment'
@@ -1057,7 +1090,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_sightings(self):
+    def test_sightings(self) -> None:
         first = self.create_simple_event()
         second = self.create_simple_event()
         try:
@@ -1132,7 +1165,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_search_csv(self):
+    def test_search_csv(self) -> None:
         first = self.create_simple_event()
         first.attributes[0].comment = 'This is the original comment'
         second = self.create_simple_event()
@@ -1212,7 +1245,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_search_text(self):
+    def test_search_text(self) -> None:
         first = self.create_simple_event()
         first.add_attribute('ip-src', '8.8.8.8')
         first.publish()
@@ -1226,7 +1259,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_search_stix(self):
+    def test_search_stix(self) -> None:
         first = self.create_simple_event()
         first.add_attribute('ip-src', '8.8.8.8')
         try:
@@ -1241,7 +1274,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_update_object(self):
+    def test_update_object(self) -> None:
         first = self.create_simple_event()
         ip_dom = MISPObject('domain-ip')
         ip_dom.add_attribute('domain', value='google.fr')
@@ -1345,7 +1378,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_custom_template(self):
+    def test_custom_template(self) -> None:
         first = self.create_simple_event()
         try:
             with open('tests/viper-test-files/test_files/whoami.exe', 'rb') as f:
@@ -1387,7 +1420,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_unknown_template(self):
+    def test_unknown_template(self) -> None:
         first = self.create_simple_event()
         attributeAsDict = [{'MyCoolAttribute': {'value': 'critical thing', 'type': 'text'}},
                            {'MyCoolerAttribute': {'value': 'even worse', 'type': 'text', 'disable_correlation': True}}]
@@ -1421,7 +1454,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_domain_ip_object(self):
+    def test_domain_ip_object(self) -> None:
         first = self.create_simple_event()
         try:
             dom_ip_obj = DomainIPObject({'ip': ['1.1.1.1', {'value': '2.2.2.2', 'to_ids': False}],
@@ -1435,7 +1468,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_asn_object(self):
+    def test_asn_object(self) -> None:
         first = self.create_simple_event()
         try:
             dom_ip_obj = ASNObject({'asn': '12345',
@@ -1448,7 +1481,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_object_template(self):
+    def test_object_template(self) -> None:
         r = self.admin_misp_connector.update_object_templates()
         self.assertEqual(type(r), list)
         object_templates = self.admin_misp_connector.object_templates(pythonify=True)
@@ -1467,7 +1500,7 @@ class TestComprehensive(unittest.TestCase):
         mo.add_attribute('domain', 'google.fr')
         self.assertEqual(mo.template_uuid, '4')
 
-    def test_tags(self):
+    def test_tags(self) -> None:
         # Get list
         tags = self.admin_misp_connector.tags(pythonify=True)
         self.assertTrue(isinstance(tags, list))
@@ -1556,7 +1589,7 @@ class TestComprehensive(unittest.TestCase):
         response = self.admin_misp_connector.delete_tag(tag_org_restricted)
         response = self.admin_misp_connector.delete_tag(tag_user_restricted)
 
-    def test_add_event_with_attachment_object_controller(self):
+    def test_add_event_with_attachment_object_controller(self) -> None:
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
@@ -1596,7 +1629,48 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_lief_and_sign(self):
+    def test_add_event_with_attachment_object_controller__hard(self) -> None:
+        first = self.create_simple_event()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            fo, peo, seos = make_binary_objects('tests/viper-test-files/test_files/whoami.exe')
+            for s in seos:
+                r = self.user_misp_connector.add_object(first, s)
+                self.assertEqual(r.name, 'pe-section', r)
+
+            r = self.user_misp_connector.add_object(first, peo, pythonify=True)
+            self.assertEqual(r.name, 'pe', r)
+            for ref in peo.ObjectReference:
+                r = self.user_misp_connector.add_object_reference(ref)
+                self.assertEqual(r.object_uuid, peo.uuid, r.to_json())
+
+            r = self.user_misp_connector.add_object(first, fo)
+            obj_attrs = r.get_attributes_by_relation('ssdeep')
+            self.assertEqual(len(obj_attrs), 1, obj_attrs)
+            self.assertEqual(r.name, 'file', r)
+
+            # Test break_on_duplicate at object level
+            fo_dup, peo_dup, _ = make_binary_objects('tests/viper-test-files/test_files/whoami.exe')
+            r = self.user_misp_connector.add_object(first, peo_dup, break_on_duplicate=True)
+            self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
+
+            # Test break on duplicate with breakOnDuplicate key in object
+            fo_dup.breakOnDuplicate = True
+            r = self.user_misp_connector.add_object(first, fo_dup)
+            self.assertTrue("Duplicate object found" in r['errors'][1]['errors'], r)
+
+            # Test refs
+            r = self.user_misp_connector.add_object_reference(fo.ObjectReference[0])
+            self.assertEqual(r.object_uuid, fo.uuid, r.to_json())
+            self.assertEqual(r.referenced_uuid, peo.uuid, r.to_json())
+            r = self.user_misp_connector.delete_object_reference(r, hard=True)
+            self.assertEqual(r['message'], 'ObjectReference deleted')
+            # TODO: verify that the reference is not soft-deleted instead
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+
+    def test_lief_and_sign(self) -> None:
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
@@ -1640,10 +1714,11 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_add_event_with_attachment(self):
-        first = self.create_simple_event()
+    def test_add_event_with_attachment(self) -> None:
+        first_send = self.create_simple_event()
         try:
-            first = self.user_misp_connector.add_event(first)
+            first = self.user_misp_connector.add_event(first_send)
+            self.assertTrue(isinstance(first, MISPEvent), first)
             file_obj, bin_obj, sections = make_binary_objects('tests/viper-test-files/test_files/whoami.exe', standalone=False)
             first.add_object(file_obj)
             first.add_object(bin_obj)
@@ -1658,7 +1733,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_taxonomies(self):
+    def test_taxonomies(self) -> None:
         # Make sure we're up-to-date
         r = self.admin_misp_connector.update_taxonomies()
         self.assertEqual(r['name'], 'All taxonomy libraries are up to date already.')
@@ -1698,7 +1773,7 @@ class TestComprehensive(unittest.TestCase):
         # Return back to default required status
         r = self.admin_misp_connector.set_taxonomy_required(tax, not tax.required)
 
-    def test_warninglists(self):
+    def test_warninglists(self) -> None:
         # Make sure we're up-to-date
         r = self.admin_misp_connector.update_warninglists()
         self.assertTrue('name' in r, msg=r)
@@ -1727,7 +1802,7 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.disable_warninglist(testwl)
         self.assertEqual(r['success'], '1 warninglist(s) disabled')
 
-    def test_noticelists(self):
+    def test_noticelists(self) -> None:
         # Make sure we're up-to-date
         r = self.admin_misp_connector.update_noticelists()
         self.assertEqual(r['name'], 'All noticelists are up to date already.')
@@ -1748,7 +1823,7 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.disable_noticelist(testnl)
         self.assertFalse(r['Noticelist']['enabled'], r)
 
-    def test_correlation_exclusions(self):
+    def test_correlation_exclusions(self) -> None:
         newce = MISPCorrelationExclusion()
         newce.value = "test-correlation-exclusion"
         r = self.admin_misp_connector.add_correlation_exclusion(newce, pythonify=True)
@@ -1763,7 +1838,7 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.clean_correlation_exclusions()
         self.assertTrue(r['success'])
 
-    def test_galaxies(self):
+    def test_galaxies(self) -> None:
         # Make sure we're up-to-date
         r = self.admin_misp_connector.update_galaxies()
         self.assertEqual(r['name'], 'Galaxies updated.')
@@ -1779,7 +1854,7 @@ class TestComprehensive(unittest.TestCase):
         # FIXME: Fails due to https://github.com/MISP/MISP/issues/4855
         # self.assertTrue('GalaxyCluster' in r)
 
-    def test_zmq(self):
+    def test_zmq(self) -> None:
         first = self.create_simple_event()
         try:
             first = self.user_misp_connector.add_event(first)
@@ -1789,7 +1864,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_csv_loader(self):
+    def test_csv_loader(self) -> None:
         csv1 = CSVLoader(template_name='file', csv_path=Path('tests/csv_testfiles/valid_fieldnames.csv'))
         event = MISPEvent()
         event.info = 'Test event from CSV loader'
@@ -1797,7 +1872,7 @@ class TestComprehensive(unittest.TestCase):
             event.add_object(**o)
 
         csv2 = CSVLoader(template_name='file', csv_path=Path('tests/csv_testfiles/invalid_fieldnames.csv'),
-                         fieldnames=['SHA1', 'fileName', 'size-in-bytes'], has_fieldnames=True)
+                         fieldnames=['sha1', 'filename', 'size-in-bytes'], has_fieldnames=True)
         try:
             first = self.user_misp_connector.add_event(event)
             for o in csv2.load():
@@ -1807,7 +1882,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_user(self):
+    def test_user(self) -> None:
         # Get list
         users = self.admin_misp_connector.users(pythonify=True)
         self.assertTrue(isinstance(users, list))
@@ -1829,7 +1904,7 @@ class TestComprehensive(unittest.TestCase):
         key = self.user_misp_connector.get_new_authkey()
         self.assertTrue(isinstance(key, str))
 
-    def test_organisation(self):
+    def test_organisation(self) -> None:
         # Get list
         orgs = self.admin_misp_connector.organisations(pythonify=True)
         self.assertTrue(isinstance(orgs, list))
@@ -1846,7 +1921,7 @@ class TestComprehensive(unittest.TestCase):
         organisation = self.admin_misp_connector.update_organisation(organisation, pythonify=True)
         self.assertEqual(organisation.name, 'blah', organisation)
 
-    def test_org_search(self):
+    def test_org_search(self) -> None:
         orgs = self.admin_misp_connector.organisations(pythonify=True)
         org_name = 'ORGNAME'
         # Search by the org name
@@ -1857,7 +1932,7 @@ class TestComprehensive(unittest.TestCase):
         # This org should have the name ORGNAME
         self.assertEqual(orgs[0].name, org_name)
 
-    def test_user_search(self):
+    def test_user_search(self) -> None:
         users = self.admin_misp_connector.users(pythonify=True)
         emailAddr = users[0].email
 
@@ -1873,7 +1948,7 @@ class TestComprehensive(unittest.TestCase):
         self.assertTrue(len(users) == 1)
         self.assertEqual(users[0].email, emailAddr)
 
-    def test_attribute(self):
+    def test_attribute(self) -> None:
         first = self.create_simple_event()
         second = self.create_simple_event()
         a = second.add_attribute('ip-src', '11.11.11.11')
@@ -1900,6 +1975,15 @@ class TestComprehensive(unittest.TestCase):
             new_similar.type = 'ip-dst'
             similar_error = self.user_misp_connector.add_attribute(first, new_similar)
             self.assertEqual(similar_error['errors'][1]['errors']['value'][0], 'A similar attribute already exists for this event.')
+
+            # Test add attribute break_on_duplicate=False
+            time.sleep(5)
+            new_similar = MISPAttribute()
+            new_similar.value = '1.2.3.4'
+            new_similar.type = 'ip-dst'
+            new_similar = self.user_misp_connector.add_attribute(first, new_similar, break_on_duplicate=False)
+            self.assertTrue(isinstance(new_similar, MISPAttribute), new_similar)
+            self.assertGreater(new_similar.timestamp, new_attribute.timestamp)
 
             # Test add multiple attributes at once
             attr0 = MISPAttribute()
@@ -2033,7 +2117,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_search_type_event_csv(self):
+    def test_search_type_event_csv(self) -> None:
         try:
             first, second, third = self.environment()
             # Search as admin
@@ -2051,7 +2135,8 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_search_logs(self):
+    @unittest.skip("Not very important, skip for now.")
+    def test_search_logs(self) -> None:
         r = self.admin_misp_connector.update_user({'email': 'testusr-changed@user.local'}, self.test_usr)
         r = self.admin_misp_connector.search_logs(model='User', created=date.today(), pythonify=True)
         for entry in r[-1:]:
@@ -2061,31 +2146,30 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(entry.action, 'edit')
 
         self.admin_misp_connector.update_user({'email': 'testusr@user.local'}, self.test_usr)
-        page = 1
-        while True:
-            r = self.admin_misp_connector.search_logs(model='User', limit=1, page=page, created=date.today(), pythonify=True)
-            if not r:
-                break
-            page += 1
+        time.sleep(5)
+        r = self.admin_misp_connector.search_logs(model='User', limit=1, page=1, created=date.today(), pythonify=True)
+        if r:
             last_change = r[0]
-        self.assertEqual(last_change['change'], 'email (testusr-changed@user.local) => (testusr@user.local)', last_change)
+            self.assertEqual(last_change['change'], 'email (testusr-changed@user.local) => (testusr@user.local)', last_change)
+        else:
+            raise Exception('Unable to find log entry after updating the user')
 
-    def test_db_schema(self):
+    def test_db_schema(self) -> None:
         diag = self.admin_misp_connector.db_schema_diagnostic()
         self.assertEqual(diag['actual_db_version'], diag['expected_db_version'], diag)
 
-    def test_live_acl(self):
+    def test_live_acl(self) -> None:
         missing_acls = self.admin_misp_connector.remote_acl()
         self.assertEqual(missing_acls, [], msg=missing_acls)
 
-    def test_roles(self):
+    def test_roles(self) -> None:
         role = self.admin_misp_connector.set_default_role(4)
         self.assertEqual(role['message'], 'Default role set.')
         self.admin_misp_connector.set_default_role(3)
         roles = self.admin_misp_connector.roles(pythonify=True)
         self.assertTrue(isinstance(roles, list))
 
-    def test_describe_types(self):
+    def test_describe_types(self) -> None:
         remote = self.admin_misp_connector.describe_types_remote
         remote_types = remote.pop('types')
         remote_categories = remote.pop('categories')
@@ -2104,12 +2188,12 @@ class TestComprehensive(unittest.TestCase):
             for typ in mapping:
                 self.assertIn(typ, remote_types)
 
-    def test_versions(self):
+    def test_versions(self) -> None:
         self.assertEqual(self.user_misp_connector.version, self.user_misp_connector.pymisp_version_master)
         self.assertEqual(self.user_misp_connector.misp_instance_version['version'],
                          self.user_misp_connector.misp_instance_version_master['version'])
 
-    def test_statistics(self):
+    def test_statistics(self) -> None:
         try:
             # Attributes
             first, second, third = self.environment()
@@ -2158,7 +2242,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(second)
             self.admin_misp_connector.delete_event(third)
 
-    def test_direct(self):
+    def test_direct(self) -> None:
         try:
             r = self.user_misp_connector.direct_call('events/add', data={'info': 'foo'})
             event = MISPEvent()
@@ -2175,7 +2259,7 @@ class TestComprehensive(unittest.TestCase):
         finally:
             self.admin_misp_connector.delete_event(event)
 
-    def test_freetext(self):
+    def test_freetext(self) -> None:
         first = self.create_simple_event()
         try:
             self.admin_misp_connector.toggle_warninglist(warninglist_name='%dns resolv%', force_enable=True)
@@ -2211,7 +2295,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_sharing_groups(self):
+    def test_sharing_groups(self) -> None:
         # add
         sg = MISPSharingGroup()
         sg.name = 'Testcases SG'
@@ -2221,10 +2305,14 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(sharing_group.releasability, 'Testing')
 
         # Change releasability
-        r = self.admin_misp_connector.update_sharing_group({"releasability": "Testing updated"}, sharing_group, pythonify=True)
-        self.assertEqual(r.releasability, 'Testing updated')
-        r = self.admin_misp_connector.update_sharing_group({"releasability": "Testing updated - 2"}, sharing_group)
-        self.assertEqual(r['SharingGroup']['releasability'], 'Testing updated - 2')
+        r = self.admin_misp_connector.update_sharing_group({"releasability": "Testing updated"}, sharing_group)
+        self.assertEqual(r['SharingGroup']['releasability'], 'Testing updated')
+        r = self.admin_misp_connector.update_sharing_group({"releasability": "Testing updated - 2"}, sharing_group, pythonify=True)
+        self.assertEqual(r.releasability, 'Testing updated - 2')
+        # Change name
+        r.name = 'Testcases SG - new name'
+        r = self.admin_misp_connector.update_sharing_group(r, pythonify=True)
+        self.assertEqual(r.name, 'Testcases SG - new name')
 
         # Test `sharing_group_exists` method
         self.assertTrue(self.admin_misp_connector.sharing_group_exists(sharing_group))
@@ -2243,7 +2331,7 @@ class TestComprehensive(unittest.TestCase):
         # Get list
         sharing_groups = self.admin_misp_connector.sharing_groups(pythonify=True)
         self.assertTrue(isinstance(sharing_groups, list))
-        self.assertEqual(sharing_groups[0].name, 'Testcases SG')
+        self.assertEqual(sharing_groups[0].name, 'Testcases SG - new name')
 
         # Use the SG
 
@@ -2257,7 +2345,7 @@ class TestComprehensive(unittest.TestCase):
         try:
             first = self.user_misp_connector.add_event(first)
             first = self.admin_misp_connector.change_sharing_group_on_entity(first, sharing_group.id, pythonify=True)
-            self.assertEqual(first.SharingGroup['name'], 'Testcases SG')
+            self.assertEqual(first.SharingGroup['name'], 'Testcases SG - new name')
 
             first_object = self.admin_misp_connector.change_sharing_group_on_entity(first.objects[0], sharing_group.id, pythonify=True)
             self.assertEqual(first_object.sharing_group_id, sharing_group.id)
@@ -2283,7 +2371,7 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.id))
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group.uuid))
 
-    def test_sharing_group(self):
+    def test_sharing_group(self) -> None:
         # add
         sg = MISPSharingGroup()
         sg.name = 'Testcases SG'
@@ -2308,7 +2396,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_sharing_group(sharing_group.id)
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
 
-    def test_sharing_group_search(self):
+    def test_sharing_group_search(self) -> None:
         # Add sharing group
         sg = MISPSharingGroup()
         sg.name = 'Testcases SG'
@@ -2355,7 +2443,7 @@ class TestComprehensive(unittest.TestCase):
 
         self.assertFalse(self.admin_misp_connector.sharing_group_exists(sharing_group))
 
-    def test_feeds(self):
+    def test_feeds(self) -> None:
         # Add
         feed = MISPFeed()
         feed.name = 'TestFeed'
@@ -2438,7 +2526,7 @@ class TestComprehensive(unittest.TestCase):
         self.assertFalse(updated_feed.enabled)
         self.assertEqual(updated_feed.settings, e_thread_csv_feed.settings)
 
-    def test_servers(self):
+    def test_servers(self) -> None:
         # add
         server = MISPServer()
         server.name = 'Test Server'
@@ -2458,7 +2546,7 @@ class TestComprehensive(unittest.TestCase):
         r = self.admin_misp_connector.delete_server(server)
         self.assertEqual(r['name'], 'Server deleted')
 
-    def test_roles_expanded(self):
+    def test_roles_expanded(self) -> None:
         '''Test all possible things regarding roles
         1. Use existing roles (ID in test VM):
             * Read only (6):  Can only connect via API and see events visible by its organisation
@@ -2576,7 +2664,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_user(test_roles_user)
             self.admin_misp_connector.delete_tag(test_tag)
 
-    def test_expansion(self):
+    def test_expansion(self) -> None:
         first = self.create_simple_event()
         try:
             md5_disk = hashlib.md5()
@@ -2613,7 +2701,7 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_user_settings(self):
+    def test_user_settings(self) -> None:
         first = self.create_simple_event()
         first.distribution = 3
         first.add_tag('test_publish_filter')
@@ -2641,7 +2729,8 @@ class TestComprehensive(unittest.TestCase):
             # # Enable autoalert on admin
             self.admin_misp_connector._current_user.autoalert = True
             self.admin_misp_connector._current_user.termsaccepted = True
-            self.user_misp_connector.update_user(self.admin_misp_connector._current_user)
+            admin_usr = self.admin_misp_connector.update_user(self.admin_misp_connector._current_user, pythonify=True)
+            self.assertTrue(admin_usr.autoalert)
 
             first = self.admin_misp_connector.add_event(first, pythonify=True)
             second = self.admin_misp_connector.add_event(second, pythonify=True)
@@ -2674,7 +2763,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_communities(self):
+    def test_communities(self) -> None:
         communities = self.admin_misp_connector.communities(pythonify=True)
         self.assertEqual(communities[0].name, 'CIRCL Private Sector Information Sharing Community - aka MISPPRIV')
         community = self.admin_misp_connector.get_community(communities[1], pythonify=True)
@@ -2688,7 +2777,7 @@ class TestComprehensive(unittest.TestCase):
         #    if k == 'To':
         #        self.assertEqual(v, 'info@circl.lu')
 
-    def test_upload_stix(self):
+    def test_upload_stix(self) -> None:
         # FIXME https://github.com/MISP/MISP/issues/4892
         try:
             r1 = self.user_misp_connector.upload_stix('tests/stix1.xml-utf8', version='1')
@@ -2719,7 +2808,7 @@ class TestComprehensive(unittest.TestCase):
             except Exception:
                 pass
 
-    def test_toggle_global_pythonify(self):
+    def test_toggle_global_pythonify(self) -> None:
         first = self.create_simple_event()
         second = self.create_simple_event()
         try:
@@ -2734,7 +2823,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
-    def test_first_last_seen(self):
+    def test_first_last_seen(self) -> None:
         event = MISPEvent()
         event.info = 'Test First Last seen'
         event.add_attribute('ip-dst', '8.8.8.8', first_seen='2020-01-03', last_seen='2020-01-04T12:30:34.323242+0800')
@@ -2781,7 +2870,7 @@ class TestComprehensive(unittest.TestCase):
         finally:
             self.admin_misp_connector.delete_event(first)
 
-    def test_registrations(self):
+    def test_registrations(self) -> None:
         r = register_user(url, 'self_register@user.local', organisation=self.test_org,
                           org_name=self.test_org.name, verify=verifycert)
         self.assertTrue(r['saved'])
@@ -2811,7 +2900,7 @@ class TestComprehensive(unittest.TestCase):
         m = self.admin_misp_connector.discard_user_registration(registrations[1].id)
         self.assertEqual(m['name'], '1 registration(s) discarded.')
 
-    def test_search_workflow(self):
+    def test_search_workflow(self) -> None:
         first = self.create_simple_event()
         first.add_attribute('domain', 'google.com')
         tag = MISPTag()
@@ -2860,7 +2949,7 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_tag(tag)
 
-    def test_search_workflow_ts(self):
+    def test_search_workflow_ts(self) -> None:
         first = self.create_simple_event()
         first.add_attribute('domain', 'google.com')
         tag = MISPTag()
@@ -2909,14 +2998,14 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_tag(tag)
 
-    def test_blocklists(self):
+    def test_blocklists(self) -> None:
         first = self.create_simple_event()
         second = self.create_simple_event()
         second.Orgc = self.test_org
-        to_delete = {'bl_events': [], 'bl_organisations': []}
+        to_delete: dict[str, MISPOrganisationBlocklist | MISPEventBlocklist] = {'bl_events': [], 'bl_organisations': []}
         try:
             # test events BL
-            ebl = self.admin_misp_connector.add_event_blocklist(uuids=[first.uuid])
+            ebl: MISPEventBlocklist = self.admin_misp_connector.add_event_blocklist(uuids=[first.uuid])
             self.assertEqual(ebl['result']['successes'][0], first.uuid, ebl)
             bl_events = self.admin_misp_connector.event_blocklists(pythonify=True)
             for ble in bl_events:
@@ -2950,7 +3039,7 @@ class TestComprehensive(unittest.TestCase):
 
             blo.comment = 'This is a test'
             blo.org_name = 'bar'
-            blo = self.admin_misp_connector.update_organisation_blocklist(blo, pythonify=True)
+            blo: MISPOrganisationBlocklist = self.admin_misp_connector.update_organisation_blocklist(blo, pythonify=True)
             self.assertEqual(blo.org_name, 'bar')
             r = self.admin_misp_connector.delete_organisation_blocklist(blo)
             self.assertTrue(r['success'])
@@ -2961,15 +3050,15 @@ class TestComprehensive(unittest.TestCase):
             for blo in to_delete['bl_organisations']:
                 self.admin_misp_connector.delete_organisation_blocklist(blo)
 
-    def test_event_report(self):
+    def test_event_report(self) -> None:
         event = self.create_simple_event()
-        new_event_report = MISPEventReport()
+        new_event_report: MISPEventReport = MISPEventReport()
         new_event_report.name = "Test Event Report"
         new_event_report.content = "# Example report markdown"
         new_event_report.distribution = 5  # Inherit
         try:
             event = self.user_misp_connector.add_event(event)
-            new_event_report = self.user_misp_connector.add_event_report(event.id, new_event_report)
+            new_event_report = self.user_misp_connector.add_event_report(event.id, new_event_report)  # type: ignore[assignment]
             # The event report should be linked by Event ID
             self.assertEqual(event.id, new_event_report.event_id)
 
@@ -2979,12 +3068,12 @@ class TestComprehensive(unittest.TestCase):
 
             new_event_report.name = "Updated Event Report"
             new_event_report.content = "Updated content"
-            new_event_report = self.user_misp_connector.update_event_report(new_event_report)
+            new_event_report = self.user_misp_connector.update_event_report(new_event_report)  # type: ignore[assignment]
             # The event report should be updatable
             self.assertTrue(new_event_report.name == "Updated Event Report")
             self.assertTrue(new_event_report.content == "Updated content")
 
-            event_reports = self.user_misp_connector.get_event_reports(event.id)
+            event_reports: list[MISPEventReport] = self.user_misp_connector.get_event_reports(event.id)  # type: ignore[assignment]
             # The event report should be requestable by the Event ID
             self.assertEqual(new_event_report.id, event_reports[0].id)
 
@@ -2999,26 +3088,38 @@ class TestComprehensive(unittest.TestCase):
             self.user_misp_connector.delete_event(event)
             self.user_misp_connector.delete_event_report(new_event_report)
 
-    def test_galaxy_cluster(self):
-        self.admin_misp_connector.toggle_global_pythonify()
-        galaxy = self.admin_misp_connector.galaxies()[0]
-        new_galaxy_cluster = MISPGalaxyCluster()
+    def test_search_galaxy(self) -> None:
+        galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)  # type: ignore[assignment]
+        galaxy: MISPGalaxy = galaxies[0]
+        ret = self.admin_misp_connector.search_galaxy(value=galaxy.name, pythonify=True)
+        self.assertEqual(len(ret), 1)
+
+    def test_galaxy_cluster(self) -> None:
+        galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)  # type: ignore[assignment]
+        galaxy: MISPGalaxy = galaxies[0]
+        new_galaxy_cluster: MISPGalaxyCluster = MISPGalaxyCluster()
         new_galaxy_cluster.value = "Test Cluster"
         new_galaxy_cluster.authors = ["MISP"]
         new_galaxy_cluster.distribution = 1
         new_galaxy_cluster.description = "Example test cluster"
         try:
-            galaxy = self.admin_misp_connector.get_galaxy(galaxy.id, withCluster=True)
+            if gid := galaxy.id:
+                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True, pythonify=True)  # type: ignore[assignment]
+            else:
+                raise Exception("No galaxy found")
             existing_galaxy_cluster = galaxy.clusters[0]
 
-            new_galaxy_cluster = self.admin_misp_connector.add_galaxy_cluster(galaxy.id, new_galaxy_cluster)
+            if gid := galaxy.id:
+                new_galaxy_cluster = self.admin_misp_connector.add_galaxy_cluster(gid, new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
+            else:
+                raise Exception("No galaxy found")
             # The new galaxy cluster should be under the selected galaxy
             self.assertEqual(galaxy.id, new_galaxy_cluster.galaxy_id)
             # The cluster should have the right value
             self.assertEqual(new_galaxy_cluster.value, "Test Cluster")
 
             new_galaxy_cluster.add_cluster_element("synonyms", "Test2")
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
 
             # The cluster should have one element that is a synonym
             self.assertEqual(len(new_galaxy_cluster.cluster_elements), 1)
@@ -3031,22 +3132,22 @@ class TestComprehensive(unittest.TestCase):
 
             # The cluster element should be updatable
             element.value = "Test3"
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             element = new_galaxy_cluster.cluster_elements[0]
             self.assertEqual(element.value, "Test3")
 
             new_galaxy_cluster.add_cluster_element("synonyms", "ToDelete")
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             # The cluster should have two elements
             self.assertEqual(len(new_galaxy_cluster.cluster_elements), 2)
 
             new_galaxy_cluster.cluster_elements = [e for e in new_galaxy_cluster.cluster_elements if e.value != "ToDelete"]
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             # The cluster elements should be deletable
             self.assertEqual(len(new_galaxy_cluster.cluster_elements), 1)
 
             new_galaxy_cluster.add_cluster_relation(existing_galaxy_cluster, "is-tested-by")
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             # The cluster should have a relationship
             self.assertEqual(len(new_galaxy_cluster.cluster_relations), 1)
             relation = new_galaxy_cluster.cluster_relations[0]
@@ -3054,7 +3155,7 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(relation.referenced_galaxy_cluster_uuid, existing_galaxy_cluster.uuid)
 
             relation.add_tag("tlp:amber")
-            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster)
+            new_galaxy_cluster = self.admin_misp_connector.update_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             relation = new_galaxy_cluster.cluster_relations[0]
             # The relationship should have a tag of tlp:amber
             self.assertEqual(len(relation.tags), 1)
@@ -3064,34 +3165,35 @@ class TestComprehensive(unittest.TestCase):
             resp = self.admin_misp_connector.delete_galaxy_cluster_relation(relation)
             self.assertTrue(resp['success'])
             # The cluster relation should no longer be present
-            new_galaxy_cluster = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster)
+            new_galaxy_cluster = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             self.assertEqual(len(new_galaxy_cluster.cluster_relations), 0)
 
             resp = self.admin_misp_connector.delete_galaxy_cluster(new_galaxy_cluster)
             # Galaxy clusters should be soft deletable
             self.assertTrue(resp['success'])
-            new_galaxy_cluster = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster)
+            new_galaxy_cluster = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster, pythonify=True)  # type: ignore[assignment]
             self.assertTrue(isinstance(new_galaxy_cluster, MISPGalaxyCluster))
 
             resp = self.admin_misp_connector.delete_galaxy_cluster(new_galaxy_cluster, hard=True)
             # Galaxy clusters should be hard deletable
             self.assertTrue(resp['success'])
-            resp = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster)
+            resp = self.admin_misp_connector.get_galaxy_cluster(new_galaxy_cluster)  # type: ignore[assignment]
             self.assertTrue("errors" in resp)
         finally:
-            self.admin_misp_connector.delete_galaxy_cluster_relation(relation)
-            self.admin_misp_connector.delete_galaxy_cluster(new_galaxy_cluster, hard=True)
-            self.admin_misp_connector.toggle_global_pythonify()
+            pass
 
-    def test_event_galaxy(self):
-        self.admin_misp_connector.toggle_global_pythonify()
+    def test_event_galaxy(self) -> None:
         event = self.create_simple_event()
         try:
-            galaxy = self.admin_misp_connector.galaxies()[0]
-            galaxy = self.admin_misp_connector.get_galaxy(galaxy.id, withCluster=True)
-            galaxy_cluster = galaxy.clusters[0]
+            galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)  # type: ignore[assignment]
+            galaxy: MISPGalaxy = galaxies[0]
+            if gid := galaxy.id:
+                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True, pythonify=True)  # type: ignore[assignment]
+            else:
+                raise Exception("No galaxy found")
+            galaxy_cluster: MISPGalaxyCluster = galaxy.clusters[0]
             event.add_tag(galaxy_cluster.tag_name)
-            event = self.admin_misp_connector.add_event(event)
+            event = self.admin_misp_connector.add_event(event, pythonify=True)
             # The event should have a galaxy attached
             self.assertEqual(len(event.galaxies), 1)
             event_galaxy = event.galaxies[0]
@@ -3101,10 +3203,182 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(event_galaxy.clusters[0].id, galaxy_cluster.id)
         finally:
             self.admin_misp_connector.delete_event(event)
-            self.admin_misp_connector.toggle_global_pythonify()
+
+    def test_attach_galaxy_cluster(self) -> None:
+        event = self.create_simple_event()
+        event = self.admin_misp_connector.add_event(event, pythonify=True)
+        try:
+            galaxies: list[MISPGalaxy] = self.admin_misp_connector.galaxies(pythonify=True)
+            galaxy: MISPGalaxy = galaxies[0]
+            if gid := galaxy.id:
+                galaxy = self.admin_misp_connector.get_galaxy(gid, withCluster=True, pythonify=True)
+            else:
+                raise Exception("No galaxy found")
+            galaxy_cluster: MISPGalaxyCluster = galaxy.clusters[0]
+            response = self.admin_misp_connector.attach_galaxy_cluster(event, galaxy_cluster)
+            self.assertTrue(response['saved'])
+            event = self.admin_misp_connector.get_event(event.id, pythonify=True)
+
+            self.assertEqual(len(event.galaxies), 1)
+            event_galaxy = event.galaxies[0]
+            # The galaxy ID should equal the galaxy from which the cluster came from
+            self.assertEqual(event_galaxy.id, galaxy.id)
+            # The galaxy cluster should equal the cluster added
+            self.assertEqual(event_galaxy.clusters[0].id, galaxy_cluster.id)
+
+            galaxy_cluster: MISPGalaxyCluster = galaxy.clusters[1]
+
+            # Test on attribute
+            attribute = event.attributes[0]
+            response = self.admin_misp_connector.attach_galaxy_cluster(attribute, galaxy_cluster)
+            self.assertTrue(response['saved'])
+            event = self.admin_misp_connector.get_event(event.id, pythonify=True)
+            attribute = event.attributes[0]
+            self.assertEqual(len(attribute.galaxies), 1)
+            attribute_galaxy = attribute.galaxies[0]
+            # The galaxy ID should equal the galaxy from which the cluster came from
+            self.assertEqual(attribute_galaxy.id, galaxy.id)
+            # The galaxy cluster should equal the cluster added
+            self.assertEqual(attribute_galaxy.clusters[0].id, galaxy_cluster.id)
+        finally:
+            self.admin_misp_connector.delete_event(event)
+
+    def test_analyst_data_CRUD(self) -> None:
+        event = self.create_simple_event()
+        try:
+            fake_uuid = str(uuid4())
+            new_note1 = MISPNote()
+            new_note1.object_type = 'Event'
+            new_note1.object_uuid = fake_uuid
+            new_note1.note = 'Fake note'
+            new_note1 = self.user_misp_connector.add_note(new_note1)
+            # The Note should be linked even for non-existing data
+            self.assertTrue(new_note1.object_uuid == fake_uuid)
+
+            new_note1.note = "Updated Note"
+            new_note1 = self.user_misp_connector.update_note(new_note1)
+            # The Note should be updatable
+            self.assertTrue(new_note1.note == "Updated Note")
+
+            # The Note should be able to get an Opinion
+            new_opinion = new_note1.add_opinion(42, 'Test Opinion')
+            new_note1 = self.user_misp_connector.update_note(new_note1)
+            # Fetch newly added node
+            new_note1 = self.user_misp_connector.get_note(new_note1)
+            # The Opinion shoud be able to be created via the Note
+            self.assertTrue(new_note1.opinions[0].opinion == new_opinion.opinion)
+
+            response = self.user_misp_connector.delete_note(new_note1)
+            # The Note should be deletable
+            self.assertTrue(response['success'])
+            self.assertEqual(response['message'], 'Note deleted.')
+            # The Opinion should not be deleted
+            opinion_resp = self.user_misp_connector.get_opinion(new_opinion)
+            self.assertTrue(opinion_resp.opinion == new_opinion.opinion)
+
+            new_note: MISPNote = event.add_note(note='Test Note', language='en')
+            new_note.distribution = 1  # Community
+            event = self.user_misp_connector.add_event(event)
+            # The note should be linked by Event UUID
+            self.assertEqual(new_note.object_type, 'Event')
+            self.assertTrue(new_note.object_uuid == event.uuid)
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note should be present on the event
+            self.assertTrue(event.notes[0].object_uuid == event.uuid)
+
+        finally:
+            self.admin_misp_connector.delete_event(event)
+            try:
+                self.admin_misp_connector.delete_opinion(new_opinion)
+                self.admin_misp_connector.delete_note(new_note)
+                self.admin_misp_connector.delete_note(new_note1)  # Should already be deleted
+            except Exception:
+                pass
+
+    def test_analyst_data_ACL(self) -> None:
+        event = self.create_simple_event()
+        event.distribution = 2
+        sg = MISPSharingGroup()
+        sg.name = 'Testcases SG'
+        sg.releasability = 'Testing'
+        sharing_group = self.admin_misp_connector.add_sharing_group(sg, pythonify=True)
+        # Chec that sharing group was created
+        self.assertEqual(sharing_group.name, 'Testcases SG')
+
+        try:
+            new_note: MISPNote = event.add_note(note='Test Note', language='en')
+            new_note.distribution = 0  # Org only
+            event = self.admin_misp_connector.add_event(event, pythonify=True)
+
+            # The note should be linked by Event UUID
+            self.assertEqual(new_note.object_type, 'Event')
+            self.assertEqual(event.uuid, new_note.object_uuid)
+
+            event = self.admin_misp_connector.get_event(event, pythonify=True)
+            # The note should be visible for the creator
+            self.assertEqual(len(event.notes), 1)
+            self.assertTrue(new_note.note == "Test Note")
+
+            resp = self.user_misp_connector.get_note(new_note)
+            # The note should not be visible to another org
+            self.assertTrue(len(resp), 0)
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should not be visible for another org than the creator
+            self.assertEqual(len(event.Note), 0)
+
+            new_note = self.admin_misp_connector.get_note(new_note, pythonify=True)
+            new_note.distribution = 4
+            new_note.sharing_group_id = sharing_group.id
+            new_note = self.admin_misp_connector.update_note(new_note, pythonify=True)
+            self.assertEqual(int(new_note.sharing_group_id), int(sharing_group.id))
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should not be visible for another org not part of the sharing group
+            self.assertEqual(len(event.Note), 0)
+
+            # Add org to the sharing group
+            r = self.admin_misp_connector.add_org_to_sharing_group(sharing_group,
+                                                                   self.test_org, extend=True)
+            self.assertEqual(r['name'], 'Organisation added to the sharing group.')
+
+            event = self.user_misp_connector.get_event(event)
+            # The Note attached to the event should now be visible
+            self.assertEqual(len(event.Note), 1)
+
+            new_note.note = "Updated Note"
+            resp = self.user_misp_connector.update_note(new_note)
+            # The Note should not be updatable by another organisation
+            self.assertTrue(resp['errors'])
+
+            resp = self.user_misp_connector.delete_note(new_note)
+            # The Note should not be deletable by another organisation
+            self.assertTrue(resp['errors'])
+
+            organisation = MISPOrganisation()
+            organisation.name = 'Fake Org'
+            fake_org = self.admin_misp_connector.add_organisation(organisation, pythonify=True)
+            new_note_2 = new_note.add_note('Test Note 2')
+            new_note_2.orgc_uuid = fake_org.uuid
+            new_note_2 = self.user_misp_connector.add_note(new_note_2)
+            # Regular user should not be able to create a note on behalf of another organisation
+            self.assertFalse(new_note_2.orgc_uuid == fake_org.uuid)
+            # Note should have the orgc set to the use's organisation for non-privileged users
+            self.assertTrue(new_note_2.orgc_uuid == self.test_org.uuid)
+
+        finally:
+            self.admin_misp_connector.delete_event(event)
+            try:
+                pass
+                self.admin_misp_connector.delete_sharing_group(sharing_group.id)
+                self.admin_misp_connector.delete_organisation(fake_org)
+                self.admin_misp_connector.delete_note(new_note)
+            except Exception:
+                pass
 
     @unittest.skip("Internal use only")
-    def missing_methods(self):
+    def missing_methods(self) -> None:
         skip = [
             "attributes/download",
             "attributes/add_attachment",

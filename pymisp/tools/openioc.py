@@ -1,5 +1,4 @@
-
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import os
 
@@ -156,7 +155,7 @@ def extract_field(report, field_name):
 def load_openioc_file(openioc_path):
     if not os.path.exists(openioc_path):
         raise Exception("Path doesn't exists.")
-    with open(openioc_path, 'r') as f:
+    with open(openioc_path) as f:
         return load_openioc(f)
 
 

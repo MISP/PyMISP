@@ -10,7 +10,7 @@ from pymisp import MISPEvent
 
 try:
     from keys import misp_url, misp_key, misp_verifycert
-    from pymisp import ExpandedPyMISP
+    from pymisp import PyMISP
     offline = False
 except ImportError as e:
     offline = True
@@ -66,7 +66,7 @@ if __name__ == '__main__':
         if offline:
             print('You are in offline mode, quitting.')
         else:
-            misp = ExpandedPyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
+            misp = PyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
             if args.new_event:
                 event = MISPEvent()
                 event.info = args.new_event
@@ -80,7 +80,7 @@ if __name__ == '__main__':
                 else:
                     print('Something went wrong:')
                     print(new_event)
-            else:
+            elif args.update_event:
                 for o in objects:
                     new_object = misp.add_object(args.update_event, o, pythonify=True)
                     if isinstance(new_object, str):
@@ -90,3 +90,5 @@ if __name__ == '__main__':
                     else:
                         print('Something went wrong:')
                         print(new_event)
+            else:
+                print('you need to pass either a event info field (flag -i), or the event ID you want to update (flag -u)')

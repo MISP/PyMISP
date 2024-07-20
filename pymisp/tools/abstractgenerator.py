@@ -1,16 +1,19 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+from datetime import datetime, date
+from dateutil.parser import parse
+
+from typing import Any
 
 from .. import MISPObject
 from ..exceptions import InvalidMISPObject
-from datetime import datetime, date
-from dateutil.parser import parse
-from typing import Union, Optional
 
 
 class AbstractMISPObjectGenerator(MISPObject):
 
-    def _detect_epoch(self, timestamp: Union[str, int, float]) -> bool:
+    def _detect_epoch(self, timestamp: str | int | float) -> bool:
         try:
             tmp = float(timestamp)
             if tmp < 30000000:
@@ -21,7 +24,7 @@ class AbstractMISPObjectGenerator(MISPObject):
         except ValueError:
             return False
 
-    def _sanitize_timestamp(self, timestamp: Optional[Union[datetime, date, dict, str, int, float]] = None) -> datetime:
+    def _sanitize_timestamp(self, timestamp: datetime | date | dict[str, Any] | str | int | float | None = None) -> datetime:
         if not timestamp:
             return datetime.now()
 
@@ -42,9 +45,9 @@ class AbstractMISPObjectGenerator(MISPObject):
             else:
                 raise Exception(f'Unable to convert {timestamp} to a datetime.')
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         """Contains the logic where all the values of the object are gathered"""
-        if hasattr(self, '_parameters'):
+        if hasattr(self, '_parameters') and self._definition is not None:
             for object_relation in self._definition['attributes']:
                 value = self._parameters.pop(object_relation, None)
                 if not value:

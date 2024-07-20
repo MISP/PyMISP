@@ -1,22 +1,24 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
+import logging
+from typing import Any
 # NOTE: Reference on how this module is used: https://vvx7.io/posts/2020/05/misp-slack-bot/
 
 from .abstractgenerator import AbstractMISPObjectGenerator
-import logging
 
 logger = logging.getLogger('pymisp')
 
 
 class MicroblogObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, parameters: dict, strict: bool = True, **kwargs):
+    def __init__(self, parameters: dict[str, Any], strict: bool = True, **kwargs):  # type: ignore[no-untyped-def]
         super().__init__('microblog', strict=strict, **kwargs)
         self._parameters = parameters
         self.generate_attributes()
 
-    def generate_attributes(self):
+    def generate_attributes(self) -> None:
         # Raw post.
         if 'post' in self._parameters:
             self.add_attribute('post', value=self._parameters['post'])
@@ -32,7 +34,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         # Original URL location of the microblog post (potentially malicious.
         if 'url' in self._parameters:
             if isinstance(self._parameters.get('url'), list):
-                for i in self._parameters.get('url'):
+                for i in self._parameters['url']:
                     self.add_attribute('url', value=i)
             else:
                 self.add_attribute('url', value=self._parameters['url'])
@@ -40,7 +42,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         # Archive of the original document (Internet Archive, Archive.is, etc).
         if 'archive' in self._parameters:
             if isinstance(self._parameters.get('archive'), list):
-                for i in self._parameters.get('archive'):
+                for i in self._parameters['archive']:
                     self.add_attribute('archive', value=i)
             else:
                 self.add_attribute('archive', value=self._parameters['archive'])
@@ -74,7 +76,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
                                "Instagram", "Forum", "Other"]
         if 'type' in self._parameters:
             if isinstance(self._parameters.get('type'), list):
-                for i in self._parameters.get('type'):
+                for i in self._parameters['type']:
                     if i in type_allowed_values:
                         self.add_attribute('type', value=i)
             else:
@@ -85,7 +87,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         type_allowed_values = ["Informative", "Malicious", "Misinformation", "Disinformation", "Unknown"]
         if 'state' in self._parameters:
             if isinstance(self._parameters.get('state'), list):
-                for i in self._parameters.get('state'):
+                for i in self._parameters['state']:
                     if i in type_allowed_values:
                         self.add_attribute('state', value=i)
             else:
@@ -100,7 +102,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         type_allowed_values = ["Verified", "Unverified", "Unknown"]
         if 'verified-username' in self._parameters:
             if isinstance(self._parameters.get('verified-username'), list):
-                for i in self._parameters.get('verified-username'):
+                for i in self._parameters['verified-username']:
                     if i in type_allowed_values:
                         self.add_attribute('verified-username', value=i)
             else:
@@ -110,7 +112,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         # embedded-link.
         if 'embedded-link' in self._parameters:
             if isinstance(self._parameters.get('embedded-link'), list):
-                for i in self._parameters.get('embedded-link'):
+                for i in self._parameters['embedded-link']:
                     self.add_attribute('embedded-link', value=i)
             else:
                 self.add_attribute('embedded-link', value=self._parameters['embedded-link'])
@@ -118,7 +120,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         # embedded-safe-link
         if 'embedded-safe-link' in self._parameters:
             if isinstance(self._parameters.get('embedded-safe-link'), list):
-                for i in self._parameters.get('embedded-safe-link'):
+                for i in self._parameters['embedded-safe-link']:
                     self.add_attribute('embedded-safe-link', value=i)
             else:
                 self.add_attribute('embedded-safe-link', value=self._parameters['embedded-safe-link'])
@@ -126,7 +128,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         # Hashtag into the microblog post.
         if 'hashtag' in self._parameters:
             if isinstance(self._parameters.get('hashtag'), list):
-                for i in self._parameters.get('hashtag'):
+                for i in self._parameters['hashtag']:
                     self.add_attribute('hashtag', value=i)
             else:
                 self.add_attribute('hashtag', value=self._parameters['hashtag'])
@@ -134,7 +136,7 @@ class MicroblogObject(AbstractMISPObjectGenerator):
         # username quoted
         if 'username-quoted' in self._parameters:
             if isinstance(self._parameters.get('username-quoted'), list):
-                for i in self._parameters.get('username-quoted'):
+                for i in self._parameters['username-quoted']:
                     self.add_attribute('username-quoted', value=i)
             else:
                 self.add_attribute('username-quoted', value=self._parameters['username-quoted'])
