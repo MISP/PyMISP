@@ -259,7 +259,7 @@ class EMailObject(AbstractMISPObjectGenerator):
         to_return = []
         try:
             for attachment in self.email.iter_attachments():
-                content = attachment.get_content()  # type: ignore
+                content = attachment.get_content()
                 if isinstance(content, str):
                     content = content.encode()
                 to_return.append((attachment.get_filename(), BytesIO(content)))
