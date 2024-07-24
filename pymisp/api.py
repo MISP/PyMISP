@@ -3789,7 +3789,7 @@ class PyMISP:
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: AbstractMISP | str | dict[str, Any], tag: MISPTag | str,
+    def tag(self, misp_entity: AbstractMISP | str | dict[str, Any], tag: MISPTag | str | dict[str, Any],
             local: bool = False, relationship_type: str | None = None) -> dict[str, Any] | list[dict[str, Any]]:
         """Tag an event or an attribute.
 
@@ -3801,8 +3801,12 @@ class PyMISP:
         uuid = get_uuid_or_id_from_abstract_misp(misp_entity)
         if isinstance(tag, MISPTag):
             tag_name = tag.name if 'name' in tag else ""
+        elif isinstance(tag, dict):
+            tag_name = tag.get('name', '')
         else:
             tag_name = tag
+        if not tag_name:
+            raise PyMISPError('tag must be a MISPTag object, a dict with a name key, or a string, and it cannot be empty.')
         to_post = {'uuid': uuid, 'tag': tag_name, 'local': local}
         if relationship_type:
             to_post['relationship_type'] = relationship_type
