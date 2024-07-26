@@ -2638,7 +2638,7 @@ class PyMISP:
             for _r in self.roles(pythonify=True):
                 if not isinstance(_r, MISPRole):
                     continue
-                if _r.default_role:  # type: ignore
+                if _r.default_role:
                     role_id = get_uuid_or_id_from_abstract_misp(_r)
                     break
             else:
@@ -2738,6 +2738,15 @@ class PyMISP:
         role_id = get_uuid_or_id_from_abstract_misp(role)
         url = urljoin(self.root_url, f'admin/roles/set_default/{role_id}')
         response = self._prepare_request('POST', url)
+        return self._check_json_response(response)
+
+    def delete_role(self, role: MISPRole | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete a role
+
+        :param role: role to delete
+        """
+        role_id = get_uuid_or_id_from_abstract_misp(role)
+        response = self._prepare_request('POST', f'admin/roles/delete/{role_id}')
         return self._check_json_response(response)
 
     # ## END Role ###
