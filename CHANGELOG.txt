@@ -14,6 +14,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
@@ -38,6 +39,7 @@ Changes
 
 Fix
 ~~~
+- Bump objects (invalid template) [Raphaël Vinot]
 - Do not let a user pass a full dict as tagname. [Raphaël Vinot]
 - [publish tests] fixed invalid setting name for disabling background
   processing. [iglocska]
