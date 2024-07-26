@@ -33,7 +33,10 @@ include = [
     "pymisp/data/misp-objects/schema_relationships.json",
     "pymisp/data/misp-objects/objects/*/definition.json",
     "pymisp/data/misp-objects/relationships/definition.json",
-    "pymisp/tools/pdf_fonts/Noto_TTF/*"
+    "pymisp/tools/pdf_fonts/Noto_TTF/*",
+    "docs",
+    "examples",
+    "tests",
 ]
 
 [tool.poetry.urls]
