@@ -2638,7 +2638,7 @@ class PyMISP:
             for _r in self.roles(pythonify=True):
                 if not isinstance(_r, MISPRole):
                     continue
-                if _r.default_role:  # type: ignore
+                if _r.default_role:
                     role_id = get_uuid_or_id_from_abstract_misp(_r)
                     break
             else:
@@ -2696,6 +2696,40 @@ class PyMISP:
             to_return.append(nr)
         return to_return
 
+    def add_role(self, role: MISPRole, pythonify: bool = False) -> dict[str, Any] | MISPRole:
+        """Add a new role
+
+        :param role: role to add
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        r = self._prepare_request('POST', 'admin/roles/add', data=role)
+        role_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in role_j:
+            return role_j
+        new_misp_role = MISPRole()
+        new_misp_role.from_dict(**role_j)
+        return new_misp_role
+
+    def update_role(self, role: MISPRole, role_id: int | None = None, pythonify: bool = False) -> dict[str, Any] | MISPRole:
+        """Update a role on a MISP instance
+
+        :param role: role to update
+        :param role_id: id to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        if role_id is None:
+            uid = get_uuid_or_id_from_abstract_misp(role)
+        else:
+            uid = get_uuid_or_id_from_abstract_misp(role_id)
+        url = f'admin/roles/edit/{uid}'
+        r = self._prepare_request('POST', url, data=role)
+        updated_role = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_role:
+            return updated_role
+        updated_misp_role = MISPRole()
+        updated_misp_role.from_dict(**updated_role)
+        return updated_misp_role
+
     def set_default_role(self, role: MISPRole | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
         """Set a default role for the new user accounts
 
@@ -2704,6 +2738,15 @@ class PyMISP:
         role_id = get_uuid_or_id_from_abstract_misp(role)
         url = urljoin(self.root_url, f'admin/roles/set_default/{role_id}')
         response = self._prepare_request('POST', url)
+        return self._check_json_response(response)
+
+    def delete_role(self, role: MISPRole | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete a role
+
+        :param role: role to delete
+        """
+        role_id = get_uuid_or_id_from_abstract_misp(role)
+        response = self._prepare_request('POST', f'admin/roles/delete/{role_id}')
         return self._check_json_response(response)
 
     # ## END Role ###
