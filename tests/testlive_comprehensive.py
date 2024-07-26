@@ -26,7 +26,7 @@ try:
                         MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting,
                         MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster,
                         MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist,
-                        MISPNote)
+                        MISPNote, MISPRole)
     from pymisp.tools import CSVLoader, DomainIPObject, ASNObject, GenericObjectGenerator
 except ImportError:
     raise
@@ -36,7 +36,7 @@ try:
     verifycert = False
 except ImportError as e:
     print(e)
-    url = 'https://10.197.206.83'
+    url = 'https://10.197.206.84'
     key = 'OdzzuBSnH83tEjvZbf7SFejC1kC3gS11Cnj2wxLk'
     verifycert = False
 
@@ -79,6 +79,7 @@ class TestComprehensive(unittest.TestCase):
         cls.admin_misp_connector.set_server_setting('debug', 1, force=True)
         if not fast_mode:
             r = cls.admin_misp_connector.update_misp()
+            print(r)
         # Creates an org
         organisation = MISPOrganisation()
         organisation.name = 'Test Org'
@@ -2168,6 +2169,19 @@ class TestComprehensive(unittest.TestCase):
         self.admin_misp_connector.set_default_role(3)
         roles = self.admin_misp_connector.roles(pythonify=True)
         self.assertTrue(isinstance(roles, list))
+        try:
+            # Create a new role
+            new_role = MISPRole()
+            new_role.name = 'testrole'
+            new_role = self.admin_misp_connector.add_role(new_role, pythonify=True)
+            self.assertFalse(new_role.perm_sighting)
+            new_role.perm_sighting = True
+            new_role.max_execution_time = 1234
+            updated_role = self.admin_misp_connector.update_role(new_role, pythonify=True)
+            self.assertTrue(updated_role.perm_sighting)
+            self.assertEqual(updated_role.max_execution_time, '1234')
+        finally:
+            self.admin_misp_connector.delete_role(new_role)
 
     def test_describe_types(self) -> None:
         remote = self.admin_misp_connector.describe_types_remote
