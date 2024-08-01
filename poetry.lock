@@ -2220,13 +2220,13 @@ files = [
 
 [[package]]
 name = "publicsuffixlist"
-version = "1.0.2.20240726"
+version = "1.0.2.20240801"
 description = "publicsuffixlist implement"
 optional = true
 python-versions = ">=3.5"
 files = [
-    {file = "publicsuffixlist-1.0.2.20240726-py2.py3-none-any.whl", hash = "sha256:76d8fe1451229900b111b61ed94cfac1c7d8316818ba3689c59efc3b773a8bab"},
-    {file = "publicsuffixlist-1.0.2.20240726.tar.gz", hash = "sha256:1f989294da1452b7fea47846fedc32faeb4239f556e94f9603e5f58e04c579ac"},
+    {file = "publicsuffixlist-1.0.2.20240801-py2.py3-none-any.whl", hash = "sha256:4f2b38ecd856c98ea27ba67c1539f387f531ef766adbb97b6bbaddc7b601167d"},
+    {file = "publicsuffixlist-1.0.2.20240801.tar.gz", hash = "sha256:d680e938c27b4d87a41c69db344d526b32ec620dd48fd347069c60e1e3492936"},
 ]
 
 [package.extras]
