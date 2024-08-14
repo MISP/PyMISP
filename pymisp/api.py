@@ -300,7 +300,7 @@ class PyMISP:
     @property
     def pymisp_version_main(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Get the most recent version of PyMISP from github"""
-        r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/main/pyproject.toml')
+        r = requests.get('https://raw.githubusercontent.com/MISP/PyMISP/main/pyproject.toml', verify=self.ssl)
         if r.status_code == 200:
             version = re.findall('version = "(.*)"', r.text)
             return {'version': version[0]}
@@ -315,7 +315,7 @@ class PyMISP:
     @property
     def misp_instance_version_master(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Get the most recent version from github"""
-        r = requests.get('https://raw.githubusercontent.com/MISP/MISP/2.4/VERSION.json')
+        r = requests.get('https://raw.githubusercontent.com/MISP/MISP/2.4/VERSION.json', verify=self.ssl)
         if r.status_code == 200:
             master_version = loads(r.content)
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
