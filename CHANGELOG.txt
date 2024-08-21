@@ -2,6 +2,19 @@ Changelog
 =========
 
 
+v2.4.196 (2024-08-21)
+---------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Remove broken config. [Raphaël Vinot]
+
+
 v2.4.195 (2024-07-27)
 ---------------------
 
@@ -14,6 +27,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump Changelog (issue with template) [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
