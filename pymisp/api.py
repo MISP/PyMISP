@@ -3985,7 +3985,10 @@ class PyMISP:
         """Check if the response from the server is not an unexpected error"""
         if response.status_code >= 500:
             headers_without_auth = {h_name: h_value for h_name, h_value in response.request.headers.items() if h_value != self.key}
-            logger.critical(everything_broken.format(headers_without_auth, response.request.body, response.text))
+            if logger.level == logging.DEBUG:
+                logger.debug(everything_broken.format(headers_without_auth, response.request.body, response.text))
+            else:
+                logger.critical(everything_broken.format(headers_without_auth, response.request.body, f'{response.text[:1000]}... (enable debug mode for more details)'))
             raise MISPServerError(f'Error code 500:\n{response.text}')
 
         if 400 <= response.status_code < 500:
