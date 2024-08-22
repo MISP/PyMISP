@@ -939,13 +939,13 @@ tests = ["asttokens (>=2.1.0)", "coverage", "coverage-enable-subprocess", "ipyth
 
 [[package]]
 name = "extract-msg"
-version = "0.48.7"
+version = "0.49.0"
 description = "Extracts emails and attachments saved in Microsoft Outlook's .msg files"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "extract_msg-0.48.7-py3-none-any.whl", hash = "sha256:0477489aa2ac417387803f19fa53ddc44136846a648b0898a114212272a1a111"},
-    {file = "extract_msg-0.48.7.tar.gz", hash = "sha256:3ddf015c0e0a6ea36026fedfb7f8e434ca37150a31069363b2d0752196d15b6e"},
+    {file = "extract_msg-0.49.0-py3-none-any.whl", hash = "sha256:6a1756164ef2d0c230bce1966d52155da8bd4bec9a6a1c3166cbdff8ffd9e0ba"},
+    {file = "extract_msg-0.49.0.tar.gz", hash = "sha256:cc700cdcc0cb6fcdbfa3b9e477201958cc28c584716d5c45fdd47261c1f2dfcc"},
 ]
 
 [package.dependencies]
@@ -3695,4 +3695,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "9ef76e8f6c939f8ac67a26ba95dbe88b686c623dfb2c3ac42d4e9592d9082e6e"
+content-hash = "e96be8fc87fae0cf59bf9c142097054a3be4f57f8d21a980ed034d9c72f2f957"
