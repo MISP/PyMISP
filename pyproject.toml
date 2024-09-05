@@ -27,7 +27,7 @@ classifiers=[
 ]
 
 include = [
-    "CHANGELOG.txt",
+    {path = "CHANGELOG.txt", format = "sdist"},
     "pymisp/data/*.json",
     "pymisp/data/misp-objects/schema_objects.json",
     "pymisp/data/misp-objects/schema_relationships.json",
