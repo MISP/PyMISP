@@ -1173,6 +1173,7 @@ class TestComprehensive(unittest.TestCase):
         second.info = 'foo blah'
         second.set_date('2018-09-01')
         second.add_attribute('ip-src', '8.8.8.8')
+        self.admin_misp_connector.set_server_setting('Plugin.ZeroMQ_enable', False, force=True)
         try:
             first = self.user_misp_connector.add_event(first)
             second = self.user_misp_connector.add_event(second)
