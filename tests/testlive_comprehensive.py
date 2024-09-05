@@ -1184,8 +1184,9 @@ class TestComprehensive(unittest.TestCase):
             first = self.user_misp_connector.update_event(first)
             time.sleep(5)
             csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp())
-            self.assertEqual(len(csv), 1)
+            print('HERE!!!!')
             print(self.user_misp_connector.direct_call('jobs/index'))
+            self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
 
             # eventid
