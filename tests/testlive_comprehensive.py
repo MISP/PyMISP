@@ -1175,15 +1175,18 @@ class TestComprehensive(unittest.TestCase):
         second.add_attribute('ip-src', '8.8.8.8')
         try:
             first = self.user_misp_connector.add_event(first)
+            print(first.to_json())
             second = self.user_misp_connector.add_event(second)
-
+            print(second.to_json())
             response = self.user_misp_connector.publish(first, alert=False)
+            print(response.to_json())
             self.assertEqual(response['errors'][1]['message'], 'You do not have permission to use this functionality.')
 
             # Default search, attribute with to_ids == True
             first.attributes[0].to_ids = True
             first = self.user_misp_connector.update_event(first)
-            self.admin_misp_connector.publish(first, alert=False)
+            print(first.to_json())
+            print(self.admin_misp_connector.publish(first, alert=False))
             time.sleep(5)
             csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp())
             self.assertEqual(len(csv), 1)
