@@ -1174,24 +1174,18 @@ class TestComprehensive(unittest.TestCase):
         second.set_date('2018-09-01')
         second.add_attribute('ip-src', '8.8.8.8')
         try:
-            self.admin_misp_connector.set_server_setting('MISP.background_jobs', False, force=True)
             first = self.user_misp_connector.add_event(first)
-            print(first.to_json())
             second = self.user_misp_connector.add_event(second)
-            print(second.to_json())
             response = self.user_misp_connector.publish(first, alert=False)
-            print(response)
             self.assertEqual(response['errors'][1]['message'], 'You do not have permission to use this functionality.')
 
             # Default search, attribute with to_ids == True
             first.attributes[0].to_ids = True
             first = self.user_misp_connector.update_event(first)
-            print(first.to_json())
-            print(self.admin_misp_connector.publish(first, alert=False))
-            self.admin_misp_connector.set_server_setting('MISP.background_jobs', True, force=True)
             time.sleep(5)
             csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp())
             self.assertEqual(len(csv), 1)
+            print(self.user_misp_connector.direct_call('jobs/index'))
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
 
             # eventid
