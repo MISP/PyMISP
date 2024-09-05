@@ -1179,7 +1179,7 @@ class TestComprehensive(unittest.TestCase):
             second = self.user_misp_connector.add_event(second)
             print(second.to_json())
             response = self.user_misp_connector.publish(first, alert=False)
-            print(response.to_json())
+            print(response)
             self.assertEqual(response['errors'][1]['message'], 'You do not have permission to use this functionality.')
 
             # Default search, attribute with to_ids == True
