@@ -1173,20 +1173,19 @@ class TestComprehensive(unittest.TestCase):
         second.info = 'foo blah'
         second.set_date('2018-09-01')
         second.add_attribute('ip-src', '8.8.8.8')
-        self.admin_misp_connector.set_server_setting('Plugin.ZeroMQ_enable', False, force=True)
         try:
             first = self.user_misp_connector.add_event(first)
             second = self.user_misp_connector.add_event(second)
+
             response = self.user_misp_connector.publish(first, alert=False)
             self.assertEqual(response['errors'][1]['message'], 'You do not have permission to use this functionality.')
 
             # Default search, attribute with to_ids == True
             first.attributes[0].to_ids = True
             first = self.user_misp_connector.update_event(first)
+            self.admin_misp_connector.publish(first, alert=False)
             time.sleep(5)
             csv = self.user_misp_connector.search(return_format='csv', publish_timestamp=first.timestamp.timestamp())
-            print('HERE!!!!')
-            print(self.admin_misp_connector.direct_call('jobs/index'))
             self.assertEqual(len(csv), 1)
             self.assertEqual(csv[0]['value'], first.attributes[0].value)
 
