@@ -2,7 +2,40 @@ Changelog
 =========
 
 
-v2.4.195 (2024-07-26)
+v2.4.197 (2024-09-02)
+---------------------
+
+Changes
+~~~~~~~
+- Bump deps, version, templates. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+
+Fix
+~~~
+- Avoid printing huge log when a request fails. [Raphaël Vinot]
+
+  fix #1286
+
+
+v2.4.196 (2024-08-21)
+---------------------
+
+New
+~~~
+- Add pre-commit file. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Remove broken config. [Raphaël Vinot]
+
+
+v2.4.195 (2024-07-27)
 ---------------------
 
 New
@@ -14,6 +47,9 @@ New
 
 Changes
 ~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump Changelog (issue with template) [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
