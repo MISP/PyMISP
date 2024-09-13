@@ -2,11 +2,25 @@ Changelog
 =========
 
 
+v2.4.198 (2024-09-13)
+---------------------
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Only include the changelog in the sdist package. [Raphaël Vinot]
+
+  Related #1295
+- [data] describeTypes.json updated. [Alexandre Dulaunoy]
+
+
 v2.4.197 (2024-09-02)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version, templates. [Raphaël Vinot]
 - [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
 
