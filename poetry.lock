@@ -2,17 +2,6 @@
 
 [[package]]
 name = "alabaster"
-version = "0.7.16"
-description = "A light, configurable Sphinx theme"
-optional = true
-python-versions = ">=3.9"
-files = [
-    {file = "alabaster-0.7.16-py3-none-any.whl", hash = "sha256:b46733c07dce03ae4e150330b975c75737fa60f0a7c591b6c8bf4928a28e2c92"},
-    {file = "alabaster-0.7.16.tar.gz", hash = "sha256:75a8b99c28a5dad50dd7f8ccdd447a121ddb3892da9e53d1ca5cca3106d58d65"},
-]
-
-[[package]]
-name = "alabaster"
 version = "1.0.0"
 description = "A light, configurable Sphinx theme"
 optional = true
@@ -1070,32 +1059,36 @@ files = [
 
 [[package]]
 name = "importlib-metadata"
-version = "8.4.0"
+version = "8.5.0"
 description = "Read metadata from Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "importlib_metadata-8.4.0-py3-none-any.whl", hash = "sha256:66f342cc6ac9818fc6ff340576acd24d65ba0b3efabb2b4ac08b598965a4a2f1"},
-    {file = "importlib_metadata-8.4.0.tar.gz", hash = "sha256:9a547d3bc3608b025f93d403fdd1aae741c24fbb8314df4b155675742ce303c5"},
+    {file = "importlib_metadata-8.5.0-py3-none-any.whl", hash = "sha256:45e54197d28b7a7f1559e60b95e7c567032b602131fbd588f1497f47880aa68b"},
+    {file = "importlib_metadata-8.5.0.tar.gz", hash = "sha256:71522656f0abace1d072b9e5481a48f07c138e00f079c38c8f883823f9c26bd7"},
 ]
 
 [package.dependencies]
-zipp = ">=0.5"
+zipp = ">=3.20"
 
 [package.extras]
+check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1)"]
+cover = ["pytest-cov"]
 doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
+enabler = ["pytest-enabler (>=2.2)"]
 perf = ["ipython"]
-test = ["flufl.flake8", "importlib-resources (>=1.3)", "jaraco.test (>=5.4)", "packaging", "pyfakefs", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy", "pytest-perf (>=0.9.2)", "pytest-ruff (>=0.2.1)"]
+test = ["flufl.flake8", "importlib-resources (>=1.3)", "jaraco.test (>=5.4)", "packaging", "pyfakefs", "pytest (>=6,!=8.1.*)", "pytest-perf (>=0.9.2)"]
+type = ["pytest-mypy"]
 
 [[package]]
 name = "importlib-resources"
-version = "6.4.4"
+version = "6.4.5"
 description = "Read resources from Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "importlib_resources-6.4.4-py3-none-any.whl", hash = "sha256:dda242603d1c9cd836c3368b1174ed74cb4049ecd209e7a1a0104620c18c5c11"},
-    {file = "importlib_resources-6.4.4.tar.gz", hash = "sha256:20600c8b7361938dc0bb2d5ec0297802e575df486f5a544fa414da65e13721f7"},
+    {file = "importlib_resources-6.4.5-py3-none-any.whl", hash = "sha256:ac29d5f956f01d5e4bb63102a5a19957f1b9175e45649977264a1416783bb717"},
+    {file = "importlib_resources-6.4.5.tar.gz", hash = "sha256:980862a1d16c9e147a59603677fa2aa5fd82b87f223b6cb870695bcfce830065"},
 ]
 
 [package.dependencies]
@@ -2172,19 +2165,19 @@ files = [
 
 [[package]]
 name = "platformdirs"
-version = "4.2.2"
+version = "4.3.2"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "platformdirs-4.2.2-py3-none-any.whl", hash = "sha256:2d7a1657e36a80ea911db832a8a6ece5ee53d8de21edd5cc5879af6530b1bfee"},
-    {file = "platformdirs-4.2.2.tar.gz", hash = "sha256:38b7b51f512eed9e84a22788b4bce1de17c0adb134d6becb09836e37d8654cd3"},
+    {file = "platformdirs-4.3.2-py3-none-any.whl", hash = "sha256:eb1c8582560b34ed4ba105009a4badf7f6f85768b30126f351328507b2beb617"},
+    {file = "platformdirs-4.3.2.tar.gz", hash = "sha256:9e5e27a08aa095dd127b9f2e764d74254f482fef22b0970773bfba79d091ab8c"},
 ]
 
 [package.extras]
-docs = ["furo (>=2023.9.10)", "proselint (>=0.13)", "sphinx (>=7.2.6)", "sphinx-autodoc-typehints (>=1.25.2)"]
-test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4.3)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)"]
-type = ["mypy (>=1.8)"]
+docs = ["furo (>=2024.8.6)", "proselint (>=0.14)", "sphinx (>=8.0.2)", "sphinx-autodoc-typehints (>=2.4)"]
+test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=8.3.2)", "pytest-cov (>=5)", "pytest-mock (>=3.14)"]
+type = ["mypy (>=1.11.2)"]
 
 [[package]]
 name = "pluggy"
@@ -2271,13 +2264,13 @@ files = [
 
 [[package]]
 name = "publicsuffixlist"
-version = "1.0.2.20240905"
+version = "1.0.2.20240913"
 description = "publicsuffixlist implement"
 optional = true
 python-versions = ">=3.5"
 files = [
-    {file = "publicsuffixlist-1.0.2.20240905-py2.py3-none-any.whl", hash = "sha256:a94d6831c5ea0e03075aa83ac3c755cb975c793d7fb530b6dc65e1db52466db1"},
-    {file = "publicsuffixlist-1.0.2.20240905.tar.gz", hash = "sha256:a834fe92c4b0264832795265de1a9cda9e2e3eec7c1a3b2ae9c9d6fd24383431"},
+    {file = "publicsuffixlist-1.0.2.20240913-py2.py3-none-any.whl", hash = "sha256:dfb109e165d9421c1c245f09045249ce395c88612b5d9e78953613c41ffe4d3a"},
+    {file = "publicsuffixlist-1.0.2.20240913.tar.gz", hash = "sha256:1fbf87485d1729f00e03c2c8fbf3b729ee3de5886bc1bd8b580cf86ddd850b5f"},
 ]
 
 [package.extras]
@@ -2374,13 +2367,13 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pytest"
-version = "8.3.2"
+version = "8.3.3"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-8.3.2-py3-none-any.whl", hash = "sha256:4ba08f9ae7dcf84ded419494d229b48d0903ea6407b030eaec46df5e6a73bba5"},
-    {file = "pytest-8.3.2.tar.gz", hash = "sha256:c132345d12ce551242c87269de812483f5bcc87cdbb4722e48487ba194f9fdce"},
+    {file = "pytest-8.3.3-py3-none-any.whl", hash = "sha256:a6853c7375b2663155079443d2e45de913a911a11d669df02a50814944db57b2"},
+    {file = "pytest-8.3.3.tar.gz", hash = "sha256:70b98107bd648308a7952b06e6ca9a50bc660be218d53c257cc1fc94fda10181"},
 ]
 
 [package.dependencies]
@@ -2450,13 +2443,13 @@ files = [
 
 [[package]]
 name = "pytz"
-version = "2024.1"
+version = "2024.2"
 description = "World timezone definitions, modern and historical"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pytz-2024.1-py2.py3-none-any.whl", hash = "sha256:328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319"},
-    {file = "pytz-2024.1.tar.gz", hash = "sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812"},
+    {file = "pytz-2024.2-py2.py3-none-any.whl", hash = "sha256:31c7c1817eb7fae7ca4b8c7ee50c72f93aa2dd863de768e1ef4245d426aa0725"},
+    {file = "pytz-2024.2.tar.gz", hash = "sha256:2aa355083c50a0f93fa581709deac0c9ad65cca8a9e9beac660adcbd493c798a"},
 ]
 
 [[package]]
@@ -3016,42 +3009,6 @@ files = [
 
 [[package]]
 name = "sphinx"
-version = "7.4.7"
-description = "Python documentation generator"
-optional = true
-python-versions = ">=3.9"
-files = [
-    {file = "sphinx-7.4.7-py3-none-any.whl", hash = "sha256:c2419e2135d11f1951cd994d6eb18a1835bd8fdd8429f9ca375dc1f3281bd239"},
-    {file = "sphinx-7.4.7.tar.gz", hash = "sha256:242f92a7ea7e6c5b406fdc2615413890ba9f699114a9c09192d7dfead2ee9cfe"},
-]
-
-[package.dependencies]
-alabaster = ">=0.7.14,<0.8.0"
-babel = ">=2.13"
-colorama = {version = ">=0.4.6", markers = "sys_platform == \"win32\""}
-docutils = ">=0.20,<0.22"
-imagesize = ">=1.3"
-importlib-metadata = {version = ">=6.0", markers = "python_version < \"3.10\""}
-Jinja2 = ">=3.1"
-packaging = ">=23.0"
-Pygments = ">=2.17"
-requests = ">=2.30.0"
-snowballstemmer = ">=2.2"
-sphinxcontrib-applehelp = "*"
-sphinxcontrib-devhelp = "*"
-sphinxcontrib-htmlhelp = ">=2.0.0"
-sphinxcontrib-jsmath = "*"
-sphinxcontrib-qthelp = "*"
-sphinxcontrib-serializinghtml = ">=1.1.9"
-tomli = {version = ">=2", markers = "python_version < \"3.11\""}
-
-[package.extras]
-docs = ["sphinxcontrib-websupport"]
-lint = ["flake8 (>=6.0)", "importlib-metadata (>=6.0)", "mypy (==1.10.1)", "pytest (>=6.0)", "ruff (==0.5.2)", "sphinx-lint (>=0.9)", "tomli (>=2)", "types-docutils (==0.21.0.20240711)", "types-requests (>=2.30.0)"]
-test = ["cython (>=3.0)", "defusedxml (>=0.7.1)", "pytest (>=8.0)", "setuptools (>=70.0)", "typing_extensions (>=4.9)"]
-
-[[package]]
-name = "sphinx"
 version = "8.0.2"
 description = "Python documentation generator"
 optional = true
@@ -3087,22 +3044,22 @@ test = ["cython (>=3.0)", "defusedxml (>=0.7.1)", "pytest (>=8.0)", "setuptools 
 
 [[package]]
 name = "sphinx-autodoc-typehints"
-version = "2.3.0"
+version = "2.4.1"
 description = "Type hints (PEP 484) support for the Sphinx autodoc extension"
 optional = true
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 files = [
-    {file = "sphinx_autodoc_typehints-2.3.0-py3-none-any.whl", hash = "sha256:3098e2c6d0ba99eacd013eb06861acc9b51c6e595be86ab05c08ee5506ac0c67"},
-    {file = "sphinx_autodoc_typehints-2.3.0.tar.gz", hash = "sha256:535c78ed2d6a1bad393ba9f3dfa2602cf424e2631ee207263e07874c38fde084"},
+    {file = "sphinx_autodoc_typehints-2.4.1-py3-none-any.whl", hash = "sha256:af37abb816ebd2cf56c7a8174fd2f34d0f2f84fbf58265f89429ae107212fe6f"},
+    {file = "sphinx_autodoc_typehints-2.4.1.tar.gz", hash = "sha256:cfe410920cecf08ade046bb387b0007edb83e992de59686c62d194c762f1e45c"},
 ]
 
 [package.dependencies]
-sphinx = ">=7.3.5"
+sphinx = ">=8.0.2"
 
 [package.extras]
-docs = ["furo (>=2024.1.29)"]
+docs = ["furo (>=2024.8.6)"]
 numpy = ["nptyping (>=2.5)"]
-testing = ["covdefaults (>=2.3)", "coverage (>=7.4.4)", "defusedxml (>=0.7.1)", "diff-cover (>=9)", "pytest (>=8.1.1)", "pytest-cov (>=5)", "sphobjinv (>=2.3.1)", "typing-extensions (>=4.11)"]
+testing = ["covdefaults (>=2.3)", "coverage (>=7.6.1)", "defusedxml (>=0.7.1)", "diff-cover (>=9.1.1)", "pytest (>=8.3.2)", "pytest-cov (>=5)", "sphobjinv (>=2.3.1.1)", "typing-extensions (>=4.12.2)"]
 
 [[package]]
 name = "sphinxcontrib-applehelp"
@@ -3385,13 +3342,13 @@ types-cffi = "*"
 
 [[package]]
 name = "types-python-dateutil"
-version = "2.9.0.20240821"
+version = "2.9.0.20240906"
 description = "Typing stubs for python-dateutil"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-python-dateutil-2.9.0.20240821.tar.gz", hash = "sha256:9649d1dcb6fef1046fb18bebe9ea2aa0028b160918518c34589a46045f6ebd98"},
-    {file = "types_python_dateutil-2.9.0.20240821-py3-none-any.whl", hash = "sha256:f5889fcb4e63ed4aaa379b44f93c32593d50b9a94c9a60a0c854d8cc3511cd57"},
+    {file = "types-python-dateutil-2.9.0.20240906.tar.gz", hash = "sha256:9706c3b68284c25adffc47319ecc7947e5bb86b3773f843c73906fd598bc176e"},
+    {file = "types_python_dateutil-2.9.0.20240906-py3-none-any.whl", hash = "sha256:27c8cc2d058ccb14946eebcaaa503088f4f6dbc4fb6093d3d456a49aef2753f6"},
 ]
 
 [[package]]
@@ -3411,13 +3368,13 @@ types-pyOpenSSL = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.32.0.20240905"
+version = "2.32.0.20240907"
 description = "Typing stubs for requests"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-requests-2.32.0.20240905.tar.gz", hash = "sha256:e97fd015a5ed982c9ddcd14cc4afba9d111e0e06b797c8f776d14602735e9bd6"},
-    {file = "types_requests-2.32.0.20240905-py3-none-any.whl", hash = "sha256:f46ecb55f5e1a37a58be684cf3f013f166da27552732ef2469a0cc8e62a72881"},
+    {file = "types-requests-2.32.0.20240907.tar.gz", hash = "sha256:ff33935f061b5e81ec87997e91050f7b4af4f82027a7a7a9d9aaea04a963fdf8"},
+    {file = "types_requests-2.32.0.20240907-py3-none-any.whl", hash = "sha256:1d1e79faeaf9d42def77f3c304893dea17a97cae98168ac69f3cb465516ee8da"},
 ]
 
 [package.dependencies]
@@ -3425,13 +3382,13 @@ urllib3 = ">=2"
 
 [[package]]
 name = "types-setuptools"
-version = "74.0.0.20240831"
+version = "74.1.0.20240907"
 description = "Typing stubs for setuptools"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-setuptools-74.0.0.20240831.tar.gz", hash = "sha256:8b4a544cc91d42a019dc1e41fd397608b4bc7e20c7d7d5bc326589ffd9e8f8a1"},
-    {file = "types_setuptools-74.0.0.20240831-py3-none-any.whl", hash = "sha256:4d9d18ea9214828d695a384633130009f5dee2681a157ee873d3680b62931590"},
+    {file = "types-setuptools-74.1.0.20240907.tar.gz", hash = "sha256:0abdb082552ca966c1e5fc244e4853adc62971f6cd724fb1d8a3713b580e5a65"},
+    {file = "types_setuptools-74.1.0.20240907-py3-none-any.whl", hash = "sha256:15b38c8e63ca34f42f6063ff4b1dd662ea20086166d5ad6a102e670a52574120"},
 ]
 
 [[package]]
@@ -3501,13 +3458,13 @@ dev = ["flake8", "flake8-annotations", "flake8-bandit", "flake8-bugbear", "flake
 
 [[package]]
 name = "urllib3"
-version = "2.2.2"
+version = "2.2.3"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "urllib3-2.2.2-py3-none-any.whl", hash = "sha256:a448b2f64d686155468037e1ace9f2d2199776e17f0a46610480d311f73e3472"},
-    {file = "urllib3-2.2.2.tar.gz", hash = "sha256:dd505485549a7a552833da5e6063639d0d177c04f23bc3864e41e5dc5f612168"},
+    {file = "urllib3-2.2.3-py3-none-any.whl", hash = "sha256:ca899ca043dcb1bafa3e262d73aa25c465bfb49e0bd9dd5d59f1d0acba2f8fac"},
+    {file = "urllib3-2.2.3.tar.gz", hash = "sha256:e7d814a81dad81e6caf2ec9fdedb284ecc9c73076b62654547cc64ccdcae26e9"},
 ]
 
 [package.dependencies]
@@ -3697,7 +3654,7 @@ type = ["pytest-mypy"]
 
 [extras]
 brotli = ["urllib3"]
-docs = ["Sphinx", "Sphinx", "docutils", "recommonmark", "sphinx-autodoc-typehints"]
+docs = ["Sphinx", "docutils", "recommonmark", "sphinx-autodoc-typehints"]
 email = ["RTFDE", "extract_msg", "oletools"]
 fileobjects = ["lief", "pydeep2", "python-magic"]
 openioc = ["beautifulsoup4"]
@@ -3708,4 +3665,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "f5006b6e522da073d9e61c01f97cbecf52b5d660de8b3fe65663554437a2d1e1"
+content-hash = "f4e846fdac1ae1c32a0a9baf5c1623dd47919ddf90edf69181f027d6c5d6fdb5"
