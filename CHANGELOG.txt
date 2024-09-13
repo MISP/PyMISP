@@ -7,12 +7,23 @@ v2.4.198 (2024-09-13)
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Only include the changelog in the sdist package. [Raphaël Vinot]
 
   Related #1295
 - [data] describeTypes.json updated. [Alexandre Dulaunoy]
+
+Other
+~~~~~
+- Openioc.py is not a script, but had exec bit. [Sebastian Wagner]
+
+  the file openioc can only be used as module and as part of a package,
+  has no instructions for direct execution and is therefor not a script
+  for direct execution
+
+  this removes the executable bit from the file
 
 
 v2.4.197 (2024-09-02)
