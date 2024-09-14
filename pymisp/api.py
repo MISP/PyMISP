@@ -40,7 +40,7 @@ if sys.platform == 'linux':
     # Enable TCP keepalive by default on every requests
     import socket
     from urllib3.connection import HTTPConnection
-    HTTPConnection.default_socket_options = HTTPConnection.default_socket_options + [  # type: ignore
+    HTTPConnection.default_socket_options = HTTPConnection.default_socket_options + [
         (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),  # enable keepalive
         (socket.SOL_TCP, socket.TCP_KEEPIDLE, 30),  # Start pinging after 30s of idle time
         (socket.SOL_TCP, socket.TCP_KEEPINTVL, 10),  # ping every 10s
