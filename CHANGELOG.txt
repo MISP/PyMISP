@@ -2,11 +2,27 @@ Changelog
 =========
 
 
+v2.5.0 (2024-10-04)
+-------------------
+
+Changes
+~~~~~~~
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [tests] misp_instance_version_master now uses the 2.5 branch.
+  [iglocska]
+
+Fix
+~~~
+- Make mypy happy. [Raphaël Vinot]
+
+
 v2.4.198 (2024-09-13)
 ---------------------
 
 Changes
 ~~~~~~~
+- Re-Bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
