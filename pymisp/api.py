@@ -3139,9 +3139,9 @@ class PyMISP:
         query.pop('self')
         query.pop('pythonify')
         if query.get('date_from'):
-            query['datefrom'] = self._make_timestamp(query.pop('date_from'))
+            query['datefrom'] = self._make_datestr(query.pop('date_from'))
         if query.get('date_to'):
-            query['dateuntil'] = self._make_timestamp(query.pop('date_to'))
+            query['dateuntil'] = self._make_datestr(query.pop('date_to'))
         if isinstance(query.get('sharinggroup'), list):
             query['sharinggroup'] = '|'.join([str(sg) for sg in query['sharinggroup']])
         if query.get('timestamp') is not None:
@@ -3965,6 +3965,29 @@ class PyMISP:
                 # The value can also be '1d', '10h', ...
                 return value
         return value
+
+    def _make_datestr(self, value: datetime | date | int | str | float | None) -> str | None:
+        """Catch-all method to normalize anything that can be converted to a YYYY-MM-DD date string"""
+        if not value:
+            return None
+        if isinstance(value, str):
+            if value.isdigit():
+                value = int(value)
+            else:
+                try:
+                    value = datetime.strptime(value, "%Y-%m-%d")
+                except Exception:
+                    raise PyMISPError(f"Unable to parse {value} as date in format YYYY-MM-DD")
+
+        if isinstance(value, (int, float)):
+            try:
+                value = datetime.fromtimestamp(value)
+            except Exception:
+                raise PyMISPError(f"Unable to parse {value} as timestamp")
+
+        if isinstance(value, (datetime, date)):
+            return value.strftime("%Y-%m-%d")
+        raise PyMISPError(f"{value} could not be resolved as a date")
 
     def _check_json_response(self, response: requests.Response) -> dict[str, Any] | list[dict[str, Any]]:
         r = self._check_response(response, expect_json=True)
