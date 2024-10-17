@@ -3696,4 +3696,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "ff26e4708107a10975b7314bcdf50b895fa5345695a1e56207830f98d2c23d3f"
+content-hash = "c990e5b895fd93a56b28501299eca566f2ed12a62104d11769abb3e00e12f1ff"
