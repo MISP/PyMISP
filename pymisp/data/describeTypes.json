@@ -149,6 +149,10 @@
                 "default_category": "Network activity",
                 "to_ids": 1
             },
+            "dom-hash": {
+                "default_category": "Network activity",
+                "to_ids": 1
+            },
             "pattern-in-file": {
                 "default_category": "Payload installation",
                 "to_ids": 1
@@ -796,6 +800,7 @@
             "bro",
             "zeek",
             "community-id",
+            "dom-hash",
             "pattern-in-file",
             "pattern-in-traffic",
             "pattern-in-memory",
@@ -1293,7 +1298,8 @@
                 "favicon-mmh3",
                 "dkim",
                 "dkim-signature",
-                "ssh-fingerprint"
+                "ssh-fingerprint",
+                "dom-hash"
             ],
             "Payload type": [
                 "comment",
@@ -1377,7 +1383,8 @@
                 "other",
                 "cortex",
                 "anonymised",
-                "community-id"
+                "community-id",
+                "dom-hash"
             ],
             "Financial fraud": [
                 "btc",

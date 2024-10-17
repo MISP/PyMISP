@@ -2,11 +2,178 @@ Changelog
 =========
 
 
+v2.5.0 (2024-10-04)
+-------------------
+
+Changes
+~~~~~~~
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [tests] misp_instance_version_master now uses the 2.5 branch.
+  [iglocska]
+
+Fix
+~~~
+- Make mypy happy. [Raphaël Vinot]
+
+
+v2.4.198 (2024-09-13)
+---------------------
+
+Changes
+~~~~~~~
+- Re-Bump changelog. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Only include the changelog in the sdist package. [Raphaël Vinot]
+
+  Related #1295
+- [data] describeTypes.json updated. [Alexandre Dulaunoy]
+
+Other
+~~~~~
+- Openioc.py is not a script, but had exec bit. [Sebastian Wagner]
+
+  the file openioc can only be used as module and as part of a package,
+  has no instructions for direct execution and is therefor not a script
+  for direct execution
+
+  this removes the executable bit from the file
+
+
+v2.4.197 (2024-09-02)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version, templates. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+
+Fix
+~~~
+- Avoid printing huge log when a request fails. [Raphaël Vinot]
+
+  fix #1286
+
+
+v2.4.196 (2024-08-21)
+---------------------
+
+New
+~~~
+- Add pre-commit file. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Remove broken config. [Raphaël Vinot]
+
+
+v2.4.195 (2024-07-27)
+---------------------
+
+New
+~~~
+- Add delete role, test suite for roles. [Raphaël Vinot]
+- Test publish & search. [Raphaël Vinot]
+- Add delete role, test suite for roles. [Raphaël Vinot]
+- Test publish & search. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump Changelog. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump Changelog (issue with template) [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [publish tests] further debugging. [iglocska]
+- [publish test] check if the publishing actually worked as intended.
+  [iglocska]
+- [tests] speculative fix for the published search. [iglocska]
+
+  - locally it seems to work as intended, curious what is going on here
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [publish tests] further debugging. [iglocska]
+- [publish test] check if the publishing actually worked as intended.
+  [iglocska]
+- [tests] speculative fix for the published search. [iglocska]
+
+  - locally it seems to work as intended, curious what is going on here
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Bump objects (invalid template) [Raphaël Vinot]
+- Do not let a user pass a full dict as tagname. [Raphaël Vinot]
+- [publish tests] fixed invalid setting name for disabling background
+  processing. [iglocska]
+- [publish test] invalid path for the publishing outcome in the
+  response. [iglocska]
+- [publish test] fixed. [iglocska]
+
+  - was incorrect as it triggered a background processed publishing, which can take time
+- Do not let a user pass a full dict as tagname. [Raphaël Vinot]
+- Do not let a user pass a full dict as tagname. [Raphaël Vinot]
+- [publish tests] fixed invalid setting name for disabling background
+  processing. [iglocska]
+- [publish test] invalid path for the publishing outcome in the
+  response. [iglocska]
+- [publish test] fixed. [iglocska]
+
+  - was incorrect as it triggered a background processed publishing, which can take time
+
+Other
+~~~~~
+- Re-naming variables to make tests happy. [Tobias Mainka]
+- Added support to add or update a MISP role. [Tobias Mainka]
+- Update tests. [Raphaël Vinot]
+- Build(deps): bump certifi from 2024.6.2 to 2024.7.4. [dependabot[bot]]
+
+  Bumps [certifi](https://github.com/certifi/python-certifi) from 2024.6.2 to 2024.7.4.
+  - [Commits](https://github.com/certifi/python-certifi/compare/2024.06.02...2024.07.04)
+
+  ---
+  updated-dependencies:
+  - dependency-name: certifi
+    dependency-type: indirect
+  ...
+- MANIFEST.in does not seem to have an effect any longer. [Ulrik Haugen]
+- Include docs, examples and tests in sdist. [Ulrik Haugen]
+- Re-naming variables to make tests happy. [Tobias Mainka]
+- Added support to add or update a MISP role. [Tobias Mainka]
+- Update tests. [Raphaël Vinot]
+- Build(deps): bump certifi from 2024.6.2 to 2024.7.4. [dependabot[bot]]
+
+  Bumps [certifi](https://github.com/certifi/python-certifi) from 2024.6.2 to 2024.7.4.
+  - [Commits](https://github.com/certifi/python-certifi/compare/2024.06.02...2024.07.04)
+
+  ---
+  updated-dependencies:
+  - dependency-name: certifi
+    dependency-type: indirect
+  ...
+- Feat: Adds methods to get attribute by id/uuid. [Sura De Silva]
+
+
 v2.4.194 (2024-06-21)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 

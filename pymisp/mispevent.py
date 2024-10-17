@@ -2260,13 +2260,47 @@ class MISPRole(AbstractMISP):
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         super().__init__(**kwargs)
-        self.perm_admin: int
-        self.perm_site_admin: int
+        self.name: str
+        self.perm_add: bool
+        self.perm_modify: bool
+        self.perm_modify_org: bool
+        self.perm_publish: bool
+        self.perm_delegate: bool
+        self.perm_sync: bool
+        self.perm_admin: bool
+        self.perm_audit: bool
+        self.perm_auth: bool
+        self.perm_site_admin: bool
+        self.perm_regexp_access: bool
+        self.perm_tagger: bool
+        self.perm_template: bool
+        self.perm_sharing_group: bool
+        self.perm_tag_editor: bool
+        self.perm_sighting: bool
+        self.perm_object_template: bool
+        self.default_role: bool
+        self.memory_limit: str | int
+        self.max_execution_time: str | int
+        self.restricted_to_site_admin: bool
+        self.perm_publish_zmq: bool
+        self.perm_publish_kafka: bool
+        self.perm_decaying: bool
+        self.enforce_rate_limit: bool
+        self.rate_limit_count: str | int
+        self.perm_galaxy_editor: bool
+        self.perm_warninglist: bool
+        self.perm_view_feed_correlations: bool
+        self.perm_analyst_data: bool
+        self.permission: str
+        self.permission_description: str
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if 'Role' in kwargs:
             kwargs = kwargs['Role']
         super().from_dict(**kwargs)
+
+    def __repr__(self) -> str:
+        return '<{self.__class__.__name__}({self.name})'.format(self=self)
 
 
 class MISPServer(AbstractMISP):

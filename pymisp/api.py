@@ -40,7 +40,7 @@ if sys.platform == 'linux':
     # Enable TCP keepalive by default on every requests
     import socket
     from urllib3.connection import HTTPConnection
-    HTTPConnection.default_socket_options = HTTPConnection.default_socket_options + [  # type: ignore
+    HTTPConnection.default_socket_options = HTTPConnection.default_socket_options + [
         (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),  # enable keepalive
         (socket.SOL_TCP, socket.TCP_KEEPIDLE, 30),  # Start pinging after 30s of idle time
         (socket.SOL_TCP, socket.TCP_KEEPINTVL, 10),  # ping every 10s
@@ -315,7 +315,7 @@ class PyMISP:
     @property
     def misp_instance_version_master(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Get the most recent version from github"""
-        r = requests.get('https://raw.githubusercontent.com/MISP/MISP/2.4/VERSION.json')
+        r = requests.get('https://raw.githubusercontent.com/MISP/MISP/2.5/VERSION.json')
         if r.status_code == 200:
             master_version = loads(r.content)
             return {'version': '{}.{}.{}'.format(master_version['major'], master_version['minor'], master_version['hotfix'])}
@@ -2638,7 +2638,7 @@ class PyMISP:
             for _r in self.roles(pythonify=True):
                 if not isinstance(_r, MISPRole):
                     continue
-                if _r.default_role:  # type: ignore
+                if _r.default_role:
                     role_id = get_uuid_or_id_from_abstract_misp(_r)
                     break
             else:
@@ -2696,6 +2696,40 @@ class PyMISP:
             to_return.append(nr)
         return to_return
 
+    def add_role(self, role: MISPRole, pythonify: bool = False) -> dict[str, Any] | MISPRole:
+        """Add a new role
+
+        :param role: role to add
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        r = self._prepare_request('POST', 'admin/roles/add', data=role)
+        role_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in role_j:
+            return role_j
+        new_misp_role = MISPRole()
+        new_misp_role.from_dict(**role_j)
+        return new_misp_role
+
+    def update_role(self, role: MISPRole, role_id: int | None = None, pythonify: bool = False) -> dict[str, Any] | MISPRole:
+        """Update a role on a MISP instance
+
+        :param role: role to update
+        :param role_id: id to update
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        if role_id is None:
+            uid = get_uuid_or_id_from_abstract_misp(role)
+        else:
+            uid = get_uuid_or_id_from_abstract_misp(role_id)
+        url = f'admin/roles/edit/{uid}'
+        r = self._prepare_request('POST', url, data=role)
+        updated_role = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_role:
+            return updated_role
+        updated_misp_role = MISPRole()
+        updated_misp_role.from_dict(**updated_role)
+        return updated_misp_role
+
     def set_default_role(self, role: MISPRole | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
         """Set a default role for the new user accounts
 
@@ -2704,6 +2738,15 @@ class PyMISP:
         role_id = get_uuid_or_id_from_abstract_misp(role)
         url = urljoin(self.root_url, f'admin/roles/set_default/{role_id}')
         response = self._prepare_request('POST', url)
+        return self._check_json_response(response)
+
+    def delete_role(self, role: MISPRole | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete a role
+
+        :param role: role to delete
+        """
+        role_id = get_uuid_or_id_from_abstract_misp(role)
+        response = self._prepare_request('POST', f'admin/roles/delete/{role_id}')
         return self._check_json_response(response)
 
     # ## END Role ###
@@ -3789,7 +3832,7 @@ class PyMISP:
 
         raise PyMISPError('The misp_entity must be MISPEvent, MISPObject or MISPAttribute')
 
-    def tag(self, misp_entity: AbstractMISP | str | dict[str, Any], tag: MISPTag | str,
+    def tag(self, misp_entity: AbstractMISP | str | dict[str, Any], tag: MISPTag | str | dict[str, Any],
             local: bool = False, relationship_type: str | None = None) -> dict[str, Any] | list[dict[str, Any]]:
         """Tag an event or an attribute.
 
@@ -3801,8 +3844,12 @@ class PyMISP:
         uuid = get_uuid_or_id_from_abstract_misp(misp_entity)
         if isinstance(tag, MISPTag):
             tag_name = tag.name if 'name' in tag else ""
+        elif isinstance(tag, dict):
+            tag_name = tag.get('name', '')
         else:
             tag_name = tag
+        if not tag_name:
+            raise PyMISPError('tag must be a MISPTag object, a dict with a name key, or a string, and it cannot be empty.')
         to_post = {'uuid': uuid, 'tag': tag_name, 'local': local}
         if relationship_type:
             to_post['relationship_type'] = relationship_type
@@ -3938,7 +3985,10 @@ class PyMISP:
         """Check if the response from the server is not an unexpected error"""
         if response.status_code >= 500:
             headers_without_auth = {h_name: h_value for h_name, h_value in response.request.headers.items() if h_value != self.key}
-            logger.critical(everything_broken.format(headers_without_auth, response.request.body, response.text))
+            if logger.level == logging.DEBUG:
+                logger.debug(everything_broken.format(headers_without_auth, response.request.body, response.text))
+            else:
+                logger.critical(everything_broken.format(headers_without_auth, response.request.body, f'{response.text[:1000]}... (enable debug mode for more details)'))
             raise MISPServerError(f'Error code 500:\n{response.text}')
 
         if 400 <= response.status_code < 500:
