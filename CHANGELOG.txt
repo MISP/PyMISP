@@ -5,11 +5,20 @@ Changelog
 v2.5.1 (2024-10-17)
 -------------------
 
+New
+~~~
+- Onion-address type. [Raphaël Vinot]
+
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Skip trying to install doc in python 3.9. [Raphaël Vinot]
 
 
 v2.5.0 (2024-10-04)
