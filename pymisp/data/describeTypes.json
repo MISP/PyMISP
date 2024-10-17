@@ -760,6 +760,10 @@
             "anonymised": {
                 "default_category": "Other",
                 "to_ids": 0
+            },
+            "onion-address": {
+                "default_category": "Network activity",
+                "to_ids": 1
             }
         },
         "types": [
@@ -952,7 +956,8 @@
             "chrome-extension-id",
             "cortex",
             "boolean",
-            "anonymised"
+            "anonymised",
+            "onion-address"
         ],
         "categories": [
             "Internal reference",
@@ -1098,7 +1103,8 @@
                 "mobile-application-id",
                 "chrome-extension-id",
                 "whois-registrant-email",
-                "anonymised"
+                "anonymised",
+                "onion-address"
             ],
             "Artifacts dropped": [
                 "md5",
@@ -1234,7 +1240,6 @@
                 "x509-fingerprint-md5",
                 "x509-fingerprint-sha256",
                 "azure-application-id",
-                "azure-application-id",
                 "mobile-application-id",
                 "chrome-extension-id",
                 "other",
@@ -1299,7 +1304,8 @@
                 "dkim",
                 "dkim-signature",
                 "ssh-fingerprint",
-                "dom-hash"
+                "dom-hash",
+                "onion-address"
             ],
             "Payload type": [
                 "comment",
@@ -1384,7 +1390,8 @@
                 "cortex",
                 "anonymised",
                 "community-id",
-                "dom-hash"
+                "dom-hash",
+                "onion-address"
             ],
             "Financial fraud": [
                 "btc",
