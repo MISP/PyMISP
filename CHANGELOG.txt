@@ -2,11 +2,22 @@ Changelog
 =========
 
 
+v2.5.1 (2024-10-17)
+-------------------
+
+Changes
+~~~~~~~
+- Bump objects. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+
 v2.5.0 (2024-10-04)
 -------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - [tests] misp_instance_version_master now uses the 2.5 branch.
