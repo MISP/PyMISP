@@ -2599,7 +2599,7 @@ class MISPNote(AnalystDataBehaviorMixin, MISPAnalystData):
         super().__init__(**kwargs)
 
     def from_dict(self, contained=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        if not conainted and 'Note' in kwargs:
+        if not contained and 'Note' in kwargs:
             kwargs = kwargs['Note']
         self.note = kwargs.pop('note', None)
         if self.note is None:
