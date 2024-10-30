@@ -67,7 +67,7 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         self.edited = True
         return the_note
 
-    def add_opinion(self, opinion: int, comment: str | None = None, **kwargs) -> MISPNote:  # type: ignore[no-untyped-def]
+    def add_opinion(self, opinion: int, comment: str | None = None, **kwargs) -> MISPOpinion:  # type: ignore[no-untyped-def]
         the_opinion = MISPOpinion()
         the_opinion.from_dict(opinion=opinion, comment=comment,
                               object_uuid=self.uuid, object_type=self.analyst_data_object_type,
@@ -76,7 +76,7 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         self.edited = True
         return the_opinion
 
-    def add_relationship(self, related_object_type: AbstractMISP | str, related_object_uuid: str | None, relationship_type: str, **kwargs) -> MISPNote:  # type: ignore[no-untyped-def]
+    def add_relationship(self, related_object_type: AbstractMISP | str, related_object_uuid: str | None, relationship_type: str, **kwargs) -> MISPRelationship:  # type: ignore[no-untyped-def]
         the_relationship = MISPRelationship()
         the_relationship.from_dict(related_object_type=related_object_type, related_object_uuid=related_object_uuid,
                                    relationship_type=relationship_type,
