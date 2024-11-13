@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pymisp"
-version = "2.5.2.dev0"
+version = "2.5.2.dev1"
 description = "Python API for MISP."
 authors = ["Raphaël Vinot <raphael.vinot@circl.lu>"]
 license = "BSD-2-Clause"
@@ -61,7 +61,7 @@ docutils = {version = "^0.21.1", optional = true, python = ">=3.10"}
 recommonmark = {version = "^0.7.1", optional = true, python = ">=3.10"}
 reportlab = {version = "^4.2.5", optional = true}
 pyfaup = {version = "^1.2", optional = true}
-publicsuffixlist = {version = "^1.0.2.20241108", optional = true}
+publicsuffixlist = {version = "^1.0.2.20241113", optional = true}
 urllib3 = {extras = ["brotli"], version = "*", optional = true}
 Sphinx = [
     {version = "^8", python = ">=3.10", optional = true}
