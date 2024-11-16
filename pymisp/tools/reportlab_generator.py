@@ -12,6 +12,8 @@ from pathlib import Path
 import sys
 import os
 
+import requests
+
 if sys.version_info.major >= 3:
     from html import escape
 else:
@@ -410,9 +412,19 @@ def internationalize_font(config=None):
             NotoSansCJKtc - Medium.ttf
         '''
         font_path = Path(sys.modules['pymisp'].__file__).parent / 'tools' / 'pdf_fonts' / 'Noto_TTF'
-
         noto_bold = font_path / "NotoSansCJKtc-Bold.ttf"
         noto = font_path / "NotoSansCJKtc-DemiLight.ttf"
+
+        if not font_path.is_dir() or not noto_bold.is_file() or not noto.is_file():
+            font_path.mkdir(parents=True, exist_ok=True)
+            if not noto_bold.is_file():
+                bf = requests.get('https://github.com/MISP/pdf_fonts/raw/refs/heads/master/Noto_TTF/NotoSansCJKtc-Bold.ttf')
+                with open(noto_bold, 'wb') as f:
+                    f.write(bf.content)
+            if not noto.is_file():
+                rf = requests.get('https://github.com/MISP/pdf_fonts/raw/refs/heads/master/Noto_TTF/NotoSansCJKtc-DemiLight.ttf')
+                with open(noto, 'wb') as f:
+                    f.write(rf.content)
 
         if noto_bold.is_file() and noto.is_file():
             registerFont(TTFont("Noto", noto))
@@ -421,7 +433,7 @@ def internationalize_font(config=None):
             FIRST_COL_FONT = 'Noto-bold'
             SECOND_COL_FONT = 'Noto'
         else:
-            logger.error(f"Trying to load a custom (internationalization) font, unable to access the file: {noto_bold}")
+            logger.error(f"Trying to load a custom (internationalization) font, unable to access the file: {noto_bold} / {noto}")
 
 
 def get_table_styles():
