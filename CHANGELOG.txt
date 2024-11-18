@@ -2,6 +2,51 @@ Changelog
 =========
 
 
+v2.5.2 (2024-11-18)
+-------------------
+
+New
+~~~
+- Publish to PyPi on release. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Skip PyMISP version check. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Bump version, deps, templates. [Raphaël Vinot]
+- Bump version, test for GH action release. [Raphaël Vinot]
+- Drop python 3.8, add python 3.13. [Raphaël Vinot]
+- Bump templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Remove fonts from submodules, on-demand download if needed. [Raphaël
+  Vinot]
+
+Fix
+~~~
+- Avoid exception on dev releases. [Raphaël Vinot]
+- Template versions in tests. [Raphaël Vinot]
+- [AnalystData] A quick and simple typing fix. [Christian Studer]
+
+Other
+~~~~~
+- Build(deps): bump codecov/codecov-action from 4 to 5.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 4 to 5.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v4...v5)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Update pytest.yml for python 3.13. [Raphaël Vinot]
+
+
 v2.5.1 (2024-10-17)
 -------------------
 
@@ -11,6 +56,7 @@ New
 
 Changes
 ~~~~~~~
+- Re-bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
