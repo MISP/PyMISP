@@ -2202,6 +2202,7 @@ class TestComprehensive(unittest.TestCase):
             for typ in mapping:
                 self.assertIn(typ, remote_types)
 
+    @unittest.skip("Tested elsewhere.")
     def test_versions(self) -> None:
         self.assertEqual(self.user_misp_connector.version, self.user_misp_connector.pymisp_version_master)
         self.assertEqual(self.user_misp_connector.misp_instance_version['version'],
