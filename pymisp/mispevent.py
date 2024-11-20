@@ -38,6 +38,9 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         super().__init__(**kwargs)
         self.uuid: str  # Created in the child class
         self._analyst_data_object_type: str  # Must be defined in the child class
+        self.Note: list[MISPNote] = []
+        self.Opinion: list[MISPOpinion] = []
+        self.Relationship: list[MISPRelationship] = []
 
     @property
     def analyst_data_object_type(self) -> str:
@@ -333,9 +336,6 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         self.Sighting: list[MISPSighting] = []
         self.Tag: list[MISPTag] = []
         self.Galaxy: list[MISPGalaxy] = []
-        self.Note: list[MISPNote] = []
-        self.Opinion: list[MISPOpinion] = []
-        self.Relationship: list[MISPRelationship] = []
 
         self.expand: str
         self.timestamp: float | int | datetime
@@ -792,9 +792,6 @@ class MISPObject(AnalystDataBehaviorMixin):
         self.ObjectReference: list[MISPObjectReference] = []
         self._standalone: bool = False
         self.Attribute: list[MISPObjectAttribute] = []
-        self.Note: list[MISPNote] = []
-        self.Opinion: list[MISPOpinion] = []
-        self.Relationship: list[MISPRelationship] = []
         self.SharingGroup: MISPSharingGroup
         self._default_attributes_parameters: dict[str, Any]
         if isinstance(default_attributes_parameters, MISPAttribute):
@@ -1181,9 +1178,6 @@ class MISPEventReport(AnalystDataBehaviorMixin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.uuid: str = str(uuid.uuid4())
-        self.Note: list[MISPNote] = []
-        self.Opinion: list[MISPOpinion] = []
-        self.Relationship: list[MISPRelationship] = []
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if 'EventReport' in kwargs:
@@ -1592,9 +1586,6 @@ class MISPEvent(AnalystDataBehaviorMixin):
         self.EventReport: list[MISPEventReport] = []
         self.Tag: list[MISPTag] = []
         self.Galaxy: list[MISPGalaxy] = []
-        self.Note: list[MISPNote] = []
-        self.Opinion: list[MISPOpinion] = []
-        self.Relationship: list[MISPRelationship] = []
 
         self.publish_timestamp: float | int | datetime
         self.timestamp: float | int | datetime
