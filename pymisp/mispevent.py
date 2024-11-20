@@ -2533,7 +2533,7 @@ class MISPAnalystData(AbstractMISP):
         self.SharingGroup: MISPSharingGroup
         self._analyst_data_object_type: str  # Must be defined in the child class
 
-    def add_note(self, note: str, language: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs) -> MISPNote:
+    def add_note(self, note: str, language: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs: dict[str, Any]) -> MISPNote:
         misp_note = MISPNote()
         if object_uuid is None:
             object_uuid = self.uuid
@@ -2554,7 +2554,7 @@ class MISPAnalystData(AbstractMISP):
         self.edited = True
         return misp_note
 
-    def add_opinion(self, opinion: int, comment: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs) -> MISPOpinion:
+    def add_opinion(self, opinion: int, comment: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs: dict[str, Any]) -> MISPOpinion:
         misp_opinion = MISPOpinion()
         if object_uuid is None:
             object_uuid = self.uuid
