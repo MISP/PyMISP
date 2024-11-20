@@ -2542,36 +2542,52 @@ class MISPAnalystData(AbstractMISP):
         self.SharingGroup: MISPSharingGroup
         self._analyst_data_object_type: str  # Must be defined in the child class
 
-    def add_note(self, note: str, language: str | None = None, **kwargs) -> MISPNote:
+    def add_note(self, note: str, language: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs) -> MISPNote:
         misp_note = MISPNote()
-        object_uuid = kwargs.pop('object_uuid', self.uuid)
-        object_type = kwargs.pop('object_type', self.analyst_data_object_type)
+        if object_uuid is None:
+            object_uuid = self.uuid
+        if object_type is None:
+            object_type = self.analyst_data_object_type
+        if parent is None and hasattr(self, 'parent'):
+            parent = self.parent
         misp_note.from_dict(
             note=note, language=language, object_uuid=object_uuid,
-            object_type=object_type, parent=kwargs.pop('parent', self.parent),
-            contained=True, **kwargs
+            object_type=object_type, parent=parent, contained=True, **kwargs
         )
-        self.parent.notes.append(misp_note)
+        if parent is None:
+            if not hasattr(self, 'Note'):
+                self.Note: list[MISPNote] = []
+            self.Note.append(misp_note)
+        else:
+            self.parent.notes.append(misp_note)
         self.edited = True
         return misp_note
 
-    def add_opinion(self, opinion: int, comment: str | None = None, **kwargs) -> MISPOpinion:
+    def add_opinion(self, opinion: int, comment: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs) -> MISPOpinion:
         misp_opinion = MISPOpinion()
-        object_uuid = kwargs.pop('object_uuid', self.uuid)
-        object_type = kwargs.pop('object_type', self.analyst_data_object_type)
+        if object_uuid is None:
+            object_uuid = self.uuid
+        if object_type is None:
+            object_type = self.analyst_data_object_type
+        if parent is None and hasattr(self, 'parent'):
+            parent = self.parent
         misp_opinion.from_dict(
             opinion=opinion, comment=comment, object_uuid=object_uuid,
-            object_type=object_type, parent=kwargs.pop('parent', self.parent),
-            contained=True, **kwargs
+            object_type=object_type, parent=parent, contained=True, **kwargs
         )
-        self.parent.opinions.append(misp_opinion)
+        if parent is None:
+            if not hasattr(self, 'Opinion'):
+                self.Opinion: list[MISPOpinion] = []
+            self.Opinion.append(misp_opinion)
+        else:
+            self.parent.opinions.append(misp_opinion)
         self.edited = True
         return misp_opinion
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         notes = kwargs.pop('Note', [])
         opinions = kwargs.pop('Opinion', [])
-        self.__parent = kwargs.pop('parent')
+        self.__parent = kwargs.pop('parent', None)
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
             self.distribution = int(self.distribution)
@@ -2626,11 +2642,9 @@ class MISPAnalystData(AbstractMISP):
         super().from_dict(**kwargs)
 
         for note in notes:
-            note_value = note.pop('note')
-            self.add_note(note_value, parent=self.parent, **note)
+            self.add_note(**note)
         for opinion in opinions:
-            opinion_value = opinion.pop('opinion')
-            self.add_opinion(opinion_value, parent=self.parent, **opinion)
+            self.add_opinion(**opinion)
 
     def _set_default(self) -> None:
         if not hasattr(self, 'created'):
