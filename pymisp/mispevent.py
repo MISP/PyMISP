@@ -1559,7 +1559,8 @@ class MISPGalaxy(AbstractMISP):
 class MISPEvent(AnalystDataBehaviorMixin):
 
     _fields_for_feed: set[str] = {'uuid', 'info', 'threat_level_id', 'analysis', 'timestamp',
-                                  'publish_timestamp', 'published', 'date', 'extends_uuid'}
+                                  'publish_timestamp', 'published', 'date', 'extends_uuid',
+                                  'protected'}
 
     _analyst_data_object_type = 'Event'
 
@@ -1581,6 +1582,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
         self.EventReport: list[MISPEventReport] = []
         self.Tag: list[MISPTag] = []
         self.Galaxy: list[MISPGalaxy] = []
+        self.CryptographicKey: list[MISPCryptographicKey] = []
 
         self.publish_timestamp: float | int | datetime
         self.timestamp: float | int | datetime
@@ -1649,13 +1651,14 @@ class MISPEvent(AnalystDataBehaviorMixin):
                 to_return += attribute.hash_values(algorithm)
         return to_return
 
-    def to_feed(self, valid_distributions: list[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False, with_distribution: bool=False, with_local_tags: bool = True, with_event_reports: bool = True) -> dict[str, Any]:
+    def to_feed(self, valid_distributions: list[int] = [0, 1, 2, 3, 4, 5], with_meta: bool = False, with_distribution: bool=False, with_local_tags: bool = True, with_event_reports: bool = True, with_cryptographic_keys: bool = True) -> dict[str, Any]:
         """ Generate a json output for MISP Feed.
 
         :param valid_distributions: only makes sense if the distribution key is set; i.e., the event is exported from a MISP instance.
         :param with_distribution: exports distribution and Sharing Group info; otherwise all SharingGroup information is discarded (protecting privacy)
         :param with_local_tags: tag export includes local exportable tags along with global exportable tags
         :param with_event_reports: include event reports in the returned MISP event
+        :param with_cryptographic_keys: include the associated cryptographic keys in the returned protected MISP event
         """
         required = ['info', 'Orgc']
         for r in required:
@@ -1719,6 +1722,13 @@ class MISPEvent(AnalystDataBehaviorMixin):
                     event_report.pop('SharingGroup', None)
                     event_report.pop('sharing_group_id', None)
                 to_return['EventReport'].append(event_report.to_dict())
+        
+        if with_cryptographic_keys and self.cryptographic_keys:
+            to_return['CryptographicKey'] = []
+            for cryptographic_key in self.cryptographic_keys:
+                cryptographic_key.pop('parent_id', None)
+                cryptographic_key.pop('id', None)
+                to_return['CryptographicKey'].append(cryptographic_key.to_dict())
 
         return {'Event': to_return}
 
@@ -1755,6 +1765,10 @@ class MISPEvent(AnalystDataBehaviorMixin):
     @property
     def event_reports(self) -> list[MISPEventReport]:
         return self.EventReport
+    
+    @property
+    def cryptographic_keys(self) -> list[MISPCryptographicKey]:
+        return self.CryptographicKey
 
     @property
     def shadow_attributes(self) -> list[MISPShadowAttribute]:
@@ -1891,6 +1905,8 @@ class MISPEvent(AnalystDataBehaviorMixin):
             [self.add_galaxy(**e) for e in kwargs.pop('Galaxy')]
         if kwargs.get('EventReport'):
             [self.add_event_report(**e) for e in kwargs.pop('EventReport')]
+        if kwargs.get('CryptographicKey'):
+            [self.add_cryprographic_key(**e) for e in kwargs.pop('CryptographicKey')]
 
         # All other keys
         if kwargs.get('id'):
@@ -2040,6 +2056,15 @@ class MISPEvent(AnalystDataBehaviorMixin):
         self.event_reports.append(event_report)
         self.edited = True
         return event_report
+
+    def add_cryprographic_key(self, parent_type: str, key_data: str, type: str, uuid: str, fingerprint: str, timestamp: str, **kwargs) -> MISPCryptographicKey:  # type: ignore[no-untyped-def]
+        """Add a Cryptographic Key. parent_type, key_data, type, uuid, fingerprint, timestamp are required but you can pass all
+        other parameters supported by MISPEventReport"""
+        cryptographic_key = MISPCryptographicKey()
+        cryptographic_key.from_dict(parent_type=parent_type, key_data=key_data, type=type, uuid=uuid, fingerprint=fingerprint, timestamp=timestamp, **kwargs)
+        self.cryptographic_keys.append(cryptographic_key)
+        self.edited = True
+        return cryptographic_key
 
     def add_galaxy(self, galaxy: MISPGalaxy | dict[str, Any] | None = None, **kwargs) -> MISPGalaxy:  # type: ignore[no-untyped-def]
         """Add a galaxy and sub-clusters into an event, either by passing
@@ -2225,6 +2250,11 @@ class MISPWarninglist(AbstractMISP):
             kwargs = kwargs['Warninglist']
         super().from_dict(**kwargs)
 
+class MISPCryptographicKey(AbstractMISP):
+    def from_dict(self, **kwargs) -> None: # type: ignore[no-untyped-def]
+        if 'CryptographicKey' in kwargs:
+            kwargs = kwargs['CryptographicKey']
+        super().from_dict(**kwargs)
 
 class MISPTaxonomy(AbstractMISP):
 
