@@ -5,11 +5,16 @@ import sys
 import json
 import os
 from pymisp import ExpandedPyMISP
-from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
+from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels, with_signatures
 try:
     from settings import with_distribution
 except ImportError:
     with_distribution = False
+
+try:
+    from settings import with_signatures
+except ImportError:
+    with_signatures = False
 
 try:
     from settings import with_local_tags
@@ -39,14 +44,31 @@ def init():
     return ExpandedPyMISP(url, key, ssl)
 
 
-def saveEvent(event):
+def saveEvent(event, misp):
+    stringified_event = json.dumps(event, indent=2)
+    if with_signatures and event['Event'].get('protected'):
+        signature = getSignature(stringified_event, misp)
+        try:
+            with open(os.path.join(outputdir, f'{event["Event"]["uuid"]}.asc'), 'w') as f:
+                f.write(signature)
+        except Exception as e:
+            print(e)
+            sys.exit('Could not create the event signature dump.')
+
     try:
         with open(os.path.join(outputdir, f'{event["Event"]["uuid"]}.json'), 'w') as f:
-            json.dump(event, f, indent=2)
+            f.write(stringified_event)
     except Exception as e:
         print(e)
         sys.exit('Could not create the event dump.')
 
+def getSignature(stringified_event, misp):
+    try:
+        signature = misp.direct_call('/cryptographicKeys/serverSign', stringified_event)
+        return signature
+    except Exception as e:
+        print(e)
+        sys.exit('Could not get the signature for the event from the MISP instance. Perhaps the user does not have the necessary permissions.')
 
 def saveHashes(hashes):
     try:
@@ -79,6 +101,7 @@ if __name__ == '__main__':
         sys.exit("No events returned.")
     manifest = {}
     hashes = []
+    signatures = []
     counter = 1
     total = len(events)
     for event in events:
@@ -97,7 +120,7 @@ if __name__ == '__main__':
             continue
         hashes += [[h, e.uuid] for h in e_feed['Event'].pop('_hashes')]
         manifest.update(e_feed['Event'].pop('_manifest'))
-        saveEvent(e_feed)
+        saveEvent(e_feed, misp)
         print("Event " + str(counter) + "/" + str(total) + " exported.")
         counter += 1
     saveManifest(manifest)
