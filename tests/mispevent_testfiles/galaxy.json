@@ -1,0 +1,25 @@
+{
+    "uuid": "c5f2dfb4-21a1-42d8-a452-1d3c36a204ff",
+    "name": "Tea Matrix",
+    "type": "tea-matrix",
+    "description": "Tea Matrix",
+    "namespace": "tea-matrix",
+    "GalaxyCluster": [
+        {
+            "collection_uuid": "7eacd736-b093-4cc0-a56c-5f84de725dfb",
+            "type": "tea-matrix",
+            "value": "Milk in tea",
+            "tag_name": "misp-galaxy:tea-matrix=\"Milk in tea\"",
+            "description": "Milk in tea",
+            "uuid": "24430dc6-9c27-4b3c-a5e7-6dda478fffa0",
+            "distribution": "3",
+            "default": true,
+            "meta": {
+                "kill_chain": [
+                    "tea:black"
+                ]
+            },
+            "relationship_type": "ennemy-of"
+        }
+    ]
+}

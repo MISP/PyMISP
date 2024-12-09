@@ -8,12 +8,10 @@ from pymisp.tools.abstractgenerator import AbstractMISPObjectGenerator
 class CowrieMISPObject(AbstractMISPObjectGenerator):
     def __init__(self, dico_val, **kargs):
         self._dico_val = dico_val
-        self.name = "cowrie"
-
         #  Enforce attribute date with timestamp
         super(CowrieMISPObject, self).__init__('cowrie',
-            default_attributes_parameters={'timestamp': int(time.time())},
-            **kargs)
+                                               default_attributes_parameters={'timestamp': int(time.time())},
+                                               **kargs)
         self.generate_attributes()
 
     def generate_attributes(self):

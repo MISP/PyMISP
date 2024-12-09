@@ -1,0 +1,110 @@
+<stix:STIX_Package
+	xmlns:cyboxCommon="http://cybox.mitre.org/common-2"
+	xmlns:cybox="http://cybox.mitre.org/cybox-2"
+	xmlns:cyboxVocabs="http://cybox.mitre.org/default_vocabularies-2"
+	xmlns:AccountObj="http://cybox.mitre.org/objects#AccountObject-2"
+	xmlns:ArtifactObj="http://cybox.mitre.org/objects#ArtifactObject-2"
+	xmlns:ASObj="http://cybox.mitre.org/objects#ASObject-1"
+	xmlns:AddressObj="http://cybox.mitre.org/objects#AddressObject-2"
+	xmlns:PortObj="http://cybox.mitre.org/objects#PortObject-2"
+	xmlns:DomainNameObj="http://cybox.mitre.org/objects#DomainNameObject-1"
+	xmlns:EmailMessageObj="http://cybox.mitre.org/objects#EmailMessageObject-2"
+	xmlns:FileObj="http://cybox.mitre.org/objects#FileObject-2"
+	xmlns:HTTPSessionObj="http://cybox.mitre.org/objects#HTTPSessionObject-2"
+	xmlns:HostnameObj="http://cybox.mitre.org/objects#HostnameObject-1"
+	xmlns:MutexObj="http://cybox.mitre.org/objects#MutexObject-2"
+	xmlns:PipeObj="http://cybox.mitre.org/objects#PipeObject-2"
+	xmlns:URIObj="http://cybox.mitre.org/objects#URIObject-2"
+	xmlns:WinRegistryKeyObj="http://cybox.mitre.org/objects#WinRegistryKeyObject-2"
+	xmlns:WinServiceObj="http://cybox.mitre.org/objects#WinServiceObject-2"
+	xmlns:NetworkConnectionObj="http://cybox.mitre.org/objects#NetworkConnectionObject-2"
+	xmlns:NetworkSocketObj="http://cybox.mitre.org/objects#NetworkSocketObject-2"
+	xmlns:SocketAddressObj="http://cybox.mitre.org/objects#SocketAddressObject-1"
+	xmlns:SystemObj="http://cybox.mitre.org/objects#SystemObject-2"
+	xmlns:ProcessObj="http://cybox.mitre.org/objects#ProcessObject-2"
+	xmlns:X509CertificateObj="http://cybox.mitre.org/objects#X509CertificateObject-2"
+	xmlns:WhoisObj="http://cybox.mitre.org/objects#WhoisObject-2"
+	xmlns:WinExecutableFileObj="http://cybox.mitre.org/objects#WinExecutableFileObject-2"
+	xmlns:UnixUserAccountObj="http://cybox.mitre.org/objects#UnixUserAccountObject-2"
+	xmlns:UserAccountObj="http://cybox.mitre.org/objects#UserAccountObject-2"
+	xmlns:WinUserAccountObj="http://cybox.mitre.org/objects#WinUserAccountObject-2"
+	xmlns:CustomObj="http://cybox.mitre.org/objects#CustomObject-1"
+	xmlns:marking="http://data-marking.mitre.org/Marking-1"
+	xmlns:simpleMarking="http://data-marking.mitre.org/extensions/MarkingStructure#Simple-1"
+	xmlns:tlpMarking="http://data-marking.mitre.org/extensions/MarkingStructure#TLP-1"
+	xmlns:et="http://stix.mitre.org/ExploitTarget-1"
+	xmlns:incident="http://stix.mitre.org/Incident-1"
+	xmlns:indicator="http://stix.mitre.org/Indicator-2"
+	xmlns:coa="http://stix.mitre.org/CourseOfAction-1"
+	xmlns:ttp="http://stix.mitre.org/TTP-1"
+	xmlns:ta="http://stix.mitre.org/ThreatActor-1"
+	xmlns:stixCommon="http://stix.mitre.org/common-1"
+	xmlns:stixVocabs="http://stix.mitre.org/default_vocabularies-1"
+	xmlns:stix-ciqidentity="http://stix.mitre.org/extensions/Identity#CIQIdentity3.0-1"
+	xmlns:snortTM="http://stix.mitre.org/extensions/TestMechanism#Snort-1"
+	xmlns:stix="http://stix.mitre.org/stix-1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xal="urn:oasis:names:tc:ciq:xal:3"
+	xmlns:xnl="urn:oasis:names:tc:ciq:xnl:3"
+	xmlns:xpil="urn:oasis:names:tc:ciq:xpil:3"
+	xmlns:ORGNAME="https://localhost:8443"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	 id="ORGNAME:Package-fbe98511-c726-4550-bb2f-46752f4e47c7" version="1.1.1" timestamp="2021-08-24T12:53:38.320654">
+    <stix:STIX_Header>
+        <stix:Title>Export from ORGNAME MISP</stix:Title>
+        <stix:Package_Intent xsi:type="stixVocabs:PackageIntentVocab-1.0">Threat Report</stix:Package_Intent>
+    </stix:STIX_Header>
+    <stix:Related_Packages>
+        <stix:Related_Package>
+            <stix:Package id="ORGNAME:STIXPackage-f90bb8c1-8505-4d74-af34-3dcffec6b6d4" version="1.1.1" timestamp="2021-08-24T10:53:13">
+                <stix:STIX_Header>
+                    <stix:Title>Export from ORGNAME MISP © YADA YADA</stix:Title>
+                    <stix:Package_Intent xsi:type="stixVocabs:PackageIntentVocab-1.0">Threat Report</stix:Package_Intent>
+                </stix:STIX_Header>
+                <stix:Incidents>
+                    <stix:Incident id="ORGNAME:Incident-f90bb8c1-8505-4d74-af34-3dcffec6b6d4" timestamp="2021-08-24T10:53:28" xsi:type='incident:IncidentType'>
+                        <incident:Title>Test Stix</incident:Title>
+                        <incident:External_ID source="MISP Event">612</incident:External_ID>
+                        <incident:Time>
+                            <incident:Incident_Discovery precision="second">2021-08-24T00:00:00</incident:Incident_Discovery>
+                            <incident:Incident_Reported precision="second">2021-08-24T10:53:28</incident:Incident_Reported>
+                        </incident:Time>
+                        <incident:Reporter>
+                            <stixCommon:Identity>
+                                <stixCommon:Name>ORGNAME</stixCommon:Name>
+                            </stixCommon:Identity>
+                        </incident:Reporter>
+                        <incident:Status xsi:type="stixVocabs:IncidentStatusVocab-1.0">New</incident:Status>
+                        <incident:Related_Observables>
+                            <incident:Related_Observable>
+                                <stixCommon:Relationship>Network activity</stixCommon:Relationship>
+                                <stixCommon:Observable id="ORGNAME:Address-0853d51f-0fe7-4d35-b3cb-b96bdbc1f0ee">
+                                    <cybox:Object id="ORGNAME:AddressObject-0853d51f-0fe7-4d35-b3cb-b96bdbc1f0ee">
+                                        <cybox:Properties xsi:type="AddressObj:AddressObjectType" category="ipv4-addr" is_source="true" is_destination="false">
+                                            <AddressObj:Address_Value condition="Equals">8.8.8.8</AddressObj:Address_Value>
+                                        </cybox:Properties>
+                                    </cybox:Object>
+                                </stixCommon:Observable>
+                            </incident:Related_Observable>
+                        </incident:Related_Observables>
+                        <incident:History>
+                            <incident:History_Item>
+                                <incident:Journal_Entry time_precision="second">Event Threat Level: High</incident:Journal_Entry>
+                            </incident:History_Item>
+                            <incident:History_Item>
+                                <incident:Journal_Entry time_precision="second">MISP Tag: misp:tool="misp2stix"</incident:Journal_Entry>
+                            </incident:History_Item>
+                        </incident:History>
+                        <incident:Information_Source>
+                            <stixCommon:Identity>
+                                <stixCommon:Name>ORGNAME</stixCommon:Name>
+                            </stixCommon:Identity>
+                        </incident:Information_Source>
+                    </stix:Incident>
+                </stix:Incidents>
+            </stix:Package>
+        </stix:Related_Package>
+    </stix:Related_Packages>
+</stix:STIX_Package>

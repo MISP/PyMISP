@@ -10,7 +10,7 @@ from pymisp import MISPEvent
 
 try:
     from keys import misp_url, misp_key, misp_verifycert
-    from pymisp import ExpandedPyMISP
+    from pymisp import PyMISP
     offline = False
 except ImportError as e:
     offline = True
@@ -22,9 +22,14 @@ Example:
 
     load_csv.py -n file -p /tmp/foo.csv
 
+    CSV sample file: tests/csv_testfiles/valid_fieldnames.csv
+
+
 * If you want to force the fieldnames:
 
     load_csv.py -n file -p /tmp/foo.csv -f SHA1 fileName size-in-bytes
+
+    CSV sample file: tests/csv_testfiles/invalid_fieldnames.csv
 '''
 
 
@@ -35,6 +40,8 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--fieldnames", nargs='*', default=[], help="Fieldnames of the CSV, have to match the object-relation allowed in the template. If empty, the fieldnames of the CSV have to match the template.")
     parser.add_argument("-s", "--skip_fieldnames", action='store_true', help="Skip fieldnames in the CSV.")
     parser.add_argument("-d", "--dump", action='store_true', help="(Debug) Dump the object in the terminal.")
+    parser.add_argument("--delimiter", type=str, default=',', help="Delimiter between firlds in the CSV. Default: ','.")
+    parser.add_argument("--quotechar", type=str, default='"', help="Quote character of the fields in the CSV. Default: '\"'.")
 
     # Interact with MISP
     misp_group = parser.add_mutually_exclusive_group()
@@ -48,7 +55,8 @@ if __name__ == '__main__':
     else:
         has_fieldnames = args.skip_fieldnames
     csv_loader = CSVLoader(template_name=args.object_name, csv_path=args.path,
-                           fieldnames=args.fieldnames, has_fieldnames=has_fieldnames)
+                           fieldnames=args.fieldnames, has_fieldnames=has_fieldnames,
+                           delimiter=args.delimiter, quotechar=args.quotechar)
 
     objects = csv_loader.load()
     if args.dump:
@@ -58,13 +66,13 @@ if __name__ == '__main__':
         if offline:
             print('You are in offline mode, quitting.')
         else:
-            misp = ExpandedPyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
+            misp = PyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
             if args.new_event:
                 event = MISPEvent()
                 event.info = args.new_event
                 for o in objects:
                     event.add_object(**o)
-                new_event = misp.add_event(event)
+                new_event = misp.add_event(event, pythonify=True)
                 if isinstance(new_event, str):
                     print(new_event)
                 elif 'id' in new_event:
@@ -72,9 +80,9 @@ if __name__ == '__main__':
                 else:
                     print('Something went wrong:')
                     print(new_event)
-            else:
+            elif args.update_event:
                 for o in objects:
-                    new_object = misp.add_object(args.update_event, o)
+                    new_object = misp.add_object(args.update_event, o, pythonify=True)
                     if isinstance(new_object, str):
                         print(new_object)
                     elif new_object.attributes:
@@ -82,3 +90,5 @@ if __name__ == '__main__':
                     else:
                         print('Something went wrong:')
                         print(new_event)
+            else:
+                print('you need to pass either a event info field (flag -i), or the event ID you want to update (flag -u)')

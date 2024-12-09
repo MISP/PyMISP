@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from pymisp.tools import GenericObjectGenerator
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
@@ -19,21 +19,8 @@ if __name__ == '__main__':
     parser.add_argument("-l", "--attr_list", required=True, help="List of attributes")
     args = parser.parse_args()
 
-    pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
-    template = pymisp.get_object_templates_list()
-    if 'response' in template.keys():
-        template = template['response']
-    try:
-        template_ids = [x['ObjectTemplate']['id'] for x in template if x['ObjectTemplate']['name'] == args.type]
-        if len(template_ids) > 0:
-            template_id = template_ids[0]
-        else:
-            raise IndexError
-    except IndexError:
-        valid_types = ", ".join([x['ObjectTemplate']['name'] for x in template])
-        print ("Template for type %s not found! Valid types are: %s" % (args.type, valid_types))
-        exit()
+    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
 
     misp_object = GenericObjectGenerator(args.type.replace("|", "-"))
     misp_object.generate_attributes(json.loads(args.attr_list))
-    r = pymisp.add_object(args.event, template_id, misp_object)
+    r = pymisp.add_object(args.event, misp_object)

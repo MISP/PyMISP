@@ -14,7 +14,7 @@ def init(url, key):
 
 def search_sighting(m, context, out=None, **kwargs):
 
-    result = m.sighting_search(context, **kwargs)
+    result = m.search_sightings(context, **kwargs)
     if out is None:
         print(json.dumps(result['response']))
     else:

@@ -4,149 +4,55 @@
 import sys
 import json
 import os
-import hashlib
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
+try:
+    from settings import with_distribution
+except ImportError:
+    with_distribution = False
 
-objectsFields = {
-    'Attribute': {
-        'uuid',
-        'value',
-        'category',
-        'type',
-        'comment',
-        'data',
-        'timestamp',
-        'to_ids',
-        'object_relation'
-    },
-    'Event': {
-        'uuid',
-        'info',
-        'threat_level_id',
-        'analysis',
-        'timestamp',
-        'publish_timestamp',
-        'published',
-        'date'
-    },
-    'Object': {
-        'name',
-        'meta-category',
-        'description',
-        'template_uuid',
-        'template_version',
-        'uuid',
-        'timestamp',
-        'distribution',
-        'sharing_group_id',
-        'comment'
-    },
-    'ObjectReference': {
-        'uuid',
-        'timestamp',
-        'relationship_type',
-        'comment',
-        'object_uuid',
-        'referenced_uuid'
-    },
-    'Orgc': {
-        'name',
-        'uuid'
-    },
-    'Tag': {
-        'name',
-        'colour',
-        'exportable'
-    }
-}
+try:
+    from settings import with_local_tags
+except ImportError:
+    with_local_tags = True
 
-objectsToSave = {
-    'Orgc': {},
-    'Tag': {},
-    'Attribute': {
-        'Tag': {}
-    },
-    'Object': {
-        'Attribute': {
-            'Tag': {}
-        },
-        'ObjectReference': {}
-    }
-}
+try:
+    from settings import include_deleted
+except ImportError:
+    include_deleted = False
+
+try:
+    from settings import exclude_attribute_types
+except ImportError:
+    exclude_attribute_types = []
 
 valid_attribute_distributions = []
-
-attributeHashes = []
 
 
 def init():
     # If we have an old settings.py file then this variable won't exist
     global valid_attribute_distributions
     try:
-        valid_attribute_distributions = valid_attribute_distribution_levels
+        valid_attribute_distributions = [int(v) for v in valid_attribute_distribution_levels]
     except Exception:
-        valid_attribute_distributions = ['0', '1', '2', '3', '4', '5']
-    return PyMISP(url, key, ssl)
+        valid_attribute_distributions = [0, 1, 2, 3, 4, 5]
+    return ExpandedPyMISP(url, key, ssl)
 
 
-def recursiveExtract(container, containerType, leaf, eventUuid):
-    temp = {}
-    if containerType in ['Attribute', 'Object']:
-        if (__blockByDistribution(container)):
-            return False
-    for field in objectsFields[containerType]:
-        if field in container:
-            temp[field] = container[field]
-    if (containerType == 'Attribute'):
-        global attributeHashes
-        if ('|' in container['type'] or container['type'] == 'malware-sample'):
-            split = container['value'].split('|')
-            attributeHashes.append([hashlib.md5(split[0].encode("utf-8")).hexdigest(), eventUuid])
-            attributeHashes.append([hashlib.md5(split[1].encode("utf-8")).hexdigest(), eventUuid])
-        else:
-            attributeHashes.append([hashlib.md5(container['value'].encode("utf-8")).hexdigest(), eventUuid])
-    children = leaf.keys()
-    for childType in children:
-        childContainer = container.get(childType)
-        if (childContainer):
-            if (type(childContainer) is dict):
-                temp[childType] = recursiveExtract(childContainer, childType, leaf[childType], eventUuid)
-            else:
-                temp[childType] = []
-                for element in childContainer:
-                    processed = recursiveExtract(element, childType, leaf[childType], eventUuid)
-                    if (processed):
-                        temp[childType].append(processed)
-    return temp
-
-
-def saveEvent(misp, uuid):
-    event = misp.get_event(uuid)
-    if not event.get('Event'):
-        print('Error while fetching event: {}'.format(event['message']))
-        sys.exit('Could not create file for event ' + uuid + '.')
-    event['Event'] = recursiveExtract(event['Event'], 'Event', objectsToSave, event['Event']['uuid'])
-    event = json.dumps(event)
-    eventFile = open(os.path.join(outputdir, uuid + '.json'), 'w')
-    eventFile.write(event)
-    eventFile.close()
-
-
-def __blockByDistribution(element):
-    if element['distribution'] not in valid_attribute_distributions:
-        return True
-    return False
-
-
-def saveHashes():
-    if not attributeHashes:
-        return False
+def saveEvent(event):
     try:
-        hashFile = open(os.path.join(outputdir, 'hashes.csv'), 'w')
-        for element in attributeHashes:
-            hashFile.write('{},{}\n'.format(element[0], element[1]))
-        hashFile.close()
+        with open(os.path.join(outputdir, f'{event["Event"]["uuid"]}.json'), 'w') as f:
+            json.dump(event, f, indent=2)
+    except Exception as e:
+        print(e)
+        sys.exit('Could not create the event dump.')
+
+
+def saveHashes(hashes):
+    try:
+        with open(os.path.join(outputdir, 'hashes.csv'), 'w') as hashFile:
+            for element in hashes:
+                hashFile.write('{},{}\n'.format(element[0], element[1]))
     except Exception as e:
         print(e)
         sys.exit('Could not create the quick hash lookup file.')
@@ -162,41 +68,39 @@ def saveManifest(manifest):
         sys.exit('Could not create the manifest file.')
 
 
-def __addEventToManifest(event):
-    tags = []
-    for eventTag in event['EventTag']:
-        tags.append({'name': eventTag['Tag']['name'],
-                     'colour': eventTag['Tag']['colour']})
-    return {'Orgc': event['Orgc'],
-            'Tag': tags,
-            'info': event['info'],
-            'date': event['date'],
-            'analysis': event['analysis'],
-            'threat_level_id': event['threat_level_id'],
-            'timestamp': event['timestamp']
-            }
-
-
 if __name__ == '__main__':
     misp = init()
     try:
-        r = misp.get_index(filters)
-        events = r['response']
-        print(events[0])
+        events = misp.search_index(minimal=True, **filters, pythonify=False)
     except Exception as e:
         print(e)
         sys.exit("Invalid response received from MISP.")
     if len(events) == 0:
         sys.exit("No events returned.")
     manifest = {}
+    hashes = []
     counter = 1
     total = len(events)
     for event in events:
-        saveEvent(misp, event['uuid'])
-        manifest[event['uuid']] = __addEventToManifest(event)
+        try:
+            e = misp.get_event(event['uuid'], deleted=include_deleted, pythonify=True)
+            if exclude_attribute_types:
+                for i, attribute in enumerate(e.attributes):
+                    if attribute.type in exclude_attribute_types:
+                        e.attributes.pop(i)
+            e_feed = e.to_feed(valid_distributions=valid_attribute_distributions, with_meta=True, with_distribution=with_distribution, with_local_tags=with_local_tags)
+        except Exception as err:
+            print(err, event['uuid'])
+            continue
+        if not e_feed:
+            print(f'Invalid distribution {e.distribution}, skipping')
+            continue
+        hashes += [[h, e.uuid] for h in e_feed['Event'].pop('_hashes')]
+        manifest.update(e_feed['Event'].pop('_manifest'))
+        saveEvent(e_feed)
         print("Event " + str(counter) + "/" + str(total) + " exported.")
         counter += 1
     saveManifest(manifest)
     print('Manifest saved.')
-    saveHashes()
+    saveHashes(hashes)
     print('Hashes saved. Feed creation completed.')

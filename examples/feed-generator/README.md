@@ -7,7 +7,7 @@ This python script can be used to generate a MISP feed based on an existing MISP
 ````
 git clone https://github.com/MISP/PyMISP.git
 cd examples/feed-generator
-cp settings-default.py settings.py
+cp settings.default.py settings.py
 vi settings.py #adjust your settings
 python3 generate.py
 ````

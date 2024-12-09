@@ -1,12 +1,16 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
+from typing import Any
 
 from .abstractgenerator import AbstractMISPObjectGenerator
 
 
 class GenericObjectGenerator(AbstractMISPObjectGenerator):
 
-    def generate_attributes(self, attributes):
+    # FIXME: this method is different from the master one, and that's probably not a good idea.
+    def generate_attributes(self, attributes: list[dict[str, Any]]) -> None:  # type: ignore[override]
         """Generates MISPObjectAttributes from a list of dictionaries.
         Each entry if the list must be in one of the two following formats:
         * {<object_relation>: <value>}

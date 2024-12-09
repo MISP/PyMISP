@@ -1,0 +1,1493 @@
+{
+  "cbffa53cc0454bcc4ab95d9363b13fb8c68301d4": {
+    "message": "doc/security: Security announcements for 4 issues\n\n* doc/security/Quagga-2018-0543.txt: attr_endp used for NOTIFY data\n* doc/security/Quagga-2018-1114.txt: bgpd double free\n* doc/security/Quagga-2018-1550.txt: debug overrun in notify lookup tables\n* doc/security/Quagga-2018-1975.txt: BGP capability inf. loop\n",
+    "language": "en",
+    "commit-id": "cbffa53cc0454bcc4ab95d9363b13fb8c68301d4",
+    "summary": "doc/security: Security announcements for 4 issues",
+    "stats": {
+      "insertions": 257,
+      "deletions": 0,
+      "lines": 257,
+      "files": 5
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@jakma.org",
+    "authored_date": 1516554152,
+    "committed_date": 1517758950,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/cbffa53cc0454bcc4ab95d9363b13fb8c68301d4",
+    "tags": [],
+    "state": "under-review"
+  },
+  "f080b436bbddf8d28dd991c967dcac5288272522": {
+    "message": "doc/security: Add a doc/security folder and template for announcements\n\n* doc/security: New folder to store Quagga security announcements,\n  where they can be revision controlled.\n* doc/security/template.txt: Template for announcements\n",
+    "language": "en",
+    "commit-id": "f080b436bbddf8d28dd991c967dcac5288272522",
+    "summary": "doc/security: Add a doc/security folder and template for announcements",
+    "stats": {
+      "insertions": 39,
+      "deletions": 0,
+      "lines": 39,
+      "files": 1
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@jakma.org",
+    "authored_date": 1516554078,
+    "committed_date": 1517758950,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/f080b436bbddf8d28dd991c967dcac5288272522",
+    "tags": [],
+    "state": "under-review"
+  },
+  "9e5251151894aefdf8e9392a2371615222119ad8": {
+    "message": "bgpd/security: debug print of received NOTIFY data can over-read msg array\n\nSecurity issue: Quagga-2018-1550\nSee: https://www.quagga.net/security/Quagga-2018-1550.txt\n\n* bgpd/bgp_debug.c: (struct message) Nearly every one of the NOTIFY\n  code/subcode message arrays has their corresponding size variables off\n  by one, as most have 1 as first index.\n\n  This means (bgp_notify_print) can cause mes_lookup to overread the (struct\n  message) by 1 pointer value if given an unknown index.\n\n  Fix the bgp_notify_..._msg_max variables to use the compiler to calculate\n  the correct sizes.\n",
+    "language": "en",
+    "commit-id": "9e5251151894aefdf8e9392a2371615222119ad8",
+    "summary": "bgpd/security: debug print of received NOTIFY data can over-read msg array",
+    "stats": {
+      "insertions": 12,
+      "deletions": 9,
+      "lines": 21,
+      "files": 1
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@jakma.org",
+    "authored_date": 1515277912,
+    "committed_date": 1517742933,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/9e5251151894aefdf8e9392a2371615222119ad8",
+    "tags": [],
+    "state": "under-review"
+  },
+  "ce07207c50a3d1f05d6dd49b5294282e59749787": {
+    "message": "bgpd/security: fix infinite loop on certain invalid OPEN messages\n\nSecurity issue: Quagga-2018-1975\nSee: https://www.quagga.net/security/Quagga-2018-1975.txt\n\n* bgpd/bgp_packet.c: (bgp_capability_msg_parse) capability parser can infinite\n  loop due to checks that issue 'continue' without bumping the input\n  pointer.\n",
+    "language": "en",
+    "commit-id": "ce07207c50a3d1f05d6dd49b5294282e59749787",
+    "summary": "bgpd/security: fix infinite loop on certain invalid OPEN messages",
+    "stats": {
+      "insertions": 2,
+      "deletions": 2,
+      "lines": 4,
+      "files": 1
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@jakma.org",
+    "authored_date": 1515273651,
+    "committed_date": 1517742928,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/ce07207c50a3d1f05d6dd49b5294282e59749787",
+    "tags": [],
+    "state": "under-review"
+  },
+  "e69b535f92eafb599329bf725d9b4c6fd5d7fded": {
+    "message": "bgpd/security: Fix double free of unknown attribute\n\nSecurity issue: Quagga-2018-1114\nSee: https://www.quagga.net/security/Quagga-2018-1114.txt\n\nIt is possible for bgpd to double-free an unknown attribute. This can happen\nvia bgp_update_receive receiving an UPDATE with an invalid unknown attribute.\nbgp_update_receive then will call bgp_attr_unintern_sub and bgp_attr_flush,\nand the latter may try free an already freed unknown attr.\n\n* bgpd/bgp_attr.c: (transit_unintern) Take a pointer to the caller's storage\n  for the (struct transit *), so that transit_unintern can NULL out the\n  caller's reference if the (struct transit) is freed.\n  (cluster_unintern) By inspection, appears to have a similar issue.\n  (bgp_attr_unintern_sub) adjust for above.\n",
+    "language": "en",
+    "commit-id": "e69b535f92eafb599329bf725d9b4c6fd5d7fded",
+    "summary": "bgpd/security: Fix double free of unknown attribute",
+    "stats": {
+      "insertions": 21,
+      "deletions": 16,
+      "lines": 37,
+      "files": 2
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@jakma.org",
+    "authored_date": 1515268330,
+    "committed_date": 1517742615,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/e69b535f92eafb599329bf725d9b4c6fd5d7fded",
+    "tags": [],
+    "state": "under-review"
+  },
+  "cc2e6770697e343f4af534114ab7e633d5beabec": {
+    "message": "bgpd/security: invalid attr length sends NOTIFY with data overrun\n\nSecurity issue: Quagga-2018-0543\n\nSee: https://www.quagga.net/security/Quagga-2018-0543.txt\n\n* bgpd/bgp_attr.c: (bgp_attr_parse) An invalid attribute length is correctly\n  checked, and a NOTIFY prepared.  The NOTIFY can include the incorrect\n  received data with the NOTIFY, for debug purposes.  Commit\n  c69698704806a9ac5 modified the code to do that just, and also send the\n  malformed attr with the NOTIFY.  However, the invalid attribute length was\n  used as the length of the data to send back.\n\n  The result is a read past the end of data, which is then written to the\n  NOTIFY message and sent to the peer.\n\n  A configured BGP peer can use this bug to read up to 64 KiB of memory from\n  the bgpd process, or crash the process if the invalid read is caught by\n  some means (unmapped page and SEGV, or other mechanism) resulting in a DoS.\n\n  This bug _ought_ /not/ be exploitable by anything other than the connected\n  BGP peer, assuming the underlying TCP transport is secure.  For no BGP\n  peer should send on an UPDATE with this attribute.  Quagga will not, as\n  Quagga always validates the attr header length, regardless of type.\n\n  However, it is possible that there are BGP implementations that do not\n  check lengths on some attributes (e.g.  optional/transitive ones of a type\n  they do not recognise), and might pass such malformed attrs on.  If such\n  implementations exists and are common, then this bug might be triggerable\n  by BGP speakers further hops away.  Those peers will not receive the\n  NOTIFY (unless they sit on a shared medium), however they might then be\n  able to trigger a DoS.\n\n  Fix: use the valid bound to calculate the length.\n",
+    "language": "en",
+    "commit-id": "cc2e6770697e343f4af534114ab7e633d5beabec",
+    "summary": "bgpd/security: invalid attr length sends NOTIFY with data overrun",
+    "stats": {
+      "insertions": 3,
+      "deletions": 1,
+      "lines": 4,
+      "files": 1
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@jakma.org",
+    "authored_date": 1515023853,
+    "committed_date": 1517742611,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/cc2e6770697e343f4af534114ab7e633d5beabec",
+    "tags": [],
+    "state": "under-review"
+  },
+  "69f8d5df72b6bd9c39c3a262ae0ed07f2cd566e9": {
+    "message": "configure: Add commonly used GCC security flags\n",
+    "language": "en",
+    "commit-id": "69f8d5df72b6bd9c39c3a262ae0ed07f2cd566e9",
+    "summary": "configure: Add commonly used GCC security flags",
+    "stats": {
+      "insertions": 4,
+      "deletions": 0,
+      "lines": 4,
+      "files": 1
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@jakma.org",
+    "authored_date": 1488993358,
+    "committed_date": 1489082635,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/69f8d5df72b6bd9c39c3a262ae0ed07f2cd566e9",
+    "tags": [],
+    "state": "under-review"
+  },
+  "e3443a21552b6a3cd6ebdbb98336eede217a478f": {
+    "message": "bgpd: simplify ebgp-multihop and ttl-security handling\n\nChange to track configured value in ->ttl and ->gtsm_hops;\nnot the value set to sockopt. Instead, setting of socket's ttl\nand minttl options are now merged to one function which calculates\nit on demand. This greatly simplifies the code.\n",
+    "language": "en",
+    "commit-id": "e3443a21552b6a3cd6ebdbb98336eede217a478f",
+    "summary": "bgpd: simplify ebgp-multihop and ttl-security handling",
+    "stats": {
+      "insertions": 95,
+      "deletions": 253,
+      "lines": 348,
+      "files": 8
+    },
+    "author": "Timo Teräs",
+    "author-email": "timo.teras@iki.fi",
+    "authored_date": 1476882154,
+    "committed_date": 1485197511,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/e3443a21552b6a3cd6ebdbb98336eede217a478f",
+    "tags": [],
+    "state": "under-review"
+  },
+  "f5a4488a0dda521f19e96f2615f4a8b134c5878b": {
+    "message": "vtysh: Fix, guard against NULL pointer dereference\n\ngetpwuid() may fail returning a null value leaving subsequent\ncode vulnerable to a null pointer dereference.\n\nTested-by: NetDEF CI System <cisystem@netdef.org>\n",
+    "language": "en",
+    "commit-id": "f5a4488a0dda521f19e96f2615f4a8b134c5878b",
+    "summary": "vtysh: Fix, guard against NULL pointer dereference",
+    "stats": {
+      "insertions": 5,
+      "deletions": 1,
+      "lines": 6,
+      "files": 1
+    },
+    "author": "Jafar Al-Gharaibeh",
+    "author-email": "jafar@atcorp.com",
+    "authored_date": 1470093278,
+    "committed_date": 1485192051,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "vuln"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/f5a4488a0dda521f19e96f2615f4a8b134c5878b",
+    "tags": [],
+    "state": "under-review"
+  },
+  "cfb1fae25f8c092e0d17073eaf7bd428ce1cd546": {
+    "message": "zebra: stack overrun in IPv6 RA receive code (CVE-2016-1245)\n\nThe IPv6 RA code also receives ICMPv6 RS and RA messages.\nUnfortunately, by bad coding practice, the buffer size specified on\nreceiving such messages mixed up 2 constants that in fact have\ndifferent values.\n\nThe code itself has:\n #define RTADV_MSG_SIZE 4096\nWhile BUFSIZ is system-dependent, in my case (x86_64 glibc):\n /usr/include/_G_config.h:#define _G_BUFSIZ 8192\n /usr/include/libio.h:#define _IO_BUFSIZ _G_BUFSIZ\n /usr/include/stdio.h:# define BUFSIZ _IO_BUFSIZ\n\nFreeBSD, OpenBSD, NetBSD and Illumos are not affected, since all of them\nhave BUFSIZ == 1024.\n\nAs the latter is passed to the kernel on recvmsg(), it's possible to\noverwrite 4kB of stack -- with ICMPv6 packets that can be globally sent\nto any of the system's addresses (using fragmentation to get to 8k).\n\n(The socket has filters installed limiting this to RS and RA packets,\nbut does not have a filter for source address or TTL.)\n\nIssue discovered by trying to test other stuff, which randomly caused\nthe stack to be smaller than 8kB in that code location, which then\ncauses the kernel to report EFAULT (Bad address).\n\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\nReviewed-by: Donald Sharp <sharpd@cumulusnetworks.com>\n",
+    "language": "en",
+    "commit-id": "cfb1fae25f8c092e0d17073eaf7bd428ce1cd546",
+    "summary": "zebra: stack overrun in IPv6 RA receive code (CVE-2016-1245)",
+    "stats": {
+      "insertions": 1,
+      "deletions": 1,
+      "lines": 2,
+      "files": 1
+    },
+    "author": "David Lamparter",
+    "author-email": "equinox@opensourcerouting.org",
+    "authored_date": 1472643076,
+    "committed_date": 1476722496,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/cfb1fae25f8c092e0d17073eaf7bd428ce1cd546",
+    "tags": [],
+    "cve": [
+      "CVE-2016-1245"
+    ],
+    "state": "cve-assigned"
+  },
+  "2db962760426ddb9e266f9a4bc0b274584c819cc": {
+    "message": "lib: zclient can overflow (struct interface) hw_addr if zebra is evil\n\n* lib/zclient.c: (zebra_interface_if_set_value) The hw_addr_len field\n  is used as trusted input to read off the hw_addr and write to the\n  INTERFACE_HWADDR_MAX sized hw_addr field.  The read from the stream is\n  bounds-checked by the stream abstraction, however the write out to the\n  heap can not be.\n\n  Tighten the supplied length to stream_get used to do the write.\n\n  Impact: a malicious zebra can overflow the heap of clients using the ZServ\n  IPC.  Note that zebra is already fairly trusted within Quagga.\n\nReported-by: Kostya Kortchinsky <kostyak@google.com>\n",
+    "language": "en",
+    "commit-id": "2db962760426ddb9e266f9a4bc0b274584c819cc",
+    "summary": "lib: zclient can overflow (struct interface) hw_addr if zebra is evil",
+    "stats": {
+      "insertions": 1,
+      "deletions": 1,
+      "lines": 2,
+      "files": 1
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul.jakma@hpe.com",
+    "authored_date": 1454942788,
+    "committed_date": 1457459602,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "malicious"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/2db962760426ddb9e266f9a4bc0b274584c819cc",
+    "tags": [],
+    "state": "under-review"
+  },
+  "a3bc7e9400b214a0f078fdb19596ba54214a1442": {
+    "message": "bgpd: Fix VU#270232, VPNv4 NLRI parser memcpys to stack on unchecked length\n\nAddress CERT vulnerability report VU#270232, memcpy to stack data structure\nbased on length field from packet data whose length field upper-bound was\nnot properly checked.\n\nThis likely allows BGP peers that are enabled to send Labeled-VPN SAFI\nroutes to Quagga bgpd to remotely exploit Quagga bgpd.\n\nMitigation: Do not enable Labeled-VPN SAFI with untrusted neighbours.\n\nImpact: Labeled-VPN SAFI is not enabled by default.\n\n* bgp_mplsvpn.c: (bgp_nlri_parse_vpnv4) The prefixlen is checked for\n  lower-bound, but not for upper-bound against received data length.\n  The packet data is then memcpy'd to the stack based on the prefixlen.\n\n  Extend the prefixlen check to ensure it is within the bound of the NLRI\n  packet data AND the on-stack prefix structure AND the maximum size for the\n  address family.\n\nReported-by: Kostya Kortchinsky <kostyak@google.com>\n\nThis commit a joint effort between:\n\nLou Berger <lberger@labn.net>\nDonald Sharp <sharpd@cumulusnetworks.com>\nPaul Jakma <paul.jakma@hpe.com> / <paul@jakma.org>\n",
+    "language": "en",
+    "commit-id": "a3bc7e9400b214a0f078fdb19596ba54214a1442",
+    "summary": "bgpd: Fix VU#270232, VPNv4 NLRI parser memcpys to stack on unchecked length",
+    "stats": {
+      "insertions": 36,
+      "deletions": 16,
+      "lines": 52,
+      "files": 1
+    },
+    "author": "Donald Sharp",
+    "author-email": "sharpd@cumulusnetworks.com",
+    "authored_date": 1453913685,
+    "committed_date": 1455116527,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "vuln"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/a3bc7e9400b214a0f078fdb19596ba54214a1442",
+    "tags": [],
+    "state": "under-review"
+  },
+  "75a3cf6cf69f6ab940f8421b0f79b2b1f689b904": {
+    "message": "solaris: fix SMF manifest dependency model and start method\n\nResolves an issue where quagga daemons restart in an infinite loop.\nQuagga daemons declare a dependency on zebra that requires a restart\nof the daemon when zebra restarts and they explicitly restart zebra,\nwhich again triggers their own restart.\n\nRestarting zebra when other daemons are started is explicitly removed,\nleaving dependency management up to SMF rather than handling it in the\nstart method.\n\nsolaris/quagga.init.in: Remove calls to routeadm_zebra_enable, and the\n    routeadm_zebra_enable function.\nsolaris/quagga.xml.in: Set dependency zebra grouping to require_all.\n\nFixes: #818\nSigned-off-by: Greg Troxel <gdt@ir.bbn.com>\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\n",
+    "language": "en",
+    "commit-id": "75a3cf6cf69f6ab940f8421b0f79b2b1f689b904",
+    "summary": "solaris: fix SMF manifest dependency model and start method",
+    "stats": {
+      "insertions": 7,
+      "deletions": 31,
+      "lines": 38,
+      "files": 2
+    },
+    "author": "Brian Bennett",
+    "author-email": "brian.bennett@joyent.com",
+    "authored_date": 1424215572,
+    "committed_date": 1425276045,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "infinite loop"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/75a3cf6cf69f6ab940f8421b0f79b2b1f689b904",
+    "tags": [],
+    "state": "under-review"
+  },
+  "5d804b439a4138c77f81de30c64f923e2b5c1340": {
+    "message": "bgpd: support TTL-security with iBGP\n\nTraditionally, ttl-security feature has been associated with EBGP\nsessions as those identify directly connected external peers. The\nGTSM RFC (rfc 5082) does not make any restrictions on type of\npeering. In fact, it is beneficial to support ttl-security for both\nEBGP and IBGP sessions. Specifically, in data centers, there are\ndirectly connected IBGP peerings that will benefit from the protection\nttl-security provides.\n\nSigned-off-by: Dinesh G Dutt <ddutt@cumulusnetworks.com>\nReviewed-by: Pradosh Mohapatra <pmohapat@cumulusnetworks.com>\n[DL: function refactoring split out into previous 2 patches.  changes:\n     - bgp_set_socket_ttl(): ret type int -> void\n     - is_ebgp_multihop_configured(): stripped peer == NULL check\n     - comments/whitespace]\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\n",
+    "language": "en",
+    "commit-id": "5d804b439a4138c77f81de30c64f923e2b5c1340",
+    "summary": "bgpd: support TTL-security with iBGP",
+    "stats": {
+      "insertions": 62,
+      "deletions": 26,
+      "lines": 88,
+      "files": 4
+    },
+    "author": "Pradosh Mohapatra",
+    "author-email": "pmohapat@cumulusnetworks.com",
+    "authored_date": 1378957027,
+    "committed_date": 1400534746,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/5d804b439a4138c77f81de30c64f923e2b5c1340",
+    "tags": [],
+    "state": "under-review"
+  },
+  "8da8689d91a6436c17aca5000b1426aaea47e23c": {
+    "message": "bgpd: fix fast external fallover behavior\n\nISSUES\n\n1. When an interface goes down, the zclient callbacks are invoked\n   in the following order: (a) address_delete() that removes the\n   connected address list: ifp->connected, (b) interface_down()\n   that performs \"fast external fallover\" operation. The operation\n   relies on ifp->connected to look for peers that should be brought\n   down. That's a cyclic dependency.\n\n2. 'ttl-security' configuration handler sets peer->ttl to\n   MAXTTL (so that BGP packets are sent with TTL=255, as per the\n   requirement of ttl-security). This, however, is incompatible\n   with 'fast external fallover' as the fallover operation checks\n   for (ttl == 1) to determine directly connected peers.\n\n3. The current fallover operation does not work for IPv6 address family.\n\nPATCH\n\n1. The patch removes the dependency on 'ifp->connected' list for fast\n   fallover. The peer already contains a nexthop structure that reflects\n   the peering address. The nexthop structure has a pointer to the\n   interface (ifp) that peering address resolves to. Everytime the TCP\n   connection succeeds, the ifp is updated. The patch uses this ifp in\n   the interface_down() callback for a match for the peers that should be\n   brought down.\n\n2. The evaluation for directly connected peering is enhanced as\n   'peer->ttl == 1' OR 'peer->gtsm_hops == 1'. Thus a ttl-security\n   configuration on the peer with one hop is directly connected and\n   should be brought down under 'fast external fallover'.\n\n3. Because of fix (1), IPv6 address family works automatically.\n\nSigned-off-by: Pradosh Mohapatra <pmohapat@cumulusnetworks.com>\nReviewed-by: Dinesh G Dutt <ddutt@cumulusnetworks.com>\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\n",
+    "language": "en",
+    "commit-id": "8da8689d91a6436c17aca5000b1426aaea47e23c",
+    "summary": "bgpd: fix fast external fallover behavior",
+    "stats": {
+      "insertions": 3,
+      "deletions": 9,
+      "lines": 12,
+      "files": 1
+    },
+    "author": "Pradosh Mohapatra",
+    "author-email": "pmohapat@cumulusnetworks.com",
+    "authored_date": 1378870435,
+    "committed_date": 1400534739,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/8da8689d91a6436c17aca5000b1426aaea47e23c",
+    "tags": [],
+    "state": "under-review"
+  },
+  "a11e012e8661629d665e992e765741a5eaa7d017": {
+    "message": "security: Fix some typos and potential NULL-deref\n\nThis patch against the git tree fixes minor typos, some of them possibily\nleading to NULL-pointer dereference in rare conditions.\n\nSigned-off-by: Remi Gacogne <rgacogne-github@coredump.fr>\nSigned-off-by: Joachim Nilsson <troglobit@gmail.com>\nAcked-by: Feng Lu <lu.feng@6wind.com>\n",
+    "language": "en",
+    "commit-id": "a11e012e8661629d665e992e765741a5eaa7d017",
+    "summary": "security: Fix some typos and potential NULL-deref",
+    "stats": {
+      "insertions": 8,
+      "deletions": 4,
+      "lines": 12,
+      "files": 5
+    },
+    "author": "Remi Gacogne",
+    "author-email": "rgacogne-github@coredump.fr",
+    "authored_date": 1378648114,
+    "committed_date": 1392110883,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/a11e012e8661629d665e992e765741a5eaa7d017",
+    "tags": [],
+    "state": "under-review"
+  },
+  "23cd8fb7133befdb84b3a918f7b2f6147161ac6e": {
+    "message": "ospfd: protect vs. VU#229804 (malformed Router-LSA)\n\nVU#229804 reports that, by injecting Router LSAs with the Advertising\nRouter ID different from the Link State ID, OSPF implementations can be\ntricked into retaining and using invalid information.\n\nQuagga is not vulnerable to this because it looks up Router LSAs by\n(Router-ID, LS-ID) pair.  The relevant code is in ospf_lsa.c l.3140.\nNote the double \"id\" parameter at the end.\n\nStill, we can provide an improvement here by discarding such malformed\nLSAs and providing a warning to the administrator.  While we cannot\nprevent such malformed LSAs from entering the OSPF domain, we can\ncertainly try to limit their distribution.\n\ncf. http://www.kb.cert.org/vuls/id/229804 for the vulnerability report.\nThis issue is a specification issue in the OSPF protocol that was\ndiscovered by Dr. Gabi Nakibly.\n\nReported-by: CERT Coordination Center <cert@cert.org>\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\n",
+    "language": "en",
+    "commit-id": "23cd8fb7133befdb84b3a918f7b2f6147161ac6e",
+    "summary": "ospfd: protect vs. VU#229804 (malformed Router-LSA)",
+    "stats": {
+      "insertions": 21,
+      "deletions": 0,
+      "lines": 21,
+      "files": 1
+    },
+    "author": "David Lamparter",
+    "author-email": "equinox@diac24.net",
+    "authored_date": 1375428473,
+    "committed_date": 1375785706,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "vuln"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/23cd8fb7133befdb84b3a918f7b2f6147161ac6e",
+    "tags": [],
+    "state": "under-review"
+  },
+  "c423d413e464913ee88c1ee700e2c4037e6bdb24": {
+    "message": "lib: unconditionally include stddef.h\n\nI've used offsetof() in the previous commit to paper over the security\nproblems in ospf_api.c.  This blows the build on FreeBSD 7.0, missing\noffsetof().  Let's add that to zebra's generally used includes.\n\nstddef.h (and offsetof) is defined in C89 section 4.1.5 (and not\ndeprecated/removed by any later standard).  If this causes problems, the\nbug report should go against the host OS/compiler...\n\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\n",
+    "language": "en",
+    "commit-id": "c423d413e464913ee88c1ee700e2c4037e6bdb24",
+    "summary": "lib: unconditionally include stddef.h",
+    "stats": {
+      "insertions": 1,
+      "deletions": 1,
+      "lines": 2,
+      "files": 1
+    },
+    "author": "David Lamparter",
+    "author-email": "equinox@opensourcerouting.org",
+    "authored_date": 1375191386,
+    "committed_date": 1375200853,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/c423d413e464913ee88c1ee700e2c4037e6bdb24",
+    "tags": [],
+    "state": "under-review"
+  },
+  "c51443f4aa6b7f0b0d6ad5409ad7d4b215092443": {
+    "message": "ospfd: CVE-2013-2236, stack overrun in apiserver\n\nthe OSPF API-server (exporting the LSDB and allowing announcement of\nOpaque-LSAs) writes past the end of fixed on-stack buffers.  This leads\nto an exploitable stack overflow.\n\nFor this condition to occur, the following two conditions must be true:\n- Quagga is configured with --enable-opaque-lsa\n- ospfd is started with the \"-a\" command line option\n\nIf either of these does not hold, the relevant code is not executed and\nthe issue does not get triggered.\n\nSince the issue occurs on receiving large LSAs (larger than 1488 bytes),\nit is possible for this to happen during normal operation of a network.\nIn particular, if there is an OSPF router with a large number of\ninterfaces, the Router-LSA of that router may exceed 1488 bytes and\ntrigger this, leading to an ospfd crash.\n\nFor an attacker to exploit this, s/he must be able to inject valid LSAs\ninto the OSPF domain.  Any best-practice protection measure (using\ncrypto authentication, restricting OSPF to internal interfaces, packet\nfiltering protocol 89, etc.) will prevent exploitation.  On top of that,\nremote (not on an OSPF-speaking network segment) attackers will have\ndifficulties bringing up the adjacency needed to inject a LSA.\n\nThis patch only performs minimal changes to remove the possibility of a\nstack overrun.  The OSPF API in general is quite ugly and needs a\nrewrite.\n\nReported-by: Ricky Charlet <ricky.charlet@hp.com>\nCc: Florian Weimer <fweimer@redhat.com>\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\n",
+    "language": "en",
+    "commit-id": "c51443f4aa6b7f0b0d6ad5409ad7d4b215092443",
+    "summary": "ospfd: CVE-2013-2236, stack overrun in apiserver",
+    "stats": {
+      "insertions": 18,
+      "deletions": 7,
+      "lines": 25,
+      "files": 1
+    },
+    "author": "David Lamparter",
+    "author-email": "equinox@opensourcerouting.org",
+    "authored_date": 1373317528,
+    "committed_date": 1375020790,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/c51443f4aa6b7f0b0d6ad5409ad7d4b215092443",
+    "tags": [],
+    "cve": [
+      "CVE-2013-2236"
+    ],
+    "state": "cve-assigned"
+  },
+  "5e728e929942d39ce5a4ab3d01c33f7b688c4e3f": {
+    "message": "bgpd: relax ORF capability length handling\n\ncommit fe9bb64... \"bgpd: CVE-2012-1820, DoS in bgp_capability_orf()\"\nmade the length test in bgp_capability_orf_entry() stricter and is now\ncausing us to refuse (with CEASE) ORF capabilites carrying any excess\ndata.  This does not conform to the robustness principle as laid out by\nRFC1122 (\"be liberal in what you accept\").\n\nEven worse, RFC5291 is quite unclear on how to use the ORF capability\nwith multiple AFI/SAFIs.  It can be interpreted as either \"use one\ninstance, stuff everything in\" but also as \"use multiple instances\".\nSo, if not for applying robustness, we end up clearing sessions from\nimplementations going by the former interpretation.  (or if anyone dares\nadd a byte of padding...)\n\nCc: Denis Ovsienko <infrastation@yandex.ru>\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\n",
+    "language": "en",
+    "commit-id": "5e728e929942d39ce5a4ab3d01c33f7b688c4e3f",
+    "summary": "bgpd: relax ORF capability length handling",
+    "stats": {
+      "insertions": 1,
+      "deletions": 1,
+      "lines": 2,
+      "files": 1
+    },
+    "author": "David Lamparter",
+    "author-email": "equinox@opensourcerouting.org",
+    "authored_date": 1358916624,
+    "committed_date": 1359737704,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/5e728e929942d39ce5a4ab3d01c33f7b688c4e3f",
+    "tags": [],
+    "cve": [
+      "CVE-2012-1820"
+    ],
+    "state": "cve-assigned"
+  },
+  "e8aca32f312cbef1cb0b0dd9e87b7e59dc9fa251": {
+    "message": "isisd: address Coverity warnings\n\nthis fixes a bunch of issues found by Coverity SCAN and flagged as\n\"high\" impact -- although, they're all rather minute issues.\n\n* isisd/isis_adjacency.c: one superfluous check, one possible NULL deref\n* isisd/isis_circuit.c: two prefix memory leaks\n* isisd/isis_csm.c: one missing break\n* isisd/isis_lsp.c: one possible NULL deref\n* isisd/isis_pfpacket.c: one error-case fd leak\n* isisd/isis_route.c: one isis_route_info memory leak\n* isisd/isis_routemap.c: one... fnord\n* isisd/isis_tlv.c: one infinite loop\n\nReported-by: Coverity SCAN\nSigned-off-by: David Lamparter <equinox@opensourcerouting.org>\n",
+    "language": "en",
+    "commit-id": "e8aca32f312cbef1cb0b0dd9e87b7e59dc9fa251",
+    "summary": "isisd: address Coverity warnings",
+    "stats": {
+      "insertions": 19,
+      "deletions": 7,
+      "lines": 26,
+      "files": 9
+    },
+    "author": "David Lamparter",
+    "author-email": "equinox@opensourcerouting.org",
+    "authored_date": 1353978630,
+    "committed_date": 1355323088,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "infinite loop"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/e8aca32f312cbef1cb0b0dd9e87b7e59dc9fa251",
+    "tags": [],
+    "state": "under-review"
+  },
+  "fe9bb6459afe0d55e56619cdc5061d8407cd1f15": {
+    "message": "bgpd: CVE-2012-1820, DoS in bgp_capability_orf()\n\nAn ORF (code 3) capability TLV is defined to contain exactly one\nAFI/SAFI block. Function bgp_capability_orf(), which parses ORF\ncapability TLV, uses do-while cycle to call its helper function\nbgp_capability_orf_entry(), which actually processes the AFI/SAFI data\nblock. The call is made at least once and repeated as long as the input\nbuffer has enough data for the next call.\n\nThe helper function, bgp_capability_orf_entry(), uses \"Number of ORFs\"\nfield of the provided AFI/SAFI block to verify, if it fits the input\nbuffer. However, the check is made based on the total length of the ORF\nTLV regardless of the data already consumed by the previous helper\nfunction call(s). This way, the check condition is only valid for the\nfirst AFI/SAFI block inside an ORF capability TLV.\n\nFor the subsequent calls of the helper function, if any are made, the\ncheck condition may erroneously tell, that the current \"Number of ORFs\"\nfield fits the buffer boundary, where in fact it does not. This makes it\npossible to trigger an assertion by feeding an OPEN message with a\nspecially-crafted malformed ORF capability TLV.\n\nThis commit fixes the vulnerability by making the implementation follow\nthe spec.\n",
+    "language": "en",
+    "commit-id": "fe9bb6459afe0d55e56619cdc5061d8407cd1f15",
+    "summary": "bgpd: CVE-2012-1820, DoS in bgp_capability_orf()",
+    "stats": {
+      "insertions": 2,
+      "deletions": 24,
+      "lines": 26,
+      "files": 1
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1334853253,
+    "committed_date": 1351836435,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/fe9bb6459afe0d55e56619cdc5061d8407cd1f15",
+    "tags": [],
+    "cve": [
+      "CVE-2012-1820"
+    ],
+    "state": "cve-assigned"
+  },
+  "5861739f8c38bc36ea9955e5cb2be2bf2f482d70": {
+    "message": "bgpd: Open option parse errors don't NOTIFY, resulting in abort & DoS\n\n* bgp_packet.c: (bgp_open_receive) Errors from bgp_open_option_parse are\n  detected, and the code will stop processing the OPEN and return.  However\n  it does so without calling bgp_notify_send to send a NOTIFY - which means\n  the peer FSM doesn't get stopped, and bgp_read will be called again later.\n  Because it returns, it doesn't go through the code near the end of the\n  function that removes the current message from the peer input streaam.\n  Thus the next call to bgp_read will try to parse a half-parsed stream as\n  if it were a new BGP message, leading to an assert later in the code when\n  it tries to read stuff that isn't there. Add the required call to\n  bgp_notify_send before returning.\n* bgp_open.c: (bgp_capability_as4) Be a bit stricter, check the length field\n  corresponds to the only value it can be, which is the amount we're going to\n  read off the stream. And make sure the capability flag gets set, so\n  callers can know this capability was read, regardless.\n  (peek_for_as4_capability) Let bgp_capability_as4 do the length check.\n",
+    "language": "en",
+    "commit-id": "5861739f8c38bc36ea9955e5cb2be2bf2f482d70",
+    "summary": "bgpd: Open option parse errors don't NOTIFY, resulting in abort & DoS",
+    "stats": {
+      "insertions": 16,
+      "deletions": 8,
+      "lines": 24,
+      "files": 2
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@quagga.net",
+    "authored_date": 1326142766,
+    "committed_date": 1330905302,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "DoS"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/5861739f8c38bc36ea9955e5cb2be2bf2f482d70",
+    "tags": [],
+    "state": "under-review"
+  },
+  "70e3ca2ccedca2cae58bd91c968714cad0f9d5d6": {
+    "message": "ospfd: improve fix to CVE-2011-3326 (BZ#586)\n\nMake ospf_flood() propagate error returned by ospf_lsa_install() further\nto properly discard the malformed LSA, not just prevent the immediate\ncrash.\n",
+    "language": "en",
+    "commit-id": "70e3ca2ccedca2cae58bd91c968714cad0f9d5d6",
+    "summary": "ospfd: improve fix to CVE-2011-3326 (BZ#586)",
+    "stats": {
+      "insertions": 1,
+      "deletions": 1,
+      "lines": 2,
+      "files": 1
+    },
+    "author": "Thomas Ries",
+    "author-email": "tries@gmx.net",
+    "authored_date": 1319723018,
+    "committed_date": 1321377770,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/70e3ca2ccedca2cae58bd91c968714cad0f9d5d6",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3326"
+    ],
+    "state": "cve-assigned"
+  },
+  "4de148e5d6f6f7885b2c0952a236a3bc3ec36250": {
+    "message": "ospfd: improve fix to CVE-2011-3326 (BZ#586)\n\nMake ospf_flood() propagate error returned by ospf_lsa_install() further\nto properly discard the malformed LSA, not just prevent the immediate\ncrash.\n",
+    "language": "en",
+    "commit-id": "4de148e5d6f6f7885b2c0952a236a3bc3ec36250",
+    "summary": "ospfd: improve fix to CVE-2011-3326 (BZ#586)",
+    "stats": {
+      "insertions": 1,
+      "deletions": 1,
+      "lines": 2,
+      "files": 1
+    },
+    "author": "Thomas Ries",
+    "author-email": "tries@gmx.net",
+    "authored_date": 1319723018,
+    "committed_date": 1321375848,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/4de148e5d6f6f7885b2c0952a236a3bc3ec36250",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3326"
+    ],
+    "state": "cve-assigned"
+  },
+  "abc7ef44ca05493500865ce81f7b84f5c4eb6594": {
+    "message": "ospf6d: CVE-2011-3323 (fortify packet reception)\n\nThis vulnerability (CERT-FI #514840) was reported by CROSS project.\n\nospf6d processes IPv6 prefix structures in incoming packets without\nverifying that the declared prefix length is valid. This leads to a\ncrash\ncaused by out of bounds memory access.\n\n* ospf6_abr.h: new macros for size/alignment validation\n* ospf6_asbr.h: idem\n* ospf6_intra.h: idem\n* ospf6_lsa.h: idem\n* ospf6_message.h: idem\n* ospf6_proto.h: idem\n* ospf6_message.c\n  * ospf6_packet_minlen: helper array for ospf6_packet_examin()\n  * ospf6_lsa_minlen: helper array for ospf6_lsa_examin()\n  * ospf6_hello_recv(): do not call ospf6_header_examin(), let upper\n    layer verify the input data\n  * ospf6_dbdesc_recv(): idem\n  * ospf6_lsreq_recv(): idem\n  * ospf6_lsupdate_recv(): idem\n  * ospf6_lsack_recv(): idem\n  * ospf6_prefixes_examin(): new function, implements A.4.1\n  * ospf6_lsa_examin(): new function, implements A.4\n  * ospf6_lsaseq_examin(): new function, an interface to above\n  * ospf6_packet_examin(): new function, implements A.3\n  * ospf6_rxpacket_examin(): new function, replaces\n    ospf6_header_examin()\n  * ospf6_header_examin(): sayonara\n  * ospf6_receive(): perform passive interface check earliest possible,\n    employ ospf6_rxpacket_examin()\n",
+    "language": "en",
+    "commit-id": "abc7ef44ca05493500865ce81f7b84f5c4eb6594",
+    "summary": "ospf6d: CVE-2011-3323 (fortify packet reception)",
+    "stats": {
+      "insertions": 492,
+      "deletions": 73,
+      "lines": 565,
+      "files": 7
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1317028731,
+    "committed_date": 1317048436,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/abc7ef44ca05493500865ce81f7b84f5c4eb6594",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3323"
+    ],
+    "state": "cve-assigned"
+  },
+  "09395e2a0e93b2cf4258cb1de91887948796bb68": {
+    "message": "ospf6d: CVE-2011-3324 (DD LSA assertion)\n\nThis vulnerability (CERT-FI #514839) was reported by CROSS project.\n\nWhen Database Description LSA header list contains trailing zero octets,\nospf6d tries to process this data as an LSA header. This triggers an\nassertion in the code and ospf6d shuts down.\n\n* ospf6_lsa.c\n  * ospf6_lsa_is_changed(): handle header-only argument(s)\n    appropriately, do not treat LSA length underrun as a fatal error.\n",
+    "language": "en",
+    "commit-id": "09395e2a0e93b2cf4258cb1de91887948796bb68",
+    "summary": "ospf6d: CVE-2011-3324 (DD LSA assertion)",
+    "stats": {
+      "insertions": 11,
+      "deletions": 1,
+      "lines": 12,
+      "files": 1
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1317028716,
+    "committed_date": 1317048426,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/09395e2a0e93b2cf4258cb1de91887948796bb68",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3324"
+    ],
+    "state": "cve-assigned"
+  },
+  "717750433839762d23a5f8d88fe0b4d57c8d490a": {
+    "message": "ospfd: CVE-2011-3325 part 2 (OSPF pkt type segv)\n\nThis vulnerability (CERT-FI #514838) was reported by CROSS project.\n\nThe error is reproducible only when ospfd debugging is enabled:\n  * debug ospf packet all\n  * debug ospf zebra\nWhen incoming packet header type field is set to 0x0a, ospfd will crash.\n\n* ospf_packet.c\n  * ospf_verify_header(): add type field check\n  * ospf_read(): perform input checks early\n",
+    "language": "en",
+    "commit-id": "717750433839762d23a5f8d88fe0b4d57c8d490a",
+    "summary": "ospfd: CVE-2011-3325 part 2 (OSPF pkt type segv)",
+    "stats": {
+      "insertions": 18,
+      "deletions": 14,
+      "lines": 32,
+      "files": 1
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1317028682,
+    "committed_date": 1317048414,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/717750433839762d23a5f8d88fe0b4d57c8d490a",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3325"
+    ],
+    "state": "cve-assigned"
+  },
+  "61ab0301606053192f45c188bc48afc837518770": {
+    "message": "ospfd: CVE-2011-3325 part 1 (OSPF header underrun)\n\nThis vulnerability (CERT-FI #514838) was reported by CROSS project.\n\nWhen only 14 first bytes of a Hello packet is delivered, ospfd crashes.\n\n* ospf_packet.c\n  * ospf_read(): add size check\n",
+    "language": "en",
+    "commit-id": "61ab0301606053192f45c188bc48afc837518770",
+    "summary": "ospfd: CVE-2011-3325 part 1 (OSPF header underrun)",
+    "stats": {
+      "insertions": 12,
+      "deletions": 3,
+      "lines": 15,
+      "files": 1
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1317028672,
+    "committed_date": 1317048402,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/61ab0301606053192f45c188bc48afc837518770",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3325"
+    ],
+    "state": "cve-assigned"
+  },
+  "6b161fc12a15aba8824c84d1eb38e529aaf70769": {
+    "message": "ospfd: CVE-2011-3326 (uknown LSA type segfault)\n\nThis vulnerability (CERT-FI #514837) was reported by CROSS project.\nThey have also suggested a fix to the problem, which was found\nacceptable.\n\nQuagga ospfd does not seem to handle unknown LSA types in a Link State\nUpdate message correctly. If LSA type is something else than one\nsupported\nby Quagga, the default handling of unknown types leads to an error.\n\n* ospf_flood.c\n  * ospf_flood(): check return value of ospf_lsa_install()\n",
+    "language": "en",
+    "commit-id": "6b161fc12a15aba8824c84d1eb38e529aaf70769",
+    "summary": "ospfd: CVE-2011-3326 (uknown LSA type segfault)",
+    "stats": {
+      "insertions": 2,
+      "deletions": 1,
+      "lines": 3,
+      "files": 1
+    },
+    "author": "CROSS",
+    "author-email": "info@codenomicon.com",
+    "authored_date": 1317028641,
+    "committed_date": 1317048388,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/6b161fc12a15aba8824c84d1eb38e529aaf70769",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3326"
+    ],
+    "state": "cve-assigned"
+  },
+  "94431dbc753171b48b5c6806af97fd690813b00a": {
+    "message": "bgpd: CVE-2011-3327 (ext. comm. buffer overflow)\n\nThis vulnerability (CERT-FI #513254) was reported by CROSS project.\nThey have also suggested a fix to the problem, which was found\nacceptable.\n\nThe problem occurs when bgpd receives an UPDATE message containing\n255 unknown AS_PATH attributes in Path Attribute Extended Communities.\nThis causes a buffer overlow in bgpd.\n\n* bgp_ecommunity.c\n  * ecommunity_ecom2str(): perform size check earlier\n",
+    "language": "en",
+    "commit-id": "94431dbc753171b48b5c6806af97fd690813b00a",
+    "summary": "bgpd: CVE-2011-3327 (ext. comm. buffer overflow)",
+    "stats": {
+      "insertions": 7,
+      "deletions": 7,
+      "lines": 14,
+      "files": 1
+    },
+    "author": "CROSS",
+    "author-email": "info@codenomicon.com",
+    "authored_date": 1317028625,
+    "committed_date": 1317048376,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/94431dbc753171b48b5c6806af97fd690813b00a",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3327"
+    ],
+    "state": "cve-assigned"
+  },
+  "552563a1c443ec876edd92bf79f29ff3afe2c01e": {
+    "message": "ospf6d: CVE-2011-3323 (fortify packet reception)\n\nThis vulnerability (CERT-FI #514840) was reported by CROSS project.\n\nospf6d processes IPv6 prefix structures in incoming packets without\nverifying that the declared prefix length is valid. This leads to a\ncrash\ncaused by out of bounds memory access.\n\n* ospf6_abr.h: new macros for size/alignment validation\n* ospf6_asbr.h: idem\n* ospf6_intra.h: idem\n* ospf6_lsa.h: idem\n* ospf6_message.h: idem\n* ospf6_proto.h: idem\n* ospf6_message.c\n  * ospf6_packet_minlen: helper array for ospf6_packet_examin()\n  * ospf6_lsa_minlen: helper array for ospf6_lsa_examin()\n  * ospf6_hello_recv(): do not call ospf6_header_examin(), let upper\n    layer verify the input data\n  * ospf6_dbdesc_recv(): idem\n  * ospf6_lsreq_recv(): idem\n  * ospf6_lsupdate_recv(): idem\n  * ospf6_lsack_recv(): idem\n  * ospf6_prefixes_examin(): new function, implements A.4.1\n  * ospf6_lsa_examin(): new function, implements A.4\n  * ospf6_lsaseq_examin(): new function, an interface to above\n  * ospf6_packet_examin(): new function, implements A.3\n  * ospf6_rxpacket_examin(): new function, replaces\n    ospf6_header_examin()\n  * ospf6_header_examin(): sayonara\n  * ospf6_receive(): perform passive interface check earliest possible,\n    employ ospf6_rxpacket_examin()\n",
+    "language": "en",
+    "commit-id": "552563a1c443ec876edd92bf79f29ff3afe2c01e",
+    "summary": "ospf6d: CVE-2011-3323 (fortify packet reception)",
+    "stats": {
+      "insertions": 492,
+      "deletions": 73,
+      "lines": 565,
+      "files": 7
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1317028731,
+    "committed_date": 1317048048,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/552563a1c443ec876edd92bf79f29ff3afe2c01e",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3323"
+    ],
+    "state": "cve-assigned"
+  },
+  "308687b7d73c5cacf927a3a33efbfaea627ccc09": {
+    "message": "ospf6d: CVE-2011-3324 (DD LSA assertion)\n\nThis vulnerability (CERT-FI #514839) was reported by CROSS project.\n\nWhen Database Description LSA header list contains trailing zero octets,\nospf6d tries to process this data as an LSA header. This triggers an\nassertion in the code and ospf6d shuts down.\n\n* ospf6_lsa.c\n  * ospf6_lsa_is_changed(): handle header-only argument(s)\n    appropriately, do not treat LSA length underrun as a fatal error.\n",
+    "language": "en",
+    "commit-id": "308687b7d73c5cacf927a3a33efbfaea627ccc09",
+    "summary": "ospf6d: CVE-2011-3324 (DD LSA assertion)",
+    "stats": {
+      "insertions": 11,
+      "deletions": 1,
+      "lines": 12,
+      "files": 1
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1317028716,
+    "committed_date": 1317048030,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/308687b7d73c5cacf927a3a33efbfaea627ccc09",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3324"
+    ],
+    "state": "cve-assigned"
+  },
+  "1f54cef38dab072f1054c6cfedd9ac32af14a120": {
+    "message": "ospfd: CVE-2011-3325 part 2 (OSPF pkt type segv)\n\nThis vulnerability (CERT-FI #514838) was reported by CROSS project.\n\nThe error is reproducible only when ospfd debugging is enabled:\n  * debug ospf packet all\n  * debug ospf zebra\nWhen incoming packet header type field is set to 0x0a, ospfd will crash.\n\n* ospf_packet.c\n  * ospf_verify_header(): add type field check\n  * ospf_read(): perform input checks early\n",
+    "language": "en",
+    "commit-id": "1f54cef38dab072f1054c6cfedd9ac32af14a120",
+    "summary": "ospfd: CVE-2011-3325 part 2 (OSPF pkt type segv)",
+    "stats": {
+      "insertions": 18,
+      "deletions": 14,
+      "lines": 32,
+      "files": 1
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1317028682,
+    "committed_date": 1317048019,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/1f54cef38dab072f1054c6cfedd9ac32af14a120",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3325"
+    ],
+    "state": "cve-assigned"
+  },
+  "3d3380d4fda43924171bc0866746c85634952c99": {
+    "message": "ospfd: CVE-2011-3325 part 1 (OSPF header underrun)\n\nThis vulnerability (CERT-FI #514838) was reported by CROSS project.\n\nWhen only 14 first bytes of a Hello packet is delivered, ospfd crashes.\n\n* ospf_packet.c\n  * ospf_read(): add size check\n",
+    "language": "en",
+    "commit-id": "3d3380d4fda43924171bc0866746c85634952c99",
+    "summary": "ospfd: CVE-2011-3325 part 1 (OSPF header underrun)",
+    "stats": {
+      "insertions": 12,
+      "deletions": 3,
+      "lines": 15,
+      "files": 1
+    },
+    "author": "Denis Ovsienko",
+    "author-email": "infrastation@yandex.ru",
+    "authored_date": 1317028672,
+    "committed_date": 1317048007,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/3d3380d4fda43924171bc0866746c85634952c99",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3325"
+    ],
+    "state": "cve-assigned"
+  },
+  "af143a26ef96ba9be7b9c0b151b7605e1c2c74cd": {
+    "message": "ospfd: CVE-2011-3326 (uknown LSA type segfault)\n\nThis vulnerability (CERT-FI #514837) was reported by CROSS project.\nThey have also suggested a fix to the problem, which was found\nacceptable.\n\nQuagga ospfd does not seem to handle unknown LSA types in a Link State\nUpdate message correctly. If LSA type is something else than one\nsupported\nby Quagga, the default handling of unknown types leads to an error.\n\n* ospf_flood.c\n  * ospf_flood(): check return value of ospf_lsa_install()\n",
+    "language": "en",
+    "commit-id": "af143a26ef96ba9be7b9c0b151b7605e1c2c74cd",
+    "summary": "ospfd: CVE-2011-3326 (uknown LSA type segfault)",
+    "stats": {
+      "insertions": 2,
+      "deletions": 1,
+      "lines": 3,
+      "files": 1
+    },
+    "author": "CROSS",
+    "author-email": "info@codenomicon.com",
+    "authored_date": 1317028641,
+    "committed_date": 1317047992,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/af143a26ef96ba9be7b9c0b151b7605e1c2c74cd",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3326"
+    ],
+    "state": "cve-assigned"
+  },
+  "a1afbc6e1d56b06409de5e8d7d984d565817fd96": {
+    "message": "bgpd: CVE-2011-3327 (ext. comm. buffer overflow)\n\nThis vulnerability (CERT-FI #513254) was reported by CROSS project.\nThey have also suggested a fix to the problem, which was found\nacceptable.\n\nThe problem occurs when bgpd receives an UPDATE message containing\n255 unknown AS_PATH attributes in Path Attribute Extended Communities.\nThis causes a buffer overlow in bgpd.\n\n* bgp_ecommunity.c\n  * ecommunity_ecom2str(): perform size check earlier\n",
+    "language": "en",
+    "commit-id": "a1afbc6e1d56b06409de5e8d7d984d565817fd96",
+    "summary": "bgpd: CVE-2011-3327 (ext. comm. buffer overflow)",
+    "stats": {
+      "insertions": 7,
+      "deletions": 7,
+      "lines": 14,
+      "files": 1
+    },
+    "author": "CROSS",
+    "author-email": "info@codenomicon.com",
+    "authored_date": 1317028625,
+    "committed_date": 1317047977,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "CVE"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/a1afbc6e1d56b06409de5e8d7d984d565817fd96",
+    "tags": [],
+    "cve": [
+      "CVE-2011-3327"
+    ],
+    "state": "cve-assigned"
+  },
+  "fc09716b81e67f2d06dc92ff7bcb1efdf18c4eec": {
+    "message": "bgpd/security: CVE-2010-1674 Fix crash due to extended-community parser error\n\n* bgp_attr.c: (bgp_attr_ext_communities) Certain extended-community attrs\n  can leave attr->flag indicating ext-community is present, even though no\n  extended-community object has been attached to the attr structure.  Thus a\n  null-pointer dereference can occur later.\n  (bgp_attr_community) No bug fixed here, but tidy up flow so it has same\n  form as previous.\n\n  Problem and fix thanks to anonymous reporter.\n(cherry picked from commit 0c46638122f10019a12ae9668aec91691cf2e017)\n",
+    "language": "en",
+    "commit-id": "fc09716b81e67f2d06dc92ff7bcb1efdf18c4eec",
+    "summary": "bgpd/security: CVE-2010-1674 Fix crash due to extended-community parser error",
+    "stats": {
+      "insertions": 20,
+      "deletions": 12,
+      "lines": 32,
+      "files": 1
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@quagga.net",
+    "authored_date": 1291569446,
+    "committed_date": 1309798920,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/fc09716b81e67f2d06dc92ff7bcb1efdf18c4eec",
+    "tags": [],
+    "cve": [
+      "CVE-2010-1674"
+    ],
+    "state": "cve-assigned"
+  },
+  "f5a4827db60545309d0ee378b85acac56cf7837a": {
+    "message": "bgpd: refine the setting up of GTSM\n\n* bgpd.h: Add error code for setting GTSM on iBGP\n* bgpd.c: (peer_ttl_security_hops_set) use previous error code and signal\n  incompatibility of GTSM+iBGP to vty.\n  Consider the session state when setting GTSM, and reset Open/Active peers\n  to let them pick up new TTL from start.\n",
+    "language": "en",
+    "commit-id": "f5a4827db60545309d0ee378b85acac56cf7837a",
+    "summary": "bgpd: refine the setting up of GTSM",
+    "stats": {
+      "insertions": 33,
+      "deletions": 8,
+      "lines": 41,
+      "files": 3
+    },
+    "author": "Stephen Hemminger",
+    "author-email": "shemminger@vyatta.com",
+    "authored_date": 1300987821,
+    "committed_date": 1301308061,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/f5a4827db60545309d0ee378b85acac56cf7837a",
+    "tags": [],
+    "state": "under-review"
+  },
+  "d876bdf4a84f40ac3f9bec8d5040858b3725db3e": {
+    "message": "lib: Add support for IPv6 ttl security\n\n* sockunion.c: (sockopt_minttl) Add IPv6 support for min hop count.\n  The kernel support is Linux kernel 2.6.35 or later.\n",
+    "language": "en",
+    "commit-id": "d876bdf4a84f40ac3f9bec8d5040858b3725db3e",
+    "summary": "lib: Add support for IPv6 ttl security",
+    "stats": {
+      "insertions": 19,
+      "deletions": 11,
+      "lines": 30,
+      "files": 1
+    },
+    "author": "Stephen Hemminger",
+    "author-email": "shemminger@vyatta.com",
+    "authored_date": 1281029187,
+    "committed_date": 1300965521,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/d876bdf4a84f40ac3f9bec8d5040858b3725db3e",
+    "tags": [],
+    "state": "under-review"
+  },
+  "89b6d1f8e2759cc38bc768067abe3a296d93f454": {
+    "message": "bgpd: Cleanups & fixes for minttl / GTSM\n\n* bgp_vty.c: (peer_ebgp_multihop_{un,}set_vty) tail-call cleanup.\n  ({no_,}neighbor_ttl_security) ditto.\n* bgpd.c: (peer_ttl_security_hops_set) Peer group checks and TTL set only\n  need to be done on transition.\n* sockunion.c: (sockopt_minttl) remove always-on debug and improve readability.\n",
+    "language": "en",
+    "commit-id": "89b6d1f8e2759cc38bc768067abe3a296d93f454",
+    "summary": "bgpd: Cleanups & fixes for minttl / GTSM",
+    "stats": {
+      "insertions": 41,
+      "deletions": 51,
+      "lines": 92,
+      "files": 3
+    },
+    "author": "Stephen Hemminger",
+    "author-email": "shemminger@vyatta.com",
+    "authored_date": 1300963919,
+    "committed_date": 1300963919,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/89b6d1f8e2759cc38bc768067abe3a296d93f454",
+    "tags": [],
+    "state": "under-review"
+  },
+  "fa411a212b55bba650d68fd0456686f3e47b7395": {
+    "message": "bgpd: RFC 5082 Generalized TTL Security Mechanism support\n\n* bgpd: Add support for RFC 5082 GTSM, which allows the TTL field to be used\n  to verify that incoming packets have been sent from neighbours no more\n  than X IP hops away. In other words, this allows packets that were sent from\n  further away (i.e. not by the neighbour with known distance, and so possibly\n  a miscreant) to be filtered out.\n* lib/sockunion.{c,h}: (sockopt_minttl) new function, to set a minimum TTL\n  using the IP_MINTTL socket opt.\n* bgpd.h: (BGP_ERR_NO_EBGP_MULTIHOP_WITH_TTLHACK) define for command\n  error for minttl.\n  (struct peer) add a config variable, to store the configured minttl.\n  (peer_ttl_security_hops_{set,unset}) configuration handlers\n* bgpd.c: (peer_group_get) init gtsm_hops\n  (peer_ebgp_multihop_{un,}set) check for conflicts with GTSM. Multihop and\n  GTSM can't both be active for a peer at the same time.\n  (peer_ttl_security_hops_set) set minttl, taking care to avoid conflicts with\n  ebgp_multihop.\n  (bgp_config_write_peer) write out minttl as \"neighbor .. ttl-security hops X\".\n* bgp_vty.c: (bgp_vty_return) message for\n  BGP_ERR_NO_EBGP_MULTIHOP_WITH_TTLHACK\n  (peer_ebgp_multihop_{un,}set_vty)\n* bgp_network.c: (bgp_accept) set minttl on accepted sockets if appropriate.\n  (bgp_connect) ditto for outbound.\n",
+    "language": "en",
+    "commit-id": "fa411a212b55bba650d68fd0456686f3e47b7395",
+    "summary": "bgpd: RFC 5082 Generalized TTL Security Mechanism support",
+    "stats": {
+      "insertions": 256,
+      "deletions": 11,
+      "lines": 267,
+      "files": 6
+    },
+    "author": "Nick Hilliard",
+    "author-email": "nick@inex.ie",
+    "authored_date": 1300894397,
+    "committed_date": 1300894397,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "Security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/fa411a212b55bba650d68fd0456686f3e47b7395",
+    "tags": [],
+    "state": "under-review"
+  },
+  "0c46638122f10019a12ae9668aec91691cf2e017": {
+    "message": "bgpd/security: CVE-2010-1674 Fix crash due to extended-community parser error\n\n* bgp_attr.c: (bgp_attr_ext_communities) Certain extended-community attrs\n  can leave attr->flag indicating ext-community is present, even though no\n  extended-community object has been attached to the attr structure.  Thus a\n  null-pointer dereference can occur later.\n  (bgp_attr_community) No bug fixed here, but tidy up flow so it has same\n  form as previous.\n\n  Problem and fix thanks to anonymous reporter.\n",
+    "language": "en",
+    "commit-id": "0c46638122f10019a12ae9668aec91691cf2e017",
+    "summary": "bgpd/security: CVE-2010-1674 Fix crash due to extended-community parser error",
+    "stats": {
+      "insertions": 20,
+      "deletions": 12,
+      "lines": 32,
+      "files": 1
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul@quagga.net",
+    "authored_date": 1291569446,
+    "committed_date": 1300715456,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/0c46638122f10019a12ae9668aec91691cf2e017",
+    "tags": [],
+    "cve": [
+      "CVE-2010-1674"
+    ],
+    "state": "cve-assigned"
+  },
+  "e26873fd8f0c4306eff65de94a45b4114fc81b98": {
+    "message": "zebra: fix infinite loop when deleting an interface\n\nWhen deleting a VLAN interface after flushing its\naddresses, zebra uses 100% CPU time and freezes.\n\n * interface.c: The while loop in line 407 that\n   should clean up connected routes never hits one\n   of the 2 lines \"last = node;\" and thus loops\n   forever.\n\nSigned-off-by: Roman Hoog Antink <rha@open.ch>\n",
+    "language": "en",
+    "commit-id": "e26873fd8f0c4306eff65de94a45b4114fc81b98",
+    "summary": "zebra: fix infinite loop when deleting an interface",
+    "stats": {
+      "insertions": 4,
+      "deletions": 0,
+      "lines": 4,
+      "files": 1
+    },
+    "author": "Roman Hoog Antink",
+    "author-email": "rha@open.ch",
+    "authored_date": 1273068050,
+    "committed_date": 1273075413,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "infinite loop"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/e26873fd8f0c4306eff65de94a45b4114fc81b98",
+    "tags": [],
+    "state": "under-review"
+  },
+  "d023aec49f70156d2ed894a8fba65bcfa221ff02": {
+    "message": "bgpd: start listener on first instance\n\nStart BGP listener only after first instance is started.  This helps the\nsecurity if BGP is not used but daemon is started.  It also addresses some\nissues like MD5 not working on listener unless IPV6 configured (because\nlistener was not in list); as well as compiler warnings.\n\n* bgp_network.c: (bgp_listener) listen socket creation consolidated here\n  (bgp_socket) Use bgp_listener\n* bgpd.c: (bgp_get) call bgp_socket on creation of first struct bgp.\n  (bgp_init) remove bgp_socket call.\n* memtypes.c: Add MTYPE_BGP_LISTENER\n",
+    "language": "en",
+    "commit-id": "d023aec49f70156d2ed894a8fba65bcfa221ff02",
+    "summary": "bgpd: start listener on first instance",
+    "stats": {
+      "insertions": 114,
+      "deletions": 94,
+      "lines": 208,
+      "files": 4
+    },
+    "author": "Stephen Hemminger",
+    "author-email": "shemminger@vyatta.com",
+    "authored_date": 1248218841,
+    "committed_date": 1248771878,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/d023aec49f70156d2ed894a8fba65bcfa221ff02",
+    "tags": [],
+    "state": "under-review"
+  },
+  "370b64a2ad38e43b4bed028960481bbf4192becd": {
+    "message": "[bgpd] Fix number of DoS security issues, restricted to configured peers.\n\n2007-12-22 Paul Jakma <paul.jakma@sun.com>\n\n\t* Fix series of vulnerabilities reported by \"Mu Security\n\t  Research Team\", where bgpd can be made to crash by sending\n\t  malformed packets - requires that bgpd be configured with a\n\t  session to the peer.\n\t* bgp_attr.c: (bgp_attr_as4_path) aspath_parse may fail, only\n\t  set the attribute flag indicating AS4_PATH if we actually managed\n\t  to parse one.\n\t  (bgp_attr_munge_as4_attrs) Assert was too general, it is possible\n\t  to receive AS4_AGGREGATOR before AGGREGATOR.\n\t  (bgp_attr_parse) Check that we have actually received the extra\n\t  byte of header for Extended-Length attributes.\n\t* bgp_attr.h: Fix BGP_ATTR_MIN_LEN to account for the length byte.\n\t* bgp_open.c: (cap_minsizes) Fix size of CAPABILITY_CODE_RESTART,\n\t  incorrect -2 left in place from a development version of as4-path\n\t  patch.\n\t* bgp_packet.c: (bgp_route_refresh_receive) ORF length parameter\n\t  needs to be properly sanity checked.\n\t* tests/bgp_capability_test.c: Test for empty capabilities.\n",
+    "language": "en",
+    "commit-id": "370b64a2ad38e43b4bed028960481bbf4192becd",
+    "summary": "[bgpd] Fix number of DoS security issues, restricted to configured peers.",
+    "stats": {
+      "insertions": 87,
+      "deletions": 8,
+      "lines": 95,
+      "files": 7
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul.jakma@sun.com",
+    "authored_date": 1198342192,
+    "committed_date": 1198342192,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "DoS"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/370b64a2ad38e43b4bed028960481bbf4192becd",
+    "tags": [],
+    "state": "under-review"
+  },
+  "b2ceea18074ab8cca894051a3fbc30c312e3acc6": {
+    "message": "[bgpd] low-impact DoS: crash on malformed community with debug set\n\n2007-09-07 Paul Jakma <paul.jakma@sun.com>\n\n\t* (general) bgpd can be made crash by remote peers if debug\n\t  bgp updates is set, due to NULL pointer dereference.\n\t  Reported by \"Mu Security Research Team\",\n\t  <security@musecurity.com>.\n\t* bgp_attr.c: (bgp_attr_community) If community length is 0,\n\t  don't set the community-present attribute bit, just return\n\t  early.\n\t* bgp_debug.c: (community_str,community_com2str) Check com\n\t  pointer before dereferencing.\n",
+    "language": "en",
+    "commit-id": "b2ceea18074ab8cca894051a3fbc30c312e3acc6",
+    "summary": "[bgpd] low-impact DoS: crash on malformed community with debug set",
+    "stats": {
+      "insertions": 22,
+      "deletions": 1,
+      "lines": 23,
+      "files": 3
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul.jakma@sun.com",
+    "authored_date": 1189175095,
+    "committed_date": 1189175095,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "DoS"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/b2ceea18074ab8cca894051a3fbc30c312e3acc6",
+    "tags": [],
+    "state": "under-review"
+  },
+  "5f03f141eced8bad4971fcc6ec7d7a538c227d8c": {
+    "message": "[docs] Update ripd docs on version and authentication, see bugs #261,#262\n\n2006-05-04 Paul Jakma <paul.jakma@sun.com>\n\n\t* ripd.texi: Add Version Control as a distinct section.\n\t  Expand Version Control section with overview text,\n\t  touching on insecurity of RIPv1 and referencing\n\t  authentication section, cleanup text of various version\n\t  commands.\n\t  RIP Authentication: Add overview text, refer to RIPv1 version\n\t  control, which is required to completely secure RIP.\n",
+    "language": "en",
+    "commit-id": "5f03f141eced8bad4971fcc6ec7d7a538c227d8c",
+    "summary": "[docs] Update ripd docs on version and authentication, see bugs #261,#262",
+    "stats": {
+      "insertions": 86,
+      "deletions": 31,
+      "lines": 117,
+      "files": 2
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul.jakma@sun.com",
+    "authored_date": 1146728257,
+    "committed_date": 1146728257,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/5f03f141eced8bad4971fcc6ec7d7a538c227d8c",
+    "tags": [],
+    "state": "under-review"
+  },
+  "15aa6a1a732eef1049dbc64d7ede9236772cafcf": {
+    "message": "[bgpd] Fix infinite loop in community_str2com\n\n2006-03-30 Paul Jakma <paul.jakma@sun.com>\n\n\t* bgp_community.c: (community_gettoken) Unknown token should\n\t  return NULL, to give a strong indication to callers that\n\t  the token no longer can be parsed, otherwise callers looping\n\t  on this function may have a hard time ending their loop.\n\t  (community_str2com) While loop around community_gettoken appears\n\t  to have been coded thinking that break statement would break\n\t  from the while{}, hence it could never exit for unknown token\n\t  case. Fix it to do..while, so it can use the NULL result from\n\t  community_gettoken easily.\n",
+    "language": "en",
+    "commit-id": "15aa6a1a732eef1049dbc64d7ede9236772cafcf",
+    "summary": "[bgpd] Fix infinite loop in community_str2com",
+    "stats": {
+      "insertions": 20,
+      "deletions": 6,
+      "lines": 26,
+      "files": 2
+    },
+    "author": "Paul Jakma",
+    "author-email": "paul.jakma@sun.com",
+    "authored_date": 1143729575,
+    "committed_date": 1143729575,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "infinite loop"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/15aa6a1a732eef1049dbc64d7ede9236772cafcf",
+    "tags": [],
+    "state": "under-review"
+  },
+  "9dbc797274ca5df614d61784658b8f809bbd8e2b": {
+    "message": "2005-03-13 Andrew J. Schorr <ajschorr@alumni.princeton.edu>\n\n\t* ospf_lsa.c: (ospf_lsa_refresh_walker) If the system clock jumps\n\t  backward, then current time may be less than\n\t  ospf->lsa_refresher_started.  This was causing invalid values\n\t  for ospf->lsa_refresh_queue.index resulting in infinite loops.\n\t  Problem fixed by casting the expression to unsigned before taking\n\t  the modulus.\n\n\t[backport candidate]\n",
+    "language": "en",
+    "commit-id": "9dbc797274ca5df614d61784658b8f809bbd8e2b",
+    "summary": "2005-03-13 Andrew J. Schorr <ajschorr@alumni.princeton.edu>",
+    "stats": {
+      "insertions": 15,
+      "deletions": 3,
+      "lines": 18,
+      "files": 2
+    },
+    "author": "ajs",
+    "author-email": "ajs",
+    "authored_date": 1110742042,
+    "committed_date": 1110742042,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "infinite loop"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/9dbc797274ca5df614d61784658b8f809bbd8e2b",
+    "tags": [],
+    "state": "under-review"
+  },
+  "cced60dd5bf297d16ec61fad75a122deaeca9e20": {
+    "message": "004-07-13  David Wiggins <dwiggins@bbn.com\n\n\t* kernel_socket.c (rtm_flag_dump): terminate buffer with '\\0', not '0'.\n\n\nThis is arguably not a security problem, since strlcat is used to copy\nto the buffer -gdt.\n",
+    "language": "en",
+    "commit-id": "cced60dd5bf297d16ec61fad75a122deaeca9e20",
+    "summary": "004-07-13  David Wiggins <dwiggins@bbn.com",
+    "stats": {
+      "insertions": 5,
+      "deletions": 1,
+      "lines": 6,
+      "files": 2
+    },
+    "author": "gdt",
+    "author-email": "gdt",
+    "authored_date": 1089737154,
+    "committed_date": 1089737154,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "security"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/cced60dd5bf297d16ec61fad75a122deaeca9e20",
+    "tags": [],
+    "state": "under-review"
+  },
+  "5b8c1b0d6af736b0633309b4b3490298b9a20742": {
+    "message": "2003-10-15 Jay Fenlason <fenlason@redhat.com>\n\n        * lib/vty.c: (vty_telnet_option) Remote DoS exists if a telnet\n          end-sub-negotation is sent when no sub-negotation data has been\n          sent. Return immediately if no sub-negotation is in progress.\n          (vty_read) do not attempt to process options if no sub-negotation\n          is in progress.\n",
+    "language": "en",
+    "commit-id": "5b8c1b0d6af736b0633309b4b3490298b9a20742",
+    "summary": "2003-10-15 Jay Fenlason <fenlason@redhat.com>",
+    "stats": {
+      "insertions": 11,
+      "deletions": 6,
+      "lines": 17,
+      "files": 1
+    },
+    "author": "paul",
+    "author-email": "paul",
+    "authored_date": 1066259335,
+    "committed_date": 1066259335,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "DoS"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/5b8c1b0d6af736b0633309b4b3490298b9a20742",
+    "tags": [],
+    "state": "under-review"
+  },
+  "90578521e5f332e65e97f7612485d04ace5c0ba5": {
+    "message": "2003-09-24 sowmini.varadhan@sun.com\n\n\t* lib/if.c: (if_cmp_func) fix infinite loop if\n\t  ifp1->name == ifp2->name\n",
+    "language": "en",
+    "commit-id": "90578521e5f332e65e97f7612485d04ace5c0ba5",
+    "summary": "2003-09-24 sowmini.varadhan@sun.com",
+    "stats": {
+      "insertions": 6,
+      "deletions": 1,
+      "lines": 7,
+      "files": 1
+    },
+    "author": "paul",
+    "author-email": "paul",
+    "authored_date": 1064360761,
+    "committed_date": 1064360761,
+    "branches": [
+      "master"
+    ],
+    "pattern-selected": "(?i)(denial of service|\\bXXE\\b|remote code execution|\\bopen redirect|OSVDB|\\bvuln|\\bCVE\\b|\\bXSS\\b|\\bReDoS\\b|\\bNVD\\b|malicious|x−frame−options|attack|cross site|exploit|malicious|directory traversal|\\bRCE\\b|\\bdos\\b|\\bXSRF \\b|\\bXSS\\b|clickjack|session.fixation|hijack|\\badvisory|\\binsecure|security|\\bcross−origin\\b|unauthori[z|s]ed|infinite loop)",
+    "pattern-matches": [
+      "infinite loop"
+    ],
+    "origin": "https://git.savannah.nongnu.org/git/quagga.git",
+    "origin-github-api": "https://api.github.com/repos///git.savannah.nongnu.org/git/quagga/commits/90578521e5f332e65e97f7612485d04ace5c0ba5",
+    "tags": [],
+    "state": "under-review"
+  }
+}

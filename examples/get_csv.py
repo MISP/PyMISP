@@ -9,6 +9,7 @@ from keys import misp_url, misp_key, misp_verifycert
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get MISP stuff as CSV.')
+    parser.add_argument("--controller", default='attributes', help="Attribute to use for the search (events, objects, attributes)")
     parser.add_argument("-e", "--event_id", help="Event ID to fetch. Without it, it will fetch the whole database.")
     parser.add_argument("-a", "--attribute", nargs='+', help="Attribute column names")
     parser.add_argument("-o", "--object_attribute", nargs='+', help="Object attribute column names")
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     if not attr:
         attr = None
     print(args.context)
-    response = pymisp.search(return_format='csv', eventid=args.event_id, requested_attributes=attr,
+    response = pymisp.search(return_format='csv', controller=args.controller, eventid=args.event_id, requested_attributes=attr,
                              type_attribute=args.misp_types, include_context=args.context)
 
     if args.outfile:

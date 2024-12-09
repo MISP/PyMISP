@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
-import json
 import argparse
 import datetime
+import json
+import sys
 import time
+
 import redis
 
 import settings
-
 from generator import FeedGenerator
 
 
@@ -60,7 +60,10 @@ class RedisToMISPFeed:
                     except Exception as error:
                         self.save_error_to_redis(error, data)
 
-            beautyful_sleep(5, self.format_last_action())
+            try:
+                beautyful_sleep(5, self.format_last_action())
+            except KeyboardInterrupt:
+                sys.exit(130)
 
     def pop(self, key):
         popped = self.serv.rpop(key)
@@ -104,7 +107,7 @@ class RedisToMISPFeed:
             # Suffix not provided, try to add anyway
             if settings.fallback_MISP_type == 'attribute':
                 new_key = key + self.SUFFIX_ATTR
-                # Add atribute type from the config
+                # Add attribute type from the config
                 if 'type' not in data and settings.fallback_attribute_type:
                     data['type'] = settings.fallback_attribute_type
                 else:

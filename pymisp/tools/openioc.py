@@ -1,11 +1,10 @@
-
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import os
 
 from .. import MISPEvent
 try:
-    from bs4 import BeautifulSoup
+    from bs4 import BeautifulSoup  # type: ignore
     has_bs4 = True
 except ImportError:
     has_bs4 = False
@@ -100,7 +99,7 @@ iocMispMapping = {
 
     'RouteEntryItem/Destination': {'type': 'ip-dst'},
     'RouteEntryItem/Destination/IP': {'type': 'ip-dst', 'comment': 'RouteDestination. '},
-    'RouteEntryItem/Destination/string': {'type': 'url', 'comment': 'RouteDestination. '},
+    'RouteEntryItem/Destination/string': {'type': 'hostname', 'comment': 'RouteDestination. '},
 
 
     'ServiceItem/name': {'type': 'windows-service-name'},
@@ -156,7 +155,7 @@ def extract_field(report, field_name):
 def load_openioc_file(openioc_path):
     if not os.path.exists(openioc_path):
         raise Exception("Path doesn't exists.")
-    with open(openioc_path, 'r') as f:
+    with open(openioc_path) as f:
         return load_openioc(f)
 
 
@@ -218,7 +217,12 @@ def set_values(value1, value2=None):
         compositeMapping = '{}|{}'.format(value1.find('context')['search'], value2.find('context')['search'])
         mapping = get_mapping(compositeMapping, mappingDict=iocMispCompositeMapping)
     else:
-        mapping = get_mapping(value1.find('context')['search'])
+        context_search = value1.find('context')['search']
+        content_type = value1.find('content').get('type', None)
+        if "RouteEntryItem/Destination" in context_search and content_type:
+            mapping = get_mapping(context_search + '/' + content_type)
+        else:
+            mapping = get_mapping(context_search)
 
     if mapping:
         attribute_values.update(mapping)

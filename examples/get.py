@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
-import json
 
-
-# Usage for pipe masters: ./last.py -l 5h | jq .
 
 proxies = {
     'http': 'http://127.0.0.1:8123',
@@ -17,18 +14,6 @@ proxies = {
 
 proxies = None
 
-
-def init(url, key):
-    return PyMISP(url, key, misp_verifycert, 'json', proxies=proxies)
-
-
-def get_event(m, event, out=None):
-    result = m.get_event(event)
-    if out is None:
-        print(json.dumps(result) + '\n')
-    else:
-        with open(out, 'w') as f:
-            f.write(json.dumps(result) + '\n')
 
 if __name__ == '__main__':
 
@@ -42,6 +27,11 @@ if __name__ == '__main__':
         print('Output file already exists, abort.')
         exit(0)
 
-    misp = init(misp_url, misp_key)
+    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, proxies=proxies)
 
-    get_event(misp, args.event, args.output)
+    event = misp.get_event(args.event, pythonify=True)
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(event.to_json())
+    else:
+        print(event.to_json())

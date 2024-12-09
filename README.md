@@ -1,57 +1,58 @@
-README
-======
-
-[![Documentation Status](https://readthedocs.org/projects/pymisp/badge/?version=latest)](http://pymisp.readthedocs.io/?badge=latest)
-[![Build Status](https://travis-ci.org/MISP/PyMISP.svg?branch=master)](https://travis-ci.org/MISP/PyMISP)
-[![Coverage Status](https://coveralls.io/repos/github/MISP/PyMISP/badge.svg?branch=master)](https://coveralls.io/github/MISP/PyMISP?branch=master)
-[![Python 3.6](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360/)
-[![PyPi version](https://img.shields.io/pypi/v/pymisp.svg)](https://pypi.python.org/pypi/pymisp/)
-[![Number of PyPI downloads](https://pypip.in/d/pymisp/badge.png)](https://pypi.python.org/pypi/pymisp/)
+**IMPORTANT NOTE**: This library will require **at least** Python 3.10 starting the 1st of January 2024. If you have legacy versions of python, please use the latest PyMISP version that will be released in December 2023, and consider updating your system(s). Anything released within the last 2 years will do, starting with Ubuntu 22.04.
 
 # PyMISP - Python Library to access MISP
+
+[![Documentation Status](https://readthedocs.org/projects/pymisp/badge/?version=latest)](http://pymisp.readthedocs.io/?badge=latest)
+[![Coverage Status](https://coveralls.io/repos/github/MISP/PyMISP/badge.svg?branch=main)](https://coveralls.io/github/MISP/PyMISP?branch=main)
+[![Python 3.8](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![PyPi version](https://img.shields.io/pypi/v/pymisp.svg)](https://pypi.python.org/pypi/pymisp/)
+[![Number of PyPI downloads](https://img.shields.io/pypi/dm/pymisp.svg)](https://pypi.python.org/pypi/pymisp/)
 
 PyMISP is a Python library to access [MISP](https://github.com/MISP/MISP) platforms via their REST API.
 
 PyMISP allows you to fetch events, add or update events/attributes, add or update samples or search for attributes.
 
-## Requirements
-
- * [requests](http://docs.python-requests.org)
-
 ## Install from pip
 
+**It is strongly recommended to use a virtual environment**
+
+If you want to know more about virtual environments, [python has you covered](https://docs.python.org/3/tutorial/venv.html)
+
+Only basic dependencies:
 ```
 pip3 install pymisp
 ```
 
-## Install the latest version from repo
+And there are a few optional dependencies:
+* fileobjects: to create PE/ELF/Mach-o objects
+* openioc: to import files in OpenIOC format (not really maintained)
+* virustotal: to query VirusTotal and generate the appropriate objects
+* docs: to generate te documentation
+* pdfexport: to generate PDF reports out of MISP events
+* url: to generate URL objects out of URLs with Pyfaup
+* email: to generate MISP Email objects
+* brotli: to use the brotli compression when interacting with a MISP instance
+
+Example:
+
+```
+pip3 install pymisp[virustotal,email]
+```
+
+## Install the latest version from repo from development purposes
+
+**Note**: poetry is required; e.g., "pip3 install poetry"
 
 ```
 git clone https://github.com/MISP/PyMISP.git && cd PyMISP
 git submodule update --init
-pip3 install -I .[fileobjects,neo,openioc,virustotal]
+poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport -E email
 ```
 
-## Installing it with virtualenv
-
-It is recommended to use virtualenv to not polute your OS python envirenment.
-```
-pip3 install virtualenv
-git clone https://github.com/MISP/PyMISP.git && cd PyMISP
-python3 -m venv ./
-source venv/bin/activate
-git submodule update --init
-pip3 install -I .[fileobjects,neo,openioc,virustotal]
-```
-
-## Running the tests
+### Running the tests
 
 ```bash
-pip3 install -U nose pip setuptools coveralls codecov requests-mock
-pip3 install git+https://github.com/kbandla/pydeep.git
-
-git clone https://github.com/viper-framework/viper-test-files.git tests/viper-test-files
-nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/test_*.py
+poetry run pytest --cov=pymisp tests/test_*.py
 ```
 
 If you have a MISP instance to test against, you can also run the live ones:
@@ -59,7 +60,7 @@ If you have a MISP instance to test against, you can also run the live ones:
 **Note**: You need to update the key in `tests/testlive_comprehensive.py` to the automation key of your admin account.
 
 ```bash
-nosetests-3.4 --with-coverage --cover-package=pymisp,tests --cover-tests tests/testlive_comprehensive.py
+poetry run pytest --cov=pymisp tests/testlive_comprehensive.py
 ```
 
 ## Samples and how to use PyMISP
@@ -89,7 +90,7 @@ python3 last.py -l 45m # 45 minutes
 
 ## Debugging
 
-You have two options there:
+You have two options here:
 
 1. Pass `debug=True` to `PyMISP` and it will enable logging.DEBUG to stderr on the whole module
 
@@ -100,7 +101,7 @@ You have two options there:
 import logging
 logger = logging.getLogger('pymisp')
 
-# Configure it as you whish, for example, enable DEBUG mode:
+# Configure it as you wish, for example, enable DEBUG mode:
 logger.setLevel(logging.DEBUG)
 ```
 
@@ -114,31 +115,37 @@ logger = logging.getLogger('pymisp')
 logging.basicConfig(level=logging.DEBUG, filename="debug.log", filemode='w', format=pymisp.FORMAT)
 ```
 
+## Test cases
+
+1. The content of `mispevent.py` is tested on every commit
+2. The test cases that require a running MISP instance can be run the following way:
+
+
+```bash
+# From poetry
+
+pytest --cov=pymisp tests/test_*.py tests/testlive_comprehensive.py:TestComprehensive.[test_name]
+```
+
 ## Documentation
 
-[PyMISP API documentation is available](https://media.readthedocs.org/pdf/pymisp/latest/pymisp.pdf).
-
-Documentation can be generated with epydoc:
-
-```
-epydoc --url https://github.com/MISP/PyMISP --graph all --name PyMISP --pdf pymisp -o doc
-```
+The documentation is available [here](https://pymisp.readthedocs.io/en/latest/).
 
 ### Jupyter notebook
 
-A series of [Jupyter notebooks for PyMISP tutorial](https://github.com/MISP/PyMISP/tree/master/docs/tutorial) are available in the repository.
+A series of [Jupyter notebooks for PyMISP tutorial](https://github.com/MISP/PyMISP/tree/main/docs/tutorial) are available in the repository.
 
 ## Everything is a Mutable Mapping
 
 ... or at least everything that can be imported/exported from/to a json blob
 
-`AbstractMISP` is the master class, and inherit `collections.MutableMapping` which means
+`AbstractMISP` is the master class, and inherits from `collections.MutableMapping` which means
 the class can be represented as a python dictionary.
 
 The abstraction assumes every property that should not be seen in the dictionary is prepended with a `_`,
 or its name is added to the private list `__not_jsonable` (accessible through `update_not_jsonable` and `set_not_jsonable`.
 
-This master class has helpers that will make it easy to load, and export, to, and from, a json string.
+This master class has helpers that make it easy to load, and export to, and from, a json string.
 
 `MISPEvent`, `MISPAttribute`, `MISPObjectReference`, `MISPObjectAttribute`, and `MISPObject`
 are subclasses of AbstractMISP, which mean that they can be handled as python dictionaries.
@@ -147,6 +154,40 @@ are subclasses of AbstractMISP, which mean that they can be handled as python di
 
 Creating a new MISP object generator should be done using a pre-defined template and inherit `AbstractMISPObjectGenerator`.
 
-Your new MISPObject generator need to generate attributes, and add them as class properties using `add_attribute`.
+Your new MISPObject generator must generate attributes and add them as class properties using `add_attribute`.
 
 When the object is sent to MISP, all the class properties will be exported to the JSON export.
+
+## Installing PyMISP on a machine with no internet access
+
+This is done using poetry and you need to have this repository cloned on your machine.
+The commands below have to be run from inside the cloned directory.
+
+
+1. From a machine with access to the internet, get the dependencies:
+
+```bash
+mkdir offline
+poetry export --all-extras  > offline/requirements.txt
+poetry run pip download -r offline/requirements.txt -d offline/packages/
+```
+
+2. Prepare the PyMISP Package
+
+```bash
+poetry build
+mv dist/*.whl offline/packages/
+```
+
+3. Copy the content of `offline/packages/` to the machine with no internet access.
+
+4. Install the packages:
+
+```bash
+python -m pip install --no-index --no-deps packages/*.whl
+```
+
+# License
+
+PyMISP is distributed under an [open source license](./LICENSE). A simplified 2-BSD license.
+

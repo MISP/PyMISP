@@ -1,5 +1,5 @@
-pymisp
-======
+pymisp - Classes
+================
 
 .. toctree::
    :maxdepth: 4
@@ -12,12 +12,6 @@ PyMISP
 ------
 
 .. autoclass:: PyMISP
-    :members:
-
-PyMISPExpanded (Python 3.6+ only)
----------------------------------
-
-.. autoclass:: ExpandedPyMISP
     :members:
 
 MISPAbstract
@@ -36,6 +30,20 @@ MISPEvent
 ---------
 
 .. autoclass:: MISPEvent
+    :members:
+    :inherited-members:
+
+MISPEventBlocklist
+------------------
+
+.. autoclass:: MISPEventBlocklist
+    :members:
+    :inherited-members:
+
+MISPEventDelegation
+-------------------
+
+.. autoclass:: MISPEventDelegation
     :members:
     :inherited-members:
 
@@ -67,6 +75,13 @@ MISPObjectReference
     :members:
     :inherited-members:
 
+MISPObjectTemplate
+------------------
+
+.. autoclass:: MISPObjectTemplate
+    :members:
+    :inherited-members:
+
 MISPTag
 -------
 
@@ -81,11 +96,101 @@ MISPUser
     :members:
     :inherited-members:
 
+MISPUserSetting
+---------------
+
+.. autoclass:: MISPUserSetting
+    :members:
+    :inherited-members:
 
 MISPOrganisation
 ----------------
 
 .. autoclass:: MISPOrganisation
+    :members:
+    :inherited-members:
+
+MISPOrganisationBlocklist
+-------------------------
+
+.. autoclass:: MISPOrganisationBlocklist
+    :members:
+    :inherited-members:
+
+MISPFeed
+--------
+
+.. autoclass:: MISPFeed
+    :members:
+    :inherited-members:
+
+MISPInbox
+---------
+
+.. autoclass:: MISPInbox
+    :members:
+    :inherited-members:
+
+MISPLog
+-------
+
+.. autoclass:: MISPLog
+    :members:
+    :inherited-members:
+
+MISPNoticelist
+--------------
+
+.. autoclass:: MISPNoticelist
+    :members:
+    :inherited-members:
+
+MISPRole
+--------
+
+.. autoclass:: MISPRole
+    :members:
+    :inherited-members:
+
+MISPServer
+----------
+
+.. autoclass:: MISPServer
+    :members:
+    :inherited-members:
+
+MISPShadowAttribute
+-------------------
+
+.. autoclass:: MISPShadowAttribute
+    :members:
+    :inherited-members:
+
+MISPSharingGroup
+----------------
+
+.. autoclass:: MISPSharingGroup
+    :members:
+    :inherited-members:
+
+MISPSighting
+------------
+
+.. autoclass:: MISPSighting
+    :members:
+    :inherited-members:
+
+MISPTaxonomy
+------------
+
+.. autoclass:: MISPTaxonomy
+    :members:
+    :inherited-members:
+
+MISPWarninglist
+---------------
+
+.. autoclass:: MISPWarninglist
     :members:
     :inherited-members:
 

@@ -1,60 +1,83 @@
-__version__ = '2.4.103'
-import logging
-import functools
-import warnings
-import sys
+from __future__ import annotations
 
-FORMAT = "%(levelname)s [%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
-formatter = logging.Formatter(FORMAT)
-default_handler = logging.StreamHandler()
-default_handler.setFormatter(formatter)
+import logging
+import sys
+import warnings
+
+import importlib.metadata
 
 logger = logging.getLogger(__name__)
-logger.addHandler(default_handler)
-logger.setLevel(logging.WARNING)
+
+__version__ = importlib.metadata.version("pymisp")
 
 
-def deprecated(func):
-    '''This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used.'''
+def warning_2024() -> None:
+    if sys.version_info < (3, 10):
+        warnings.warn("""
+As our baseline system is the latest Ubuntu LTS, and Ubuntu LTS 22.04 has Python 3.10 available,
+we will officially deprecate python versions below 3.10 on January 1st 2024.
+**Please update your codebase.**""", DeprecationWarning, stacklevel=3)
 
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.showwarning(
-            "Call to deprecated function {}.".format(func.__name__),
-            category=DeprecationWarning,
-            filename=func.__code__.co_filename,
-            lineno=func.__code__.co_firstlineno + 1
-        )
-        return func(*args, **kwargs)
-    return new_func
+
+everything_broken = '''Unknown error: the response is not in JSON.
+Something is broken server-side, please send us everything that follows (careful with the auth key):
+Request headers:
+{}
+Request body:
+{}
+Response (if any):
+{}'''
 
 
 try:
-    from .exceptions import PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse  # noqa
-    from .api import PyMISP  # noqa
-    from .abstract import AbstractMISP, MISPEncode, MISPTag, Distribution, ThreatLevel, Analysis  # noqa
-    from .mispevent import MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, MISPOrganisation, MISPSighting, MISPLog  # noqa
+    warning_2024()
+    from .exceptions import (PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, # noqa
+                             InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse)
+    from .abstract import AbstractMISP, MISPEncode, pymisp_json_default, MISPTag, Distribution, ThreatLevel, Analysis # noqa
+    from .mispevent import (MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, # noqa
+                            MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy,
+                            MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed,
+                            MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist,
+                            MISPEventReport, MISPCorrelationExclusion, MISPDecayingModel, MISPGalaxy, MISPGalaxyCluster,
+                            MISPGalaxyClusterElement, MISPGalaxyClusterRelation, MISPNote, MISPOpinion, MISPRelationship)
+    from .api import PyMISP, register_user  # noqa
+    # NOTE: the direct imports to .tools are kept for backward compatibility but should be removed in the future
     from .tools import AbstractMISPObjectGenerator  # noqa
-    from .tools import Neo4j  # noqa
-    from .tools import stix  # noqa
     from .tools import openioc  # noqa
-    from .tools import load_warninglists  # noqa
     from .tools import ext_lookups  # noqa
+    from .tools import update_objects  # noqa
+    from .tools import load_warninglists  # noqa
 
-    if sys.version_info >= (3, 6):
-        # Let's not bother with old python
-        try:
-            from .tools import reportlab_generator  # noqa
-        except ImportError:
-            # FIXME: The import should not raise an exception if reportlab isn't installed
-            pass
-        except NameError:
-            # FIXME: The import should not raise an exception if reportlab isn't installed
-            pass
-    if sys.version_info >= (3, 6):
-        from .aping import ExpandedPyMISP  # noqa
+    try:
+        from .tools import reportlab_generator  # noqa
+    except ImportError:
+        # FIXME: The import should not raise an exception if reportlab isn't installed
+        pass
+    except NameError:
+        # FIXME: The import should not raise an exception if reportlab isn't installed
+        pass
     logger.debug('pymisp loaded properly')
 except ImportError as e:
-    logger.warning('Unable to load pymisp properly: {}'.format(e))
+    logger.warning(f'Unable to load pymisp properly: {e}')
+
+
+class ExpandedPyMISP(PyMISP):
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn('This class is deprecated, use PyMISP instead', FutureWarning)
+        super().__init__(*args, **kwargs)
+
+
+__all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
+           'MISPEvent', 'MISPAttribute', 'MISPObjectReference', 'MISPObjectAttribute',
+           'MISPObject', 'MISPUser', 'MISPOrganisation', 'MISPSighting', 'MISPLog',
+           'MISPShadowAttribute', 'MISPWarninglist', 'MISPTaxonomy', 'MISPNoticelist',
+           'MISPObjectTemplate', 'MISPSharingGroup', 'MISPRole', 'MISPServer', 'MISPFeed',
+           'MISPEventDelegation', 'MISPUserSetting', 'MISPInbox', 'MISPEventBlocklist',
+           'MISPOrganisationBlocklist', 'MISPEventReport', 'MISPCorrelationExclusion',
+           'MISPDecayingModel', 'MISPGalaxy', 'MISPGalaxyCluster', 'MISPGalaxyClusterElement',
+           'MISPGalaxyClusterRelation', 'MISPNote', 'MISPOpinion', 'MISPRelationship',
+           'PyMISPError', 'NewEventError', 'NewAttributeError',
+           'NoURL', 'NoKey', 'InvalidMISPObject', 'UnknownMISPObjectTemplate', 'PyMISPInvalidFormat',
+           'Distribution', 'ThreatLevel', 'Analysis', 'ExpandedPyMISP'
+           ]

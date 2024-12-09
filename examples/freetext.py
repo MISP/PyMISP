@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 

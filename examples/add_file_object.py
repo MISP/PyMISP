@@ -19,23 +19,29 @@ if __name__ == '__main__':
     for f in glob.glob(args.path):
         try:
             fo, peo, seos = make_binary_objects(f)
-        except Exception as e:
+        except Exception:
             traceback.print_exc()
             continue
 
         if seos:
             for s in seos:
-                template_id = pymisp.get_object_template_id(s.template_uuid)
-                r = pymisp.add_object(args.event, template_id, s)
+                r = pymisp.add_object(args.event, s)
 
         if peo:
-            template_id = pymisp.get_object_template_id(peo.template_uuid)
-            r = pymisp.add_object(args.event, template_id, peo)
+            if hasattr(peo, 'certificates') and hasattr(peo, 'signers'):
+                # special authenticode case for PE objects
+                for c in peo.certificates:
+                    pymisp.add_object(args.event, c, pythonify=True)
+                for s in peo.signers:
+                    pymisp.add_object(args.event, s, pythonify=True)
+                del peo.certificates
+                del peo.signers
+            del peo.sections
+            r = pymisp.add_object(args.event, peo, pythonify=True)
             for ref in peo.ObjectReference:
                 r = pymisp.add_object_reference(ref)
 
         if fo:
-            template_id = pymisp.get_object_template_id(fo.template_uuid)
-            response = pymisp.add_object(args.event, template_id, fo)
+            response = pymisp.add_object(args.event, fo, pythonify=True)
             for ref in fo.ObjectReference:
                 r = pymisp.add_object_reference(ref)

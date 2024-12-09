@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
-import sys
+import datetime
+import hashlib
 import json
 import os
-import hashlib
-import datetime
+import sys
 import time
-import uuid
 
-from pymisp import MISPEvent
+from pymisp import MISPEvent, MISPOrganisation
 
 import settings
 
@@ -33,11 +32,6 @@ def get_system_templates():
                 definition = json.load(f)
                 templates[obj_name] = definition
     return templates
-
-
-def gen_uuid():
-    """Generate a random UUID and returns its string representation"""
-    return str(uuid.uuid4())
 
 
 class FeedGenerator:
@@ -127,29 +121,44 @@ class FeedGenerator:
         if ('|' in attr_type or attr_type == 'malware-sample'):
             split = attr_value.split('|')
             self.attributeHashes.append([
-                hashlib.md5(str(split[0]).encode("utf-8")).hexdigest(),
+                hashlib.md5(str(split[0]).encode("utf-8"), usedforsecurity=False).hexdigest(),
                 self.current_event_uuid
             ])
             self.attributeHashes.append([
-                hashlib.md5(str(split[1]).encode("utf-8")).hexdigest(),
+                hashlib.md5(str(split[1]).encode("utf-8"), usedforsecurity=False).hexdigest(),
                 self.current_event_uuid
             ])
         else:
             self.attributeHashes.append([
-                hashlib.md5(str(attr_value).encode("utf-8")).hexdigest(),
+                hashlib.md5(str(attr_value).encode("utf-8"), usedforsecurity=False).hexdigest(),
                 self.current_event_uuid
             ])
 
     # Manifest
     def _init_manifest(self):
+        # check if outputdir exists and try to create it if not
+        if not os.path.exists(settings.outputdir):
+            try:
+                os.makedirs(settings.outputdir)
+            except PermissionError as error:
+                print(error)
+                print("Please fix the above error and try again.")
+                sys.exit(126)
+
         # create an empty manifest
-        with open(os.path.join(settings.outputdir, 'manifest.json'), 'w'):
-            pass
+        try:
+            with open(os.path.join(settings.outputdir, 'manifest.json'), 'w') as f:
+                json.dump({}, f)
+        except PermissionError as error:
+            print(error)
+            print("Please fix the above error and try again.")
+            sys.exit(126)
+
         # create new event and save manifest
         self.create_daily_event()
 
     def flush_event(self, new_event=None):
-        print('Writting event on disk'+' '*50)
+        print('Writing event on disk' + ' ' * 50)
         if new_event is not None:
             event_uuid = new_event['uuid']
             event = new_event
@@ -157,9 +166,8 @@ class FeedGenerator:
             event_uuid = self.current_event_uuid
             event = self.current_event
 
-        eventFile = open(os.path.join(settings.outputdir, event_uuid+'.json'), 'w')
-        eventFile.write(event.to_json())
-        eventFile.close()
+        with open(os.path.join(settings.outputdir, event_uuid + '.json'), 'w') as eventFile:
+            json.dump(event.to_feed(), eventFile)
 
         self.save_hashes()
 
@@ -182,26 +190,10 @@ class FeedGenerator:
                 hashFile.write('{},{}\n'.format(element[0], element[1]))
             hashFile.close()
             self.attributeHashes = []
-            print('Hash saved' + ' '*30)
+            print('Hash saved' + ' ' * 30)
         except Exception as e:
             print(e)
             sys.exit('Could not create the quick hash lookup file.')
-
-    def _addEventToManifest(self, event):
-        event_dict = event.to_dict()['Event']
-        tags = []
-        for eventTag in event_dict.get('EventTag', []):
-            tags.append({'name': eventTag['Tag']['name'],
-                         'colour': eventTag['Tag']['colour']})
-        return {
-                'Orgc': event_dict.get('Orgc', []),
-                'Tag': tags,
-                'info': event_dict['info'],
-                'date': event_dict['date'],
-                'analysis': event_dict['analysis'],
-                'threat_level_id': event_dict['threat_level_id'],
-                'timestamp': event_dict.get('timestamp', int(time.time()))
-               }
 
     def get_last_event_from_manifest(self):
         """Retreive last event from the manifest.
@@ -225,7 +217,7 @@ class FeedGenerator:
                 # Sort by date then by event name
                 dated_events.sort(key=lambda k: (k[0], k[2]), reverse=True)
                 return dated_events[0]
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             print('Manifest not found, generating a fresh one')
             self._init_manifest()
             return self.get_last_event_from_manifest()
@@ -248,11 +240,9 @@ class FeedGenerator:
             return event
 
     def create_daily_event(self):
-        new_uuid = gen_uuid()
         today = str(datetime.date.today())
         event_dict = {
-            'uuid': new_uuid,
-            'id': len(self.manifest)+1,
+            'id': len(self.manifest) + 1,
             'Tag': settings.Tag,
             'info': self.daily_event_name.format(today),
             'analysis': settings.analysis,  # [0-2]
@@ -264,14 +254,14 @@ class FeedGenerator:
         event.from_dict(**event_dict)
 
         # reference org
-        org_dict = {}
-        org_dict['name'] = settings.org_name
-        org_dict['uui'] = settings.org_uuid
-        event['Orgc'] = org_dict
+        org = MISPOrganisation()
+        org.name = settings.org_name
+        org.uuid = settings.org_uuid
+        event.Orgc = org
 
         # save event on disk
         self.flush_event(new_event=event)
         # add event to manifest
-        self.manifest[event['uuid']] = self._addEventToManifest(event)
+        self.manifest.update(event.manifest)
         self.save_manifest()
         return event

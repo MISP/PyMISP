@@ -1,36 +1,49 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
-import sys
-import datetime
-import json
-from json import JSONEncoder
-import collections
+from __future__ import annotations
+
 import logging
+from datetime import date, datetime
+from deprecated import deprecated  # type: ignore
+from json import JSONEncoder
+from uuid import UUID
+from abc import ABCMeta
 from enum import Enum
+from typing import Any, Mapping
+from collections.abc import MutableMapping
+from functools import lru_cache
+from pathlib import Path
 
-from .exceptions import PyMISPInvalidFormat
+try:
+    import orjson  # type: ignore
+    from orjson import loads, dumps
+    HAS_ORJSON = True
+except ImportError:
+    from json import loads, dumps
+    HAS_ORJSON = False
 
+from .exceptions import PyMISPInvalidFormat, PyMISPError
 
 logger = logging.getLogger('pymisp')
 
-if sys.version_info < (3, 0):
-    logger.warning("You're using python 2, it is strongly recommended to use python >=3.6")
 
-    # This is required because Python 2 is a pain.
-    from datetime import tzinfo, timedelta
+resources_path = Path(__file__).parent / 'data'
+misp_objects_path = resources_path / 'misp-objects' / 'objects'
+with (resources_path / 'describeTypes.json').open('rb') as f:
+    describe_types: dict[str, Any] = loads(f.read())['result']
 
-    class UTC(tzinfo):
-        """UTC"""
 
-        def utcoffset(self, dt):
-            return timedelta(0)
+class MISPFileCache:
+    # cache up to 150 JSON structures in class attribute
 
-        def tzname(self, dt):
-            return "UTC"
-
-        def dst(self, dt):
-            return timedelta(0)
+    @staticmethod
+    @lru_cache(maxsize=150)
+    def _load_json(path: Path) -> dict[str, Any] | None:
+        if not path.exists():
+            return None
+        with path.open('rb') as f:
+            data = loads(f.read())
+        return data
 
 
 class Distribution(Enum):
@@ -55,62 +68,80 @@ class Analysis(Enum):
     completed = 2
 
 
-def _int_to_str(d):
+def _int_to_str(d: dict[str, Any]) -> dict[str, Any]:
     # transform all integer back to string
     for k, v in d.items():
-        if isinstance(v, (int, float)) and not isinstance(v, bool):
+        if isinstance(v, dict):
+            d[k] = _int_to_str(v)
+        elif isinstance(v, int) and not isinstance(v, bool):
             d[k] = str(v)
     return d
 
 
+@deprecated(reason=" Use method default=pymisp_json_default instead of cls=MISPEncode", version='2.4.117', action='default')
 class MISPEncode(JSONEncoder):
-
-    def default(self, obj):
+    def default(self, obj: Any) -> dict[str, Any] | str:
         if isinstance(obj, AbstractMISP):
             return obj.jsonable()
-        elif isinstance(obj, datetime.datetime):
+        elif isinstance(obj, (datetime, date)):
             return obj.isoformat()
         elif isinstance(obj, Enum):
             return obj.value
+        elif isinstance(obj, UUID):
+            return str(obj)
         return JSONEncoder.default(self, obj)
 
 
-class AbstractMISP(collections.MutableMapping):
+class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: ignore[type-arg]
+    __resources_path = resources_path
+    __misp_objects_path = misp_objects_path
+    __describe_types = describe_types
 
-    __not_jsonable = []
-
-    def __init__(self, **kwargs):
-        """Abstract class for all the MISP objects"""
-        super(AbstractMISP, self).__init__()
-        self.__edited = True  # As we create a new object, we assume it is edited
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        """Abstract class for all the MISP objects.
+        NOTE: Every method in every classes inheriting this one are doing
+              changes in memory and  do not modify data on a remote MISP instance.
+              To do so, you need to call the respective add_* or update_*
+              methods in PyMISP.
+        """
+        super().__init__()
+        self.__edited: bool = True  # As we create a new object, we assume it is edited
+        self.__not_jsonable: list[str] = []
+        self._fields_for_feed: set[str]
+        self.__self_defined_describe_types: dict[str, Any] | None = None
+        self.uuid: str
 
         if kwargs.get('force_timestamps') is not None:
             # Ignore the edited objects and keep the timestamps.
-            self.__force_timestamps = True
+            self.__force_timestamps: bool = True
         else:
             self.__force_timestamps = False
 
-        # List of classes having tags
-        from .mispevent import MISPAttribute, MISPEvent
-        self.__has_tags = (MISPAttribute, MISPEvent)
-        if isinstance(self, self.__has_tags):
-            self.Tag = []
-            setattr(AbstractMISP, 'add_tag', AbstractMISP.__add_tag)
-            setattr(AbstractMISP, 'tags', property(AbstractMISP.__get_tags, AbstractMISP.__set_tags))
+    @property
+    def describe_types(self) -> dict[str, Any]:
+        if self.__self_defined_describe_types:
+            return self.__self_defined_describe_types
+        return self.__describe_types
+
+    @describe_types.setter
+    def describe_types(self, describe_types: dict[str, Any]) -> None:
+        self.__self_defined_describe_types = describe_types
 
     @property
-    def properties(self):
-        """All the class public properties that will be dumped in the dictionary, and the JSON export.
-        Note: all the properties starting with a `_` (private), or listed in __not_jsonable will be skipped.
-        """
-        to_return = []
-        for prop, value in vars(self).items():
-            if prop.startswith('_') or prop in self.__not_jsonable:
-                continue
-            to_return.append(prop)
-        return to_return
+    def resources_path(self) -> Path:
+        return self.__resources_path
 
-    def from_dict(self, **kwargs):
+    @property
+    def misp_objects_path(self) -> Path:
+        return self.__misp_objects_path
+
+    @misp_objects_path.setter
+    def misp_objects_path(self, misp_objects_path: str | Path) -> None:
+        if isinstance(misp_objects_path, str):
+            misp_objects_path = Path(misp_objects_path)
+        self.__misp_objects_path = misp_objects_path
+
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         """Loading all the parameters as class properties, if they aren't `None`.
         This method aims to be called when all the properties requiring a special
         treatment are processed.
@@ -123,31 +154,51 @@ class AbstractMISP(collections.MutableMapping):
         # We load an existing dictionary, marking it an not-edited
         self.__edited = False
 
-    def update_not_jsonable(self, *args):
+    def update_not_jsonable(self, *args) -> None:  # type: ignore[no-untyped-def]
         """Add entries to the __not_jsonable list"""
         self.__not_jsonable += args
 
-    def set_not_jsonable(self, *args):
+    def set_not_jsonable(self, args: list[str]) -> None:
         """Set __not_jsonable to a new list"""
         self.__not_jsonable = args
 
-    def from_json(self, json_string):
-        """Load a JSON string"""
-        self.from_dict(**json.loads(json_string))
+    def _remove_from_not_jsonable(self, *args) -> None:  # type: ignore[no-untyped-def]
+        """Remove the entries that are in the __not_jsonable list"""
+        for entry in args:
+            try:
+                self.__not_jsonable.remove(entry)
+            except ValueError:
+                pass
 
-    def to_dict(self):
-        """Dump the lass to a dictionary.
+    def from_json(self, json_string: str) -> None:
+        """Load a JSON string"""
+        self.from_dict(**loads(json_string))
+
+    def to_dict(self, json_format: bool = False) -> dict[str, Any]:
+        """Dump the class to a dictionary.
         This method automatically removes the timestamp recursively in every object
         that has been edited is order to let MISP update the event accordingly."""
+        is_edited = self.edited
         to_return = {}
-        for attribute in self.properties:
-            val = getattr(self, attribute, None)
+        for attribute, val in self.items():
             if val is None:
                 continue
             elif isinstance(val, list) and len(val) == 0:
                 continue
+            elif isinstance(val, str):
+                val = val.strip()
+            elif json_format:
+                if isinstance(val, AbstractMISP):
+                    val = val.to_json(True)
+                elif isinstance(val, (datetime, date)):
+                    val = val.isoformat()
+                elif isinstance(val, Enum):
+                    val = val.value
+                elif isinstance(val, UUID):
+                    val = str(val)
+
             if attribute == 'timestamp':
-                if not self.__force_timestamps and self.edited:
+                if not self.__force_timestamps and is_edited:
                     # In order to be accepted by MISP, the timestamp of an object
                     # needs to be either newer, or None.
                     # If the current object is marked as edited, the easiest is to
@@ -155,78 +206,132 @@ class AbstractMISP(collections.MutableMapping):
                     continue
                 else:
                     val = self._datetime_to_timestamp(val)
+            if (attribute in ('first_seen', 'last_seen', 'datetime')
+                    and isinstance(val, datetime)
+                    and not val.tzinfo):
+                # Need to make sure the timezone is set. Otherwise, it will be processed as UTC on the server
+                val = val.astimezone()
+
             to_return[attribute] = val
         to_return = _int_to_str(to_return)
         return to_return
 
-    def jsonable(self):
+    def jsonable(self) -> dict[str, Any]:
         """This method is used by the JSON encoder"""
         return self.to_dict()
 
-    def to_json(self):
-        """Dump recursively any class of type MISPAbstract to a json string"""
-        return json.dumps(self, cls=MISPEncode, sort_keys=True, indent=2)
+    def _to_feed(self) -> dict[str, Any]:
+        if not hasattr(self, '_fields_for_feed') or not self._fields_for_feed:
+            raise PyMISPError('Unable to export in the feed format, _fields_for_feed is missing.')
+        if hasattr(self, '_set_default') and callable(self._set_default):
+            self._set_default()
+        to_return = {}
+        for field in sorted(self._fields_for_feed):
+            if getattr(self, field, None) is not None:
+                if field in ['timestamp', 'publish_timestamp']:
+                    to_return[field] = self._datetime_to_timestamp(getattr(self, field))
+                elif isinstance(getattr(self, field), (datetime, date)):
+                    to_return[field] = getattr(self, field).isoformat()
+                else:
+                    to_return[field] = getattr(self, field)
+            else:
+                if field in ['data', 'first_seen', 'last_seen', 'deleted']:
+                    # special fields
+                    continue
+                raise PyMISPError(f'The field {field} is required in {self.__class__.__name__} when generating a feed.')
+        to_return = _int_to_str(to_return)
+        return to_return
 
-    def __getitem__(self, key):
+    def to_json(self, sort_keys: bool = False, indent: int | None = None) -> str:
+        """Dump recursively any class of type MISPAbstract to a json string"""
+        if HAS_ORJSON:
+            option = 0
+            if sort_keys:
+                option |= orjson.OPT_SORT_KEYS
+            if indent:
+                option |= orjson.OPT_INDENT_2
+            # orjson dumps method returns bytes instead of bytes, to keep compatibility with json
+            # we have to convert output to str
+            return dumps(self, default=pymisp_json_default, option=option).decode()
+
+        return dumps(self, default=pymisp_json_default, sort_keys=sort_keys, indent=indent)
+
+    def __getitem__(self, key: str) -> Any:
         try:
-            return getattr(self, key)
+            if key[0] != '_' and key not in self.__not_jsonable:
+                return self.__dict__[key]
+            raise KeyError
         except AttributeError:
             # Expected by pop and other dict-related methods
             raise KeyError
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         setattr(self, key, value)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: str) -> None:
         delattr(self, key)
 
-    def __iter__(self):
-        return iter(self.to_dict())
+    def __iter__(self) -> Any:
+        '''When we call **self, skip keys:
+            * starting with _
+            * in __not_jsonable
+            * timestamp if the object is edited *unless* it is forced
+        '''
+        return iter({k: v for k, v in self.__dict__.items()
+                     if not (k[0] == '_'
+                             or k in self.__not_jsonable
+                             or (not self.__force_timestamps and (k == 'timestamp' and self.__edited)))})
 
-    def __len__(self):
-        return len(self.to_dict())
+    def __len__(self) -> int:
+        return len([k for k in self.__dict__.keys() if not (k[0] == '_' or k in self.__not_jsonable)])
 
     @property
-    def edited(self):
+    def force_timestamp(self) -> bool:
+        return self.__force_timestamps
+
+    @force_timestamp.setter
+    def force_timestamp(self, force: bool) -> None:
+        self.__force_timestamps = force
+
+    @property
+    def edited(self) -> bool:
         """Recursively check if an object has been edited and update the flag accordingly
         to the parent objects"""
         if self.__edited:
             return self.__edited
-        for p in self.properties:
-            if self.__edited:
-                break
-            val = getattr(self, p)
+        for p, val in self.items():
             if isinstance(val, AbstractMISP) and val.edited:
                 self.__edited = True
+                break
             elif isinstance(val, list) and all(isinstance(a, AbstractMISP) for a in val):
                 if any(a.edited for a in val):
                     self.__edited = True
+                    break
         return self.__edited
 
     @edited.setter
-    def edited(self, val):
+    def edited(self, val: bool) -> None:
         """Set the edit flag"""
         if isinstance(val, bool):
             self.__edited = val
         else:
-            raise Exception('edited can only be True or False')
+            raise PyMISPError('edited can only be True or False')
 
-    def __setattr__(self, name, value):
-        if name in self.properties:
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name[0] != '_' and not self.__edited and name in self:
+            # The private members don't matter
+            # If we already have a key with that name, we're modifying it.
             self.__edited = True
-        super(AbstractMISP, self).__setattr__(name, value)
+        super().__setattr__(name, value)
 
-    def _datetime_to_timestamp(self, d):
-        """Convert a datetime.datetime object to a timestamp (int)"""
-        if isinstance(d, (int, str)) or (sys.version_info < (3, 0) and isinstance(d, unicode)):
+    def _datetime_to_timestamp(self, d: int | float | str | datetime) -> int:
+        """Convert a datetime object to a timestamp (int)"""
+        if isinstance(d, (int, float, str)):
             # Assume we already have a timestamp
             return int(d)
-        if sys.version_info >= (3, 3):
-            return int(d.timestamp())
-        else:
-            return int((d - datetime.datetime.fromtimestamp(0, UTC())).total_seconds())
+        return int(d.timestamp())
 
-    def __add_tag(self, tag=None, **kwargs):
+    def _add_tag(self, tag: str | MISPTag | Mapping[str, Any] | None = None, **kwargs):  # type: ignore[no-untyped-def]
         """Add a tag to the attribute (by name or a MISPTag object)"""
         if isinstance(tag, str):
             misp_tag = MISPTag()
@@ -240,23 +345,20 @@ class AbstractMISP(collections.MutableMapping):
             misp_tag = MISPTag()
             misp_tag.from_dict(**kwargs)
         else:
-            raise PyMISPInvalidFormat("The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {}".format(tag))
-        if misp_tag not in self.tags:
+            raise PyMISPInvalidFormat(f"The tag is in an invalid format (can be either string, MISPTag, or an expanded dict): {tag}")
+        if misp_tag not in self.tags:  # type: ignore
             self.Tag.append(misp_tag)
             self.edited = True
+        return misp_tag
 
-    def __get_tags(self):
-        """Returns a lost of tags associated to this Attribute"""
-        return self.Tag
-
-    def __set_tags(self, tags):
+    def _set_tags(self, tags: list[MISPTag]) -> None:
         """Set a list of prepared MISPTag."""
         if all(isinstance(x, MISPTag) for x in tags):
             self.Tag = tags
         else:
             raise PyMISPInvalidFormat('All the attributes have to be of type MISPTag.')
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, AbstractMISP):
             return self.to_dict() == other.to_dict()
         elif isinstance(other, dict):
@@ -264,16 +366,58 @@ class AbstractMISP(collections.MutableMapping):
         else:
             return False
 
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__} - please define me>'
+
 
 class MISPTag(AbstractMISP):
-    def __init__(self):
-        super(MISPTag, self).__init__()
 
-    def from_dict(self, name, **kwargs):
-        self.name = name
-        super(MISPTag, self).from_dict(**kwargs)
+    _fields_for_feed: set[str] = {'name', 'colour', 'relationship_type', 'local'}
 
-    def __repr__(self):
+    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(**kwargs)
+        self.name: str
+        self.exportable: bool
+        self.local: bool
+        self.relationship_type: str | None
+
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs.get('Tag'):
+            kwargs = kwargs.get('Tag')  # type: ignore[assignment]
+        super().from_dict(**kwargs)
+
+    def _set_default(self) -> None:
+        if not hasattr(self, 'relationship_type'):
+            self.relationship_type = ''
+        if not hasattr(self, 'colour'):
+            self.colour = '#ffffff'
+        if not hasattr(self, 'local'):
+            self.local = False
+
+    def _to_feed(self, with_local: bool = True) -> dict[str, Any]:
+        if hasattr(self, 'exportable') and not self.exportable:
+            return {}
+        if with_local is False and hasattr(self, 'local') and self.local:
+            return {}
+        return super()._to_feed()
+
+    def delete(self) -> None:
+        self.deleted = True
+        self.edited = True
+
+    def __repr__(self) -> str:
         if hasattr(self, 'name'):
-            return '<{self.__class__.__name__}(name={self.name})'.format(self=self)
-        return '<{self.__class__.__name__}(NotInitialized)'.format(self=self)
+            return '<{self.__class__.__name__}(name={self.name})>'.format(self=self)
+        return f'<{self.__class__.__name__}(NotInitialized)>'
+
+
+# UUID, datetime, date and Enum is serialized by ORJSON by default
+def pymisp_json_default(obj: AbstractMISP | datetime | date | Enum | UUID) -> dict[str, Any] | str:
+    if isinstance(obj, AbstractMISP):
+        return obj.jsonable()
+    elif isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    elif isinstance(obj, Enum):
+        return obj.value
+    elif isinstance(obj, UUID):
+        return str(obj)

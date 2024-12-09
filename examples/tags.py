@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import json
-
-
-def init(url, key):
-    return PyMISP(url, key, misp_verifycert, 'json', True)
 
 
 def get_tags(m):
@@ -22,6 +18,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    misp = init(misp_url, misp_key)
+    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
 
-    get_tags(misp)
+    tags = misp.tags(pythonify=True)
+    for tag in tags:
+        print(tag.to_json())

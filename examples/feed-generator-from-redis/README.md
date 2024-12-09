@@ -9,10 +9,16 @@
 
 ## Installation
 
-````
+```
+# redis-server
+sudo apt install redis-server
+
+# Check if redis is running
+redis-cli ping
+
 #  Feed generator
-git clone https://github.com/CIRCL/PyMISP
-cd examples/feed-generator-from-redis
+git clone https://github.com/MISP/PyMISP
+cd PyMISP/examples/feed-generator-from-redis
 cp settings.default.py settings.py
 vi settings.py  # adjust your settings
 
@@ -66,7 +72,7 @@ python3 server.py
 >>> obj_data = { "session": "session_id", "username": "admin", "password": "admin", "protocol": "telnet" }
 >>> generator.add_object_to_event(obj_name, **obj_data)
 
-# Immediatly write the event to the disk (Bypassing the default flushing behavior)
+# Immediately write the event to the disk (Bypassing the default flushing behavior)
 >>> generator.flush_event()
 ```
 

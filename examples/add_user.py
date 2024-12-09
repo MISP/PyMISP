@@ -1,19 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import PyMISP
+from pymisp import ExpandedPyMISP, MISPUser
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
-
-# For python2 & 3 compat, a bit dirty, but it seems to be the least bad one
-try:
-    input = raw_input
-except NameError:
-    pass
-
-
-def init(url, key):
-    return PyMISP(url, key, misp_verifycert, 'json')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add a new user by setting the mandory fields.')
@@ -22,6 +12,11 @@ if __name__ == '__main__':
     parser.add_argument("-r", "--role_id", required=True, help="Role linked to the user.")
     args = parser.parse_args()
 
-    misp = init(misp_url, misp_key)
+    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, 'json')
 
-    print (misp.add_user(args.email, args.org_id, args.role_id))
+    user = MISPUser()
+    user.email = args.email
+    user.org_id = args.org_id
+    user.role_id = args.role_id
+
+    print(misp.add_user(user, pythonify=True))

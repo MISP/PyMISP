@@ -1,28 +1,29 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+
+from __future__ import annotations
 
 import os
 import sys
 import time
 import unittest
 
-from pymisp import MISPEvent
-
+import logging
+logging.disable(logging.CRITICAL)
 manual_testing = False
 
 try:
+    from pymisp import MISPEvent
     from pymisp.tools import reportlab_generator
+    reportlab_missing = False
 except Exception:
-    if sys.version_info < (3, 6):
-        print('This test suite requires Python 3.6+, breaking.')
-        sys.exit(0)
-    else:
-        raise
+    reportlab_missing = True
 
 
 class TestPDFExport(unittest.TestCase):
 
     def setUp(self):
+        if reportlab_missing:
+            self.skipTest('reportlab missing, skip test.')
         self.maxDiff = None
         self.mispevent = MISPEvent()
         if not manual_testing:

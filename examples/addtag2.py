@@ -3,21 +3,18 @@
 from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
-import os
-import json
 
 
 def init(url, key):
     return PyMISP(url, key, misp_verifycert, 'json')
 
-    result = m.get_event(event)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tag something.')
     parser.add_argument("-u", "--uuid", help="UUID to tag.")
     parser.add_argument("-e", "--event", help="Event ID to tag.")
     parser.add_argument("-a", "--attribute", help="Attribute ID to tag")
-    parser.add_argument("-t", "--tag", required=True, help="Attribute ID to modify.")
+    parser.add_argument("-t", "--tag", required=True, help="Tag ID.")
     args = parser.parse_args()
 
     if not args.event and not args.uuid and not args.attribute:
@@ -26,12 +23,9 @@ if __name__ == '__main__':
 
     misp = init(misp_url, misp_key)
 
-    event = misp.get_event(args.event)
-
     if args.event and not args.attribute:
         result = misp.search(eventid=args.event)
-        data = result['response']
-        for event in data:
+        for event in result:
             uuid = event['Event']['uuid']
 
     if args.attribute:
@@ -39,8 +33,7 @@ if __name__ == '__main__':
             print("Please provide event ID also")
             exit()
         result = misp.search(eventid=args.event)
-        data = result['response']
-        for event in data:
+        for event in result:
             for attribute in event['Event']['Attribute']:
                 if attribute["id"] == args.attribute:
                     uuid = attribute["uuid"]
@@ -48,5 +41,5 @@ if __name__ == '__main__':
     if args.uuid:
         uuid = args.uuid
 
-    print("UUID tagged: %s"%uuid)
+    print("UUID tagged: %s" % uuid)
     misp.tag(uuid, args.tag)
