@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import sys
 import json
 import os
 from pymisp import ExpandedPyMISP
-from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels, with_signatures
+from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
 try:
     from settings import with_distribution
 except ImportError:
@@ -62,19 +61,21 @@ def saveEvent(event, misp):
         print(e)
         sys.exit('Could not create the event dump.')
 
+
 def getSignature(stringified_event, misp):
     try:
-        signature = misp.direct_call('/cryptographicKeys/serverSign', stringified_event)
+        signature = misp.sign_blob(stringified_event)
         return signature
     except Exception as e:
         print(e)
         sys.exit('Could not get the signature for the event from the MISP instance. Perhaps the user does not have the necessary permissions.')
 
+
 def saveHashes(hashes):
     try:
         with open(os.path.join(outputdir, 'hashes.csv'), 'w') as hashFile:
             for element in hashes:
-                hashFile.write('{},{}\n'.format(element[0], element[1]))
+                hashFile.write(f'{element[0]},{element[1]}\n')
     except Exception as e:
         print(e)
         sys.exit('Could not create the quick hash lookup file.')

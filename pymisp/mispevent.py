@@ -1602,6 +1602,8 @@ class MISPEvent(AnalystDataBehaviorMixin):
 
     def _set_default(self) -> None:
         """There are a few keys that could, or need to be set by default for the feed generator"""
+        if not hasattr(self, 'protected'):
+            self.protected = False
         if not hasattr(self, 'published'):
             self.published = True
         if not hasattr(self, 'uuid'):
@@ -1722,7 +1724,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
                     event_report.pop('SharingGroup', None)
                     event_report.pop('sharing_group_id', None)
                 to_return['EventReport'].append(event_report.to_dict())
-        
+
         if with_cryptographic_keys and self.cryptographic_keys:
             to_return['CryptographicKey'] = []
             for cryptographic_key in self.cryptographic_keys:
@@ -1765,7 +1767,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
     @property
     def event_reports(self) -> list[MISPEventReport]:
         return self.EventReport
-    
+
     @property
     def cryptographic_keys(self) -> list[MISPCryptographicKey]:
         return self.CryptographicKey
@@ -2250,11 +2252,13 @@ class MISPWarninglist(AbstractMISP):
             kwargs = kwargs['Warninglist']
         super().from_dict(**kwargs)
 
+
 class MISPCryptographicKey(AbstractMISP):
-    def from_dict(self, **kwargs) -> None: # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if 'CryptographicKey' in kwargs:
             kwargs = kwargs['CryptographicKey']
         super().from_dict(**kwargs)
+
 
 class MISPTaxonomy(AbstractMISP):
 
