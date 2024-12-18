@@ -68,8 +68,7 @@ class TestAnalystData(unittest.TestCase):
         misp_object.add_attribute('filename', 'foo.exe')
         self._attach_analyst_data(misp_object.attributes[0])
         
-    def _attach_analyst_data(
-            self, container: MISPAttribute | MISPEvent | MISPEventReport | MISPObject) -> None:
+    def _attach_analyst_data(self, container) -> None:
         object_type = container._analyst_data_object_type
         note1 = container.add_note(note='note1')
         opinion1 = note1.add_opinion(opinion=25, comment='Disagree')
