@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import annotations
+
 import unittest
 from pymisp import (MISPAttribute, MISPEvent, MISPEventReport, MISPNote,
                     MISPObject, MISPOpinion)
@@ -67,7 +69,7 @@ class TestAnalystData(unittest.TestCase):
         misp_object = MISPObject('file')
         misp_object.add_attribute('filename', 'foo.exe')
         self._attach_analyst_data(misp_object.attributes[0])
-        
+
     def _attach_analyst_data(
             self, container: MISPAttribute | MISPEvent | MISPEventReport | MISPObject) -> None:
         object_type = container._analyst_data_object_type
@@ -96,7 +98,7 @@ class TestAnalystData(unittest.TestCase):
         self.assertEqual(misp_note1.object_type, object_type)
         self.assertEqual(misp_note1.object_uuid, container.uuid)
         self.assertEqual(misp_note1.note, 'note1')
-        
+
         self.assertEqual(misp_note2.object_type, 'Opinion')
         self.assertEqual(misp_note2.object_uuid, opinion2.uuid)
         self.assertEqual(misp_note2.note, 'note2')
@@ -114,9 +116,8 @@ class TestAnalystData(unittest.TestCase):
         self.assertEqual(misp_opinion2.object_uuid, container.uuid)
         self.assertEqual(misp_opinion2.opinion, 50)
         self.assertEqual(misp_opinion2.comment, 'Neutral')
-        
+
         self.assertEqual(misp_opinion3.object_type, 'Note')
         self.assertEqual(misp_opinion3.object_uuid, note3.uuid)
         self.assertEqual(misp_opinion3.opinion, 75)
         self.assertEqual(misp_opinion3.comment, 'Agree')
-
