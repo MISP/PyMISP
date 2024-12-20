@@ -2,6 +2,64 @@ Changelog
 =========
 
 
+v2.5.4 (2024-12-20)
+-------------------
+
+Changes
+~~~~~~~
+- Update objects templates. [Raphaël Vinot]
+- Make python 3.9 happy. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [AnalystData] Flattening analyst data based on the recent changes on
+  MISP standard format. [Christian Studer]
+
+  - Adding a note or an opinion will always add the
+    new analyst data object to the list of notes or
+    opinions at the parent data layer level
+  - `from_dict` on a JSON blob is also able to parse
+    properly analyst data and generate flat lists
+    regardless of whether the given data described
+    in the new flat or previously nested format
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- [tests] Removed typing. [Christian Studer]
+- [MISPAnalystData] Added missing typing. [Christian Studer]
+- [MISPAnalystData] Reverted the declaration of Analyst data objects
+  lists back to the mixin parent class. [Christian Studer]
+- [MISPAnalystData] Better handling of the different use cases.
+  [Christian Studer]
+
+  - Additional checks for parent to support both
+    the standalone and attached analyst data objects
+  - Standalone Analyst data objects with nested
+    notes or opinions are defined with the nesting
+    as they have no parent. When they are added to
+    a parent data layer, the nested objects are then
+    flattened
+- [AnalystData] Typo... [Christian Studer]
+- [AnalystData] Avoiding issues with analyst data objects. [Christian
+  Studer]
+
+Other
+~~~~~
+- Chg; Bump version. [Raphaël Vinot]
+- Revert "fix: [tests] Removed typing" [Christian Studer]
+
+  This reverts commit a7cf9dc3f03ffda5ee6c1b614792455fe43d8704.
+- Add: [tests] Testing Analyst Data in different scenarios. [Christian
+  Studer]
+
+  - Testing different ways to attach analyst data
+  - Testing that no matter what object type the
+    analyst data is attached to, the `object_type`
+    & `object_uuid` are correct, and the parent
+    container does contain every analyst data object
+    in flat lists with no nesting
+
+
 v2.5.3 (2024-12-16)
 -------------------
 
@@ -26,6 +84,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump release. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 
