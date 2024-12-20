@@ -60,28 +60,37 @@ class AnalystDataBehaviorMixin(AbstractMISP):
 
     def add_note(self, note: str, language: str | None = None, **kwargs) -> MISPNote:  # type: ignore[no-untyped-def]
         the_note = MISPNote()
-        the_note.from_dict(note=note, language=language,
-                           object_uuid=self.uuid, object_type=self.analyst_data_object_type,
-                           **kwargs)
+        object_uuid = kwargs.pop('object_uuid', self.uuid)
+        object_type = kwargs.pop('object_type', self.analyst_data_object_type)
+        the_note.from_dict(
+            note=note, language=language, object_uuid=object_uuid,
+            object_type=object_type, contained=True, parent=self, **kwargs
+        )
         self.notes.append(the_note)
         self.edited = True
         return the_note
 
     def add_opinion(self, opinion: int, comment: str | None = None, **kwargs) -> MISPOpinion:  # type: ignore[no-untyped-def]
         the_opinion = MISPOpinion()
-        the_opinion.from_dict(opinion=opinion, comment=comment,
-                              object_uuid=self.uuid, object_type=self.analyst_data_object_type,
-                              **kwargs)
+        object_uuid = kwargs.pop('object_uuid', self.uuid)
+        object_type = kwargs.pop('object_type', self.analyst_data_object_type)
+        the_opinion.from_dict(
+            opinion=opinion, comment=comment, object_uuid=object_uuid,
+            object_type=object_type, contained=True, parent=self, **kwargs
+        )
         self.opinions.append(the_opinion)
         self.edited = True
         return the_opinion
 
     def add_relationship(self, related_object_type: AbstractMISP | str, related_object_uuid: str | None, relationship_type: str, **kwargs) -> MISPRelationship:  # type: ignore[no-untyped-def]
         the_relationship = MISPRelationship()
-        the_relationship.from_dict(related_object_type=related_object_type, related_object_uuid=related_object_uuid,
-                                   relationship_type=relationship_type,
-                                   object_uuid=self.uuid, object_type=self.analyst_data_object_type,
-                                   **kwargs)
+        the_relationship.from_dict(
+            related_object_type=related_object_type,
+            related_object_uuid=related_object_uuid,
+            relationship_type=relationship_type, object_uuid=self.uuid,
+            object_type=self.analyst_data_object_type, contained=True,
+            parent=self, **kwargs
+        )
         self.relationships.append(the_relationship)
         self.edited = True
         return the_relationship
@@ -93,12 +102,8 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         relationships = kwargs.pop('Relationship', [])
         super().from_dict(**kwargs)
         for note in notes:
-            note.pop('object_uuid', None)
-            note.pop('object_type', None)
             self.add_note(**note)
         for opinion in opinions:
-            opinion.pop('object_uuid', None)
-            opinion.pop('object_type', None)
             self.add_opinion(**opinion)
         for relationship in relationships:
             relationship.pop('object_uuid', None)
@@ -2524,6 +2529,10 @@ class MISPAnalystData(AbstractMISP):
                          'SharingGroup'}
 
     @property
+    def analyst_data_object_type(self) -> str:
+        return self._analyst_data_object_type
+
+    @property
     def org(self) -> MISPOrganisation:
         return self.Org
 
@@ -2537,6 +2546,10 @@ class MISPAnalystData(AbstractMISP):
             self.Orgc = orgc
         else:
             raise PyMISPError('Orgc must be of type MISPOrganisation.')
+
+    @property
+    def parent(self) -> MISPAttribute | MISPEvent | MISPEventReport | MISPObject:
+        return self.__parent
 
     def __new__(cls, *args, **kwargs):
         if cls is MISPAnalystData:
@@ -2552,8 +2565,54 @@ class MISPAnalystData(AbstractMISP):
         self.created: float | int | datetime
         self.modified: float | int | datetime
         self.SharingGroup: MISPSharingGroup
+        self._analyst_data_object_type: str  # Must be defined in the child class
+
+    def add_note(self, note: str, language: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs: dict[str, Any]) -> MISPNote:
+        misp_note = MISPNote()
+        if object_uuid is None:
+            object_uuid = self.uuid
+        if object_type is None:
+            object_type = self.analyst_data_object_type
+        if parent is None and hasattr(self, 'parent'):
+            parent = self.parent
+        misp_note.from_dict(
+            note=note, language=language, object_uuid=object_uuid,
+            object_type=object_type, parent=parent, contained=True, **kwargs
+        )
+        if parent is None:
+            if not hasattr(self, 'Note'):
+                self.Note: list[MISPNote] = []
+            self.Note.append(misp_note)
+        else:
+            self.parent.notes.append(misp_note)
+        self.edited = True
+        return misp_note
+
+    def add_opinion(self, opinion: int, comment: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs: dict[str, Any]) -> MISPOpinion:
+        misp_opinion = MISPOpinion()
+        if object_uuid is None:
+            object_uuid = self.uuid
+        if object_type is None:
+            object_type = self.analyst_data_object_type
+        if parent is None and hasattr(self, 'parent'):
+            parent = self.parent
+        misp_opinion.from_dict(
+            opinion=opinion, comment=comment, object_uuid=object_uuid,
+            object_type=object_type, parent=parent, contained=True, **kwargs
+        )
+        if parent is None:
+            if not hasattr(self, 'Opinion'):
+                self.Opinion: list[MISPOpinion] = []
+            self.Opinion.append(misp_opinion)
+        else:
+            self.parent.opinions.append(misp_opinion)
+        self.edited = True
+        return misp_opinion
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        notes = kwargs.pop('Note', [])
+        opinions = kwargs.pop('Opinion', [])
+        self.__parent = kwargs.pop('parent', None)
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
             self.distribution = int(self.distribution)
@@ -2607,6 +2666,11 @@ class MISPAnalystData(AbstractMISP):
 
         super().from_dict(**kwargs)
 
+        for note in notes:
+            self.add_note(**note)
+        for opinion in opinions:
+            self.add_opinion(**opinion)
+
     def _set_default(self) -> None:
         if not hasattr(self, 'created'):
             self.created = datetime.timestamp(datetime.now())
@@ -2614,7 +2678,7 @@ class MISPAnalystData(AbstractMISP):
             self.modified = self.created
 
 
-class MISPNote(AnalystDataBehaviorMixin, MISPAnalystData):
+class MISPNote(MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'note', 'language'})
 
@@ -2625,8 +2689,8 @@ class MISPNote(AnalystDataBehaviorMixin, MISPAnalystData):
         self.language: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        if 'Note' in kwargs:
+    def from_dict(self, contained=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if not contained and 'Note' in kwargs:
             kwargs = kwargs['Note']
         self.note = kwargs.pop('note', None)
         if self.note is None:
@@ -2639,7 +2703,7 @@ class MISPNote(AnalystDataBehaviorMixin, MISPAnalystData):
         return f'<{self.__class__.__name__}(NotInitialized)'
 
 
-class MISPOpinion(AnalystDataBehaviorMixin, MISPAnalystData):
+class MISPOpinion(MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'opinion', 'comment'})
 
@@ -2650,8 +2714,8 @@ class MISPOpinion(AnalystDataBehaviorMixin, MISPAnalystData):
         self.comment: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        if 'Opinion' in kwargs:
+    def from_dict(self, contained=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if not contained and 'Opinion' in kwargs:
             kwargs = kwargs['Opinion']
         self.opinion = kwargs.pop('opinion', None)
         if self.opinion is not None:
@@ -2673,7 +2737,7 @@ class MISPOpinion(AnalystDataBehaviorMixin, MISPAnalystData):
         return f'<{self.__class__.__name__}(NotInitialized)'
 
 
-class MISPRelationship(AnalystDataBehaviorMixin, MISPAnalystData):
+class MISPRelationship(MISPAnalystData):
 
     _fields_for_feed: set[str] = MISPAnalystData._fields_for_feed.union({'related_object_uuid', 'related_object_type', 'relationship_type'})
 
@@ -2685,8 +2749,8 @@ class MISPRelationship(AnalystDataBehaviorMixin, MISPAnalystData):
         self.relationship_type: str
         super().__init__(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        if 'Relationship' in kwargs:
+    def from_dict(self, contained=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if not contained and 'Relationship' in kwargs:
             kwargs = kwargs['Relationship']
         self.related_object_type = kwargs.pop('related_object_type', None)
         if self.related_object_type is None:
