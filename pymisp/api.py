@@ -3541,6 +3541,14 @@ class PyMISP:
             response = self._prepare_request('POST', url, data=to_post)
         return response
 
+    def sign_blob(self, blob: str) -> str:
+        """Sign a blob
+
+        :param blob: blob to sign
+        """
+        response = self._prepare_request('POST', '/cryptographicKeys/serverSign', data=blob)
+        return self._check_response(response, lenient_response_type=True)
+
     # ## END Others ###
 
     # ## BEGIN Statistics ###

@@ -140,7 +140,7 @@ subject_process = (strip |
 ##
 ## Tags that will be used for the changelog must match this regexp.
 ##
-tag_filter_regexp = r'^v[0-9]+\.[0-9]+\.[0-9]+(\.[0-9])*$'
+tag_filter_regexp = r'^v2.5.[0-9]+(\.[0-9])*$|^v2.4.(1)?[0-9]{1,2}$'
 
 
 ## ``unreleased_version_label`` is a string
@@ -189,4 +189,3 @@ output_engine = rest_py
 ## This option tells git-log whether to include merge commits in the log.
 ## The default is to include them.
 include_merge = False
-

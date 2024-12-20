@@ -54,3 +54,6 @@ with_distribution = False
 
 # Include the exportable local tags along with the global tags.  The default is True.
 with_local_tags = True
+
+# Include signatures for protected events. This will allow MISP to ingest and update protected events from the feed. It requires perm_server_sign to be set to true in the user's role on MISP's side.
+with_signatures = False

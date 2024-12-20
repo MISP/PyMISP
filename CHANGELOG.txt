@@ -2,6 +2,80 @@ Changelog
 =========
 
 
+v2.5.3 (2024-12-16)
+-------------------
+
+New
+~~~
+- Create a sign_blob method to sign events. [Raphaël Vinot]
+- [support for signing] added. [iglocska]
+
+  - added new class CryptographicKeys
+  - added functions to to_feed calls to include crypto keys
+  - added protected boolean field to misp event
+
+  - updated feed generator to support signing
+    - if the new setting is set to True signing will be attempted for protected events
+    - protected events are now passed to the /cryptographic_keys/serverSign endpoint of misp for signing
+    - signatures are included as a .asc file in the output directory
+
+  - TODO:
+    - currently the JSON dumping is moved from a streamed dumping to an in memory dump before saving to disk
+    - add a check for protected events and revert to streamed dumping for non protected events
+    - alternatively use the already saved files to request signing from MISP
+
+Changes
+~~~~~~~
+- Bump release. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+
+v2.4.199 (2024-11-26)
+---------------------
+
+New
+~~~
+- Publish to PyPi on release. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Skip PyMISP version check. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Bump version, deps, templates. [Raphaël Vinot]
+- Bump version, test for GH action release. [Raphaël Vinot]
+- Drop python 3.8, add python 3.13. [Raphaël Vinot]
+- Bump templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Remove fonts from submodules, on-demand download if needed. [Raphaël
+  Vinot]
+
+Fix
+~~~
+- Avoid exception on dev releases. [Raphaël Vinot]
+- Template versions in tests. [Raphaël Vinot]
+- [AnalystData] A quick and simple typing fix. [Christian Studer]
+
+Other
+~~~~~
+- Build(deps): bump codecov/codecov-action from 4 to 5.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 4 to 5.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v4...v5)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Update pytest.yml for python 3.13. [Raphaël Vinot]
+
+
 v2.5.1 (2024-10-17)
 -------------------
 
@@ -11,6 +85,7 @@ New
 
 Changes
 ~~~~~~~
+- Re-bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
@@ -353,21 +428,18 @@ Changes
 ~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
-
-
-v2.4.184.3 (2024-02-12)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
+- Add changelog. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
 
 Fix
 ~~~
 - Properly get body from message, without headers. [Raphaël Vinot]
 - Remove from __all__ entries that shouldn't be there. [Raphaël Vinot]
+- Do not throw a warning every time one import pymisp... [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -384,23 +456,6 @@ Other
   - dependency-name: jupyter-lsp
     dependency-type: indirect
   ...
-
-
-v2.4.184.2 (2024-02-06)
------------------------
-
-Changes
-~~~~~~~
-- Add changelog. [Raphaël Vinot]
-- Bump changelog. [Raphaël Vinot]
-- Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
-
-Fix
-~~~
-- Do not throw a warning every time one import pymisp... [Raphaël Vinot]
-
-Other
-~~~~~
 - Build(deps): bump codecov/codecov-action from 3 to 4.
   [dependabot[bot]]
 
@@ -415,15 +470,6 @@ Other
     dependency-type: direct:production
     update-type: version-update:semver-major
   ...
-
-
-v2.4.184.1 (2024-02-06)
------------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Re-add ExpandedPyMISP, with a warning. [Raphaël Vinot]
 
 
 v2.4.184 (2024-02-02)
@@ -797,11 +843,19 @@ Changes
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Remove old setup files, bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Disable fail fast in GHA. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
 
 Fix
 ~~~
 - Extra print breaking the CI on MISP side. [Raphaël Vinot]
 - Properly use lief on a file. [Raphaël Vinot]
+- Update lief code to v0.13. [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -820,31 +874,6 @@ Other
   See https://setuptools.pypa.io/en/latest/userguide/declarative_config.html for details.
 
 
-v2.4.170.2 (2023-05-04)
------------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-
-
-v2.4.170.1 (2023-04-19)
------------------------
-
-Changes
-~~~~~~~
-- Disable fail fast in GHA. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-
-Fix
-~~~
-- Update lief code to v0.13. [Raphaël Vinot]
-
-
 v2.4.170 (2023-04-12)
 ---------------------
 
@@ -853,84 +882,39 @@ Changes
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
-
-Other
-~~~~~
-- Add: support breakOnDuplicate option for attributes:add() [Luciano
-  Righetti]
-- Update reportlab_generator.py. [CarlosLoureiro]
-
-
-v2.4.169.3 (2023-03-27)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
-
-Fix
-~~~
-- Invalid check if taxo is enabled. [Raphaël Vinot]
-
-
-v2.4.169.2 (2023-03-17)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Include event reports by default in feed. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
-
-Fix
-~~~
-- Use proper parameter to trigger the request in search_galaxy_clusters.
-  [Raphaël Vinot]
-- Use POST in search galaxy cluster. [Raphaël Vinot]
-
-Other
-~~~~~
-- Rename include_event_reports kwarg to with_event_reports, in-line with
-  other kwarg naming. [UFOSmuggler]
-- Add kwarg to allow the inclusion of event reports into to_feed(),
-  honour with_distribution and valid_distributions kwargs. [UFOSmuggler]
-
-
-v2.4.169.1 (2023-03-14)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Add greynoise-ip object. [Raphaël Vinot]
 
   Fix #951
 
+Fix
+~~~
+- Invalid check if taxo is enabled. [Raphaël Vinot]
+- Use proper parameter to trigger the request in search_galaxy_clusters.
+  [Raphaël Vinot]
+- Use POST in search galaxy cluster. [Raphaël Vinot]
+
+Other
+~~~~~
+- Add: support breakOnDuplicate option for attributes:add() [Luciano
+  Righetti]
+- Update reportlab_generator.py. [CarlosLoureiro]
+- Rename include_event_reports kwarg to with_event_reports, in-line with
+  other kwarg naming. [UFOSmuggler]
+- Add kwarg to allow the inclusion of event reports into to_feed(),
+  honour with_distribution and valid_distributions kwargs. [UFOSmuggler]
+
 
 v2.4.169 (2023-03-10)
 ---------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump templates. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-
-Fix
-~~~
-- Add local key in MISPTag. [Raphaël Vinot]
-
-  Related #947
-- Use pytest for the tests. [Raphaël Vinot]
-
-
-v2.4.168.1 (2023-02-28)
------------------------
 
 New
 ~~~
@@ -939,6 +923,10 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump templates. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
 - Bump changelog, version. [Raphaël Vinot]
 - Bump templates, again. [Raphaël Vinot]
 - Bump templates. [Raphaël Vinot]
@@ -952,6 +940,10 @@ Changes
 
 Fix
 ~~~
+- Add local key in MISPTag. [Raphaël Vinot]
+
+  Related #947
+- Use pytest for the tests. [Raphaël Vinot]
 - Properly handle missing parameter in CSV importer. [Raphaël Vinot]
 
   Fix #931
@@ -964,39 +956,18 @@ Fix
 v2.4.168 (2023-01-23)
 ---------------------
 
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-
-
-v2.4.167.2 (2023-01-17)
------------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump deps, version. [Raphaël Vinot]
-
-Fix
-~~~
-- Set relationship_type default in MISPTag to empty string. [Raphaël
-  Vinot]
-- Another typo in readme. [Raphaël Vinot]
-- Typo in readme. [Raphaël Vinot]
-
-
-v2.4.167.1 (2023-01-16)
------------------------
-
 New
 ~~~
 - Add relationship_type in Tag entries for feeds. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
@@ -1011,6 +982,10 @@ Changes
 
 Fix
 ~~~
+- Set relationship_type default in MISPTag to empty string. [Raphaël
+  Vinot]
+- Another typo in readme. [Raphaël Vinot]
+- Typo in readme. [Raphaël Vinot]
 - Update whl files. [Raphaël Vinot]
 - Nvm, readthedocs requires python 3.8 at most. [Raphaël Vinot]
 
@@ -1067,23 +1042,13 @@ Changes
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
-
-Fix
-~~~
-- [describetypes] updated with the latest output from MISP. [iglocska]
-- [types] added missing type value. [iglocska]
-
-
-v2.4.165.1 (2022-11-10)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 
 Fix
 ~~~
+- [describetypes] updated with the latest output from MISP. [iglocska]
+- [types] added missing type value. [iglocska]
 - Properly bump version. [Raphaël Vinot]
 
 Other
@@ -1099,27 +1064,16 @@ Other
 v2.4.165 (2022-11-09)
 ---------------------
 
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump mypy. [Raphaël Vinot]
-- Add links to doc. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-
-Fix
-~~~
-- Issue with EMailObject. [Raphaël Vinot]
-
-
-v2.4.162.2 (2022-11-02)
------------------------
-
 New
 ~~~
 - Add in ability to set a taxonomies required status. [Tom King]
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump mypy. [Raphaël Vinot]
+- Add links to doc. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump lief (CVEs), version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
@@ -1128,6 +1082,16 @@ Changes
   [Alexandre Dulaunoy]
 - Bump deps. [Raphaël Vinot]
 - Add dependabot. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump deps and version. [Raphaël Vinot]
+
+  Fix LIEF vuln.
+- Bump deps, objects. [Raphaël Vinot]
+
+Fix
+~~~
+- Issue with EMailObject. [Raphaël Vinot]
+- Change DNS warning list test. [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -1177,22 +1141,6 @@ Other
 - Create codeql-analysis.yml. [Raphaël Vinot]
 
 
-v2.4.162.1 (2022-10-02)
------------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump deps and version. [Raphaël Vinot]
-
-  Fix LIEF vuln.
-- Bump deps, objects. [Raphaël Vinot]
-
-Fix
-~~~
-- Change DNS warning list test. [Raphaël Vinot]
-
-
 v2.4.162 (2022-09-09)
 ---------------------
 
@@ -1210,22 +1158,12 @@ Changes
 - Add in sort/desc for sorting results and limit/page for pagination.
   [Tom King]
 - Improve documentation for add_attribute. [Raphaël Vinot]
-
-Fix
-~~~
-- Missing place to update version. [Raphaël Vinot]
-
-
-v2.4.160.1 (2022-08-09)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 
 Fix
 ~~~
+- Missing place to update version. [Raphaël Vinot]
 - Make keepalive configuration linux only. [Raphaël Vinot]
 
   Bump deps
@@ -1317,24 +1255,14 @@ Changes
 - [tests] reverted. [Alexandre Dulaunoy]
 - [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
 - [tests] subversion are supported. [Alexandre Dulaunoy]
-
-Fix
-~~~
-- [tests] check if the version is a substring as PyMISP might contain
-  sub version. [Alexandre Dulaunoy]
-
-
-v2.4.155.1 (2022-03-03)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump required python version for doc. [Raphaël Vinot]
 - Remove python 3.6 from metadata. [Raphaël Vinot]
 
 Fix
 ~~~
+- [tests] check if the version is a substring as PyMISP might contain
+  sub version. [Alexandre Dulaunoy]
 - Incorrect call when requesting a new API key. [Raphaël Vinot]
 
 
@@ -1420,6 +1348,10 @@ v2.4.151 (2021-11-19)
 New
 ~~~
 - Add Blind Carbon Copy (bcc) headers. [Sami Tainio]
+- Add few keys to email object creator. [Raphaël Vinot]
+
+  Fix #787
+- Test cases for edit objects and upload stix. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
@@ -1452,9 +1384,28 @@ Changes
   or organisation (users) [Tom King]
 - [test] Check if all category types exists. [Jakub Onderka]
 - Bump changelog. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
 - [py] Typo. [Steve Clement]
 - [describeTypes] updated to include ssh-fingerprint. [Alexandre
   Dulaunoy]
+- [doc] Minor fixes, note and typo. [Steve Clement]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Update tutorial for custom objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump live tests. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- [types] updated types/categories mapping. [Christophe Vandeplas]
+- Remove test files. [Raphaël Vinot]
+- Automatically pull the malwares repo when running
+  tests/testlive_comprehensive.py. [Raphaël Vinot]
+- Remove submodules with malware. [Raphaël Vinot]
+- Add test for updating a objects from a custom template. [Raphaël
+  Vinot]
+- Re-bump changelog. [Raphaël Vinot]
 
 Fix
 ~~~
@@ -1475,47 +1426,6 @@ Fix
   Fix #796
 - [tests] Fixed stix test. [chrisr3d]
 - [py] Typo. [Steve Clement]
-
-Other
-~~~~~
-- Update README.md. [Raphaël Vinot]
-
-
-v2.4.148.1 (2021-09-30)
------------------------
-
-New
-~~~
-- Add few keys to email object creator. [Raphaël Vinot]
-
-  Fix #787
-- Test cases for edit objects and upload stix. [Raphaël Vinot]
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump misp-objects. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-- [doc] Minor fixes, note and typo. [Steve Clement]
-- Bump deps. [Raphaël Vinot]
-- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
-- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
-- Update tutorial for custom objects. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-- Bump live tests. [Raphaël Vinot]
-- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
-- [types] updated types/categories mapping. [Christophe Vandeplas]
-- Remove test files. [Raphaël Vinot]
-- Automatically pull the malwares repo when running
-  tests/testlive_comprehensive.py. [Raphaël Vinot]
-- Remove submodules with malware. [Raphaël Vinot]
-- Add test for updating a objects from a custom template. [Raphaël
-  Vinot]
-- Re-bump changelog. [Raphaël Vinot]
-
-Fix
-~~~
 - Message_from_bytes really dislikes newline at the beginning of a mail.
   [Raphaël Vinot]
 - Skip IPs in Received header. [Raphaël Vinot]
@@ -1534,6 +1444,7 @@ Fix
 
 Other
 ~~~~~
+- Update README.md. [Raphaël Vinot]
 - Remove unicode to ascii parts. [Sami Tainio]
 - Fix #787 and add Unicode to ASCII function. [Sami Tainio]
 
@@ -1711,22 +1622,15 @@ Changes
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Add comment for controller attribute in search. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Re-bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
 
 Fix
 ~~~
 - Enable/disable feeds. [Raphaël Vinot]
 - Mistake in mypy config. [Raphaël Vinot]
 - Exclude data from mypy. [Raphaël Vinot]
-
-
-v2.4.141.1 (2021-04-02)
------------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Re-bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -1886,41 +1790,6 @@ Other
 v2.4.138 (2021-02-08)
 ---------------------
 
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-
-
-v2.4.137.4 (2021-02-04)
------------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump objects. [Raphaël Vinot]
-- Add kw_params to tags. [Raphaël Vinot]
-- Bump objects. [Raphaël Vinot]
-- Bump template ID in test case. [Raphaël Vinot]
-
-
-v2.4.137.3 (2021-02-02)
------------------------
-
-Changes
-~~~~~~~
-- Bump version. [Raphaël Vinot]
-- Bump changelog. [Raphaël Vinot]
-- Bump objects. [Raphaël Vinot]
-- Fix and improve optional dependencies. [Raphaël Vinot]
-- Make brotli optional. [Raphaël Vinot]
-
-
-v2.4.137.2 (2021-02-01)
------------------------
-
 New
 ~~~
 - Add in ability to create/update/delete MISP Event Reports. [Tom King]
@@ -1932,9 +1801,24 @@ New
 - Add in ability to create/update/delete MISP Event Reports. [Tom King]
 - Add in ability to create/update/delete MISP Event Reports. [Tom King]
 - Hard delete flag for objects. [Raphaël Vinot]
+- Fail if a duplicate object is added to an event. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Add kw_params to tags. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump template ID in test case. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Fix and improve optional dependencies. [Raphaël Vinot]
+- Make brotli optional. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Add brotli support in the dependencies. [Raphaël Vinot]
@@ -2021,6 +1905,14 @@ Changes
 - Add test case fir add_attribute and enforceWarninglist=True. [Raphaël
   Vinot]
 - Add testcase with breakOnDuplicate in a MISPObject. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Add test case for page/limit in logs search. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Improve docstring for get_event. [Raphaël Vinot]
+
+  fix #686
+- Bump changelog. [Raphaël Vinot]
 
 Fix
 ~~~
@@ -2042,28 +1934,6 @@ Fix
 - Add python 3.9 in GH Actions. [Raphaël Vinot]
 - Call the AbstractMISP.from_dict at the end of the function to ensure
   the edited flag remains false. [Tom King]
-
-
-v2.4.137.1 (2021-01-21)
------------------------
-
-New
-~~~
-- Fail if a duplicate object is added to an event. [Raphaël Vinot]
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Add test case for page/limit in logs search. [Raphaël Vinot]
-- Bump deps. [Raphaël Vinot]
-- Improve docstring for get_event. [Raphaël Vinot]
-
-  fix #686
-- Bump changelog. [Raphaël Vinot]
-
-Fix
-~~~
 - Better warning if lief is outdated. [Raphaël Vinot]
 - Update minimal dependency for lief in setup.py. [Raphaël Vinot]
 
@@ -2077,6 +1947,7 @@ New
   Vinot]
 
   MISPObject part of #6670
+- Add Github workflow. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
@@ -2103,6 +1974,21 @@ Changes
 - On-demand decryption of malware-binary, speeds up pythonify. [Raphaël
   Vinot]
 - Force a few packages versions. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Improve typing. [Raphaël Vinot]
+- Improve add_attribute with a list. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Improve error message if a type in missing. [Raphaël Vinot]
+- [type] process-state added. [Alexandre Dulaunoy]
+- Bump misp-objects. [Raphaël Vinot]
+- [misp-objects] updated. [Alexandre Dulaunoy]
+- Add path to CSV sample files. [Raphaël Vinot]
+- [types] jarm-fingerprint added. [Alexandre Dulaunoy]
+- Bump changelog. [Raphaël Vinot]
+- Bump version, travis install. [Raphaël Vinot]
+- Make mail-parser an optional dependency. [Raphaël Vinot]
 
 Fix
 ~~~
@@ -2118,6 +2004,11 @@ Fix
 - Typing on recent mypy. [Raphaël Vinot]
 - Typing edge case. [Raphaël Vinot]
 - Add attribute dict as proposal. [Raphaël Vinot]
+- Do not fail on PyMISP import when mail-parser is not present. [Raphaël
+  Vinot]
+- Remove python 3.9 from action (lief not supported yet) [Raphaël Vinot]
+- Initialize submodules in gh action. [Raphaël Vinot]
+- Make mail-parser really optional. [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -2133,57 +2024,6 @@ Other
 - Update `vmray_automation` to stay compatible with the changes made to
   `vmray_import` MISP modules. [Jens Thom]
 - Update mispevent.py. [Raphaël Vinot]
-
-
-v2.4.135.3 (2020-11-24)
------------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Improve typing. [Raphaël Vinot]
-- Improve add_attribute with a list. [Raphaël Vinot]
-
-Fix
-~~~
-- Do not fail on PyMISP import when mail-parser is not present. [Raphaël
-  Vinot]
-
-
-v2.4.135.2 (2020-11-24)
------------------------
-
-New
-~~~
-- Add Github workflow. [Raphaël Vinot]
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Improve error message if a type in missing. [Raphaël Vinot]
-- [type] process-state added. [Alexandre Dulaunoy]
-- Bump misp-objects. [Raphaël Vinot]
-- [misp-objects] updated. [Alexandre Dulaunoy]
-- Add path to CSV sample files. [Raphaël Vinot]
-- [types] jarm-fingerprint added. [Alexandre Dulaunoy]
-
-Fix
-~~~
-- Remove python 3.9 from action (lief not supported yet) [Raphaël Vinot]
-- Initialize submodules in gh action. [Raphaël Vinot]
-- Make mail-parser really optional. [Raphaël Vinot]
-
-
-v2.4.135.1 (2020-11-24)
------------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version, travis install. [Raphaël Vinot]
-- Make mail-parser an optional dependency. [Raphaël Vinot]
 
 
 v2.4.135 (2020-11-23)
@@ -2503,23 +2343,16 @@ Other
 v2.4.128 (2020-06-22)
 ---------------------
 
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Add a few test cases. [Raphaël Vinot]
-- Bump objects. [Raphaël Vinot]
-
-
-v2.4.127.1 (2020-06-19)
------------------------
-
 New
 ~~~
 - Optionally include deleted attributes/objects in feed. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Add a few test cases. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
@@ -2768,24 +2601,6 @@ Changes
 - Fix typo in readme. [Raphaël Vinot]
 - Use bionic on travis. [Raphaël Vinot]
 - Add poetry support. [Raphaël Vinot]
-
-Fix
-~~~
-- Test cases & template version. [Raphaël Vinot]
-- Mypy, more typing. [Raphaël Vinot]
-- Do not skip data in add_attribute methods. [Raphaël Vinot]
-- Remove references to the old API. [Raphaël Vinot]
-
-Other
-~~~~~
-- Use poetry everywhere, fix readme. [Raphaël Vinot]
-
-
-v2.4.121.1 (2020-02-07)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
@@ -2793,9 +2608,17 @@ Changes
 
 Fix
 ~~~
+- Test cases & template version. [Raphaël Vinot]
+- Mypy, more typing. [Raphaël Vinot]
+- Do not skip data in add_attribute methods. [Raphaël Vinot]
+- Remove references to the old API. [Raphaël Vinot]
 - Make lief optional again. [Raphaël Vinot]
 
   fix #538
+
+Other
+~~~~~
+- Use poetry everywhere, fix readme. [Raphaël Vinot]
 
 
 v2.4.121 (2020-02-06)
@@ -2870,6 +2693,7 @@ New
   to search large dataset. It's used in Windows Defender ATP Hunting-Queries
   and also Azure Sentinel (Cloud-native SIEM).
 - Remove python < 3.6 support. [Raphaël Vinot]
+- URLObject (requires pyfaup) [Raphaël Vinot]
 
 Changes
 ~~~~~~~
@@ -2889,6 +2713,18 @@ Changes
 - Bump misp-objects. [Raphaël Vinot]
 - Bump Dependencies. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- Bump test files. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Debug travis error message. [Raphaël Vinot]
+- [types] eppn type added. [Alexandre Dulaunoy]
+- Fix typo. [Raphaël Vinot]
+- Move scrippsco2 feed generator to a sub directory. [Raphaël Vinot]
+- Update documentation. [Raphaël Vinot]
+
+  Fix #396
+- Bump objects. [Raphaël Vinot]
 
 Fix
 ~~~
@@ -2901,6 +2737,12 @@ Fix
 - Event without hashable attribute. [Raphaël Vinot]
 
   Related #506
+- Properly test custom objects. [Raphaël Vinot]
+- Adding a sighting takes a little bit of time. [Raphaël Vinot]
+- Test case on reference. [Raphaël Vinot]
+- Add missing fields to event & attribute for the feed output. [Raphaël
+  Vinot]
+- Make sure the publish timestamp is bumped on update. [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -2926,58 +2768,8 @@ Other
 - Update README.md. [Raphaël Vinot]
 
 
-v2.4.119.1 (2019-12-17)
------------------------
-
-New
-~~~
-- URLObject (requires pyfaup) [Raphaël Vinot]
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Version bump. [Raphaël Vinot]
-- Bump test files. [Raphaël Vinot]
-- Bump misp-objects. [Raphaël Vinot]
-- Debug travis error message. [Raphaël Vinot]
-- [types] eppn type added. [Alexandre Dulaunoy]
-- Fix typo. [Raphaël Vinot]
-- Move scrippsco2 feed generator to a sub directory. [Raphaël Vinot]
-- Update documentation. [Raphaël Vinot]
-
-  Fix #396
-- Bump objects. [Raphaël Vinot]
-
-Fix
-~~~
-- Properly test custom objects. [Raphaël Vinot]
-- Adding a sighting takes a little bit of time. [Raphaël Vinot]
-- Test case on reference. [Raphaël Vinot]
-- Add missing fields to event & attribute for the feed output. [Raphaël
-  Vinot]
-- Make sure the publish timestamp is bumped on update. [Raphaël Vinot]
-
-
 v2.4.119 (2019-12-02)
 ---------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump dependencies. [Raphaël Vinot]
-
-Fix
-~~~
-- Bump lief to 0.10.1. [Raphaël Vinot]
-- Update tests. [Raphaël Vinot]
-- Raise PyMISPError instead of Exception. [Raphaël Vinot]
-- Rename feed_meta_generator so it clearly fails with python<3.6.
-  [Raphaël Vinot]
-
-
-v2.4.117.3 (2019-11-25)
------------------------
 
 New
 ~~~
@@ -2993,9 +2785,13 @@ New
 - Get Database Schema Diagnostic. [Raphaël Vinot]
 
   Fix #492
+- Add support for UserSettings. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump dependencies. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump dependencies. [Raphaël Vinot]
@@ -3010,43 +2806,7 @@ Changes
 - Bump dependencies. [Raphaël Vinot]
 - [test] feed test updated as botvrij is now TLS by default. [Alexandre
   Dulaunoy]
-
-Fix
-~~~
-- Improve stability of feed output. [Raphaël Vinot]
-- Do not unitialize the uuid in MISPEvent. [Raphaël Vinot]
-- Bump url template version in test cases. [Raphaël Vinot]
-- Python 2.7 tests. [Raphaël Vinot]
-- Print the full json blob in debug mode. [Raphaël Vinot]
-
-  Related https://github.com/MISP/PyMISP/issues/462
-
-Other
-~~~~~
-- Cch: Bump misp-objects. [Raphaël Vinot]
-
-
-v2.4.117.2 (2019-10-30)
------------------------
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
-
-Fix
-~~~
-- Avoid exception on legacy MISP. [Raphaël Vinot]
-
-
-v2.4.117.1 (2019-10-30)
------------------------
-
-New
-~~~
-- Add support for UserSettings. [Raphaël Vinot]
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
@@ -3057,6 +2817,19 @@ Changes
 
 Fix
 ~~~
+- Bump lief to 0.10.1. [Raphaël Vinot]
+- Update tests. [Raphaël Vinot]
+- Raise PyMISPError instead of Exception. [Raphaël Vinot]
+- Rename feed_meta_generator so it clearly fails with python<3.6.
+  [Raphaël Vinot]
+- Improve stability of feed output. [Raphaël Vinot]
+- Do not unitialize the uuid in MISPEvent. [Raphaël Vinot]
+- Bump url template version in test cases. [Raphaël Vinot]
+- Python 2.7 tests. [Raphaël Vinot]
+- Print the full json blob in debug mode. [Raphaël Vinot]
+
+  Related https://github.com/MISP/PyMISP/issues/462
+- Avoid exception on legacy MISP. [Raphaël Vinot]
 - [examples] typo uuid. [Jean-Louis Huynen]
 
   give me a hoodie.
@@ -3070,6 +2843,7 @@ Fix
 
 Other
 ~~~~~
+- Cch: Bump misp-objects. [Raphaël Vinot]
 - Added example for checking sync servers. [wotschel]
 - Corrected docstring. [Shortfinga]
 - Include to_ids and replace newlines in title. [Koen Van Impe]
@@ -3297,6 +3071,12 @@ New
 - Get_objects_by_name in MISPEvent. [Raphaël Vinot]
 
   new: Convert datetime objects to python datetime.
+- [Sightings] Delete method. [Raphaël Vinot]
+
+  Fix #230
+- [tests] non-exportable tags. [Raphaël Vinot]
+- Add option to locally expand malware samples with LIEF. [Raphaël
+  Vinot]
 
 Changes
 ~~~~~~~
@@ -3311,40 +3091,6 @@ Changes
 - [examples] pythonify properly when needed. [Raphaël Vinot]
 - [tests] Toggle pythonify in create_massive_dummy_events. [Raphaël
   Vinot]
-
-Fix
-~~~
-- Inconsistency in MISPEvent, reenable tests. [Raphaël Vinot]
-- Some test cases need more love. [Raphaël Vinot]
-- PyTaxonomies is not compatible with python<3.6. [Raphaël Vinot]
-- Rename filename. [Raphaël Vinot]
-- [deprecation] Wrong deprecation message. [Raphaël Vinot]
-
-  Also, deprecated method was broken.
-
-  Fix #424
-
-Other
-~~~~~
-- Add: New attribute type weakness. [chrisr3d]
-- Fix missing f in f-string. [Paal Braathen]
-- Wrong variable. [Georges Toth]
-- Remove unused line. [kovacsbalu]
-- Fix tag help text Minor pycodestyle. [kovacsbalu]
-
-
-v2.4.111.2 (2019-07-22)
------------------------
-
-New
-~~~
-- [Sightings] Delete method. [Raphaël Vinot]
-
-  Fix #230
-- [tests] non-exportable tags. [Raphaël Vinot]
-
-Changes
-~~~~~~~
 - Bump Changelog. [Raphaël Vinot]
 - Bump verison. [Raphaël Vinot]
 - Make pythonify=False default everywhere. [Raphaël Vinot]
@@ -3352,35 +3098,6 @@ Changes
   Add a method to toggle pythonify globally
 - [tests] Update stats. [Raphaël Vinot]
 - [tests] Remove travis exceptions. [Raphaël Vinot]
-
-Fix
-~~~
-- [tests] Path to test file. [Raphaël Vinot]
-
-  Fix #423
-- [objects] Allow the value of an attribute to be 0. [Raphaël Vinot]
-- [tests] Disable one of the test cases for now. [Raphaël Vinot]
-- [tests] By default, the workflow taxonomy isn't enabled. [Raphaël
-  Vinot]
-- Properly handle fallbacks add/update/delete attributes. [Raphaël
-  Vinot]
-- [add_attribute] Only create a proposal when needed. [Raphaël Vinot]
-
-Other
-~~~~~
-- Fix for issue 420. [github-pba]
-
-
-v2.4.111.1 (2019-07-18)
------------------------
-
-New
-~~~
-- Add option to locally expand malware samples with LIEF. [Raphaël
-  Vinot]
-
-Changes
-~~~~~~~
 - Bump Changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
@@ -3394,10 +3111,35 @@ Changes
 
 Fix
 ~~~
+- Inconsistency in MISPEvent, reenable tests. [Raphaël Vinot]
+- Some test cases need more love. [Raphaël Vinot]
+- PyTaxonomies is not compatible with python<3.6. [Raphaël Vinot]
+- Rename filename. [Raphaël Vinot]
+- [deprecation] Wrong deprecation message. [Raphaël Vinot]
+
+  Also, deprecated method was broken.
+
+  Fix #424
+- [tests] Path to test file. [Raphaël Vinot]
+
+  Fix #423
+- [objects] Allow the value of an attribute to be 0. [Raphaël Vinot]
+- [tests] Disable one of the test cases for now. [Raphaël Vinot]
+- [tests] By default, the workflow taxonomy isn't enabled. [Raphaël
+  Vinot]
+- Properly handle fallbacks add/update/delete attributes. [Raphaël
+  Vinot]
+- [add_attribute] Only create a proposal when needed. [Raphaël Vinot]
 - Python < 3.6 support. [Raphaël Vinot]
 
 Other
 ~~~~~
+- Add: New attribute type weakness. [chrisr3d]
+- Fix missing f in f-string. [Paal Braathen]
+- Wrong variable. [Georges Toth]
+- Remove unused line. [kovacsbalu]
+- Fix tag help text Minor pycodestyle. [kovacsbalu]
+- Fix for issue 420. [github-pba]
 - Create statistical reports for MISP. [Koen Van Impe]
 
   PyMISP script to run every x-days to get an overview of new
@@ -3918,6 +3660,7 @@ Changes
 - Update order parameters & doc. [Raphaël Vinot]
 - Add an extra IP from the warninglists. [Raphaël Vinot]
 - Test for event UUID in attribute. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 
 Fix
 ~~~
@@ -3951,14 +3694,6 @@ Other
 - - Add description from README.md as long-description -> displayed on
   pypi. - Add project related URLs to be displayed on pypi. [Georges
   Toth]
-
-
-v2.4.95.1 (2018-09-06)
-----------------------
-
-Changes
-~~~~~~~
-- Bump changelog. [Raphaël Vinot]
 
 
 v2.4.95 (2018-09-06)
@@ -4060,6 +3795,12 @@ Changes
 - Fix sample retrieval from new-style zips. [Xavier Mehrenberger]
 - Bump misp-objects. [Raphaël Vinot]
 - Raise an exception if the response is not in JSON. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Index out of range in add_object. [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -4070,25 +3811,13 @@ Other
   added: download_samples(..., unzip=True)
 
 
-v2.4.92.1 (2018-06-05)
-----------------------
-
-Changes
-~~~~~~~
-- Bump version. [Raphaël Vinot]
-- Bump changelog. [Raphaël Vinot]
-
-Fix
-~~~
-- Index out of range in add_object. [Raphaël Vinot]
-
-
 v2.4.92 (2018-06-05)
 --------------------
 
 New
 ~~~
 - Add edit_object, simplify add_object. [Raphaël Vinot]
+- Properly implement the Email object creator. [Raphaël Vinot]
 
 Changes
 ~~~~~~~
@@ -4096,30 +3825,6 @@ Changes
 - Bump misp-objects. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
-
-Fix
-~~~
-- Correct docstring of search method. [iso]
-- Response data type mismatch in _send_attributes() [Raphaël Vinot]
-
-  Fix #206
-- Decoding issue. [Raphaël Vinot]
-
-Other
-~~~~~
-- Fix issue when adding multiple attributes and the instance is too
-  slow. [Raphaël Vinot]
-
-
-v2.4.90.1 (2018-05-09)
-----------------------
-
-New
-~~~
-- Properly implement the Email object creator. [Raphaël Vinot]
-
-Changes
-~~~~~~~
 - Bump changelog. [Raphaël Vinot]
 - Version bump. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
@@ -4128,12 +3833,22 @@ Changes
 
 Fix
 ~~~
+- Correct docstring of search method. [iso]
+- Response data type mismatch in _send_attributes() [Raphaël Vinot]
+
+  Fix #206
 - Wrong version. [Raphaël Vinot]
+- Decoding issue. [Raphaël Vinot]
 - Properly get and decode the body of the email. [Raphaël Vinot]
 - Provide the extension of the EML file to attach. [Raphaël Vinot]
 - Properly handle attachments. [Raphaël Vinot]
 - Test cases & attributes automatically getting an UUID. [Raphaël Vinot]
 - Typo in the *feed methods. [Raphaël Vinot]
+
+Other
+~~~~~
+- Fix issue when adding multiple attributes and the instance is too
+  slow. [Raphaël Vinot]
 
 
 v2.4.90 (2018-04-25)
@@ -4208,6 +3923,12 @@ New
 ~~~
 - Add email object generator. [Raphaël Vinot]
 - Method to return an object by uuid. [chrisr3d]
+- APIs to manage sharing groups. [Raphaël Vinot]
+
+  Fix #185
+- ReturnMetaAttributes flag for freeTextImport API. [Raphaël Vinot]
+
+  Fix #188
 
 Changes
 ~~~~~~~
@@ -4215,6 +3936,13 @@ Changes
 - Bump version. [Raphaël Vinot]
 - Bump Changelog. [Raphaël Vinot]
 - Bump misp-objects. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump describeTypes (add mime) [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Bump describeType. [Raphaël Vinot]
+- Bump describeType. [Raphaël Vinot]
 
 Fix
 ~~~
@@ -4225,6 +3953,7 @@ Fix
   Fix #192
 - Typo. [chrisr3d]
 - Update reference test cases. [Raphaël Vinot]
+- Encode string in _encode_file_to_upload. [Raphaël Vinot]
 
 Other
 ~~~~~
@@ -4274,36 +4003,6 @@ Other
   The return will be a sighting list of event 42 with a filter for organisation 2.
 - Add attributes within objects as well, for tagging via value/id/uuid.
   [Tobias Mainka]
-
-
-v2.4.87.1 (2018-02-13)
-----------------------
-
-New
-~~~
-- APIs to manage sharing groups. [Raphaël Vinot]
-
-  Fix #185
-- ReturnMetaAttributes flag for freeTextImport API. [Raphaël Vinot]
-
-  Fix #188
-
-Changes
-~~~~~~~
-- Bump Changelog. [Raphaël Vinot]
-- Version bump. [Raphaël Vinot]
-- Bump misp-objects. [Raphaël Vinot]
-- Bump describeTypes (add mime) [Raphaël Vinot]
-- Bump misp-objects. [Raphaël Vinot]
-- Bump describeType. [Raphaël Vinot]
-- Bump describeType. [Raphaël Vinot]
-
-Fix
-~~~
-- Encode string in _encode_file_to_upload. [Raphaël Vinot]
-
-Other
-~~~~~
 - Prevent unpublished events to be included in feed. [Koen Van Impe]
 
   Change default proposed config
@@ -4334,6 +4033,28 @@ Changes
 - Allow to pass a directory with custom object templates. [Raphaël
   Vinot]
 - Remove old warning. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Cleanup from last commit. [Raphaël Vinot]
+- Move MISPTag to Abstract MISP. [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Fix tests (new template version) [Raphaël Vinot]
+- Bump misp-objects. [Raphaël Vinot]
+- Add test for loading existing malware sample from MISP. [Raphaël
+  Vinot]
+- Multiple changes. [Raphaël Vinot]
+
+  * Fix timestamp dump (properly enforce UTC)
+  * Properly handle proposals
+  * Add many getter/setter
+  * Add dedicated test cases for MISPEvent and other objects
+- Allow do pass a category in default_attributes_parameters for object.
+  [Raphaël Vinot]
+
+  fix #166
+- Add MISPSighting class. [Raphaël Vinot]
+- Bump Changelog. [Raphaël Vinot]
 
 Fix
 ~~~
@@ -4348,6 +4069,20 @@ Fix
   Fix #174
 - Make python2 happy. [Raphaël Vinot]
 - Download old samples was broken. [Raphaël Vinot]
+- Edited method works as expected, add tests. [Raphaël Vinot]
+- Forgotten test files in last commit... [Raphaël Vinot]
+- Disable_correlation from template not properly used. [Raphaël Vinot]
+- Don't remove the distribution and sharing_group_id from
+  default_attributes_parameters. [Raphaël Vinot]
+- The sharing_group_id isn't required. [Raphaël Vinot]
+- Last commit was broken... [Raphaël Vinot]
+- Properly set Tag to attributes within objects. [Raphaël Vinot]
+- Add method to add tags to objects. [Raphaël Vinot]
+
+  Fix #160
+- Typo in set_sightings. [Raphaël Vinot]
+
+  Fix #161
 
 Other
 ~~~~~
@@ -4376,55 +4111,6 @@ Other
 - Fix add_hashes test function parameters. [Louis LCE]
 - Added misp object templates path argument. [Tobias Mainka]
 - Update settings.default.py. [Andras Iklody]
-
-
-v2.4.85.1 (2018-01-10)
-----------------------
-
-Changes
-~~~~~~~
-- Bump Changelog. [Raphaël Vinot]
-- Bump version. [Raphaël Vinot]
-- Bump misp-objects. [Raphaël Vinot]
-- Cleanup from last commit. [Raphaël Vinot]
-- Move MISPTag to Abstract MISP. [Raphaël Vinot]
-- Bump misp-objects. [Raphaël Vinot]
-- Fix tests (new template version) [Raphaël Vinot]
-- Bump misp-objects. [Raphaël Vinot]
-- Add test for loading existing malware sample from MISP. [Raphaël
-  Vinot]
-- Multiple changes. [Raphaël Vinot]
-
-  * Fix timestamp dump (properly enforce UTC)
-  * Properly handle proposals
-  * Add many getter/setter
-  * Add dedicated test cases for MISPEvent and other objects
-- Allow do pass a category in default_attributes_parameters for object.
-  [Raphaël Vinot]
-
-  fix #166
-- Add MISPSighting class. [Raphaël Vinot]
-- Bump Changelog. [Raphaël Vinot]
-
-Fix
-~~~
-- Edited method works as expected, add tests. [Raphaël Vinot]
-- Forgotten test files in last commit... [Raphaël Vinot]
-- Disable_correlation from template not properly used. [Raphaël Vinot]
-- Don't remove the distribution and sharing_group_id from
-  default_attributes_parameters. [Raphaël Vinot]
-- The sharing_group_id isn't required. [Raphaël Vinot]
-- Last commit was broken... [Raphaël Vinot]
-- Properly set Tag to attributes within objects. [Raphaël Vinot]
-- Add method to add tags to objects. [Raphaël Vinot]
-
-  Fix #160
-- Typo in set_sightings. [Raphaël Vinot]
-
-  Fix #161
-
-Other
-~~~~~
 - Set_sightings. [AninaAntonie]
 
   Maybe I didn't use it correctly but the method set_sightings didn't work for me. It's working now but I'm not sure whether sending a request for every sighting in the list is the best solution.
@@ -4621,6 +4307,17 @@ Changes
 - Remove warning if PyMISP is too new. [Raphaël Vinot]
 - Add simple asciidoc generator for MISP event. [Raphaël Vinot]
 - Update changelog. [Raphaël Vinot]
+- Version bump. [Raphaël Vinot]
+- Update changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Do not raise an exception when the object template is unknown.
+  [Raphaël Vinot]
+
+  + bump misp-object
+- Bump misp-objects. [Raphaël Vinot]
+- Allow to hard delete an attribute by ID. [Raphaël Vinot]
+- Update comments. [Raphaël Vinot]
+- Bump misp-objects and describeTypes. [Raphaël Vinot]
 
 Fix
 ~~~
@@ -4642,6 +4339,17 @@ Fix
   fix #120
 - Properly pop the distribution key. [Raphaël Vinot]
 - Update dependencies for VT generator. [Raphaël Vinot]
+- Properly bundle object templates. [Raphaël Vinot]
+- Properly bundle object templates. [Raphaël Vinot]
+- Fix typos and logic mistakes in mispevent. [Raphaël Vinot]
+- Fix travis build. [Raphaël Vinot]
+- Min required version of setuptools. [Raphaël Vinot]
+- Improve dependencies listing. [Raphaël Vinot]
+
+  Partial fix for #110
+- Missing default category. [Raphaël Vinot]
+
+  Fix #119
 
 Other
 ~~~~~
@@ -4663,51 +4371,6 @@ Other
   python3 add_generic_object.py -e 1683 -t email -d '{"subject":"The Pink Letter", "to":"jon@snow.org"}'
   python3 add_generic_object.py -e 2343 -t person -d '{"first-name":"Daenerys", "last-name":"Targaryen", "place-of-birth":"Dragonstone"}'
   python3 add_generic_object.py -e 3596 -t "domain|ip" -d '{"domain":"stormborn.org", "ip":"50.63.202.33"}'
-
-
-v2.4.81.2 (2017-10-24)
-----------------------
-
-Changes
-~~~~~~~
-- Version bump. [Raphaël Vinot]
-- Update changelog. [Raphaël Vinot]
-
-Fix
-~~~
-- Properly bundle object templates. [Raphaël Vinot]
-
-
-v2.4.81.1 (2017-10-24)
-----------------------
-
-Changes
-~~~~~~~
-- Bump version. [Raphaël Vinot]
-- Do not raise an exception when the object template is unknown.
-  [Raphaël Vinot]
-
-  + bump misp-object
-- Bump misp-objects. [Raphaël Vinot]
-- Allow to hard delete an attribute by ID. [Raphaël Vinot]
-- Update comments. [Raphaël Vinot]
-- Bump misp-objects and describeTypes. [Raphaël Vinot]
-
-Fix
-~~~
-- Properly bundle object templates. [Raphaël Vinot]
-- Fix typos and logic mistakes in mispevent. [Raphaël Vinot]
-- Fix travis build. [Raphaël Vinot]
-- Min required version of setuptools. [Raphaël Vinot]
-- Improve dependencies listing. [Raphaël Vinot]
-
-  Partial fix for #110
-- Missing default category. [Raphaël Vinot]
-
-  Fix #119
-
-Other
-~~~~~
 - Update openioc.py. [Andras Iklody]
 - Added **kwargs to add_named_attribute call in add_attachment.
   [tssbo82]
@@ -4718,25 +4381,13 @@ Other
 v2.4.81 (2017-10-09)
 --------------------
 
-Fix
-~~~
-- Changelog config + update. [Raphaël Vinot]
-
-Other
-~~~~~
-- Up: bump version. [Raphaël Vinot]
-- Up: Bump misp-objects. [Raphaël Vinot]
-
-
-v2.4.80.1 (2017-10-04)
-----------------------
-
 Changes
 ~~~~~~~
 - Update changelog. [Raphaël Vinot]
 
 Fix
 ~~~
+- Changelog config + update. [Raphaël Vinot]
 - Change readme. [Raphaël Vinot]
 - Create file object. [Raphaël Vinot]
 
@@ -4747,6 +4398,8 @@ Fix
 
 Other
 ~~~~~
+- Up: bump version. [Raphaël Vinot]
+- Up: Bump misp-objects. [Raphaël Vinot]
 - Up: Version bump. [Raphaël Vinot]
 - Up: Bump misp-objects & describeTypes. [Raphaël Vinot]
 - Update readme. [Raphaël Vinot]
@@ -5107,14 +4760,6 @@ Other
 
 v2.4.63 (2017-01-31)
 --------------------
-- Version bump. [Raphaël Vinot]
-- Fix regression. [Raphaël Vinot]
-
-  Fix #46
-
-
-v2.4.62.1 (2017-01-27)
-----------------------
 
 Changes
 ~~~~~~~
@@ -5122,6 +4767,10 @@ Changes
 
 Other
 ~~~~~
+- Version bump. [Raphaël Vinot]
+- Fix regression. [Raphaël Vinot]
+
+  Fix #46
 - Version bump. [Raphaël Vinot]
 - Fix testing. [Raphaël Vinot]
 - Bug fixes. [Raphaël Vinot]
@@ -5300,10 +4949,6 @@ v2.4.53 (2016-10-21)
 - First batch of changes, will be squashed. [Raphaël Vinot]
 - Fixed search_index. [Hannah Ward]
 - Toggle flag instead of value. [Alexandre Dulaunoy]
-
-
-v2.4.51.1 (2016-09-12)
-----------------------
 - Version bump. [Raphaël Vinot]
 - Fix examples after removal of MISP XML support. [Raphaël Vinot]
 - Add some examples. [Déborah Servili]
@@ -5404,16 +5049,12 @@ v2.4.49 (2016-08-02)
   examples/treemap/treemap.py. [Deborah Servili]
 - Move files from examples/treemap to examples/situational-awareness/
   [Déborah Servili]
-- Rename examples/treemap/treemap.py to
-  examples/statistics/attribute_treemap.py. [Deborah Servili]
-
-
-v2.4.48.2 (2016-07-11)
-----------------------
 - Version bump. [Raphaël Vinot]
 - Add remove tag method. [Raphaël Vinot]
 - Use same variable names as testing environment. [Raphaël Vinot]
 - Make scripts executable. [Raphaël Vinot]
+- Rename examples/treemap/treemap.py to
+  examples/statistics/attribute_treemap.py. [Deborah Servili]
 - Random names for dummy files. [Déborah Servili]
 - Add examples "create_dummy_event" and "create_massive_dummy_events"
   [Déborah Servili]
@@ -5425,10 +5066,6 @@ v2.4.48.2 (2016-07-11)
 - Fix python3 compat. Make Pep8 happy. [Raphaël Vinot]
 - Make pep8 happy. [Raphaël Vinot]
 - Comment removed. [Alexandre Dulaunoy]
-
-
-v2.4.48.1 (2016-06-15)
-----------------------
 - Fix check MISP latest version. [Raphaël Vinot]
 - Add tag script. [Raphaël Vinot]
 - Make pep8 happy. [Raphaël Vinot]
@@ -5536,18 +5173,6 @@ v2.4.36 (2016-04-15)
 - Fixed a typo causing the tests to fail. [iglocska]
 - README updated including keys.py usage. [Alexandre Dulaunoy]
 - Authentication parameters updated. [Alexandre Dulaunoy]
-- Auth parameters updated. [Alexandre Dulaunoy]
-- Updated auth parameters. [Alexandre Dulaunoy]
-- Normalized auth parameters. [Alexandre Dulaunoy]
-- Normalized auth parameters. [Alexandre Dulaunoy]
-- Sample keys file added. [Alexandre Dulaunoy]
-- Normalized auth parameters. [Alexandre Dulaunoy]
-- Normalized auth parameters. [Alexandre Dulaunoy]
-- Auth parameters normalized. [Alexandre Dulaunoy]
-
-
-v2.1.1 (2015-11-05)
--------------------
 - Add add_ipsrc. [Raphaël Vinot]
 - Add basic support for the proposal API. [Raphaël Vinot]
 - Whitespace cleaned. [grolinet]
@@ -5556,11 +5181,15 @@ v2.1.1 (2015-11-05)
 - Missing types added. [unknown]
 - Missing types added. [unknown]
 - [UnitTest] Add some functions, testing. [Raphaël Vinot]
+- Auth parameters updated. [Alexandre Dulaunoy]
+- Updated auth parameters. [Alexandre Dulaunoy]
+- Normalized auth parameters. [Alexandre Dulaunoy]
+- Normalized auth parameters. [Alexandre Dulaunoy]
+- Sample keys file added. [Alexandre Dulaunoy]
+- Normalized auth parameters. [Alexandre Dulaunoy]
+- Normalized auth parameters. [Alexandre Dulaunoy]
+- Auth parameters normalized. [Alexandre Dulaunoy]
 - Improve error handling. [Raphaël Vinot]
-
-
-v2.0.1 (2015-09-22)
--------------------
 - Add test cases (initial) [Raphaël Vinot]
 - Fix typo in categories names. [Raphaël Vinot]
 - Check the MISP instance to query is valid. [Raphaël Vinot]
@@ -5573,15 +5202,7 @@ v2.0.1 (2015-09-22)
 - Add methods to query the version of MISP (master and local) [Raphaël
   Vinot]
 - Add publish method. [Raphaël Vinot]
-
-
-v1.8.2 (2015-09-12)
--------------------
 - Try to convert event ID to integer if not None. [Raphaël Vinot]
-
-
-v1.8.1 (2015-09-12)
--------------------
 - Fix bug in download sample function. [Raphaël Vinot]
 
   Thanks to @kevthehermit
@@ -5613,10 +5234,6 @@ v1.8.1 (2015-09-12)
 - Fix last commit. [Raphaël Vinot]
 - Initial changes to increase flexibility for Viper module. [Raphaël
   Vinot]
-
-
-v1.1.2 (2015-08-05)
--------------------
 - Fix PyPi package. [Raphaël Vinot]
 - Add netflow filter output. [Koen Van Impe]
 
