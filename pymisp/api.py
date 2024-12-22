@@ -32,7 +32,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
     MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel, \
-    MISPNote, MISPOpinion, MISPRelationship, AnalystDataBehaviorMixin
+    MISPNote, MISPOpinion, MISPRelationship, MISPAnalystData
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 
@@ -621,14 +621,14 @@ class PyMISP:
     # ## END Galaxy Cluster ###
 
     # ## BEGIN Analyst Data ###a
-    def get_analyst_data(self, analyst_data: AnalystDataBehaviorMixin | int | str | UUID,
+    def get_analyst_data(self, analyst_data: MISPAnalystData | int | str | UUID,
                          pythonify: bool = False) -> dict[str, Any] | MISPNote | MISPOpinion | MISPRelationship:
         """Get an analyst data from a MISP instance
 
         :param analyst_data: analyst data to get
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
-        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+        if isinstance(analyst_data, MISPAnalystData):
             analyst_data_type = analyst_data.analyst_data_object_type
         else:
             analyst_data_type = 'all'
@@ -666,7 +666,7 @@ class PyMISP:
         :param analyst_data_id: analyst data ID to update
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
-        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+        if isinstance(analyst_data, MISPAnalystData):
             analyst_data_type = analyst_data.analyst_data_object_type
         else:
             analyst_data_type = 'all'
@@ -685,7 +685,7 @@ class PyMISP:
 
         :param analyst_data: analyst data to delete
         """
-        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+        if isinstance(analyst_data, MISPAnalystData):
             analyst_data_type = analyst_data.analyst_data_object_type
         else:
             analyst_data_type = 'all'
