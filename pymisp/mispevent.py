@@ -2533,6 +2533,14 @@ class MISPAnalystData(AbstractMISP):
         return self._analyst_data_object_type
 
     @property
+    def notes(self) -> list[MISPNote]:
+        return self.Note
+
+    @property
+    def opinions(self) -> list[MISPOpinion]:
+        return self.Opinion
+
+    @property
     def org(self) -> MISPOrganisation:
         return self.Org
 
