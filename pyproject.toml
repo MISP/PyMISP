@@ -1,90 +1,84 @@
-[tool.poetry]
+[project]
 name = "pymisp"
 version = "2.5.4"
 description = "Python API for MISP."
-authors = ["Raphaël Vinot <raphael.vinot@circl.lu>"]
+authors = [
+    {name="Raphaël Vinot", email="raphael.vinot@circl.lu"}
+]
 license = "BSD-2-Clause"
+readme = "README.md"
+requires-python = ">=3.9,<4.0"
+
+dynamic = [ "classifiers" ]
+
+dependencies = [
+    "requests (>=2.32.3)",
+    "python-dateutil (>=2.9.0.post0)",
+    "deprecated (>=1.2.18)"
+]
+
+[project.urls]
 repository = "https://github.com/MISP/PyMISP"
+issues = "https://github.com/MISP/PyMISP/issues"
 documentation = "https://pymisp.readthedocs.io"
 
-readme = "README.md"
+[project.optional-dependencies]
 
+fileobjects = [
+    "python-magic (>=0.4.27)",
+    "pydeep2 (>=0.5.1)",
+    "lief (>=0.16.2)"
+]
+
+openioc = [ "beautifulsoup4 (>=4.12.3)" ]
+
+virustotal = [ "validators (>=0.34.0)" ]
+
+docs = [
+    "sphinx-autodoc-typehints (>=3.0.1) ; python_version >= \"3.10\"",
+    "sphinx (>=8.1.3) ; python_version >= \"3.10\"",
+    "docutils (>=0.21.2) ; python_version >= \"3.10\"",
+]
+
+pdfexport = [ "reportlab (>=4.2.5)" ]
+
+url = [ "pyfaup (>=1.2)" ]
+
+email = [
+    "extract_msg (>=0.52)",
+    "RTFDE (>=0.1.2) ; python_version <= \"3.9\"",
+    "oletools (>=0.60.2)"
+]
+
+brotli = [ "urllib3 (>=2.3.0)" ]
+
+[tool.poetry]
 classifiers=[
-    'License :: OSI Approved :: BSD License',
     'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
     'Operating System :: POSIX :: Linux',
     'Intended Audience :: Science/Research',
     'Intended Audience :: Telecommunications Industry',
     'Intended Audience :: Information Technology',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-    'Programming Language :: Python :: 3.13',
     'Topic :: Security',
     'Topic :: Internet'
 ]
 
+exclude = ["pymisp/data"]
 include = [
-    {path = "CHANGELOG.txt", format = "sdist"},
-    "pymisp/data/*.json",
-    "pymisp/data/misp-objects/schema_objects.json",
-    "pymisp/data/misp-objects/schema_relationships.json",
-    "pymisp/data/misp-objects/objects/*/definition.json",
-    "pymisp/data/misp-objects/relationships/definition.json",
-    "pymisp/tools/pdf_fonts/Noto_TTF/*",
-    "docs",
-    "examples",
-    "tests",
+    {path = "CHANGELOG.txt", format = ["sdist", "wheel"]},
+    {path = "pymisp/data/*.json", format = ["sdist", "wheel"]},
+    {path = "pymisp/data/misp-objects/*.json", format = ["sdist", "wheel"]},
+    {path = "pymisp/data/misp-objects/objects/*/definition.json", format = ["sdist", "wheel"]},
+    {path = "pymisp/data/misp-objects/relationships/definition.json", format = ["sdist", "wheel"]},
+    {path = "docs", format = ["sdist"]},
+    {path = "examples/*.py", format = ["sdist", "wheel"]},
+    {path = "tests", format = ["sdist", "wheel"]}
 ]
-
-[tool.poetry.urls]
-"Bug Tracker" = "https://github.com/MISP/PyMISP/issues"
-"Source" = "https://github.com/MISP/PyMISP"
-
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.32.3"
-python-dateutil = "^2.9.0.post0"
-deprecated = "^1.2.15"
-extract_msg = {version = "^0.52", optional = true}
-RTFDE = {version = "^0.1.1", optional = true}
-oletools = {version = "^0.60.1", optional = true}
-python-magic = {version = "^0.4.27", optional = true}
-pydeep2 = {version = "^0.5.1", optional = true}
-lief = {version = "^0.16.0", optional = true}
-beautifulsoup4 = {version = "^4.12.3", optional = true}
-validators = {version = "^0.34.0", optional = true}
-sphinx-autodoc-typehints = {version = "^2.5.0", optional = true, python = ">=3.10"}
-docutils = {version = "^0.21.1", optional = true, python = ">=3.10"}
-recommonmark = {version = "^0.7.1", optional = true, python = ">=3.10"}
-reportlab = {version = "^4.2.5", optional = true}
-pyfaup = {version = "^1.2", optional = true}
-publicsuffixlist = {version = "^1.0.2.20241218", optional = true}
-urllib3 = {extras = ["brotli"], version = "*", optional = true}
-Sphinx = [
-    {version = "^8", python = ">=3.10", optional = true}
-]
-
-[tool.poetry.extras]
-fileobjects = ['python-magic', 'pydeep2', 'lief']
-openioc = ['beautifulsoup4']
-virustotal = ['validators']
-docs = ['sphinx-autodoc-typehints', 'recommonmark', 'sphinx', 'docutils']
-pdfexport = ['reportlab']
-url = ['pyfaup']
-email = ['extract_msg', "RTFDE", "oletools"]
-brotli = ['urllib3']
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.12.1"
-mypy = "^1.13.0"
-ipython = [
-    {version = "^8.18.0", python = "<3.10"},
-    {version = "^8.19.0", python = ">=3.10"}
-]
-jupyterlab = "^4.3.4"
+mypy = "^1.14.1"
 types-requests = "^2.32.0.20241016"
 types-python-dateutil = "^2.9.0.20241206"
 types-redis = "^4.6.0.20241004"
@@ -92,5 +86,5 @@ types-Flask = "^1.1.6"
 pytest-cov = "^6.0.0"
 
 [build-system]
-requires = ["poetry_core>=1.1", "setuptools"]
+requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"
