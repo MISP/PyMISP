@@ -499,6 +499,20 @@ class PyMISP:
         response = self._prepare_request('POST', f'events/contact/{event_id}', data=to_post)
         return self._check_json_response(response)
 
+    def enrich_event(self, event: MISPEvent | int | str | UUID, enrich_with: str | list[str]) -> dict[str, Any]:
+        """Enrich an event with data from one or more module.
+
+        :param event: event to enrich
+        :param enrich_with: module name or list of module names to use for enrichment
+        """
+        event_id = get_uuid_or_id_from_abstract_misp(event)
+        if isinstance(enrich_with, str):
+            enrich_with = [enrich_with]
+
+        to_post = {module_name: True for module_name in enrich_with}
+        response = self._prepare_request('POST', f'/events/enrichEvent/{event_id}', data=to_post)
+        return self._check_json_response(response)
+
     # ## END Event ###
 
     # ## BEGIN Event Report ###
@@ -1101,6 +1115,20 @@ class PyMISP:
         a = MISPAttribute()
         a.from_dict(**response)
         return a
+
+    def enrich_attribute(self, attribute: MISPAttribute | int | str | UUID, enrich_with: str | list[str]) -> dict[str, Any]:
+        """Enrich an attribute with data from one or more module.
+
+        :param attribute: attribute to enrich
+        :param enrich_with: module name or list of module names to use for enrichment
+        """
+        attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
+        if isinstance(enrich_with, str):
+            enrich_with = [enrich_with]
+
+        to_post = {module_name: True for module_name in enrich_with}
+        response = self._prepare_request('POST', f'/attributes/enrich/{attribute_id}', data=to_post)
+        return self._check_json_response(response)
 
     # ## END Attribute ###
 
