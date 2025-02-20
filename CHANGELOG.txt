@@ -13,6 +13,8 @@ New
 
 Changes
 ~~~~~~~
+- Bump objects. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - Update readme. [Raphaël Vinot]
 - Bump deps, use poetry 2.0. [Raphaël Vinot]
