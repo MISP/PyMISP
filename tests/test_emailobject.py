@@ -19,6 +19,7 @@ T = TypeVar('T', bound='TestEmailObject')
 class TestEmailObject(unittest.TestCase):
 
     eml_1: BytesIO
+    msg_1: BytesIO
 
     @classmethod
     def setUpClass(cls: type[T]) -> None:
