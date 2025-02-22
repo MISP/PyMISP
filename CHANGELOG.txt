@@ -2,6 +2,18 @@ Changelog
 =========
 
 
+v2.5.7.1 (2025-02-22)
+---------------------
+
+Changes
+~~~~~~~
+- Remove tests from wheel. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Move email MSG to PW protected archive to fool bumb AVs. [Raphaël
+  Vinot]
+
+
 v2.5.7 (2025-02-20)
 -------------------
 
@@ -13,6 +25,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
