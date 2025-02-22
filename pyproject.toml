@@ -74,7 +74,7 @@ include = [
     {path = "pymisp/data/misp-objects/relationships/definition.json", format = ["sdist", "wheel"]},
     {path = "docs", format = ["sdist"]},
     {path = "examples/*.py", format = ["sdist", "wheel"]},
-    {path = "tests", format = ["sdist", "wheel"]}
+    {path = "tests", format = ["sdist"]}
 ]
 
 [tool.poetry.group.dev.dependencies]
