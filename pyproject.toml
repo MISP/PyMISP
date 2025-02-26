@@ -67,13 +67,14 @@ classifiers=[
 
 exclude = ["pymisp/data"]
 include = [
-    {path = "CHANGELOG.txt", format = ["sdist", "wheel"]},
+    {path = "CHANGELOG.txt", format = ["sdist"]},
+    {path = "LICENSE", format = ["sdist"]},
     {path = "pymisp/data/*.json", format = ["sdist", "wheel"]},
     {path = "pymisp/data/misp-objects/*.json", format = ["sdist", "wheel"]},
     {path = "pymisp/data/misp-objects/objects/*/definition.json", format = ["sdist", "wheel"]},
     {path = "pymisp/data/misp-objects/relationships/definition.json", format = ["sdist", "wheel"]},
     {path = "docs", format = ["sdist"]},
-    {path = "examples/*.py", format = ["sdist", "wheel"]},
+    {path = "examples/*.py", format = ["sdist"]},
     {path = "tests", format = ["sdist"]}
 ]
 

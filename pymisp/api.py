@@ -2600,6 +2600,7 @@ class PyMISP:
             uid = get_uuid_or_id_from_abstract_misp(user_id)
         url = f'users/edit/{uid}'
         if self._current_role.perm_admin or self._current_role.perm_site_admin:
+            # Privilege check.
             url = f'admin/{url}'
         r = self._prepare_request('POST', url, data=user)
         updated_user = self._check_json_response(r)
