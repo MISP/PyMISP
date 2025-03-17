@@ -7,11 +7,11 @@ from email.message import EmailMessage
 from io import BytesIO
 from os import urandom
 from pathlib import Path
-from typing import TypeVar, Type
+from typing import TypeVar
 from zipfile import ZipFile
 
 from pymisp.tools import EMailObject
-from pymisp.exceptions import PyMISPNotImplementedYet, InvalidMISPObject
+from pymisp.exceptions import InvalidMISPObject
 
 T = TypeVar('T', bound='TestEmailObject')
 
@@ -19,9 +19,13 @@ T = TypeVar('T', bound='TestEmailObject')
 class TestEmailObject(unittest.TestCase):
 
     eml_1: BytesIO
+    msg_1: BytesIO
 
     @classmethod
     def setUpClass(cls: type[T]) -> None:
+        with ZipFile(Path("tests/email_testfiles/mail_1.msg.zip"), 'r') as myzip:
+            with myzip.open('mail_1.msg', pwd=b'AVs are dumb') as myfile:
+                cls.msg_1 = BytesIO(myfile.read())
         with ZipFile(Path("tests/email_testfiles/mail_1.eml.zip"), 'r') as myzip:
             with myzip.open('mail_1.eml', pwd=b'AVs are dumb') as myfile:
                 cls.eml_1 = BytesIO(myfile.read())
@@ -67,7 +71,7 @@ class TestEmailObject(unittest.TestCase):
     def test_msg(self) -> None:
         # Test result of eml converted to msg is the same
         eml_email_object = EMailObject(pseudofile=self.eml_1)
-        email_object = EMailObject(Path("tests/email_testfiles/mail_1.msg"))
+        email_object = EMailObject(pseudofile=self.msg_1)
 
         self.assertIsInstance(email_object.email, EmailMessage)
         for file_name, file_content in email_object.attachments:

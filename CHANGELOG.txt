@@ -2,11 +2,56 @@ Changelog
 =========
 
 
+v2.5.7.1 (2025-02-22)
+---------------------
+
+Changes
+~~~~~~~
+- Remove tests from wheel. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Move email MSG to PW protected archive to fool bumb AVs. [Raphaël
+  Vinot]
+
+
+v2.5.7 (2025-02-20)
+-------------------
+
+New
+~~~
+- Enrich event/attribute endpoints. [Raphaël Vinot]
+
+  Related #1318
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Update readme. [Raphaël Vinot]
+- Bump deps, use poetry 2.0. [Raphaël Vinot]
+
+Fix
+~~~
+- Allow MD in docs. [Raphaël Vinot]
+- Remove ref to recommonmark. [Raphaël Vinot]
+- [AnalystData] Added missing properties for Notes and Opinions.
+  [Christian Studer]
+
+  - This is now needed because MISPNote and MISPOpinion
+    are no longer part of AnalystDataBehaviorMixin and
+    cannot then get them from there
+- [api] Notes, Opinions and Relationships are no longer
+  AnalystDataBehaviorMixin. [Christian Studer]
+
+
 v2.5.4 (2024-12-20)
 -------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Update objects templates. [Raphaël Vinot]
 - Make python 3.9 happy. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
