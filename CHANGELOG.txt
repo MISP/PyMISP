@@ -2,11 +2,31 @@ Changelog
 =========
 
 
+v2.5.8 (2025-03-18)
+-------------------
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Remove top level files from wheel. [Raphaël Vinot]
+
+  As per doc
+  (https://python-poetry.org/docs/pyproject#exclude-and-include), we
+  cannot have them in the wheel.
+
+  Fix #1319
+
+
 v2.5.7.1 (2025-02-22)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Remove tests from wheel. [Raphaël Vinot]
 - Make mypy happy. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
