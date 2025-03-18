@@ -1,6 +1,6 @@
 [project]
 name = "pymisp"
-version = "2.5.7.1"
+version = "2.5.8"
 description = "Python API for MISP."
 authors = [
     {name="Raphaël Vinot", email="raphael.vinot@circl.lu"}
@@ -46,7 +46,7 @@ pdfexport = [ "reportlab (>=4.3.1)" ]
 url = [ "pyfaup (>=1.2)" ]
 
 email = [
-    "extract_msg (>=0.53.1)",
+    "extract_msg (>=0.53.2)",
     "RTFDE (>=0.1.2) ; python_version <= \"3.9\"",
     "oletools (>=0.60.2)"
 ]
