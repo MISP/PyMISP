@@ -7,7 +7,12 @@ v2.5.8.1 (2025-03-18)
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump objects, version. [Raphaël Vinot]
+
+Fix
+~~~
+- Typo in objects. [Raphaël Vinot]
 
 
 v2.5.8 (2025-03-18)
