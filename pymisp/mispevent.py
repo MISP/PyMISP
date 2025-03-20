@@ -1121,6 +1121,11 @@ class MISPObject(AnalystDataBehaviorMixin):
         It is the same as calling multiple times add_attribute with the same object_relation.
         '''
         to_return = []
+
+        if not attributes:
+            logger.warning(f"The attributes you're trying to add have no value, skipping it. Object relation: {object_relation}")
+            return to_return
+
         for attribute in attributes:
             if isinstance(attribute, MISPAttribute):
                 a = self.add_attribute(object_relation, **attribute.to_dict())
