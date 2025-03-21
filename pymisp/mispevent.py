@@ -1123,7 +1123,7 @@ class MISPObject(AnalystDataBehaviorMixin):
         to_return = []
 
         if not attributes:
-            logger.warning(f"The attributes you're trying to add have no value, skipping it. Object relation: {object_relation}")
+            logger.warning(f"No attributes provided for object relation '{object_relation}'; skipping attribute addition.")
             return to_return
 
         for attribute in attributes:
