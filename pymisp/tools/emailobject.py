@@ -373,11 +373,11 @@ class EMailObject(AbstractMISPObjectGenerator):
                 # email object doesn't support display name for all email addrs
                 pass
 
-    def extract_matches(self, pattern: re.Pattern, text: str) -> list:
+    def extract_matches(self, pattern: re.Pattern[str], text: str) -> list[tuple[str, ...]]:
         """Returns all regex matches for a given pattern in a text."""
         return re.findall(pattern, text)
 
-    def add_ip_attribute(self, ip_candidate: str, received: str, seen_attributes: set) -> None:
+    def add_ip_attribute(self, ip_candidate: str, received: str, seen_attributes: set[tuple[str, str]]) -> None:
         """Validates and adds an IP address to MISP if it's public and not already seen during extraction."""
         try:
             ip = ipaddress.ip_address(ip_candidate)
@@ -387,14 +387,14 @@ class EMailObject(AbstractMISPObjectGenerator):
         except ValueError:
             pass  # Invalid IPs are ignored
 
-    def add_hostname_attribute(self, hostname: str, received: str, seen_attributes: set) -> None:
+    def add_hostname_attribute(self, hostname: str, received: str, seen_attributes: set[tuple[str, str]]) -> None:
         """Validates and adds a hostname to MISP if it contains a valid TLD-like format and is not already seen."""
         if "." in hostname and not hostname.endswith(".") and len(hostname.split(".")[-1]) > 1:
             if ("received-header-hostname", hostname) not in seen_attributes:
                 self.add_attribute("received-header-hostname", hostname, comment=received)
                 seen_attributes.add(("received-header-hostname", hostname))
 
-    def process_received_header(self, received: str, seen_attributes: set) -> None:
+    def process_received_header(self, received: str, seen_attributes: set[tuple[str, str]]) -> None:
         """Processes a single 'Received' header and extracts hostnames and IPs."""
 
         # Regex patterns
@@ -461,7 +461,7 @@ class EMailObject(AbstractMISPObjectGenerator):
             return
 
         # Track added attributes to prevent duplicates (store as (type, value) tuples)
-        seen_attributes = set()
+        seen_attributes: set[tuple[str, str]] = set()
 
         for received in received_items:
             self.process_received_header(received, seen_attributes)
