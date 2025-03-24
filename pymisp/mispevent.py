@@ -1120,12 +1120,11 @@ class MISPObject(AnalystDataBehaviorMixin):
         Helper for object_relation when multiple is True in the template.
         It is the same as calling multiple times add_attribute with the same object_relation.
         '''
-        to_return = []
-
         if not attributes:
             logger.warning(f"No attributes provided for object relation '{object_relation}'; skipping attribute addition.")
-            return to_return
+            return []
 
+        to_return = []
         for attribute in attributes:
             if isinstance(attribute, MISPAttribute):
                 a = self.add_attribute(object_relation, **attribute.to_dict())
