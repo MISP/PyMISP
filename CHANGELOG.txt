@@ -2,11 +2,41 @@ Changelog
 =========
 
 
+v2.5.9 (2025-03-26)
+-------------------
+
+Changes
+~~~~~~~
+- Make mypy happy. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- [emailobject] Improve parsing of the Received headers. [Sami Tainio]
+
+  - Rewrite of the section that deals with the logic handling the Received headers
+  - Previous version was not picking picking up e.g. Reverse DNS hostnames at all and some of the IPs were not ever handled
+- [emailobject] Improve parsing of the Received headers. [Sami Tainio]
+
+  - Rewrite of the section that deals with the logic handling the Received headers
+  - Previous version was not picking picking up e.g. Reverse DNS hostnames at all and some of the IPs were not ever handled
+
+Other
+~~~~~
+- [chg] Satisfy tests. [Sami Tainio]
+- Improve the logging message. [Peter Leitmann]
+- Add a check if add_attributes() method truly has values to add. [Peter
+  Leitmann]
+- [chg] Satisfy tests. [Sami Tainio]
+
+
 v2.5.8.1 (2025-03-18)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump objects, version. [Raphaël Vinot]
 
