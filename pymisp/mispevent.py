@@ -1121,7 +1121,7 @@ class MISPObject(AnalystDataBehaviorMixin):
         It is the same as calling multiple times add_attribute with the same object_relation.
         '''
         if not attributes:
-            logger.warning(f"No attributes provided for object relation '{object_relation}'; skipping attribute addition.")
+            logger.info(f"No attributes provided for object relation '{object_relation}'; skipping attribute addition.")
             return []
 
         to_return = []
