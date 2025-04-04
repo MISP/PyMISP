@@ -2,11 +2,25 @@ Changelog
 =========
 
 
+v2.5.10 (2025-04-04)
+--------------------
+
+Changes
+~~~~~~~
+- Bump deps, templates. [Raphaël Vinot]
+
+Fix
+~~~
+- Missing attribute in object should not be a warning (way too noisy)
+  [Raphaël Vinot]
+
+
 v2.5.9 (2025-03-26)
 -------------------
 
 Changes
 ~~~~~~~
+- Bump version, changelog. [Raphaël Vinot]
 - Make mypy happy. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
