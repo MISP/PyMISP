@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from pymisp.tools import GenericObjectGenerator
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument("-l", "--attr_list", required=True, help="List of attributes")
     args = parser.parse_args()
 
-    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     misp_object = GenericObjectGenerator(args.type.replace("|", "-"))
     misp_object.generate_attributes(json.loads(args.attr_list))

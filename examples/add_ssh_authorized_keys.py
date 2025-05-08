@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from pymisp.tools import SSHAuthorizedKeysObject
 import traceback
 from keys import misp_url, misp_key, misp_verifycert
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--path", required=True, help="Path to process (expanded using glob).")
     args = parser.parse_args()
 
-    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, debug=True)
+    pymisp = PyMISP(misp_url, misp_key, misp_verifycert, debug=True)
 
     for f in glob.glob(args.path):
         try:

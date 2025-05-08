@@ -10,7 +10,7 @@ Put this script in crontab to run every day
 
 '''
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 
 import sys
@@ -29,7 +29,7 @@ def init(url, key, verifycert):
     '''
         Template to get MISP module started
     '''
-    return ExpandedPyMISP(url, key, verifycert, 'json')
+    return PyMISP(url, key, verifycert, 'json')
 
 
 def set_drift_timestamp(drift_timestamp, drift_timestamp_path):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
@@ -27,7 +27,7 @@ if __name__ == '__main__':
         print('Output file already exists, abort.')
         exit(0)
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, proxies=proxies)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert, proxies=proxies)
 
     event = misp.get_event(args.event, pythonify=True)
     if args.output:
