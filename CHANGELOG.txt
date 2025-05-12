@@ -2,11 +2,89 @@ Changelog
 =========
 
 
+v2.5.10 (2025-04-04)
+--------------------
+
+Changes
+~~~~~~~
+- Bump deps, templates. [Raphaël Vinot]
+
+Fix
+~~~
+- Missing attribute in object should not be a warning (way too noisy)
+  [Raphaël Vinot]
+
+
+v2.5.9 (2025-03-26)
+-------------------
+
+Changes
+~~~~~~~
+- Bump version, changelog. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- [emailobject] Improve parsing of the Received headers. [Sami Tainio]
+
+  - Rewrite of the section that deals with the logic handling the Received headers
+  - Previous version was not picking picking up e.g. Reverse DNS hostnames at all and some of the IPs were not ever handled
+- [emailobject] Improve parsing of the Received headers. [Sami Tainio]
+
+  - Rewrite of the section that deals with the logic handling the Received headers
+  - Previous version was not picking picking up e.g. Reverse DNS hostnames at all and some of the IPs were not ever handled
+
+Other
+~~~~~
+- [chg] Satisfy tests. [Sami Tainio]
+- Improve the logging message. [Peter Leitmann]
+- Add a check if add_attributes() method truly has values to add. [Peter
+  Leitmann]
+- [chg] Satisfy tests. [Sami Tainio]
+
+
+v2.5.8.1 (2025-03-18)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump objects, version. [Raphaël Vinot]
+
+Fix
+~~~
+- Typo in objects. [Raphaël Vinot]
+
+
+v2.5.8 (2025-03-18)
+-------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Remove top level files from wheel. [Raphaël Vinot]
+
+  As per doc
+  (https://python-poetry.org/docs/pyproject#exclude-and-include), we
+  cannot have them in the wheel.
+
+  Fix #1319
+
+
 v2.5.7.1 (2025-02-22)
 ---------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Remove tests from wheel. [Raphaël Vinot]
 - Make mypy happy. [Raphaël Vinot]
 - Bump objects. [Raphaël Vinot]
