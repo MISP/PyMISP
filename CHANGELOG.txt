@@ -2,6 +2,24 @@ Changelog
 =========
 
 
+v2.5.12 (2025-05-13)
+--------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Incorrect calls in to_feed. [Raphaël Vinot]
+
+Other
+~~~~~
+- Replace deprecated ExpandedPyMISP with PyMISP. [Jure Sah]
+
+
 v2.5.10 (2025-04-04)
 --------------------
 
