@@ -1732,14 +1732,14 @@ class MISPEvent(AnalystDataBehaviorMixin):
                     event_report.pop('distribution', None)
                     event_report.pop('SharingGroup', None)
                     event_report.pop('sharing_group_id', None)
-                to_return['EventReport'].append(event_report.to_dict())
+                to_return['EventReport'].append(event_report._to_feed())
 
         if with_cryptographic_keys and self.cryptographic_keys:
             to_return['CryptographicKey'] = []
             for cryptographic_key in self.cryptographic_keys:
                 cryptographic_key.pop('parent_id', None)
                 cryptographic_key.pop('id', None)
-                to_return['CryptographicKey'].append(cryptographic_key.to_dict())
+                to_return['CryptographicKey'].append(cryptographic_key._to_feed())
 
         return {'Event': to_return}
 
