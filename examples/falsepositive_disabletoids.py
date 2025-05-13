@@ -11,7 +11,7 @@ Do inline config in "main"
 
 '''
 
-from pymisp import ExpandedPyMISP, MISPEvent
+from pymisp import PyMISP, MISPEvent
 from keys import misp_url, misp_key, misp_verifycert
 from datetime import datetime
 from datetime import date
@@ -30,7 +30,7 @@ def init(url, key, verifycert):
     '''
         Template to get MISP module started
     '''
-    return ExpandedPyMISP(url, key, verifycert, 'json')
+    return PyMISP(url, key, verifycert, 'json')
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP, MISPUser
+from pymisp import PyMISP, MISPUser
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument("-e", "--email", help="Email linked to the account.")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert)
     user = MISPUser
     user.id = args.user_id
     user.email = args.email

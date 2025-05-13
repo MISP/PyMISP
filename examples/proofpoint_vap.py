@@ -1,10 +1,10 @@
 import requests
 import json
-from pymisp import ExpandedPyMISP, MISPEvent, MISPOrganisation
+from pymisp import PyMISP, MISPEvent, MISPOrganisation
 from keys import misp_url, misp_key, misp_verifycert, proofpoint_key
 
 # initialize PyMISP and set url for Panorama
-misp = ExpandedPyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
+misp = PyMISP(url=misp_url, key=misp_key, ssl=misp_verifycert)
 
 urlVap = "https://tap-api-v2.proofpoint.com/v2/people/vap?window=30"  # Window can be 14, 30, and 90 Days
 
