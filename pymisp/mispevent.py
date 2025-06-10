@@ -126,7 +126,7 @@ def _make_datetime(value: int | float | str | datetime | date) -> datetime:
             # faster
             value = datetime.fromisoformat(value)
         except Exception:
-            value = parse(value)  # type: ignore[arg-type]
+            value = parse(value)
     elif isinstance(value, datetime):
         pass
     elif isinstance(value, date):  # NOTE: date has to be *after* datetime, or it will be overwritten
@@ -399,7 +399,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         if self.type == 'malware-sample':
             try:
                 # Ignore type, if data is None -> exception
-                with ZipFile(self.data) as f:  # type: ignore
+                with ZipFile(self.data) as f:
                     if not self.__is_misp_encrypted_file(f):
                         raise PyMISPError('Not an existing malware sample')
                     for name in f.namelist():
@@ -488,7 +488,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
             return self._malware_binary
         elif hasattr(self, 'malware_filename'):
             # Have a binary, but didn't decrypt it yet
-            with ZipFile(self.data) as f:  # type: ignore
+            with ZipFile(self.data) as f:
                 for name in f.namelist():
                     if not name.endswith('.filename.txt'):
                         with f.open(name, pwd=b'infected') as unpacked:
@@ -1871,7 +1871,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
         :param ignore_invalid: if True, assigns current date if d is not an expected type
         """
         if isinstance(d, (str, int, float, datetime, date)):
-            self.date = d  # type: ignore
+            self.date = d
         elif ignore_invalid:
             self.date = date.today()
         else:
@@ -1938,7 +1938,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
             for rel_event in kwargs.pop('RelatedEvent'):
                 sub_event = MISPEvent()
                 sub_event.load(rel_event)
-                self.RelatedEvent.append({'Event': sub_event})  # type: ignore[arg-type]
+                self.RelatedEvent.append({'Event': sub_event})
         if kwargs.get('Tag'):
             [self.add_tag(tag) for tag in kwargs.pop('Tag')]
         if kwargs.get('Object'):

@@ -80,9 +80,9 @@ class TestMISPEvent(unittest.TestCase):
 
     def test_attribute(self) -> None:
         self.init_event()
-        a: MISPAttribute = self.mispevent.add_attribute('filename', 'bar.exe')  # type: ignore[assignment]
+        a: MISPAttribute = self.mispevent.add_attribute('filename', 'bar.exe')
         del a.uuid
-        a = self.mispevent.add_attribute_tag('osint', 'bar.exe')  # type: ignore[assignment]
+        a = self.mispevent.add_attribute_tag('osint', 'bar.exe')
         attr_tags = self.mispevent.get_attribute_tag('bar.exe')
         self.assertEqual(self.mispevent.attributes[0].tags[0].name, 'osint')
         self.assertEqual(attr_tags[0].name, 'osint')
@@ -123,17 +123,17 @@ class TestMISPEvent(unittest.TestCase):
 
     def test_object_tag(self) -> None:
         self.mispevent.add_object(name='file', strict=True)
-        a: MISPAttribute = self.mispevent.objects[0].add_attribute('filename', value='')  # type: ignore[assignment]
+        a: MISPAttribute = self.mispevent.objects[0].add_attribute('filename', value='')
         self.assertEqual(a, None)
-        a = self.mispevent.objects[0].add_attribute('filename', value=None)  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('filename', value=None)
         self.assertEqual(a, None)
-        a = self.mispevent.objects[0].add_attribute('filename', value='bar', Tag=[{'name': 'blah'}])  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('filename', value='bar', Tag=[{'name': 'blah'}])
         del a.uuid
         self.assertEqual(self.mispevent.objects[0].attributes[0].tags[0].name, 'blah')
         self.assertTrue(self.mispevent.objects[0].has_attributes_by_relation(['filename']))
         self.assertEqual(len(self.mispevent.objects[0].get_attributes_by_relation('filename')), 1)
         self.mispevent.add_object(name='url', strict=True)
-        a = self.mispevent.objects[1].add_attribute('url', value='https://www.circl.lu')  # type: ignore[assignment]
+        a = self.mispevent.objects[1].add_attribute('url', value='https://www.circl.lu')
         del a.uuid
         self.mispevent.objects[0].uuid = 'a'
         self.mispevent.objects[1].uuid = 'b'
@@ -175,7 +175,7 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/simple.json', 'rb') as f:
             pseudofile = BytesIO(f.read())
         self.init_event()
-        a: MISPAttribute = self.mispevent.add_attribute('malware-sample', 'bar.exe', data=pseudofile)  # type: ignore[assignment]
+        a: MISPAttribute = self.mispevent.add_attribute('malware-sample', 'bar.exe', data=pseudofile)
         del a.uuid
         attribute = self.mispevent.attributes[0]
         self.assertEqual(attribute.malware_binary, pseudofile)
@@ -217,7 +217,7 @@ class TestMISPEvent(unittest.TestCase):
         self.init_event()
         p = self.mispevent.add_proposal(type='filename', value='baz.jpg')
         del p.uuid
-        a: MISPAttribute = self.mispevent.add_attribute('filename', 'bar.exe')  # type: ignore[assignment]
+        a: MISPAttribute = self.mispevent.add_attribute('filename', 'bar.exe')
         del a.uuid
         p = self.mispevent.attributes[0].add_proposal(type='filename', value='bar.pdf')
         del p.uuid
@@ -227,13 +227,13 @@ class TestMISPEvent(unittest.TestCase):
 
     def test_default_attributes(self) -> None:
         self.mispevent.add_object(name='file', strict=True)
-        a: MISPAttribute = self.mispevent.objects[0].add_attribute('filename', value='bar', Tag=[{'name': 'blah'}])  # type: ignore[assignment]
+        a: MISPAttribute = self.mispevent.objects[0].add_attribute('filename', value='bar', Tag=[{'name': 'blah'}])
         del a.uuid
-        a = self.mispevent.objects[0].add_attribute('pattern-in-file', value='baz')  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('pattern-in-file', value='baz')
         self.assertEqual(a.category, 'Artifacts dropped')
         del a.uuid
         self.mispevent.add_object(name='file', strict=False, default_attributes_parameters=self.mispevent.objects[0].attributes[0])
-        a = self.mispevent.objects[1].add_attribute('filename', value='baz')  # type: ignore[assignment]
+        a = self.mispevent.objects[1].add_attribute('filename', value='baz')
         del a.uuid
         self.mispevent.objects[0].uuid = 'a'
         self.mispevent.objects[1].uuid = 'b'
@@ -245,13 +245,13 @@ class TestMISPEvent(unittest.TestCase):
     def test_obj_default_values(self) -> None:
         self.init_event()
         self.mispevent.add_object(name='whois', strict=True)
-        a: MISPAttribute = self.mispevent.objects[0].add_attribute('registrar', value='registar.example.com')  # type: ignore[assignment]
+        a: MISPAttribute = self.mispevent.objects[0].add_attribute('registrar', value='registar.example.com')
         del a.uuid
-        a = self.mispevent.objects[0].add_attribute('domain', value='domain.example.com')  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('domain', value='domain.example.com')
         del a.uuid
-        a = self.mispevent.objects[0].add_attribute('nameserver', value='ns1.example.com')  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('nameserver', value='ns1.example.com')
         del a.uuid
-        a = self.mispevent.objects[0].add_attribute('nameserver', value='ns2.example.com', disable_correlation=False, to_ids=True, category='External analysis')  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('nameserver', value='ns2.example.com', disable_correlation=False, to_ids=True, category='External analysis')
         del a.uuid
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/def_param.json') as f:
@@ -353,16 +353,16 @@ class TestMISPEvent(unittest.TestCase):
             self.mispevent.to_json(sort_keys=True, indent=2)
         self.assertEqual(e.exception.message, '{\'member3\'} are required.')
 
-        a: MISPAttribute = self.mispevent.objects[0].add_attribute('member3', value='foo')  # type: ignore[assignment]
+        a: MISPAttribute = self.mispevent.objects[0].add_attribute('member3', value='foo')
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on requiredOneOf
             self.mispevent.to_json(sort_keys=True, indent=2)
         self.assertEqual(e.exception.message, 'At least one of the following attributes is required: member1, member2')
 
-        a = self.mispevent.objects[0].add_attribute('member1', value='bar')  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('member1', value='bar')
         del a.uuid
-        a = self.mispevent.objects[0].add_attribute('member1', value='baz')  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('member1', value='baz')
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # member1 is not a multiple
@@ -384,16 +384,16 @@ class TestMISPEvent(unittest.TestCase):
             self.mispevent.to_json(sort_keys=True, indent=2)
         self.assertEqual(e.exception.message, '{\'member3\'} are required.')
 
-        a: MISPAttribute = self.mispevent.objects[0].add_attribute('member3', value='foo')  # type: ignore[assignment]
+        a: MISPAttribute = self.mispevent.objects[0].add_attribute('member3', value='foo')
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on requiredOneOf
             self.mispevent.to_json(sort_keys=True, indent=2)
         self.assertEqual(e.exception.message, 'At least one of the following attributes is required: member1, member2')
 
-        a = self.mispevent.objects[0].add_attribute('member1', value='bar')  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('member1', value='bar')
         del a.uuid
-        a = self.mispevent.objects[0].add_attribute('member1', value='baz')  # type: ignore[assignment]
+        a = self.mispevent.objects[0].add_attribute('member1', value='baz')
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # member1 is not a multiple
@@ -410,7 +410,7 @@ class TestMISPEvent(unittest.TestCase):
     def test_first_last_seen(self) -> None:
         me = MISPEvent()
         me.info = 'Test First and Last Seen'
-        me.date = '2020.01.12'  # type: ignore[assignment]
+        me.date = '2020.01.12'
         self.assertEqual(me.date.day, 12)
         me.add_attribute('ip-dst', '8.8.8.8', first_seen='06-21-1998', last_seen=1580213607.469571)
         self.assertEqual(me.attributes[0].first_seen.year, 1998)
@@ -418,7 +418,7 @@ class TestMISPEvent(unittest.TestCase):
         now = datetime.now().astimezone()
         me.attributes[0].last_seen = now
         today = date.today()
-        me.attributes[0].first_seen = today  # type: ignore[assignment]
+        me.attributes[0].first_seen = today
         self.assertEqual(me.attributes[0].first_seen.year, today.year)
         self.assertEqual(me.attributes[0].last_seen, now)
 

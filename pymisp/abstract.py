@@ -383,7 +383,7 @@ class MISPTag(AbstractMISP):
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if kwargs.get('Tag'):
-            kwargs = kwargs.get('Tag')  # type: ignore[assignment]
+            kwargs = kwargs.get('Tag')
         super().from_dict(**kwargs)
 
     def _set_default(self) -> None:

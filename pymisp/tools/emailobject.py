@@ -10,7 +10,7 @@ from email import policy, message_from_bytes
 from email.message import EmailMessage
 from io import BytesIO
 from pathlib import Path
-from typing import cast, Any
+from typing import Any
 
 from extract_msg import openMsg
 from extract_msg.msg_classes import MessageBase
@@ -50,7 +50,6 @@ class EMailObject(AbstractMISPObjectGenerator):
         eml = message_from_bytes(content_in_bytes,
                                  _class=EmailMessage,
                                  policy=policy.default)
-        eml = cast(EmailMessage, eml)  # Only needed to quiet mypy
         if len(eml) != 0:
             self.raw_emails['eml'] = self.__pseudofile
             return eml
@@ -73,7 +72,6 @@ class EMailObject(AbstractMISPObjectGenerator):
                 eml_bytes = content_in_bytes.decode("utf_8_sig").encode("utf-8")
                 eml = email.message_from_bytes(eml_bytes,
                                                policy=policy.default)
-                eml = cast(EmailMessage, eml)  # Only needed to quiet mypy
                 if len(eml) != 0:
                     self.raw_emails['eml'] = BytesIO(eml_bytes)
                     return eml
@@ -99,7 +97,7 @@ class EMailObject(AbstractMISPObjectGenerator):
     def _msg_to_eml(self, msg_bytes: bytes) -> EmailMessage:
         """Converts a msg into an eml."""
         # NOTE: openMsg returns a MessageBase, not a MSGFile
-        msg_obj: MessageBase = openMsg(msg_bytes)  # type: ignore
+        msg_obj: MessageBase = openMsg(msg_bytes)
         # msg obj stores the original raw header here
         message, body, attachments = self._extract_msg_objects(msg_obj)
         eml = self._build_eml(message, body, attachments)
@@ -107,7 +105,7 @@ class EMailObject(AbstractMISPObjectGenerator):
 
     def _extract_msg_objects(self, msg_obj: MessageBase) -> tuple[EmailMessage, dict[str, Any], list[AttachmentBase] | list[SignedAttachment]]:
         """Extracts email objects needed to construct an eml from a msg."""
-        message: EmailMessage = email.message_from_string(msg_obj.header.as_string(), policy=policy.default)  # type: ignore
+        message: EmailMessage = email.message_from_string(msg_obj.header.as_string(), policy=policy.default)
         body = {}
         if msg_obj.body is not None:
             body['text'] = {"obj": msg_obj.body,
