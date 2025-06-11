@@ -385,6 +385,7 @@ class PyMISP:
     def get_event(self, event: MISPEvent | int | str | UUID,
                   deleted: bool | int | list[int] = False,
                   extended: bool | int = False,
+                  extending: bool | int = False,
                   pythonify: bool = False) -> dict[str, Any] | MISPEvent:
         """Get an event from a MISP instance. Includes collections like
         Attribute, EventReport, Feed, Galaxy, Object, Tag, etc. so the
@@ -393,6 +394,7 @@ class PyMISP:
         :param event: event to get
         :param deleted: whether to include soft-deleted attributes
         :param extended: whether to get extended events
+        :param extending: whether to get extending events
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
         event_id = get_uuid_or_id_from_abstract_misp(event)
@@ -400,7 +402,9 @@ class PyMISP:
         if deleted:
             data['deleted'] = deleted
         if extended:
-            data['extended'] = extended
+            data['include_extended'] = extended
+        if extending:
+            data['include_extending'] = extending
         if data:
             r = self._prepare_request('POST', f'events/view/{event_id}', data=data)
         else:
