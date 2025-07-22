@@ -77,7 +77,7 @@ __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPOrganisationBlocklist', 'MISPEventReport', 'MISPCorrelationExclusion',
            'MISPDecayingModel', 'MISPGalaxy', 'MISPGalaxyCluster', 'MISPGalaxyClusterElement',
            'MISPGalaxyClusterRelation', 'MISPNote', 'MISPOpinion', 'MISPRelationship',
-           'PyMISPError', 'NewEventError', 'NewAttributeError',
+           'PyMISPError', 'NewEventError', 'NewAttributeError', 'MISPServerError',
            'NoURL', 'NoKey', 'InvalidMISPObject', 'UnknownMISPObjectTemplate', 'PyMISPInvalidFormat',
            'Distribution', 'ThreatLevel', 'Analysis', 'ExpandedPyMISP'
            ]
