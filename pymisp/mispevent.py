@@ -343,7 +343,6 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         # For search
         self.Event: MISPEvent
         self.RelatedAttribute: list[MISPAttribute]
-        self.event_uuid: str
 
         # For malware sample
         self._malware_binary: BytesIO | None
