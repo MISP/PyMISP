@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import timezone, datetime, date
 import copy
+from dateutil.parser import parse
 import os
 import base64
-import sys
 from io import BytesIO, BufferedIOBase, TextIOBase
 from zipfile import ZipFile
 import uuid
@@ -109,12 +109,6 @@ class AnalystDataBehaviorMixin(AbstractMISP):
             relationship.pop('object_uuid', None)
             relationship.pop('object_type', None)
             self.add_relationship(**relationship)
-
-
-try:
-    from dateutil.parser import parse
-except ImportError:
-    logger.exception("Cannot import dateutil")
 
 
 def _make_datetime(value: int | float | str | datetime | date) -> datetime:
@@ -415,7 +409,12 @@ class MISPAttribute(AnalystDataBehaviorMixin):
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name in ['first_seen', 'last_seen']:
-            _datetime = _make_datetime(value)
+            try:
+                _datetime = _make_datetime(value)
+            except Exception:
+                if value is not None:
+                    logger.warning(f'Invalid value ({value}) for {name}, skipping.')
+                return None
 
             # NOTE: the two following should be exceptions, but there are existing events in this state,
             # And we cannot dump them if it is there.
@@ -585,18 +584,13 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         if self.type == 'datetime' and isinstance(self.value, str):
             try:
                 # Faster
-                if sys.version_info >= (3, 7):
-                    self.value = datetime.fromisoformat(self.value)
-                else:
-                    if '+' in self.value or '-' in self.value:
-                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f%z")
-                    elif '.' in self.value:
-                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f")
-                    else:
-                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S")
+                self.value = datetime.fromisoformat(self.value)
             except ValueError:
                 # Slower, but if the other ones fail, that's a good fallback
-                self.value = parse(self.value)
+                try:
+                    self.value = parse(self.value)
+                except Exception:
+                    raise NewAttributeError(f'{self.value} is not a valid datetime, the attribute is broken.')
 
         # Default values
         self.category = kwargs.pop('category', type_defaults['default_category'])
@@ -862,7 +856,12 @@ class MISPObject(AnalystDataBehaviorMixin):
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name in ['first_seen', 'last_seen']:
-            value = _make_datetime(value)
+            try:
+                value = _make_datetime(value)
+            except Exception:
+                if value is not None:
+                    logger.warning(f'Invalid value ({value}) for {name}, skipping.')
+                return None
 
             if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > value:
                 logger.warning(f'last_seen ({value}) has to be after first_seen ({self.first_seen})')
@@ -1855,7 +1854,10 @@ class MISPEvent(AnalystDataBehaviorMixin):
                     # faster
                     value = date.fromisoformat(value)
                 except Exception:
-                    value = parse(value).date()
+                    try:
+                        value = parse(value).date()
+                    except Exception as e:
+                        raise NewEventError(f'Invalid format for the date: {e} - {type(value)} - {value}')
             elif isinstance(value, (int, float)):
                 value = date.fromtimestamp(value)
             elif isinstance(value, datetime):
