@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP, MISPEvent
+from pymisp import PyMISP, MISPEvent
 from pymisp.tools import Fail2BanObject
 import argparse
 from base64 import b64decode
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--disable_new", action='store_true', default=False, help="Do not create a new Event.")
     args = parser.parse_args()
 
-    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, debug=True)
+    pymisp = PyMISP(misp_url, misp_key, misp_verifycert, debug=True)
     event_id = -1
     me = None
     if args.force_new:

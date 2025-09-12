@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import csv
-from pymisp import ExpandedPyMISP, MISPObject
+from pymisp import PyMISP, MISPObject
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--attr_file", required=True, help="Attribute CSV file path")
     args = parser.parse_args()
 
-    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     f = open(args.attr_file, newline='')
     csv_reader = csv.reader(f, delimiter=";")

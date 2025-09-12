@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 try:
     from keys import misp_client_cert
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     else:
         misp_client_cert = (misp_client_cert)
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, cert=misp_client_cert)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert, cert=misp_client_cert)
     result = misp.search(publish_timestamp=args.last, limit=args.limit, page=args.page, pythonify=True)
 
     if not result:

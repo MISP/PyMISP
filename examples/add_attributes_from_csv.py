@@ -3,7 +3,7 @@
 
 import csv
 from pymisp import PyMISP
-from pymisp import ExpandedPyMISP, MISPAttribute
+from pymisp import PyMISP, MISPAttribute
 from keys import misp_url, misp_key, misp_verifycert
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import argparse
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--attr_file", required=True, help="Attribute CSV file path")
     args = parser.parse_args()
 
-    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    pymisp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     f = open(args.attr_file, newline='')
     csv_reader = csv.reader(f, delimiter=";")

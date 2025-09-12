@@ -129,10 +129,10 @@ def brotli_supported() -> bool:
     # urllib >= 1.25.1 includes brotli support
     version_splitted = version('urllib3').split('.')  # noqa: F811
     if len(version_splitted) == 2:
-        major, minor = version_splitted  # type: ignore
+        major, minor = version_splitted
         patch = 0
     else:
-        major, minor, patch = version_splitted  # type: ignore
+        major, minor, patch = version_splitted
     major, minor, patch = int(major), int(minor), int(patch)
     urllib3_with_brotli = (major == 1 and ((minor == 25 and patch >= 1) or (minor >= 26))) or major >= 2
 
@@ -1050,7 +1050,7 @@ class PyMISP:
             # At this point, we assume the user tried to add an attribute on an event they don't own
             # Re-try with a proposal
             if isinstance(attribute, (MISPAttribute, dict)):
-                return self.add_attribute_proposal(event_id, attribute, pythonify)  # type: ignore
+                return self.add_attribute_proposal(event_id, attribute, pythonify)
         if not (self.global_pythonify or pythonify) or 'errors' in new_attribute:
             return new_attribute
         a = MISPAttribute()
@@ -1563,7 +1563,7 @@ class PyMISP:
             if isinstance(warninglist_id, list):
                 query['id'] = warninglist_id
             else:
-                query['id'] = [warninglist_id]  # type: ignore
+                query['id'] = [warninglist_id]
         if warninglist_name is not None:
             if isinstance(warninglist_name, list):
                 query['name'] = warninglist_name
@@ -3032,7 +3032,7 @@ class PyMISP:
         if return_format == 'csv':
             normalized_response_text = self._check_response(response)
             if (self.global_pythonify or pythonify) and not headerless:
-                return self._csv_to_dict(normalized_response_text)  # type: ignore
+                return self._csv_to_dict(normalized_response_text)
             else:
                 return normalized_response_text
         elif return_format not in ['json', 'yara-json']:
@@ -3060,7 +3060,7 @@ class PyMISP:
                     to_return.append(me)
             elif controller == 'attributes':
                 # FIXME: obvs, this is hurting my soul. We need something generic.
-                for a in normalized_response['Attribute']:  # type: ignore[call-overload]
+                for a in normalized_response['Attribute']:
                     ma = MISPAttribute()
                     ma.from_dict(**a)
                     if 'Event' in ma:

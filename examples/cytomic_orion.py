@@ -16,7 +16,7 @@ Fetches the configuration set in the Cytomic Orion enrichment module
 
 '''
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
@@ -519,7 +519,7 @@ if __name__ == '__main__':
 
     module_config = get_config(misp_url, misp_key, misp_verifycert)
     cytomicobj = cytomicobject
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, debug=cytomicobject.debug)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert, debug=cytomicobject.debug)
 
     cytomicobj.misp = misp
     cytomicobj.args = args

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP, MISPOrganisation, MISPSharingGroup
+from pymisp import PyMISP, MISPOrganisation, MISPSharingGroup
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import csv
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--csv-import", required=True, help="The CSV file containing the organizations. Format 'orgname,nationality,sector,type,contacts,uuid,local,sharingroup_uuid'")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     # CSV format
     #   orgname,nationality,sector,type,contacts,uuid,local,sharingroup

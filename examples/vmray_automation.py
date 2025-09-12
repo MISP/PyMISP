@@ -37,7 +37,7 @@ from typing import Any, Dict, List, Optional
 import requests
 
 from keys import misp_key, misp_url, misp_verifycert
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 
 # Suppress those "Unverified HTTPS request is being made"
 import urllib3
@@ -75,7 +75,7 @@ class VMRayAutomation:
         self.misp_url = misp_url.rstrip("/")
         self.misp_key = misp_key
         self.verifycert = verify_cert
-        self.misp = ExpandedPyMISP(misp_url, misp_key, ssl=verify_cert, debug=debug)
+        self.misp = PyMISP(misp_url, misp_key, ssl=verify_cert, debug=debug)
         self.config = {}
         self.tag_incomplete = 'workflow:state="incomplete"'
 
