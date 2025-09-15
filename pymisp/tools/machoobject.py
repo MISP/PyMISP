@@ -51,11 +51,11 @@ class MachOObject(AbstractMISPObjectGenerator):
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                m = lief.MachO.parse(obj=pseudofile)
+                m = lief.MachO.parse(pseudofile)
             elif isinstance(pseudofile, bytes):
-                m = lief.MachO.parse(raw=list(pseudofile))
+                m = lief.MachO.parse(pseudofile)
             elif isinstance(pseudofile, list):
-                m = lief.MachO.parse(raw=pseudofile)
+                m = lief.MachO.parse(pseudofile)
             else:
                 raise InvalidMISPObject(f'Pseudo file can be BytesIO or bytes got {type(pseudofile)}')
             if not m:
