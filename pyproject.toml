@@ -14,7 +14,7 @@ dynamic = [ "classifiers" ]
 dependencies = [
     "requests (>=2.32.5)",
     "python-dateutil (>=2.9.0.post0)",
-    "deprecated (>=1.2.18)"
+    "deprecated (>=1.2.18)",
 ]
 
 [project.urls]
@@ -30,7 +30,7 @@ fileobjects = [
     "lief (>=0.17.0)"
 ]
 
-openioc = [ "beautifulsoup4 (>=4.13.5)" ]
+openioc = [ "beautifulsoup4 (>=4.13.5,<4.14)" ]
 
 virustotal = [ "validators (>=0.35.0)" ]
 
@@ -43,7 +43,7 @@ docs = [
 
 pdfexport = [ "reportlab (>=4.4.4)" ]
 
-url = [ "pyfaup (>=1.2)" ]
+url = [ "pyfaup-rs (>=0.1.1,<0.2.0)" ]
 
 email = [
     "extract_msg (>=0.55.0)",
