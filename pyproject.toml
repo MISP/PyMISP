@@ -43,7 +43,7 @@ docs = [
 
 pdfexport = [ "reportlab (>=4.4.4)" ]
 
-url = [ "pyfaup-rs (>=0.1.1,<0.2.0)" ]
+url = [ "pyfaup-rs (>=0.1.2,<0.2.0)" ]
 
 email = [
     "extract_msg (>=0.55.0)",

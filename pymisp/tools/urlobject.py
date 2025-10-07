@@ -43,7 +43,6 @@ class URLObject(AbstractMISPObjectGenerator):
                 except Exception:
                     # not an IP
                     pass
-                self.add_attribute('credential', value=self.parsed_url.credentials())
                 self.add_attribute('fragment', value=self.parsed_url.fragment)
                 self.add_attribute('port', value=self.parsed_url.port)
                 self.add_attribute('query_string', value=self.parsed_url.query)
