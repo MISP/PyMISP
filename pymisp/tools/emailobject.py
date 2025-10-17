@@ -222,12 +222,13 @@ class EMailObject(AbstractMISPObjectGenerator):
         for attch in attachments:  # Add attachments at the end.
             if attch.cid not in related_content.keys():
                 _content_type = attch.getStringStream('__substg1.0_370E')
-                maintype, subtype = _content_type.split("/", 1)
-                message.add_attachment(attch.data,
-                                       maintype=maintype,
-                                       subtype=subtype,
-                                       cid=attch.cid,
-                                       filename=attch.longFilename)
+                if _content_type is not None:
+                    maintype, subtype = _content_type.split("/", 1)
+                    message.add_attachment(attch.data,
+                                           maintype=maintype,
+                                           subtype=subtype,
+                                           cid=attch.cid,
+                                           filename=attch.longFilename)
                 if p := message.get_payload():
                     if isinstance(p, list):
                         cur_attach = p[-1]
