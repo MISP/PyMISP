@@ -53,11 +53,11 @@ class PEObject(AbstractMISPObjectGenerator):
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                p = lief.PE.parse(obj=pseudofile)
+                p = lief.PE.parse(pseudofile)
             elif isinstance(pseudofile, bytes):
-                p = lief.PE.parse(raw=list(pseudofile))
+                p = lief.PE.parse(pseudofile)
             elif isinstance(pseudofile, list):
-                p = lief.PE.parse(raw=pseudofile)
+                p = lief.PE.parse(pseudofile)
             else:
                 raise InvalidMISPObject(f'Pseudo file can be BytesIO or bytes got {type(pseudofile)}')
             if not p:

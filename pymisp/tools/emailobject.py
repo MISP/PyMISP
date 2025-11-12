@@ -158,7 +158,7 @@ class EMailObject(AbstractMISPObjectGenerator):
                                                           body.get('html'),
                                                           body.get('rtf')] if i is not None]
         # If this a non-multipart email then we only need to attach the payload
-        if message.get_content_maintype() != 'multipart':
+        if message.get_content_maintype() != "multipart" and message.get_content_type() != 'application/ms-tnef':
             for _body in body_objects:
                 if "text/{}".format(_body['subtype']) == message.get_content_type():
                     message.set_content(**_body)
@@ -219,12 +219,13 @@ class EMailObject(AbstractMISPObjectGenerator):
         for attch in attachments:  # Add attachments at the end.
             if attch.cid not in related_content.keys():
                 _content_type = attch.getStringStream('__substg1.0_370E')
-                maintype, subtype = _content_type.split("/", 1)
-                message.add_attachment(attch.data,
-                                       maintype=maintype,
-                                       subtype=subtype,
-                                       cid=attch.cid,
-                                       filename=attch.longFilename)
+                if _content_type is not None:
+                    maintype, subtype = _content_type.split("/", 1)
+                    message.add_attachment(attch.data,
+                                           maintype=maintype,
+                                           subtype=subtype,
+                                           cid=attch.cid,
+                                           filename=attch.longFilename)
                 if p := message.get_payload():
                     if isinstance(p, list):
                         cur_attach = p[-1]
