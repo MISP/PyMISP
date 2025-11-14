@@ -3,7 +3,7 @@
 
 import argparse
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 
 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--outfile", help="Output file to write the CSV.")
 
     args = parser.parse_args()
-    pymisp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert, debug=True)
+    pymisp = PyMISP(misp_url, misp_key, misp_verifycert, debug=True)
     attr = []
     if args.attribute:
         attr += args.attribute

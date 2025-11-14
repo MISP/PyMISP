@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP, MISPEvent, MISPAttribute
+from pymisp import PyMISP, MISPEvent, MISPAttribute
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 from pathlib import Path
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--info", help="Used to populate the event info field if no event ID supplied.")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     files = []
     p = Path(args.upload)

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from io import BytesIO
+from pathlib import Path
 from typing import Any, TYPE_CHECKING
 
 from ..exceptions import MISPObjectException
@@ -35,7 +36,7 @@ class FileTypeNotImplemented(MISPObjectException):
     pass
 
 
-def make_binary_objects(filepath: str | None = None,
+def make_binary_objects(filepath: str | Path | None = None,
                         pseudofile: BytesIO | bytes | None = None,
                         filename: str | None = None,
                         standalone: bool = True,
@@ -43,13 +44,11 @@ def make_binary_objects(filepath: str | None = None,
     misp_file = FileObject(filepath=filepath, pseudofile=pseudofile, filename=filename,
                            standalone=standalone, default_attributes_parameters=default_attributes_parameters)
     if HAS_LIEF and (filepath or pseudofile):
+        # Since lief 0.17, the parse method figures out what do to with the parameter itself.
         if filepath:
-            lief_parsed = lief.parse(filepath=filepath)
+            lief_parsed = lief.parse(filepath)
         elif pseudofile:
-            if isinstance(pseudofile, bytes):
-                lief_parsed = lief.parse(raw=pseudofile)
-            else:  # BytesIO
-                lief_parsed = lief.parse(obj=pseudofile)
+            lief_parsed = lief.parse(pseudofile)
         else:
             logger.critical('You need either a filepath, or a pseudofile and a filename.')
             lief_parsed = None

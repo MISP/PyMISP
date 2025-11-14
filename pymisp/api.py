@@ -32,7 +32,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
     MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel, \
-    MISPNote, MISPOpinion, MISPRelationship, AnalystDataBehaviorMixin
+    MISPNote, MISPOpinion, MISPRelationship, MISPAnalystData
 from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
 
 
@@ -129,10 +129,10 @@ def brotli_supported() -> bool:
     # urllib >= 1.25.1 includes brotli support
     version_splitted = version('urllib3').split('.')  # noqa: F811
     if len(version_splitted) == 2:
-        major, minor = version_splitted  # type: ignore
+        major, minor = version_splitted
         patch = 0
     else:
-        major, minor, patch = version_splitted  # type: ignore
+        major, minor, patch = version_splitted
     major, minor, patch = int(major), int(minor), int(patch)
     urllib3_with_brotli = (major == 1 and ((minor == 25 and patch >= 1) or (minor >= 26))) or major >= 2
 
@@ -499,6 +499,20 @@ class PyMISP:
         response = self._prepare_request('POST', f'events/contact/{event_id}', data=to_post)
         return self._check_json_response(response)
 
+    def enrich_event(self, event: MISPEvent | int | str | UUID, enrich_with: str | list[str]) -> dict[str, Any]:
+        """Enrich an event with data from one or more module.
+
+        :param event: event to enrich
+        :param enrich_with: module name or list of module names to use for enrichment
+        """
+        event_id = get_uuid_or_id_from_abstract_misp(event)
+        if isinstance(enrich_with, str):
+            enrich_with = [enrich_with]
+
+        to_post = {module_name: True for module_name in enrich_with}
+        response = self._prepare_request('POST', f'/events/enrichEvent/{event_id}', data=to_post)
+        return self._check_json_response(response)
+
     # ## END Event ###
 
     # ## BEGIN Event Report ###
@@ -621,14 +635,14 @@ class PyMISP:
     # ## END Galaxy Cluster ###
 
     # ## BEGIN Analyst Data ###a
-    def get_analyst_data(self, analyst_data: AnalystDataBehaviorMixin | int | str | UUID,
+    def get_analyst_data(self, analyst_data: MISPAnalystData | int | str | UUID,
                          pythonify: bool = False) -> dict[str, Any] | MISPNote | MISPOpinion | MISPRelationship:
         """Get an analyst data from a MISP instance
 
         :param analyst_data: analyst data to get
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
-        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+        if isinstance(analyst_data, MISPAnalystData):
             analyst_data_type = analyst_data.analyst_data_object_type
         else:
             analyst_data_type = 'all'
@@ -666,7 +680,7 @@ class PyMISP:
         :param analyst_data_id: analyst data ID to update
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
-        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+        if isinstance(analyst_data, MISPAnalystData):
             analyst_data_type = analyst_data.analyst_data_object_type
         else:
             analyst_data_type = 'all'
@@ -685,7 +699,7 @@ class PyMISP:
 
         :param analyst_data: analyst data to delete
         """
-        if isinstance(analyst_data, AnalystDataBehaviorMixin):
+        if isinstance(analyst_data, MISPAnalystData):
             analyst_data_type = analyst_data.analyst_data_object_type
         else:
             analyst_data_type = 'all'
@@ -1036,7 +1050,7 @@ class PyMISP:
             # At this point, we assume the user tried to add an attribute on an event they don't own
             # Re-try with a proposal
             if isinstance(attribute, (MISPAttribute, dict)):
-                return self.add_attribute_proposal(event_id, attribute, pythonify)  # type: ignore
+                return self.add_attribute_proposal(event_id, attribute, pythonify)
         if not (self.global_pythonify or pythonify) or 'errors' in new_attribute:
             return new_attribute
         a = MISPAttribute()
@@ -1101,6 +1115,20 @@ class PyMISP:
         a = MISPAttribute()
         a.from_dict(**response)
         return a
+
+    def enrich_attribute(self, attribute: MISPAttribute | int | str | UUID, enrich_with: str | list[str]) -> dict[str, Any]:
+        """Enrich an attribute with data from one or more module.
+
+        :param attribute: attribute to enrich
+        :param enrich_with: module name or list of module names to use for enrichment
+        """
+        attribute_id = get_uuid_or_id_from_abstract_misp(attribute)
+        if isinstance(enrich_with, str):
+            enrich_with = [enrich_with]
+
+        to_post = {module_name: True for module_name in enrich_with}
+        response = self._prepare_request('POST', f'/attributes/enrich/{attribute_id}', data=to_post)
+        return self._check_json_response(response)
 
     # ## END Attribute ###
 
@@ -1535,7 +1563,7 @@ class PyMISP:
             if isinstance(warninglist_id, list):
                 query['id'] = warninglist_id
             else:
-                query['id'] = [warninglist_id]  # type: ignore
+                query['id'] = [warninglist_id]
         if warninglist_name is not None:
             if isinstance(warninglist_name, list):
                 query['name'] = warninglist_name
@@ -2572,6 +2600,7 @@ class PyMISP:
             uid = get_uuid_or_id_from_abstract_misp(user_id)
         url = f'users/edit/{uid}'
         if self._current_role.perm_admin or self._current_role.perm_site_admin:
+            # Privilege check.
             url = f'admin/{url}'
         r = self._prepare_request('POST', url, data=user)
         updated_user = self._check_json_response(r)
@@ -3003,7 +3032,7 @@ class PyMISP:
         if return_format == 'csv':
             normalized_response_text = self._check_response(response)
             if (self.global_pythonify or pythonify) and not headerless:
-                return self._csv_to_dict(normalized_response_text)  # type: ignore
+                return self._csv_to_dict(normalized_response_text)
             else:
                 return normalized_response_text
         elif return_format not in ['json', 'yara-json']:
@@ -3031,7 +3060,7 @@ class PyMISP:
                     to_return.append(me)
             elif controller == 'attributes':
                 # FIXME: obvs, this is hurting my soul. We need something generic.
-                for a in normalized_response['Attribute']:  # type: ignore[call-overload]
+                for a in normalized_response['Attribute']:
                     ma = MISPAttribute()
                     ma.from_dict(**a)
                     if 'Event' in ma:

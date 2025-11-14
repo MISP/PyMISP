@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import timezone, datetime, date
 import copy
+from dateutil.parser import parse
 import os
 import base64
-import sys
 from io import BytesIO, BufferedIOBase, TextIOBase
 from zipfile import ZipFile
 import uuid
@@ -111,12 +111,6 @@ class AnalystDataBehaviorMixin(AbstractMISP):
             self.add_relationship(**relationship)
 
 
-try:
-    from dateutil.parser import parse
-except ImportError:
-    logger.exception("Cannot import dateutil")
-
-
 def _make_datetime(value: int | float | str | datetime | date) -> datetime:
     if isinstance(value, (int, float)):
         # Timestamp
@@ -126,7 +120,7 @@ def _make_datetime(value: int | float | str | datetime | date) -> datetime:
             # faster
             value = datetime.fromisoformat(value)
         except Exception:
-            value = parse(value)  # type: ignore[arg-type]
+            value = parse(value)
     elif isinstance(value, datetime):
         pass
     elif isinstance(value, date):  # NOTE: date has to be *after* datetime, or it will be overwritten
@@ -399,7 +393,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         if self.type == 'malware-sample':
             try:
                 # Ignore type, if data is None -> exception
-                with ZipFile(self.data) as f:  # type: ignore
+                with ZipFile(self.data) as f:
                     if not self.__is_misp_encrypted_file(f):
                         raise PyMISPError('Not an existing malware sample')
                     for name in f.namelist():
@@ -415,7 +409,12 @@ class MISPAttribute(AnalystDataBehaviorMixin):
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name in ['first_seen', 'last_seen']:
-            _datetime = _make_datetime(value)
+            try:
+                _datetime = _make_datetime(value)
+            except Exception:
+                if value is not None:
+                    logger.warning(f'Invalid value ({value}) for {name}, skipping.')
+                return None
 
             # NOTE: the two following should be exceptions, but there are existing events in this state,
             # And we cannot dump them if it is there.
@@ -488,7 +487,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
             return self._malware_binary
         elif hasattr(self, 'malware_filename'):
             # Have a binary, but didn't decrypt it yet
-            with ZipFile(self.data) as f:  # type: ignore
+            with ZipFile(self.data) as f:
                 for name in f.namelist():
                     if not name.endswith('.filename.txt'):
                         with f.open(name, pwd=b'infected') as unpacked:
@@ -585,18 +584,13 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         if self.type == 'datetime' and isinstance(self.value, str):
             try:
                 # Faster
-                if sys.version_info >= (3, 7):
-                    self.value = datetime.fromisoformat(self.value)
-                else:
-                    if '+' in self.value or '-' in self.value:
-                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f%z")
-                    elif '.' in self.value:
-                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S.%f")
-                    else:
-                        self.value = datetime.strptime(self.value, "%Y-%m-%dT%H:%M:%S")
+                self.value = datetime.fromisoformat(self.value)
             except ValueError:
                 # Slower, but if the other ones fail, that's a good fallback
-                self.value = parse(self.value)
+                try:
+                    self.value = parse(self.value)
+                except Exception:
+                    raise NewAttributeError(f'{self.value} is not a valid datetime, the attribute is broken.')
 
         # Default values
         self.category = kwargs.pop('category', type_defaults['default_category'])
@@ -862,7 +856,12 @@ class MISPObject(AnalystDataBehaviorMixin):
 
     def __setattr__(self, name: str, value: Any) -> None:
         if name in ['first_seen', 'last_seen']:
-            value = _make_datetime(value)
+            try:
+                value = _make_datetime(value)
+            except Exception:
+                if value is not None:
+                    logger.warning(f'Invalid value ({value}) for {name}, skipping.')
+                return None
 
             if name == 'last_seen' and hasattr(self, 'first_seen') and self.first_seen > value:
                 logger.warning(f'last_seen ({value}) has to be after first_seen ({self.first_seen})')
@@ -1120,6 +1119,10 @@ class MISPObject(AnalystDataBehaviorMixin):
         Helper for object_relation when multiple is True in the template.
         It is the same as calling multiple times add_attribute with the same object_relation.
         '''
+        if not attributes:
+            logger.info(f"No attributes provided for object relation '{object_relation}'; skipping attribute addition.")
+            return []
+
         to_return = []
         for attribute in attributes:
             if isinstance(attribute, MISPAttribute):
@@ -1728,14 +1731,14 @@ class MISPEvent(AnalystDataBehaviorMixin):
                     event_report.pop('distribution', None)
                     event_report.pop('SharingGroup', None)
                     event_report.pop('sharing_group_id', None)
-                to_return['EventReport'].append(event_report.to_dict())
+                to_return['EventReport'].append(event_report._to_feed())
 
         if with_cryptographic_keys and self.cryptographic_keys:
             to_return['CryptographicKey'] = []
             for cryptographic_key in self.cryptographic_keys:
                 cryptographic_key.pop('parent_id', None)
                 cryptographic_key.pop('id', None)
-                to_return['CryptographicKey'].append(cryptographic_key.to_dict())
+                to_return['CryptographicKey'].append(cryptographic_key._to_feed())
 
         return {'Event': to_return}
 
@@ -1851,7 +1854,10 @@ class MISPEvent(AnalystDataBehaviorMixin):
                     # faster
                     value = date.fromisoformat(value)
                 except Exception:
-                    value = parse(value).date()
+                    try:
+                        value = parse(value).date()
+                    except Exception as e:
+                        raise NewEventError(f'Invalid format for the date: {e} - {type(value)} - {value}')
             elif isinstance(value, (int, float)):
                 value = date.fromtimestamp(value)
             elif isinstance(value, datetime):
@@ -1867,7 +1873,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
         :param ignore_invalid: if True, assigns current date if d is not an expected type
         """
         if isinstance(d, (str, int, float, datetime, date)):
-            self.date = d  # type: ignore
+            self.date = d
         elif ignore_invalid:
             self.date = date.today()
         else:
@@ -1934,7 +1940,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
             for rel_event in kwargs.pop('RelatedEvent'):
                 sub_event = MISPEvent()
                 sub_event.load(rel_event)
-                self.RelatedEvent.append({'Event': sub_event})  # type: ignore[arg-type]
+                self.RelatedEvent.append({'Event': sub_event})
         if kwargs.get('Tag'):
             [self.add_tag(tag) for tag in kwargs.pop('Tag')]
         if kwargs.get('Object'):
@@ -2531,6 +2537,14 @@ class MISPAnalystData(AbstractMISP):
     @property
     def analyst_data_object_type(self) -> str:
         return self._analyst_data_object_type
+
+    @property
+    def notes(self) -> list[MISPNote]:
+        return self.Note
+
+    @property
+    def opinions(self) -> list[MISPOpinion]:
+        return self.Opinion
 
     @property
     def org(self) -> MISPOrganisation:

@@ -3,7 +3,7 @@
 
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 
 
 if __name__ == '__main__':
@@ -11,5 +11,5 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--feed", required=True, help="feed's ID to be fetched.")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert)
     misp.fetch_feed(args.feed)

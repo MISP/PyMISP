@@ -10,7 +10,7 @@ from email import policy, message_from_bytes
 from email.message import EmailMessage
 from io import BytesIO
 from pathlib import Path
-from typing import cast, Any
+from typing import Any
 
 from extract_msg import openMsg
 from extract_msg.msg_classes import MessageBase
@@ -50,7 +50,6 @@ class EMailObject(AbstractMISPObjectGenerator):
         eml = message_from_bytes(content_in_bytes,
                                  _class=EmailMessage,
                                  policy=policy.default)
-        eml = cast(EmailMessage, eml)  # Only needed to quiet mypy
         if len(eml) != 0:
             self.raw_emails['eml'] = self.__pseudofile
             return eml
@@ -73,7 +72,6 @@ class EMailObject(AbstractMISPObjectGenerator):
                 eml_bytes = content_in_bytes.decode("utf_8_sig").encode("utf-8")
                 eml = email.message_from_bytes(eml_bytes,
                                                policy=policy.default)
-                eml = cast(EmailMessage, eml)  # Only needed to quiet mypy
                 if len(eml) != 0:
                     self.raw_emails['eml'] = BytesIO(eml_bytes)
                     return eml
@@ -99,7 +97,7 @@ class EMailObject(AbstractMISPObjectGenerator):
     def _msg_to_eml(self, msg_bytes: bytes) -> EmailMessage:
         """Converts a msg into an eml."""
         # NOTE: openMsg returns a MessageBase, not a MSGFile
-        msg_obj: MessageBase = openMsg(msg_bytes)  # type: ignore
+        msg_obj: MessageBase = openMsg(msg_bytes)
         # msg obj stores the original raw header here
         message, body, attachments = self._extract_msg_objects(msg_obj)
         eml = self._build_eml(message, body, attachments)
@@ -107,7 +105,7 @@ class EMailObject(AbstractMISPObjectGenerator):
 
     def _extract_msg_objects(self, msg_obj: MessageBase) -> tuple[EmailMessage, dict[str, Any], list[AttachmentBase] | list[SignedAttachment]]:
         """Extracts email objects needed to construct an eml from a msg."""
-        message: EmailMessage = email.message_from_string(msg_obj.header.as_string(), policy=policy.default)  # type: ignore
+        message: EmailMessage = email.message_from_string(msg_obj.header.as_string(), policy=policy.default)
         body = {}
         if msg_obj.body is not None:
             body['text'] = {"obj": msg_obj.body,
@@ -160,7 +158,7 @@ class EMailObject(AbstractMISPObjectGenerator):
                                                           body.get('html'),
                                                           body.get('rtf')] if i is not None]
         # If this a non-multipart email then we only need to attach the payload
-        if message.get_content_maintype() != 'multipart':
+        if message.get_content_maintype() != "multipart" and message.get_content_type() != 'application/ms-tnef':
             for _body in body_objects:
                 if "text/{}".format(_body['subtype']) == message.get_content_type():
                     message.set_content(**_body)
@@ -221,12 +219,13 @@ class EMailObject(AbstractMISPObjectGenerator):
         for attch in attachments:  # Add attachments at the end.
             if attch.cid not in related_content.keys():
                 _content_type = attch.getStringStream('__substg1.0_370E')
-                maintype, subtype = _content_type.split("/", 1)
-                message.add_attachment(attch.data,
-                                       maintype=maintype,
-                                       subtype=subtype,
-                                       cid=attch.cid,
-                                       filename=attch.longFilename)
+                if _content_type is not None:
+                    maintype, subtype = _content_type.split("/", 1)
+                    message.add_attachment(attch.data,
+                                           maintype=maintype,
+                                           subtype=subtype,
+                                           cid=attch.cid,
+                                           filename=attch.longFilename)
                 if p := message.get_payload():
                     if isinstance(p, list):
                         cur_attach = p[-1]
@@ -373,37 +372,95 @@ class EMailObject(AbstractMISPObjectGenerator):
                 # email object doesn't support display name for all email addrs
                 pass
 
+    def extract_matches(self, pattern: re.Pattern[str], text: str) -> list[tuple[str, ...]]:
+        """Returns all regex matches for a given pattern in a text."""
+        return re.findall(pattern, text)
+
+    def add_ip_attribute(self, ip_candidate: str, received: str, seen_attributes: set[tuple[str, str]]) -> None:
+        """Validates and adds an IP address to MISP if it's public and not already seen during extraction."""
+        try:
+            ip = ipaddress.ip_address(ip_candidate)
+            if not ip.is_private and ("received-header-ip", ip_candidate) not in seen_attributes:
+                self.add_attribute("received-header-ip", ip_candidate, comment=received)
+                seen_attributes.add(("received-header-ip", ip_candidate))
+        except ValueError:
+            pass  # Invalid IPs are ignored
+
+    def add_hostname_attribute(self, hostname: str, received: str, seen_attributes: set[tuple[str, str]]) -> None:
+        """Validates and adds a hostname to MISP if it contains a valid TLD-like format and is not already seen."""
+        if "." in hostname and not hostname.endswith(".") and len(hostname.split(".")[-1]) > 1:
+            if ("received-header-hostname", hostname) not in seen_attributes:
+                self.add_attribute("received-header-hostname", hostname, comment=received)
+                seen_attributes.add(("received-header-hostname", hostname))
+
+    def process_received_header(self, received: str, seen_attributes: set[tuple[str, str]]) -> None:
+        """Processes a single 'Received' header and extracts hostnames and IPs."""
+
+        # Regex patterns
+        received_from_regex = re.compile(
+            r'from\s+([\w.-]+)'  # Declared sending hostname
+            r'(?:\s+\(([^)]+)\))?'  # Reverse DNS hostname inside parentheses
+        )
+        ipv4_regex = re.compile(
+            r'\[(?P<ipv4_brackets>(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9]))\]'  # IPv4 inside []
+            r'|\((?P<ipv4_parentheses>(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9]))\)'  # IPv4 inside ()
+            r'|(?<=\.\s)(?P<ipv4_after_domain>(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.'
+            r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9]))\b'  # IPv4 appearing after a domain.
+        )
+        ipv6_regex = re.compile(
+            r'\b(?:[a-fA-F0-9]{1,4}:[a-fA-F0-9]{1,4}(?::[a-fA-F0-9]{1,4}){0,6})\b'
+        )
+
+        # Extract hostnames
+        matches = self.extract_matches(received_from_regex, received)
+        for match in matches:
+            declared_sending_host = match[0].strip() if match[0] else None
+            reverse_dns_host = match[1].split()[0].strip("[]()").rstrip('.') if match[1] else None
+
+            if declared_sending_host:
+                clean_host = declared_sending_host.strip("[]()")
+                try:
+                    ipaddress.ip_address(declared_sending_host)
+                    self.add_ip_attribute(declared_sending_host, received, seen_attributes)
+                except ValueError:
+                    self.add_hostname_attribute(declared_sending_host, received, seen_attributes)
+
+            if reverse_dns_host:
+                try:
+                    ipaddress.ip_address(reverse_dns_host)
+                    self.add_ip_attribute(reverse_dns_host, received, seen_attributes)
+                except ValueError:
+                    self.add_hostname_attribute(reverse_dns_host, received, seen_attributes)
+
+        # Extract and add **only valid** IPv4 addresses
+        for ipv4_match in self.extract_matches(ipv4_regex, received):
+            ip_candidate = ipv4_match[0] or ipv4_match[1] or ipv4_match[2]  # Select first non-empty match
+            if ip_candidate:
+                self.add_ip_attribute(ip_candidate, received, seen_attributes)
+
+        # Extract and add IPv6 addresses
+        for ipv6_match in self.extract_matches(ipv6_regex, received):
+            self.add_ip_attribute(ipv6_match, received, seen_attributes)
+
     def __generate_received(self) -> None:
         """
-        Extract IP addresses from received headers that are not private. Also extract hostnames or domains.
+        Extracts public IP addresses and hostnames from "Received" email headers.
         """
-        received_items = self.email.get_all("received")
-        if received_items is None:
+
+        received_items = self.email.get_all("Received")
+        if not received_items:
             return
+
+        # Track added attributes to prevent duplicates (store as (type, value) tuples)
+        seen_attributes: set[tuple[str, str]] = set()
+
         for received in received_items:
-            fromstr = re.split(r"\sby\s", received)[0].strip()
-            if fromstr.startswith('from') is not True:
-                continue
-            for i in ['(', ')', '[', ']']:
-                fromstr = fromstr.replace(i, " ")
-            tokens = fromstr.split(" ")
-            ip = None
-            for token in tokens:
-                try:
-                    ip = ipaddress.ip_address(token)
-                    break
-                except ValueError:
-                    pass  # token is not IP address
-
-            if not ip or ip.is_private:
-                continue  # skip header if IP not found or is private
-
-            self.add_attribute("received-header-ip", value=str(ip), comment=fromstr)
-
-        # The hostnames and/or domains always come after the "Received: from"
-        # part so we can use regex to pick up those attributes.
-        received_from = re.findall(r'(?<=from\s)[\w\d\.\-]+\.\w{2,24}', str(received_items))
-        try:
-            [self.add_attribute("received-header-hostname", i) for i in received_from]
-        except Exception:
-            pass
+            self.process_received_header(received, seen_attributes)

@@ -12,7 +12,7 @@ Do inline config in "main"
 
 '''
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 import os
@@ -36,7 +36,7 @@ def init(url, key, verifycert):
     '''
         Template to get MISP module started
     '''
-    return ExpandedPyMISP(url, key, verifycert, 'json')
+    return PyMISP(url, key, verifycert, 'json')
 
 
 def get_data(misp, timeframe, date_from=None, date_to=None):

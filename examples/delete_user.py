@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
@@ -11,6 +11,6 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--user_id", help="The id of the user you want to delete.")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     print(misp.delete_user(args.user_id))

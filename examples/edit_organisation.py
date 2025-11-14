@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP, MISPOrganisation
+from pymisp import PyMISP, MISPOrganisation
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
@@ -11,7 +11,7 @@ if __name__ == '__main__':
     parser.add_argument("-e", "--email", help="Email linked to the organisation.")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     org = MISPOrganisation()
     org.id = args.organisation_id

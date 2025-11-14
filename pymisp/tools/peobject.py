@@ -53,11 +53,11 @@ class PEObject(AbstractMISPObjectGenerator):
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if pseudofile:
             if isinstance(pseudofile, BytesIO):
-                p = lief.PE.parse(obj=pseudofile)
+                p = lief.PE.parse(pseudofile)
             elif isinstance(pseudofile, bytes):
-                p = lief.PE.parse(raw=list(pseudofile))
+                p = lief.PE.parse(pseudofile)
             elif isinstance(pseudofile, list):
-                p = lief.PE.parse(raw=pseudofile)
+                p = lief.PE.parse(pseudofile)
             else:
                 raise InvalidMISPObject(f'Pseudo file can be BytesIO or bytes got {type(pseudofile)}')
             if not p:
@@ -202,7 +202,7 @@ class PESigners(AbstractMISPObjectGenerator):
         self.add_attribute('digest_algorithm', value=str(self.__signer.digest_algorithm))
         self.add_attribute('encryption_algorithm', value=str(self.__signer.encryption_algorithm))
         self.add_attribute('digest-base64', value=b64encode(self.__signer.encrypted_digest))
-        info: lief.PE.SpcSpOpusInfo = self.__signer.get_attribute(lief.PE.Attribute.TYPE.SPC_SP_OPUS_INFO)  # type: ignore[assignment]
+        info: lief.PE.SpcSpOpusInfo = self.__signer.get_attribute(lief.PE.Attribute.TYPE.SPC_SP_OPUS_INFO)
         if info:
             self.add_attribute('program-name', value=info.program_name)
             self.add_attribute('url', value=info.more_info)

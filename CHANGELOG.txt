@@ -2,11 +2,152 @@ Changelog
 =========
 
 
+v2.5.12 (2025-05-13)
+--------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+
+Fix
+~~~
+- Incorrect calls in to_feed. [Raphaël Vinot]
+
+Other
+~~~~~
+- Replace deprecated ExpandedPyMISP with PyMISP. [Jure Sah]
+
+
+v2.5.10 (2025-04-04)
+--------------------
+
+Changes
+~~~~~~~
+- Bump deps, templates. [Raphaël Vinot]
+
+Fix
+~~~
+- Missing attribute in object should not be a warning (way too noisy)
+  [Raphaël Vinot]
+
+
+v2.5.9 (2025-03-26)
+-------------------
+
+Changes
+~~~~~~~
+- Bump version, changelog. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- [emailobject] Improve parsing of the Received headers. [Sami Tainio]
+
+  - Rewrite of the section that deals with the logic handling the Received headers
+  - Previous version was not picking picking up e.g. Reverse DNS hostnames at all and some of the IPs were not ever handled
+- [emailobject] Improve parsing of the Received headers. [Sami Tainio]
+
+  - Rewrite of the section that deals with the logic handling the Received headers
+  - Previous version was not picking picking up e.g. Reverse DNS hostnames at all and some of the IPs were not ever handled
+
+Other
+~~~~~
+- [chg] Satisfy tests. [Sami Tainio]
+- Improve the logging message. [Peter Leitmann]
+- Add a check if add_attributes() method truly has values to add. [Peter
+  Leitmann]
+- [chg] Satisfy tests. [Sami Tainio]
+
+
+v2.5.8.1 (2025-03-18)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump objects, version. [Raphaël Vinot]
+
+Fix
+~~~
+- Typo in objects. [Raphaël Vinot]
+
+
+v2.5.8 (2025-03-18)
+-------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Remove top level files from wheel. [Raphaël Vinot]
+
+  As per doc
+  (https://python-poetry.org/docs/pyproject#exclude-and-include), we
+  cannot have them in the wheel.
+
+  Fix #1319
+
+
+v2.5.7.1 (2025-02-22)
+---------------------
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Remove tests from wheel. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Move email MSG to PW protected archive to fool bumb AVs. [Raphaël
+  Vinot]
+
+
+v2.5.7 (2025-02-20)
+-------------------
+
+New
+~~~
+- Enrich event/attribute endpoints. [Raphaël Vinot]
+
+  Related #1318
+
+Changes
+~~~~~~~
+- Bump changelog. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump deps, version. [Raphaël Vinot]
+- Update readme. [Raphaël Vinot]
+- Bump deps, use poetry 2.0. [Raphaël Vinot]
+
+Fix
+~~~
+- Allow MD in docs. [Raphaël Vinot]
+- Remove ref to recommonmark. [Raphaël Vinot]
+- [AnalystData] Added missing properties for Notes and Opinions.
+  [Christian Studer]
+
+  - This is now needed because MISPNote and MISPOpinion
+    are no longer part of AnalystDataBehaviorMixin and
+    cannot then get them from there
+- [api] Notes, Opinions and Relationships are no longer
+  AnalystDataBehaviorMixin. [Christian Studer]
+
+
 v2.5.4 (2024-12-20)
 -------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Update objects templates. [Raphaël Vinot]
 - Make python 3.9 happy. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]

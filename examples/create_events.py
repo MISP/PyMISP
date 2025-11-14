@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP, MISPEvent
+from pymisp import PyMISP, MISPEvent
 from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--threat", type=int, help="The threat level ID of the newly created event, if applicable. [1-4]")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(misp_url, misp_key, misp_verifycert)
+    misp = PyMISP(misp_url, misp_key, misp_verifycert)
 
     event = MISPEvent()
     event.distribution = args.distrib

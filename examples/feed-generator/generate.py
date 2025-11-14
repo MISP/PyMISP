@@ -3,7 +3,7 @@
 import sys
 import json
 import os
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 from settings import url, key, ssl, outputdir, filters, valid_attribute_distribution_levels
 try:
     from settings import with_distribution
@@ -40,7 +40,7 @@ def init():
         valid_attribute_distributions = [int(v) for v in valid_attribute_distribution_levels]
     except Exception:
         valid_attribute_distributions = [0, 1, 2, 3, 4, 5]
-    return ExpandedPyMISP(url, key, ssl)
+    return PyMISP(url, key, ssl)
 
 
 def saveEvent(event, misp):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pymisp import ExpandedPyMISP
+from pymisp import PyMISP
 try:
     from keys import url, key
     verifycert = False
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument("-a", "--attribute", type=int, help="Number of attributes per event (default 3000)")
     args = parser.parse_args()
 
-    misp = ExpandedPyMISP(url, key, verifycert)
+    misp = PyMISP(url, key, verifycert)
     misp.toggle_global_pythonify()
 
     if args.limit is None:
