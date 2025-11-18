@@ -83,6 +83,7 @@ REMOVE_NON_NUM_RE = re.compile(r'[^0-9]+')
 REMOVE_PHONE_PARENTHESIS_RE = re.compile(r'\(0\)')
 SANITISE_PHONE_NUMBER_RE = re.compile(r'[^\+0-9]+')
 SSDEEP_RE = re.compile(r'^([0-9]+):([0-9a-zA-Z/+]*):([0-9a-zA-Z/+]*)$')
+UUID_RE = re.compile(r'[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$')
 VULNERABILITY_RE = re.compile(
     r'^(?:' + '|'.join(VULNERABILITY_REGEXES) + r')$', flags=re.IGNORECASE
 )
@@ -496,6 +497,10 @@ class AttributeValidationTool:
                 if cls._is_positive_integer(value) and int(value) <= 4294967295:
                     return True
                 return 'AS number have to be integer between 1 and 4294967295'
+            case 'uuid':
+                if UUID_RE.fullmatch(value):
+                    return True
+                return 'The value has to be a valid UUID format.'
             case _:
                 return value
 
