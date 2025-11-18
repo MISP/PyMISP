@@ -42,6 +42,36 @@ HTTP_METHODS = (
     'MKWORKSPACE', 'UPDATE', 'LABEL', 'MERGE', 'BASELINE-CONTROL',
     'MKACTIVITY', 'ORDERPATCH', 'ACL', 'PATCH', 'SEARCH'
 )
+REFANG_REGEX_TABLE = (
+    {
+        'from': re.compile(r'^(hxxp|hxtp|htxp|meow|h\[tt\]p)', re.IGNORECASE),
+        'to': 'http',
+        'types': ('link', 'url')
+    },
+    {
+        'from': re.compile(r'(\[\.\]|\[dot\]|\(dot\))', re.IGNORECASE),
+        'to': '.',
+        'types': (
+            'link', 'url', 'ip-dst', 'ip-src', 'domain|ip', 'domain',
+            'hostname', 'email', 'email-src', 'email-dst'
+        )
+    },
+    {
+        'from': re.compile(r'\[hxxp:\/\/\]', re.IGNORECASE),
+        'to': 'http',
+        'types': ('link', 'url')
+    },
+    {
+        'from': re.compile(r'\[\@\]|\[at\]', re.IGNORECASE),
+        'to': '@',
+        'types': ('email', 'email-src', 'email-dst')
+    },
+    {
+        'from': re.compile(r'\[:\]'),
+        'to': ':',
+        'types': ('link', 'url')
+    }
+)
 VULNERABILITY_REGEXES = (
     r'CVE-\d{4}-\d{4,}',
     r'GCVE-\d+-\d{4}-\d+',
@@ -93,7 +123,7 @@ WEAKNESS_RE = re.compile(r"^CWE-[0-9]+$", flags=re.IGNORECASE)
 class AttributeValidationTool:
     @classmethod
     def modifyBeforeValidation(cls, attribute_type, value):
-        value = cls._handle_4byte_unicode(value)
+        value = cls._refang_value(attribute_type, value.strip())
         match attribute_type:
             case ('ip-src' | 'ip-dst'):
                 return cls._normalise_ip(value)
@@ -182,7 +212,7 @@ class AttributeValidationTool:
                 if isinstance(value, int):
                     return bool(value)
                 if isinstance(value, str):
-                    value = value.lower().strip()
+                    value = value.lower()
                     if value == 'true':
                         return True
                     if value == 'false':
@@ -579,6 +609,13 @@ class AttributeValidationTool:
             )
         except ipaddress.AddressValueError:
             return value
+
+    @classmethod
+    def _refang_value(cls, attribute_type, value):
+        for rule in REFANG_REGEX_TABLE:
+            if attribute_type in rule['types']:
+                value = rule['from'].sub(rule['to'], value)
+        return cls._handle_4byte_unicode(value)
 
     @classmethod
     def _validate_ip(cls, value):
