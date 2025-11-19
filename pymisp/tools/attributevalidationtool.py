@@ -140,7 +140,7 @@ class AttributeValidationTool:
                 value = value.lower().strip('.')
                 # Domain is not valid, try to convert to punycode
                 if not cls._is_domain_valid(value):
-                    return value.encode('punycode')
+                    return value.encode('idna').decode('ascii')
                 return value
             case 'domain|ip':
                 parts = value.lower().split('|')
@@ -150,7 +150,7 @@ class AttributeValidationTool:
                 domain = domain.strip('.')
                 # Domain is not valid, try to convert to punycode
                 if not cls._is_domain_valid(domain):
-                    domain = domain.encode('punycode')
+                    domain = domain.encode('idna').decode('ascii')
                 return f'{domain}|{cls._normalise_ip(ip)}'
             case ('filename|md5' | 'filename|sha1' | 'filename|imphash' |
                   'filename|sha224' | 'filename|sha256' | 'filename|sha384' |
@@ -324,7 +324,7 @@ class AttributeValidationTool:
                   'filename|sha3-256' | 'filename|sha3-384' |
                   'filename|sha3-512' | 'filename|authentihash'):
                 length = HASH_HEX_LENGTH[attribute_type[9:]] # strip `filename|`]
-                if re.fullmatch(r'^.+\|[0-9a-f]{' + length + r'}$', value):
+                if re.fullmatch(r'^.+\|[0-9a-f]{' + str(length) + r'}$', value):
                     return True
                 return (
                     'Checksum has an invalid length or format (expected:'
@@ -552,7 +552,9 @@ class AttributeValidationTool:
         return cls._is_positive_integer(value) and int(value) in range(1, 65536)
 
     @staticmethod
-    def _is_positive_integer(value):
+    def _is_positive_integer(value: int | str) -> bool:
+        if isinstance(value, int):
+            return value >= 0
         return value.isdigit() and int(value) >= 0
 
     @staticmethod
