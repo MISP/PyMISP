@@ -373,7 +373,10 @@ class AttributeValidationTool:
                     return True
                 return 'Port numbers have to be integers between 1 and 65535.'
             case 'ip-dst|port' | 'ip-src|port':
-                ip, port = value.split('|', 1)
+                composite = value.split('|')
+                if len(composite) != 2:
+                    return 'Invalid ip-dst|port format.'
+                ip, port = composite
                 if not cls._is_port_valid(port):
                     return 'Port numbers have to be integers between 1 and 65535.'
                 return cls._validate_ip(ip)
@@ -397,14 +400,20 @@ class AttributeValidationTool:
                     'Please double check the value or select type "other".'
                 );
             case 'hostname|port':
-                hostname, port = value.split('|', 1)
+                composite = value.split('|')
+                if len(composite) != 2:
+                    return 'Invalid hostname|port format.'
+                hostname, port = composite
                 if not cls._is_domain_valid(hostname):
                     return 'Hostname has an invalid format.'
                 if not cls._is_port_valid(port):
                     return 'Port numbers have to be integers between 1 and 65535.'
                 return True
             case 'domain|ip':
-                domain, ip = value.split('|', 1)
+                composite = value.split('|')
+                if len(composite) != 2:
+                    return 'Invalid domain|ip format.'
+                domain, ip = composite
                 if not cls._is_domain_valid(domain):
                     return 'Domain has an invalid format.'
                 return cls._validate_ip(ip)
