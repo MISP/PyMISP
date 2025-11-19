@@ -123,7 +123,8 @@ WEAKNESS_RE = re.compile(r"^CWE-[0-9]+$", flags=re.IGNORECASE)
 class AttributeValidationTool:
     @classmethod
     def modifyBeforeValidation(cls, attribute_type, value):
-        value = cls._refang_value(attribute_type, value.strip())
+        if isinstance(value, str):
+            value = cls._refang_value(attribute_type, value.strip())
         match attribute_type:
             case ('ip-src' | 'ip-dst'):
                 return cls._normalise_ip(value)
@@ -160,7 +161,10 @@ class AttributeValidationTool:
                   'filename|sha3-512' | 'filename|authentihash' |
                   'filename|vhash' | 'filename|pehash' | 'filename|tlsh'):
                 # Convert hash to lowercase
-                filename, _hash = value.split('|', 1)
+                composite = value.split('|')
+                if len(composite) != 2:
+                    return value # not a composite
+                filename, _hash = composite
                 return f'{filename}|{_hash.lower()}'
             case 'http-method' | 'hex':
                 return value.upper()
