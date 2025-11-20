@@ -13,7 +13,7 @@ from .domainipobject import DomainIPObject  # noqa
 from .asnobject import ASNObject  # noqa
 from .geolocationobject import GeolocationObject  # noqa
 from .git_vuln_finder_object import GitVulnFinderObject  # noqa
-from .attributevalidationtool import AttributeValidationTool  # noqa
+from .attributevalidationtool import AttributeValidationTool, validate_event  # noqa
 
 from .vehicleobject import VehicleObject  # noqa
 from .csvloader import CSVLoader  # noqa
@@ -53,5 +53,5 @@ __all__ = ['VTReportObject', 'Neo4j', 'FileObject', 'make_binary_objects',
            'SSHAuthorizedKeysObject', 'feed_meta_generator', 'update_objects',
            'EMailObject', 'URLObject', 'PEObject', 'PESectionObject', 'ELFObject',
            'ELFSectionObject', 'MachOObject', 'MachOSectionObject',
-           'AttributeValidationTool'
+           'AttributeValidationTool', 'validate_event'
            ]

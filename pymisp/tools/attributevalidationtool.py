@@ -2,10 +2,13 @@
 
 import ipaddress
 import json
+import logging
 import re
 from base64 import b64decode
 from datetime import datetime
 from dateutil.parser import parse
+from pymisp import MISPAttribute, MISPEvent, MISPObject
+from typing import Generator
 from urllib.parse import urlparse
 
 HASH_HEX_LENGTH = {
@@ -118,6 +121,8 @@ VULNERABILITY_RE = re.compile(
     r'^(?:' + '|'.join(VULNERABILITY_REGEXES) + r')$', flags=re.IGNORECASE
 )
 WEAKNESS_RE = re.compile(r"^CWE-[0-9]+$", flags=re.IGNORECASE)
+
+logger = logging.getLogger('pymisp')
 
 
 class AttributeValidationTool:
@@ -662,3 +667,59 @@ class AttributeValidationTool:
         except ValueError:
             return 'IP address has an invalid format.'
         return True
+
+
+def validate_event(event: dict | MISPEvent) -> MISPEvent:
+    """
+    Validate event attributes and skip/remove any that don't validate.
+    Replicates MISP server-side validation behavior.
+
+    :param event: MISPEvent object or dict representing an event
+    :return: MISPEvent with only valid attributes
+    """
+    try:
+        if isinstance(event, dict):
+            event = _load_misp_event(event)
+        # Validation of Attributes
+        event.attributes = list(_validate_attributes(event.attributes))
+        # Validation of Objects
+        for misp_object in event.objects:
+            misp_object.attributes = list(_validate_object_attributes(misp_object))
+    except Exception as e:
+        logger.error(f'Failed to validate event: {e}')
+    return event
+
+
+def _load_misp_event(event: dict) -> MISPEvent:
+    misp_event = MISPEvent()
+    misp_event.from_dict(**event)
+    return misp_event
+
+
+def _message_logging(validated: str, attribute: MISPAttribute, misp_object: MISPObject | None = None) -> str:
+    message = f'Failed validation for {attribute.type} Attribute <{attribute.uuid}>'
+    if misp_object is not None:
+        message = f'{message} in {misp_object.name} Object <{misp_object.uuid}>'
+    return f'{message}:\n{attribute.value} - {validated}'
+
+
+def _validate_attributes(attributes: list) -> Generator:
+    for attribute in attributes:
+        value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
+        validated = AttributeValidationTool.validate(attribute.type, value)
+        if validated is not True:
+            logger.warning(_message_logging(validated, attribute))
+            continue
+        attribute.value = value
+        yield attribute
+
+
+def _validate_object_attributes(misp_object: MISPObject) -> Generator:
+    for attribute in misp_object.attributes:
+        value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
+        validated = AttributeValidationTool.validate(attribute.type, value)
+        if validated is not True:
+            logger.warning(_message_logging(validated, attribute, misp_object))
+            continue
+        attribute.value = value
+        yield attribute
