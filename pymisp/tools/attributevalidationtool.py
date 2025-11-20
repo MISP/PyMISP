@@ -255,7 +255,7 @@ class AttributeValidationTool:
                   'git-commit-id' | 'dom-hash'):
                 if cls._is_hash_valid(attribute_type, value):
                     return True
-                length = HASH_HEX_LENGTH[type]
+                length = HASH_HEX_LENGTH[attribute_type]
                 return (
                     'Checksum has an invalid length or format (expected: '
                     f'{length} hexadecimal characters). Please double check '
