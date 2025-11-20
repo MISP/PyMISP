@@ -238,7 +238,7 @@ class AttributeValidationTool:
                 if '.' in value: # maybe value is in asdot notation
                     multiplier, remainder = value.split('.', 1)
                     if cls._is_positive_integer(multiplier) and cls._is_positive_integer(remainder):
-                        return multiplier * 65536 + remainder
+                        return int(multiplier) * 65536 + int(remainder)
                 return value
             case _:
                 return value
