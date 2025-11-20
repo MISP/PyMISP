@@ -104,8 +104,8 @@ CDHASH_RE = re.compile(r'^[0-9a-f]{40,}$')
 EMAIL_RE = re.compile(r'^.[^\s]*\@.*\..*$', flags=re.IGNORECASE)
 DOMAIN_RE = re.compile(r'^[A-Z0-9.\-_]+\.[A-Z0-9\-]{2,}$', flags=re.IGNORECASE)
 HEX_RE = re.compile(r'^[0-9a-fA-F]+$')
-MAC_ADDRESS_RE = re.compile(r'^([a-fA-F0-9]{2}[:]?){6}$')
-MAC_EUI_64_RE = re.compile(r'^([a-fA-F0-9]{2}[:]?){8}$')
+MAC_ADDRESS_RE = re.compile(r'^([a-f0-9]{2}:){5}[a-f0-9]{2}$')
+MAC_EUI_64_RE = re.compile(r'^([a-f0-9]{2}:){3}ff:fe:(:[a-f0-9]{2}){3}$')
 ONION_RE = re.compile(r'^([a-z2-7]{16}|[a-z2-7]{56})\.onion$')
 REMOVE_NON_ALPHANUM_CAP_RE = re.compile(r'[^0-9A-Z]+')
 REMOVE_NON_ALPHANUM_RE = re.compile(r'[^0-9A-Fa-f]')
@@ -594,7 +594,7 @@ class AttributeValidationTool:
 
     @staticmethod
     def _is_telfhash_valid(value):
-        return len(value) in (70, 72)
+        return len(value) in (70, 72) and HEX_RE.fullmatch(value)
 
     @staticmethod
     def _normalise_ip(value):
