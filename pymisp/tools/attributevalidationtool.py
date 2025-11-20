@@ -633,8 +633,8 @@ class AttributeValidationTool:
     @classmethod
     def _refang_value(cls, attribute_type, value):
         for rule in REFANG_REGEX_TABLE:
-            if attribute_type in rule['types']:
-                value = rule['from'].sub(rule['to'], value)
+            if attribute_type in rule['types']:  # type: ignore
+                value = rule['from'].sub(rule['to'], value)  # type: ignore
         return cls._handle_4byte_unicode(value)
 
     @classmethod
@@ -669,7 +669,7 @@ class AttributeValidationTool:
         return True
 
 
-def validate_event(event: dict | MISPEvent) -> MISPEvent:
+def validate_event(event: dict | MISPEvent) -> MISPEvent:  # type: ignore
     """
     Validate event attributes and skip/remove any that don't validate.
     Replicates MISP server-side validation behavior.
@@ -690,7 +690,7 @@ def validate_event(event: dict | MISPEvent) -> MISPEvent:
     return event
 
 
-def _load_misp_event(event: dict) -> MISPEvent:
+def _load_misp_event(event: dict) -> MISPEvent:  # type: ignore
     misp_event = MISPEvent()
     misp_event.from_dict(**event)
     return misp_event
@@ -703,7 +703,7 @@ def _message_logging(validated: str, attribute: MISPAttribute, misp_object: MISP
     return f'{message}:\n{attribute.value} - {validated}'
 
 
-def _validate_attributes(attributes: list) -> Generator:
+def _validate_attributes(attributes: list) -> Generator:  # type: ignore
     for attribute in attributes:
         value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
         validated = AttributeValidationTool.validate(attribute.type, value)
@@ -714,7 +714,7 @@ def _validate_attributes(attributes: list) -> Generator:
         yield attribute
 
 
-def _validate_object_attributes(misp_object: MISPObject) -> Generator:
+def _validate_object_attributes(misp_object: MISPObject) -> Generator:  # type: ignore
     for attribute in misp_object.attributes:
         value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
         validated = AttributeValidationTool.validate(attribute.type, value)
