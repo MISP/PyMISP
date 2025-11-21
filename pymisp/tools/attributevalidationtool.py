@@ -403,7 +403,7 @@ class AttributeValidationTool:
                 return (
                     f'{attribute_type.capitalize()} has an invalid format. '
                     'Please double check the value or select type "other".'
-                );
+                )
             case 'hostname|port':
                 composite = value.split('|')
                 if len(composite) != 2:
@@ -430,7 +430,7 @@ class AttributeValidationTool:
                 return (
                     'Email address has an invalid format. Please double '
                     'check the value or select type "other".'
-                );
+                )
             case 'vulnerability':
                 if VULNERABILITY_RE.fullmatch(value):
                     return True
