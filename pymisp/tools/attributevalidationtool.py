@@ -235,7 +235,7 @@ class AttributeValidationTool:
                         try:
                             return parse(value)
                         except Exception:
-                            pass
+                            return value
                 return value
             case 'AS':
                 if value.upper().startswith('AS'):
