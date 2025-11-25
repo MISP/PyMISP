@@ -55,8 +55,9 @@ class FileObject(AbstractMISPObjectGenerator):
         else:
             raise InvalidMISPObject('File buffer (BytesIO) or a path is required.')
         self.__data = self.__pseudofile.getvalue()
+        if HAS_MAGIC:
+            self.magic_db = MagicDb()
         self.generate_attributes()
-        self.magic_bd = MagicDb()
 
     def generate_attributes(self) -> None:
         self.add_attribute('filename', value=self.__filename)
@@ -69,7 +70,7 @@ class FileObject(AbstractMISPObjectGenerator):
             self.add_attribute('sha512', value=sha512(self.__data).hexdigest())
             self.add_attribute('malware-sample', value=self.__filename, data=self.__pseudofile, disable_correlation=True)
             if HAS_MAGIC:
-                magic = self.magic_bd.best_magic_buffer(self.__data)
+                magic = self.magic_db.best_magic_buffer(self.__data)
                 self.add_attribute('mimetype', value=magic.mime_type)
             if HAS_PYDEEP:
                 self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode())
