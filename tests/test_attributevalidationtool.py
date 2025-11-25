@@ -1,4 +1,5 @@
 import unittest
+from collections import defaultdict
 from pymisp.tools import AttributeValidationTool, validate_event
 
 class TestAttributeValidationTool(unittest.TestCase):
@@ -273,16 +274,30 @@ class TestAttributeValidationTool(unittest.TestCase):
         }
         
         # Run validation
-        validated_event = validate_event(event_dict)
+        validated_event = validate_event(event_dict, errors := defaultdict(list))
         
         # Check Attributes
         self.assertEqual(len(validated_event.attributes), 3)
-        self.assertEqual(validated_event.attributes[0].value, '1.1.1.1')
-        self.assertEqual(validated_event.attributes[1].value, 'google.com')
-        self.assertEqual(validated_event.attributes[2].value, 65537)
+        ip_attribute, domain_attribute, as_attribute = validated_event.attributes
+        self.assertEqual(ip_attribute.value, '1.1.1.1')
+        self.assertEqual(domain_attribute.value, 'google.com')
+        self.assertEqual(as_attribute.value, 65537)
         
         # Check Objects
         self.assertEqual(len(validated_event.objects), 1)
-        self.assertEqual(len(validated_event.objects[0].attributes), 2)
-        self.assertEqual(validated_event.objects[0].attributes[0].value, 'test.txt')
-        self.assertEqual(validated_event.objects[0].attributes[1].value, '0cc175b9c0f1b6a831c399e269772661')
+        file_object = validated_event.objects[0]
+        self.assertEqual(file_object.name, 'file')
+        self.assertEqual(len(file_object.attributes), 2)
+        filename_attribute, md5_attribute = file_object.attributes
+        self.assertEqual(filename_attribute.value, 'test.txt')
+        self.assertEqual(md5_attribute.value, '0cc175b9c0f1b6a831c399e269772661')
+
+        # Check Errors
+        self.assertEqual(len(errors['warnings']), 3)
+        ip_error, *md5_errors = errors['warnings']
+        self.assertIn('IP address has an invalid format.', ip_error)
+        for md5_error in md5_errors:
+            self.assertIn(
+                'Checksum has an invalid length or format (expected: 32 hexadecimal characters).',
+                md5_error
+            )
