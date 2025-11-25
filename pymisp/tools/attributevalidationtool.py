@@ -669,8 +669,7 @@ class AttributeValidationTool:
         return True
 
 
-def validate_event(event: dict | MISPEvent,
-                   errors: dict[str, list[str]]) -> MISPEvent:  # type: ignore
+def validate_event(event: dict | MISPEvent, errors: dict[str, list[str]]) -> MISPEvent:  # type: ignore
     """
     Validate event attributes and skip/remove any that don't validate.
     Replicates MISP server-side validation behavior.
