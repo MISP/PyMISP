@@ -274,7 +274,7 @@ class TestAttributeValidationTool(unittest.TestCase):
         }
         
         # Run validation
-        validated_event = validate_event(event_dict, errors := defaultdict(list))
+        validated_event = validate_event(event_dict, errors := defaultdict(list))  # type: ignore
         
         # Check Attributes
         self.assertEqual(len(validated_event.attributes), 3)
