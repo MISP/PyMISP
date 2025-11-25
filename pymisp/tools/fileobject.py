@@ -22,7 +22,7 @@ except ImportError:
     HAS_PYDEEP = False
 
 try:
-    import magic
+    from pure_magic_rs import MagicDb
     HAS_MAGIC = True
 except ImportError:
     HAS_MAGIC = False
@@ -37,7 +37,7 @@ class FileObject(AbstractMISPObjectGenerator):
         if not HAS_PYDEEP:
             logger.warning("pydeep is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if not HAS_MAGIC:
-            logger.warning("python-magic is missing, please install pymisp this way: pip install pymisp[fileobjects]")
+            logger.warning("pure-magic-rs is missing, please install pymisp this way: pip install pymisp[fileobjects]")
         if filename:
             # Useful in case the file is copied with a pre-defined name by a script but we want to keep the original name
             self.__filename = filename
@@ -55,6 +55,8 @@ class FileObject(AbstractMISPObjectGenerator):
         else:
             raise InvalidMISPObject('File buffer (BytesIO) or a path is required.')
         self.__data = self.__pseudofile.getvalue()
+        if HAS_MAGIC:
+            self.magic_db = MagicDb()
         self.generate_attributes()
 
     def generate_attributes(self) -> None:
@@ -68,7 +70,8 @@ class FileObject(AbstractMISPObjectGenerator):
             self.add_attribute('sha512', value=sha512(self.__data).hexdigest())
             self.add_attribute('malware-sample', value=self.__filename, data=self.__pseudofile, disable_correlation=True)
             if HAS_MAGIC:
-                self.add_attribute('mimetype', value=magic.from_buffer(self.__data, mime=True))
+                magic = self.magic_db.best_magic_buffer(self.__data)
+                self.add_attribute('mimetype', value=magic.mime_type)
             if HAS_PYDEEP:
                 self.add_attribute('ssdeep', value=pydeep.hash_buf(self.__data).decode())
 

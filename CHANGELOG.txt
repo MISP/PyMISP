@@ -2,6 +2,147 @@ Changelog
 =========
 
 
+v2.5.17.3 (2025-11-25)
+----------------------
+
+New
+~~~
+- Improve doc for CSV loader. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump changelog, again. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
+- Bump version. [Raphaël Vinot]
+- Use pure-magic-rs. [Raphaël Vinot]
+- [describeTypes] updated to the latest version. [Alexandre Dulaunoy]
+- Bump deps. [Raphaël Vinot]
+- Bump deps, really. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Quick cleanup. [Raphaël Vinot]
+- Optionally use faup-rs for URL parsing. [Raphaël Vinot]
+
+Fix
+~~~
+- Call order & typo in magic call. [Raphaël Vinot]
+- [tools:emailobject] Gracefully handle case where getStringStream
+  cannot find  the requested stream. [Sami Mokaddem]
+- [tools-emailobject] Circuvent crashes when dealing with ms-tnef
+  messages. [Sami Mokaddem]
+- Properly use pyfaup-rs. [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps): bump actions/checkout from 5 to 6. [dependabot[bot]]
+
+  Bumps [actions/checkout](https://github.com/actions/checkout) from 5 to 6.
+  - [Release notes](https://github.com/actions/checkout/releases)
+  - [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/actions/checkout/compare/v5...v6)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/checkout
+    dependency-version: '6'
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Build(deps): bump github/codeql-action from 3 to 4. [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 3 to 4.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v3...v4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-version: '4'
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
+v2.5.17.2 (2025-09-24)
+----------------------
+
+Changes
+~~~~~~~
+- Bump deps, objects. [Raphaël Vinot]
+
+
+v2.5.17.1 (2025-09-15)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump lief, fix code to support new release. [Raphaël Vinot]
+
+  Fix #1352
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Properly support lief 0.17. [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps): bump actions/setup-python from 5 to 6. [dependabot[bot]]
+
+  Bumps [actions/setup-python](https://github.com/actions/setup-python) from 5 to 6.
+  - [Release notes](https://github.com/actions/setup-python/releases)
+  - [Commits](https://github.com/actions/setup-python/compare/v5...v6)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/setup-python
+    dependency-version: '6'
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Build(deps): bump actions/checkout from 4 to 5. [dependabot[bot]]
+
+  Bumps [actions/checkout](https://github.com/actions/checkout) from 4 to 5.
+  - [Release notes](https://github.com/actions/checkout/releases)
+  - [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/actions/checkout/compare/v4...v5)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/checkout
+    dependency-version: '5'
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
+v2.5.17 (2025-08-04)
+--------------------
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Expose missing exception. [Raphaël Vinot]
+- Add missing optional value in MISPAttribute. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Exception when a first/last seen is invalid. [Raphaël Vinot]
+
+  Fix #1330
+
+Other
+~~~~~
+- Revert "chg: Add missing optional value in MISPAttribute" [Raphaël
+  Vinot]
+
+  This reverts commit 0e241b481c74246765f877d665e0064bb5cac99f.
+
+
 v2.5.12 (2025-05-13)
 --------------------
 
@@ -17,6 +158,7 @@ Fix
 
 Other
 ~~~~~
+- Chg; Bump changelog. [Raphaël Vinot]
 - Replace deprecated ExpandedPyMISP with PyMISP. [Jure Sah]
 
 
