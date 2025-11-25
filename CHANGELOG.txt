@@ -11,6 +11,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog, again. [Raphaël Vinot]
 - Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Use pure-magic-rs. [Raphaël Vinot]
@@ -23,6 +24,7 @@ Changes
 
 Fix
 ~~~
+- Call order & typo in magic call. [Raphaël Vinot]
 - [tools:emailobject] Gracefully handle case where getStringStream
   cannot find  the requested stream. [Sami Mokaddem]
 - [tools-emailobject] Circuvent crashes when dealing with ms-tnef
