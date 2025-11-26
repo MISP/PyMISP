@@ -496,6 +496,8 @@ class AttributeValidationTool:
                     return True
                 return 'SSH fingerprint must be in MD5 or SHA256 format.'
             case 'datetime':
+                if isinstance(value, datetime):
+                    return True
                 try:
                     parse(value)
                     return True
