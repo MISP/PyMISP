@@ -1,6 +1,11 @@
 import unittest
 from collections import defaultdict
-from pymisp.tools import AttributeValidationTool, validate_event
+from datetime import datetime
+from pymisp import MISPAttribute, MISPObject
+from pymisp.tools import (
+    AttributeValidationTool, validate_attribute, validate_attributes,
+    validate_event, validate_object, validate_objects, ValidationError
+)
 
 class TestAttributeValidationTool(unittest.TestCase):
 
@@ -188,7 +193,7 @@ class TestAttributeValidationTool(unittest.TestCase):
         self._should_be_invalid('hex', 'zz')
 
         self._should_be_valid('datetime', '2020-01-01T00:00:00')
-        self._should_be_invalid('datetime', 'invalid')
+        self._should_be_invalid('datetime', '2020:01:01 00-00-00')
 
         self._should_be_valid('size-in-bytes', '1024', 1024)
         self._should_be_invalid('size-in-bytes', '-1', 'abc')
@@ -301,3 +306,111 @@ class TestAttributeValidationTool(unittest.TestCase):
                 'Checksum has an invalid length or format (expected: 32 hexadecimal characters).',
                 md5_error
             )
+
+    def test_validate_attribute(self):
+        # Test with valid dict
+        attribute_dict = {'type': 'ip-src', 'value': '1.1.1.1'}
+        validated = validate_attribute(attribute_dict)
+        self.assertIsInstance(validated, MISPAttribute)
+        self.assertEqual(validated.value, '1.1.1.1')
+
+        # Test with valid MISPAttribute
+        attribute = MISPAttribute()
+        attribute.from_dict(**attribute_dict)
+        validated = validate_attribute(attribute)
+        self.assertIsInstance(validated, MISPAttribute)
+        self.assertEqual(validated.value, '1.1.1.1')
+
+        # Test with invalid dict
+        invalid_dict = {'type': 'ip-src', 'value': '999.999.999.999'}
+        with self.assertRaises(ValidationError) as cm:
+            validate_attribute(invalid_dict)
+        self.assertIn('IP address has an invalid format.', str(cm.exception))
+
+        # Test with invalid MISPAttribute
+        invalid_attribute = MISPAttribute()
+        invalid_attribute.from_dict(**invalid_dict)
+        with self.assertRaises(ValidationError) as cm:
+            validate_attribute(invalid_attribute)
+        self.assertIn('IP address has an invalid format.', str(cm.exception))
+
+        # Test modification
+        modified_dict = {'type': 'AS', 'value': 'AS123'}
+        validated = validate_attribute(modified_dict)
+        self.assertEqual(validated.value, '123')
+
+    def test_validate_attributes(self):
+        attributes = [
+            {'type': 'ip-src', 'value': '1.1.1.1'},  # Valid
+            {'type': 'ip-src', 'value': '999.999.999.999'},  # Invalid
+            {'type': 'domain', 'value': 'google.com'}  # Valid
+        ]
+
+        valid_attributes = list(validate_attributes(attributes, errors := defaultdict(list)))
+
+        self.assertEqual(len(valid_attributes), 2)
+        self.assertEqual(valid_attributes[0].value, '1.1.1.1')
+        self.assertEqual(valid_attributes[1].value, 'google.com')
+
+        self.assertEqual(len(errors['warnings']), 1)
+        self.assertIn('IP address has an invalid format.', errors['warnings'][0])
+
+    def test_validate_object(self):
+        object_dict = {
+            'name': 'file',
+            'Attribute': [
+                {'type': 'filename', 'object_relation': 'filename', 'value': 'test.txt'},  # Valid
+                {'type': 'md5', 'object_relation': 'md5', 'value': 'invalid_md5'}  # Invalid
+            ]
+        }
+
+        # Test with dict
+        validated_object = validate_object(object_dict, errors := {})
+        self.assertIsInstance(validated_object, MISPObject)
+        self.assertEqual(len(validated_object.attributes), 1)
+        self.assertEqual(validated_object.attributes[0].value, 'test.txt')
+        self.assertEqual(len(errors['warnings']), 1)
+        self.assertIn('Checksum has an invalid length or format', errors['warnings'][0])
+
+        # Test with MISPObject
+        misp_object = MISPObject('file')
+        misp_object.from_dict(**object_dict)
+        validated_object = validate_object(misp_object, errors := {})
+        self.assertEqual(len(validated_object.attributes), 1)
+        self.assertEqual(validated_object.attributes[0].value, 'test.txt')
+        self.assertIn('Checksum has an invalid length or format', errors['warnings'][0])
+
+    def test_validate_objects(self):
+        objects = [
+            {
+                'name': 'file',
+                'Attribute': [
+                    {'type': 'filename', 'object_relation': 'filename', 'value': 'test.txt'},
+                    {'type': 'md5', 'object_relation': 'md5', 'value': 'invalid_md5'}
+                ]
+            },
+            {
+                'name': 'x509',
+                'Attribute': [
+                    {'type': 'x509-fingerprint-md5', 'object_relation': 'x509-fingerprint-md5', 'value': 'b2a5abfeef9e36964281a31e17b57c97'},
+                    {'type': 'datetime', 'object_relation': 'validity-not-before', 'value': '2022-01-01T00:00:00'}
+                ]
+            }
+        ]
+
+        errors = defaultdict(list)
+        valid_objects = list(validate_objects(objects, errors))
+
+        self.assertEqual(len(valid_objects), 2)
+        file_object, x509_object = valid_objects
+        # First object should have 1 attribute (1 filtered out)
+        self.assertEqual(len(file_object.attributes), 1)
+        self.assertEqual(file_object.attributes[0].value, 'test.txt')
+        self.assertEqual(len(errors['warnings']), 1)
+        self.assertIn('Checksum has an invalid length or format', errors['warnings'][0])
+
+        # Second object should have 2 attributes
+        self.assertEqual(len(x509_object.attributes), 2)
+        self.assertEqual(x509_object.attributes[0].value, 'b2a5abfeef9e36964281a31e17b57c97')
+        validity = x509_object.attributes[1].value
+        self.assertEqual(x509_object.attributes[1].value, datetime(2022, 1, 1, 0, 0, 0))
