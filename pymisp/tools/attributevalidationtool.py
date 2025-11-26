@@ -8,6 +8,7 @@ from base64 import b64decode
 from datetime import datetime
 from dateutil.parser import parse
 from pymisp import MISPAttribute, MISPEvent, MISPObject
+from pymisp.exceptions import PyMISPError
 from typing import Generator
 from urllib.parse import urlparse
 
@@ -123,6 +124,10 @@ VULNERABILITY_RE = re.compile(
 WEAKNESS_RE = re.compile(r"^CWE-[0-9]+$", flags=re.IGNORECASE)
 
 logger = logging.getLogger('pymisp')
+
+
+class ValidationError(PyMISPError):
+    pass
 
 
 class AttributeValidationTool:
@@ -671,33 +676,136 @@ class AttributeValidationTool:
         return True
 
 
-def validate_event(event: dict | MISPEvent, errors: dict[str, list[str]]) -> MISPEvent:  # type: ignore
+def validate_attribute(attribute: dict | MISPAttribute) -> MISPAttribute:  # type: ignore
     """
-    Validate event attributes and skip/remove any that don't validate.
-    Replicates MISP server-side validation behavior.
+    Validates a MISP Attribute and returns a MISPAttribute if valid.
+    Replicates MISP server-side validation behavior on Attributes.
+
+    :param attribute: dict or MISPAttribute to validate
+    :return: Validated MISPAttribute object
+    :raises PyMISPError: If the attribute cannot be loaded or a validation error occurs
+    :raises ValidationError: If the attribute is invalid
+    """
+    if isinstance(attribute, dict):
+        try:
+            attribute = _load_misp_attribute(attribute)
+        except Exception as e:
+            message = f'Error loading Attribute: {e}'
+            logger.error(message)
+            raise PyMISPError(message)
+    try:
+        value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
+        validated = AttributeValidationTool.validate(attribute.type, value)
+    except Exception as e:
+        message = f'Error validating Attribute <{attribute.uuid}>: {e}'
+        logger.error(message)
+        raise PyMISPError(message)
+    if validated is not True:
+        message = _message_logging(validated, attribute)
+        logger.warning(message)
+        raise ValidationError(message)
+    attribute.value = value
+    return attribute
+
+
+def validate_attributes(attributes: list, errors: dict) -> Generator:  # type: ignore
+    """
+    Validates a list of MISP attributes and skips any that doesn't validate.
+
+    :param attributes: List of MISPAttribute objects
+    :param errors: Dictionary to populate with any validation error messages
+    :return: Generator yielding only valid MISPAttribute objects
+    """
+    for attribute in attributes:
+        try:
+            misp_attribute = validate_attribute(attribute)
+        except ValidationError as e:
+            _populate_error_message(errors, 'warnings', str(e))
+            continue
+        except PyMISPError as e:
+            _populate_error_message(errors, 'errors', str(e))
+            continue
+        yield misp_attribute
+
+
+def validate_event(event: dict | MISPEvent, errors: dict) -> MISPEvent:  # type: ignore
+    """
+    Validates an event and skips Attributes or Object Attributes that don't validate.
 
     :param event: MISPEvent object or dict representing an event
+    :param errors: Dictionary to populate with any validation error messages
     :return: MISPEvent with only valid attributes
+    :raises PyMISPError: If the event cannot be loaded
     """
-    try:
-        if isinstance(event, dict):
+    if isinstance(event, dict):
+        try:
             event = _load_misp_event(event)
-        # Validation of Attributes
-        event.attributes = list(_validate_attributes(event.attributes, errors))
-        # Validation of Objects
-        for misp_object in event.objects:
-            misp_object.attributes = list(_validate_object_attributes(misp_object, errors))
-    except Exception as e:
-        message = f'Failed to validate event: {e}'
-        logger.error(message)
-        _populate_error_message(errors, 'errors', message)
+        except Exception as e:
+            message = f'Error loading Event: {e}'
+            logger.error(message)
+            raise PyMISPError(message)
+    # Validation of Attributes
+    event.attributes = list(validate_attributes(event.attributes, errors))
+    # Validation of Objects
+    event.objects = list(validate_objects(event.objects, errors))
     return event
+
+
+def validate_object(misp_object: dict | MISPObject, errors: dict) -> MISPObject:  # type: ignore
+    """
+    Validates an object and skips any Object Attribute that doesn't validate.
+
+    :param misp_object: MISPObject object or dict representing an object
+    :param errors: Dictionary to populate with any validation error messages
+    :return: MISPObject with only valid attributes
+    :raises PyMISPError: If the object cannot be loaded
+    """
+    if isinstance(misp_object, dict):
+        try:
+            misp_object = _load_misp_object(misp_object)
+        except Exception as e:
+            message = f'Error loading Object: {e}'
+            logger.error(message)
+            raise PyMISPError(message)
+    # Validation of Object Attributes
+    misp_object.attributes = list(_validate_object_attributes(misp_object, errors))
+    return misp_object
+
+
+def validate_objects(misp_objects: list, errors: dict) -> Generator:  # type: ignore
+    """
+    Validates a list of MISP objects and skips any Object Attribute that
+    doesn't validate.
+
+    :param misp_objects: List of MISPObject objects
+    :param errors: Dictionary to populate with any validation error messages
+    :return: Generator yielding only valid MISPObject objects
+    """
+    for mispObject in misp_objects:
+        try:
+            misp_object = validate_object(mispObject, errors)
+        except PyMISPError as e:
+            _populate_error_message(errors, 'errors', str(e))
+            continue
+        yield misp_object
+
+
+def _load_misp_attribute(attribute: dict) -> MISPAttribute:  # type: ignore
+    misp_attribute = MISPAttribute()
+    misp_attribute.from_dict(**attribute)
+    return misp_attribute
 
 
 def _load_misp_event(event: dict) -> MISPEvent:  # type: ignore
     misp_event = MISPEvent()
     misp_event.from_dict(**event)
     return misp_event
+
+
+def _load_misp_object(mispObject: dict) -> MISPObject:  # type: ignore
+    misp_object = MISPObject(mispObject['name'])
+    misp_object.from_dict(**mispObject)
+    return misp_object
 
 
 def _message_logging(validated: str, attribute: MISPAttribute, misp_object: MISPObject | None = None) -> str:
@@ -714,23 +822,16 @@ def _populate_error_message(errors: dict[str, list[str]], key: str, message: str
         errors[key] = [message]
 
 
-def _validate_attributes(attributes: list, errors: dict[str, list[str]]) -> Generator:  # type: ignore
-    for attribute in attributes:
-        value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
-        validated = AttributeValidationTool.validate(attribute.type, value)
-        if validated is not True:
-            message = _message_logging(validated, attribute)
-            logger.warning(message)
-            _populate_error_message(errors, 'warnings', message)
-            continue
-        attribute.value = value
-        yield attribute
-
-
-def _validate_object_attributes(misp_object: MISPObject, errors: dict[str, list[str]]) -> Generator:  # type: ignore
+def _validate_object_attributes(misp_object: MISPObject, errors: dict) -> Generator:  # type: ignore
     for attribute in misp_object.attributes:
-        value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
-        validated = AttributeValidationTool.validate(attribute.type, value)
+        try:
+            value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
+            validated = AttributeValidationTool.validate(attribute.type, value)
+        except Exception as e:
+            message = f'Error validating Object Attribute <{attribute.uuid}> in Object <{misp_object.uuid}>: {e}'
+            logger.error(message)
+            _populate_error_message(errors, 'errors', message)
+            continue
         if validated is not True:
             message = _message_logging(validated, attribute, misp_object)
             logger.warning(message)
