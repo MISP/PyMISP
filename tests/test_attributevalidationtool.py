@@ -375,7 +375,7 @@ class TestAttributeValidationTool(unittest.TestCase):
         # Test with MISPObject
         misp_object = MISPObject('file')
         misp_object.from_dict(**object_dict)
-        validated_object = validate_object(misp_object, errors := {})  # type: ignore
+        validated_object = validate_object(misp_object, errors := {})
         self.assertEqual(len(validated_object.attributes), 1)
         self.assertEqual(validated_object.attributes[0].value, 'test.txt')
         self.assertIn('Checksum has an invalid length or format', errors['warnings'][0])
