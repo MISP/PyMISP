@@ -346,7 +346,7 @@ class TestAttributeValidationTool(unittest.TestCase):
             {'type': 'domain', 'value': 'google.com'}  # Valid
         ]
 
-        valid_attributes = list(validate_attributes(attributes, errors := defaultdict(list)))
+        valid_attributes = list(validate_attributes(attributes, errors := defaultdict(list)))  # type: ignore
 
         self.assertEqual(len(valid_attributes), 2)
         self.assertEqual(valid_attributes[0].value, '1.1.1.1')
@@ -365,7 +365,7 @@ class TestAttributeValidationTool(unittest.TestCase):
         }
 
         # Test with dict
-        validated_object = validate_object(object_dict, errors := {})
+        validated_object = validate_object(object_dict, errors := {})  # type: ignore
         self.assertIsInstance(validated_object, MISPObject)
         self.assertEqual(len(validated_object.attributes), 1)
         self.assertEqual(validated_object.attributes[0].value, 'test.txt')
@@ -375,7 +375,7 @@ class TestAttributeValidationTool(unittest.TestCase):
         # Test with MISPObject
         misp_object = MISPObject('file')
         misp_object.from_dict(**object_dict)
-        validated_object = validate_object(misp_object, errors := {})
+        validated_object = validate_object(misp_object, errors := {})  # type: ignore
         self.assertEqual(len(validated_object.attributes), 1)
         self.assertEqual(validated_object.attributes[0].value, 'test.txt')
         self.assertIn('Checksum has an invalid length or format', errors['warnings'][0])
@@ -398,8 +398,7 @@ class TestAttributeValidationTool(unittest.TestCase):
             }
         ]
 
-        errors = defaultdict(list)
-        valid_objects = list(validate_objects(objects, errors))
+        valid_objects = list(validate_objects(objects, errors := defaultdict(list)))  # type: ignore
 
         self.assertEqual(len(valid_objects), 2)
         file_object, x509_object = valid_objects
