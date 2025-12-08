@@ -693,6 +693,7 @@ def validate_attribute(attribute: dict | MISPAttribute) -> MISPAttribute:  # typ
             message = f'Error loading Attribute: {e}'
             logger.error(message)
             raise PyMISPError(message)
+    is_edited = attribute.edited
     try:
         value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
         validated = AttributeValidationTool.validate(attribute.type, value)
@@ -704,7 +705,9 @@ def validate_attribute(attribute: dict | MISPAttribute) -> MISPAttribute:  # typ
         message = _message_logging(validated, attribute)
         logger.warning(message)
         raise ValidationError(message)
-    attribute.value = value
+    if attribute.value != value:
+        attribute.value = value
+        attribute.edited = is_edited
     return attribute
 
 
@@ -767,8 +770,10 @@ def validate_object(misp_object: dict | MISPObject, errors: dict) -> MISPObject:
             message = f'Error loading Object: {e}'
             logger.error(message)
             raise PyMISPError(message)
+    is_edited = misp_object.edited
     # Validation of Object Attributes
     misp_object.attributes = list(_validate_object_attributes(misp_object, errors))
+    misp_object.edited = is_edited
     return misp_object
 
 
@@ -824,6 +829,7 @@ def _populate_error_message(errors: dict[str, list[str]], key: str, message: str
 
 def _validate_object_attributes(misp_object: MISPObject, errors: dict) -> Generator:  # type: ignore
     for attribute in misp_object.attributes:
+        is_edited = attribute.edited
         try:
             value = AttributeValidationTool.modifyBeforeValidation(attribute.type, attribute.value)
             validated = AttributeValidationTool.validate(attribute.type, value)
@@ -837,5 +843,7 @@ def _validate_object_attributes(misp_object: MISPObject, errors: dict) -> Genera
             logger.warning(message)
             _populate_error_message(errors, 'warnings', message)
             continue
-        attribute.value = value
+        if attribute.value != value:
+            attribute.value = value
+            attribute.edited = is_edited
         yield attribute
