@@ -686,7 +686,7 @@ def validate_attribute(attribute: dict | MISPAttribute) -> MISPAttribute:  # typ
     :raises PyMISPError: If the attribute cannot be loaded or a validation error occurs
     :raises ValidationError: If the attribute is invalid
     """
-    if isinstance(attribute, dict):
+    if not isinstance(attribute, MISPAttribute):
         try:
             attribute = _load_misp_attribute(attribute)
         except Exception as e:
@@ -740,7 +740,7 @@ def validate_event(event: dict | MISPEvent, errors: dict) -> MISPEvent:  # type:
     :return: MISPEvent with only valid attributes
     :raises PyMISPError: If the event cannot be loaded
     """
-    if isinstance(event, dict):
+    if not isinstance(event, MISPEvent):
         try:
             event = _load_misp_event(event)
         except Exception as e:
@@ -763,7 +763,7 @@ def validate_object(misp_object: dict | MISPObject, errors: dict) -> MISPObject:
     :return: MISPObject with only valid attributes
     :raises PyMISPError: If the object cannot be loaded
     """
-    if isinstance(misp_object, dict):
+    if not isinstance(misp_object, MISPObject):
         try:
             misp_object = _load_misp_object(misp_object)
         except Exception as e:
