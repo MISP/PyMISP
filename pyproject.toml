@@ -51,7 +51,7 @@ email = [
     "oletools (>=0.60.2)"
 ]
 
-brotli = [ "urllib3 (>=2.5.0)" ]
+brotli = [ "urllib3[broti] (>=2.6.0)" ]
 
 [tool.poetry]
 classifiers=[
