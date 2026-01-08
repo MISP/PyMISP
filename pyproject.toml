@@ -7,7 +7,7 @@ authors = [
 ]
 license = "BSD-2-Clause"
 readme = "README.md"
-requires-python = ">=3.10.0,<4.0"
+requires-python = ">=3.10,<4.0"
 
 dynamic = [ "classifiers" ]
 
@@ -35,9 +35,10 @@ openioc = [ "beautifulsoup4 (>=4.13.5,<4.14)" ]
 virustotal = [ "validators (>=0.35.0)" ]
 
 docs = [
-    "sphinx-autodoc-typehints (>=3.6.2) ; python_version >= \"3.12\"",
-    "sphinx (>=9.1.0) ; python_version >= \"3.12\"",
-    "docutils (<0.22) ; python_version >= \"3.12\""
+    "sphinx-autodoc-typehints (<3.6) ; python_version >= \"3.12\"",
+    "sphinx (<9) ; python_version >= \"3.12\"",
+    "docutils (<0.22) ; python_version >= \"3.12\"",
+    "myst-parser (>=4.0.1) ; python_version >= \"3.12\""
 ]
 
 pdfexport = [ "reportlab (>=4.4.7)" ]
