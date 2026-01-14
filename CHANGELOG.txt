@@ -2,6 +2,38 @@ Changelog
 =========
 
 
+v2.5.32 (2026-01-14)
+--------------------
+
+New
+~~~
+- Add missing workers endpoints. [Raphaël Vinot]
+
+  Fix #1372
+- Add logo. [Raphaël Vinot]
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+- Bump doc. [Raphaël Vinot]
+- Remove outdated dep. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [poetry] Bumped latest lock file with minimum python version >= 3.10.
+  [Christian Studer]
+- Bump changelog, one last time. [Raphaël Vinot]
+- Setting new minimum python version to 3.10. [Christian Studer]
+
+Fix
+~~~
+- Revert bump to sphinx 9. [Raphaël Vinot]
+- [actions] Changed python versions to align with the currently
+  supported ones. [Christian Studer]
+
+Other
+~~~~~
+- Chg; Bump deps. [Raphaël Vinot]
+
+
 v2.5.17.3 (2025-11-25)
 ----------------------
 
