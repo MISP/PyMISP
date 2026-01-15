@@ -36,7 +36,7 @@ description = "Screen-scraping library"
 optional = true
 python-versions = ">=3.7.0"
 groups = ["main"]
-markers = "extra == \"openioc\" or extra == \"email\""
+markers = "extra == \"email\" or extra == \"openioc\""
 files = [
     {file = "beautifulsoup4-4.13.5-py3-none-any.whl", hash = "sha256:642085eaa22233aceadff9c69651bc51e8bf3f874fb6d7104ece2beb24b47c4a"},
     {file = "beautifulsoup4-4.13.5.tar.gz", hash = "sha256:5e70131382930e7c3de33450a2f54a63d5e4b19386eab43a5b34d594268f3695"},
@@ -867,15 +867,15 @@ files = [
 
 [[package]]
 name = "markdown-it-py"
-version = "3.0.0"
+version = "4.0.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
 optional = true
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["main"]
 markers = "python_version >= \"3.12\" and extra == \"docs\""
 files = [
-    {file = "markdown-it-py-3.0.0.tar.gz", hash = "sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb"},
-    {file = "markdown_it_py-3.0.0-py3-none-any.whl", hash = "sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1"},
+    {file = "markdown_it_py-4.0.0-py3-none-any.whl", hash = "sha256:87327c59b172c5011896038353a81343b6754500a08cd7a4973bb48c6d578147"},
+    {file = "markdown_it_py-4.0.0.tar.gz", hash = "sha256:cb0a2b4aa34f932c007117b194e945bd74e0ec24133ceb5bac59009cda1cb9f3"},
 ]
 
 [package.dependencies]
@@ -883,13 +883,12 @@ mdurl = ">=0.1,<1.0"
 
 [package.extras]
 benchmarking = ["psutil", "pytest", "pytest-benchmark"]
-code-style = ["pre-commit (>=3.0,<4.0)"]
-compare = ["commonmark (>=0.9,<1.0)", "markdown (>=3.4,<4.0)", "mistletoe (>=1.0,<2.0)", "mistune (>=2.0,<3.0)", "panflute (>=2.3,<3.0)"]
+compare = ["commonmark (>=0.9,<1.0)", "markdown (>=3.4,<4.0)", "markdown-it-pyrs", "mistletoe (>=1.0,<2.0)", "mistune (>=3.0,<4.0)", "panflute (>=2.3,<3.0)"]
 linkify = ["linkify-it-py (>=1,<3)"]
-plugins = ["mdit-py-plugins"]
+plugins = ["mdit-py-plugins (>=0.5.0)"]
 profiling = ["gprof2dot"]
-rtd = ["jupyter_sphinx", "mdit-py-plugins", "myst-parser", "pyyaml", "sphinx", "sphinx-copybutton", "sphinx-design", "sphinx_book_theme"]
-testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
+rtd = ["ipykernel", "jupyter_sphinx", "mdit-py-plugins (>=0.5.0)", "myst-parser", "pyyaml", "sphinx", "sphinx-book-theme (>=1.0,<2.0)", "sphinx-copybutton", "sphinx-design"]
+testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions", "requests"]
 
 [[package]]
 name = "markupsafe"
@@ -1118,31 +1117,31 @@ files = [
 
 [[package]]
 name = "myst-parser"
-version = "4.0.1"
+version = "5.0.0"
 description = "An extended [CommonMark](https://spec.commonmark.org/) compliant parser,"
 optional = true
-python-versions = ">=3.10"
+python-versions = ">=3.11"
 groups = ["main"]
 markers = "python_version >= \"3.12\" and extra == \"docs\""
 files = [
-    {file = "myst_parser-4.0.1-py3-none-any.whl", hash = "sha256:9134e88959ec3b5780aedf8a99680ea242869d012e8821db3126d427edc9c95d"},
-    {file = "myst_parser-4.0.1.tar.gz", hash = "sha256:5cfea715e4f3574138aecbf7d54132296bfd72bb614d31168f48c477a830a7c4"},
+    {file = "myst_parser-5.0.0-py3-none-any.whl", hash = "sha256:ab31e516024918296e169139072b81592336f2fef55b8986aa31c9f04b5f7211"},
+    {file = "myst_parser-5.0.0.tar.gz", hash = "sha256:f6f231452c56e8baa662cc352c548158f6a16fcbd6e3800fc594978002b94f3a"},
 ]
 
 [package.dependencies]
-docutils = ">=0.19,<0.22"
+docutils = ">=0.20,<0.23"
 jinja2 = "*"
-markdown-it-py = ">=3.0,<4.0"
-mdit-py-plugins = ">=0.4.1,<1.0"
+markdown-it-py = ">=4.0,<5.0"
+mdit-py-plugins = ">=0.5,<1.0"
 pyyaml = "*"
-sphinx = ">=7,<9"
+sphinx = ">=8,<10"
 
 [package.extras]
 code-style = ["pre-commit (>=4.0,<5.0)"]
 linkify = ["linkify-it-py (>=2.0,<3.0)"]
-rtd = ["ipython", "sphinx (>=7)", "sphinx-autodoc2 (>=0.5.0,<0.6.0)", "sphinx-book-theme (>=1.1,<2.0)", "sphinx-copybutton", "sphinx-design", "sphinx-pyscript", "sphinx-tippy (>=0.4.3)", "sphinx-togglebutton", "sphinxext-opengraph (>=0.9.0,<0.10.0)", "sphinxext-rediraffe (>=0.2.7,<0.3.0)"]
-testing = ["beautifulsoup4", "coverage[toml]", "defusedxml", "pygments (<2.19)", "pytest (>=8,<9)", "pytest-cov", "pytest-param-files (>=0.6.0,<0.7.0)", "pytest-regressions", "sphinx-pytest"]
-testing-docutils = ["pygments", "pytest (>=8,<9)", "pytest-param-files (>=0.6.0,<0.7.0)"]
+rtd = ["ipython", "sphinx (>=8)", "sphinx-autodoc2 (>=0.5.0,<0.6.0)", "sphinx-book-theme (>=1.1,<2.0)", "sphinx-copybutton", "sphinx-design", "sphinx-pyscript", "sphinx-tippy (>=0.4.3)", "sphinx-togglebutton", "sphinxext-opengraph (>=0.13.0,<0.14.0)", "sphinxext-rediraffe (>=0.3.0,<0.4.0)"]
+testing = ["beautifulsoup4", "coverage[toml]", "defusedxml", "pygments (<2.20)", "pytest (>=9,<10)", "pytest-cov", "pytest-param-files (>=0.6.0,<0.7.0)", "pytest-regressions", "sphinx-pytest (>=0.3.0,<0.4.0)"]
+testing-docutils = ["pygments", "pytest (>=9,<10)", "pytest-param-files (>=0.6.0,<0.7.0)"]
 
 [[package]]
 name = "olefile"
@@ -1742,6 +1741,13 @@ python-versions = ">=3.8"
 groups = ["main"]
 markers = "python_version >= \"3.12\" and extra == \"docs\""
 files = [
+    {file = "PyYAML-6.0.3-cp38-cp38-macosx_10_13_x86_64.whl", hash = "sha256:c2514fceb77bc5e7a2f7adfaa1feb2fb311607c9cb518dbc378688ec73d8292f"},
+    {file = "PyYAML-6.0.3-cp38-cp38-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:9c57bb8c96f6d1808c030b1687b9b5fb476abaa47f0db9c0101f5e9f394e97f4"},
+    {file = "PyYAML-6.0.3-cp38-cp38-manylinux2014_s390x.manylinux_2_17_s390x.manylinux_2_28_s390x.whl", hash = "sha256:efd7b85f94a6f21e4932043973a7ba2613b059c4a000551892ac9f1d11f5baf3"},
+    {file = "PyYAML-6.0.3-cp38-cp38-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:22ba7cfcad58ef3ecddc7ed1db3409af68d023b7f940da23c6c2a1890976eda6"},
+    {file = "PyYAML-6.0.3-cp38-cp38-musllinux_1_2_x86_64.whl", hash = "sha256:6344df0d5755a2c9a276d4473ae6b90647e216ab4757f8426893b5dd2ac3f369"},
+    {file = "PyYAML-6.0.3-cp38-cp38-win32.whl", hash = "sha256:3ff07ec89bae51176c0549bc4c63aa6202991da2d9a6129d7aef7f1407d3f295"},
+    {file = "PyYAML-6.0.3-cp38-cp38-win_amd64.whl", hash = "sha256:5cf4e27da7e3fbed4d6c3d8e797387aaad68102272f8f9752883bc32d61cb87b"},
     {file = "pyyaml-6.0.3-cp310-cp310-macosx_10_13_x86_64.whl", hash = "sha256:214ed4befebe12df36bcc8bc2b64b396ca31be9304b8f59e25c11cf94a4c033b"},
     {file = "pyyaml-6.0.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:02ea2dfa234451bbb8772601d7b8e426c2bfa197136796224e50e35a78777956"},
     {file = "pyyaml-6.0.3-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b30236e45cf30d2b8e7b3e85881719e98507abed1011bf463a8fa23e9c3e98a8"},
@@ -1968,7 +1974,7 @@ description = "A modern CSS selector implementation for Beautiful Soup."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"openioc\" or extra == \"email\""
+markers = "extra == \"email\" or extra == \"openioc\""
 files = [
     {file = "soupsieve-2.8.1-py3-none-any.whl", hash = "sha256:a11fe2a6f3d76ab3cf2de04eb339c1be5b506a8a47f2ceb6d139803177f85434"},
     {file = "soupsieve-2.8.1.tar.gz", hash = "sha256:4cf733bc50fa805f5df4b8ef4740fc0e0fa6218cf3006269afd3f9d6d80fd350"},
@@ -2360,7 +2366,7 @@ files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
 ]
-markers = {main = "(platform_python_implementation != \"PyPy\" or platform_system != \"Windows\" and platform_system != \"Darwin\") and extra == \"email\" and python_version == \"3.10\" or extra == \"openioc\" or extra == \"email\""}
+markers = {main = "extra == \"email\" or extra == \"openioc\""}
 
 [[package]]
 name = "tzdata"
