@@ -25,7 +25,7 @@ documentation = "https://pymisp.readthedocs.io"
 [project.optional-dependencies]
 
 fileobjects = [
-    "pure-magic-rs (>=0.2.4)",
+    "pure-magic-rs (>=0.2.5)",
     "pydeep2 (>=0.5.1)",
     "lief (>=0.17.2)"
 ]
@@ -35,13 +35,13 @@ openioc = [ "beautifulsoup4 (>=4.13.5,<4.14)" ]
 virustotal = [ "validators (>=0.35.0)" ]
 
 docs = [
-    "sphinx-autodoc-typehints (<3.6) ; python_version >= \"3.12\"",
-    "sphinx (<9) ; python_version >= \"3.12\"",
-    "docutils (<0.22) ; python_version >= \"3.12\"",
-    "myst-parser (>=4.0.1) ; python_version >= \"3.12\""
+    "sphinx-autodoc-typehints (>=3.6.2) ; python_version >= \"3.12\"",
+    "sphinx (>=9.1.0) ; python_version >= \"3.12\"",
+    "docutils (>=0.22.4) ; python_version >= \"3.12\"",
+    "myst-parser (>=5.0.0) ; python_version >= \"3.12\""
 ]
 
-pdfexport = [ "reportlab (>=4.4.7)" ]
+pdfexport = [ "reportlab (>=4.4.9)" ]
 
 url = [ "pyfaup-rs (>=0.1.2,<0.2.0)" ]
 
