@@ -25,7 +25,7 @@ documentation = "https://pymisp.readthedocs.io"
 [project.optional-dependencies]
 
 fileobjects = [
-    "pure-magic-rs (>=0.2.5)",
+    "pure-magic-rs (>=0.3.0)",
     "pydeep2 (>=0.5.1)",
     "lief (>=0.17.2)"
 ]
