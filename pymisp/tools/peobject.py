@@ -122,6 +122,10 @@ class PEObject(AbstractMISPObjectGenerator):
                 self.add_attribute('company-name', value=fileinfo.get('CompanyName'))
                 self.add_attribute('legal-copyright', value=fileinfo.get('LegalCopyright'))
                 self.add_attribute('lang-id', value=version.string_file_info.langcode_items[0].key)
+        # PDB
+        if self.__pe.codeview_pdb and self.__pe.codeview_pdb.filename:
+            self.add_attribute('pdb', value=self.__pe.codeview_pdb.filename)
+
         # Sections
         self.sections = []
         if self.__pe.sections:
