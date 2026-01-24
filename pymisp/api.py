@@ -355,6 +355,35 @@ class PyMISP:
         response = self._prepare_request('POST', 'servers/restartWorkers')
         return self._check_json_response(response)
 
+    def restart_dead_workers(self) -> dict[str, Any] | list[dict[str, Any]]:
+        """Restart the dead workers"""
+        response = self._prepare_request('POST', 'servers/restartDeadWorkers')
+        return self._check_json_response(response)
+
+    def get_workers(self) -> dict[str, Any] | list[dict[str, Any]]:
+        """Get all the workers"""
+        response = self._prepare_request('GET', 'servers/getWorkers')
+        return self._check_json_response(response)
+
+    def start_worker(self, worker_type: str) -> dict[str, Any] | list[dict[str, Any]]:
+        """Start a worker
+        :param worker_type: The type of worker, must be one of the following: "default" "email" "scheduler" "cache" "prio" "update"
+        """
+        response = self._prepare_request('POST', f'servers/startWorker/{worker_type}')
+        return self._check_json_response(response)
+
+    def stop_worker_by_pid(self, worker_pid: str | int) -> dict[str, Any] | list[dict[str, Any]]:
+        """Stop a worker by its PID (get the pid with get_workers)
+        :param worker_pid: The pid of the worker to stop
+        """
+        response = self._prepare_request('POST', f'servers/stopWorker/{worker_pid}')
+        return self._check_json_response(response)
+
+    def kill_all_workers(self) -> dict[str, Any] | list[dict[str, Any]]:
+        """Kill all the workers"""
+        response = self._prepare_request('POST', 'servers/killAllWorkers')
+        return self._check_json_response(response)
+
     def db_schema_diagnostic(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Get the schema diagnostic"""
         response = self._prepare_request('GET', 'servers/dbSchemaDiagnostic')
@@ -2703,6 +2732,11 @@ class PyMISP:
         """
         registration_id = get_uuid_or_id_from_abstract_misp(registration)
         r = self._prepare_request('POST', f'users/discardRegistrations/{registration_id}')
+        return self._check_json_response(r)
+
+    def users_heartbeat(self) -> dict[str, str]:
+        """?"""
+        r = self._prepare_request('GET', 'users/heartbeat')
         return self._check_json_response(r)
 
     # ## END User ###

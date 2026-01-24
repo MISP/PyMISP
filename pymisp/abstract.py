@@ -97,7 +97,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
     __misp_objects_path = misp_objects_path
     __describe_types = describe_types
 
-    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, force_timestamps: bool=False) -> None:
         """Abstract class for all the MISP objects.
         NOTE: Every method in every classes inheriting this one are doing
               changes in memory and  do not modify data on a remote MISP instance.
@@ -111,7 +111,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
         self.__self_defined_describe_types: dict[str, Any] | None = None
         self.uuid: str
 
-        if kwargs.get('force_timestamps') is not None:
+        if force_timestamps:
             # Ignore the edited objects and keep the timestamps.
             self.__force_timestamps: bool = True
         else:
@@ -374,12 +374,15 @@ class MISPTag(AbstractMISP):
 
     _fields_for_feed: set[str] = {'name', 'colour', 'relationship_type', 'local'}
 
-    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(force_timestamps)
         self.name: str
         self.exportable: bool
         self.local: bool
         self.relationship_type: str | None
+
+        if kwargs:
+            self.from_dict(**kwargs)
 
     def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if kwargs.get('Tag'):
