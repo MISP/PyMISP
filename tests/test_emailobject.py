@@ -20,6 +20,7 @@ class TestEmailObject(unittest.TestCase):
 
     eml_1: BytesIO
     msg_1: BytesIO
+    msg_1_bom: BytesIO
 
     @classmethod
     def setUpClass(cls: type[T]) -> None:
