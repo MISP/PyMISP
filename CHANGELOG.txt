@@ -2,6 +2,19 @@ Changelog
 =========
 
 
+v2.5.32.2 (2026-02-02)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+
+Fix
+~~~
+- Incorrect typing for kwargs. [Raphaël Vinot]
+- Make mypy happy. [Raphaël Vinot]
+
+
 v2.5.32.1 (2026-02-02)
 ----------------------
 
@@ -13,6 +26,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - [tests] Checking that validation error messages are populated as
