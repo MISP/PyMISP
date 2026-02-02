@@ -2,6 +2,110 @@ Changelog
 =========
 
 
+v2.5.32.1 (2026-02-02)
+----------------------
+
+New
+~~~
+- Add support for pdb path in PE object. [Raphaël Vinot]
+
+  Related https://github.com/MISP/misp-objects/commit/4d8e21d03dbdc315552915a9b2ff6b58a258297d
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [tests] Checking that validation error messages are populated as
+  expected. [Christian Studer]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Avoid AVs to freak out. [Raphaël Vinot]
+- [tools] Fixed regex for `pehash` attribute type validation. [Christian
+  Studer]
+
+  - Was still containing a delimiter as in PHP
+- [tools] Delegating the potential loading error handling to PyMISP.
+  [Christian Studer]
+
+  - As PyMISP already handles properly the different
+    possible types of input given to `from_dict`, it
+    makes more sense here to test whether the type
+    we're expecting is NOT one of the PyMISP classes
+- [tools] Making sure the `edited` flag is not modified during the
+  validation. [Christian Studer]
+
+  - As validation should not be a change per se, we
+    do not want the `edited` flag to be set when we
+    set the value field in attributes, or the
+    `Attribute` field in MISP objects
+  - This avoids `timestamp` fields to be skipped
+    when using `.to_json()`
+- [tests] Making nosetests happy. [Christian Studer]
+- [tests] Typings again... [Christian Studer]
+- [tools] Avoiding validation to fail on `datetime` attributes being
+  already a datetime object. [Christian Studer]
+- [tools] Making nosetests happy with typings... [Christian Studer]
+- [tools] Avoiding typing warnings. [Christian Studer]
+- [tools] Populating validation error messages to make them available
+  outside of the single cli scope. [Christian Studer]
+- [tools] making codefactor happy by removing an `except .. pass`
+  [Christian Studer]
+- [tools] Removed `;` that were copy pasted from php by mistake.
+  [Christian Studer]
+- [tools] Trying to make nosetests happy (?) [Christian Studer]
+- [tools] Fixed variable name. [Christian Studer]
+- [tools] Fixed validation for `mac-addres`, `mac-eui-64` & `telfhash`
+  attributes. [Christian Studer]
+- [tools] Making sure we multiply integer and not a string... [Christian
+  Studer]
+- [tools] Fixed validation of some composite attributes. [Christian
+  Studer]
+
+  - Avoiding issues with wrong composite attribute
+    value format
+- [tools] Fixed modification for non str values and filename|hash
+  attributes. [Christian Studer]
+
+  - Avoiding issues with non str values that don't
+    support some str built-in operations
+  - Avoiding issues with wrong filename|hash value
+    format
+- [tools] Fixed modification for `domain` and validation for `AS` &
+  `filename|hash` attributes. [Christian Studer]
+- Use is kwargs in constructors, improve typing. [Raphaël Vinot]
+
+  Fix #1375
+
+Other
+~~~~~
+- Updated describeTypes to match MISP's latest version. [Andras Iklody]
+- Add: [tests] Tests to check the latest methods added to validate
+  Attributes and Objects. [Christian Studer]
+- Add: [tools] Added methods to validate attribute(s) or object(s)
+  individually. [Christian Studer]
+- Add: [tests] Testing the Attribute validation tool. [Christian Studer]
+- Add: [tools] Added method to validate Attributes and Object Attributes
+  in events. [Christian Studer]
+
+  - Takes dict or MISPEvent as input
+  - Prepares the attribute values for validation
+  - Validates the attribute values
+  - Returns the validated Event with only valid Attributes
+  - Logs warning messages with the skipped values
+- Add: [tools] Added the refanging feature with the value modification
+  that happens before validation. [Christian Studer]
+- Add: [tools] Validating `uuid` attribute type. [Christian Studer]
+- Add: [tools] Attribute value valdation tool. [Christian Studer]
+
+  - Behaves like the built-in validation with
+    `modifyBeforeValidation` and `validate`
+  - Will include also the tooling to use this
+    validation on PyMISP objects or JSON format to
+    validate data that is not coming from MISP
+
+
 v2.5.32 (2026-01-14)
 --------------------
 
@@ -14,6 +118,7 @@ New
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - Bump doc. [Raphaël Vinot]
 - Remove outdated dep. [Raphaël Vinot]
