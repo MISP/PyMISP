@@ -23,6 +23,9 @@ class TestEmailObject(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls: type[T]) -> None:
+        with ZipFile(Path("tests/email_testfiles/mail_1_bom.eml.zip"), 'r') as myzip:
+            with myzip.open('mail_1_bom.eml', pwd=b'AVs are dumb') as myfile:
+                cls.msg_1_bom = BytesIO(myfile.read())
         with ZipFile(Path("tests/email_testfiles/mail_1.msg.zip"), 'r') as myzip:
             with myzip.open('mail_1.msg', pwd=b'AVs are dumb') as myfile:
                 cls.msg_1 = BytesIO(myfile.read())
@@ -93,7 +96,7 @@ class TestEmailObject(unittest.TestCase):
 
     def test_bom_encoded(self) -> None:
         """Test utf-8-sig encoded email"""
-        bom_email_object = EMailObject(Path("tests/email_testfiles/mail_1_bom.eml"))
+        bom_email_object = EMailObject(pseudofile=self.msg_1_bom)
         eml_email_object = EMailObject(pseudofile=self.eml_1)
 
         self.assertIsInstance(bom_email_object.email, EmailMessage)
