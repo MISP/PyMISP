@@ -178,6 +178,9 @@ class PyMISP:
             raise NoKey('Please provide your authorization key.')
 
         self.root_url: str = url
+        # Warn if using HTTP instead of HTTPS
+        if self.root_url.startswith('http://'):
+            logger.warning('Using HTTP instead of HTTPS for MISP connection. This may cause redirect issues. Consider using HTTPS.')
         self.key: str = key.strip()
         self.ssl: bool | str = ssl
         self.proxies: MutableMapping[str, str] | None = proxies
@@ -4136,7 +4139,7 @@ class PyMISP:
         logger.debug(prepped.headers)
         settings = self.__session.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None,
                                                              verify=self.ssl, cert=self.cert)
-        return self.__session.send(prepped, timeout=self.timeout, **settings)
+        return self.__session.send(prepped, timeout=self.timeout, allow_redirects=True, **settings)
 
     def _csv_to_dict(self, csv_content: str) -> list[dict[str, Any]]:
         '''Makes a list of dict out of a csv file (requires headers)'''
