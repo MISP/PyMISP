@@ -4136,7 +4136,7 @@ class PyMISP:
         logger.debug(prepped.headers)
         settings = self.__session.merge_environment_settings(req.url, proxies=self.proxies or {}, stream=None,
                                                              verify=self.ssl, cert=self.cert)
-        return self.__session.send(prepped, timeout=self.timeout, **settings)
+        return self.__session.send(prepped, timeout=self.timeout, allow_redirects=True, **settings)
 
     def _csv_to_dict(self, csv_content: str) -> list[dict[str, Any]]:
         '''Makes a list of dict out of a csv file (requires headers)'''
