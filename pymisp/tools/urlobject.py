@@ -26,9 +26,9 @@ class URLObject(AbstractMISPObjectGenerator):
         super().__init__('url', **kwargs)
         self._generate_all = True if generate_all is True else False
         if not HAS_FAUP_RS:
-            faup.decode(unquote_plus(url))
+            faup.decode(unquote_plus(url).strip())
         else:
-            self.parsed_url = Url(unquote_plus(url))
+            self.parsed_url = Url(unquote_plus(url).strip())
         self.generate_attributes()
 
     def generate_attributes(self) -> None:
