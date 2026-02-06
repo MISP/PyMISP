@@ -8,6 +8,7 @@ from ipaddress import ip_address
 from urllib.parse import unquote_plus
 
 from .abstractgenerator import AbstractMISPObjectGenerator
+from ..exceptions import MISPObjectException
 
 try:
     from pyfaup import Url
@@ -25,11 +26,17 @@ class URLObject(AbstractMISPObjectGenerator):
     def __init__(self, url: str, generate_all=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__('url', **kwargs)
         self._generate_all = True if generate_all is True else False
-        if not HAS_FAUP_RS:
-            faup.decode(unquote_plus(url).strip())
+        if unquoted_url := unquote_plus(url).strip():
+            try:
+                if not HAS_FAUP_RS:
+                    faup.decode(unquoted_url)
+                else:
+                    self.parsed_url = Url(unquoted_url)
+            except Exception as e:
+                raise MISPObjectException(f'Invalid URL ({unquoted_url}): {e}')
+            self.generate_attributes()
         else:
-            self.parsed_url = Url(unquote_plus(url).strip())
-        self.generate_attributes()
+            raise MISPObjectException('No URL provided (empty string)')
 
     def generate_attributes(self) -> None:
         if HAS_FAUP_RS:
