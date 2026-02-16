@@ -2,11 +2,26 @@ Changelog
 =========
 
 
+v2.5.32.3 (2026-02-16)
+----------------------
+
+Changes
+~~~~~~~
+- Expose MISPObjectException. [Raphaël Vinot]
+- Raise proper exception on invalid URL. [Raphaël Vinot]
+
+Fix
+~~~
+- Expose DataURLObject. [Raphaël Vinot]
+- Make sure we never have a \r at the endof a URL. [Raphaël Vinot]
+
+
 v2.5.32.2 (2026-02-02)
 ----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 
 Fix
