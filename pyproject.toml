@@ -25,7 +25,7 @@ documentation = "https://pymisp.readthedocs.io"
 [project.optional-dependencies]
 
 fileobjects = [
-    "pure-magic-rs (>=0.3.1)",
+    "pure-magic-rs (>=0.3.2)",
     "pydeep2 (>=0.5.1)",
     "lief (>=0.17.3)"
 ]
@@ -41,9 +41,9 @@ docs = [
     "myst-parser (>=5.0.0) ; python_version >= \"3.12\""
 ]
 
-pdfexport = [ "reportlab (>=4.4.9)" ]
+pdfexport = [ "reportlab (>=4.4.10)" ]
 
-url = [ "pyfaup-rs (>=0.1.2,<0.2.0)" ]
+url = [ "pyfaup-rs (>=0.3)" ]
 
 email = [
     "extract_msg (>=0.55.0)",
