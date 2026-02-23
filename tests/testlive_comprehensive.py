@@ -344,6 +344,32 @@ class TestComprehensive(unittest.TestCase):
             # *First*|Second|Third event
             event = self.admin_misp_connector.search_index(timestamp=ts, sort="info", desc=False, limit=1, pythonify=True)[0]  # type: ignore[index,assignment]
             self.assertEqual(event.id, first.id)
+
+            # Test date_from (which in turn proves date_to)
+            # Represented as date
+            event: MISPEvent = self.admin_misp_connector.search_index(
+                date_from=first.date,
+                eventinfo=first.info, limit=1, pythonify=True
+            )[0]
+            self.assertEqual(event.id, first.id)
+            # Represented as timestamp
+            event: MISPEvent = self.admin_misp_connector.search_index(
+                date_from=datetime.combine(first.date, datetime.min.time()).timestamp(),
+                eventinfo=first.info, limit=1, pythonify=True
+            )[0]
+            self.assertEqual(event.id, first.id)
+            # Represented as string
+            event: MISPEvent = self.admin_misp_connector.search_index(
+                date_from=first.date.strftime("%Y-%m-%d"),
+                eventinfo=first.info, limit=1, pythonify=True
+            )[0]
+            self.assertEqual(event.id, first.id)
+            # Check it actually works (increase date to lose match)
+            no_events = self.admin_misp_connector.search_index(
+                date_from=first.date + timedelta(days=1),
+                eventinfo=first.info, limit=1, pythonify=True
+            )
+            self.assertTrue(len(no_events) == 0)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
