@@ -16,7 +16,7 @@ if __name__ == '__main__':
                          'SharingGroup'}
     
     parser = argparse.ArgumentParser(description='Add a reference between two objects')
-    parser.add_argument("-o", "--object", help="The id, uuid or json of the object referencing.",required=True)
+    parser.add_argument("-o", "--object", help="The uuid of the object referencing.",required=True)
     parser.add_argument("-t", "--target-uuid", help="The uuid of the object referenced.",required=True)
     parser.add_argument("-r", "--relationship-type", help="The type of the relationship",required=True)
     parser.add_argument("--type", help="The type of the referenced object",required=True,choices=valid_object_type)
