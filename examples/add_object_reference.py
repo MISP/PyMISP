@@ -6,8 +6,9 @@ from keys import misp_url, misp_key, misp_verifycert
 import argparse
 
 # Suppress those "Unverified HTTPS request is being made"
-import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+if not misp_verifycert:
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add a reference between two objects')
