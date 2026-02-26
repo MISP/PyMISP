@@ -27,7 +27,7 @@ documentation = "https://pymisp.readthedocs.io"
 fileobjects = [
     "pure-magic-rs (>=0.3.2)",
     "pydeep2 (>=0.5.1)",
-    "lief (>=0.17.3)"
+    "lief (>=0.17.4)"
 ]
 
 openioc = [ "beautifulsoup4 (>=4.13.5,<4.14)" ]
@@ -35,7 +35,7 @@ openioc = [ "beautifulsoup4 (>=4.13.5,<4.14)" ]
 virustotal = [ "validators (>=0.35.0)" ]
 
 docs = [
-    "sphinx-autodoc-typehints (>=3.6.2) ; python_version >= \"3.12\"",
+    "sphinx-autodoc-typehints (>=3.8.0) ; python_version >= \"3.12\"",
     "sphinx (>=9.1.0) ; python_version >= \"3.12\"",
     "docutils (>=0.22.4) ; python_version >= \"3.12\"",
     "myst-parser (>=5.0.0) ; python_version >= \"3.12\""
