@@ -2,11 +2,27 @@ Changelog
 =========
 
 
+v2.5.33 (2026-02-27)
+--------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+
+Other
+~~~~~
+- Disable http warning only when no verifycert. [rdmmf]
+- Fixed argument parameter. [rdmmf]
+- Added examples for objects references and relationships. [rdmmf]
+
+
 v2.5.32.3 (2026-02-16)
 ----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Expose MISPObjectException. [Raphaël Vinot]
 - Raise proper exception on invalid URL. [Raphaël Vinot]
 
