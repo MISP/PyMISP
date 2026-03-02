@@ -141,7 +141,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
             misp_objects_path = Path(misp_objects_path)
         self.__misp_objects_path = misp_objects_path
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         """Loading all the parameters as class properties, if they aren't `None`.
         This method aims to be called when all the properties requiring a special
         treatment are processed.
@@ -154,7 +154,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
         # We load an existing dictionary, marking it an not-edited
         self.__edited = False
 
-    def update_not_jsonable(self, *args) -> None:  # type: ignore[no-untyped-def]
+    def update_not_jsonable(self, *args: Any) -> None:
         """Add entries to the __not_jsonable list"""
         self.__not_jsonable += args
 
@@ -162,7 +162,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
         """Set __not_jsonable to a new list"""
         self.__not_jsonable = args
 
-    def _remove_from_not_jsonable(self, *args) -> None:  # type: ignore[no-untyped-def]
+    def _remove_from_not_jsonable(self, *args: Any) -> None:
         """Remove the entries that are in the __not_jsonable list"""
         for entry in args:
             try:
@@ -331,7 +331,7 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
             return int(d)
         return int(d.timestamp())
 
-    def _add_tag(self, tag: str | MISPTag | Mapping[str, Any] | None = None, **kwargs):  # type: ignore[no-untyped-def]
+    def _add_tag(self, tag: str | MISPTag | Mapping[str, Any] | None = None, **kwargs: Any):  # type: ignore[no-untyped-def]
         """Add a tag to the attribute (by name or a MISPTag object)"""
         if isinstance(tag, str):
             misp_tag = MISPTag()
@@ -374,7 +374,7 @@ class MISPTag(AbstractMISP):
 
     _fields_for_feed: set[str] = {'name', 'colour', 'relationship_type', 'local'}
 
-    def __init__(self, force_timestamps: bool=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
         super().__init__(force_timestamps)
         self.name: str
         self.exportable: bool
@@ -384,7 +384,7 @@ class MISPTag(AbstractMISP):
         if kwargs:
             self.from_dict(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if kwargs.get('Tag'):
             kwargs = kwargs.get('Tag')
         super().from_dict(**kwargs)

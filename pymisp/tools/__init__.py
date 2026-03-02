@@ -12,8 +12,9 @@ from .fail2banobject import Fail2BanObject  # noqa
 from .domainipobject import DomainIPObject  # noqa
 from .asnobject import ASNObject  # noqa
 from .geolocationobject import GeolocationObject  # noqa
+from .dataurlobject import DataURLObject  # noqa
 from .git_vuln_finder_object import GitVulnFinderObject  # noqa
-from .attributevalidationtool import (  #noqa
+from .attributevalidationtool import (  # noqa
     AttributeValidationTool, validate_attribute, validate_attributes,
     validate_event, validate_object, validate_objects, ValidationError)
 
@@ -57,5 +58,5 @@ __all__ = ['VTReportObject', 'Neo4j', 'FileObject', 'make_binary_objects',
            'ELFSectionObject', 'MachOObject', 'MachOSectionObject',
            'AttributeValidationTool', 'validate_attribute', 'validate_attributes',
            'validate_event', 'validate_object', 'validate_objects',
-           'ValidationError'
+           'ValidationError', 'DataURLObject'
            ]
