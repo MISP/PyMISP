@@ -1,6 +1,6 @@
 [project]
 name = "pymisp"
-version = "2.5.33"
+version = "2.5.33.1"
 description = "Python API for MISP."
 authors = [
     {name="Raphaël Vinot", email="raphael.vinot@circl.lu"}
