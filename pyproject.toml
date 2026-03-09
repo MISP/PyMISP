@@ -53,6 +53,8 @@ email = [
 
 brotli = [ "urllib3[broti] (>=2.6.3)" ]
 
+neo4j = [ "neo4j (>=5.0)" ]
+
 [tool.poetry]
 classifiers=[
     'Development Status :: 5 - Production/Stable',
