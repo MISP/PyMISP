@@ -90,7 +90,7 @@ class TestNeo4j(unittest.TestCase):
 
         first_attribute = event.attributes[0]
         attribute_query, attribute_params = tx.run.call_args_list[1]
-        self.assertIn('MATCH (e:Event {{uuid: $event_uuid}})', attribute_query[0])
+        self.assertIn('MATCH (e:Event {uuid: $event_uuid})', attribute_query[0])
         self.assertIn('CREATE (attr:Attribute:$($attribute_type)', attribute_query[0])
         self.assertEqual(attribute_params, {
             'event_uuid': str(event.uuid),

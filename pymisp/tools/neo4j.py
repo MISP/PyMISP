@@ -50,8 +50,8 @@ class Neo4j():
                     print(f"Warning: Attribute type '{a.type}' sanitized to '{safe_type}'")
 
                 tx.run(
-                    "MATCH (e:Event {{uuid: $event_uuid}}) " # Find the Event node by uuid reate 
-                    "CREATE (attr:Attribute:$($attribute_type) {{uuid: $uuid, category: $category, name: $value}}) " # Create an Attribute node with the sanitized type as a label
+                    "MATCH (e:Event {uuid: $event_uuid}) " # Find the Event node by uuid reate 
+                    "CREATE (attr:Attribute:$($attribute_type) {uuid: $uuid, category: $category, name: $value}) " # Create an Attribute node with the sanitized type as a label
                     "CREATE (e)-[:`is member`]->(attr)", # Then create a relationship (is member) between the Event and Attribute
                     event_uuid=str(event.uuid), uuid=str(a.uuid),
                     category=a.category, value=a.value, attribute_type=safe_type
@@ -64,7 +64,6 @@ class Neo4j():
                     "MERGE (attr)-[:is]->(v)",
                     event_uuid=str(event.uuid), attr_uuid=str(a.uuid), value=a.value
                 )
-
 
         with self.driver.session() as session:
             session.execute_write(_tx)
