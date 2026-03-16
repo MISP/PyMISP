@@ -53,7 +53,7 @@ email = [
 
 brotli = [ "urllib3[broti] (>=2.6.3)" ]
 
-neo4j = [ "neo4j (>=5.0)" ]
+neo4j = [ "neo4j (>=5.26)" ]
 
 [tool.poetry]
 classifiers=[
