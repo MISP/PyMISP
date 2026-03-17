@@ -2,11 +2,24 @@ Changelog
 =========
 
 
+v2.5.33.1 (2026-03-03)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+
+Fix
+~~~
+- Bump pyfaup-rs, backward incompatible. [Raphaël Vinot]
+
+
 v2.5.33 (2026-02-27)
 --------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 

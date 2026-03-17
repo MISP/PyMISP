@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from ipaddress import ip_address
+from typing import Any
 from urllib.parse import unquote_plus
 
 from .abstractgenerator import AbstractMISPObjectGenerator
@@ -23,7 +24,7 @@ logger = logging.getLogger('pymisp')
 
 class URLObject(AbstractMISPObjectGenerator):
 
-    def __init__(self, url: str, generate_all=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def __init__(self, url: str, generate_all: bool=False, **kwargs: Any) -> None:
         super().__init__('url', **kwargs)
         self._generate_all = True if generate_all is True else False
         if unquoted_url := unquote_plus(url).strip():
@@ -41,22 +42,23 @@ class URLObject(AbstractMISPObjectGenerator):
     def generate_attributes(self) -> None:
         if HAS_FAUP_RS:
             self.add_attribute('url', value=self.parsed_url.orig)
-            self.add_attribute('host', value=self.parsed_url.host)
-            self.add_attribute('domain', value=self.parsed_url.domain)
-            if self._generate_all:
-                try:
-                    ip = ip_address(self.parsed_url.host)
-                    self.add_attribute('ip', value=str(ip))
-                except Exception:
-                    # not an IP
-                    pass
-                self.add_attribute('fragment', value=self.parsed_url.fragment)
-                self.add_attribute('port', value=self.parsed_url.port)
-                self.add_attribute('query_string', value=self.parsed_url.query)
-                self.add_attribute('resource_path', value=self.parsed_url.path)
-                self.add_attribute('scheme', value=self.parsed_url.scheme)
-                self.add_attribute('tld', value=self.parsed_url.suffix)
-                self.add_attribute('subdomain', value=self.parsed_url.subdomain)
+            if host := self.parsed_url.host:
+                self.add_attribute('host', value=str(host))
+                self.add_attribute('domain', value=str(host.domain()))
+                if self._generate_all:
+                    try:
+                        ip = ip_address(str(host))
+                        self.add_attribute('ip', value=str(ip))
+                    except Exception:
+                        # not an IP
+                        pass
+                    self.add_attribute('fragment', value=self.parsed_url.fragment)
+                    self.add_attribute('port', value=self.parsed_url.port)
+                    self.add_attribute('query_string', value=self.parsed_url.query)
+                    self.add_attribute('resource_path', value=self.parsed_url.path)
+                    self.add_attribute('scheme', value=self.parsed_url.scheme)
+                    self.add_attribute('tld', value=host.suffix())
+                    self.add_attribute('subdomain', value=host.subdomain())
         else:
             self.add_attribute('url', value=faup.url.decode())
             if faup.get_host():
