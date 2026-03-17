@@ -34,13 +34,17 @@ class AnalystDataBehaviorMixin(AbstractMISP):
 
     # NOTE: edited here must be the property of Abstract MISP
 
-    def __init__(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.uuid: str  # Created in the child class
         self._analyst_data_object_type: str  # Must be defined in the child class
+        self.type: str  # Must be defined in the child class
         self.Note: list[MISPNote] = []
         self.Opinion: list[MISPOpinion] = []
         self.Relationship: list[MISPRelationship] = []
+
+        if kwargs:
+            self.from_dict(**kwargs)
 
     @property
     def analyst_data_object_type(self) -> str:
@@ -58,7 +62,7 @@ class AnalystDataBehaviorMixin(AbstractMISP):
     def relationships(self) -> list[MISPRelationship]:
         return self.Relationship
 
-    def add_note(self, note: str, language: str | None = None, **kwargs) -> MISPNote:  # type: ignore[no-untyped-def]
+    def add_note(self, note: str, language: str | None = None, **kwargs: Any) -> MISPNote:
         the_note = MISPNote()
         object_uuid = kwargs.pop('object_uuid', self.uuid)
         object_type = kwargs.pop('object_type', self.analyst_data_object_type)
@@ -70,7 +74,7 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         self.edited = True
         return the_note
 
-    def add_opinion(self, opinion: int, comment: str | None = None, **kwargs) -> MISPOpinion:  # type: ignore[no-untyped-def]
+    def add_opinion(self, opinion: int, comment: str | None = None, **kwargs: Any) -> MISPOpinion:
         the_opinion = MISPOpinion()
         object_uuid = kwargs.pop('object_uuid', self.uuid)
         object_type = kwargs.pop('object_type', self.analyst_data_object_type)
@@ -82,7 +86,7 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         self.edited = True
         return the_opinion
 
-    def add_relationship(self, related_object_type: AbstractMISP | str, related_object_uuid: str | None, relationship_type: str, **kwargs) -> MISPRelationship:  # type: ignore[no-untyped-def]
+    def add_relationship(self, related_object_type: AbstractMISP | str, related_object_uuid: str | None, relationship_type: str, **kwargs: Any) -> MISPRelationship:
         the_relationship = MISPRelationship()
         the_relationship.from_dict(
             related_object_type=related_object_type,
@@ -95,11 +99,11 @@ class AnalystDataBehaviorMixin(AbstractMISP):
         self.edited = True
         return the_relationship
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         # These members need a fully initialized class to be loaded properly
-        notes = kwargs.pop('Note', [])
-        opinions = kwargs.pop('Opinion', [])
-        relationships = kwargs.pop('Relationship', [])
+        notes: list[dict[str, Any]] = kwargs.pop('Note', [])
+        opinions: list[dict[str, Any]] = kwargs.pop('Opinion', [])
+        relationships: list[dict[str, Any]] = kwargs.pop('Relationship', [])
         super().from_dict(**kwargs)
         for note in notes:
             self.add_note(**note)
@@ -164,7 +168,7 @@ class MISPOrganisation(AbstractMISP):
         self.id: int
         self.name: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Organisation' in kwargs:
             kwargs = kwargs['Organisation']
         super().from_dict(**kwargs)
@@ -183,7 +187,7 @@ class MISPSharingGroupOrg(AbstractMISP):
         self.extend: bool
         self.Organisation: MISPOrganisation
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'SharingGroupOrg' in kwargs:
             kwargs = kwargs['SharingGroupOrg']
         if 'Organisation' in kwargs:
@@ -227,7 +231,7 @@ class MISPSharingGroup(AbstractMISP):
         self.SharingGroupOrg.append(misp_sgorg)
         return misp_sgorg
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'SharingGroupOrg' in kwargs:
             [self.add_sgorg(sgorg) for sgorg in kwargs.pop('SharingGroupOrg')]
         if 'SharingGroup' in kwargs:
@@ -258,7 +262,7 @@ class MISPShadowAttribute(AbstractMISP):
         self.type: str
         self.value: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'ShadowAttribute' in kwargs:
             kwargs = kwargs['ShadowAttribute']
         super().from_dict(**kwargs)
@@ -276,7 +280,7 @@ class MISPSighting(AbstractMISP):
         self.id: int
         self.value: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         """Initialize the MISPSighting from a dictionary
 
         :param value: Value of the attribute the sighting is related too. Pushing this object
@@ -333,6 +337,8 @@ class MISPAttribute(AnalystDataBehaviorMixin):
 
         self.expand: str
         self.timestamp: float | int | datetime
+        self.value: str
+        self.distribution: str | int
 
         # For search
         self.Event: MISPEvent
@@ -341,7 +347,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         # For malware sample
         self._malware_binary: BytesIO | None
 
-    def add_tag(self, tag: str | MISPTag | dict[str, Any] | None = None, **kwargs) -> MISPTag:  # type: ignore[no-untyped-def]
+    def add_tag(self, tag: str | MISPTag | dict[str, Any] | None = None, **kwargs: Any) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
@@ -354,7 +360,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         """Set a list of prepared MISPTag."""
         super()._set_tags(tags)
 
-    def add_galaxy(self, galaxy: MISPGalaxy | dict[str, Any] | None = None, **kwargs) -> MISPGalaxy:  # type: ignore[no-untyped-def]
+    def add_galaxy(self, galaxy: MISPGalaxy | dict[str, Any] | None = None, **kwargs: Any) -> MISPGalaxy:
         """Add a galaxy to the Attribute, either by passing a MISPGalaxy or a dictionary"""
         if isinstance(galaxy, MISPGalaxy):
             self.galaxies.append(galaxy)
@@ -523,11 +529,11 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         """Mark the attribute as deleted (soft delete)"""
         self.deleted = True
 
-    def add_proposal(self, shadow_attribute=None, **kwargs) -> MISPShadowAttribute:  # type: ignore[no-untyped-def]
+    def add_proposal(self, shadow_attribute: MISPShadowAttribute | dict[str, Any] | None=None, **kwargs: Any) -> MISPShadowAttribute:
         """Alias for add_shadow_attribute"""
         return self.add_shadow_attribute(shadow_attribute, **kwargs)
 
-    def add_shadow_attribute(self, shadow_attribute: MISPShadowAttribute | dict[str, Any] | None = None, **kwargs) -> MISPShadowAttribute:  # type: ignore[no-untyped-def]
+    def add_shadow_attribute(self, shadow_attribute: MISPShadowAttribute | dict[str, Any] | None = None, **kwargs: Any) -> MISPShadowAttribute:
         """Add a shadow attribute to the attribute (by name or a MISPShadowAttribute object)"""
         if isinstance(shadow_attribute, MISPShadowAttribute):
             misp_shadow_attribute = shadow_attribute
@@ -543,7 +549,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         self.edited = True
         return misp_shadow_attribute
 
-    def add_sighting(self, sighting: MISPSighting | dict[str, Any] | None = None, **kwargs) -> MISPSighting:  # type: ignore[no-untyped-def]
+    def add_sighting(self, sighting: MISPSighting | dict[str, Any] | None = None, **kwargs: Any) -> MISPSighting:
         """Add a sighting to the attribute (by name or a MISPSighting object)"""
         if isinstance(sighting, MISPSighting):
             misp_sighting = sighting
@@ -559,7 +565,7 @@ class MISPAttribute(AnalystDataBehaviorMixin):
         self.edited = True
         return misp_sighting
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Attribute' in kwargs:
             kwargs = kwargs['Attribute']
         if kwargs.get('type') and kwargs.get('category'):
@@ -732,7 +738,7 @@ class MISPObjectReference(AbstractMISP):
         if not hasattr(self, 'timestamp'):
             self.timestamp = datetime.timestamp(datetime.now())
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'ObjectReference' in kwargs:
             kwargs = kwargs['ObjectReference']
         super().from_dict(**kwargs)
@@ -751,8 +757,8 @@ class MISPObject(AnalystDataBehaviorMixin):
 
     _analyst_data_object_type = 'Object'
 
-    def __init__(self, name: str, strict: bool = False, standalone: bool = True,  # type: ignore[no-untyped-def]
-                 default_attributes_parameters: dict[str, Any] = {}, **kwargs) -> None:
+    def __init__(self, name: str, strict: bool = False, standalone: bool = True,
+                 default_attributes_parameters: dict[str, Any] = {}, force_timestamps: bool=False, **kwargs: Any) -> None:
         ''' Master class representing a generic MISP object
 
         :param name: Name of the object
@@ -763,7 +769,7 @@ class MISPObject(AnalystDataBehaviorMixin):
         :param misp_objects_path_custom: Path to custom object templates
         :param misp_objects_template_custom: Template of the object. Expects the content (dict, loaded with json.load or json.loads) of a template definition file, see repository MISP/misp-objects.
         '''
-        super().__init__(**kwargs)
+        super().__init__(force_timestamps)
         self._strict: bool = strict
         self.name: str = name
         self._known_template: bool = False
@@ -813,6 +819,10 @@ class MISPObject(AnalystDataBehaviorMixin):
             self.distribution = 5  # Default to inherit
             self.sharing_group_id = 0
         self.standalone = standalone
+
+        # NOTE: enabling that makes the test fail, but it's fine, it was never supported anyway.
+        # if kwargs:
+        #     self.from_dict(**kwargs)
 
     def _load_template_path(self, template_path: Path | str) -> bool:
         template = self._load_json(template_path)
@@ -944,7 +954,7 @@ class MISPObject(AnalystDataBehaviorMixin):
         else:
             pass
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Object' in kwargs:
             kwargs = kwargs['Object']
         if self._known_template:
@@ -1009,7 +1019,7 @@ class MISPObject(AnalystDataBehaviorMixin):
 
         super().from_dict(**kwargs)
 
-    def add_reference(self, referenced_uuid: AbstractMISP | str, relationship_type: str, comment: str | None = None, **kwargs) -> MISPObjectReference:  # type: ignore[no-untyped-def]
+    def add_reference(self, referenced_uuid: AbstractMISP | str, relationship_type: str, comment: str | None = None, **kwargs: Any) -> MISPObjectReference:
         """Add a link (uuid) to another object"""
         if isinstance(referenced_uuid, AbstractMISP):
             # Allow to pass an object or an attribute instead of its UUID
@@ -1178,11 +1188,13 @@ class MISPEventReport(AnalystDataBehaviorMixin):
 
     timestamp: float | int | datetime
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.uuid: str = str(uuid.uuid4())
+        if kwargs:
+            self.from_dict(**kwargs)
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'EventReport' in kwargs:
             kwargs = kwargs['EventReport']
 
@@ -1265,7 +1277,7 @@ class MISPGalaxyClusterElement(AbstractMISP):
                               "Instead, create seperate elements for each value")
         super().__setattr__(key, value)
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if kwargs.get('id'):
             self.id = int(kwargs.pop('id'))
         if kwargs.get('galaxy_cluster_id'):
@@ -1299,7 +1311,7 @@ class MISPGalaxyClusterRelation(AbstractMISP):
         self.referenced_galaxy_cluster_type: str
         self.Tag: list[MISPTag] = []
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         # Default values for a valid event to send to a MISP instance
         self.distribution = int(kwargs.pop('distribution', 0))
         if self.distribution not in [0, 1, 2, 3, 4, 5]:
@@ -1335,7 +1347,7 @@ class MISPGalaxyClusterRelation(AbstractMISP):
             self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
         super().from_dict(**kwargs)
 
-    def add_tag(self, tag: str | MISPTag | dict[str, Any] | None = None, **kwargs) -> MISPTag:  # type: ignore[no-untyped-def]
+    def add_tag(self, tag: str | MISPTag | dict[str, Any] | None = None, **kwargs: Any) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
@@ -1424,7 +1436,7 @@ class MISPGalaxyCluster(AbstractMISP):
             response[element.key].append(element.value)
         return dict(response)
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'GalaxyCluster' in kwargs:
             kwargs = kwargs['GalaxyCluster']
         self.default = kwargs.pop('default', False)
@@ -1474,7 +1486,7 @@ class MISPGalaxyCluster(AbstractMISP):
             self.SharingGroup.from_dict(**kwargs.pop('SharingGroup'))
         super().from_dict(**kwargs)
 
-    def add_cluster_element(self, key: str, value: str, **kwargs) -> MISPGalaxyClusterElement:  # type: ignore[no-untyped-def]
+    def add_cluster_element(self, key: str, value: str, **kwargs: Any) -> MISPGalaxyClusterElement:
         """Add a cluster relation to a MISPGalaxyCluster, key and value are required
 
         :param key: The key name of the element
@@ -1488,7 +1500,7 @@ class MISPGalaxyCluster(AbstractMISP):
         self.cluster_elements.append(cluster_element)
         return cluster_element
 
-    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: MISPGalaxyCluster | str | UUID, referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: str | None = None, **kwargs: dict[str, Any]) -> MISPGalaxyClusterRelation:
+    def add_cluster_relation(self, referenced_galaxy_cluster_uuid: MISPGalaxyCluster | str | UUID, referenced_galaxy_cluster_type: str, galaxy_cluster_uuid: str | None = None, **kwargs: Any) -> MISPGalaxyClusterRelation:
         """Add a cluster relation to a MISPGalaxyCluster.
 
         :param referenced_galaxy_cluster_uuid: UUID of the related cluster
@@ -1531,7 +1543,7 @@ class MISPGalaxy(AbstractMISP):
         self.GalaxyCluster: list[MISPGalaxyCluster] = []
         self.name: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         """Galaxy could be in one of the following formats:
         {'Galaxy': {}, 'GalaxyCluster': []}
         {'Galaxy': {'GalaxyCluster': []}}
@@ -1549,7 +1561,7 @@ class MISPGalaxy(AbstractMISP):
     def clusters(self) -> list[MISPGalaxyCluster]:
         return self.GalaxyCluster
 
-    def add_galaxy_cluster(self, **kwargs) -> MISPGalaxyCluster:  # type: ignore[no-untyped-def]
+    def add_galaxy_cluster(self, **kwargs: Any) -> MISPGalaxyCluster:
         """Add a MISP galaxy cluster into a MISPGalaxy.
         Supports all other parameters supported by MISPGalaxyCluster"""
 
@@ -1572,8 +1584,11 @@ class MISPEvent(AnalystDataBehaviorMixin):
 
     _analyst_data_object_type = 'Event'
 
-    def __init__(self, describe_types: dict[str, Any] | None = None, strict_validation: bool = False, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        super().__init__(**kwargs)
+    info: str
+    distribution: str | int
+
+    def __init__(self, describe_types: dict[str, Any] | None = None, strict_validation: bool = False, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.__schema_file = 'schema.json' if strict_validation else 'schema-lax.json'
 
         if describe_types:
@@ -1595,7 +1610,10 @@ class MISPEvent(AnalystDataBehaviorMixin):
         self.publish_timestamp: float | int | datetime
         self.timestamp: float | int | datetime
 
-    def add_tag(self, tag: str | MISPTag | dict[str, Any] | None = None, **kwargs) -> MISPTag:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def add_tag(self, tag: str | MISPTag | dict[str, Any] | None = None, **kwargs: Any) -> MISPTag:
         return super()._add_tag(tag, **kwargs)
 
     @property
@@ -1879,7 +1897,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
         else:
             raise NewEventError(f'Invalid format for the date: {type(d)} - {d}')
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Event' in kwargs:
             kwargs = kwargs['Event']
         # Required value
@@ -1971,11 +1989,11 @@ class MISPEvent(AnalystDataBehaviorMixin):
 
         return to_return
 
-    def add_proposal(self, shadow_attribute=None, **kwargs) -> MISPShadowAttribute:  # type: ignore[no-untyped-def]
+    def add_proposal(self, shadow_attribute: MISPShadowAttribute | dict[str, Any] | None=None, **kwargs: Any) -> MISPShadowAttribute:
         """Alias for add_shadow_attribute"""
         return self.add_shadow_attribute(shadow_attribute, **kwargs)
 
-    def add_shadow_attribute(self, shadow_attribute=None, **kwargs) -> MISPShadowAttribute:  # type: ignore[no-untyped-def]
+    def add_shadow_attribute(self, shadow_attribute: MISPShadowAttribute | dict[str, Any] | None=None, **kwargs: Any) -> MISPShadowAttribute:
         """Add a tag to the attribute (by name or a MISPTag object)"""
         if isinstance(shadow_attribute, MISPShadowAttribute):
             misp_shadow_attribute = shadow_attribute
@@ -2046,7 +2064,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
         else:
             raise PyMISPError(f'No attribute with UUID/ID {attribute_id} found.')
 
-    def add_attribute(self, type: str, value: str | int | float, **kwargs) -> MISPAttribute | list[MISPAttribute]:  # type: ignore[no-untyped-def]
+    def add_attribute(self, type: str, value: str | int | float, **kwargs: Any) -> MISPAttribute | list[MISPAttribute]:
         """Add an attribute. type and value are required but you can pass all
         other parameters supported by MISPAttribute"""
         attr_list: list[MISPAttribute] = []
@@ -2061,7 +2079,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
             return attr_list
         return attribute
 
-    def add_event_report(self, name: str, content: str, **kwargs) -> MISPEventReport:  # type: ignore[no-untyped-def]
+    def add_event_report(self, name: str, content: str, **kwargs: Any) -> MISPEventReport:
         """Add an event report. name and value are requred but you can pass all
         other parameters supported by MISPEventReport"""
         event_report = MISPEventReport()
@@ -2070,7 +2088,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
         self.edited = True
         return event_report
 
-    def add_cryprographic_key(self, parent_type: str, key_data: str, type: str, uuid: str, fingerprint: str, timestamp: str, **kwargs) -> MISPCryptographicKey:  # type: ignore[no-untyped-def]
+    def add_cryprographic_key(self, parent_type: str, key_data: str, type: str, uuid: str, fingerprint: str, timestamp: str, **kwargs: Any) -> MISPCryptographicKey:
         """Add a Cryptographic Key. parent_type, key_data, type, uuid, fingerprint, timestamp are required but you can pass all
         other parameters supported by MISPEventReport"""
         cryptographic_key = MISPCryptographicKey()
@@ -2079,7 +2097,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
         self.edited = True
         return cryptographic_key
 
-    def add_galaxy(self, galaxy: MISPGalaxy | dict[str, Any] | None = None, **kwargs) -> MISPGalaxy:  # type: ignore[no-untyped-def]
+    def add_galaxy(self, galaxy: MISPGalaxy | dict[str, Any] | None = None, **kwargs: Any) -> MISPGalaxy:
         """Add a galaxy and sub-clusters into an event, either by passing
         a MISPGalaxy or a dictionary.
         Supports all other parameters supported by MISPGalaxy"""
@@ -2144,7 +2162,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
                 objects.append(obj)
         return objects
 
-    def add_object(self, obj: MISPObject | dict[str, Any] | None = None, **kwargs) -> MISPObject:  # type: ignore[no-untyped-def]
+    def add_object(self, obj: MISPObject | dict[str, Any] | None = None, **kwargs: Any) -> MISPObject:
         """Add an object to the Event, either by passing a MISPObject, or a dictionary"""
         if isinstance(obj, MISPObject):
             misp_obj = obj
@@ -2209,7 +2227,7 @@ class MISPEvent(AnalystDataBehaviorMixin):
 
 class MISPObjectTemplate(AbstractMISP):
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'ObjectTemplate' in kwargs:
             kwargs = kwargs['ObjectTemplate']
         super().from_dict(**kwargs)
@@ -2222,12 +2240,15 @@ class MISPUser(AbstractMISP):
 
     authkey: str
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.email: str
         self.password: str | None
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'User' in kwargs:
             kwargs = kwargs['User']
         super().from_dict(**kwargs)
@@ -2244,7 +2265,7 @@ class MISPFeed(AbstractMISP):
 
     settings: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Feed' in kwargs:
             kwargs = kwargs['Feed']
         super().from_dict(**kwargs)
@@ -2258,14 +2279,14 @@ class MISPFeed(AbstractMISP):
 
 class MISPWarninglist(AbstractMISP):
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Warninglist' in kwargs:
             kwargs = kwargs['Warninglist']
         super().from_dict(**kwargs)
 
 
 class MISPCryptographicKey(AbstractMISP):
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'CryptographicKey' in kwargs:
             kwargs = kwargs['CryptographicKey']
         super().from_dict(**kwargs)
@@ -2276,7 +2297,7 @@ class MISPTaxonomy(AbstractMISP):
     enabled: bool
     namespace: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Taxonomy' in kwargs:
             kwargs = kwargs['Taxonomy']
         super().from_dict(**kwargs)
@@ -2287,7 +2308,7 @@ class MISPTaxonomy(AbstractMISP):
 
 class MISPNoticelist(AbstractMISP):
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Noticelist' in kwargs:
             kwargs = kwargs['Noticelist']
         super().from_dict(**kwargs)
@@ -2295,7 +2316,7 @@ class MISPNoticelist(AbstractMISP):
 
 class MISPCorrelationExclusion(AbstractMISP):
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'CorrelationExclusion' in kwargs:
             kwargs = kwargs['CorrelationExclusion']
         super().from_dict(**kwargs)
@@ -2303,8 +2324,8 @@ class MISPCorrelationExclusion(AbstractMISP):
 
 class MISPRole(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.name: str
         self.perm_add: bool
         self.perm_modify: bool
@@ -2339,7 +2360,10 @@ class MISPRole(AbstractMISP):
         self.permission: str
         self.permission_description: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Role' in kwargs:
             kwargs = kwargs['Role']
         super().from_dict(**kwargs)
@@ -2350,7 +2374,7 @@ class MISPRole(AbstractMISP):
 
 class MISPServer(AbstractMISP):
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Server' in kwargs:
             kwargs = kwargs['Server']
         super().from_dict(**kwargs)
@@ -2358,13 +2382,16 @@ class MISPServer(AbstractMISP):
 
 class MISPLog(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.model: str
         self.action: str
         self.title: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Log' in kwargs:
             kwargs = kwargs['Log']
         super().from_dict(**kwargs)
@@ -2375,13 +2402,16 @@ class MISPLog(AbstractMISP):
 
 class MISPEventDelegation(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.org_id: int
         self.requester_org_id: int
         self.event_id: int
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'EventDelegation' in kwargs:
             kwargs = kwargs['EventDelegation']
         super().from_dict(**kwargs)
@@ -2396,11 +2426,11 @@ class MISPObjectAttribute(MISPAttribute):
                                   'deleted', 'timestamp', 'to_ids', 'disable_correlation',
                                   'first_seen', 'last_seen', 'object_relation'}
 
-    def __init__(self, definition: dict[str, Any]) -> None:
-        super().__init__()
+    def __init__(self, definition: dict[str, Any], force_timestamps: bool=False) -> None:
+        super().__init__(force_timestamps)
         self._definition = definition
 
-    def from_dict(self, object_relation: str, value: str | int | float, **kwargs):  # type: ignore
+    def from_dict(self, object_relation: str='', value: str | int | float='', **kwargs: Any) -> None:
         # NOTE: Signature of "from_dict" incompatible with supertype "MISPAttribute"
         self.object_relation = object_relation
         self.value = value
@@ -2435,11 +2465,14 @@ class MISPObjectAttribute(MISPAttribute):
 
 class MISPCommunity(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.name: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Community' in kwargs:
             kwargs = kwargs['Community']
         super().from_dict(**kwargs)
@@ -2450,11 +2483,14 @@ class MISPCommunity(AbstractMISP):
 
 class MISPUserSetting(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.setting: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'UserSetting' in kwargs:
             kwargs = kwargs['UserSetting']
         super().from_dict(**kwargs)
@@ -2465,12 +2501,15 @@ class MISPUserSetting(AbstractMISP):
 
 class MISPInbox(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.data: dict[str, Any]
         self.type: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'Inbox' in kwargs:
             kwargs = kwargs['Inbox']
         super().from_dict(**kwargs)
@@ -2481,11 +2520,14 @@ class MISPInbox(AbstractMISP):
 
 class MISPEventBlocklist(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.event_uuid: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'EventBlocklist' in kwargs:
             kwargs = kwargs['EventBlocklist']
         super().from_dict(**kwargs)
@@ -2496,11 +2538,14 @@ class MISPEventBlocklist(AbstractMISP):
 
 class MISPOrganisationBlocklist(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.org_uuid: str
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'OrgBlocklist' in kwargs:
             kwargs = kwargs['OrgBlocklist']
         super().from_dict(**kwargs)
@@ -2511,12 +2556,15 @@ class MISPOrganisationBlocklist(AbstractMISP):
 
 class MISPDecayingModel(AbstractMISP):
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.uuid: str
         self.id: int
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
         if 'DecayingModel' in kwargs:
             kwargs = kwargs['DecayingModel']
         super().from_dict(**kwargs)
@@ -2570,8 +2618,8 @@ class MISPAnalystData(AbstractMISP):
             raise TypeError(f"only children of '{cls.__name__}' may be instantiated")
         return object.__new__(cls)
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
         self.uuid = str(uuid.uuid4())
         self.object_uuid: str
         self.object_type: str
@@ -2581,7 +2629,10 @@ class MISPAnalystData(AbstractMISP):
         self.SharingGroup: MISPSharingGroup
         self._analyst_data_object_type: str  # Must be defined in the child class
 
-    def add_note(self, note: str, language: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs: dict[str, Any]) -> MISPNote:
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def add_note(self, note: str, language: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs: Any) -> MISPNote:
         misp_note = MISPNote()
         if object_uuid is None:
             object_uuid = self.uuid
@@ -2602,7 +2653,7 @@ class MISPAnalystData(AbstractMISP):
         self.edited = True
         return misp_note
 
-    def add_opinion(self, opinion: int, comment: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs: dict[str, Any]) -> MISPOpinion:
+    def add_opinion(self, opinion: int, comment: str | None = None, object_uuid: str | None = None, object_type: str | None = None, parent: MISPEvent | MISPAttribute | MISPObject | MISPEventReport | None = None, **kwargs: Any) -> MISPOpinion:
         misp_opinion = MISPOpinion()
         if object_uuid is None:
             object_uuid = self.uuid
@@ -2623,9 +2674,9 @@ class MISPAnalystData(AbstractMISP):
         self.edited = True
         return misp_opinion
 
-    def from_dict(self, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        notes = kwargs.pop('Note', [])
-        opinions = kwargs.pop('Opinion', [])
+    def from_dict(self, contained: bool=False, **kwargs: Any) -> None:
+        notes: list[dict[str, Any]] = kwargs.pop('Note', [])
+        opinions: list[dict[str, Any]] = kwargs.pop('Opinion', [])
         self.__parent = kwargs.pop('parent', None)
         self.distribution = kwargs.pop('distribution', None)
         if self.distribution is not None:
@@ -2656,7 +2707,7 @@ class MISPAnalystData(AbstractMISP):
         if kwargs.get('id'):
             self.id = int(kwargs.pop('id'))
         if kwargs.get('created'):
-            ts = kwargs.pop('created')
+            ts: str = kwargs.pop('created')
             if isinstance(ts, datetime):
                 self.created = ts
             else:
@@ -2698,12 +2749,15 @@ class MISPNote(MISPAnalystData):
 
     _analyst_data_object_type = 'Note'
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
         self.note: str
         self.language: str
-        super().__init__(**kwargs)
+        super().__init__(force_timestamps)
 
-    def from_dict(self, contained=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, contained: bool=False, **kwargs: Any) -> None:
         if not contained and 'Note' in kwargs:
             kwargs = kwargs['Note']
         self.note = kwargs.pop('note', None)
@@ -2723,12 +2777,15 @@ class MISPOpinion(MISPAnalystData):
 
     _analyst_data_object_type = 'Opinion'
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
         self.opinion: int
         self.comment: str
-        super().__init__(**kwargs)
+        super().__init__(force_timestamps)
 
-    def from_dict(self, contained=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, contained: bool=False, **kwargs: Any) -> None:
         if not contained and 'Opinion' in kwargs:
             kwargs = kwargs['Opinion']
         self.opinion = kwargs.pop('opinion', None)
@@ -2757,13 +2814,16 @@ class MISPRelationship(MISPAnalystData):
 
     _analyst_data_object_type = 'Relationship'
 
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
         self.related_object_uuid: str
         self.related_object_type: str
         self.relationship_type: str
-        super().__init__(**kwargs)
+        super().__init__(force_timestamps)
 
-    def from_dict(self, contained=False, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, contained: bool=False, **kwargs: Any) -> None:
         if not contained and 'Relationship' in kwargs:
             kwargs = kwargs['Relationship']
         self.related_object_type = kwargs.pop('related_object_type', None)

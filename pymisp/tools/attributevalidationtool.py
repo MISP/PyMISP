@@ -321,7 +321,7 @@ class AttributeValidationTool:
                     return True
                 return 'Unknown HTTP method.'
             case 'filename|pehash':
-                if re.fullmatch(r'^.+\|[0-9a-f]{40}$#', value):
+                if re.fullmatch(r'^.+\|[0-9a-f]{40}$', value):
                     return True
                 return (
                     "The input doesn't match the expected filename|sha1 format "

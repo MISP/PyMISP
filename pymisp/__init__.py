@@ -32,7 +32,9 @@ Response (if any):
 try:
     warning_2024()
     from .exceptions import (PyMISPError, NewEventError, NewAttributeError, MissingDependency, NoURL, NoKey, # noqa
-                             InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError, PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse)
+                             InvalidMISPObject, UnknownMISPObjectTemplate, PyMISPInvalidFormat, MISPServerError,
+                             PyMISPNotImplementedYet, PyMISPUnexpectedResponse, PyMISPEmptyResponse,
+                             MISPObjectException)
     from .abstract import AbstractMISP, MISPEncode, pymisp_json_default, MISPTag, Distribution, ThreatLevel, Analysis # noqa
     from .mispevent import (MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, # noqa
                             MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy,
@@ -79,5 +81,5 @@ __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPGalaxyClusterRelation', 'MISPNote', 'MISPOpinion', 'MISPRelationship',
            'PyMISPError', 'NewEventError', 'NewAttributeError', 'MISPServerError',
            'NoURL', 'NoKey', 'InvalidMISPObject', 'UnknownMISPObjectTemplate', 'PyMISPInvalidFormat',
-           'Distribution', 'ThreatLevel', 'Analysis', 'ExpandedPyMISP'
+           'Distribution', 'ThreatLevel', 'Analysis', 'ExpandedPyMISP', 'MISPObjectException'
            ]
