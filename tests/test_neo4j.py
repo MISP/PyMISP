@@ -15,6 +15,8 @@ from pymisp import MISPEvent
 from pymisp.tools import neo4j as neo4j_tool_mod
 
 class TestNeo4j(unittest.TestCase):
+    fixture_path: Path
+    fixture_event: MISPEvent
 
     @classmethod
     def setUpClass(cls) -> None:

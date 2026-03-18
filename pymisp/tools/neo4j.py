@@ -3,14 +3,19 @@ from __future__ import annotations
 import glob
 import os
 import re
+import types
+from typing import TYPE_CHECKING
 
 from .. import MISPEvent
 
 try:
-    from neo4j import GraphDatabase  # type: ignore
+    from neo4j import GraphDatabase
     has_neo4j = True
 except ImportError:
     has_neo4j = False
+
+if TYPE_CHECKING:
+    from neo4j import ManagedTransaction
 
 
 class Neo4j():
@@ -20,11 +25,10 @@ class Neo4j():
             raise Exception('neo4j is required, please install: pip install neo4j')
         self.driver = GraphDatabase.driver(f"neo4j://{host}:{port}", auth=(username, password))
 
-
-    def __enter__(self):
+    def __enter__(self) -> Neo4j:
         return self
-    
-    def __exit__(self, exc_type, exc_value, traceback):
+
+    def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None, traceback: types.TracebackType | None) -> None:
         self.driver.close()
 
     def load_events_directory(self, directory: str) -> None:
@@ -39,7 +43,7 @@ class Neo4j():
             session.run("MATCH (n) DETACH DELETE n")
 
     def import_event(self, event: MISPEvent) -> None:
-        def _tx(tx) -> None:
+        def _tx(tx: ManagedTransaction) -> None:
             tx.run(
             "CREATE (e:Event {uuid: $uuid, name: $name})",    # Create the Event node with uuid and info as properties
             uuid=str(event.uuid), name=event.info
