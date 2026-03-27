@@ -1169,6 +1169,27 @@ testing = ["beautifulsoup4", "coverage[toml]", "defusedxml", "pygments (<2.20)",
 testing-docutils = ["pygments", "pytest (>=9,<10)", "pytest-param-files (>=0.6.0,<0.7.0)"]
 
 [[package]]
+name = "neo4j"
+version = "6.1.0"
+description = "Neo4j Bolt driver for Python"
+optional = true
+python-versions = ">=3.10"
+groups = ["main"]
+markers = "extra == \"neo4j\""
+files = [
+    {file = "neo4j-6.1.0-py3-none-any.whl", hash = "sha256:3bd93941f3a3559af197031157220af9fd71f4f93a311db687bd69ffa417b67d"},
+    {file = "neo4j-6.1.0.tar.gz", hash = "sha256:b5dde8c0d8481e7b6ae3733569d990dd3e5befdc5d452f531ad1884ed3500b84"},
+]
+
+[package.dependencies]
+pytz = "*"
+
+[package.extras]
+numpy = ["numpy (>=1.21.2,<3.0.0)"]
+pandas = ["numpy (>=1.21.2,<3.0.0)", "pandas (>=1.1.0,<3.0.0)"]
+pyarrow = ["pyarrow (>=6.0.0,<23.0.0)"]
+
+[[package]]
 name = "olefile"
 version = "0.47"
 description = "Python package to parse, read and write Microsoft OLE2 files (Structured Storage or Compound Document, Microsoft Office)"
@@ -1777,6 +1798,19 @@ files = [
 
 [package.dependencies]
 six = ">=1.5"
+
+[[package]]
+name = "pytz"
+version = "2026.1.post1"
+description = "World timezone definitions, modern and historical"
+optional = true
+python-versions = "*"
+groups = ["main"]
+markers = "extra == \"neo4j\""
+files = [
+    {file = "pytz-2026.1.post1-py2.py3-none-any.whl", hash = "sha256:f2fd16142fda348286a75e1a524be810bb05d444e5a081f37f7affc635035f7a"},
+    {file = "pytz-2026.1.post1.tar.gz", hash = "sha256:3378dde6a0c3d26719182142c56e60c7f9af7e968076f31aae569d72a0358ee1"},
+]
 
 [[package]]
 name = "pyyaml"
@@ -2559,6 +2593,7 @@ brotli = ["urllib3"]
 docs = ["docutils", "myst-parser", "sphinx", "sphinx-autodoc-typehints"]
 email = ["RTFDE", "extract_msg", "oletools"]
 fileobjects = ["lief", "pure-magic-rs", "pydeep2"]
+neo4j = ["neo4j"]
 openioc = ["beautifulsoup4"]
 pdfexport = ["reportlab"]
 url = ["pyfaup-rs"]
@@ -2567,4 +2602,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "140ab1eea0872bda2f61ce0d9f38c3314e8d21473d08fd98516070b5723d567a"
+content-hash = "e17718de9409be166901cded0b5eaac995831db4679ecde3f532002c3817a20f"

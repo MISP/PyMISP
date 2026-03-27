@@ -34,7 +34,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip poetry
-        poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport -E url -E email -E brotli -vvv
+        poetry install -E fileobjects -E openioc -E virustotal -E docs -E pdfexport -E url -E email -E brotli -E neo4j -vvv
 
     - name: Test with nosetests
       run: |
@@ -47,4 +47,4 @@ jobs:
         poetry run pytest --cov=pymisp tests/test_*.py
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6

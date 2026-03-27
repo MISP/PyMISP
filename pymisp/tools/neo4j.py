@@ -2,57 +2,72 @@ from __future__ import annotations
 
 import glob
 import os
+import re
+import types
+from typing import TYPE_CHECKING
 
 from .. import MISPEvent
 
 try:
-    from py2neo import authenticate, Graph, Node, Relationship  # type: ignore
-    has_py2neo = True
+    from neo4j import GraphDatabase
+    has_neo4j = True
 except ImportError:
-    has_py2neo = False
+    has_neo4j = False
+
+if TYPE_CHECKING:
+    from neo4j import ManagedTransaction
 
 
 class Neo4j():
 
-    def __init__(self, host: str='localhost:7474', username: str='neo4j', password: str='neo4j') -> None:
-        if not has_py2neo:
-            raise Exception('py2neo is required, please install: pip install py2neo')
-        authenticate(host, username, password)
-        self.graph = Graph(f"http://{host}/db/data/")
+    def __init__(self, host: str='localhost', port: int=7687, username: str='neo4j', password: str='neo4j') -> None:
+        if not has_neo4j:
+            raise Exception('neo4j is required, please install: pip install neo4j')
+        self.driver = GraphDatabase.driver(f"neo4j://{host}:{port}", auth=(username, password))
+
+    def __enter__(self) -> Neo4j:
+        return self
+
+    def __exit__(self, exc_type: type[BaseException] | None, exc_value: BaseException | None, traceback: types.TracebackType | None) -> None:
+        self.driver.close()
 
     def load_events_directory(self, directory: str) -> None:
         self.events: list[MISPEvent] = []
         for path in glob.glob(os.path.join(directory, '*.json')):
             e = MISPEvent()
-            e.load(path)
+            e.load_file(path)
             self.import_event(e)
 
     def del_all(self) -> None:
-        self.graph.delete_all()
+        with self.driver.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
 
     def import_event(self, event: MISPEvent) -> None:
-        tx = self.graph.begin()
-        event_node = Node('Event', uuid=event.uuid, name=event.info)
-        # event_node['distribution'] = event.distribution
-        # event_node['threat_level_id'] = event.threat_level_id
-        # event_node['analysis'] = event.analysis
-        # event_node['published'] = event.published
-        # event_node['date'] = event.date.isoformat()
-        tx.create(event_node)
-        for a in event.attributes:
-            attr_node = Node('Attribute', a.type, uuid=a.uuid)
-            attr_node['category'] = a.category
-            attr_node['name'] = a.value
-            # attr_node['to_ids'] = a.to_ids
-            # attr_node['comment'] = a.comment
-            # attr_node['distribution'] = a.distribution
-            tx.create(attr_node)
-            member_rel = Relationship(event_node, "is member", attr_node)
-            tx.create(member_rel)
-            val = Node('Value', name=a.value)
-            ev = Relationship(event_node, "has", val)
-            av = Relationship(attr_node, "is", val)
-            s = val | ev | av
-            tx.merge(s)
-            # tx.graph.push(s)
-        tx.commit()
+        def _tx(tx: ManagedTransaction) -> None:
+            tx.run(
+            "CREATE (e:Event {uuid: $uuid, name: $name})",    # Create the Event node with uuid and info as properties
+            uuid=str(event.uuid), name=event.info
+            )
+            for a in event.attributes:
+                safe_type = re.sub(r'[^A-Za-z0-9_]', '_', a.type) # Sanitisation - Neo4j labels must be alphanumeric or underscores
+                if safe_type != a.type:
+                    print(f"Warning: Attribute type '{a.type}' sanitized to '{safe_type}'")
+
+                tx.run(
+                    "MATCH (e:Event {uuid: $event_uuid}) " # Find the Event node by uuid reate 
+                    "CREATE (attr:Attribute:$($attribute_type) {uuid: $uuid, category: $category, name: $value}) " # Create an Attribute node with the sanitized type as a label
+                    "CREATE (e)-[:`is member`]->(attr)", # Then create a relationship (is member) between the Event and Attribute
+                    event_uuid=str(event.uuid), uuid=str(a.uuid),
+                    category=a.category, value=a.value, attribute_type=safe_type
+                )
+                tx.run(
+                    "MATCH (e:Event {uuid: $event_uuid}) " # Find the Event node by uuid 
+                    "MATCH (attr:Attribute {uuid: $attr_uuid}) " # Find the Attribute node by uuid
+                    "MERGE (v:Value {name: $value}) " # Merges a value node and adds has and is relationships below
+                    "MERGE (e)-[:has]->(v) "
+                    "MERGE (attr)-[:is]->(v)",
+                    event_uuid=str(event.uuid), attr_uuid=str(a.uuid), value=a.value
+                )
+
+        with self.driver.session() as session:
+            session.execute_write(_tx)
