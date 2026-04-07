@@ -227,9 +227,9 @@ class AttributeValidationTool:
                     return bool(value)
                 if isinstance(value, str):
                     value = value.lower()
-                    if value == 'true':
+                    if value in ('true', '1'):
                         return True
-                    if value == 'false':
+                    if value in ('false', '0'):
                         return False
                 return value
             case 'datetime':
