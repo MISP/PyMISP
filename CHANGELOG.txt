@@ -2,11 +2,54 @@ Changelog
 =========
 
 
+v2.5.33.2 (2026-04-21)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Bump deps. [Raphaël Vinot]
+- [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
+- Add neo4j in CI. [Raphaël Vinot]
+
+Fix
+~~~
+- [tools] Handling boolean values directly from MISP. [Christian Studer]
+- [tests] Updated STIX search test. [Christian Studer]
+
+  - Following recent changes on `misp-stix`
+
+Other
+~~~~~
+- Build(deps): bump codecov/codecov-action from 5 to 6.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 5 to 6.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v5...v6)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-version: '6'
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Updated poetry lock. [David Omurwa]
+- Updated dependancies and type annotations. [David Omurwa]
+- Review and improvements. [David Omurwa]
+- Changes to Fix #1327. [David Omurwa]
+- Fixes #1327 replacing py2neo with neo4j. [David Omurwa]
+
+
 v2.5.33.1 (2026-03-03)
 ----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 
 Fix
