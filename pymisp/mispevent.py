@@ -1138,7 +1138,7 @@ class MISPObject(AnalystDataBehaviorMixin):
             if isinstance(attribute, MISPAttribute):
                 a = self.add_attribute(object_relation, **attribute.to_dict())
             elif isinstance(attribute, dict):
-                a = self.add_attribute(object_relation, **attribute)  # type: ignore[misc]
+                a = self.add_attribute(object_relation, **attribute)
             else:
                 a = self.add_attribute(object_relation, value=attribute)
             to_return.append(a)
