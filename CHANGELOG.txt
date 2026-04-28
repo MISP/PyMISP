@@ -2,11 +2,25 @@ Changelog
 =========
 
 
+v2.5.34.1 (2026-04-28)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+
+Fix
+~~~
+- [attributevalidationtool] Validating new `suricata` attribute type.
+  [Christian Studer]
+
+
 v2.5.34 (2026-04-28)
 --------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - [misp-objects] Latest submodule version bump. [Christian Studer]
 - Make mypy happy. [Raphaël Vinot]
