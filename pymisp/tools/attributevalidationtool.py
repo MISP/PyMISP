@@ -451,8 +451,8 @@ class AttributeValidationTool:
                         "that don't include any forward or backward slashes are allowed."
                     )
                 return True
-            case ('mutex' | 'process-state' | 'snort' | 'bro' | 'zeek' |
-                  'community-id' | 'anonymised' | 'pattern-in-file' |
+            case ('mutex' | 'process-state' | 'snort' | 'suricata' | 'bro' |
+                  'zeek' | 'community-id' | 'anonymised' | 'pattern-in-file' |
                   'pattern-in-traffic' | 'pattern-in-memory' | 'filename-pattern' |
                   'pgp-public-key' | 'pgp-private-key' | 'yara' | 'stix2-pattern' |
                   'sigma' | 'gene' | 'kusto-query' | 'mime-type' |
