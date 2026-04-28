@@ -2,11 +2,24 @@ Changelog
 =========
 
 
+v2.5.34 (2026-04-28)
+--------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- [misp-objects] Latest submodule version bump. [Christian Studer]
+- Make mypy happy. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [describetypes] bump. [iglocska]
+
+
 v2.5.33.2 (2026-04-21)
 ----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - [misp-objects] updated to the latest version. [Alexandre Dulaunoy]
 - Bump deps. [Raphaël Vinot]
