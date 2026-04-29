@@ -41,7 +41,7 @@ docs = [
     "myst-parser (>=5.0.0) ; python_version >= \"3.12\""
 ]
 
-pdfexport = [ "reportlab (>=4.4.10)" ]
+pdfexport = [ "reportlab (>=4.5.0)" ]
 
 url = [ "pyfaup-rs (>=0.4,<0.5)" ]
 
