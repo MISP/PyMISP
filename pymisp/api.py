@@ -1933,7 +1933,7 @@ class PyMISP:
         # Set the UUID and version it extends from the existing galaxy cluster
         forked_galaxy_cluster.extends_uuid = forked_galaxy_cluster.pop('uuid')
         forked_galaxy_cluster.extends_version = forked_galaxy_cluster.pop('version')
-        r = self._prepare_request('POST', f'galaxy_clusters/add/{galaxy_id}/forkUUID:{cluster_id}', data=galaxy_cluster)
+        r = self._prepare_request('POST', f'galaxy_clusters/add/{galaxy_id}/forkUUID:{cluster_id}', data=forked_galaxy_cluster)
         cluster_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
             return cluster_j
