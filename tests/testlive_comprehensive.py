@@ -688,7 +688,14 @@ class TestComprehensive(unittest.TestCase):
             # we need to sleep here as per 2.5.40 we've moved the publish timestamp setting to the background process instead of front loading it.
             # The default tick rate of the background worker is 5s so 10 seconds should be safe-ish. (assuming no other fuck-ups)
             time.sleep(10)
-            
+
+            # The add_event response no longer carries the publish_timestamp (it is now set by the background
+            # publish job, not synchronously), so the events fetched above still hold publish_timestamp == 0,
+            # which pythonify leaves as a plain int rather than a datetime. Re-fetch them now that the worker
+            # has published so publish_timestamp is populated as a datetime for the .timestamp() calls below.
+            first = self.pub_misp_connector.get_event(first, pythonify=True)
+            second = self.pub_misp_connector.get_event(second, pythonify=True)
+
             # Test 5 sec before timestamp of 2nd event
             events = self.pub_misp_connector.search(publish_timestamp=(second.publish_timestamp.timestamp()), pythonify=True)
             self.assertEqual(len(events), 1)
