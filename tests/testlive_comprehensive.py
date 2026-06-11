@@ -685,6 +685,10 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(len(events), 1)
             self.assertEqual(events[0].id, second.id)
 
+            # we need to sleep here as per 2.5.40 we've moved the publish timestamp setting to the background process instead of front loading it.
+            # The default tick rate of the background worker is 5s so 10 seconds should be safe-ish. (assuming no other fuck-ups)
+            time.sleep(10)
+            
             # Test 5 sec before timestamp of 2nd event
             events = self.pub_misp_connector.search(publish_timestamp=(second.publish_timestamp.timestamp()), pythonify=True)
             self.assertEqual(len(events), 1)
