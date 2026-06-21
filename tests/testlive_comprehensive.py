@@ -1082,6 +1082,20 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
+    def test_event_no_sightings(self) -> None:
+        first = self.create_simple_event()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
+
+            with_s = self.user_misp_connector.get_event(first.id)
+            self.assertTrue(any(a.sightings for a in with_s.attributes))
+
+            without_s = self.user_misp_connector.get_event(first.id, no_sightings=True)
+            self.assertFalse(any(a.sightings for a in without_s.attributes))
+        finally:
+            self.admin_misp_connector.delete_event(first)
+
     def test_edit_attribute(self) -> None:
         first = self.create_simple_event()
         try:
