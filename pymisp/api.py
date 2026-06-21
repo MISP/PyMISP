@@ -3942,7 +3942,8 @@ class PyMISP:
         response = self._prepare_request('POST', 'tags/removeTagFromObject', data=to_post)
         return self._check_json_response(response)
 
-    def build_complex_query(self, or_parameters: list[SearchType] | None = None,
+    @staticmethod
+    def build_complex_query(or_parameters: list[SearchType] | None = None,
                             and_parameters: list[SearchType] | None = None,
                             not_parameters: list[SearchType] | None = None) -> dict[str, list[SearchType]]:
         '''Build a complex search query. MISP expects a dictionary with AND, OR and NOT keys.'''
