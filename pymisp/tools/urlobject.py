@@ -27,14 +27,14 @@ class URLObject(AbstractMISPObjectGenerator):
     def __init__(self, url: str, generate_all: bool=False, **kwargs: Any) -> None:
         super().__init__('url', **kwargs)
         self._generate_all = True if generate_all is True else False
-        if unquoted_url := unquote_plus(url).strip():
+        if striped_url := url.strip():
             try:
-                if not HAS_FAUP_RS:
-                    faup.decode(unquoted_url)
+                if HAS_FAUP_RS:
+                    self.parsed_url = Url(striped_url)
                 else:
-                    self.parsed_url = Url(unquoted_url)
+                    faup.decode(unquote_plus(striped_url))
             except Exception as e:
-                raise MISPObjectException(f'Invalid URL ({unquoted_url}): {e}')
+                raise MISPObjectException(f'Invalid URL ({striped_url}): {e}')
             self.generate_attributes()
         else:
             raise MISPObjectException('No URL provided (empty string)')
