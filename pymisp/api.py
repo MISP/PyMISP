@@ -414,6 +414,7 @@ class PyMISP:
     def get_event(self, event: MISPEvent | int | str | UUID,
                   deleted: bool | int | list[int] = False,
                   extended: bool | int = False,
+                  no_sightings: bool | int = False,
                   pythonify: bool = False) -> dict[str, Any] | MISPEvent:
         """Get an event from a MISP instance. Includes collections like
         Attribute, EventReport, Feed, Galaxy, Object, Tag, etc. so the
@@ -422,6 +423,7 @@ class PyMISP:
         :param event: event to get
         :param deleted: whether to include soft-deleted attributes
         :param extended: whether to get extended events
+        :param no_sightings: set to skip sightings on attributes (they're included by default)
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
         event_id = get_uuid_or_id_from_abstract_misp(event)
@@ -430,10 +432,13 @@ class PyMISP:
             data['deleted'] = deleted
         if extended:
             data['extended'] = extended
+        kw_params = {}
+        if no_sightings:
+            kw_params['noSightings'] = 1
         if data:
-            r = self._prepare_request('POST', f'events/view/{event_id}', data=data)
+            r = self._prepare_request('POST', f'events/view/{event_id}', data=data, kw_params=kw_params)
         else:
-            r = self._prepare_request('GET', f'events/view/{event_id}')
+            r = self._prepare_request('GET', f'events/view/{event_id}', kw_params=kw_params)
         event_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in event_r:
             return event_r
