@@ -257,7 +257,7 @@ def set_all_attributes(openioc, misp_event):
             childList = [child.find('context')['search'] for child in childs]
 
             def check_and_add(value1, value2):
-                if (value1 and value2) in childList:
+                if value1 in childList and value2 in childList:
                     if childs[0].find('context')['search'] == value1:
                         attribute_values = set_values(childs[0], childs[1])
                     else:
