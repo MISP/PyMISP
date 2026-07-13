@@ -27,7 +27,7 @@ documentation = "https://pymisp.readthedocs.io"
 fileobjects = [
     "pure-magic-rs (>=0.4.3)",
     "pydeep2 (>=0.5.1)",
-    "lief (>=0.17.6)"
+    "lief (>=1.0.0)"
 ]
 
 openioc = [ "beautifulsoup4 (>=4.13.5,<4.14)" ]
