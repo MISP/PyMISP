@@ -2135,6 +2135,11 @@ class PyMISP:
         response = self._prepare_request('GET', f'feeds/fetchFromFeed/{feed_id}')
         return self._check_json_response(response)
 
+    def fetch_all_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
+        """ Fetch all the feeds: https://www.misp-project.org/openapi/#tag/Feeds/operation/fetchFromAllFeeds"""
+        response = self._prepare_request('GET', f'feeds/fetchFromAllFeeds')
+        return self._check_json_response(response)
+
     def cache_all_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
         """ Cache all the feeds: https://www.misp-project.org/openapi/#tag/Feeds/operation/cacheFeeds"""
         response = self._prepare_request('GET', 'feeds/cacheFeeds/all')
