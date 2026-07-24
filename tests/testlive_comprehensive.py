@@ -2533,6 +2533,9 @@ class TestComprehensive(unittest.TestCase):
         # Cache all enabled feeds
         r = self.admin_misp_connector.cache_all_feeds()
         self.assertEqual(r['message'], 'Feed caching job initiated.')
+        # Fetch all enabled feeds
+        # Cannot test that, it fetches all the events.
+        # r = self.admin_misp_connector.fetch_all_feeds()
         # Compare all enabled feeds
         r = self.admin_misp_connector.compare_feeds()
         # FIXME: https://github.com/MISP/MISP/issues/4834#issuecomment-511890466
@@ -3522,7 +3525,6 @@ class TestComprehensive(unittest.TestCase):
             "favouriteTags/getToggleField",  # TODO
             "feeds/feedCoverage",
             "feeds/importFeeds",
-            "feeds/fetchFromAllFeeds",
             "feeds/getEvent",
             "feeds/previewIndex",  # TODO
             "feeds/previewEvent",  # TODO
