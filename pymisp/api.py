@@ -1073,7 +1073,7 @@ class PyMISP:
                     a.from_dict(**new_attribute['Attribute'])
                     to_return['attributes'].append(a)
             else:
-                for new_attr in new_attribute['Attribute']:
+                for new_attr in new_attribute.get('Attribute', []):
                     a = MISPAttribute()
                     a.from_dict(**new_attr)
                     to_return['attributes'].append(a)
