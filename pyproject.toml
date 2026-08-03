@@ -30,7 +30,7 @@ fileobjects = [
     "lief (>=1.0.0)"
 ]
 
-openioc = [ "beautifulsoup4 (>=4.13.5,<4.14)" ]
+openioc = [ "beautifulsoup4 (>=4.15.0)" ]
 
 virustotal = [ "validators (>=0.35.0)" ]
 
