@@ -1066,17 +1066,17 @@ class PyMISP:
             if 'errors' in new_attribute:
                 to_return['errors'] = new_attribute['errors']
 
-            if len(attribute) == 1:
-                # input list size 1 yields dict, not list of size 1
-                if 'Attribute' in new_attribute:
+            if 'Attribute' in new_attribute:
+                if len(attribute) == 1:
+                    # input list size 1 yields dict, not list of size 1
                     a = MISPAttribute()
                     a.from_dict(**new_attribute['Attribute'])
                     to_return['attributes'].append(a)
-            else:
-                for new_attr in new_attribute['Attribute']:
-                    a = MISPAttribute()
-                    a.from_dict(**new_attr)
-                    to_return['attributes'].append(a)
+                else:
+                    for new_attr in new_attribute['Attribute']:
+                        a = MISPAttribute()
+                        a.from_dict(**new_attr)
+                        to_return['attributes'].append(a)
             return to_return
 
         if ('errors' in new_attribute and new_attribute['errors'][0] == 403
