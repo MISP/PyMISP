@@ -1947,11 +1947,23 @@ class MISPEvent(AnalystDataBehaviorMixin):
         if kwargs.get('org_id'):
             self.org_id = int(kwargs.pop('org_id'))
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.fromtimestamp(int(kwargs.pop('timestamp')), timezone.utc)
+            ts = kwargs.pop('timestamp')
+            if isinstance(ts, datetime):
+                self.timestamp = ts
+            else:
+                self.timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
         if kwargs.get('publish_timestamp'):
-            self.publish_timestamp = datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), timezone.utc)
+            ts = kwargs.pop('publish_timestamp')
+            if isinstance(ts, datetime):
+                self.publish_timestamp = ts
+            else:
+                self.publish_timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
         if kwargs.get('sighting_timestamp'):
-            self.sighting_timestamp = datetime.fromtimestamp(int(kwargs.pop('sighting_timestamp')), timezone.utc)
+            ts = kwargs.pop('sighting_timestamp')
+            if isinstance(ts, datetime):
+                self.sighting_timestamp = ts
+            else:
+                self.sighting_timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('RelatedEvent'):
