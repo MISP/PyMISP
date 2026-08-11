@@ -7,7 +7,7 @@ import json
 from io import BytesIO
 import glob
 import hashlib
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from pymisp import (MISPAttribute, MISPEvent, MISPGalaxy, MISPObject, MISPOrganisation,
                     MISPSighting, MISPTag)
@@ -421,6 +421,20 @@ class TestMISPEvent(unittest.TestCase):
         me.attributes[0].first_seen = today
         self.assertEqual(me.attributes[0].first_seen.year, today.year)
         self.assertEqual(me.attributes[0].last_seen, now)
+
+    def test_event_datetime_timestamps(self) -> None:
+        me = MISPEvent()
+        timestamps = {'timestamp': datetime(2021, 1, 1, 12, 30),
+                      'publish_timestamp': datetime(2021, 1, 2, 12, 30),
+                      'sighting_timestamp': datetime(2021, 1, 3, 12, 30)}
+        me.from_dict(info='test', **timestamps)
+        for field, value in timestamps.items():
+            self.assertEqual(getattr(me, field), value)
+        # The integer/string timestamps from a MISP server must still work
+        me2 = MISPEvent()
+        me2.from_dict(info='test', timestamp='1609459200', publish_timestamp=1609545600)
+        self.assertEqual(me2.timestamp, datetime(2021, 1, 1, tzinfo=timezone.utc))
+        self.assertEqual(me2.publish_timestamp, datetime(2021, 1, 2, tzinfo=timezone.utc))
 
     def test_feed(self) -> None:
         me = MISPEvent()
