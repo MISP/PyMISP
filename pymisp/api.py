@@ -2889,7 +2889,7 @@ class PyMISP:
                published: bool | None = None,
                enforce_warninglist: bool | None = None, enforceWarninglist: bool | None = None,
                to_ids: ToIDSType | list[ToIDSType] | None = None,
-               deleted: str | None = None,
+               deleted: bool | int | list[int] | None = None,
                include_event_uuid: bool | None = None, includeEventUuid: bool | None = None,
                include_event_tags: bool | None = None, includeEventTags: bool | None = None,
                event_timestamp: datetime | date | int | str | float | None | None = None,
@@ -2937,7 +2937,7 @@ class PyMISP:
         :param published: Set whether published or unpublished events should be returned. Do not set the parameter if you want both.
         :param enforce_warninglist: Remove any attributes from the result that would cause a hit on a warninglist entry.
         :param to_ids: By default all attributes are returned that match the other filter parameters, regardless of their to_ids setting. To restrict the returned data set to to_ids only attributes set this parameter to 1. 0 for the ones with to_ids set to False.
-        :param deleted: If this parameter is set to 1, it will only return soft-deleted attributes. ["0", "1"] will return the active ones as well as the soft-deleted ones.
+        :param deleted: If this parameter is set to 1, it will only return soft-deleted attributes. [0, 1] will return the active ones as well as the soft-deleted ones.
         :param include_event_uuid: Instead of just including the event ID, also include the event UUID in each of the attributes.
         :param include_event_tags: Include the event level tags in each of the attributes.
         :param event_timestamp: Only return attributes from events that have received a modification after the given timestamp.
