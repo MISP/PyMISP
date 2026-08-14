@@ -3596,7 +3596,9 @@ class PyMISP:
         """
         to_post: str | bytes
         if path is not None:
-            if isinstance(path, (str, Path)):
+            if isinstance(path, (BytesIO, StringIO)):
+                to_post = path.getvalue()
+            elif isinstance(path, (str, Path)):
                 with open(path, 'rb') as f:
                     to_post = f.read()
             else:
