@@ -103,7 +103,7 @@ description = "Screen-scraping library"
 optional = true
 python-versions = ">=3.7.0"
 groups = ["main"]
-markers = "extra == \"openioc\" or extra == \"email\""
+markers = "extra == \"email\" or extra == \"openioc\""
 files = [
     {file = "beautifulsoup4-4.15.0-py3-none-any.whl", hash = "sha256:d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9"},
     {file = "beautifulsoup4-4.15.0.tar.gz", hash = "sha256:288e3ca7d54b06f2ac191970bc275c1939cb46d450b255bf6718b04aa37ab4f7"},
@@ -2125,15 +2125,15 @@ files = [
 
 [[package]]
 name = "reportlab"
-version = "5.0.0"
+version = "5.0.1"
 description = "The Reportlab Toolkit"
 optional = true
 python-versions = "<4,>=3.9"
 groups = ["main"]
 markers = "extra == \"pdfexport\""
 files = [
-    {file = "reportlab-5.0.0-py3-none-any.whl", hash = "sha256:9d5a3affa84919e1111ede580031266a570e93b1ce388219621347965ff1d93c"},
-    {file = "reportlab-5.0.0.tar.gz", hash = "sha256:e4494a0c6623ae213bb856fba523171b2b54a7bf629fda02d5e525a7b899a784"},
+    {file = "reportlab-5.0.1-py3-none-any.whl", hash = "sha256:1c36e6bb0e71780c72331eba60da7f602e8d4389a8723825af71342e49d791e8"},
+    {file = "reportlab-5.0.1.tar.gz", hash = "sha256:ebd13154be1c8515e665de70bd2d303ae9ddc3ef47e44afd5116441ca0283a26"},
 ]
 
 [package.dependencies]
@@ -2252,7 +2252,7 @@ description = "A modern CSS selector implementation for Beautiful Soup."
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "extra == \"openioc\" or extra == \"email\""
+markers = "extra == \"email\" or extra == \"openioc\""
 files = [
     {file = "soupsieve-2.9.2-py3-none-any.whl", hash = "sha256:8089a26fd974ca7a1f30276d3d8492ab266ab15af581642dfe8aa162e0c1c823"},
     {file = "soupsieve-2.9.2.tar.gz", hash = "sha256:4a55d8cf158a9c2e587fa4922f1bbb91d68ac829e2d6f25403a85747c71daf74"},
@@ -2635,7 +2635,7 @@ files = [
     {file = "typing_extensions-4.16.0-py3-none-any.whl", hash = "sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"},
     {file = "typing_extensions-4.16.0.tar.gz", hash = "sha256:dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5"},
 ]
-markers = {main = "platform_python_implementation != \"PyPy\" and (extra == \"email\" or extra == \"openioc\") or platform_system != \"Windows\" and platform_system != \"Darwin\" and (extra == \"email\" or extra == \"openioc\") or extra == \"openioc\" or extra == \"email\""}
+markers = {main = "extra == \"email\" or extra == \"openioc\""}
 
 [[package]]
 name = "tzdata"
@@ -2833,4 +2833,4 @@ virustotal = ["validators"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "cbf7818e8b4a7e437b0c53871f005ced28d779d0cffd3d666346729658dce895"
+content-hash = "1c6a7513051c7717d6553be5b59f2daca5c6f3e19ff5d6739ed51c4085900995"
