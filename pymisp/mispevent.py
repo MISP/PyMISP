@@ -1440,14 +1440,10 @@ class MISPGalaxyCluster(AbstractMISP):
         if 'GalaxyCluster' in kwargs:
             kwargs = kwargs['GalaxyCluster']
         self.default = kwargs.pop('default', False)
-        # If the default field is set, we shouldn't have distribution or sharing group ID set
-        if self.default:
-            blocked_fields = ["distribution", "sharing_group_id"]
-            for field in blocked_fields:
-                if kwargs.get(field, None):
-                    raise NewGalaxyClusterError(
-                        f"The field '{field}' cannot be set on a default galaxy cluster"
-                    )
+        # A default cluster always comes from a server, and MISP stores every
+        # default cluster with distribution 3 (all communities), so those fields
+        # are expected here rather than an error. They are not editable on a
+        # default cluster, which the server enforces on write.
 
         self.distribution = int(kwargs.pop('distribution', 0))
         if self.distribution not in [0, 1, 2, 3, 4]:
