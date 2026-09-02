@@ -2137,7 +2137,7 @@ class PyMISP:
         :param feed: feed to fetch
         """
         feed_id = get_uuid_or_id_from_abstract_misp(feed)
-        response = self._prepare_request('GET', f'feeds/fetchFromFeed/{feed_id}')
+        response = self._prepare_request('POST', f'feeds/fetchFromFeed/{feed_id}')
         return self._check_json_response(response)
 
     def fetch_all_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
@@ -2147,7 +2147,7 @@ class PyMISP:
 
     def cache_all_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
         """ Cache all the feeds: https://www.misp-project.org/openapi/#tag/Feeds/operation/cacheFeeds"""
-        response = self._prepare_request('GET', 'feeds/cacheFeeds/all')
+        response = self._prepare_request('POST', 'feeds/cacheFeeds/all')
         return self._check_json_response(response)
 
     def cache_feed(self, feed: MISPFeed | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
@@ -2156,17 +2156,17 @@ class PyMISP:
         :param feed: feed to cache
         """
         feed_id = get_uuid_or_id_from_abstract_misp(feed)
-        response = self._prepare_request('GET', f'feeds/cacheFeeds/{feed_id}')
+        response = self._prepare_request('POST', f'feeds/cacheFeeds/{feed_id}')
         return self._check_json_response(response)
 
     def cache_freetext_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Cache all the freetext feeds"""
-        response = self._prepare_request('GET', 'feeds/cacheFeeds/freetext')
+        response = self._prepare_request('POST', 'feeds/cacheFeeds/freetext')
         return self._check_json_response(response)
 
     def cache_misp_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Cache all the MISP feeds"""
-        response = self._prepare_request('GET', 'feeds/cacheFeeds/misp')
+        response = self._prepare_request('POST', 'feeds/cacheFeeds/misp')
         return self._check_json_response(response)
 
     def compare_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
@@ -2281,7 +2281,7 @@ class PyMISP:
             url = f'servers/pull/{server_id}/{event_id}'
         else:
             url = f'servers/pull/{server_id}'
-        response = self._prepare_request('GET', url)
+        response = self._prepare_request('POST', url)
         # FIXME: can we pythonify?
         return self._check_json_response(response)
 
@@ -2297,7 +2297,7 @@ class PyMISP:
             url = f'servers/push/{server_id}/{event_id}'
         else:
             url = f'servers/push/{server_id}'
-        response = self._prepare_request('GET', url)
+        response = self._prepare_request('POST', url)
         # FIXME: can we pythonify?
         return self._check_json_response(response)
 
