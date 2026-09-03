@@ -141,6 +141,29 @@ class TestComprehensive(unittest.TestCase):
         mispevent.add_attribute('text', str(uuid4()))
         return mispevent
 
+    def _wait_until_published(self, event: MISPEvent, timeout: int=30) -> MISPEvent:
+        """Block until the background worker has actually published `event`.
+
+        Since MISP 2.5.40 publishing is handed to a background job, so
+        add_event() returns before publish_timestamp is set. Any assertion on a
+        publication window has to wait for the worker rather than assume the
+        calls made in between took long enough.
+        """
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            fetched = self.pub_misp_connector.get_event(event, pythonify=True)
+            if not isinstance(fetched, MISPEvent):
+                self.fail(f'could not re-fetch event while waiting for publication: {fetched}')
+            # publish_timestamp is a plain int (0) until the worker sets it,
+            # and a datetime once pythonify can parse it.
+            published_at = fetched.publish_timestamp
+            if isinstance(published_at, datetime):
+                published_at = published_at.timestamp()
+            if fetched.published and int(published_at or 0):
+                return fetched
+            time.sleep(0.5)
+        self.fail(f'event {event.id} was not published within {timeout}s')
+
     def environment(self) -> tuple[MISPEvent, MISPEvent, MISPEvent]:
         first_event = MISPEvent()
         first_event.info = 'First event - org only - low - completed'
@@ -671,6 +694,13 @@ class TestComprehensive(unittest.TestCase):
         second.publish()
         try:
             first = self.pub_misp_connector.add_event(first, pythonify=True)
+            # The interval assertion at the end needs the two events' publish
+            # timestamps to be at least 5s apart. Publishing is done by a
+            # background worker, so wait until the first event is really
+            # published before creating the second: sleeping a fixed amount
+            # only separates the *creation* times, which is not what is
+            # compared below.
+            first = self._wait_until_published(first)
             time.sleep(10)
             second = self.pub_misp_connector.add_event(second, pythonify=True)
             # Test invalid query
@@ -680,21 +710,28 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events, [])
             events = self.pub_misp_connector.search(publish_timestamp='aaad', pythonify=True)
             self.assertEqual(events, [])
+            # Wait for the background publish worker before asserting on a
+            # 5-second publication window. Without this the assertion races the
+            # worker: it only passed because the three invalid queries above
+            # happened to take long enough, so any speed-up on the server (or a
+            # faster runner) makes the search run first and match nothing.
+            second = self._wait_until_published(second)
             # Test - last 4 min
             events = self.pub_misp_connector.search(publish_timestamp='5s', pythonify=True)
-            self.assertEqual(len(events), 1)
+            self.assertEqual(len(events), 1, events)
             self.assertEqual(events[0].id, second.id)
 
-            # we need to sleep here as per 2.5.40 we've moved the publish timestamp setting to the background process instead of front loading it.
-            # The default tick rate of the background worker is 5s so 10 seconds should be safe-ish. (assuming no other fuck-ups)
-            time.sleep(10)
+            # Both events have already been waited on above, so their
+            # publish_timestamp is a datetime rather than the int 0 that
+            # add_event returns since 2.5.40. That replaces a fixed 10s sleep,
+            # which both slowed the suite down and still raised AttributeError
+            # whenever the worker happened to be slower than the guess.
 
-            # The add_event response no longer carries the publish_timestamp (it is now set by the background
-            # publish job, not synchronously), so the events fetched above still hold publish_timestamp == 0,
-            # which pythonify leaves as a plain int rather than a datetime. Re-fetch them now that the worker
-            # has published so publish_timestamp is populated as a datetime for the .timestamp() calls below.
-            first = self.pub_misp_connector.get_event(first, pythonify=True)
-            second = self.pub_misp_connector.get_event(second, pythonify=True)
+            # The interval assertion below only distinguishes the two events if
+            # their publish timestamps are more than 5s apart. Check it here so
+            # a violation reports the actual gap instead of an opaque count.
+            gap = second.publish_timestamp.timestamp() - first.publish_timestamp.timestamp()
+            self.assertGreater(gap, 5, f'publish timestamps only {gap}s apart')
 
             # Test 5 sec before timestamp of 2nd event
             events = self.pub_misp_connector.search(publish_timestamp=(second.publish_timestamp.timestamp()), pythonify=True)
