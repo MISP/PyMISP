@@ -35,13 +35,13 @@ openioc = [ "beautifulsoup4 (>=4.15.0)" ]
 virustotal = [ "validators (>=0.35.0)" ]
 
 docs = [
-    "sphinx-autodoc-typehints (>=3.13.2) ; python_version >= \"3.12\"",
+    "sphinx-autodoc-typehints (>=3.13.5) ; python_version >= \"3.12\"",
     "sphinx (>=9.1.0) ; python_version >= \"3.12\"",
     "docutils (<0.23) ; python_version >= \"3.12\"",
     "myst-parser (>=5.1.0) ; python_version >= \"3.12\""
 ]
 
-pdfexport = [ "reportlab (>=5.0.0)" ]
+pdfexport = [ "reportlab (>=5.0.1)" ]
 
 url = [ "pyfaup-rs (>=0.4,<0.5)" ]
 
@@ -53,7 +53,7 @@ email = [
 
 brotli = [ "urllib3[broti] (>=2.7.0)" ]
 
-neo4j = [ "neo4j (>=6.2.0)" ]
+neo4j = [ "neo4j (>=6.3.0)" ]
 
 [tool.poetry]
 classifiers=[
