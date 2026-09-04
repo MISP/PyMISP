@@ -14,6 +14,7 @@ except ImportError:
     pass
 
 
+
 # Two children of an AND-indicator whose combined search-context pair is NOT a
 # defined composite (RegistryItem/Value + FileItem/Md5sum). These must come back
 # as their two individual attributes, not a merged composite.
@@ -54,6 +55,10 @@ COMPOSITE = """<?xml version="1.0" encoding="us-ascii"?>
 </ioc>"""
 
 
+# Every test here calls load_openioc, which raises when bs4 is absent. The
+# import guard above already anticipates bs4 being missing; without this the
+# tests fail instead of skipping.
+@unittest.skipUnless(openioc.has_bs4, "requires the openioc extra (bs4)")
 class TestOpenIOC(unittest.TestCase):
 
     def test_non_composite_and_indicator_not_merged(self) -> None:
