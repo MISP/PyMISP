@@ -1442,7 +1442,9 @@ class MISPGalaxyCluster(AbstractMISP):
         self.default = kwargs.pop('default', False)
         # If the default field is set, we shouldn't have distribution or sharing group ID set
         if self.default:
-            blocked_fields = ["distribution", "sharing_group_id"]
+            # NOTE 2026-09-04: distribution is present in some exports: https://github.com/MISP/PyMISP/issues/1475
+            #                  so we remove it from there.
+            blocked_fields = ["sharing_group_id"]
             for field in blocked_fields:
                 if kwargs.get(field, None):
                     raise NewGalaxyClusterError(
