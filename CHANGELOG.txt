@@ -2,11 +2,211 @@ Changelog
 =========
 
 
+v2.5.34.3 (2026-09-10)
+----------------------
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [http method] changed for multiple endpoints. [iglocska]
+
+  - no more GET to trigger some action in MISP, anything that results in data being modified is a POST now
+  - diff was written by Fable. Benna! Ya wan ya duru!
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- [default galaxy cluster] fixes. [iglocska]
+
+  - mostly to make the tests happy, distribution is included in default clusters, misp will just reject changes to it. But not expecting it in the API ain't the way
+- Allow distribution in MISPGalaxyCluster. [Raphaël Vinot]
+
+  Fix #1475
+
+Other
+~~~~~
+- Build(deps): bump github/codeql-action from 4.37.7 to 4.37.9.
+  [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 4.37.7 to 4.37.9.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v4.37.7...v4.37.9)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-version: 4.37.9
+    dependency-type: direct:production
+    update-type: version-update:semver-patch
+  ...
+- Skip tests whose optional extra is not installed. [Chirag Gupta]
+- Build(deps): bump github/codeql-action from 4.37.6 to 4.37.7.
+  [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 4.37.6 to 4.37.7.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v4.37.6...v4.37.7)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-version: 4.37.7
+    dependency-type: direct:production
+    update-type: version-update:semver-patch
+  ...
+
+
+v2.5.34.2 (2026-08-14)
+----------------------
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Bump objects. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Remove unused f-string. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [tests] account for the publish_timestamp not being set on events/add
+  time. [iglocska]
+- [tests] added a sleep to account for the publishing changes. [Andras
+  Iklody]
+- Bump deps. [Raphaël Vinot]
+
+Fix
+~~~
+- Correct deleted search parameter type. [nightcityblade]
+- Accept datetime objects for MISPEvent timestamps in from_dict.
+  [SkxOverKill]
+- Avoid keyError on buggy submission. [Raphaël Vinot]
+
+  Cleaner fix than #1461
+- Make mypy happy. [Raphaël Vinot]
+- [openioc] require both search-contexts before merging a composite.
+  [Arpit Jain]
+
+  The composite check in set_all_attributes used
+  `if (value1 and value2) in childList`, which Python evaluates as
+  `(value1 and value2)` first. Both operands are non-empty mapping-key
+  strings, so the expression reduces to `value2 in childList` and value1
+  is never checked. An AND-indicator with two children whose combined pair
+  is not a real composite (but whose second search-context matches a
+  composite mapping's value2) was wrongly merged into a bogus type='other'
+  attribute, emitted once per matching mapping key.
+
+  Check that both search-contexts are present before merging, so genuine
+  composites still merge and unrelated pairs fall through to their two
+  individual attributes. Adds a regression test covering both cases.
+- Block distribution fields on default galaxy clusters. [nightcityblade]
+- Do not unquote URLs before using faup-rs. [Raphaël Vinot]
+
+Other
+~~~~~
+- Build(deps): bump github/codeql-action from 4.37.4 to 4.37.6.
+  [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 4.37.4 to 4.37.6.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v4.37.4...v4.37.6)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-version: 4.37.6
+    dependency-type: direct:production
+    update-type: version-update:semver-patch
+  ...
+- Fix STIX uploads from in-memory files. [nightcityblade]
+- Build(deps): bump github/codeql-action from 4.37.3 to 4.37.4.
+  [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 4.37.3 to 4.37.4.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v4.37.3...v4.37.4)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-version: 4.37.4
+    dependency-type: direct:production
+    update-type: version-update:semver-patch
+  ...
+- Build(deps): bump github/codeql-action from 4 to 4.37.3.
+  [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 4 to 4.37.3.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v4...v4.37.3)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-version: 4.37.3
+    dependency-type: direct:production
+    update-type: version-update:semver-minor
+  ...
+- Make build_complex_query a staticmethod. [Mahdi]
+- Feat: Add fetchFromAllFeeds. [pablo-schmeiser]
+- Fix data reference in galaxy cluster fork request. [vx3r]
+- Add no_sightings option to get_event. [monjiapawne]
+- Build(deps): bump codecov/codecov-action from 6 to 7.
+  [dependabot[bot]]
+
+  Bumps [codecov/codecov-action](https://github.com/codecov/codecov-action) from 6 to 7.
+  - [Release notes](https://github.com/codecov/codecov-action/releases)
+  - [Changelog](https://github.com/codecov/codecov-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/codecov/codecov-action/compare/v6...v7)
+
+  ---
+  updated-dependencies:
+  - dependency-name: codecov/codecov-action
+    dependency-version: '7'
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Build(deps): bump actions/setup-python from 6 to 7. [dependabot[bot]]
+
+  Bumps [actions/setup-python](https://github.com/actions/setup-python) from 6 to 7.
+  - [Release notes](https://github.com/actions/setup-python/releases)
+  - [Commits](https://github.com/actions/setup-python/compare/v6...v7)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/setup-python
+    dependency-version: '7'
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+- Build(deps): bump actions/checkout from 6 to 7. [dependabot[bot]]
+
+  Bumps [actions/checkout](https://github.com/actions/checkout) from 6 to 7.
+  - [Release notes](https://github.com/actions/checkout/releases)
+  - [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/actions/checkout/compare/v6...v7)
+
+  ---
+  updated-dependencies:
+  - dependency-name: actions/checkout
+    dependency-version: '7'
+    dependency-type: direct:production
+    update-type: version-update:semver-major
+  ...
+
+
 v2.5.34.1 (2026-04-28)
 ----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 
 Fix
