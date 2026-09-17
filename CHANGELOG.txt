@@ -2,11 +2,28 @@ Changelog
 =========
 
 
+v2.5.34.4 (2026-09-17)
+----------------------
+
+Changes
+~~~~~~~
+- Bump deps, version. [Raphaël Vinot]
+
+Fix
+~~~
+- Support pure-magic-rs. [Raphaël Vinot]
+
+Other
+~~~~~
+- Chg; Bump deps. [Raphaël Vinot]
+
+
 v2.5.34.3 (2026-09-10)
 ----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 - Bump deps. [Raphaël Vinot]
 - [http method] changed for multiple endpoints. [iglocska]
