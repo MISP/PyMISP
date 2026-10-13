@@ -23,7 +23,7 @@ try:
     from pymisp import (register_user, PyMISP, MISPEvent, MISPOrganisation,
                         MISPUser, Distribution, ThreatLevel, Analysis, MISPObject,
                         MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag,
-                        MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting,
+                        MISPSharingGroup, MISPSharingGroupBlueprint, MISPFeed, MISPServer, MISPUserSetting,
                         MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster,
                         MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist,
                         MISPNote, MISPRole)
@@ -2373,6 +2373,49 @@ class TestComprehensive(unittest.TestCase):
             time.sleep(10)
             # Delete event
             self.admin_misp_connector.delete_event(first)
+
+    def test_sharing_group_blueprints(self) -> None:
+        # add
+        sgb = MISPSharingGroupBlueprint()
+        sgb.name = 'Testcases SG blueprint'
+        sgb.rules = json.dumps({'org_id': [self.test_org.id]})
+        blueprint = self.admin_misp_connector.add_sharing_group_blueprint(sgb, pythonify=True)
+        sharing_group_id = None
+        try:
+            self.assertEqual(blueprint.name, 'Testcases SG blueprint')
+
+            # Organisations matching the rules
+            orgs = self.admin_misp_connector.sharing_group_blueprint_organisations(blueprint, pythonify=True)
+            self.assertEqual([org.name for org in orgs], ['Test Org'])
+
+            # Change name
+            blueprint.name = 'Testcases SG blueprint - new name'
+            blueprint = self.admin_misp_connector.update_sharing_group_blueprint(blueprint, pythonify=True)
+            self.assertEqual(blueprint.name, 'Testcases SG blueprint - new name')
+
+            # Get list
+            blueprints = self.admin_misp_connector.sharing_group_blueprints(pythonify=True)
+            self.assertIn(blueprint.id, [b.id for b in blueprints])
+
+            # Execute, creates the sharing group
+            r = self.admin_misp_connector.execute_sharing_group_blueprint(blueprint)
+            self.assertTrue(r['success'], r)
+            blueprint = self.admin_misp_connector.get_sharing_group_blueprint(blueprint, pythonify=True)
+            sharing_group_id = blueprint.sharing_group_id
+            sharing_group = self.admin_misp_connector.get_sharing_group(sharing_group_id, pythonify=True)
+            self.assertEqual(sharing_group.name, 'Testcases SG blueprint - new name')
+
+            # Detach
+            r = self.admin_misp_connector.detach_sharing_group_blueprint(blueprint)
+            self.assertTrue(r['success'], r)
+            blueprint = self.admin_misp_connector.get_sharing_group_blueprint(blueprint, pythonify=True)
+            self.assertEqual(int(blueprint.sharing_group_id), 0)
+        finally:
+            # Delete
+            r = self.admin_misp_connector.delete_sharing_group_blueprint(blueprint)
+            self.assertTrue(r['success'], r)
+            if sharing_group_id:
+                self.admin_misp_connector.delete_sharing_group(sharing_group_id)
 
     def test_sharing_groups(self) -> None:
         # add

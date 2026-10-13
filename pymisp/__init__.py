@@ -38,7 +38,7 @@ try:
     from .abstract import AbstractMISP, MISPEncode, pymisp_json_default, MISPTag, Distribution, ThreatLevel, Analysis # noqa
     from .mispevent import (MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, # noqa
                             MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy,
-                            MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed,
+                            MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPSharingGroupBlueprint, MISPRole, MISPServer, MISPFeed,
                             MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist,
                             MISPEventReport, MISPCorrelationExclusion, MISPDecayingModel, MISPGalaxy, MISPGalaxyCluster,
                             MISPGalaxyClusterElement, MISPGalaxyClusterRelation, MISPNote, MISPOpinion, MISPRelationship)
@@ -74,7 +74,7 @@ __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPEvent', 'MISPAttribute', 'MISPObjectReference', 'MISPObjectAttribute',
            'MISPObject', 'MISPUser', 'MISPOrganisation', 'MISPSighting', 'MISPLog',
            'MISPShadowAttribute', 'MISPWarninglist', 'MISPTaxonomy', 'MISPNoticelist',
-           'MISPObjectTemplate', 'MISPSharingGroup', 'MISPRole', 'MISPServer', 'MISPFeed',
+           'MISPObjectTemplate', 'MISPSharingGroup', 'MISPSharingGroupBlueprint', 'MISPRole', 'MISPServer', 'MISPFeed',
            'MISPEventDelegation', 'MISPUserSetting', 'MISPInbox', 'MISPEventBlocklist',
            'MISPOrganisationBlocklist', 'MISPEventReport', 'MISPCorrelationExclusion',
            'MISPDecayingModel', 'MISPGalaxy', 'MISPGalaxyCluster', 'MISPGalaxyClusterElement',
