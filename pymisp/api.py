@@ -696,9 +696,12 @@ class PyMISP:
         :param analyst_data: analyst_data to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
-        object_uuid = analyst_data.object_uuid
         object_type = analyst_data.object_type
-        r = self._prepare_request('POST', f'analyst_data/add/{analyst_data.analyst_data_object_type}/{object_uuid}/{object_type}', data=analyst_data)
+        if object_type == 'AttributeValue':
+            object_address = analyst_data.object_sha256
+        else:
+            object_address = analyst_data.object_uuid
+        r = self._prepare_request('POST', f'analyst_data/add/{analyst_data.analyst_data_object_type}/{object_address}/{object_type}', data=analyst_data)
         new_analyst_data = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_analyst_data:
             return new_analyst_data

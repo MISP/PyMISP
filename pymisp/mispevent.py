@@ -2581,6 +2581,26 @@ class MISPDecayingModel(AbstractMISP):
         return f'<{self.__class__.__name__}(uuid={self.uuid})>'
 
 
+def value_sha256(value: str) -> str:
+    """Address of an attribute value (MISP 3.0+), for notes, opinions, relationships
+    and collection elements of type AttributeValue: the SHA-256 of the value as MISP
+    stores it, in lowercase hex.
+
+    Hash the value as the API returns it (MISP refangs, trims and lowercases some
+    types on save), and each half of a composite attribute (domain|ip, ...) on its own.
+    """
+    return hashlib.sha256(value.encode('utf-8')).hexdigest()
+
+
+def _value_address(address: Any, error: type[Exception], field: str) -> str:
+    if not isinstance(address, str):
+        raise error(f'{field} is required when the target type is AttributeValue.')
+    address = address.strip().lower()
+    if len(address) != 64 or any(c not in '0123456789abcdef' for c in address):
+        raise error(f'{field} must be a SHA-256 in hex. Actual: {address}.')
+    return address
+
+
 class MISPAnalystData(AbstractMISP):
 
     _fields_for_feed: set[str] = {'uuid', 'object_uuid', 'object_type', 'authors',
@@ -2588,7 +2608,7 @@ class MISPAnalystData(AbstractMISP):
 
     valid_object_type = {'Attribute', 'Event', 'EventReport', 'GalaxyCluster', 'Galaxy',
                          'Object', 'Note', 'Opinion', 'Relationship', 'Organisation',
-                         'SharingGroup'}
+                         'SharingGroup', 'AttributeValue'}
 
     @property
     def analyst_data_object_type(self) -> str:
@@ -2629,7 +2649,8 @@ class MISPAnalystData(AbstractMISP):
     def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
         super().__init__(force_timestamps)
         self.uuid = str(uuid.uuid4())
-        self.object_uuid: str
+        self.object_uuid: str | None
+        self.object_sha256: str | None
         self.object_type: str
         self.authors: str
         self.created: float | int | datetime
@@ -2703,14 +2724,24 @@ class MISPAnalystData(AbstractMISP):
                 # Cannot be None or 0 either.
                 raise NewAnalystDataError(f'If the distribution is set to sharing group, a sharing group ID is required (cannot be {self.sharing_group_id}).')
 
-        self.object_uuid = kwargs.pop('object_uuid', None)
-        if self.object_uuid is None:
-            raise NewAnalystDataError('The UUID for which this element is attached is required.')
+        object_uuid = kwargs.pop('object_uuid', None)
+        object_sha256 = kwargs.pop('object_sha256', None)
         self.object_type = kwargs.pop('object_type', None)
         if self.object_type is None:
             raise NewAnalystDataError('The element type for which this element is attached is required.')
         if self.object_type not in self.valid_object_type:
             raise NewAnalystDataError('The element type is not a valid type. Actual: {self.object_type}.')
+        # The target type decides the address: a value has no UUID, everything else has no SHA-256
+        if self.object_type == 'AttributeValue':
+            self.object_uuid = None
+            self.object_sha256 = _value_address(object_sha256, NewAnalystDataError, 'object_sha256')
+        else:
+            if object_uuid is None:
+                raise NewAnalystDataError('The UUID for which this element is attached is required.')
+            if object_sha256 is not None:
+                raise NewAnalystDataError('object_sha256 is only used with the AttributeValue type.')
+            self.object_uuid = object_uuid
+            self.object_sha256 = None
 
         if kwargs.get('id'):
             self.id = int(kwargs.pop('id'))
@@ -2823,7 +2854,8 @@ class MISPRelationship(MISPAnalystData):
     _analyst_data_object_type = 'Relationship'
 
     def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
-        self.related_object_uuid: str
+        self.related_object_uuid: str | None
+        self.related_object_sha256: str | None
         self.related_object_type: str
         self.relationship_type: str
         super().__init__(force_timestamps)
@@ -2839,7 +2871,14 @@ class MISPRelationship(MISPAnalystData):
             raise NewRelationshipError('The target object type for this relationship is required.')
 
         self.related_object_uuid = kwargs.pop('related_object_uuid', None)
-        if self.related_object_uuid is None:
+        related_object_sha256 = kwargs.pop('related_object_sha256', None)
+        self.related_object_sha256 = None
+        if self.related_object_type == 'AttributeValue':
+            self.related_object_uuid = None
+            self.related_object_sha256 = _value_address(related_object_sha256, NewRelationshipError, 'related_object_sha256')
+        elif related_object_sha256 is not None:
+            raise NewRelationshipError('related_object_sha256 is only used with the AttributeValue type.')
+        elif self.related_object_uuid is None:
             if not isinstance(self.related_object_type, AbstractMISP):
                 raise NewRelationshipError('The target UUID for this relationship is required.')
             else:
