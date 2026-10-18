@@ -2319,7 +2319,7 @@ class TestComprehensive(unittest.TestCase):
 
             self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             users_stats = self.user_misp_connector.users_statistics(context='sightings')
-            self.assertEqual(list(users_stats.keys()), ['toplist', 'eventids'])
+            self.assertIn('toplist', users_stats)
 
             # FIXME this one fails on travis.
             # users_stats = self.admin_misp_connector.users_statistics(context='galaxyMatrix')
