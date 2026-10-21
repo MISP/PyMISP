@@ -32,7 +32,7 @@ class DataURLObject(AbstractMISPObjectGenerator):
         if base64:
             mime, data = self._dataurl.split(';base64,')
         else:
-            mime, data = self._dataurl.split(',')
+            mime, data = self._dataurl.split(',', 1)
         if mime and ';' in mime:
             mime, param = mime.split(';', 1)
         else:
