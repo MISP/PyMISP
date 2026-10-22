@@ -29,7 +29,7 @@ from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPError, 
 from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, \
     MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, \
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
-    MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
+    MISPSharingGroupBlueprint, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
     MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel, \
     MISPNote, MISPOpinion, MISPRelationship, MISPAnalystData
@@ -83,6 +83,9 @@ def get_uuid_or_id_from_abstract_misp(obj: AbstractMISP | int | str | UUID | dic
         return obj['id']
     if isinstance(obj, MISPEventDelegation):
         # An EventDelegation doesn't have a uuid, we *need* to use the ID
+        return obj['id']
+    if isinstance(obj, MISPSharingGroupBlueprint):
+        # The SharingGroupBlueprint endpoints only accept the ID, not the uuid
         return obj['id']
 
     # For the blocklists, we want to return a specific key.
@@ -2455,6 +2458,119 @@ class PyMISP:
         return self._check_json_response(response)
 
     # ## END Sharing groups ###
+
+    # ## BEGIN Sharing group blueprints ###
+
+    def sharing_group_blueprints(self, pythonify: bool = False) -> dict[str, Any] | list[MISPSharingGroupBlueprint] | list[dict[str, Any]]:
+        """Get the existing sharing group blueprints
+
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        r = self._prepare_request('GET', 'sharingGroupBlueprints/index')
+        sharing_group_blueprints = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or isinstance(sharing_group_blueprints, dict):
+            return sharing_group_blueprints
+        to_return = []
+        for sharing_group_blueprint in sharing_group_blueprints:
+            s = MISPSharingGroupBlueprint()
+            s.from_dict(**sharing_group_blueprint)
+            to_return.append(s)
+        return to_return
+
+    def get_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str, pythonify: bool = False) -> dict[str, Any] | MISPSharingGroupBlueprint:
+        """Get a sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to find
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        r = self._prepare_request('GET', f'sharingGroupBlueprints/view/{sharing_group_blueprint_id}')
+        sharing_group_blueprint_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in sharing_group_blueprint_j:
+            return sharing_group_blueprint_j
+        s = MISPSharingGroupBlueprint()
+        s.from_dict(**sharing_group_blueprint_j)
+        return s
+
+    def add_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint, pythonify: bool = False) -> dict[str, Any] | MISPSharingGroupBlueprint:
+        """Add a new sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to add, its rules are a JSON encoded string
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        r = self._prepare_request('POST', 'sharingGroupBlueprints/add', data=sharing_group_blueprint)
+        sharing_group_blueprint_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in sharing_group_blueprint_j:
+            return sharing_group_blueprint_j
+        s = MISPSharingGroupBlueprint()
+        s.from_dict(**sharing_group_blueprint_j)
+        return s
+
+    def update_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | dict[str, Any], sharing_group_blueprint_id: int | None = None, pythonify: bool = False) -> dict[str, Any] | MISPSharingGroupBlueprint:
+        """Update a sharing group blueprint, MISP only updates the name and the rules
+
+        :param sharing_group_blueprint: MISP Sharing Group Blueprint
+        :param sharing_group_blueprint_id: Sharing group blueprint ID
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        if sharing_group_blueprint_id is None:
+            sid = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        else:
+            sid = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint_id)
+        r = self._prepare_request('POST', f'sharingGroupBlueprints/edit/{sid}', data=sharing_group_blueprint)
+        updated_sharing_group_blueprint = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_sharing_group_blueprint:
+            return updated_sharing_group_blueprint
+        s = MISPSharingGroupBlueprint()
+        s.from_dict(**updated_sharing_group_blueprint)
+        return s
+
+    def delete_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete a sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to delete
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        response = self._prepare_request('POST', f'sharingGroupBlueprints/delete/{sharing_group_blueprint_id}')
+        return self._check_json_response(response)
+
+    def execute_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str) -> dict[str, Any] | list[dict[str, Any]]:
+        """Create or update the sharing group generated from a sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to execute
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        response = self._prepare_request('POST', f'sharingGroupBlueprints/execute/{sharing_group_blueprint_id}')
+        return self._check_json_response(response)
+
+    def detach_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str) -> dict[str, Any] | list[dict[str, Any]]:
+        """Detach the sharing group generated from a sharing group blueprint, the next execution creates a new one
+
+        :param sharing_group_blueprint: sharing group blueprint to detach
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        response = self._prepare_request('POST', f'sharingGroupBlueprints/detach/{sharing_group_blueprint_id}')
+        return self._check_json_response(response)
+
+    def sharing_group_blueprint_organisations(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str, pythonify: bool = False) -> dict[str, Any] | list[MISPOrganisation] | list[dict[str, Any]]:
+        """Get the organisations matching the rules of a sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to evaluate
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        r = self._prepare_request('GET', f'sharingGroupBlueprints/viewOrgs/{sharing_group_blueprint_id}')
+        organisations = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or isinstance(organisations, dict):
+            return organisations
+        to_return = []
+        for organisation in organisations:
+            o = MISPOrganisation()
+            o.from_dict(**organisation)
+            to_return.append(o)
+        return to_return
+
+    # ## END Sharing group blueprints ###
 
     # ## BEGIN Organisation ###
 
