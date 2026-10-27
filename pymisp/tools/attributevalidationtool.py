@@ -109,7 +109,7 @@ EMAIL_RE = re.compile(r'^.[^\s]*\@.*\..*$', flags=re.IGNORECASE)
 DOMAIN_RE = re.compile(r'^[A-Z0-9.\-_]+\.[A-Z0-9\-]{2,}$', flags=re.IGNORECASE)
 HEX_RE = re.compile(r'^[0-9a-fA-F]+$')
 MAC_ADDRESS_RE = re.compile(r'^([a-f0-9]{2}:){5}[a-f0-9]{2}$')
-MAC_EUI_64_RE = re.compile(r'^([a-f0-9]{2}:){3}ff:fe:(:[a-f0-9]{2}){3}$')
+MAC_EUI_64_RE = re.compile(r'^([a-f0-9]{2}:){3}ff:fe(:[a-f0-9]{2}){3}$')
 ONION_RE = re.compile(r'^([a-z2-7]{16}|[a-z2-7]{56})\.onion$')
 REMOVE_NON_ALPHANUM_CAP_RE = re.compile(r'[^0-9A-Z]+')
 REMOVE_NON_ALPHANUM_RE = re.compile(r'[^0-9A-Fa-f]')
@@ -219,7 +219,7 @@ class AttributeValidationTool:
                 return value
             case 'mac-address' | 'mac-eui-64':
                 value = re.sub(REMOVE_NON_ALPHANUM_RE, '', value).lower()
-                return ':'.join(value[i:i+2] for i in range(0, 12, 2))
+                return ':'.join(value[i:i+2] for i in range(0, len(value), 2))
             case 'hostname|port':
                 return value.replace(':', '|').lower()
             case 'boolean':
@@ -589,8 +589,11 @@ class AttributeValidationTool:
     @classmethod
     def _is_ssh_fingerprint(cls, value):
         if value.startswith('SHA256:'):
+            # MISP ignores whitespace in the base64 encoded fingerprint
+            fingerprint = ''.join(value[7:].split())
             try:
-                decoded = b64decode(value[7:])
+                # OpenSSH prints SHA256 fingerprints without the base64 padding
+                decoded = b64decode(fingerprint + '=' * (-len(fingerprint) % 4), validate=True)
             except Exception:
                 return False
             return decoded is not None and len(decoded) == 32
