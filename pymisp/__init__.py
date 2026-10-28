@@ -46,7 +46,6 @@ try:
     from .api import PyMISP, register_user  # noqa
     # NOTE: the direct imports to .tools are kept for backward compatibility but should be removed in the future
     from .tools import AbstractMISPObjectGenerator  # noqa
-    from .tools import openioc  # noqa
     from .tools import ext_lookups  # noqa
     from .tools import update_objects  # noqa
     from .tools import load_warninglists  # noqa
