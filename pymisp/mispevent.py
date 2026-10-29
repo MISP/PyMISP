@@ -13,7 +13,7 @@ from collections import defaultdict
 import logging
 import hashlib
 from pathlib import Path
-from typing import IO, Any, Sequence
+from typing import IO, Any, Sequence, Iterable
 import warnings
 
 try:
@@ -2285,12 +2285,140 @@ class MISPFeed(AbstractMISP):
                 raise e
 
 
+class MISPWarninglistEntry(AbstractMISP):
+
+    def __init__(self, force_timestamps: bool = False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
+        self.id: int | str
+        self.warninglist_id: int | str
+        self.value: str
+
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
+        if 'WarninglistEntry' in kwargs:
+            kwargs = kwargs['WarninglistEntry']
+        super().from_dict(**kwargs)
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'value'):
+            return f'<{self.__class__.__name__}(value={self.value})>'
+        return f'<{self.__class__.__name__}(NotInitialized)>'
+
+
 class MISPWarninglist(AbstractMISP):
+
+    def __init__(self, force_timestamps: bool = False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
+        self.id: int | str
+        self.name: str
+        self.type: str
+        self.description: str
+        self.category: str
+        self.version: int | str
+        self.enabled: bool
+        self.default: bool
+        self.matching_attributes: list[str]
+        self.valid_attributes: list[str] | str
+        self.entries: list[str] = []
+        self.WarninglistEntry: list[MISPWarninglistEntry] = []
+
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def add_entry(self, entry: str | MISPWarninglistEntry | dict[str, Any]) -> MISPWarninglistEntry:
+        """Add an entry to the warninglist.
+
+        :param entry: Entry string, MISPWarninglistEntry object, or dict
+        """
+        if not hasattr(self, 'entries') or self.entries is None:
+            self.entries = []
+        if not hasattr(self, 'WarninglistEntry') or self.WarninglistEntry is None:
+            self.WarninglistEntry = []
+
+        if isinstance(entry, MISPWarninglistEntry):
+            entry_obj = entry
+            val = getattr(entry, 'value', '')
+        elif isinstance(entry, dict):
+            entry_obj = MISPWarninglistEntry()
+            entry_obj.from_dict(**entry)
+            val = getattr(entry_obj, 'value', '')
+        else:
+            val = str(entry)
+            entry_obj = MISPWarninglistEntry(value=val)
+
+        if val:
+            if val not in self.entries:
+                self.entries.append(val)
+                self.WarninglistEntry.append(entry_obj)
+        else:
+            self.WarninglistEntry.append(entry_obj)
+        return entry_obj
+
+    def add_entries(self, entries: Iterable[str | MISPWarninglistEntry | dict[str, Any]]) -> list[MISPWarninglistEntry]:
+        """Add multiple entries to the warninglist.
+
+        :param entries: Iterable of entry strings, MISPWarninglistEntry objects, or dicts
+        """
+        added = []
+        for entry in entries:
+            added.append(self.add_entry(entry))
+        return added
 
     def from_dict(self, **kwargs: Any) -> None:
         if 'Warninglist' in kwargs:
             kwargs = kwargs['Warninglist']
+        if 'WarninglistEntry' in kwargs:
+            raw_entries = kwargs.pop('WarninglistEntry')
+            self.WarninglistEntry = []
+            entry_values = []
+            for entry in raw_entries:
+                if isinstance(entry, MISPWarninglistEntry):
+                    self.WarninglistEntry.append(entry)
+                    if hasattr(entry, 'value'):
+                        entry_values.append(entry.value)
+                elif isinstance(entry, dict):
+                    e = MISPWarninglistEntry()
+                    e.from_dict(**entry)
+                    self.WarninglistEntry.append(e)
+                    if hasattr(e, 'value'):
+                        entry_values.append(e.value)
+                else:
+                    self.WarninglistEntry.append(entry)
+                    if isinstance(entry, str):
+                        entry_values.append(entry)
+            if not getattr(self, 'entries', None):
+                self.entries = entry_values
+
+        if 'entries' in kwargs:
+            self.entries = kwargs.pop('entries')
+        elif 'list' in kwargs and not getattr(self, 'entries', None):
+            self.entries = kwargs.pop('list')
+
+        if not getattr(self, 'WarninglistEntry', None) and getattr(self, 'entries', None):
+            self.WarninglistEntry = [MISPWarninglistEntry(value=v) for v in self.entries]
+
+        if 'matching_attributes' in kwargs and isinstance(kwargs['matching_attributes'], str):
+            kwargs['matching_attributes'] = [a.strip() for a in kwargs['matching_attributes'].split(',') if a.strip()]
+
         super().from_dict(**kwargs)
+
+    def to_dict(self, json_format: bool = False) -> dict[str, Any]:
+        to_return = super().to_dict(json_format)
+        if hasattr(self, 'WarninglistEntry') and self.WarninglistEntry:
+            to_return['WarninglistEntry'] = [
+                entry.to_dict(json_format) if isinstance(entry, AbstractMISP) else entry
+                for entry in self.WarninglistEntry
+            ]
+        if hasattr(self, 'entries') and self.entries:
+            to_return['entries'] = self.entries
+        return to_return
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'name'):
+            return f'<{self.__class__.__name__}(name={self.name})>'
+        return f'<{self.__class__.__name__}(NotInitialized)>'
 
 
 class MISPCryptographicKey(AbstractMISP):

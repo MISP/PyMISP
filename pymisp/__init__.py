@@ -8,7 +8,10 @@ import importlib.metadata
 
 logger = logging.getLogger(__name__)
 
-__version__ = importlib.metadata.version("pymisp")
+try:
+    __version__ = importlib.metadata.version("pymisp")
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "unknown"
 
 
 def warning_2024() -> None:
@@ -37,7 +40,7 @@ try:
                              MISPObjectException)
     from .abstract import AbstractMISP, MISPEncode, pymisp_json_default, MISPTag, Distribution, ThreatLevel, Analysis # noqa
     from .mispevent import (MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, # noqa
-                            MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy,
+                            MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPWarninglistEntry, MISPTaxonomy,
                             MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed,
                             MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist,
                             MISPEventReport, MISPCorrelationExclusion, MISPDecayingModel, MISPGalaxy, MISPGalaxyCluster,
@@ -73,7 +76,7 @@ class ExpandedPyMISP(PyMISP):
 __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPEvent', 'MISPAttribute', 'MISPObjectReference', 'MISPObjectAttribute',
            'MISPObject', 'MISPUser', 'MISPOrganisation', 'MISPSighting', 'MISPLog',
-           'MISPShadowAttribute', 'MISPWarninglist', 'MISPTaxonomy', 'MISPNoticelist',
+           'MISPShadowAttribute', 'MISPWarninglist', 'MISPWarninglistEntry', 'MISPTaxonomy', 'MISPNoticelist',
            'MISPObjectTemplate', 'MISPSharingGroup', 'MISPRole', 'MISPServer', 'MISPFeed',
            'MISPEventDelegation', 'MISPUserSetting', 'MISPInbox', 'MISPEventBlocklist',
            'MISPOrganisationBlocklist', 'MISPEventReport', 'MISPCorrelationExclusion',
