@@ -8,7 +8,10 @@ import importlib.metadata
 
 logger = logging.getLogger(__name__)
 
-__version__ = importlib.metadata.version("pymisp")
+try:
+    __version__ = importlib.metadata.version("pymisp")
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "unknown"
 
 
 def warning_2024() -> None:
