@@ -2,11 +2,143 @@ Changelog
 =========
 
 
+v3.0.0 (2026-11-04)
+-------------------
+
+New
+~~~
+- Add missing type dep. [Raphaël Vinot]
+- [warninglists] Implement MISPWarninglist and MISPWarninglistEntry
+  models. [Pablo Schmeiser]
+
+  - Expand MISPWarninglist with full attribute schema, typing, and helper methods
+  - Add add_entry() and add_entries() with automatic deduplication
+  - Add MISPWarninglistEntry model representing individual warninglist values
+  - Support deserialization from MISP API view, custom payload, and list.json formats
+  - Export MISPWarninglistEntry in __init__.__all__ and add Sphinx autodoc entry
+  - Add unit tests for MISPWarninglist and MISPWarninglistEntry in test_mispevent
+- Add sharing group blueprint management. [cj]
+- [analyst data] Notes, opinions and relationships on attribute values.
+  [Claude Opus 5.5, iglocska]
+
+  - `object_sha256` / `related_object_sha256` with the `AttributeValue` type (MISP 3.0), and `value_sha256()` for the address
+  - events from MISP 3.0 that nest a relationship to a value no longer fail to load
+
+Changes
+~~~~~~~
+- Bump version. [Raphaël Vinot]
+- Cleanup. [Raphaël Vinot]
+- Remove python 3.10 from gha. [Raphaël Vinot]
+- Remove python 3.10 from gha. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- Remove openioc module, use misp-modules instead. [Raphaël Vinot]
+- Bump deps. [Raphaël Vinot]
+- [tests] Split test_search_stix into STIX 1 and STIX 2 tests. [Claude
+  Opus 5.5, iglocska]
+
+  - MISP 3.0 dropped the STIX 1 JSON export, so a 3.0 CI can skip the STIX 1
+    half while the STIX 2 checks keep running
+
+Fix
+~~~
+- [package] Fall back to "unknown" version if package metadata is not
+  found. [Pablo Schmeiser]
+
+  - Catch PackageNotFoundError when importing pymisp in an uninstalled/development environment
+- [tools] Validation of mac-eui-64, mac-address and SHA256 ssh-
+  fingerprint values. [Andrei Bacescu]
+
+  mac-eui-64 values were truncated to 6 octets and checked with a wrong
+  regex, so they never validated; mac-address values longer than 6 octets
+  were truncated and accepted; SHA256 ssh-fingerprints in the unpadded
+  form printed by OpenSSH were rejected. Whitespace in SHA256 fingerprints
+  is ignored, as in MISP. The tests now require validate() to return True
+  instead of any truthy value.
+- [DataURLObject] keep commas in the data of non-base64 data URLs.
+  [Mehmet Emin Mağnısalıoğlu]
+
+  Per RFC 2397 only the first comma separates the header from the data.
+- [tests] Sightings statistics test no longer expects eventids. [Claude
+  Opus 5.5, iglocska]
+
+  - MISP 3.0 drops the eventids field (it held no event ids since 2021); the test only checks for toplist, which both 2.5 and 3.0 return
+- Wait for the publish worker in test_search_publish_timestamp. [Claude
+  Opus 5 (1M context), elhoim]
+
+  The test asserts that a search for publish_timestamp='5s' returns exactly
+  one event immediately after creating it. Since 2.5.40 MISP sets the publish
+  timestamp in a background worker rather than during add_event, so this only
+  passed because the three invalid-query searches in between happened to take
+  longer than the worker's tick.
+
+  That makes the test sensitive to unrelated server-side performance. It fails
+  reproducibly against a MISP branch that removes a bcrypt verification from
+  every authenticated REST request: the same 85-test suite drops from 190-217s
+  to 146s, the three queries return before the worker has published, and the
+  search correctly matches nothing - "AssertionError: 0 != 1".
+
+  Wait for publication instead of relying on incidental latency:
+
+    - add _wait_until_published(), which polls until the event reports
+      published with a non-zero publish_timestamp, and fails with a clear
+      message on timeout rather than letting a later assertion fail obscurely.
+      It accepts publish_timestamp as either the int 0 add_event returns or the
+      datetime pythonify produces once the worker has run.
+    - wait for the first event before creating the second, so the two publish
+      timestamps are genuinely separated. The previous sleep separated only the
+      creation times, which is not what the interval assertion compares.
+    - wait for the second event before the 5-second window assertion.
+    - drop the fixed 10s sleep that preceded the re-fetch. It slowed the suite
+      down and still raised AttributeError on int.timestamp() whenever the
+      worker was slower than the guess.
+    - assert the two publish timestamps are more than 5s apart, so a violation
+      reports the real gap instead of an opaque count mismatch.
+
+  The test is now driven by the worker's actual progress, so it neither races a
+  faster server nor pays a fixed delay on a slower one.
+
+Other
+~~~~~
+- Build(deps): bump github/codeql-action from 4.38.0 to 4.39.1.
+  [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 4.38.0 to 4.39.1.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v4.38.0...v4.39.1)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-version: 4.39.1
+    dependency-type: direct:production
+    update-type: version-update:semver-minor
+  ...
+- Add: [tests] DataURLObject comma and base64 cases. [Mehmet Emin
+  Mağnısalıoğlu]
+- Build(deps): bump github/codeql-action from 4.37.9 to 4.38.0.
+  [dependabot[bot]]
+
+  Bumps [github/codeql-action](https://github.com/github/codeql-action) from 4.37.9 to 4.38.0.
+  - [Release notes](https://github.com/github/codeql-action/releases)
+  - [Changelog](https://github.com/github/codeql-action/blob/main/CHANGELOG.md)
+  - [Commits](https://github.com/github/codeql-action/compare/v4.37.9...v4.38.0)
+
+  ---
+  updated-dependencies:
+  - dependency-name: github/codeql-action
+    dependency-version: 4.38.0
+    dependency-type: direct:production
+    update-type: version-update:semver-minor
+  ...
+
+
 v2.5.34.4 (2026-09-17)
 ----------------------
 
 Changes
 ~~~~~~~
+- Bump changelog. [Raphaël Vinot]
 - Bump deps, version. [Raphaël Vinot]
 
 Fix
