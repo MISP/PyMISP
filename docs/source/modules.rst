@@ -194,3 +194,11 @@ MISPWarninglist
     :members:
     :inherited-members:
 
+MISPWarninglistEntry
+--------------------
+
+.. autoclass:: MISPWarninglistEntry
+    :members:
+    :inherited-members:
+
+

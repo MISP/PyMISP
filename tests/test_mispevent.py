@@ -10,7 +10,7 @@ import hashlib
 from datetime import date, datetime, timezone
 
 from pymisp import (MISPAttribute, MISPEvent, MISPGalaxy, MISPObject, MISPOrganisation,
-                    MISPSighting, MISPTag)
+                    MISPSighting, MISPTag, MISPWarninglist, MISPWarninglistEntry)
 from pymisp.exceptions import InvalidMISPObject
 from pymisp.tools import GitVulnFinderObject
 
@@ -481,6 +481,84 @@ class TestMISPEvent(unittest.TestCase):
             author = vuln['author']
             vuln_finder = GitVulnFinderObject(vuln)
             self.assertEqual(vuln_finder.get_attributes_by_relation('author')[0].value, author)
+
+    def test_warninglist(self) -> None:
+        # Test basic instantiation and properties
+        wl = MISPWarninglist()
+        self.assertIn('NotInitialized', repr(wl))
+        wl.name = 'Custom Internal Subnets'
+        wl.type = 'cidr'
+        wl.description = 'Warninglist for internal RFC1918 ranges'
+        wl.category = 'false_positive'
+        wl.matching_attributes = ['ip-src', 'ip-dst']
+
+        self.assertIn('Custom Internal Subnets', repr(wl))
+
+        # Test adding entries
+        entry1 = wl.add_entry('10.0.0.0/8')
+        self.assertIsInstance(entry1, MISPWarninglistEntry)
+        self.assertEqual(entry1.value, '10.0.0.0/8')
+        self.assertIn('10.0.0.0/8', repr(entry1))
+
+        # Add multiple entries
+        wl.add_entries(['192.168.0.0/16', '172.16.0.0/12'])
+        self.assertEqual(len(wl.entries), 3)
+        self.assertEqual(len(wl.WarninglistEntry), 3)
+
+        # Test deduplication
+        wl.add_entry('10.0.0.0/8')
+        self.assertEqual(len(wl.entries), 3)
+
+        # Test to_dict and to_json
+        d = wl.to_dict()
+        self.assertEqual(d['name'], 'Custom Internal Subnets')
+        self.assertEqual(d['type'], 'cidr')
+        self.assertEqual(d['entries'], ['10.0.0.0/8', '192.168.0.0/16', '172.16.0.0/12'])
+        self.assertEqual(len(d['WarninglistEntry']), 3)
+
+        js = wl.to_json()
+        self.assertIn('10.0.0.0/8', js)
+
+        # Test loading from MISP view response format (nested Warninglist and WarninglistEntry)
+        misp_resp = {
+            'Warninglist': {
+                'id': '10',
+                'name': 'Public Resolvers',
+                'type': 'cidr',
+                'description': 'Public DNS servers',
+                'category': 'false_positive',
+                'matching_attributes': 'ip-src, ip-dst',
+                'enabled': True,
+                'WarninglistEntry': [
+                    {'id': '101', 'warninglist_id': '10', 'value': '8.8.8.8'},
+                    {'id': '102', 'warninglist_id': '10', 'value': '1.1.1.1'}
+                ]
+            }
+        }
+        loaded_wl = MISPWarninglist()
+        loaded_wl.from_dict(**misp_resp)
+        self.assertEqual(loaded_wl.id, '10')
+        self.assertEqual(loaded_wl.name, 'Public Resolvers')
+        self.assertEqual(loaded_wl.matching_attributes, ['ip-src', 'ip-dst'])
+        self.assertTrue(loaded_wl.enabled)
+        self.assertTrue('WarninglistEntry' in loaded_wl)
+        self.assertEqual(loaded_wl['name'], 'Public Resolvers')
+        self.assertEqual(len(loaded_wl.WarninglistEntry), 2)
+        self.assertEqual(loaded_wl.WarninglistEntry[0].value, '8.8.8.8')
+        self.assertEqual(loaded_wl.WarninglistEntry[0]['value'], '8.8.8.8')
+        self.assertEqual(loaded_wl.entries, ['8.8.8.8', '1.1.1.1'])
+
+        # Test loading from list.json format (with 'list' key)
+        file_format = {
+            'name': 'File List',
+            'type': 'string',
+            'description': 'Test list from file',
+            'list': ['val1', 'val2']
+        }
+        file_wl = MISPWarninglist(**file_format)
+        self.assertEqual(file_wl.name, 'File List')
+        self.assertEqual(file_wl.entries, ['val1', 'val2'])
+        self.assertEqual(len(file_wl.WarninglistEntry), 2)
 
 
 if __name__ == '__main__':
