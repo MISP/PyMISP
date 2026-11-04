@@ -11,7 +11,7 @@ class TestAttributeValidationTool(unittest.TestCase):
 
     def _should_be_valid(self, type_, *values):
         for value in values:
-            self.assertTrue(AttributeValidationTool.validate(type_, value))
+            self.assertIs(AttributeValidationTool.validate(type_, value), True)
 
     def _should_be_invalid(self, type_, *values):
         for value in values:
@@ -75,6 +75,8 @@ class TestAttributeValidationTool(unittest.TestCase):
     def test_modify_before_validation_mac(self):
         self.assertEqual('aa:bb:cc:dd:ee:ff', AttributeValidationTool.modifyBeforeValidation('mac-address', 'AA-BB-CC-DD-EE-FF'))
         self.assertEqual('aa:bb:cc:dd:ee:ff', AttributeValidationTool.modifyBeforeValidation('mac-address', 'aabbccddeeff'))
+        self.assertEqual('aa:bb:cc:dd:ee:ff:00:11', AttributeValidationTool.modifyBeforeValidation('mac-address', 'AA-BB-CC-DD-EE-FF-00-11'))
+        self.assertEqual('aa:bb:cc:ff:fe:dd:ee:11', AttributeValidationTool.modifyBeforeValidation('mac-eui-64', 'AA-BB-CC-FF-FE-DD-EE-11'))
 
     def test_modify_before_validation_phone(self):
         self.assertEqual('+123456', AttributeValidationTool.modifyBeforeValidation('phone-number', '00123456'))
@@ -99,8 +101,8 @@ class TestAttributeValidationTool(unittest.TestCase):
         self.assertEqual('aa6fc83f37787abea6be2c5126163fd3', AttributeValidationTool.modifyBeforeValidation('x509-fingerprint-md5', 'AA:6F:C8:3F:37:78:7A:BE:A6:BE:2C:51:26:16:3F:D3'))
 
     def test_validate_as(self):
-        self._should_be_valid('AS', '0', 0, 1, '1', 4294967295, '1.1')
-        self._should_be_invalid('AS', '1.2.3.4')
+        self._should_be_valid('AS', '0', 0, 1, '1', 4294967295)
+        self._should_be_invalid('AS', '1.1', '1.2.3.4')
 
     def test_validate_domain_ip(self):
         self._should_be_valid(
@@ -217,7 +219,7 @@ class TestAttributeValidationTool(unittest.TestCase):
         self._should_be_valid('ip-dst|port', '127.0.0.1|80', '::1|80')
         self._should_be_invalid('ip-dst|port', '127.0.0.1', '127.0.0.1|99999')
 
-        self._should_be_valid('onion-address', 'abcdefghijklmnop.onion', 'abcdefghijklmnopqrstuvwxyz234567abcdefghijklmnopqrstuvwxyz23.onion')
+        self._should_be_valid('onion-address', 'abcdefghijklmnop.onion', 'abcdefghijklmnopqrstuvwxyz234567abcdefghijklmnopqrstuvwx.onion')
         self._should_be_invalid('onion-address', 'invalid.onion', 'abc.onion')
 
         self._should_be_valid('mac-address', 'aa:bb:cc:dd:ee:ff')
@@ -252,6 +254,13 @@ class TestAttributeValidationTool(unittest.TestCase):
             '7b:e5:6f:a7:f4:f9:81:62:5c:e3:1f:bf:8b:57:6c:5a',
             'MD5:7b:e5:6f:a7:f4:f9:81:62:5c:e3:1f:bf:8b:57:6c:5a',
             'SHA256:mVPwvezndPv/ARoIadVY98vAC0g+P/5633yTC4d/wXE',
+            'SHA256:mVPwvezndPv/ARoIadVY98vAC0g+P/5633yTC4d/wXE=',
+            'SHA256:mVPwvezndPv/ARoIadVY98vAC0g+P/5633 yTC4d/wXE',
+        )
+        self._should_be_invalid(
+            'ssh-fingerprint',
+            'SHA256:mVPwvezndPv/ARoIadVY98vAC0g+P/5633yTC4d/wX',
+            'SHA256:mVPwvezndPv/ARoIadVY98vAC0g+P/5633yTC4d/wX!',
         )
 
     def test_validate_event(self):
