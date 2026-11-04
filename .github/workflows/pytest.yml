@@ -31,9 +31,11 @@ jobs:
       run: |
         sudo apt-get install -y build-essential python3-dev libfuzzy-dev
 
+    - name: Install poetry
+      run: pipx install poetry
+
     - name: Install Python dependencies
       run: |
-        python -m pip install --upgrade pip poetry pytest pytest-cov
         poetry install -E fileobjects -E virustotal -E docs -E pdfexport -E url -E email -E brotli -E neo4j -vvv --with dev
 
     - name: Test with nosetests
