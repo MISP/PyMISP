@@ -255,6 +255,25 @@ class MISPSharingGroup(AbstractMISP):
         return to_return
 
 
+class MISPSharingGroupBlueprint(AbstractMISP):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.name: str
+        # JSON encoded string, e.g. json.dumps({'AND': {'org_type': ['CSIRT'], 'org_nationality': ['Luxembourg']}})
+        self.rules: str
+
+    def from_dict(self, **kwargs: Any) -> None:
+        if 'SharingGroupBlueprint' in kwargs:
+            kwargs = kwargs['SharingGroupBlueprint']
+        super().from_dict(**kwargs)
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'name'):
+            return f'<{self.__class__.__name__}(name={self.name})>'
+        return f'<{self.__class__.__name__}(NotInitialized)>'
+
+
 class MISPShadowAttribute(AbstractMISP):
 
     def __init__(self) -> None:

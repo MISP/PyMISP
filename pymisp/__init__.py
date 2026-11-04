@@ -41,7 +41,9 @@ try:
     from .abstract import AbstractMISP, MISPEncode, pymisp_json_default, MISPTag, Distribution, ThreatLevel, Analysis # noqa
     from .mispevent import (MISPEvent, MISPAttribute, MISPObjectReference, MISPObjectAttribute, MISPObject, MISPUser, # noqa
                             MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPWarninglistEntry, MISPTaxonomy,
-                            MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed,
+                            MISPNoticelist, MISPObjectTemplate, MISPSharingGroup, MISPRole, MISPServer, MISPFeed, MISPSharingGroupBlueprint,
+                            MISPOrganisation, MISPSighting, MISPLog, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy,
+                            MISPNoticelist, MISPObjectTemplate, MISPSharingGroup,  MISPRole, MISPServer, MISPFeed,
                             MISPEventDelegation, MISPUserSetting, MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist,
                             MISPEventReport, MISPCorrelationExclusion, MISPDecayingModel, MISPGalaxy, MISPGalaxyCluster,
                             MISPGalaxyClusterElement, MISPGalaxyClusterRelation, MISPNote, MISPOpinion, MISPRelationship,
@@ -49,7 +51,6 @@ try:
     from .api import PyMISP, register_user  # noqa
     # NOTE: the direct imports to .tools are kept for backward compatibility but should be removed in the future
     from .tools import AbstractMISPObjectGenerator  # noqa
-    from .tools import openioc  # noqa
     from .tools import ext_lookups  # noqa
     from .tools import update_objects  # noqa
     from .tools import load_warninglists  # noqa
@@ -78,7 +79,7 @@ __all__ = ['PyMISP', 'register_user', 'AbstractMISP', 'MISPTag',
            'MISPEvent', 'MISPAttribute', 'MISPObjectReference', 'MISPObjectAttribute',
            'MISPObject', 'MISPUser', 'MISPOrganisation', 'MISPSighting', 'MISPLog',
            'MISPShadowAttribute', 'MISPWarninglist', 'MISPWarninglistEntry', 'MISPTaxonomy', 'MISPNoticelist',
-           'MISPObjectTemplate', 'MISPSharingGroup', 'MISPRole', 'MISPServer', 'MISPFeed',
+           'MISPObjectTemplate', 'MISPSharingGroup', 'MISPRole', 'MISPServer', 'MISPFeed','MISPSharingGroupBlueprint',
            'MISPEventDelegation', 'MISPUserSetting', 'MISPInbox', 'MISPEventBlocklist',
            'MISPOrganisationBlocklist', 'MISPEventReport', 'MISPCorrelationExclusion',
            'MISPDecayingModel', 'MISPGalaxy', 'MISPGalaxyCluster', 'MISPGalaxyClusterElement',

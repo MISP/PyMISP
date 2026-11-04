@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from datetime import date, datetime
-from deprecated import deprecated  # type: ignore
+from deprecated import deprecated
 from json import JSONEncoder
 from uuid import UUID
 from abc import ABCMeta

@@ -6,7 +6,6 @@ from .fileobject import FileObject  # noqa
 from .create_misp_object import make_binary_objects  # noqa
 from .abstractgenerator import AbstractMISPObjectGenerator  # noqa
 from .genericgenerator import GenericObjectGenerator  # noqa
-from .openioc import load_openioc, load_openioc_file  # noqa
 from .sbsignatureobject import SBSignatureObject  # noqa
 from .fail2banobject import Fail2BanObject  # noqa
 from .domainipobject import DomainIPObject  # noqa
@@ -50,9 +49,8 @@ except ImportError:
 
 __all__ = ['VTReportObject', 'Neo4j', 'FileObject', 'make_binary_objects',
            'AbstractMISPObjectGenerator', 'GenericObjectGenerator',
-           'load_openioc', 'load_openioc_file', 'SBSignatureObject',
-           'Fail2BanObject', 'DomainIPObject', 'ASNObject', 'GeolocationObject',
-           'GitVulnFinderObject', 'VehicleObject', 'CSVLoader',
+           'SBSignatureObject', 'Fail2BanObject', 'DomainIPObject', 'ASNObject',
+           'GitVulnFinderObject', 'VehicleObject', 'CSVLoader', 'GeolocationObject',
            'SSHAuthorizedKeysObject', 'feed_meta_generator', 'update_objects',
            'EMailObject', 'URLObject', 'PEObject', 'PESectionObject', 'ELFObject',
            'ELFSectionObject', 'MachOObject', 'MachOSectionObject',
