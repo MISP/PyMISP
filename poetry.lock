@@ -2505,6 +2505,19 @@ files = [
 ]
 
 [[package]]
+name = "types-deprecated"
+version = "1.3.1.20260928"
+description = "Typing stubs for Deprecated"
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+markers = "python_version < \"3.15\""
+files = [
+    {file = "types_deprecated-1.3.1.20260928-py3-none-any.whl", hash = "sha256:97d6816bbe822bb7b52c9a1ad035ed10ff916e7dfe8652c4c406f950d8f72694"},
+    {file = "types_deprecated-1.3.1.20260928.tar.gz", hash = "sha256:baa950d1a8125c015e4614eedc16fb5401a6d418075a81aea8330cc26b3d4ff6"},
+]
+
+[[package]]
 name = "types-flask"
 version = "1.1.6"
 description = "Typing stubs for Flask"
@@ -2861,4 +2874,4 @@ virustotal = ["validators", "validators"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.16"
-content-hash = "ed4a710c6c3519e7839f93ebc1c63e66b00996d2ddf04b03d650f4aec11cf2c9"
+content-hash = "ffe1268abfc389d16996ab79e8d86caf625b374039143722b170b0a4116bb303"
