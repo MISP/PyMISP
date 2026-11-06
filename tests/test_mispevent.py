@@ -15,7 +15,7 @@ from pymisp.tools import GitVulnFinderObject
 
 import json
 try:
-    import orjson
+    import orjson  # type: ignore[import-not-found]
     from orjson import dumps
     sort_keys = orjson.OPT_SORT_KEYS
     indent = orjson.OPT_INDENT_2
