@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-v3.0.0 (2026-11-04)
+v3.0.0 (2026-11-06)
 -------------------
 
 New
@@ -26,6 +26,18 @@ New
 
 Changes
 ~~~~~~~
+- Run pytest as module. [Raphaël Vinot]
+- Install pytest systemwide. [Raphaël Vinot]
+- Bump deps, try to fix GHA for python 3.15. [Raphaël Vinot]
+- One more try to run pytest. [Raphaël Vinot]
+- Cleaner install for poetry. [Raphaël Vinot]
+- Also add pytest-cov. [Raphaël Vinot]
+- Force install pytest. [Raphaël Vinot]
+- Make sure dev is installed in GHA. [Raphaël Vinot]
+- Add pytest in dev deps. [Raphaël Vinot]
+- Add GHA for python 3.15. [Raphaël Vinot]
+- Bump pre-commit. [Raphaël Vinot]
+- Bump changelog. [Raphaël Vinot]
 - Bump version. [Raphaël Vinot]
 - Cleanup. [Raphaël Vinot]
 - Remove python 3.10 from gha. [Raphaël Vinot]
@@ -41,6 +53,10 @@ Changes
 
 Fix
 ~~~
+- Make mypy happy. [Raphaël Vinot]
+- Left debug in last commit. [Raphaël Vinot]
+- Properly test with orjson. [Raphaël Vinot]
+- GHA for python 3.15. [Raphaël Vinot]
 - [package] Fall back to "unknown" version if package metadata is not
   found. [Pablo Schmeiser]
 
