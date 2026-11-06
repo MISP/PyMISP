@@ -29,7 +29,7 @@ jobs:
     - name: Install python 3.13+ specific dependencies
       if: ${{ matrix.python-version == '3.13' || matrix.python-version == '3.14' || matrix.python-version == '3.15'}}
       run: |
-        sudo apt-get install -y build-essential python3-dev libfuzzy-dev python3-pytest
+        sudo apt-get install -y build-essential python3-dev libfuzzy-dev
 
     - name: Install poetry
       run: pipx install poetry
@@ -40,13 +40,15 @@ jobs:
 
     - name: Test with nosetests
       run: |
+        poetry run install pytest mypy
+        poetry run whereis pytest
         poetry run pytest tests/test_*.py
         poetry run mypy .
 
     - name: Test with nosetests with orjson
       run: |
-        poetry run pip install orjson
-        poetry run pytest tests/test_*.py
+        poetry run python -m pip install orjson
+        poetry run python -m pytest tests/test_*.py
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v7
