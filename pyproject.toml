@@ -14,8 +14,8 @@ dynamic = [ "classifiers" ]
 dependencies = [
     "requests (>=2.34.2)",
     "python-dateutil (>=3.0.0)",
-    "deprecated (<3) ; python_version < \"3.12\"",
-    "deprecated (>=3) ; python_version >= \"3.12,<3.15\""
+    "deprecated (<3) ; python_version == \"3.11\"",
+    "deprecated (>=3) ; python_version >= \"3.12\""
 ]
 
 [project.urls]
@@ -33,7 +33,7 @@ fileobjects = [
 
 virustotal = [
     "validators (>=0.36.0) ; python_version == \"3.11\"",
-    "validators (>=0.36.0) ; python_version >= \"3.11,<3.15\""
+    "validators (>=0.36.0) ; python_version >= \"3.12\""
 ]
 
 docs = [
