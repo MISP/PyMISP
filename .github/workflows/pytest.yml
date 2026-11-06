@@ -29,7 +29,7 @@ jobs:
     - name: Install python 3.13+ specific dependencies
       if: ${{ matrix.python-version == '3.13' || matrix.python-version == '3.14' || matrix.python-version == '3.15'}}
       run: |
-        sudo apt-get install -y build-essential python3-dev libfuzzy-dev
+        sudo apt-get install -y build-essential python3-dev libfuzzy-dev python3-pytest
 
     - name: Install poetry
       run: pipx install poetry
