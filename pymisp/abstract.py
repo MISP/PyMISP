@@ -421,11 +421,7 @@ class MISPTag(AbstractMISP):
 # UUID, datetime, date and Enum is serialized by ORJSON by default
 def pymisp_json_default(obj: AbstractMISP | datetime | date | Enum | UUID) -> dict[str, Any] | str:
     if isinstance(obj, AbstractMISP):
-        try:
-            return obj.jsonable()
-        except InvalidMISPObject as e:
-            print(e)
-            raise TypeError from e
+        return obj.jsonable()
     elif isinstance(obj, (datetime, date)):
         return obj.isoformat()
     elif isinstance(obj, Enum):
