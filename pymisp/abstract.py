@@ -9,7 +9,8 @@ from json import JSONEncoder
 from uuid import UUID
 from abc import ABCMeta
 from enum import Enum
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 from collections.abc import MutableMapping
 from functools import lru_cache
 from pathlib import Path
@@ -22,7 +23,7 @@ except ImportError:
     from json import loads, dumps
     HAS_ORJSON = False
 
-from .exceptions import PyMISPInvalidFormat, PyMISPError
+from .exceptions import PyMISPInvalidFormat, PyMISPError, InvalidMISPObject
 
 logger = logging.getLogger('pymisp')
 
@@ -252,7 +253,10 @@ class AbstractMISP(MutableMapping, MISPFileCache, metaclass=ABCMeta):  # type: i
                 option |= orjson.OPT_INDENT_2
             # orjson dumps method returns bytes instead of bytes, to keep compatibility with json
             # we have to convert output to str
-            return dumps(self, default=pymisp_json_default, option=option).decode()
+            try:
+                return dumps(self, default=pymisp_json_default, option=option).decode()
+            except Exception as e:
+                raise InvalidMISPObject('OrJSON swallow the error') from e
 
         return dumps(self, default=pymisp_json_default, sort_keys=sort_keys, indent=indent)
 
@@ -417,7 +421,11 @@ class MISPTag(AbstractMISP):
 # UUID, datetime, date and Enum is serialized by ORJSON by default
 def pymisp_json_default(obj: AbstractMISP | datetime | date | Enum | UUID) -> dict[str, Any] | str:
     if isinstance(obj, AbstractMISP):
-        return obj.jsonable()
+        try:
+            return obj.jsonable()
+        except InvalidMISPObject as e:
+            print(e)
+            raise TypeError from e
     elif isinstance(obj, (datetime, date)):
         return obj.isoformat()
     elif isinstance(obj, Enum):
