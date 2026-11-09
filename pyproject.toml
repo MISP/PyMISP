@@ -48,7 +48,7 @@ pdfexport = [ "reportlab (>=5.1.0)" ]
 url = [ "pyfaup-rs (>=0.4,<0.5)" ]
 
 email = [
-    "extract_msg (>=0.57.0)",
+    "extract_msg (>=0.58.2)",
     "RTFDE (>=0.1.2.2) ; python_version <= \"3.10\"",
     "oletools (>=0.60.2)"
 ]
