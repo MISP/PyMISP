@@ -35,7 +35,7 @@ Example:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load a CSV file as MISP objects')
-    parser.add_argument("-n", "--object_name", type=str, required=True, help="Template name of the objects in the CSV.")
+    parser.add_argument("-n", "--object_name", nargs="+", type=str, required=True, help="One or more template names for the CSV objects.")
     parser.add_argument("-p", "--path", required=True, type=Path, help="Path to the CSV file.")
     parser.add_argument("-f", "--fieldnames", nargs='*', default=[], help="Fieldnames of the CSV, have to match the object-relation allowed in the template. If empty, the fieldnames of the CSV have to match the template.")
     parser.add_argument("-s", "--skip_fieldnames", action='store_true', help="Skip fieldnames in the CSV.")
@@ -54,11 +54,12 @@ if __name__ == '__main__':
         has_fieldnames = True
     else:
         has_fieldnames = args.skip_fieldnames
-    csv_loader = CSVLoader(template_name=args.object_name, csv_path=args.path,
-                           fieldnames=args.fieldnames, has_fieldnames=has_fieldnames,
-                           delimiter=args.delimiter, quotechar=args.quotechar)
-
-    objects = csv_loader.load()
+    objects = []
+    for template_name in args.object_name:
+        csv_loader = CSVLoader(template_name=template_name, csv_path=args.path,
+                               fieldnames=args.fieldnames, has_fieldnames=has_fieldnames,
+                               delimiter=args.delimiter, quotechar=args.quotechar)
+        objects.extend(csv_loader.load())
     if args.dump:
         for o in objects:
             print(o.to_json())
