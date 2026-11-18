@@ -1992,8 +1992,12 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(organisation.name, 'Test Org')
         # Update org
         organisation.name = 'blah'
-        organisation = self.admin_misp_connector.update_organisation(organisation, pythonify=True)
-        self.assertEqual(organisation.name, 'blah', organisation)
+        try:
+            organisation = self.admin_misp_connector.update_organisation(organisation, pythonify=True)
+            self.assertEqual(organisation.name, 'blah', organisation)
+        finally:
+            organisation.name = 'Test Org'
+            self.admin_misp_connector.update_organisation(organisation, pythonify=True)
 
     def test_org_search(self) -> None:
         orgs = self.admin_misp_connector.organisations(pythonify=True)
