@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import unittest
 from pymisp import (MISPAttribute, MISPEvent, MISPEventReport, MISPNote,
-                    MISPObject, MISPOpinion)
+                    MISPObject, MISPOpinion, MISPRelationship, value_sha256)
+from pymisp.exceptions import NewAnalystDataError, NewRelationshipError
 from uuid import uuid4
 
 
@@ -69,6 +70,85 @@ class TestAnalystData(unittest.TestCase):
         misp_object = MISPObject('file')
         misp_object.add_attribute('filename', 'foo.exe')
         self._attach_analyst_data(misp_object.attributes[0])
+
+    def test_value_sha256(self) -> None:
+        self.assertEqual(value_sha256('tftp://213.21.117.191/.i'),
+                         '3cbad7bc936718f07fa8665bc64ce46986142bea60f86fd0c05cd2a4a8ea2bc4')
+
+    def test_note_on_value(self) -> None:
+        address = value_sha256('evil.com')
+        note = MISPNote(note='Seen in campaign X', object_type='AttributeValue',
+                        object_sha256=f' {address.upper()} ')
+        self.assertEqual(note.object_sha256, address)
+        self.assertIsNone(note.object_uuid)
+        exported = note.to_dict()
+        self.assertEqual(exported['object_sha256'], address)
+        self.assertNotIn('object_uuid', exported)
+
+    def test_value_target_needs_a_valid_hash(self) -> None:
+        with self.assertRaises(NewAnalystDataError):
+            MISPNote(note='x', object_type='AttributeValue')
+        with self.assertRaises(NewAnalystDataError):
+            MISPNote(note='x', object_type='AttributeValue', object_sha256='not-a-hash')
+        with self.assertRaises(NewAnalystDataError):
+            MISPNote(note='x', object_type='Event', object_uuid=str(uuid4()),
+                     object_sha256=value_sha256('evil.com'))
+
+    def test_analyst_data_as_misp_3_returns_it(self) -> None:
+        address = value_sha256('evil.com')
+        on_value = MISPOpinion()
+        on_value.from_dict(Opinion={
+            'uuid': str(uuid4()), 'opinion': '70', 'comment': 'x', 'distribution': '3',
+            'object_type': 'AttributeValue', 'object_uuid': None, 'object_sha256': address,
+            'created': '2026-10-16 08:34:49', 'modified': '2026-10-16 08:34:49'})
+        self.assertEqual(on_value.object_sha256, address)
+        on_event = MISPNote()
+        event_uuid = str(uuid4())
+        on_event.from_dict(Note={
+            'uuid': str(uuid4()), 'note': 'x', 'distribution': '3', 'object_type': 'Event',
+            'object_uuid': event_uuid, 'object_sha256': None})
+        self.assertEqual(on_event.object_uuid, event_uuid)
+        self.assertNotIn('object_sha256', on_event.to_dict())
+
+    def test_relationship_to_value(self) -> None:
+        attribute = MISPAttribute()
+        attribute.from_dict(type='domain', value='evil.com')
+        address = value_sha256(attribute.value)
+        relationship = attribute.add_relationship('AttributeValue', None, 'related-to',
+                                                  related_object_sha256=address)
+        self.assertEqual(relationship.object_uuid, attribute.uuid)
+        self.assertEqual(relationship.related_object_sha256, address)
+        self.assertIsNone(relationship.related_object_uuid)
+        with self.assertRaises(NewRelationshipError):
+            attribute.add_relationship('AttributeValue', None, 'related-to')
+        with self.assertRaises(NewRelationshipError):
+            attribute.add_relationship('Attribute', str(uuid4()), 'related-to',
+                                       related_object_sha256=address)
+
+    def test_relationship_from_value(self) -> None:
+        event_uuid = str(uuid4())
+        relationship = MISPRelationship(
+            object_type='AttributeValue', object_sha256=value_sha256('evil.com'),
+            related_object_type='Event', related_object_uuid=event_uuid,
+            relationship_type='seen-in')
+        self.assertIsNone(relationship.object_uuid)
+        self.assertEqual(relationship.related_object_uuid, event_uuid)
+
+    def test_event_nesting_a_relationship_to_value(self) -> None:
+        # MISP 3.0 nests an attribute's relationship to a value under the attribute
+        address = value_sha256('evil.com')
+        attribute_uuid = str(uuid4())
+        event = MISPEvent()
+        event.load({'Event': {'info': 'Test', 'Attribute': [{
+            'uuid': attribute_uuid, 'type': 'domain', 'value': 'evil.com',
+            'Relationship': [{
+                'uuid': str(uuid4()), 'distribution': '3', 'relationship_type': 'related-to',
+                'object_type': 'Attribute', 'object_uuid': attribute_uuid, 'object_sha256': None,
+                'related_object_type': 'AttributeValue', 'related_object_uuid': None,
+                'related_object_sha256': address}]}]}})
+        relationship = event.attributes[0].relationships[0]
+        self.assertEqual(relationship.related_object_sha256, address)
+        self.assertEqual(relationship.object_uuid, attribute_uuid)
 
     def _attach_analyst_data(
             self, container: MISPAttribute | MISPEvent | MISPEventReport | MISPObject) -> None:

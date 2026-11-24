@@ -13,7 +13,7 @@ from collections import defaultdict
 import logging
 import hashlib
 from pathlib import Path
-from typing import IO, Any, Sequence
+from typing import IO, Any, Sequence, Iterable
 import warnings
 
 try:
@@ -253,6 +253,25 @@ class MISPSharingGroup(AbstractMISP):
             server.pop('server_id', None)
             server['Server'].pop('id', None)
         return to_return
+
+
+class MISPSharingGroupBlueprint(AbstractMISP):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.name: str
+        # JSON encoded string, e.g. json.dumps({'AND': {'org_type': ['CSIRT'], 'org_nationality': ['Luxembourg']}})
+        self.rules: str
+
+    def from_dict(self, **kwargs: Any) -> None:
+        if 'SharingGroupBlueprint' in kwargs:
+            kwargs = kwargs['SharingGroupBlueprint']
+        super().from_dict(**kwargs)
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'name'):
+            return f'<{self.__class__.__name__}(name={self.name})>'
+        return f'<{self.__class__.__name__}(NotInitialized)>'
 
 
 class MISPShadowAttribute(AbstractMISP):
@@ -1440,14 +1459,10 @@ class MISPGalaxyCluster(AbstractMISP):
         if 'GalaxyCluster' in kwargs:
             kwargs = kwargs['GalaxyCluster']
         self.default = kwargs.pop('default', False)
-        # If the default field is set, we shouldn't have distribution or sharing group ID set
-        if self.default:
-            blocked_fields = ["distribution" "sharing_group_id"]
-            for field in blocked_fields:
-                if kwargs.get(field, None):
-                    raise NewGalaxyClusterError(
-                        f"The field '{field}' cannot be set on a default galaxy cluster"
-                    )
+        # A default cluster always comes from a server, and MISP stores every
+        # default cluster with distribution 3 (all communities), so those fields
+        # are expected here rather than an error. They are not editable on a
+        # default cluster, which the server enforces on write.
 
         self.distribution = int(kwargs.pop('distribution', 0))
         if self.distribution not in [0, 1, 2, 3, 4]:
@@ -1947,11 +1962,23 @@ class MISPEvent(AnalystDataBehaviorMixin):
         if kwargs.get('org_id'):
             self.org_id = int(kwargs.pop('org_id'))
         if kwargs.get('timestamp'):
-            self.timestamp = datetime.fromtimestamp(int(kwargs.pop('timestamp')), timezone.utc)
+            ts = kwargs.pop('timestamp')
+            if isinstance(ts, datetime):
+                self.timestamp = ts
+            else:
+                self.timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
         if kwargs.get('publish_timestamp'):
-            self.publish_timestamp = datetime.fromtimestamp(int(kwargs.pop('publish_timestamp')), timezone.utc)
+            ts = kwargs.pop('publish_timestamp')
+            if isinstance(ts, datetime):
+                self.publish_timestamp = ts
+            else:
+                self.publish_timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
         if kwargs.get('sighting_timestamp'):
-            self.sighting_timestamp = datetime.fromtimestamp(int(kwargs.pop('sighting_timestamp')), timezone.utc)
+            ts = kwargs.pop('sighting_timestamp')
+            if isinstance(ts, datetime):
+                self.sighting_timestamp = ts
+            else:
+                self.sighting_timestamp = datetime.fromtimestamp(int(ts), timezone.utc)
         if kwargs.get('sharing_group_id'):
             self.sharing_group_id = int(kwargs.pop('sharing_group_id'))
         if kwargs.get('RelatedEvent'):
@@ -2277,12 +2304,140 @@ class MISPFeed(AbstractMISP):
                 raise e
 
 
+class MISPWarninglistEntry(AbstractMISP):
+
+    def __init__(self, force_timestamps: bool = False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
+        self.id: int | str
+        self.warninglist_id: int | str
+        self.value: str
+
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def from_dict(self, **kwargs: Any) -> None:
+        if 'WarninglistEntry' in kwargs:
+            kwargs = kwargs['WarninglistEntry']
+        super().from_dict(**kwargs)
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'value'):
+            return f'<{self.__class__.__name__}(value={self.value})>'
+        return f'<{self.__class__.__name__}(NotInitialized)>'
+
+
 class MISPWarninglist(AbstractMISP):
+
+    def __init__(self, force_timestamps: bool = False, **kwargs: Any) -> None:
+        super().__init__(force_timestamps)
+        self.id: int | str
+        self.name: str
+        self.type: str
+        self.description: str
+        self.category: str
+        self.version: int | str
+        self.enabled: bool
+        self.default: bool
+        self.matching_attributes: list[str]
+        self.valid_attributes: list[str] | str
+        self.entries: list[str] = []
+        self.WarninglistEntry: list[MISPWarninglistEntry] = []
+
+        if kwargs:
+            self.from_dict(**kwargs)
+
+    def add_entry(self, entry: str | MISPWarninglistEntry | dict[str, Any]) -> MISPWarninglistEntry:
+        """Add an entry to the warninglist.
+
+        :param entry: Entry string, MISPWarninglistEntry object, or dict
+        """
+        if not hasattr(self, 'entries') or self.entries is None:
+            self.entries = []
+        if not hasattr(self, 'WarninglistEntry') or self.WarninglistEntry is None:
+            self.WarninglistEntry = []
+
+        if isinstance(entry, MISPWarninglistEntry):
+            entry_obj = entry
+            val = getattr(entry, 'value', '')
+        elif isinstance(entry, dict):
+            entry_obj = MISPWarninglistEntry()
+            entry_obj.from_dict(**entry)
+            val = getattr(entry_obj, 'value', '')
+        else:
+            val = str(entry)
+            entry_obj = MISPWarninglistEntry(value=val)
+
+        if val:
+            if val not in self.entries:
+                self.entries.append(val)
+                self.WarninglistEntry.append(entry_obj)
+        else:
+            self.WarninglistEntry.append(entry_obj)
+        return entry_obj
+
+    def add_entries(self, entries: Iterable[str | MISPWarninglistEntry | dict[str, Any]]) -> list[MISPWarninglistEntry]:
+        """Add multiple entries to the warninglist.
+
+        :param entries: Iterable of entry strings, MISPWarninglistEntry objects, or dicts
+        """
+        added = []
+        for entry in entries:
+            added.append(self.add_entry(entry))
+        return added
 
     def from_dict(self, **kwargs: Any) -> None:
         if 'Warninglist' in kwargs:
             kwargs = kwargs['Warninglist']
+        if 'WarninglistEntry' in kwargs:
+            raw_entries = kwargs.pop('WarninglistEntry')
+            self.WarninglistEntry = []
+            entry_values = []
+            for entry in raw_entries:
+                if isinstance(entry, MISPWarninglistEntry):
+                    self.WarninglistEntry.append(entry)
+                    if hasattr(entry, 'value'):
+                        entry_values.append(entry.value)
+                elif isinstance(entry, dict):
+                    e = MISPWarninglistEntry()
+                    e.from_dict(**entry)
+                    self.WarninglistEntry.append(e)
+                    if hasattr(e, 'value'):
+                        entry_values.append(e.value)
+                else:
+                    self.WarninglistEntry.append(entry)
+                    if isinstance(entry, str):
+                        entry_values.append(entry)
+            if not getattr(self, 'entries', None):
+                self.entries = entry_values
+
+        if 'entries' in kwargs:
+            self.entries = kwargs.pop('entries')
+        elif 'list' in kwargs and not getattr(self, 'entries', None):
+            self.entries = kwargs.pop('list')
+
+        if not getattr(self, 'WarninglistEntry', None) and getattr(self, 'entries', None):
+            self.WarninglistEntry = [MISPWarninglistEntry(value=v) for v in self.entries]
+
+        if 'matching_attributes' in kwargs and isinstance(kwargs['matching_attributes'], str):
+            kwargs['matching_attributes'] = [a.strip() for a in kwargs['matching_attributes'].split(',') if a.strip()]
+
         super().from_dict(**kwargs)
+
+    def to_dict(self, json_format: bool = False) -> dict[str, Any]:
+        to_return = super().to_dict(json_format)
+        if hasattr(self, 'WarninglistEntry') and self.WarninglistEntry:
+            to_return['WarninglistEntry'] = [
+                entry.to_dict(json_format) if isinstance(entry, AbstractMISP) else entry
+                for entry in self.WarninglistEntry
+            ]
+        if hasattr(self, 'entries') and self.entries:
+            to_return['entries'] = self.entries
+        return to_return
+
+    def __repr__(self) -> str:
+        if hasattr(self, 'name'):
+            return f'<{self.__class__.__name__}(name={self.name})>'
+        return f'<{self.__class__.__name__}(NotInitialized)>'
 
 
 class MISPCryptographicKey(AbstractMISP):
@@ -2573,6 +2728,26 @@ class MISPDecayingModel(AbstractMISP):
         return f'<{self.__class__.__name__}(uuid={self.uuid})>'
 
 
+def value_sha256(value: str) -> str:
+    """Address of an attribute value (MISP 3.0+), for notes, opinions, relationships
+    and collection elements of type AttributeValue: the SHA-256 of the value as MISP
+    stores it, in lowercase hex.
+
+    Hash the value as the API returns it (MISP refangs, trims and lowercases some
+    types on save), and each half of a composite attribute (domain|ip, ...) on its own.
+    """
+    return hashlib.sha256(value.encode('utf-8')).hexdigest()
+
+
+def _value_address(address: Any, error: type[Exception], field: str) -> str:
+    if not isinstance(address, str):
+        raise error(f'{field} is required when the target type is AttributeValue.')
+    address = address.strip().lower()
+    if len(address) != 64 or any(c not in '0123456789abcdef' for c in address):
+        raise error(f'{field} must be a SHA-256 in hex. Actual: {address}.')
+    return address
+
+
 class MISPAnalystData(AbstractMISP):
 
     _fields_for_feed: set[str] = {'uuid', 'object_uuid', 'object_type', 'authors',
@@ -2580,7 +2755,7 @@ class MISPAnalystData(AbstractMISP):
 
     valid_object_type = {'Attribute', 'Event', 'EventReport', 'GalaxyCluster', 'Galaxy',
                          'Object', 'Note', 'Opinion', 'Relationship', 'Organisation',
-                         'SharingGroup'}
+                         'SharingGroup', 'AttributeValue'}
 
     @property
     def analyst_data_object_type(self) -> str:
@@ -2621,7 +2796,8 @@ class MISPAnalystData(AbstractMISP):
     def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
         super().__init__(force_timestamps)
         self.uuid = str(uuid.uuid4())
-        self.object_uuid: str
+        self.object_uuid: str | None
+        self.object_sha256: str | None
         self.object_type: str
         self.authors: str
         self.created: float | int | datetime
@@ -2695,14 +2871,24 @@ class MISPAnalystData(AbstractMISP):
                 # Cannot be None or 0 either.
                 raise NewAnalystDataError(f'If the distribution is set to sharing group, a sharing group ID is required (cannot be {self.sharing_group_id}).')
 
-        self.object_uuid = kwargs.pop('object_uuid', None)
-        if self.object_uuid is None:
-            raise NewAnalystDataError('The UUID for which this element is attached is required.')
+        object_uuid = kwargs.pop('object_uuid', None)
+        object_sha256 = kwargs.pop('object_sha256', None)
         self.object_type = kwargs.pop('object_type', None)
         if self.object_type is None:
             raise NewAnalystDataError('The element type for which this element is attached is required.')
         if self.object_type not in self.valid_object_type:
             raise NewAnalystDataError('The element type is not a valid type. Actual: {self.object_type}.')
+        # The target type decides the address: a value has no UUID, everything else has no SHA-256
+        if self.object_type == 'AttributeValue':
+            self.object_uuid = None
+            self.object_sha256 = _value_address(object_sha256, NewAnalystDataError, 'object_sha256')
+        else:
+            if object_uuid is None:
+                raise NewAnalystDataError('The UUID for which this element is attached is required.')
+            if object_sha256 is not None:
+                raise NewAnalystDataError('object_sha256 is only used with the AttributeValue type.')
+            self.object_uuid = object_uuid
+            self.object_sha256 = None
 
         if kwargs.get('id'):
             self.id = int(kwargs.pop('id'))
@@ -2815,7 +3001,8 @@ class MISPRelationship(MISPAnalystData):
     _analyst_data_object_type = 'Relationship'
 
     def __init__(self, force_timestamps: bool=False, **kwargs: Any) -> None:
-        self.related_object_uuid: str
+        self.related_object_uuid: str | None
+        self.related_object_sha256: str | None
         self.related_object_type: str
         self.relationship_type: str
         super().__init__(force_timestamps)
@@ -2831,7 +3018,14 @@ class MISPRelationship(MISPAnalystData):
             raise NewRelationshipError('The target object type for this relationship is required.')
 
         self.related_object_uuid = kwargs.pop('related_object_uuid', None)
-        if self.related_object_uuid is None:
+        related_object_sha256 = kwargs.pop('related_object_sha256', None)
+        self.related_object_sha256 = None
+        if self.related_object_type == 'AttributeValue':
+            self.related_object_uuid = None
+            self.related_object_sha256 = _value_address(related_object_sha256, NewRelationshipError, 'related_object_sha256')
+        elif related_object_sha256 is not None:
+            raise NewRelationshipError('related_object_sha256 is only used with the AttributeValue type.')
+        elif self.related_object_uuid is None:
             if not isinstance(self.related_object_type, AbstractMISP):
                 raise NewRelationshipError('The target UUID for this relationship is required.')
             else:

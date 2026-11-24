@@ -29,7 +29,7 @@ from .exceptions import MISPServerError, PyMISPUnexpectedResponse, PyMISPError, 
 from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObject, \
     MISPUser, MISPOrganisation, MISPShadowAttribute, MISPWarninglist, MISPTaxonomy, \
     MISPGalaxy, MISPNoticelist, MISPObjectReference, MISPObjectTemplate, MISPSharingGroup, \
-    MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
+    MISPSharingGroupBlueprint, MISPRole, MISPServer, MISPFeed, MISPEventDelegation, MISPCommunity, MISPUserSetting, \
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
     MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel, \
     MISPNote, MISPOpinion, MISPRelationship, MISPAnalystData
@@ -83,6 +83,9 @@ def get_uuid_or_id_from_abstract_misp(obj: AbstractMISP | int | str | UUID | dic
         return obj['id']
     if isinstance(obj, MISPEventDelegation):
         # An EventDelegation doesn't have a uuid, we *need* to use the ID
+        return obj['id']
+    if isinstance(obj, MISPSharingGroupBlueprint):
+        # The SharingGroupBlueprint endpoints only accept the ID, not the uuid
         return obj['id']
 
     # For the blocklists, we want to return a specific key.
@@ -414,6 +417,7 @@ class PyMISP:
     def get_event(self, event: MISPEvent | int | str | UUID,
                   deleted: bool | int | list[int] = False,
                   extended: bool | int = False,
+                  no_sightings: bool | int = False,
                   pythonify: bool = False) -> dict[str, Any] | MISPEvent:
         """Get an event from a MISP instance. Includes collections like
         Attribute, EventReport, Feed, Galaxy, Object, Tag, etc. so the
@@ -422,6 +426,7 @@ class PyMISP:
         :param event: event to get
         :param deleted: whether to include soft-deleted attributes
         :param extended: whether to get extended events
+        :param no_sightings: set to skip sightings on attributes (they're included by default)
         :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
         """
         event_id = get_uuid_or_id_from_abstract_misp(event)
@@ -430,10 +435,13 @@ class PyMISP:
             data['deleted'] = deleted
         if extended:
             data['extended'] = extended
+        kw_params = {}
+        if no_sightings:
+            kw_params['noSightings'] = 1
         if data:
-            r = self._prepare_request('POST', f'events/view/{event_id}', data=data)
+            r = self._prepare_request('POST', f'events/view/{event_id}', data=data, kw_params=kw_params)
         else:
-            r = self._prepare_request('GET', f'events/view/{event_id}')
+            r = self._prepare_request('GET', f'events/view/{event_id}', kw_params=kw_params)
         event_r = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in event_r:
             return event_r
@@ -691,9 +699,12 @@ class PyMISP:
         :param analyst_data: analyst_data to add
         :param pythonify: Returns a PyMISP Object instead of the plain json output
         """
-        object_uuid = analyst_data.object_uuid
         object_type = analyst_data.object_type
-        r = self._prepare_request('POST', f'analyst_data/add/{analyst_data.analyst_data_object_type}/{object_uuid}/{object_type}', data=analyst_data)
+        if object_type == 'AttributeValue':
+            object_address = analyst_data.object_sha256
+        else:
+            object_address = analyst_data.object_uuid
+        r = self._prepare_request('POST', f'analyst_data/add/{analyst_data.analyst_data_object_type}/{object_address}/{object_type}', data=analyst_data)
         new_analyst_data = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in new_analyst_data:
             return new_analyst_data
@@ -1061,17 +1072,17 @@ class PyMISP:
             if 'errors' in new_attribute:
                 to_return['errors'] = new_attribute['errors']
 
-            if len(attribute) == 1:
-                # input list size 1 yields dict, not list of size 1
-                if 'Attribute' in new_attribute:
+            if 'Attribute' in new_attribute:
+                if len(attribute) == 1:
+                    # input list size 1 yields dict, not list of size 1
                     a = MISPAttribute()
                     a.from_dict(**new_attribute['Attribute'])
                     to_return['attributes'].append(a)
-            else:
-                for new_attr in new_attribute['Attribute']:
-                    a = MISPAttribute()
-                    a.from_dict(**new_attr)
-                    to_return['attributes'].append(a)
+                else:
+                    for new_attr in new_attribute['Attribute']:
+                        a = MISPAttribute()
+                        a.from_dict(**new_attr)
+                        to_return['attributes'].append(a)
             return to_return
 
         if ('errors' in new_attribute and new_attribute['errors'][0] == 403
@@ -1933,7 +1944,7 @@ class PyMISP:
         # Set the UUID and version it extends from the existing galaxy cluster
         forked_galaxy_cluster.extends_uuid = forked_galaxy_cluster.pop('uuid')
         forked_galaxy_cluster.extends_version = forked_galaxy_cluster.pop('version')
-        r = self._prepare_request('POST', f'galaxy_clusters/add/{galaxy_id}/forkUUID:{cluster_id}', data=galaxy_cluster)
+        r = self._prepare_request('POST', f'galaxy_clusters/add/{galaxy_id}/forkUUID:{cluster_id}', data=forked_galaxy_cluster)
         cluster_j = self._check_json_response(r)
         if not (self.global_pythonify or pythonify) or 'errors' in cluster_j:
             return cluster_j
@@ -2132,12 +2143,17 @@ class PyMISP:
         :param feed: feed to fetch
         """
         feed_id = get_uuid_or_id_from_abstract_misp(feed)
-        response = self._prepare_request('GET', f'feeds/fetchFromFeed/{feed_id}')
+        response = self._prepare_request('POST', f'feeds/fetchFromFeed/{feed_id}')
+        return self._check_json_response(response)
+
+    def fetch_all_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
+        """ Fetch all the feeds: https://www.misp-project.org/openapi/#tag/Feeds/operation/fetchFromAllFeeds"""
+        response = self._prepare_request('GET', 'feeds/fetchFromAllFeeds')
         return self._check_json_response(response)
 
     def cache_all_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
         """ Cache all the feeds: https://www.misp-project.org/openapi/#tag/Feeds/operation/cacheFeeds"""
-        response = self._prepare_request('GET', 'feeds/cacheFeeds/all')
+        response = self._prepare_request('POST', 'feeds/cacheFeeds/all')
         return self._check_json_response(response)
 
     def cache_feed(self, feed: MISPFeed | int | str | UUID) -> dict[str, Any] | list[dict[str, Any]]:
@@ -2146,17 +2162,17 @@ class PyMISP:
         :param feed: feed to cache
         """
         feed_id = get_uuid_or_id_from_abstract_misp(feed)
-        response = self._prepare_request('GET', f'feeds/cacheFeeds/{feed_id}')
+        response = self._prepare_request('POST', f'feeds/cacheFeeds/{feed_id}')
         return self._check_json_response(response)
 
     def cache_freetext_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Cache all the freetext feeds"""
-        response = self._prepare_request('GET', 'feeds/cacheFeeds/freetext')
+        response = self._prepare_request('POST', 'feeds/cacheFeeds/freetext')
         return self._check_json_response(response)
 
     def cache_misp_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
         """Cache all the MISP feeds"""
-        response = self._prepare_request('GET', 'feeds/cacheFeeds/misp')
+        response = self._prepare_request('POST', 'feeds/cacheFeeds/misp')
         return self._check_json_response(response)
 
     def compare_feeds(self) -> dict[str, Any] | list[dict[str, Any]]:
@@ -2271,7 +2287,7 @@ class PyMISP:
             url = f'servers/pull/{server_id}/{event_id}'
         else:
             url = f'servers/pull/{server_id}'
-        response = self._prepare_request('GET', url)
+        response = self._prepare_request('POST', url)
         # FIXME: can we pythonify?
         return self._check_json_response(response)
 
@@ -2287,7 +2303,7 @@ class PyMISP:
             url = f'servers/push/{server_id}/{event_id}'
         else:
             url = f'servers/push/{server_id}'
-        response = self._prepare_request('GET', url)
+        response = self._prepare_request('POST', url)
         # FIXME: can we pythonify?
         return self._check_json_response(response)
 
@@ -2442,6 +2458,119 @@ class PyMISP:
         return self._check_json_response(response)
 
     # ## END Sharing groups ###
+
+    # ## BEGIN Sharing group blueprints ###
+
+    def sharing_group_blueprints(self, pythonify: bool = False) -> dict[str, Any] | list[MISPSharingGroupBlueprint] | list[dict[str, Any]]:
+        """Get the existing sharing group blueprints
+
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output. Warning: it might use a lot of RAM
+        """
+        r = self._prepare_request('GET', 'sharingGroupBlueprints/index')
+        sharing_group_blueprints = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or isinstance(sharing_group_blueprints, dict):
+            return sharing_group_blueprints
+        to_return = []
+        for sharing_group_blueprint in sharing_group_blueprints:
+            s = MISPSharingGroupBlueprint()
+            s.from_dict(**sharing_group_blueprint)
+            to_return.append(s)
+        return to_return
+
+    def get_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str, pythonify: bool = False) -> dict[str, Any] | MISPSharingGroupBlueprint:
+        """Get a sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to find
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        r = self._prepare_request('GET', f'sharingGroupBlueprints/view/{sharing_group_blueprint_id}')
+        sharing_group_blueprint_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in sharing_group_blueprint_j:
+            return sharing_group_blueprint_j
+        s = MISPSharingGroupBlueprint()
+        s.from_dict(**sharing_group_blueprint_j)
+        return s
+
+    def add_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint, pythonify: bool = False) -> dict[str, Any] | MISPSharingGroupBlueprint:
+        """Add a new sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to add, its rules are a JSON encoded string
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        r = self._prepare_request('POST', 'sharingGroupBlueprints/add', data=sharing_group_blueprint)
+        sharing_group_blueprint_j = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in sharing_group_blueprint_j:
+            return sharing_group_blueprint_j
+        s = MISPSharingGroupBlueprint()
+        s.from_dict(**sharing_group_blueprint_j)
+        return s
+
+    def update_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | dict[str, Any], sharing_group_blueprint_id: int | None = None, pythonify: bool = False) -> dict[str, Any] | MISPSharingGroupBlueprint:
+        """Update a sharing group blueprint, MISP only updates the name and the rules
+
+        :param sharing_group_blueprint: MISP Sharing Group Blueprint
+        :param sharing_group_blueprint_id: Sharing group blueprint ID
+        :param pythonify: Returns a PyMISP Object instead of the plain json output
+        """
+        if sharing_group_blueprint_id is None:
+            sid = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        else:
+            sid = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint_id)
+        r = self._prepare_request('POST', f'sharingGroupBlueprints/edit/{sid}', data=sharing_group_blueprint)
+        updated_sharing_group_blueprint = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or 'errors' in updated_sharing_group_blueprint:
+            return updated_sharing_group_blueprint
+        s = MISPSharingGroupBlueprint()
+        s.from_dict(**updated_sharing_group_blueprint)
+        return s
+
+    def delete_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str) -> dict[str, Any] | list[dict[str, Any]]:
+        """Delete a sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to delete
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        response = self._prepare_request('POST', f'sharingGroupBlueprints/delete/{sharing_group_blueprint_id}')
+        return self._check_json_response(response)
+
+    def execute_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str) -> dict[str, Any] | list[dict[str, Any]]:
+        """Create or update the sharing group generated from a sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to execute
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        response = self._prepare_request('POST', f'sharingGroupBlueprints/execute/{sharing_group_blueprint_id}')
+        return self._check_json_response(response)
+
+    def detach_sharing_group_blueprint(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str) -> dict[str, Any] | list[dict[str, Any]]:
+        """Detach the sharing group generated from a sharing group blueprint, the next execution creates a new one
+
+        :param sharing_group_blueprint: sharing group blueprint to detach
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        response = self._prepare_request('POST', f'sharingGroupBlueprints/detach/{sharing_group_blueprint_id}')
+        return self._check_json_response(response)
+
+    def sharing_group_blueprint_organisations(self, sharing_group_blueprint: MISPSharingGroupBlueprint | int | str, pythonify: bool = False) -> dict[str, Any] | list[MISPOrganisation] | list[dict[str, Any]]:
+        """Get the organisations matching the rules of a sharing group blueprint
+
+        :param sharing_group_blueprint: sharing group blueprint to evaluate
+        :param pythonify: Returns a list of PyMISP Objects instead of the plain json output
+        """
+        sharing_group_blueprint_id = get_uuid_or_id_from_abstract_misp(sharing_group_blueprint)
+        r = self._prepare_request('GET', f'sharingGroupBlueprints/viewOrgs/{sharing_group_blueprint_id}')
+        organisations = self._check_json_response(r)
+        if not (self.global_pythonify or pythonify) or isinstance(organisations, dict):
+            return organisations
+        to_return = []
+        for organisation in organisations:
+            o = MISPOrganisation()
+            o.from_dict(**organisation)
+            to_return.append(o)
+        return to_return
+
+    # ## END Sharing group blueprints ###
 
     # ## BEGIN Organisation ###
 
@@ -2889,7 +3018,7 @@ class PyMISP:
                published: bool | None = None,
                enforce_warninglist: bool | None = None, enforceWarninglist: bool | None = None,
                to_ids: ToIDSType | list[ToIDSType] | None = None,
-               deleted: str | None = None,
+               deleted: bool | int | list[int] | None = None,
                include_event_uuid: bool | None = None, includeEventUuid: bool | None = None,
                include_event_tags: bool | None = None, includeEventTags: bool | None = None,
                event_timestamp: datetime | date | int | str | float | None | None = None,
@@ -2937,7 +3066,7 @@ class PyMISP:
         :param published: Set whether published or unpublished events should be returned. Do not set the parameter if you want both.
         :param enforce_warninglist: Remove any attributes from the result that would cause a hit on a warninglist entry.
         :param to_ids: By default all attributes are returned that match the other filter parameters, regardless of their to_ids setting. To restrict the returned data set to to_ids only attributes set this parameter to 1. 0 for the ones with to_ids set to False.
-        :param deleted: If this parameter is set to 1, it will only return soft-deleted attributes. ["0", "1"] will return the active ones as well as the soft-deleted ones.
+        :param deleted: If this parameter is set to 1, it will only return soft-deleted attributes. [0, 1] will return the active ones as well as the soft-deleted ones.
         :param include_event_uuid: Instead of just including the event ID, also include the event UUID in each of the attributes.
         :param include_event_tags: Include the event level tags in each of the attributes.
         :param event_timestamp: Only return attributes from events that have received a modification after the given timestamp.
@@ -3586,7 +3715,9 @@ class PyMISP:
         """
         to_post: str | bytes
         if path is not None:
-            if isinstance(path, (str, Path)):
+            if isinstance(path, (BytesIO, StringIO)):
+                to_post = path.getvalue()
+            elif isinstance(path, (str, Path)):
                 with open(path, 'rb') as f:
                     to_post = f.read()
             else:
@@ -3942,7 +4073,8 @@ class PyMISP:
         response = self._prepare_request('POST', 'tags/removeTagFromObject', data=to_post)
         return self._check_json_response(response)
 
-    def build_complex_query(self, or_parameters: list[SearchType] | None = None,
+    @staticmethod
+    def build_complex_query(or_parameters: list[SearchType] | None = None,
                             and_parameters: list[SearchType] | None = None,
                             not_parameters: list[SearchType] | None = None) -> dict[str, list[SearchType]]:
         '''Build a complex search query. MISP expects a dictionary with AND, OR and NOT keys.'''

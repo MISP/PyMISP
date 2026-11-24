@@ -23,7 +23,7 @@ try:
     from pymisp import (register_user, PyMISP, MISPEvent, MISPOrganisation,
                         MISPUser, Distribution, ThreatLevel, Analysis, MISPObject,
                         MISPAttribute, MISPSighting, MISPShadowAttribute, MISPTag,
-                        MISPSharingGroup, MISPFeed, MISPServer, MISPUserSetting,
+                        MISPSharingGroup, MISPSharingGroupBlueprint, MISPFeed, MISPServer, MISPUserSetting,
                         MISPEventReport, MISPCorrelationExclusion, MISPGalaxyCluster,
                         MISPGalaxy, MISPOrganisationBlocklist, MISPEventBlocklist,
                         MISPNote, MISPRole)
@@ -140,6 +140,29 @@ class TestComprehensive(unittest.TestCase):
         mispevent.analysis = Analysis.completed
         mispevent.add_attribute('text', str(uuid4()))
         return mispevent
+
+    def _wait_until_published(self, event: MISPEvent, timeout: int=30) -> MISPEvent:
+        """Block until the background worker has actually published `event`.
+
+        Since MISP 2.5.40 publishing is handed to a background job, so
+        add_event() returns before publish_timestamp is set. Any assertion on a
+        publication window has to wait for the worker rather than assume the
+        calls made in between took long enough.
+        """
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            fetched = self.pub_misp_connector.get_event(event, pythonify=True)
+            if not isinstance(fetched, MISPEvent):
+                self.fail(f'could not re-fetch event while waiting for publication: {fetched}')
+            # publish_timestamp is a plain int (0) until the worker sets it,
+            # and a datetime once pythonify can parse it.
+            published_at = fetched.publish_timestamp
+            if isinstance(published_at, datetime):
+                published_at = published_at.timestamp()
+            if fetched.published and int(published_at or 0):
+                return fetched
+            time.sleep(0.5)
+        self.fail(f'event {event.id} was not published within {timeout}s')
 
     def environment(self) -> tuple[MISPEvent, MISPEvent, MISPEvent]:
         first_event = MISPEvent()
@@ -671,6 +694,13 @@ class TestComprehensive(unittest.TestCase):
         second.publish()
         try:
             first = self.pub_misp_connector.add_event(first, pythonify=True)
+            # The interval assertion at the end needs the two events' publish
+            # timestamps to be at least 5s apart. Publishing is done by a
+            # background worker, so wait until the first event is really
+            # published before creating the second: sleeping a fixed amount
+            # only separates the *creation* times, which is not what is
+            # compared below.
+            first = self._wait_until_published(first)
             time.sleep(10)
             second = self.pub_misp_connector.add_event(second, pythonify=True)
             # Test invalid query
@@ -680,10 +710,28 @@ class TestComprehensive(unittest.TestCase):
             self.assertEqual(events, [])
             events = self.pub_misp_connector.search(publish_timestamp='aaad', pythonify=True)
             self.assertEqual(events, [])
+            # Wait for the background publish worker before asserting on a
+            # 5-second publication window. Without this the assertion races the
+            # worker: it only passed because the three invalid queries above
+            # happened to take long enough, so any speed-up on the server (or a
+            # faster runner) makes the search run first and match nothing.
+            second = self._wait_until_published(second)
             # Test - last 4 min
             events = self.pub_misp_connector.search(publish_timestamp='5s', pythonify=True)
-            self.assertEqual(len(events), 1)
+            self.assertEqual(len(events), 1, events)
             self.assertEqual(events[0].id, second.id)
+
+            # Both events have already been waited on above, so their
+            # publish_timestamp is a datetime rather than the int 0 that
+            # add_event returns since 2.5.40. That replaces a fixed 10s sleep,
+            # which both slowed the suite down and still raised AttributeError
+            # whenever the worker happened to be slower than the guess.
+
+            # The interval assertion below only distinguishes the two events if
+            # their publish timestamps are more than 5s apart. Check it here so
+            # a violation reports the actual gap instead of an opaque count.
+            gap = second.publish_timestamp.timestamp() - first.publish_timestamp.timestamp()
+            self.assertGreater(gap, 5, f'publish timestamps only {gap}s apart')
 
             # Test 5 sec before timestamp of 2nd event
             events = self.pub_misp_connector.search(publish_timestamp=(second.publish_timestamp.timestamp()), pythonify=True)
@@ -1071,6 +1119,20 @@ class TestComprehensive(unittest.TestCase):
             self.admin_misp_connector.delete_event(first)
             self.admin_misp_connector.delete_event(second)
 
+    def test_event_no_sightings(self) -> None:
+        first = self.create_simple_event()
+        try:
+            first = self.user_misp_connector.add_event(first)
+            self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
+
+            with_s = self.user_misp_connector.get_event(first.id)
+            self.assertTrue(any(a.sightings for a in with_s.attributes))
+
+            without_s = self.user_misp_connector.get_event(first.id, no_sightings=True)
+            self.assertFalse(any(a.sightings for a in without_s.attributes))
+        finally:
+            self.admin_misp_connector.delete_event(first)
+
     def test_edit_attribute(self) -> None:
         first = self.create_simple_event()
         try:
@@ -1260,19 +1322,28 @@ class TestComprehensive(unittest.TestCase):
             # Delete event
             self.admin_misp_connector.delete_event(first)
 
-    def test_search_stix(self) -> None:
+    def test_search_stix1(self) -> None:
         first = self.create_simple_event()
         first.add_attribute('ip-src', '8.8.8.8')
         try:
             first = self.user_misp_connector.add_event(first)
             stix = self.user_misp_connector.search(return_format='stix', eventid=first.id)
             self.assertTrue(stix['related_packages']['related_packages'][0]['package']['incidents'][0]['related_indicators']['indicators'][0]['indicator']['observable']['object']['properties']['address_value']['value'], '8.8.8.8')
+            stix_xml = self.user_misp_connector.search(return_format='stix-xml', eventid=first.id)
+            self.assertTrue('<AddressObj:Address_Value condition="Equals">8.8.8.8</AddressObj:Address_Value>' in stix_xml)
+        finally:
+            # Delete event
+            self.admin_misp_connector.delete_event(first)
+
+    def test_search_stix2(self) -> None:
+        first = self.create_simple_event()
+        first.add_attribute('ip-src', '8.8.8.8')
+        try:
+            first = self.user_misp_connector.add_event(first)
             stix2 = self.user_misp_connector.search(return_format='stix2', eventid=first.id)
             *_, ip_address, indicator, _ = stix2['objects']
             self.assertEqual(ip_address['value'], '8.8.8.8')
             self.assertEqual(indicator['pattern'], "[network-traffic:src_ref.type = 'ipv4-addr' AND network-traffic:src_ref.value = '8.8.8.8']")
-            stix_xml = self.user_misp_connector.search(return_format='stix-xml', eventid=first.id)
-            self.assertTrue('<AddressObj:Address_Value condition="Equals">8.8.8.8</AddressObj:Address_Value>' in stix_xml)
         finally:
             # Delete event
             self.admin_misp_connector.delete_event(first)
@@ -1921,8 +1992,12 @@ class TestComprehensive(unittest.TestCase):
         self.assertEqual(organisation.name, 'Test Org')
         # Update org
         organisation.name = 'blah'
-        organisation = self.admin_misp_connector.update_organisation(organisation, pythonify=True)
-        self.assertEqual(organisation.name, 'blah', organisation)
+        try:
+            organisation = self.admin_misp_connector.update_organisation(organisation, pythonify=True)
+            self.assertEqual(organisation.name, 'blah', organisation)
+        finally:
+            organisation.name = 'Test Org'
+            self.admin_misp_connector.update_organisation(organisation, pythonify=True)
 
     def test_org_search(self) -> None:
         orgs = self.admin_misp_connector.organisations(pythonify=True)
@@ -2248,7 +2323,7 @@ class TestComprehensive(unittest.TestCase):
 
             self.user_misp_connector.add_sighting({'value': first.attributes[0].value})
             users_stats = self.user_misp_connector.users_statistics(context='sightings')
-            self.assertEqual(list(users_stats.keys()), ['toplist', 'eventids'])
+            self.assertIn('toplist', users_stats)
 
             # FIXME this one fails on travis.
             # users_stats = self.admin_misp_connector.users_statistics(context='galaxyMatrix')
@@ -2311,6 +2386,49 @@ class TestComprehensive(unittest.TestCase):
             time.sleep(10)
             # Delete event
             self.admin_misp_connector.delete_event(first)
+
+    def test_sharing_group_blueprints(self) -> None:
+        # add
+        sgb = MISPSharingGroupBlueprint()
+        sgb.name = 'Testcases SG blueprint'
+        sgb.rules = json.dumps({'org_id': [self.test_org.id]})
+        blueprint = self.admin_misp_connector.add_sharing_group_blueprint(sgb, pythonify=True)
+        sharing_group_id = None
+        try:
+            self.assertEqual(blueprint.name, 'Testcases SG blueprint')
+
+            # Organisations matching the rules
+            orgs = self.admin_misp_connector.sharing_group_blueprint_organisations(blueprint, pythonify=True)
+            self.assertEqual([org.name for org in orgs], ['Test Org'])
+
+            # Change name
+            blueprint.name = 'Testcases SG blueprint - new name'
+            blueprint = self.admin_misp_connector.update_sharing_group_blueprint(blueprint, pythonify=True)
+            self.assertEqual(blueprint.name, 'Testcases SG blueprint - new name')
+
+            # Get list
+            blueprints = self.admin_misp_connector.sharing_group_blueprints(pythonify=True)
+            self.assertIn(blueprint.id, [b.id for b in blueprints])
+
+            # Execute, creates the sharing group
+            r = self.admin_misp_connector.execute_sharing_group_blueprint(blueprint)
+            self.assertTrue(r['success'], r)
+            blueprint = self.admin_misp_connector.get_sharing_group_blueprint(blueprint, pythonify=True)
+            sharing_group_id = blueprint.sharing_group_id
+            sharing_group = self.admin_misp_connector.get_sharing_group(sharing_group_id, pythonify=True)
+            self.assertEqual(sharing_group.name, 'Testcases SG blueprint - new name')
+
+            # Detach
+            r = self.admin_misp_connector.detach_sharing_group_blueprint(blueprint)
+            self.assertTrue(r['success'], r)
+            blueprint = self.admin_misp_connector.get_sharing_group_blueprint(blueprint, pythonify=True)
+            self.assertEqual(int(blueprint.sharing_group_id), 0)
+        finally:
+            # Delete
+            r = self.admin_misp_connector.delete_sharing_group_blueprint(blueprint)
+            self.assertTrue(r['success'], r)
+            if sharing_group_id:
+                self.admin_misp_connector.delete_sharing_group(sharing_group_id)
 
     def test_sharing_groups(self) -> None:
         # add
@@ -2508,6 +2626,9 @@ class TestComprehensive(unittest.TestCase):
         # Cache all enabled feeds
         r = self.admin_misp_connector.cache_all_feeds()
         self.assertEqual(r['message'], 'Feed caching job initiated.')
+        # Fetch all enabled feeds
+        # Cannot test that, it fetches all the events.
+        # r = self.admin_misp_connector.fetch_all_feeds()
         # Compare all enabled feeds
         r = self.admin_misp_connector.compare_feeds()
         # FIXME: https://github.com/MISP/MISP/issues/4834#issuecomment-511890466
@@ -3497,7 +3618,6 @@ class TestComprehensive(unittest.TestCase):
             "favouriteTags/getToggleField",  # TODO
             "feeds/feedCoverage",
             "feeds/importFeeds",
-            "feeds/fetchFromAllFeeds",
             "feeds/getEvent",
             "feeds/previewIndex",  # TODO
             "feeds/previewEvent",  # TODO

@@ -10,12 +10,21 @@ from pathlib import Path
 from typing import TypeVar
 from zipfile import ZipFile
 
-from pymisp.tools import EMailObject
 from pymisp.exceptions import InvalidMISPObject
+
+# EMailObject is only exported when the email extra is installed. Importing it
+# unguarded makes this module a collection error rather than a skip, which
+# fails the whole run for anyone who installed pymisp without extras.
+try:
+    from pymisp.tools import EMailObject
+    HAS_EMAIL_EXTRA = True
+except ImportError:
+    HAS_EMAIL_EXTRA = False
 
 T = TypeVar('T', bound='TestEmailObject')
 
 
+@unittest.skipUnless(HAS_EMAIL_EXTRA, "requires the email extra")
 class TestEmailObject(unittest.TestCase):
 
     eml_1: BytesIO

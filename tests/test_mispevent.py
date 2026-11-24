@@ -3,16 +3,28 @@
 from __future__ import annotations
 
 import unittest
-import json
 from io import BytesIO
 import glob
 import hashlib
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from pymisp import (MISPAttribute, MISPEvent, MISPGalaxy, MISPObject, MISPOrganisation,
-                    MISPSighting, MISPTag)
+                    MISPSighting, MISPTag, MISPWarninglist, MISPWarninglistEntry)
 from pymisp.exceptions import InvalidMISPObject
 from pymisp.tools import GitVulnFinderObject
+
+import json
+try:
+    import orjson  # type: ignore[import-not-found]
+    from orjson import dumps
+    sort_keys = orjson.OPT_SORT_KEYS
+    indent = orjson.OPT_INDENT_2
+    HAS_ORJSON = True
+except ImportError:
+    from json import dumps
+    sort_keys = True
+    indent = 2
+    HAS_ORJSON = False
 
 
 class TestMISPEvent(unittest.TestCase):
@@ -32,7 +44,10 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/simple.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_event(self) -> None:
         self.init_event()
@@ -40,14 +55,20 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/event.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_loadfile(self) -> None:
         self.mispevent.load_file('tests/mispevent_testfiles/event.json')
         with open('tests/mispevent_testfiles/event.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_loadfile_validate(self) -> None:
         misp_event = MISPEvent()
@@ -67,7 +88,10 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/event_tags.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_event_galaxy(self) -> None:
         self.init_event()
@@ -76,7 +100,10 @@ class TestMISPEvent(unittest.TestCase):
         misp_galaxy = MISPGalaxy()
         misp_galaxy.from_dict(**galaxy)
         self.mispevent.add_galaxy(misp_galaxy)
-        self.assertEqual(self.mispevent.galaxies[0].to_json(sort_keys=True, indent=2), json.dumps(galaxy, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.galaxies[0].to_json(sort_keys=sort_keys, indent=indent), dumps(galaxy, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.galaxies[0].to_json(sort_keys=sort_keys, indent=indent), dumps(galaxy, sort_keys=sort_keys, indent=indent))
 
     def test_attribute(self) -> None:
         self.init_event()
@@ -89,13 +116,19 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/attribute.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
         # Fake setting an attribute ID for testing
         self.mispevent.attributes[0].id = 42
         self.mispevent.delete_attribute('42')
         with open('tests/mispevent_testfiles/attribute_del.json') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_attribute_galaxy(self) -> None:
         self.init_event()
@@ -107,10 +140,16 @@ class TestMISPEvent(unittest.TestCase):
         attribute.from_dict(**{'type': 'github-username', 'value': 'adulau'})
         attribute.add_galaxy(misp_galaxy)
         self.mispevent.add_attribute(**attribute)
-        self.assertEqual(
-            self.mispevent.attributes[0].galaxies[0].to_json(sort_keys=True, indent=2),
-            json.dumps(galaxy, sort_keys=True, indent=2)
-        )
+        if HAS_ORJSON:
+            self.assertEqual(
+                self.mispevent.attributes[0].galaxies[0].to_json(sort_keys=sort_keys, indent=indent),
+                dumps(galaxy, option=sort_keys | indent).decode()
+            )
+        else:
+            self.assertEqual(
+                self.mispevent.attributes[0].galaxies[0].to_json(sort_keys=sort_keys, indent=indent),
+                dumps(galaxy, sort_keys=sort_keys, indent=indent)
+            )
 
     def test_to_dict_json_format(self) -> None:
         misp_event = MISPEvent()
@@ -143,7 +182,10 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/event_obj_attr_tag.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     @unittest.skip("Not supported on MISP: https://github.com/MISP/MISP/issues/2638 - https://github.com/MISP/PyMISP/issues/168")
     def test_object_level_tag(self) -> None:
@@ -153,7 +195,10 @@ class TestMISPEvent(unittest.TestCase):
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/event_obj_tag.json') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_object_galaxy(self) -> None:
         self.init_event()
@@ -166,10 +211,16 @@ class TestMISPEvent(unittest.TestCase):
         misp_galaxy = MISPGalaxy()
         misp_galaxy.from_dict(**galaxy)
         self.mispevent.objects[0].attributes[0].add_galaxy(misp_galaxy)
-        self.assertEqual(
-            self.mispevent.objects[0].attributes[0].galaxies[0].to_json(sort_keys=True, indent=2),
-            json.dumps(galaxy, sort_keys=True, indent=2)
-        )
+        if HAS_ORJSON:
+            self.assertEqual(
+                self.mispevent.objects[0].attributes[0].galaxies[0].to_json(sort_keys=sort_keys, indent=indent),
+                dumps(galaxy, option=sort_keys | indent).decode()
+            )
+        else:
+            self.assertEqual(
+                self.mispevent.objects[0].attributes[0].galaxies[0].to_json(sort_keys=sort_keys, indent=indent),
+                dumps(galaxy, sort_keys=sort_keys, indent=indent)
+            )
 
     def test_malware(self) -> None:
         with open('tests/mispevent_testfiles/simple.json', 'rb') as f:
@@ -182,7 +233,10 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/malware.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_existing_malware(self) -> None:
         self.mispevent.load_file('tests/mispevent_testfiles/malware_exist.json')
@@ -197,20 +251,29 @@ class TestMISPEvent(unittest.TestCase):
         sighting.from_dict(value='1', type='bar', timestamp=11111111)
         with open('tests/mispevent_testfiles/sighting.json') as f:
             ref_json = json.load(f)
-        self.assertEqual(sighting.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(sighting.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(sighting.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_existing_event(self) -> None:
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
         with open('tests/mispevent_testfiles/existing_event.json') as f:
             ref_json = json.load(f)
 
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_shadow_attributes_existing(self) -> None:
         self.mispevent.load_file('tests/mispevent_testfiles/shadow.json')
         with open('tests/mispevent_testfiles/shadow.json') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     @unittest.skip("Not supported on MISP.")
     def test_shadow_attributes(self) -> None:
@@ -223,7 +286,10 @@ class TestMISPEvent(unittest.TestCase):
         del p.uuid
         with open('tests/mispevent_testfiles/proposals.json') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_default_attributes(self) -> None:
         self.mispevent.add_object(name='file', strict=True)
@@ -240,7 +306,10 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/event_obj_def_param.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_obj_default_values(self) -> None:
         self.init_event()
@@ -257,7 +326,10 @@ class TestMISPEvent(unittest.TestCase):
         with open('tests/mispevent_testfiles/def_param.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_obj_references_export(self) -> None:
         self.init_event()
@@ -335,7 +407,10 @@ class TestMISPEvent(unittest.TestCase):
         self.assertTrue(self.mispevent.edited)
         with open('tests/mispevent_testfiles/existing_event_edited.json') as f:
             ref_json = json.load(f)
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_obj_by_id(self) -> None:
         self.mispevent.load_file('tests/mispevent_testfiles/existing_event.json')
@@ -350,15 +425,22 @@ class TestMISPEvent(unittest.TestCase):
                                   misp_objects_template_custom=template)
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on required
-            self.mispevent.to_json(sort_keys=True, indent=2)
-        self.assertEqual(e.exception.message, '{\'member3\'} are required.')
+            self.mispevent.to_json(sort_keys=sort_keys, indent=indent)
+        if HAS_ORJSON:
+            self.assertEqual(e.exception.message, 'OrJSON swallow the error')
+        else:
+            self.assertEqual(e.exception.message, '{\'member3\'} are required.')
 
         a: MISPAttribute = self.mispevent.objects[0].add_attribute('member3', value='foo')
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on requiredOneOf
-            self.mispevent.to_json(sort_keys=True, indent=2)
-        self.assertEqual(e.exception.message, 'At least one of the following attributes is required: member1, member2')
+            self.mispevent.to_json(sort_keys=sort_keys, indent=indent)
+
+        if HAS_ORJSON:
+            self.assertEqual(e.exception.message, 'OrJSON swallow the error')
+        else:
+            self.assertEqual(e.exception.message, 'At least one of the following attributes is required: member1, member2')
 
         a = self.mispevent.objects[0].add_attribute('member1', value='bar')
         del a.uuid
@@ -366,30 +448,42 @@ class TestMISPEvent(unittest.TestCase):
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # member1 is not a multiple
-            self.mispevent.to_json(sort_keys=True, indent=2)
-        self.assertEqual(e.exception.message, 'Multiple occurrences of member1 is not allowed')
+            self.mispevent.to_json(sort_keys=sort_keys, indent=indent)
+        if HAS_ORJSON:
+            self.assertEqual(e.exception.message, 'OrJSON swallow the error')
+        else:
+            self.assertEqual(e.exception.message, 'Multiple occurrences of member1 is not allowed')
 
         self.mispevent.objects[0].attributes = self.mispevent.objects[0].attributes[:2]
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/misp_custom_obj.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_userdefined_object_custom_dir(self) -> None:
         self.init_event()
         self.mispevent.add_object(name='test_object_template', strict=True, misp_objects_path_custom='tests/mispevent_testfiles')
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on required
-            self.mispevent.to_json(sort_keys=True, indent=2)
-        self.assertEqual(e.exception.message, '{\'member3\'} are required.')
+            self.mispevent.to_json(sort_keys=sort_keys, indent=indent)
+        if HAS_ORJSON:
+            self.assertEqual(e.exception.message, 'OrJSON swallow the error')
+        else:
+            self.assertEqual(e.exception.message, '{\'member3\'} are required.')
 
         a: MISPAttribute = self.mispevent.objects[0].add_attribute('member3', value='foo')
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # Fail on requiredOneOf
-            self.mispevent.to_json(sort_keys=True, indent=2)
-        self.assertEqual(e.exception.message, 'At least one of the following attributes is required: member1, member2')
+            self.mispevent.to_json(sort_keys=sort_keys, indent=indent)
+        if HAS_ORJSON:
+            self.assertEqual(e.exception.message, 'OrJSON swallow the error')
+        else:
+            self.assertEqual(e.exception.message, 'At least one of the following attributes is required: member1, member2')
 
         a = self.mispevent.objects[0].add_attribute('member1', value='bar')
         del a.uuid
@@ -397,15 +491,21 @@ class TestMISPEvent(unittest.TestCase):
         del a.uuid
         with self.assertRaises(InvalidMISPObject) as e:
             # member1 is not a multiple
-            self.mispevent.to_json(sort_keys=True, indent=2)
-        self.assertEqual(e.exception.message, 'Multiple occurrences of member1 is not allowed')
+            self.mispevent.to_json(sort_keys=sort_keys, indent=indent)
+        if HAS_ORJSON:
+            self.assertEqual(e.exception.message, 'OrJSON swallow the error')
+        else:
+            self.assertEqual(e.exception.message, 'Multiple occurrences of member1 is not allowed')
 
         self.mispevent.objects[0].attributes = self.mispevent.objects[0].attributes[:2]
         self.mispevent.objects[0].uuid = 'a'
         with open('tests/mispevent_testfiles/misp_custom_obj.json') as f:
             ref_json = json.load(f)
         del self.mispevent.uuid
-        self.assertEqual(self.mispevent.to_json(sort_keys=True, indent=2), json.dumps(ref_json, sort_keys=True, indent=2))
+        if HAS_ORJSON:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, option=sort_keys | indent).decode())
+        else:
+            self.assertEqual(self.mispevent.to_json(sort_keys=sort_keys, indent=indent), dumps(ref_json, sort_keys=sort_keys, indent=indent))
 
     def test_first_last_seen(self) -> None:
         me = MISPEvent()
@@ -421,6 +521,20 @@ class TestMISPEvent(unittest.TestCase):
         me.attributes[0].first_seen = today
         self.assertEqual(me.attributes[0].first_seen.year, today.year)
         self.assertEqual(me.attributes[0].last_seen, now)
+
+    def test_event_datetime_timestamps(self) -> None:
+        me = MISPEvent()
+        timestamps = {'timestamp': datetime(2021, 1, 1, 12, 30),
+                      'publish_timestamp': datetime(2021, 1, 2, 12, 30),
+                      'sighting_timestamp': datetime(2021, 1, 3, 12, 30)}
+        me.from_dict(info='test', **timestamps)
+        for field, value in timestamps.items():
+            self.assertEqual(getattr(me, field), value)
+        # The integer/string timestamps from a MISP server must still work
+        me2 = MISPEvent()
+        me2.from_dict(info='test', timestamp='1609459200', publish_timestamp=1609545600)
+        self.assertEqual(me2.timestamp, datetime(2021, 1, 1, tzinfo=timezone.utc))
+        self.assertEqual(me2.publish_timestamp, datetime(2021, 1, 2, tzinfo=timezone.utc))
 
     def test_feed(self) -> None:
         me = MISPEvent()
@@ -467,6 +581,84 @@ class TestMISPEvent(unittest.TestCase):
             author = vuln['author']
             vuln_finder = GitVulnFinderObject(vuln)
             self.assertEqual(vuln_finder.get_attributes_by_relation('author')[0].value, author)
+
+    def test_warninglist(self) -> None:
+        # Test basic instantiation and properties
+        wl = MISPWarninglist()
+        self.assertIn('NotInitialized', repr(wl))
+        wl.name = 'Custom Internal Subnets'
+        wl.type = 'cidr'
+        wl.description = 'Warninglist for internal RFC1918 ranges'
+        wl.category = 'false_positive'
+        wl.matching_attributes = ['ip-src', 'ip-dst']
+
+        self.assertIn('Custom Internal Subnets', repr(wl))
+
+        # Test adding entries
+        entry1 = wl.add_entry('10.0.0.0/8')
+        self.assertIsInstance(entry1, MISPWarninglistEntry)
+        self.assertEqual(entry1.value, '10.0.0.0/8')
+        self.assertIn('10.0.0.0/8', repr(entry1))
+
+        # Add multiple entries
+        wl.add_entries(['192.168.0.0/16', '172.16.0.0/12'])
+        self.assertEqual(len(wl.entries), 3)
+        self.assertEqual(len(wl.WarninglistEntry), 3)
+
+        # Test deduplication
+        wl.add_entry('10.0.0.0/8')
+        self.assertEqual(len(wl.entries), 3)
+
+        # Test to_dict and to_json
+        d = wl.to_dict()
+        self.assertEqual(d['name'], 'Custom Internal Subnets')
+        self.assertEqual(d['type'], 'cidr')
+        self.assertEqual(d['entries'], ['10.0.0.0/8', '192.168.0.0/16', '172.16.0.0/12'])
+        self.assertEqual(len(d['WarninglistEntry']), 3)
+
+        js = wl.to_json()
+        self.assertIn('10.0.0.0/8', js)
+
+        # Test loading from MISP view response format (nested Warninglist and WarninglistEntry)
+        misp_resp = {
+            'Warninglist': {
+                'id': '10',
+                'name': 'Public Resolvers',
+                'type': 'cidr',
+                'description': 'Public DNS servers',
+                'category': 'false_positive',
+                'matching_attributes': 'ip-src, ip-dst',
+                'enabled': True,
+                'WarninglistEntry': [
+                    {'id': '101', 'warninglist_id': '10', 'value': '8.8.8.8'},
+                    {'id': '102', 'warninglist_id': '10', 'value': '1.1.1.1'}
+                ]
+            }
+        }
+        loaded_wl = MISPWarninglist()
+        loaded_wl.from_dict(**misp_resp)
+        self.assertEqual(loaded_wl.id, '10')
+        self.assertEqual(loaded_wl.name, 'Public Resolvers')
+        self.assertEqual(loaded_wl.matching_attributes, ['ip-src', 'ip-dst'])
+        self.assertTrue(loaded_wl.enabled)
+        self.assertTrue('WarninglistEntry' in loaded_wl)
+        self.assertEqual(loaded_wl['name'], 'Public Resolvers')
+        self.assertEqual(len(loaded_wl.WarninglistEntry), 2)
+        self.assertEqual(loaded_wl.WarninglistEntry[0].value, '8.8.8.8')
+        self.assertEqual(loaded_wl.WarninglistEntry[0]['value'], '8.8.8.8')
+        self.assertEqual(loaded_wl.entries, ['8.8.8.8', '1.1.1.1'])
+
+        # Test loading from list.json format (with 'list' key)
+        file_format = {
+            'name': 'File List',
+            'type': 'string',
+            'description': 'Test list from file',
+            'list': ['val1', 'val2']
+        }
+        file_wl = MISPWarninglist(**file_format)
+        self.assertEqual(file_wl.name, 'File List')
+        self.assertEqual(file_wl.entries, ['val1', 'val2'])
+        self.assertEqual(len(file_wl.WarninglistEntry), 2)
 
 
 if __name__ == '__main__':
