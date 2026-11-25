@@ -2946,6 +2946,48 @@ class TestComprehensive(unittest.TestCase):
             except Exception:
                 pass
 
+    def test_upload_stix_import_options(self) -> None:
+        uploaded: list[MISPEvent] = []
+
+        def upload(**import_options: Any) -> MISPEvent:
+            r = self.user_misp_connector.upload_stix('tests/stix2.json', version='2', **import_options)
+            event = MISPEvent()
+            event.load(r.json())
+            uploaded.append(event)
+            return event
+
+        def remove(event: MISPEvent) -> None:
+            # Same bundle each time: the event and its blocklist entry must go before the next upload
+            self.admin_misp_connector.delete_event(event)
+            self.admin_misp_connector.delete_event_blocklist(event.uuid)
+            uploaded.remove(event)
+
+        def has_original_file(event: MISPEvent) -> bool:
+            return any(o.name == 'original-imported-file' for o in event.objects)
+
+        try:
+            # The instance default distribution is 1
+            event = upload(distribution=0)
+            self.assertEqual(event.distribution, 0)
+            self.assertTrue(has_original_file(event))
+            remove(event)
+
+            r = self.user_misp_connector.upload_stix('tests/stix2.json', version='2', distribution=7)
+            self.assertEqual(r.status_code, 400)
+
+            # Servers reading original_file (MISP/MISP#11320) reject an empty STIX document with a 400.
+            # Older ones fail its conversion instead, and always attach the original file.
+            if self.user_misp_connector.upload_stix(data=b'').status_code == 400:
+                event = upload(original_file=False)
+                self.assertFalse(has_original_file(event))
+                remove(event)
+        finally:
+            for event in list(uploaded):
+                try:
+                    remove(event)
+                except Exception:
+                    pass
+
     def test_toggle_global_pythonify(self) -> None:
         first = self.create_simple_event()
         second = self.create_simple_event()
