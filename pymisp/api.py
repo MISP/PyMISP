@@ -33,7 +33,7 @@ from .mispevent import MISPEvent, MISPAttribute, MISPSighting, MISPLog, MISPObje
     MISPInbox, MISPEventBlocklist, MISPOrganisationBlocklist, MISPEventReport, \
     MISPGalaxyCluster, MISPGalaxyClusterRelation, MISPCorrelationExclusion, MISPDecayingModel, \
     MISPNote, MISPOpinion, MISPRelationship, MISPAnalystData
-from .abstract import pymisp_json_default, MISPTag, AbstractMISP, describe_types
+from .abstract import pymisp_json_default, MISPTag, AbstractMISP, Distribution, describe_types
 
 
 if sys.platform == 'linux':
@@ -3706,12 +3706,30 @@ class PyMISP:
         return to_return
 
     def upload_stix(self, path: str | Path | BytesIO | StringIO | None = None,
-                    data: str | bytes | None = None, version: str = '2') -> requests.Response:
-        """Upload a STIX file to MISP.
+                    data: str | bytes | None = None, version: str = '2', *,
+                    publish: bool = False,
+                    distribution: Distribution | int | None = None,
+                    sharing_group_id: MISPSharingGroup | int | None = None,
+                    original_file: bool = True,
+                    force_contextual_data: bool = True,
+                    galaxies_as_tags: bool = False,
+                    cluster_distribution: Distribution | int | None = None,
+                    cluster_sharing_group_id: MISPSharingGroup | int | None = None,
+                    debug: bool = False) -> requests.Response:
+        """Import a STIX document as a MISP event.
 
-        :param path: Path to the STIX on the disk (can be a path-like object, or a pseudofile)
-        :param data: stix object
+        :param path: Path to the STIX document on the disk (can be a path-like object, or a pseudofile)
+        :param data: STIX document: a STIX 1 package or a STIX 2 bundle
         :param version: Can be 1 or 2
+        :param publish: Publish the event, if the user may publish
+        :param distribution: Distribution of the event, the instance default if None
+        :param sharing_group_id: Sharing group of the event, required when distribution is 4 (sharing group)
+        :param original_file: Attach the STIX document to the event. MISP 2.5 ignores False and always attaches it.
+        :param force_contextual_data: Convert contextual STIX objects as Galaxy Clusters, instead of letting the conversion library decide
+        :param galaxies_as_tags: Attach galaxies as tag names only, without creating custom Galaxy Clusters
+        :param cluster_distribution: Distribution of the Galaxy Clusters the import creates, the instance default if None
+        :param cluster_sharing_group_id: Sharing group of the created Galaxy Clusters, required when cluster_distribution is 4 (sharing group)
+        :param debug: Log all the conversion errors and warnings. Honoured for site admins only (MISP 2.5: for every user)
         """
         to_post: str | bytes
         if path is not None:
@@ -3729,12 +3747,34 @@ class PyMISP:
         if isinstance(to_post, str):
             # A str body would be JSON-encoded by _prepare_request
             to_post = to_post.encode('utf-8')
+
+        # Named params, not a JSON envelope: MISP 2.5 takes a whole envelope as the STIX document
+        # MISP's own defaults, always sent: the signature shows what the server gets
+        import_options: dict[str, int] = {
+            'publish': int(publish),
+            'original_file': int(original_file),
+            'force_contextual_data': int(force_contextual_data),
+            'galaxies_as_tags': int(galaxies_as_tags),
+            'debugging': int(debug),
+        }
+        # Unset, they fall back to the instance default distribution
+        for name, value in (('distribution', distribution), ('sharing_group_id', sharing_group_id),
+                            ('cluster_distribution', cluster_distribution),
+                            ('cluster_sharing_group_id', cluster_sharing_group_id)):
+            if isinstance(value, Distribution):
+                import_options[name] = value.value
+            elif isinstance(value, MISPSharingGroup):
+                # MISP takes the numeric id only, not the UUID
+                import_options[name] = int(value['id'])
+            elif value is not None:
+                import_options[name] = value
         if str(version) == '1':
             url = urljoin(self.root_url, 'events/upload_stix')
-            response = self._prepare_request('POST', url, data=to_post, output_type='xml', content_type='xml')
+            response = self._prepare_request('POST', url, data=to_post, kw_params=import_options,
+                                             output_type='xml', content_type='xml')
         else:
             url = urljoin(self.root_url, 'events/upload_stix/2')
-            response = self._prepare_request('POST', url, data=to_post)
+            response = self._prepare_request('POST', url, data=to_post, kw_params=import_options)
         return response
 
     def sign_blob(self, blob: str) -> str:
