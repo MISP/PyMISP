@@ -2985,8 +2985,8 @@ class TestComprehensive(unittest.TestCase):
             for event in list(uploaded):
                 try:
                     remove(event)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f'Cleanup of event {event.uuid} failed: {e}')
 
     def test_toggle_global_pythonify(self) -> None:
         first = self.create_simple_event()
