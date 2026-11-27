@@ -243,6 +243,8 @@ class AttributeValidationTool:
                             return value
                 return value
             case 'AS':
+                if not isinstance(value, str):
+                    return value
                 if value.upper().startswith('AS'):
                     value = value[2:] # remove 'AS'
                 if '.' in value: # maybe value is in asdot notation
