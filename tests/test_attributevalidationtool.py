@@ -22,6 +22,7 @@ class TestAttributeValidationTool(unittest.TestCase):
     def test_modify_before_validation_as(self):
         self.assertEqual('123', AttributeValidationTool.modifyBeforeValidation('AS', 'AS123'))
         self.assertEqual(65537, AttributeValidationTool.modifyBeforeValidation('AS', '1.1'))
+        self.assertEqual(13335, AttributeValidationTool.modifyBeforeValidation('AS', 13335))
 
     def test_modify_before_validation_boolean(self):
         self.assertEqual(True, AttributeValidationTool.modifyBeforeValidation('boolean', 'True'))
@@ -347,6 +348,10 @@ class TestAttributeValidationTool(unittest.TestCase):
         modified_dict = {'type': 'AS', 'value': 'AS123'}
         validated = validate_attribute(modified_dict)
         self.assertEqual(validated.value, '123')
+
+        # Test with an integer AS number
+        validated = validate_attribute({'type': 'AS', 'value': 13335})
+        self.assertEqual(validated.value, 13335)
 
     def test_validate_attributes(self):
         attributes = [
