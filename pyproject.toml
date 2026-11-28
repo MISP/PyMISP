@@ -40,7 +40,7 @@ docs = [
     "sphinx-autodoc-typehints (>=3.17.4) ; python_version >= \"3.13\"",
     "sphinx (>=9.2.0) ; python_version >= \"3.13\"",
     "docutils (<0.23) ; python_version >= \"3.13\"",
-    "myst-parser (>=5.1.0) ; python_version >= \"3.13\""
+    "myst-parser (>=5.2.0) ; python_version >= \"3.13\""
 ]
 
 pdfexport = [ "reportlab (>=5.1.0)" ]
